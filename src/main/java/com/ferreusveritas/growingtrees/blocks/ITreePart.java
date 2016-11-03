@@ -1,5 +1,7 @@
 package com.ferreusveritas.growingtrees.blocks;
 
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -15,10 +17,10 @@ public interface ITreePart {
      * @param y Y Position
      * @param z Z Position
      * @param dir The direction of the request(opposite the direction of the requester)
-     * @param fromBlock The block the request came from
-     * @param fromSub The subblock(using metadata) of the growing leaves
+     * @param leavesTree The tree data of the leaves the request came from
+     * @return Hydration level for block
      */
-	int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockGrowingLeaves fromBlock, int fromSub);
+	int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, GrowingTree leavesTree);
 	
 	/**
 	 * The signal that is passed from the root of the tree to the tip of a branch to create growth.
@@ -80,26 +82,15 @@ public interface ITreePart {
 	MapSignal analyse(World world, int x, int y, int z, ForgeDirection fromDir, MapSignal signal);
 	
 	/**
-	 * Get the appropriate growing leaves for the tree this block is used to build.
+	 * Get the appropriate growing tree this block is used to build.
 	 *  
      * @param blockAccess Readonly access to blocks
      * @param x X Position
      * @param y Y Position
      * @param z Z Position
-	 * @return GrowingLeaves block
+	 * @return GrowingTree
 	 */
-	BlockGrowingLeaves getGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z);
-	
-	/**
-	 * Get the appropriate growing leaves sub block number for the tree this block is used to build.
-	 *  
-     * @param blockAccess Readonly access to blocks
-     * @param x X Position
-     * @param y Y Position
-     * @param z Z Position
-	 * @return The subblock used by the GrowingLeaves block
-	 */
-	int getGrowingLeavesSub(IBlockAccess blockAccess, int x, int y, int z);
+	GrowingTree getTree(IBlockAccess blockAccess, int x, int y, int z);
 	
 	/**
 	 * A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch

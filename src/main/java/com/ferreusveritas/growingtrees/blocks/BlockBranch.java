@@ -2,13 +2,12 @@ package com.ferreusveritas.growingtrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.growingtrees.GrowingTrees;
+import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.growingtrees.inspectors.NodeNetVolume;
-import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.renderers.RendererBranch;
-import com.ferreusveritas.growingtrees.special.BottomListenerDropItems;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,7 +16,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -26,58 +24,28 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockBranch extends Block implements ITreePart {
 
-	public BlockGrowingLeaves growingLeaves;
-	public int growingLeavesSub;
-	public BlockAndMeta primitiveLog;
-	
-	/** How quickly the branch thickens on it's own without branch merges */
-	public float tapering;
-	/** The probability that the direction decider will choose up out of the other possible direction weights */
-	public int upProbability;
-	/** Thickness of the branch connected to a twig(radius == 1) */
-	public float secondaryThickness;
-	/** Number of blocks high we have to be before a branch is allowed to form */
-	public int lowestBranchHeight;
-	/** Number of times a grow signal retries before failing. Affects growing speed */
-	public int retries;
-	/** Ideal signal energy. Greatest possible height that branches can reach from the root node */
-	public float signalEnergy;
-	
-	/** Ideal growth rate */
-	public float growthRate;
-	
-	/** Ideal soil longevity */
-	public int soilLongevity;
+	private GrowingTree tree;
 	
 	public BlockBranch() {
 		super(Material.wood);//Trees are made of wood. Brilliant.
-		
-		//Some generic defaults that will be inherited by all tree branches
-		tapering = 0.3f;
-		upProbability = 2;
-		secondaryThickness = 2.0f;//This should probably always be 2
-		lowestBranchHeight = 3;//High enough to walk under
-		retries = 0;
-		signalEnergy = 16.0f;
-		growthRate = 1.0f;
-		soilLongevity = 8;
-		
-		//Setup functions here
         this.setTickRandomly(true);//We need this to facilitate decay when supporting neighbors are lacking
-        setPrimitiveLog(Blocks.log, 0);
 	}
 	
-	public void setPrimitiveLog(Block block, int meta){
-		primitiveLog = new BlockAndMeta(block, meta);
+	public void setTree(GrowingTree tree){
+		this.tree = tree;
+	}
+	
+	public GrowingTree getTree(){
+		return tree;
 	}
 
-	public BlockAndMeta getPrimitiveLog() {
-		return primitiveLog;
+	@Override
+	public GrowingTree getTree(IBlockAccess blockAccess, int x, int y, int z) {
+		return getTree();
 	}
 	
 	public boolean isSameWood(ITreePart treepart){
@@ -85,7 +53,7 @@ public class BlockBranch extends Block implements ITreePart {
 	}
 	
 	public boolean isSameWood(BlockBranch branch){
-		return branch != null && getPrimitiveLog().equals(branch.getPrimitiveLog());
+		return branch != null && getTree() == branch.getTree();
 	}
 	
 	@Override
@@ -116,19 +84,7 @@ public class BlockBranch extends Block implements ITreePart {
 			}
 		}
 		
-		return rot(world, x, y, z, neigh & 0x0F, radius, random);//Unreinforced branches are destroyed
-	}
-	
-	public boolean rot(World world, int x, int y, int z, int neighborCount, int radius, Random random){
-		if(radius <= 1){
-			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS){
-				if(getGrowingLeaves().growLeaves(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, getGrowingLeavesSub(), 0)){
-					return false;
-				}
-			}
-		} 
-		world.setBlockToAir(x, y, z);
-		return true;
+		return getTree().rot(world, x, y, z, neigh & 0x0F, radius, random);//Unreinforced branches are destroyed
 	}
 	
 	///////////////////////////////////////////
@@ -157,19 +113,19 @@ public class BlockBranch extends Block implements ITreePart {
 	@Override
 	public float getBlockHardness(World world, int x, int y, int z) {
 		int radius = getRadius(world, x, y, z);
-		return primitiveLog.getBlock().getBlockHardness(world, x, y, z) * (radius * radius) / 64.0f * 8.0f;
+		return getTree().getPrimitiveLog().getBlock().getBlockHardness(world, x, y, z) * (radius * radius) / 64.0f * 8.0f;
 	};
 
 	@Override
     public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
 		//return 300;
-		return primitiveLog.getBlock().getFlammability(world, x, y, z, face);
+		return getTree().getPrimitiveLog().getBlock().getFlammability(world, x, y, z, face);
     }
 	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
 		//return 4096;
-		return primitiveLog.getBlock().getFireSpreadSpeed(world, x, y, z, face);
+		return getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, x, y, z, face);
     }
 
 	///////////////////////////////////////////
@@ -190,7 +146,7 @@ public class BlockBranch extends Block implements ITreePart {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int metadata) {
-		return primitiveLog.getIcon((1 << side & RendererBranch.renderRingSides) != 0 ? 0 : 2);//0:Ring, 2:Bark
+		return getTree().getPrimitiveLog().getIcon((1 << side & RendererBranch.renderRingSides) != 0 ? 0 : 2);//0:Ring, 2:Bark
 	}
 
     @Override
@@ -201,13 +157,13 @@ public class BlockBranch extends Block implements ITreePart {
 	//Leaf texture for Saplings
 	@SideOnly(Side.CLIENT)
 	public IIcon getLeavesIcon() {
-		return getPrimitiveLeavesBlockRef().getIcon(0);
+		return getTree().getPrimitiveLeaves().getIcon(0);
 	}
 	
 	@Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess access, int x, int y, int z, int side) {
-		if(RendererBranch.renderFaceFlags == RendererBranch.faceAll){
+		if(RendererBranch.renderFaceFlags == RendererBranch.faceAll){//Behave like a regular block
 			return super.shouldSideBeRendered(access, x, y, z, side);
 		}
 		return (1 << side & RendererBranch.renderFaceFlags) != 0;
@@ -219,8 +175,8 @@ public class BlockBranch extends Block implements ITreePart {
 	}
 	
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockGrowingLeaves fromBlock, int fromSub) {
-		return getRadius(blockAccess, x, y, z) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub) ? 5 : 0;
+	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, GrowingTree leavesTree) {
+		return getTree().getBranchHydrationLevel(blockAccess, x, y, z, dir, this, leavesTree.getGrowingLeaves(), leavesTree.getGrowingLeavesSub());
 	}
 	
 	public boolean isSapling(IBlockAccess blockAccess, int x, int y, int z){
@@ -243,114 +199,20 @@ public class BlockBranch extends Block implements ITreePart {
 		radius = MathHelper.clamp_int(radius, 0, 8);
 		world.setBlockMetadataWithNotify(x, y, z, (radius - 1) & 7, 2);
 	}
-
-	public float getGrowthRate(){
-		return growthRate;
-	}
-	
-	public float getGrowthRate(World world, int x, int y, int z){
-		return getGrowthRate();
-	}
-	
-	//Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
-	public int getUpProbability(){
-		return upProbability;
-	}
-
-	//Probability reinforcer for current travel direction
-	public int getReinfTravel(){
-		return 1;
-	}
-
-	public int getLowestBranchHeight() {
-		return lowestBranchHeight;
-	}
-	
-	public int getLowestBranchHeight(World world, int x, int y, int z){
-		return getLowestBranchHeight();
-	}
 	
 	//Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, int x, int y, int z, BlockBranch from) {
 		return isSameWood(from) ? getRadius(blockAccess, x, y, z) + 2 : 0;
 	}
-
-	//Selects a new direction to turn to.
-	//This class uses a probability map to make the decision.  Override for different species.
-	public ForgeDirection selectNewDirection(World world, int x, int y, int z, GrowSignal signal) {
-		ForgeDirection originDir = signal.dir.getOpposite();
-
-		//prevent branches on the ground
-		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.originX, signal.originY, signal.originZ)){
-			return ForgeDirection.UP;
-		}
-		
-		int probMap[] = new int[6];//6 directions possible DUNSWE
-
-		//Probability taking direction into account
-		probMap[ForgeDirection.UP.ordinal()] = signal.dir != ForgeDirection.DOWN ? getUpProbability(): 0;//Favor up 
-		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
-		
-		//Create probability map for direction change
-		for(int i = 0; i < 6; i++){
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			if(!dir.equals(originDir)){
-				int dx = x + dir.offsetX;
-				int dy = y + dir.offsetY;
-				int dz = z + dir.offsetZ;
-				
-				//Check probability for surrounding blocks
-				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[i] += TreeHelper.getSafeTreePart(world, dx, dy, dz).probabilityForBlock(world, dx, dy, dz, this);
-			}
-		}
-		
-		//Do custom stuff for various species
-		probMap = customDirectionManipulation(world, x, y, z, getRadius(world, x, y, z), signal, probMap);
-		
-		//Select a direction from the probability map
-		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return ForgeDirection.getOrientation(choice != -1 ? choice : 1);//Default to up if things are screwy
-	}
-	
-	//Override for species dependent decisions
-	public int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
-		return probMap;
-	}
-	
-	//Select a random direction weighted from the probability map 
-	public static int selectRandomFromDistribution(Random random, int distMap[]){
-
-		int distSize = 0;
-		
-		for(int i = 0; i < distMap.length; i++){
-			distSize += distMap[i];
-		}
-
-		if(distSize <= 0){
-			return -1;
-		}
-		
-		int rnd = random.nextInt(distSize) + 1;
-		
-		for(int i = 0; i < 6; i++){
-			if(rnd > distMap[i]){
-				rnd -= distMap[i];
-			} else {
-				return i;
-			}
-		}
-
-		return 0;
-	}
 	
 	public GrowSignal growIntoAir(World world, int x, int y, int z, GrowSignal signal, int fromRadius){
-		if(getGrowingLeaves() != null){
+		BlockGrowingLeaves leaves = getTree().getGrowingLeaves();
+		if(leaves != null){
 			if(fromRadius == 1){//If we came from a twig then just make some leaves
-				signal.success = getGrowingLeaves().growLeaves(world, x, y, z, getGrowingLeavesSub(), 0);
+				signal.success = leaves.growLeaves(world, x, y, z, getTree().getGrowingLeavesSub(), 0);
 			} else {//Otherwise make a proper branch
-				return getGrowingLeaves().branchOut(world, x, y, z, signal);
+				return leaves.branchOut(world, x, y, z, signal);
 			}
 		}
 		return signal;
@@ -361,7 +223,7 @@ public class BlockBranch extends Block implements ITreePart {
 		
 		if(signal.step()){//This is always placed at the beginning of every growSignal function
 			ForgeDirection originDir = signal.dir.getOpposite();//Direction this signal originated from
-			ForgeDirection targetDir = selectNewDirection(world, x, y, z, signal);//This must be cached on stack for proper recursion
+			ForgeDirection targetDir = getTree().selectNewDirection(world, x, y, z, this, signal);//This must be cached on stack for proper recursion
 			signal.doTurn(targetDir);
 			
 			{
@@ -399,103 +261,13 @@ public class BlockBranch extends Block implements ITreePart {
 
 			//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			//But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp_float((float)Math.sqrt(areaAccum) + getTapering(), getRadius(world, x, y, z), 8);// WOW!
+			signal.radius = MathHelper.clamp_float((float)Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, x, y, z), 8);// WOW!
 			setRadius(world, x, y, z, (int)Math.floor(signal.radius));
 		}
 
 		return signal;
 	}
-	
 
-	//Used by seed to determine the proper dirt block to use.
-	public BlockRootyDirt getRootyDirtBlock(){
-		return GrowingTrees.blockRootyDirt;
-	}
-	
-	public float getTapering(){
-		return tapering;
-	}
-
-	public float getEnergy(){
-		return signalEnergy;
-	}
-	
-	public float getEnergy(World world, int x, int y, int z){
-		return getEnergy();
-	}
-	
-	public int getSoilLongevity(){
-		return soilLongevity;
-	}
-	
-	public int getSoilLongevity(World world, int x, int y, int z){
-		return (int)(biomeSuitability(world, x, y, z) * getSoilLongevity());
-	}
-	
-	//Biome suitability 0.0f for completely unsuited.. 1.0f for perfectly suited
-	public float biomeSuitability(World world, int x, int y, int z){
-        /*
-        BIOME CLIMATE DATA FOR REFERENCE: 
-        
-        BIOME				NAME				TEMP	PRECIP
-        ocean				Ocean				0.5		0.5
-        plains				Plains				0.8		0.4
-        desert				Desert				2.0		0.0
-        extremeHills		Extreme Hills		0.2		0.3
-        forest				Forest				0.7		0.8
-        taiga				Taiga				0.25	0.8
-        swampland			Swampland			0.8		0.9
-        river				River				0.5		0.5
-        hell				Hell				2.0		0.0
-        Sky					Sky					0.5		0.5
-        frozenOcean			FrozenOcean			0.0		0.5
-        frozenRiver			FrozenRiver			0.0		0.5
-        icePlains			Ice Plains			0.0		0.5
-        iceMountains		Ice Mountains		0.0		0.5
-        mushroomIsland		MushroomIsland		0.9		1.0
-        mushroomIslandShore	MushroomIslandShore	0.9		1.0
-        beach				Beach				0.8		0.4
-        desertHills			DesertHills			2.0		0.0
-        forestHills			ForestHills			0.7		0.8
-        taigaHills			TaigaHills			0.25	0.8
-        extremeHillsEdge	Extreme Hills Edge	0.2		0.3
-        jungle				Jungle				0.95	0.9
-        jungleHills			JungleHills			0.95	0.9
-        jungleEdge			JungleEdge			0.95	0.8
-        deepOcean			Deep Ocean			0.5		0.5
-        stoneBeach			Stone Beach			0.2		0.3
-        coldBeach			Cold Beach			0.05	0.3
-        birchForest			Birch Forest		0.6		0.6
-        birchForestHills	Birch Forest Hills	0.6		0.6
-        roofedForest		Roofed Forest		0.7		0.8
-        coldTaiga			Cold Taiga			-0.5	0.4
-        coldTaigaHills		Cold Taiga Hills	-0.5	0.4
-        megaTaiga			Mega Taiga			0.3		0.8
-        megaTaigaHills		Mega Taiga Hills	0.3		0.8
-        extremeHillsPlus	Extreme Hills+		0.2		0.3
-        savanna				Savanna				1.2		0.0
-        savannaPlateau		Savanna Plateau		1.0		0.0
-        mesa				Mesa				2.0		0.0
-        mesaPlateau_F		Mesa Plateau F		2.0		0.0
-        mesaPlateau			Mesa Plateau		2.0		0.0
-        */
-		
-        return 1.0f;
-	}
-	
-	public static boolean isOneOfBiomes(BiomeGenBase biomeToCheck, BiomeGenBase ... biomes){
-		for(BiomeGenBase biome: biomes){
-			if(biomeToCheck.biomeID == biome.biomeID){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static int isOneOfBiomes(BiomeGenBase biomeToCheck, int valueIfTrue, BiomeGenBase ... biomes){
-		return isOneOfBiomes(biomeToCheck, biomes) ? valueIfTrue : 0;
-	}
-	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
@@ -567,71 +339,7 @@ public class BlockBranch extends Block implements ITreePart {
 		int dz = z + side.offsetZ;
 		return TreeHelper.getSafeTreePart(blockAccess, dx, dy, dz).getRadiusForConnection(blockAccess, dx, dy, dz, this, radius);
 	}
-	
-	///////////////////////////////////////////
-	// LEAVES AND SEEDS
-	///////////////////////////////////////////
-	
-	public BlockBranch setGrowingLeavesAndSeeds(String name, BlockGrowingLeaves newGrowingLeaves, int sub, Seed seed){
-		growingLeaves = newGrowingLeaves;
-		growingLeavesSub = sub;
-		if(growingLeaves != null){
-			growingLeaves.setSpeciesName(sub, name).setSeed(seed, getGrowingLeavesSub());
-			growingLeaves.registerBottomSpecials(sub, new BottomListenerDropItems(new ItemStack(getSeed()), 1f/256f));
-		}
-		
-		return this;
-	}
 
-	@Override
-	public BlockGrowingLeaves getGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z) {
-		return getGrowingLeaves();
-	}
-
-	@Override
-	public int getGrowingLeavesSub(IBlockAccess blockAccess, int x, int y, int z) {
-		return getGrowingLeavesSub();
-	}
-	
-	public BlockGrowingLeaves getGrowingLeaves(){
-		return growingLeaves;
-	}
-	
-	public int getGrowingLeavesSub(){
-		return growingLeavesSub;
-	}
-	
-	public Seed getSeed(){
-		if(getGrowingLeaves() != null){
-			return getGrowingLeaves().getSeed(getGrowingLeavesSub());
-		}
-		return null;
-	}
-	
-	public BlockAndMeta getPrimitiveLeavesBlockRef(){
-		return getGrowingLeaves().getPrimitiveLeaves(getGrowingLeavesSub());
-	}
-	
-	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z){
-		return isCompatibleGrowingLeaves(blockAccess, blockAccess.getBlock(x, y, z), x, y, z);
-	}
-
-	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, Block block, int x, int y, int z){
-		return isCompatibleGrowingLeaves(block, BlockGrowingLeaves.getSubBlockNum(blockAccess, x, y, z));
-	}
-	
-	public boolean isCompatibleGrowingLeaves(Block leaves, int sub){
-		return leaves == getGrowingLeaves() && sub == getGrowingLeavesSub();
-	}
-	
-	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, int x, int y, int z){
-		return getPrimitiveLeavesBlockRef().matches(blockAccess, x, y, z);
-	}
-	
-	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, int x, int y, int z){
-		return isCompatibleGrowingLeaves(blockAccess, x, y, z) || isCompatibleVanillaLeaves(blockAccess, x, y, z);
-	}
-	
 	///////////////////////////////////////////
 	// NODE ANALYSIS
 	///////////////////////////////////////////
@@ -671,13 +379,13 @@ public class BlockBranch extends Block implements ITreePart {
 	public void destroyTreeFromNode(World world, int x, int y, int z){
 		MapSignal signal = analyse(world, x, y, z, ForgeDirection.UNKNOWN, new MapSignal());//Analyze entire tree network to find root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		analyse(world, x, y, z, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(this)));//Analyze only part of the tree beyond the break point and calculate it's volume
+		analyse(world, x, y, z, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(getTree())));//Analyze only part of the tree beyond the break point and calculate it's volume
 		dropWood(world, x, y, z, volumeSum.getVolume());//Drop an amount of wood calculated from the body of the tree network
 	}
 	
 	public void destroyEntireTree(World world, int x, int y, int z){
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		analyse(world, x, y, z, ForgeDirection.UNKNOWN, new MapSignal(volumeSum, new NodeDestroyer(this)));
+		analyse(world, x, y, z, ForgeDirection.UNKNOWN, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
 		dropWood(world, x, y, z, volumeSum.getVolume());//Drop an amount of wood calculated from the body of the tree network
 	}
 	
@@ -686,10 +394,12 @@ public class BlockBranch extends Block implements ITreePart {
 	///////////////////////////////////////////
 	
 	public void dropWood(World world, int x, int y, int z, int volume){
+		volume *= ConfigHandler.treeHarvestMultiplier;//For cheaters..  you know who you are.
 		int logs = volume / 4096;//A log contains 4096 voxels of wood material(16x16x16 pixels)
-		int sticks = (volume % 4096) / 512;//A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
-		dropBlockAsItem(world, x, y, z, primitiveLog.toItemStack(logs));//Drop vanilla logs or whatever
-		dropBlockAsItem(world, x, y, z, new ItemStack(Items.stick, sticks));//Give him the stick!
+		ItemStack stickItem = getTree().getStick().copy();
+		stickItem.stackSize = (volume % 4096) / 512;//A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
+		dropBlockAsItem(world, x, y, z, getTree().getPrimitiveLog().toItemStack(logs));//Drop vanilla logs or whatever
+		dropBlockAsItem(world, x, y, z, stickItem);//Give him the stick!
 	}
 	
 	@Override
@@ -706,8 +416,7 @@ public class BlockBranch extends Block implements ITreePart {
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
 		//Normally just sets the block to air but we've already done that.
-		//False prevents block harvest as we've already done that also.
-		return false;
+		return false;//False prevents block harvest as we've already done that also.
 	}
 
 	@Override
@@ -723,5 +432,5 @@ public class BlockBranch extends Block implements ITreePart {
 	public boolean isRootNode() {
 		return false;
 	}
-	
+
 }

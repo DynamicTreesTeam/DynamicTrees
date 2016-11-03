@@ -2,10 +2,13 @@ package com.ferreusveritas.growingtrees.blocks;
 
 import java.util.Random;
 
+import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
+import com.ferreusveritas.growingtrees.inspectors.NodeDisease;
 import com.ferreusveritas.growingtrees.inspectors.NodeFreezer;
 import com.ferreusveritas.growingtrees.inspectors.NodeTwinkle;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -46,22 +49,27 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
 		
 		if(branch != null){
-			float growthRate = branch.getGrowthRate(world, x, y + 1, z);
+			GrowingTree tree = branch.getTree();
+			float growthRate = tree.getGrowthRate(world, x, y + 1, z) * ConfigHandler.treeGrowthRateMultiplier;
 			do{
-				if(random.nextFloat() <= growthRate){
+				if(random.nextFloat() < growthRate){
 					int life = getSoilLife(world, x, y, z);
 					if(life > 0){
 						boolean success = false;
 
-						float energy = branch.getEnergy(world, x, y + 1, z);
-						for(int i = 0; !success && i < 1 + branch.retries; i++){//Some species have multiple growth retry attempts
+						float energy = tree.getEnergy(world, x, y + 1, z);
+						for(int i = 0; !success && i < 1 + tree.retries; i++){//Some species have multiple growth retry attempts
 							success = branch.growSignal(world, x, y + 1, z, new GrowSignal(branch, x, y, z, energy)).success;
 						}
 
-						int soilLongevity = branch.getSoilLongevity(world, x, y + 1, z) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+						int soilLongevity = tree.getSoilLongevity(world, x, y + 1, z) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
 						if(random.nextInt(soilLongevity) == 0){//1 in X(soilLongevity) chance to draw nutrients from soil
 							setSoilLife(world, x, y, z, life - 1);//decrement soil life
+						}
+					} else {
+						if(random.nextFloat() < ConfigHandler.diseaseChance){
+							branch.analyse(world, x, y, z, ForgeDirection.DOWN, new MapSignal(new NodeDisease(tree)));
 						}
 					}
 				}
@@ -192,7 +200,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 	
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockGrowingLeaves fromBlock, int fromSub) {
+	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, GrowingTree leavesTree) {
 		return 0;
 	}
 
@@ -244,16 +252,6 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 
 	@Override
-	public BlockGrowingLeaves getGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z) {
-		return null;
-	}
-
-	@Override
-	public int getGrowingLeavesSub(IBlockAccess blockAccess, int x, int y, int z) {
-		return 0;
-	}
-
-	@Override
     public int getMobilityFlag() {
         return 2;
     }
@@ -272,5 +270,12 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	@Override
 	public void registerBlockIcons(IIconRegister register) {
 		sideIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt");
-	}	
+	}
+
+	@Override
+	public GrowingTree getTree(IBlockAccess blockAccess, int x, int y, int z) {
+		//TODO: Get the tree sitting above this block... or null
+		return null;
+	}
+
 }

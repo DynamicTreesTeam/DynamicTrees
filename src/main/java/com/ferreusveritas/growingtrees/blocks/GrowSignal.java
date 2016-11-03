@@ -2,26 +2,29 @@ package com.ferreusveritas.growingtrees.blocks;
 
 import java.util.Random;
 
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
+
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class GrowSignal {
 
 	//Forward data
-	float energy;
-	ForgeDirection dir;
-	int numTurns;
-	int numSteps;
-	boolean inTrunk;
-	BlockBranch branchBlock;
+	public float energy;
+	public ForgeDirection dir;
+	public int numTurns;
+	public int numSteps;
+	public boolean inTrunk;
+	private GrowingTree tree;
+	public BlockBranch branchBlock;
 	
-	int originX;
-	int originY;
-	int originZ;
+	public int originX;
+	public int originY;
+	public int originZ;
 	
 	//Delta coords
-	int dx;
-	int dy;
-	int dz;
+	public int dx;
+	public int dy;
+	public int dz;
 	
 	//Back data
 	float radius;
@@ -29,9 +32,10 @@ public class GrowSignal {
 	boolean success;
 
 	//Utility
-	Random rand;
+	public Random rand;
 	
 	public GrowSignal(BlockBranch branch, int x, int y, int z, float energy){
+		tree = branch.getTree();
 		this.branchBlock = branch;
 		this.energy = energy;
 		dir = ForgeDirection.UP;
@@ -47,6 +51,10 @@ public class GrowSignal {
 		originY = y;
 		originZ = z;
 		dx = dy = dz = 0;
+	}
+	
+	public GrowingTree getTree(){
+		return tree;
 	}
 	
 	public boolean step(){

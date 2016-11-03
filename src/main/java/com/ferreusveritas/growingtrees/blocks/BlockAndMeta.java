@@ -35,7 +35,7 @@ public class BlockAndMeta {
 	}
 
 	public boolean matches(IBlockAccess blockAccess, int x, int y, int z){
-		return matches(blockAccess,x, y, z, 3);
+		return matches(blockAccess,x, y, z, 7);
 	}
 	
 	public boolean matches(Block block, int meta){

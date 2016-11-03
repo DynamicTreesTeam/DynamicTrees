@@ -1,5 +1,7 @@
 package com.ferreusveritas.growingtrees.blocks;
 
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.item.ItemStack;
@@ -13,7 +15,7 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 	
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockGrowingLeaves fromBlock, int fromSub) {
+	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir,	GrowingTree leavesTree) {
 		return 0;
 	}
 
@@ -25,8 +27,7 @@ public class NullTreePart implements ITreePart {
 	@Override
 	public int getRadiusForConnection(IBlockAccess world, int x, int y, int z, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
-		BlockAndMeta primLeaves = from.getPrimitiveLeavesBlockRef();
-		return fromRadius == 1 && primLeaves.matches(world, x, y, z) ? 1 : 0;
+		return fromRadius == 1 && from.getTree().getPrimitiveLeaves().matches(world, x, y, z, 3) ? 1 : 0;
 	}
 
 	@Override
@@ -53,8 +54,7 @@ public class NullTreePart implements ITreePart {
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, int x, int y, int z, ForgeDirection dir,	int radius) {
 		Block block = blockAccess.getBlock(x, y, z);
 		if(block instanceof BlockLeaves){//Vanilla leaves can be used for support
-			int dm = blockAccess.getBlockMetadata(x, y, z);
-			if(branch.getPrimitiveLeavesBlockRef().matches(block, dm & 3)){
+			if(branch.getTree().getPrimitiveLeaves().matches(blockAccess, x, y, z, 3)){
 				return 0x01;
 			}
 		}
@@ -62,18 +62,13 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public BlockGrowingLeaves getGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z) {
-		return null;
-	}
-
-	@Override
-	public int getGrowingLeavesSub(IBlockAccess blockAccess, int x, int y, int z) {
-		return 0;
-	}
-
-	@Override
 	public boolean applySubstance(World world, int x, int y, int z, ItemStack itemStack) {
 		return false;
+	}
+
+	@Override
+	public GrowingTree getTree(IBlockAccess blockAccess, int x, int y, int z) {
+		return null;
 	}
 
 }
