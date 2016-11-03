@@ -2,9 +2,11 @@ package com.ferreusveritas.growingtrees.items;
 
 import java.util.Random;
 
+import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -17,25 +19,34 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class Seed extends Item {
 
-	public BlockBranch branch;//The branch type this seed creates
+	private GrowingTree tree;//The tree this seed creates
 	
-	public Seed(BlockBranch branch){
-		this.branch = branch;
+	public Seed(){
+	}
+	
+	public void setTree(GrowingTree tree){
+		this.tree = tree;
+	}
+	
+	public GrowingTree getTree(){
+		return tree;
 	}
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem){
 
-		if(entityItem.age >= 1200){//1 minute(helps with lag)
-			int tileX = (int)Math.floor(entityItem.posX);
-			int tileY = (int)Math.floor(entityItem.posY);
-			int tileZ = (int)Math.floor(entityItem.posZ);
-			if(entityItem.worldObj.canBlockSeeTheSky(tileX, tileY, tileZ)){
-				Random rand = new Random();
-				while(entityItem.getEntityItem().stackSize-- > 0){
-					if( rand.nextFloat() * 16.0f <= branch.biomeSuitability(entityItem.worldObj, tileX, tileY, tileZ) ){//1 in 16 chance if ideal
-						if(plantTree(entityItem.worldObj, tileX, tileY, tileZ)){
-							break;
+		if(entityItem.age >= ConfigHandler.seedTimeToLive){//1 minute(helps with lag)
+			if(!entityItem.worldObj.isRemote){//Server side only
+				int tileX = (int)Math.floor(entityItem.posX);
+				int tileY = (int)Math.floor(entityItem.posY);
+				int tileZ = (int)Math.floor(entityItem.posZ);
+				if(entityItem.worldObj.canBlockSeeTheSky(tileX, tileY, tileZ)){
+					Random rand = new Random();
+					while(entityItem.getEntityItem().stackSize-- > 0){
+						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree().biomeSuitability(entityItem.worldObj, tileX, tileY, tileZ) ){//1 in 16 chance if ideal
+							if(plantTree(entityItem.worldObj, tileX, tileY, tileZ)){
+								break;
+							}
 						}
 					}
 				}
@@ -72,8 +83,8 @@ public class Seed extends Item {
 
 		//Ensure planting conditions are right
 		if(world.isAirBlock(x, y, z) && isAcceptableSoil(world.getBlock(x, y - 1, z))){
-			world.setBlock(x, y, z, branch, 0, 3);//set to a single branch with 1 radius
-			world.setBlock(x, y - 1, z, branch.getRootyDirtBlock(), 15, 3);//Set to fully fertilized rooty dirt
+			world.setBlock(x, y, z, getTree().getGrowingBranch(), 0, 3);//set to a single branch with 1 radius
+			world.setBlock(x, y - 1, z, getTree().getRootyDirtBlock(), 15, 3);//Set to fully fertilized rooty dirt
 			return true;
 		}
 		

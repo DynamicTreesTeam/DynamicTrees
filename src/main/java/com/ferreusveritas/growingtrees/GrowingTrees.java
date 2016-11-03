@@ -1,14 +1,15 @@
 package com.ferreusveritas.growingtrees;
 
-import com.ferreusveritas.growingtrees.blocks.BlockAcacia;
-import com.ferreusveritas.growingtrees.blocks.BlockBirchBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
-import com.ferreusveritas.growingtrees.blocks.BlockDarkOak;
-import com.ferreusveritas.growingtrees.blocks.BlockJungleBranch;
-import com.ferreusveritas.growingtrees.blocks.BlockOakBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.growingtrees.blocks.BlockSpruceBranch;
 import com.ferreusveritas.growingtrees.proxy.CommonProxy;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
+import com.ferreusveritas.growingtrees.trees.TreeAcacia;
+import com.ferreusveritas.growingtrees.trees.TreeBirch;
+import com.ferreusveritas.growingtrees.trees.TreeDarkOak;
+import com.ferreusveritas.growingtrees.trees.TreeJungle;
+import com.ferreusveritas.growingtrees.trees.TreeOak;
+import com.ferreusveritas.growingtrees.trees.TreeSpruce;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -21,23 +22,27 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Mod(modid = GrowingTrees.MODID, version=GrowingTrees.VERSION)
 public class GrowingTrees {
 
 	public static final String MODID = "growingtrees";
-	public static final String VERSION = "0.4.3";
+	public static final String VERSION = "0.4.4";
 
 	public static final GrowingTreesTab growingTreesTab = new GrowingTreesTab(MODID);
 	
 	public static BlockRootyDirt blockRootyDirt;
-	public static BlockBranch blockOakBranch;
-	public static BlockBranch blockSpruceBranch;
-	public static BlockBranch blockBirchBranch;
-	public static BlockBranch blockJungleBranch;
-	public static BlockBranch blockAcaciaBranch;
-	public static BlockBranch blockDarkOak;
+	public static GrowingTree treeOak;
+	public static GrowingTree treeSpruce;
+	public static GrowingTree treeBirch;
+	public static GrowingTree treeJungle;
+	public static GrowingTree treeAcacia;
+	public static GrowingTree treeDarkOak;
+
+
+	
 	public static ForgeDirection cardinalDirs[] = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
 	
 	@Instance(MODID)
@@ -50,19 +55,21 @@ public class GrowingTrees {
 	public void preInit(FMLPreInitializationEvent event) {
 		//Run before anything else. Read your config, create blocks, items, etc, and register them with the GameRegistry.
 		
+		ConfigHandler.preInit(event);
+		
 		//Dirt
 		blockRootyDirt = (BlockRootyDirt) new BlockRootyDirt().setBlockName(GrowingTrees.MODID + "_rootydirt");
 		GameRegistry.registerBlock(blockRootyDirt, "rootydirt");
 
 		//Trees
-		blockOakBranch = TreeHelper.createTree("oak", new BlockOakBranch(), 0);
-		blockSpruceBranch = TreeHelper.createTree("spruce", new BlockSpruceBranch(), 1);
-		blockBirchBranch = TreeHelper.createTree("birch", new BlockBirchBranch(), 2);
-		blockJungleBranch = TreeHelper.createTree("jungle", new BlockJungleBranch(), 3);
-		blockAcaciaBranch = TreeHelper.createTree("acacia", new BlockAcacia(), 4);
-		blockDarkOak = TreeHelper.createTree("darkoak", new BlockDarkOak(), 5);
+		treeOak = new TreeOak(0).register();
+		treeSpruce = new TreeSpruce(1).register();
+		treeBirch = new TreeBirch(2).register();
+		treeJungle = new TreeJungle(3).register();
+		treeAcacia = new TreeAcacia(4).register();
+		treeDarkOak = new TreeDarkOak(5).register();
 		
-		growingTreesTab.setTabIconItemStack(new ItemStack(blockOakBranch.getSeed()));
+		growingTreesTab.setTabIconItemStack(new ItemStack(treeOak.getSeed()));
 		
 		proxy.preInit();
 	}
@@ -71,19 +78,12 @@ public class GrowingTrees {
 	public void init(FMLInitializationEvent event) {
 		//Do your mod setup. Build whatever data structures you care about. Register recipes.
 		
-		GameRegistry.addShapelessRecipe(new ItemStack(blockOakBranch.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 0), Items.bowl});
-		GameRegistry.addShapelessRecipe(new ItemStack(blockSpruceBranch.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 1), Items.bowl});
-		GameRegistry.addShapelessRecipe(new ItemStack(blockBirchBranch.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 2), Items.bowl});
-		GameRegistry.addShapelessRecipe(new ItemStack(blockJungleBranch.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 3), Items.bowl});
-		GameRegistry.addShapelessRecipe(new ItemStack(blockAcaciaBranch.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 4), Items.bowl});
-		GameRegistry.addShapelessRecipe(new ItemStack(blockDarkOak.getSeed()), new Object[]{new ItemStack(Blocks.sapling, 1, 5), Items.bowl});
-		
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 0), new Object[]{blockOakBranch.getSeed(), Blocks.dirt });
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 1), new Object[]{blockSpruceBranch.getSeed(), Blocks.dirt });
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 2), new Object[]{blockBirchBranch.getSeed(), Blocks.dirt });
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 3), new Object[]{blockJungleBranch.getSeed(), Blocks.dirt });
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 4), new Object[]{blockAcaciaBranch.getSeed(), Blocks.dirt });
-		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sapling, 1, 5), new Object[]{blockDarkOak.getSeed(), Blocks.dirt });
+		treeOak.registerRecipes(new ItemStack(Blocks.sapling, 1, 0));
+		treeSpruce.registerRecipes(new ItemStack(Blocks.sapling, 1, 1));
+		treeBirch.registerRecipes(new ItemStack(Blocks.sapling, 1, 2));
+		treeJungle.registerRecipes(new ItemStack(Blocks.sapling, 1, 3));
+		treeAcacia.registerRecipes(new ItemStack(Blocks.sapling, 1, 4));
+		treeDarkOak.registerRecipes(new ItemStack(Blocks.sapling, 1, 5));
 		
 		proxy.init();
 	}

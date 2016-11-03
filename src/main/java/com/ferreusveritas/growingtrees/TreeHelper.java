@@ -7,12 +7,9 @@ import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.growingtrees.blocks.ITreePart;
 import com.ferreusveritas.growingtrees.blocks.NullTreePart;
-import com.ferreusveritas.growingtrees.items.Seed;
-
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.biome.BiomeGenBase;
 
 public class TreeHelper {
 	
@@ -38,25 +35,6 @@ public class TreeHelper {
 			leavesArray.put(key, leavesBlock);
 			return leavesBlock;
 		}
-	}
-	
-	public static BlockBranch createTree(String name, BlockBranch branch, int seq){
-		return createTree(name, GrowingTrees.MODID, branch, seq);
-	}
-	
-	public static BlockBranch createTree(String name, String modid, BlockBranch branch, int seq){
-		if(branch != null){
-			BlockGrowingLeaves leaves = getLeavesBlockForSequence(modid, name, seq);
-			int sub = seq & 3;
-			
-			branch.setBlockName(modid + "_" + name + "branch");
-			Seed itemSeed = (Seed) new Seed(branch).setTextureName(modid + ":" + name + "seed").setCreativeTab(GrowingTrees.growingTreesTab).setUnlocalizedName(modid + "_" + name + "seed");
-			branch.setGrowingLeavesAndSeeds(name, leaves, sub, itemSeed);
-			
-			GameRegistry.registerBlock(branch, name + "branch");
-			GameRegistry.registerItem(itemSeed, name + "seed");
-		}
-		return branch;
 	}
 	
 	//Treeparts

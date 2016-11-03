@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
-import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
@@ -19,7 +19,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class BottomListenerPodzol implements IBottomListener {
 	
 	@Override
-	public void run(World world, BlockGrowingLeaves leaves, int x, int y, int z, int subBlockNum, Random random){
+	public void run(World world, GrowingTree tree, int x, int y, int z, Random random) {
 
 		final int darkThreshold = 4;
 

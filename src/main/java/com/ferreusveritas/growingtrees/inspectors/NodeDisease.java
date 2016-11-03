@@ -2,7 +2,6 @@ package com.ferreusveritas.growingtrees.inspectors;
 
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
-import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;
@@ -12,14 +11,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
- * Destroys all branches on a tree and the surrounding leaves.
+ * Destroys all thin(radius == 1) branches on a tree.. leaving it to rot.
  * @author ferreusveritas
  */
-public class NodeDestroyer implements INodeInspector {
+public class NodeDisease implements INodeInspector {
 
-	GrowingTree tree;//Destroy any node that's made of the same kind of wood
+	GrowingTree tree;//Destroy any thin branches made of the same kind of wood.
 	
-	public NodeDestroyer(GrowingTree tree) {
+	public NodeDisease(GrowingTree tree) {
 		this.tree = tree;
 	}
 	
@@ -27,11 +26,11 @@ public class NodeDestroyer implements INodeInspector {
 	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
-		if(branch != null && tree == branch.getTree()){
+		if(tree == branch.getTree()){
 			if(branch.getRadius(world, x, y, z) == 1){
+				world.setBlockToAir(x, y, z);//Destroy the thin branch
 				killSurroundingLeaves(world, x, y, z);//Destroy the surrounding leaves
 			}
-			world.setBlockToAir(x, y, z);//Destroy the branch
 		}
 		
 		return true;

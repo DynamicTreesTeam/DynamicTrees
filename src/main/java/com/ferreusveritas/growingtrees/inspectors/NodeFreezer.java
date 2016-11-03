@@ -24,13 +24,13 @@ public class NodeFreezer implements INodeInspector {
 	}
 	
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, int x, int y, int z){
-		BlockAndMeta primLeaves = branch.getPrimitiveLeavesBlockRef();
+		BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
 		int noDecayBits = 0x04;
 		
 		for(int iz = z - 3; iz <= z + 3; iz++){
 			for(int iy = y - 3; iy <= y + 3; iy++){
 				for(int ix = x - 3; ix <= x + 3; ix++){
-					if(branch.isCompatibleGrowingLeaves(world, ix, iy, iz)){
+					if(branch.getTree().isCompatibleGrowingLeaves(world, ix, iy, iz)){
 						world.setBlock(ix, iy, iz, primLeaves.getBlock(), primLeaves.getMeta() | noDecayBits, 3);
 					}
 				}

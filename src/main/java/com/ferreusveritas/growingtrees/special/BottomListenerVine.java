@@ -2,7 +2,7 @@
 
 import java.util.Random;
 
-import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class BottomListenerVine implements IBottomListener {
 
 	@Override
-	public void run(World world, BlockGrowingLeaves leaves, int x, int y, int z, int subBlockNum, Random random){
+	public void run(World world, GrowingTree tree, int x, int y, int z, Random random) {
 
 		ForgeDirection around[] = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST, ForgeDirection.DOWN };
 		ForgeDirection dir = around[random.nextInt(around.length)];

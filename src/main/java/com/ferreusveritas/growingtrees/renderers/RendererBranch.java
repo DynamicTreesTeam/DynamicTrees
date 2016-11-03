@@ -70,14 +70,14 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 	    
 	    GL11.glTranslatef(0.5f + rad, 0, 0);
 
-	    int color = branch.getGrowingLeaves().getRenderColor(branch.getGrowingLeavesSub() << 2);
+	    int color = branch.getTree().getGrowingLeaves().getRenderColor(branch.getTree().getGrowingLeavesSub() << 2);
         float r = (color >> 16 & 255) / 255.0F;
         float g = (color >> 8 & 255) / 255.0F;
         float b = (color & 255) / 255.0F;
 
         GL11.glColor4f(r, g, b, 1.0f);
 	    renderer.setRenderBounds(0.5 - rad, 0.5 - rad, 0.5 - rad, 0.5 + rad, 0.5 + rad, 0.5 + rad);
-	    BlockAndMeta primLeaves = branch.getPrimitiveLeavesBlockRef();
+	    BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
 	    renderStandardInventoryBlock(primLeaves.getBlock(), primLeaves.getMeta(), modelId, renderer);
 	    GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	    GL11.glTranslatef(-0.5f - rad, 0, 0);
@@ -134,7 +134,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 				faceOverrides = faceDown;//override the renderer to force it to render the face
 			}
 
-			if(radius == 8){
+			if(radius == 8){//Simply render a standard block if the radius is large enough to fill the entire block
 				if(numConnections == 1){
 					renderRingSides = 1 << ForgeDirection.getOrientation(sourceDir).getOpposite().ordinal();
 				}
@@ -184,7 +184,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			renderFaceFlags = faceDown | faceUp | faceEast | faceWest | faceOverrides;
 			renderer.uvRotateSouth = 1;
 			renderer.uvRotateNorth = 1;
-			if(radii[2] == radii[3] && radii[2] != 0){//Opposites are the same radius and therefore a single block
+			if(radii[2] == radii[3] && radii[2] > 1){//Opposites are the same radius and therefore a single block
 				min = 0.5f - radii[2] / 16.0f;
 				max = 0.5f + radii[2] / 16.0f;
 				renderer.setRenderBounds(min, min, 0.0d, max, max, 1.0d);
@@ -216,7 +216,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			renderer.uvRotateWest = 1;
 			renderer.uvRotateTop = 1;
 			renderer.uvRotateBottom = 1;
-			if(radii[4] == radii[5] && radii[4] != 0){//Opposites are the same radius and therefore a single block
+			if(radii[4] == radii[5] && radii[4] > 1){//Opposites are the same radius and therefore a single block
 				min = 0.5f - radii[4] / 16.0f;
 				max = 0.5f + radii[4] / 16.0f;
 				renderer.setRenderBounds(0.0d, min, min, 1.0f, max, max);
@@ -259,7 +259,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 		//Draw leaves
 		renderer.setRenderBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		renderer.setOverrideBlockTexture(branch.getLeavesIcon());
-		int multiplier = branch.getGrowingLeaves().colorMultiplier(blockAcces, x, y, z);
+		int multiplier = branch.getTree().getGrowingLeaves().colorMultiplier(blockAcces, x, y, z);
 		
 		float r = (multiplier >> 16 & 255) / 255.0F;
         float g = (multiplier >> 8 & 255) / 255.0F;
