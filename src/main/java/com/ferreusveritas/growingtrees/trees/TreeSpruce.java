@@ -1,12 +1,10 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.growingtrees.blocks.GrowSignal;
-import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
 
 import net.minecraft.init.Blocks;

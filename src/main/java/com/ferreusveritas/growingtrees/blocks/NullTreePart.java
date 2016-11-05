@@ -4,6 +4,7 @@ import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -62,7 +63,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public boolean applySubstance(World world, int x, int y, int z, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack){
 		return false;
 	}
 

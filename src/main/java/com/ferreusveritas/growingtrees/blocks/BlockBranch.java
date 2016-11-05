@@ -16,7 +16,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -94,18 +93,15 @@ public class BlockBranch extends Block implements ITreePart {
 	@Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float px, float py, float pz){
 		if(player.getCurrentEquippedItem() != null) {
-			if(applySubstance(world, x, y, z, player.getCurrentEquippedItem())){
-				player.getCurrentEquippedItem().stackSize--;
-				return true;
-			}
+			return applyItemSubstance(world, x, y, z, player, player.getCurrentEquippedItem());
 		}
 		return false;
 	}
 
 	@Override
-	public boolean applySubstance(World world, int x, int y, int z, ItemStack itemStack){
+	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack){
 		if(world.getBlock(x, y - 1, z) != this){
-			return TreeHelper.getSafeTreePart(world, x, y - 1, z).applySubstance(world, x, y - 1, z, itemStack);
+			return TreeHelper.getSafeTreePart(world, x, y - 1, z).applyItemSubstance(world, x, y - 1, z, player, itemStack);
 		}
 		return false;
 	}

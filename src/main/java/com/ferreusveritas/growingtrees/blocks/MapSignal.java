@@ -3,8 +3,6 @@ package com.ferreusveritas.growingtrees.blocks;
 import java.util.ArrayList;
 
 import com.ferreusveritas.growingtrees.inspectors.INodeInspector;
-import com.ferreusveritas.growingtrees.special.IBottomListener;
-
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;

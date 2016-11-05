@@ -14,10 +14,12 @@ public class BottomListenerDropItems implements IBottomListener {
 
 	ItemStack toDrop;
 	float chance;
+	boolean onlyEdge;
 	
-	public BottomListenerDropItems(ItemStack itemStack, float dropChance){
+	public BottomListenerDropItems(ItemStack itemStack, float dropChance, boolean edge){
 		toDrop = itemStack;
 		chance = dropChance;
+		onlyEdge = edge;
 	}
 	
 	@Override
@@ -35,7 +37,7 @@ public class BottomListenerDropItems implements IBottomListener {
 		}
 		
 		//Spawn seed
-		if(tree.getGrowingLeaves().getHydrationLevel(world, x, y, z) == 1){
+		if(!onlyEdge || tree.getGrowingLeaves().getHydrationLevel(world, x, y, z) == 1){
 			EntityItem itemEntity = new EntityItem(world, x, y, z, toDrop.copy());
 			itemEntity.setPosition(x,  y - 1, z);
 			world.spawnEntityInWorld(itemEntity);

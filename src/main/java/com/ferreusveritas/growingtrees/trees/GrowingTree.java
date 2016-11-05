@@ -121,9 +121,46 @@ public class GrowingTree {
 		
 		setStick(new ItemStack(Items.stick));
 		
-		registerBottomSpecials(new BottomListenerDropItems(new ItemStack(getSeed()), ConfigHandler.seedDropRate));
+		registerBottomSpecials(new BottomListenerDropItems(new ItemStack(getSeed()), ConfigHandler.seedDropRate, true));
 	}
 
+	
+	public boolean applySubstance(World world, int x, int y, int z, BlockRootyDirt dirt, ItemStack itemStack){
+		
+		//Bonemeal fertilizes the soil
+		if( itemStack.getItem() == Items.dye && itemStack.getItemDamage() == 15) {
+			return dirt.substanceFertilize(world, x, y, z, 1);
+		}
+		
+		if( itemStack.getItem() == Items.potionitem){
+			switch(itemStack.getItemDamage()){
+			case 8268://Harming
+			case 8236://Harming II
+				return dirt.substanceDeplete(world, x, y, z, 15);
+			case 8196://Poison
+			case 8260://Poison(long)
+			case 8228://Poison II
+				return dirt.substanceDisease(world, x, y, z);
+			case 8194://Swiftness
+			case 8258://Swiftness(long)
+			case 8226://Swiftness II
+				return dirt.substanceInstantGrowth(world, x, y, z);
+			case 8201://Strength
+			case 8265://Strength(long)
+			case 8233://Strength II
+				return dirt.substanceFertilize(world, x, y, z, 15);
+			case 8193://Regeneration
+			case 8257://Regeneration(long)
+			case 8225://Regeneration II
+				return dirt.substanceFreeze(world, x, y, z);
+			default:
+				return false;
+			}
+		}
+		
+		return false;
+	}
+	
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
@@ -365,7 +402,7 @@ public class GrowingTree {
 	}
 	
 	//Selects a new direction to turn to.
-	//This class uses a probability map to make the decision.  Override for different species.
+	//This class uses a probability map to make the decision.  Can be overridden for different species.
 	public ForgeDirection selectNewDirection(World world, int x, int y, int z, BlockBranch branch, GrowSignal signal) {
 		ForgeDirection originDir = signal.dir.getOpposite();
 
@@ -454,7 +491,7 @@ public class GrowingTree {
 	 * Provides an interface for other mods to add special effects like fruit, spawns or whatever 
 	 * @param sub
 	 * @param specials
-	 * @return
+	 * @return GrowingTree for chaining
 	 */
 	public GrowingTree registerBottomSpecials(IBottomListener ... specials){
 		for(IBottomListener special: specials){

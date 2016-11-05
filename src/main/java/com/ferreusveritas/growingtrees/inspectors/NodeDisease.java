@@ -26,7 +26,7 @@ public class NodeDisease implements INodeInspector {
 	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
-		if(tree == branch.getTree()){
+		if(branch != null && tree == branch.getTree()){
 			if(branch.getRadius(world, x, y, z) == 1){
 				world.setBlockToAir(x, y, z);//Destroy the thin branch
 				killSurroundingLeaves(world, x, y, z);//Destroy the surrounding leaves

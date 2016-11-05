@@ -1,6 +1,5 @@
 package com.ferreusveritas.growingtrees;
 
-import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.growingtrees.proxy.CommonProxy;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
@@ -20,16 +19,14 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.ForgeDirection;
 
 @Mod(modid = GrowingTrees.MODID, version=GrowingTrees.VERSION)
 public class GrowingTrees {
 
 	public static final String MODID = "growingtrees";
-	public static final String VERSION = "0.4.4";
+	public static final String VERSION = "0.4.5";
 
 	public static final GrowingTreesTab growingTreesTab = new GrowingTreesTab(MODID);
 	
@@ -41,8 +38,6 @@ public class GrowingTrees {
 	public static GrowingTree treeAcacia;
 	public static GrowingTree treeDarkOak;
 
-
-	
 	public static ForgeDirection cardinalDirs[] = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
 	
 	@Instance(MODID)

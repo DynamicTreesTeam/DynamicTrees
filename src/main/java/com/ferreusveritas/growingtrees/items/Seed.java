@@ -5,7 +5,6 @@ import java.util.Random;
 import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
-import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;
@@ -58,6 +57,7 @@ public class Seed extends Item {
 	}
 	
 	
+	@Override
 	public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float px, float py, float pz){
 
 		if (side == 1) {//Ensure this seed is only used on the top side of a block

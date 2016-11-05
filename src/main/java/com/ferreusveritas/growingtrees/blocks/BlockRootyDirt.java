@@ -103,10 +103,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		ItemStack equippedItem = player.getCurrentEquippedItem();
 		
 		if(equippedItem != null){//Something in the hand
-			if(applySubstance(world, x, y, z, equippedItem)){
-				equippedItem.stackSize--;
-				return true;
-			}
+			return applyItemSubstance(world, x, y, z, player, equippedItem);
 		}
 		else{//Bare hand
 			if(world.isRemote){
@@ -114,48 +111,73 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			}
 			return true;
 		}
-		
-		return false;
     }
 	
 	@Override
-	public boolean applySubstance(World world, int x, int y, int z, ItemStack itemStack){
+	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack){
+		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
 		
-		//Bonemeal fertilized the soil
-		if( itemStack.getItem() == Items.dye && itemStack.getItemDamage() == 15) {
-			if(fertilize(world, x, y, z, 1)){
-				if(world.isRemote){
-					TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("happyVillager", 8)));
-				}
-				return true;
-			}
-		}
-		else//Ender pearls cause instant growth
-		if( itemStack.getItem() == Items.ender_pearl) {
-			if(world.isRemote){
-				TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("spell", 8)));
+		if(branch != null && branch.getTree().applySubstance(world, x, y, z, this, itemStack)){
+			if(itemStack.getItem() == Items.potionitem){
+				player.setCurrentItemOrArmor(0, new ItemStack(Items.glass_bottle));
 			} else {
-				grow(world, x, y, z, world.rand);
+				itemStack.stackSize--;
 			}
 			return true;
 		}
-		else //Fermented spider eye is a soil poison that destroys soil fertility
-		if( itemStack.getItem() == Items.fermented_spider_eye) {
-			if(fertilize(world, x, y, z, -15)){
-				if(world.isRemote){
-					TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("crit", 8)));
-				}
-				return true;
-			}
-		}
-		else//Ghast Tear turns all of the growing leaves into vanilla leaves
-		if( itemStack.getItem() == Items.ghast_tear) {
-			return freeze(world, x, y, z);
-		}
-		
 		return false;
 	}
-		
+	
+	public boolean substanceFertilize(World world, int x, int y, int z, int amount){
+		if(fertilize(world, x, y, z, amount)){
+			if(world.isRemote){
+				TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("happyVillager", 8)));
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean substanceDeplete(World world, int x, int y, int z, int amount){
+		if(fertilize(world, x, y, z, -amount)){
+			if(world.isRemote){
+				TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("crit", 8)));
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean substanceInstantGrowth(World world, int x, int y, int z){
+		if(world.isRemote){
+			TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("spell", 8)));
+		} else {
+			grow(world, x, y, z, world.rand);
+		}
+		return true;
+	}
+	
+	public boolean substanceFreeze(World world, int x, int y, int z){
+		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
+		if(branch != null){
+			branch.analyse(world, x, y, z, ForgeDirection.DOWN, new MapSignal(new NodeFreezer(), new NodeTwinkle("fireworksSpark", 8)));
+			fertilize(world, x, y, z, -15);//destroy the soil life so it can no longer grow
+		}
+		return true;
+	}
+	
+	public boolean substanceDisease(World world, int x, int y, int z){
+		if(world.isRemote){
+			TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeTwinkle("crit", 8)));
+		} else {
+			BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
+			if(branch != null){
+				TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeDisease(branch.getTree())));
+			}
+		}
+		return true;
+	}
+	
 	public void destroyTree(World world, int x, int y, int z){
 		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
 		if(branch != null){
@@ -187,15 +209,6 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			return false;//Already maxed out
 		}
 		setSoilLife(world, x, y, z, soilLife + amount);
-		return true;
-	}
-	
-	public boolean freeze(World world, int x, int y, int z){
-		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
-		if(branch != null){
-			branch.analyse(world, x, y, z, ForgeDirection.DOWN, new MapSignal(new NodeFreezer(), new NodeTwinkle("fireworksSpark", 8)));
-			fertilize(world, x, y, z, -15);//destroy the soil life so it can no longer grow
-		}
 		return true;
 	}
 	

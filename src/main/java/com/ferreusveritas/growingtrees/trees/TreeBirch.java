@@ -1,8 +1,6 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.GrowingTrees;
-
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;

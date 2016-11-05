@@ -37,7 +37,7 @@ public class TreeJungle extends GrowingTree {
 		//Jungle Trees grow a maximum of 16 meters tall
 		
 		//Amplify cardinal directions to encourage spread
-		float spreadPush = 1.0f + (float)signal.dy / getEnergy(world, x, y, z) * 6;// 1(bottom) to 6(top)
+		float spreadPush = 1.0f + signal.dy / getEnergy(world, x, y, z) * 6;// 1(bottom) to 6(top)
 		
 		for(ForgeDirection dir: GrowingTrees.cardinalDirs){
 			probMap[dir.ordinal()] *= spreadPush;

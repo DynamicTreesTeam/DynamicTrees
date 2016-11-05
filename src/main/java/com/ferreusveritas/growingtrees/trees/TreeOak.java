@@ -3,11 +3,13 @@ package com.ferreusveritas.growingtrees.trees;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
+import com.ferreusveritas.growingtrees.special.BottomListenerDropItems;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -25,7 +27,7 @@ public class TreeOak extends GrowingTree {
 		setPrimitiveLeaves(Blocks.leaves, 0);
 		setPrimitiveLog(Blocks.log, 0);
 		
-		registerBottomSpecials(new BottomListenerPodzol());
+		registerBottomSpecials(new BottomListenerPodzol(), new BottomListenerDropItems(new ItemStack(Items.apple), 1/1024f, false));
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.ferreusveritas.growingtrees.blocks;
 
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -115,10 +116,11 @@ public interface ITreePart {
      * @param x X Position
      * @param y Y Position
      * @param z Z Position
+     * @param player The player applying the substance
 	 * @param itemStack The itemstack to be used.
 	 * @return true if item was used, false otherwise
 	 */
-	boolean applySubstance(World world, int x, int y, int z, ItemStack itemStack);
+	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack);
 
 	/**
 	 * The single root node of a tree.

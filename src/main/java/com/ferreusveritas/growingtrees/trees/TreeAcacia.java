@@ -1,7 +1,6 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
 

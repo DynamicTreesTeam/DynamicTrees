@@ -2,7 +2,6 @@ package com.ferreusveritas.growingtrees.inspectors;
 
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
-import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import net.minecraft.block.Block;

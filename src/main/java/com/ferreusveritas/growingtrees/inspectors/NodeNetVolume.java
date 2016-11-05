@@ -1,8 +1,6 @@
 package com.ferreusveritas.growingtrees.inspectors;
 
 import com.ferreusveritas.growingtrees.TreeHelper;
-import com.ferreusveritas.growingtrees.blocks.ITreePart;
-
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
