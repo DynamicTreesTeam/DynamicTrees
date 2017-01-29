@@ -1,5 +1,6 @@
 package com.ferreusveritas.growingtrees.trees;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
@@ -9,6 +10,8 @@ import com.ferreusveritas.growingtrees.blocks.GrowSignal;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -51,14 +54,12 @@ public class TreeDarkOak extends GrowingTree {
 	}
 	
 	@Override
-	public int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
 
 		if(signal.numTurns >= 1){
 			probMap[ForgeDirection.UP.ordinal()] = 0;
 			probMap[ForgeDirection.DOWN.ordinal()] = 0;
 		}
-
-		//float spreadPush = 1.0f + (float)signal.dy / getEnergy(world, x, y, z) * 4;// 1(bottom) to 4(top)
 		
 		//Amplify cardinal directions to encourage spread
 		float energyRatio = signal.dy / getEnergy(world, x, y, z);
@@ -82,7 +83,7 @@ public class TreeDarkOak extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.75f;//Suitability(Should be just barely less than the biome suitabilities)
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         
@@ -112,6 +113,12 @@ public class TreeDarkOak extends GrowingTree {
 		return false;
 	}
 	
-	
+	@Override
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int chance, ArrayList<ItemStack> drops) {
+    	if ((world.rand.nextInt(chance) == 0)) {
+        	drops.add(new ItemStack(Items.apple, 1, 0));
+        }
+    	return drops;
+    }
 
 }

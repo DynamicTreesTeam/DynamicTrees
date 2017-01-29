@@ -1,5 +1,7 @@
 package com.ferreusveritas.growingtrees.trees;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
@@ -27,7 +29,7 @@ public class TreeOak extends GrowingTree {
 		setPrimitiveLeaves(Blocks.leaves, 0);
 		setPrimitiveLog(Blocks.log, 0);
 		
-		registerBottomSpecials(new BottomListenerPodzol(), new BottomListenerDropItems(new ItemStack(Items.apple), 1/1024f, false));
+		registerBottomSpecials(new BottomListenerPodzol());
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class TreeOak extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.75f;//Suitability(Should be just barely less than the biome suitabilities)
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         
@@ -58,7 +60,6 @@ public class TreeOak extends GrowingTree {
 		return MathHelper.clamp_float(s, 0.0f, 1.0f);
 	}
 	
-	//Handle rotting branches
 	@Override
 	public boolean rot(World world, int x, int y, int z, int neighborCount, int radius, Random random){
 		if(super.rot(world, x, y, z, neighborCount, radius, random)){
@@ -72,4 +73,11 @@ public class TreeOak extends GrowingTree {
 		return false;
 	}
 	
+	@Override
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int chance, ArrayList<ItemStack> drops) {
+    	if ((world.rand.nextInt(chance) == 0)) {
+        	drops.add(new ItemStack(Items.apple, 1, 0));
+        }
+    	return drops;
+    }
 }

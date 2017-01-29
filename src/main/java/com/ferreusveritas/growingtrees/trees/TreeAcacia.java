@@ -58,7 +58,7 @@ public class TreeAcacia extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.85f;//Suitability(Should be just barely less than the biome suitabilities)
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         

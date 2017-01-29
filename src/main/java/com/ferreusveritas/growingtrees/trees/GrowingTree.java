@@ -1,6 +1,7 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
@@ -78,7 +79,7 @@ public class GrowingTree {
 
 	ItemStack stick;
 	
-	//Seed
+	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
 	Seed seed;
 
@@ -265,6 +266,13 @@ public class GrowingTree {
 		return 1;
 	}
 	
+	/**
+	 * @param world
+	 * @param x X-Axis
+	 * @param y Y-Axis
+	 * @param z Z-Axis
+	 * @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
+	 */
 	public int getLowestBranchHeight(World world, int x, int y, int z){
 		return lowestBranchHeight;
 	}
@@ -307,60 +315,98 @@ public class GrowingTree {
 	}
 	
 	//////////////////////////////
-	// BIOME HANDLING
+	// DROPS HANDLING
 	//////////////////////////////
 	
-	//Biome suitability 0.0f for completely unsuited.. 1.0f for perfectly suited
-	public float biomeSuitability(World world, int x, int y, int z){
-        /*
-        BIOME CLIMATE DATA FOR REFERENCE: 
-        
-        BIOME				NAME				TEMP	PRECIP
-        ocean				Ocean				0.5		0.5
-        plains				Plains				0.8		0.4
-        desert				Desert				2.0		0.0
-        extremeHills		Extreme Hills		0.2		0.3
-        forest				Forest				0.7		0.8
-        taiga				Taiga				0.25	0.8
-        swampland			Swampland			0.8		0.9
-        river				River				0.5		0.5
-        hell				Hell				2.0		0.0
-        Sky					Sky					0.5		0.5
-        frozenOcean			FrozenOcean			0.0		0.5
-        frozenRiver			FrozenRiver			0.0		0.5
-        icePlains			Ice Plains			0.0		0.5
-        iceMountains		Ice Mountains		0.0		0.5
-        mushroomIsland		MushroomIsland		0.9		1.0
-        mushroomIslandShore	MushroomIslandShore	0.9		1.0
-        beach				Beach				0.8		0.4
-        desertHills			DesertHills			2.0		0.0
-        forestHills			ForestHills			0.7		0.8
-        taigaHills			TaigaHills			0.25	0.8
-        extremeHillsEdge	Extreme Hills Edge	0.2		0.3
-        jungle				Jungle				0.95	0.9
-        jungleHills			JungleHills			0.95	0.9
-        jungleEdge			JungleEdge			0.95	0.8
-        deepOcean			Deep Ocean			0.5		0.5
-        stoneBeach			Stone Beach			0.2		0.3
-        coldBeach			Cold Beach			0.05	0.3
-        birchForest			Birch Forest		0.6		0.6
-        birchForestHills	Birch Forest Hills	0.6		0.6
-        roofedForest		Roofed Forest		0.7		0.8
-        coldTaiga			Cold Taiga			-0.5	0.4
-        coldTaigaHills		Cold Taiga Hills	-0.5	0.4
-        megaTaiga			Mega Taiga			0.3		0.8
-        megaTaigaHills		Mega Taiga Hills	0.3		0.8
-        extremeHillsPlus	Extreme Hills+		0.2		0.3
-        savanna				Savanna				1.2		0.0
-        savannaPlateau		Savanna Plateau		1.0		0.0
-        mesa				Mesa				2.0		0.0
-        mesaPlateau_F		Mesa Plateau F		2.0		0.0
-        mesaPlateau			Mesa Plateau		2.0		0.0
-        */
-		
-        return 1.0f;
+	/** 
+	 * Override to add items to the included list argument. For apples and whatnot.
+	 * Pay Attention!  Add items to drops parameter.
+	 * 
+	 * @param world
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param chance
+	 * @param drops
+	 * @return
+	 */
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int chance, ArrayList<ItemStack> drops){
+    	return drops;
+    }
+	
+	//////////////////////////////
+	// BIOME HANDLING
+	//////////////////////////////
+
+    /**
+     * Biome suitability. It is recommended to override this member function for each tree species.
+     *<pre><tt>
+     *BIOME CLIMATE DATA FOR REFERENCE: 
+     *BIOME                NAME                TEMP     PRECIP
+     *ocean                Ocean               0.5        0.5
+     *plains               Plains              0.8        0.4
+     *desert               Desert              2.0        0.0
+     *extremeHills         Extreme Hills       0.2        0.3
+     *forest               Forest              0.7        0.8
+     *taiga                Taiga               0.25       0.8
+     *swampland            Swampland           0.8        0.9
+     *river                River               0.5        0.5
+     *hell                 Hell                2.0        0.0
+     *Sky                  Sky                 0.5        0.5
+     *frozenOcean          FrozenOcean         0.0        0.5
+     *frozenRiver          FrozenRiver         0.0        0.5
+     *icePlains            Ice Plains          0.0        0.5
+     *iceMountains         Ice Mountains       0.0        0.5
+     *mushroomIsland       MushroomIsland      0.9        1.0
+     *mushroomIslandShore  MushroomIslandShore 0.9        1.0
+     *beach                Beach               0.8        0.4
+     *desertHills          DesertHills         2.0        0.0
+     *forestHills          ForestHills         0.7        0.8
+     *taigaHills           TaigaHills          0.25       0.8
+     *extremeHillsEdge     Extreme Hills Edge  0.2        0.3
+     *jungle               Jungle              0.95       0.9
+     *jungleHills          JungleHills         0.95       0.9
+     *jungleEdge           JungleEdge          0.95       0.8
+     *deepOcean            Deep Ocean          0.5        0.5
+     *stoneBeach           Stone Beach         0.2        0.3
+     *coldBeach            Cold Beach          0.05       0.3
+     *birchForest          Birch Forest        0.6        0.6
+     *birchForestHills     Birch Forest Hills  0.6        0.6
+     *roofedForest         Roofed Forest       0.7        0.8
+     *coldTaiga            Cold Taiga          -0.5       0.4
+     *coldTaigaHills       Cold Taiga Hills    -0.5       0.4
+     *megaTaiga            Mega Taiga          0.3        0.8
+     *megaTaigaHills       Mega Taiga Hills    0.3        0.8
+     *extremeHillsPlus     Extreme Hills+      0.2        0.3
+     *savanna              Savanna             1.2        0.0
+     *savannaPlateau       Savanna Plateau     1.0        0.0
+     *mesa                 Mesa                2.0        0.0
+     *mesaPlateau_F        Mesa Plateau F      2.0        0.0
+     *mesaPlateau          Mesa Plateau        2.0        0.0
+     *</tt></pre>
+     *
+     * @param world The World
+     * @param x X-Axis
+     * @param y Y-Axis
+     * @param z Z-Axis
+     * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
+     */
+    public float biomeSuitability(World world, int x, int y, int z){
+        return defaultSuitability();
 	}
 	
+    /** A value that determines what a tree's suitability is before climate manipulation occurs. */
+	public static final float defaultSuitability(){
+		return 0.85f;
+	}
+
+	/**
+	 * A convenience function to test if a biome is one of the many options passed.
+	 * 
+	 * @param biomeToCheck The biome we are matching
+	 * @param biomes Multiple biomes to match against
+	 * @return True if a match is found. False if not.
+	 */
 	public static boolean isOneOfBiomes(BiomeGenBase biomeToCheck, BiomeGenBase ... biomes){
 		for(BiomeGenBase biome: biomes){
 			if(biomeToCheck.biomeID == biome.biomeID){
@@ -370,13 +416,29 @@ public class GrowingTree {
 		return false;
 	}
 
+	/**
+	 * A convenience function to check if a biome is one of the many options passed and return a value if so.
+	 * 
+	 * @param biomeToCheck The biome we are matching
+	 * @param valueIfTrue The value to return if a match is found.
+	 * @param biomes Multiple biomes to match against
+	 * @return valueIfTrue if a match is found. 0 otherwise.
+	 */
 	public static int isOneOfBiomes(BiomeGenBase biomeToCheck, int valueIfTrue, BiomeGenBase ... biomes){
 		return isOneOfBiomes(biomeToCheck, biomes) ? valueIfTrue : 0;
 	}
-	
-	/////////////////////////////
-	
-	//Handle rotting branches
+		
+	/**
+	 * Handle rotting branches
+	 * @param world The world
+	 * @param x X-Axis
+	 * @param y Y-Axis
+	 * @param z Z-Axis
+	 * @param neighborCount Count of neighbors reinforcing this block
+	 * @param radius The radius of the branch
+	 * @param random Access to a random number generator
+	 * @return true if the branch should rot
+	 */
 	public boolean rot(World world, int x, int y, int z, int neighborCount, int radius, Random random){
 		if(radius <= 1){
 			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS){
@@ -397,12 +459,19 @@ public class GrowingTree {
 		return branch.getRadius(blockAccess, x, y, z) == 1 && this == fromBlock.getTree(fromSub) ? 5 : 0;
 	}
 
-	public int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
-		return probMap;
-	}
-	
-	//Selects a new direction to turn to.
-	//This class uses a probability map to make the decision.  Can be overridden for different species.
+	/**
+	 * Selects a new direction for the branch(grow) signal to turn to.
+	 * This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
+	 * Can be overridden for different species but it's preferable to override customDirectionManipulation.
+	 * 
+	 * @param world The World
+	 * @param x X-Axis
+	 * @param y Y-Axis
+	 * @param z Z-Axis
+	 * @param branch The branch block the GrowSignal is traveling in.
+	 * @param signal The grow signal.
+	 * @return
+	*/
 	public ForgeDirection selectNewDirection(World world, int x, int y, int z, BlockBranch branch, GrowSignal signal) {
 		ForgeDirection originDir = signal.dir.getOpposite();
 
@@ -431,12 +500,22 @@ public class GrowingTree {
 			}
 		}
 		
-		//Do custom stuff for various species
+		//Do custom stuff or override probability map for various species
 		probMap = customDirectionManipulation(world, x, y, z, branch.getRadius(world, x, y, z), signal, probMap);
 		
 		//Select a direction from the probability map
 		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return ForgeDirection.getOrientation(choice != -1 ? choice : 1);//Default to up if things are screwy
+		return newDirectionSelected(ForgeDirection.getOrientation(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
+	}
+
+	/** Species can override the probability map here **/
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+		return probMap;
+	}
+	
+	/** Species can override to take action once a new direction is selected **/
+	protected ForgeDirection newDirectionSelected(ForgeDirection newDir, GrowSignal signal){
+		return newDir;
 	}
 	
 	//Select a random direction weighted from the probability map 
@@ -470,13 +549,13 @@ public class GrowingTree {
 	//////////////////////////////
 	
 	/**
-	 * Run special effects for bottom blocks 
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param sub
-	 * @param random
+	 * Run special effects for bottom blocks
+	 * 
+	 * @param world The World
+	 * @param x X-Axis
+	 * @param y Y-Axis
+	 * @param z Z-Axis
+	 * @param random Random number access
 	 */
 	public void bottomSpecial(World world, int x, int y, int z, Random random){
 		for(IBottomListener special: bottomSpecials){
@@ -488,10 +567,10 @@ public class GrowingTree {
 	}
 
 	/**
-	 * Provides an interface for other mods to add special effects like fruit, spawns or whatever 
-	 * @param sub
+	 * Provides an interface for other mods to add special effects like fruit, spawns or whatever
+	 *  
 	 * @param specials
-	 * @return GrowingTree for chaining
+	 * @return GrowingTree for function chaining
 	 */
 	public GrowingTree registerBottomSpecials(IBottomListener ... specials){
 		for(IBottomListener special: specials){

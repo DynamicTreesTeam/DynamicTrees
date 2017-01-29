@@ -14,6 +14,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -348,7 +349,7 @@ public class BlockBranch extends Block implements ITreePart {
 			signal.run(world, this, x, y, z, fromDir);//Run the inspectors of choice
 
 			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS){//Spread signal in various directions
-				if(dir != fromDir){//dont count where the signal originated from
+				if(dir != fromDir){//don't count where the signal originated from
 					int dx = x + dir.offsetX;
 					int dy = y + dir.offsetY;
 					int dz = z + dir.offsetZ;
@@ -372,11 +373,11 @@ public class BlockBranch extends Block implements ITreePart {
 	}
 
 	//Destroys all branches recursively not facing the branching direction with the root node
-	public void destroyTreeFromNode(World world, int x, int y, int z){
+	public void destroyTreeFromNode(World world, int x, int y, int z, float fortuneFactor){
 		MapSignal signal = analyse(world, x, y, z, ForgeDirection.UNKNOWN, new MapSignal());//Analyze entire tree network to find root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		analyse(world, x, y, z, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(getTree())));//Analyze only part of the tree beyond the break point and calculate it's volume
-		dropWood(world, x, y, z, volumeSum.getVolume());//Drop an amount of wood calculated from the body of the tree network
+		dropWood(world, x, y, z, (int)(volumeSum.getVolume() * fortuneFactor));//Drop an amount of wood calculated from the body of the tree network
 	}
 	
 	public void destroyEntireTree(World world, int x, int y, int z){
@@ -400,13 +401,14 @@ public class BlockBranch extends Block implements ITreePart {
 	
 	@Override
 	public void onBlockHarvested(World world, int x, int y, int z, int localMeta, EntityPlayer player) {
-		destroyTreeFromNode(world, x, y, z);
+		int fortune = EnchantmentHelper.getFortuneModifier(player);
+		destroyTreeFromNode(world, x, y, z, 1.0f + 0.25f * fortune);
 	}
 	
 	//Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
 	@Override
-    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion){
-		destroyTreeFromNode(world, x, y, z);
+    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
+		destroyTreeFromNode(world, x, y, z, 1.0f);
 	}
 	
 	@Override

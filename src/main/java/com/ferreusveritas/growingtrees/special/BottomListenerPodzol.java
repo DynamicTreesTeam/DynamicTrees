@@ -21,6 +21,9 @@ public class BottomListenerPodzol implements IBottomListener {
 	@Override
 	public void run(World world, GrowingTree tree, int x, int y, int z, Random random) {
 
+		x = + random.nextInt(3) - 1;
+		y = + random.nextInt(3) - 1;
+		
 		final int darkThreshold = 4;
 
 		for(int i = 0; i < 32; i++){
@@ -28,18 +31,18 @@ public class BottomListenerPodzol implements IBottomListener {
 			if(!world.isAirBlock(x, offy, z)){
 				Block block = world.getBlock(x, offy, z);
 
-				if(block instanceof BlockBranch || block instanceof BlockMushroom){
+				if(block instanceof BlockBranch || block instanceof BlockMushroom){//Skip past Mushrooms and branches on the way down
 					continue;
 				}
 				else 
-					if(block instanceof BlockFlower || block instanceof BlockTallGrass || block instanceof BlockDoublePlant){
+					if(block instanceof BlockFlower || block instanceof BlockTallGrass || block instanceof BlockDoublePlant){//Kill Plants
 						if(world.getSavedLightValue(EnumSkyBlock.Sky, x, offy, z) <= darkThreshold){
 							world.setBlockToAir(x, y, z);
 						}
 						continue;
 					}
 					else
-						if(block == Blocks.dirt || block == Blocks.grass){
+						if(block == Blocks.dirt || block == Blocks.grass){//Convert grass and dirt to podzol
 							if(world.getSavedLightValue(EnumSkyBlock.Sky, x, offy + 1, z) <= darkThreshold){
 								world.setBlock(x, offy, z, Blocks.dirt, 2, 3);//Set to podzol
 							} else {

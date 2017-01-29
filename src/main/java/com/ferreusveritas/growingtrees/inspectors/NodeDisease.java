@@ -29,30 +29,10 @@ public class NodeDisease implements INodeInspector {
 		if(branch != null && tree == branch.getTree()){
 			if(branch.getRadius(world, x, y, z) == 1){
 				world.setBlockToAir(x, y, z);//Destroy the thin branch
-				killSurroundingLeaves(world, x, y, z);//Destroy the surrounding leaves
 			}
 		}
 		
 		return true;
-	}
-
-	//Clumsy hack to eliminate leaves
-	public void killSurroundingLeaves(World world, int x, int y, int z){
-		for(int iz = z - 3; iz <= z + 3; iz++){
-			for(int iy = y - 3; iy <= y + 3; iy++){
-				for(int ix = x - 3; ix <= x + 3; ix++){
-					if(tree.isCompatibleGenericLeaves(world, ix, iy, iz)){
-						world.setBlockToAir(ix, iy, iz);
-						int qty = tree.getGrowingLeaves().quantityDropped(world.rand);
-						if(qty != 0){
-							EntityItem itemEntity = new EntityItem(world, x, y, z, new ItemStack(tree.getSeed(), qty));
-							itemEntity.setPosition(x, y, z);
-							world.spawnEntityInWorld(itemEntity);
-						}
-					}
-				}
-			}
-		}
 	}
 	
 }

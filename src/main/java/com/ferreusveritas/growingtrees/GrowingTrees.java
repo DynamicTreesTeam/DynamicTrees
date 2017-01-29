@@ -9,6 +9,10 @@ import com.ferreusveritas.growingtrees.trees.TreeDarkOak;
 import com.ferreusveritas.growingtrees.trees.TreeJungle;
 import com.ferreusveritas.growingtrees.trees.TreeOak;
 import com.ferreusveritas.growingtrees.trees.TreeSpruce;
+import com.ferreusveritas.growingtrees.worldgen.CircleDebug;
+import com.ferreusveritas.growingtrees.worldgen.CircleHelper;
+import com.ferreusveritas.growingtrees.worldgen.DecorateEventHandler;
+import com.ferreusveritas.growingtrees.worldgen.TreeGenerator;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -20,8 +24,36 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
+/**
+ * <p><pre><tt><b>
+ *  ╭─────────────────╮
+ *  │                 │
+ *  │       ▓▓        │
+ *  │      ▓▓▓▓▓      │
+ *  │     ▓▓▓┼▓▓▓     │
+ *  │    ▓▓▓▓│▓▓▓     │
+ *  │    ▓▓└─┧ ▓▓▓    │
+ *  │     ▓  ┠─┘▓     │
+ *  │        ┃        │
+ *  │  █████████████  │
+ *  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+ *  │  ░░░░░░░░░░░░░  │
+ *  ╞═════════════════╡
+ *  │  GROWING TREES  │
+ *  ╰─────────────────╯
+ * </b></tt></pre></p>
+ * 
+ * <p>
+ * 2016-2017 Ferreusveritas
+ * </p>
+ * 
+ * @author ferreusveritas
+ * @version 0.4.5
+ *
+ */
 @Mod(modid = GrowingTrees.MODID, version=GrowingTrees.VERSION)
 public class GrowingTrees {
 
@@ -50,6 +82,8 @@ public class GrowingTrees {
 	public void preInit(FMLPreInitializationEvent event) {
 		//Run before anything else. Read your config, create blocks, items, etc, and register them with the GameRegistry.
 		
+		//CircleDebug.initCircleTests();
+		
 		ConfigHandler.preInit(event);
 		
 		//Dirt
@@ -65,8 +99,16 @@ public class GrowingTrees {
 		treeDarkOak = new TreeDarkOak(5).register();
 		
 		growingTreesTab.setTabIconItemStack(new ItemStack(treeOak.getSeed()));
+
+		//Conveniently accessible disaster
+		if(ConfigHandler.worldGen){
+			GameRegistry.registerWorldGenerator(new TreeGenerator(), 20);
+			MinecraftForge.TERRAIN_GEN_BUS.register(new DecorateEventHandler());
+		}
 		
 		proxy.preInit();
+		
+		proxy.registerEventHandlers();
 	}
 	
 	@EventHandler
@@ -85,7 +127,9 @@ public class GrowingTrees {
 
 	@EventHandler
 	public void PostInit(FMLPostInitializationEvent e){
-		//Handle interaction with other mods, complete your setup based on this.
+		//Handle interaction with other mods, complete your setup based on this.	
 	}
 
+	
+	
 }

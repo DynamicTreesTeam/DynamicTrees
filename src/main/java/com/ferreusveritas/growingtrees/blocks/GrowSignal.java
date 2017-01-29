@@ -13,7 +13,6 @@ public class GrowSignal {
 	public ForgeDirection dir;
 	public int numTurns;
 	public int numSteps;
-	public boolean inTrunk;
 	private GrowingTree tree;
 	public BlockBranch branchBlock;
 	
@@ -43,7 +42,6 @@ public class GrowSignal {
 		numTurns = 0;
 		numSteps = 0;
 		tapering = 0.3f;
-		inTrunk = true;
 		rand = new Random();
 		success = true;
 		
@@ -75,10 +73,12 @@ public class GrowSignal {
 		if(dir != targetDir) {//Check for a direction change
 			dir = targetDir;
 			numTurns++;
-			inTrunk = false;
 			return true;
 		}
 		return false;
 	}
 	
+	public boolean isInTrunk(){
+		return numTurns > 0;
+	}
 }

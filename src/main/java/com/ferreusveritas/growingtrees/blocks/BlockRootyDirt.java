@@ -3,11 +3,15 @@ package com.ferreusveritas.growingtrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
+import com.ferreusveritas.growingtrees.Dir;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.inspectors.NodeDisease;
 import com.ferreusveritas.growingtrees.inspectors.NodeFreezer;
 import com.ferreusveritas.growingtrees.inspectors.NodeTwinkle;
+import com.ferreusveritas.growingtrees.renderers.RendererBranch;
+import com.ferreusveritas.growingtrees.renderers.RendererRootyDirt;
+import com.ferreusveritas.growingtrees.renderers.RendererRootyDirt.RenderType;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import cpw.mods.fml.relauncher.Side;
@@ -31,9 +35,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockRootyDirt extends Block implements ITreePart {
 
-	public IIcon sideIcon;
-    protected static Random rootyRand = new Random();
-    
+	public IIcon dirtIcon;
+	public IIcon grassIcon;
+	public IIcon myceliumIcon;
+	public IIcon podzolIcon;
+	
 	public BlockRootyDirt() {
 		super(Material.ground);
         this.setTickRandomly(true);
@@ -173,6 +179,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
 			if(branch != null){
 				TreeHelper.getSafeTreePart(world, x, y + 1, z).analyse(world, x, y + 1, z, ForgeDirection.UNKNOWN, new MapSignal(new NodeDisease(branch.getTree())));
+				fertilize(world, x, y, z, -15);//destroy the soil life so it can no longer grow
 			}
 		}
 		return true;
@@ -270,25 +277,119 @@ public class BlockRootyDirt extends Block implements ITreePart {
     }
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metadata) {
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
+
+		if(RendererRootyDirt.renderPass == 1){//First Pass
+			switch(side){
+				case 0: return dirtIcon;//Bottom
+				case 1: switch(RendererRootyDirt.renderType){//Top
+					case GRASS: return Blocks.grass.getIcon(side, 0);
+					case MYCELIUM: return Blocks.mycelium.getIcon(side, 0);
+					case PODZOL: return Blocks.dirt.getIcon(side, 2);
+					default: return Blocks.dirt.getIcon(side, 0);
+					}
+				default: switch(RendererRootyDirt.renderType){//All other sides
+					case GRASS: return grassIcon;
+					case MYCELIUM: return myceliumIcon;
+					case PODZOL: return podzolIcon;
+					default: return dirtIcon;
+				}
+			}
+		} else {//Second Pass
+			if(RendererRootyDirt.renderType == RenderType.GRASS){
+				if(side == 1){//Top
+					return Blocks.grass.getIcon(side, 0);
+				} else if(side != 0){//NSWE
+					return Blocks.grass.getIconSideOverlay();
+				}
+			}
+		}
+
+		return dirtIcon;//Everything else
+    }
+
+	@Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int metadata) {
 		if(side == 1){
 			return Blocks.dirt.getIcon(side, 0);
-		} else {
-			return sideIcon;
 		}
+		return dirtIcon;
+    }
+
+	
+	public RenderType getRenderType(IBlockAccess blockAccess, int x, int y, int z){
+		BlockAndMeta mimic = new BlockAndMeta();
+		
+		final int dMap[] = {0, -1, 1};
+		
+		for(int depth = 0; depth < 3; depth++){
+			for(Dir d: Dir.CARDINAL){
+				mimic.setFromCoords(blockAccess, x + d.xOffset, y + dMap[depth], z + d.zOffset);
+
+				if(mimic.matches(Blocks.grass)){
+					return RenderType.GRASS;
+				} else if(mimic.matches(Blocks.mycelium)){
+					return RenderType.MYCELIUM;
+				} else if(mimic.matches(Blocks.dirt, 2)){
+					return RenderType.PODZOL;
+				}
+			}
+		}
+		
+		return RenderType.DIRT;//Default to plain old dirt
 	}
+	
+	@Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockAccess access, int x, int y, int z, int side) {
+		
+		boolean shouldRender = super.shouldSideBeRendered(access, x, y, z, side);
+
+		if(shouldRender){
+			if(RendererRootyDirt.renderPass == 1){//First Pass
+				if(RendererRootyDirt.renderType == RenderType.GRASS){
+					return side != 1;//Don't render top of grass block on first pass	
+				}
+				return true;//Render all sides of dirt, mycelium and podzol block on first pass
+			} else {//Second Pass
+				if(RendererRootyDirt.renderType == RenderType.GRASS){
+					return side != 0;//Don't render bottom of grass block on second pass	
+				}
+				return false;//Render nothing for dirt, mycelium and podzol block on second pass
+			}
+		}
+		
+		return false;
+    }
+	
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(IBlockAccess blockAccess, int x, int y, int z) {
+    	if(RendererRootyDirt.renderType == RenderType.GRASS && RendererRootyDirt.renderPass == 2){
+    		return Blocks.grass.colorMultiplier(blockAccess, x, y, z);
+    	} else {
+    		return super.colorMultiplier(blockAccess, x, y, z);
+    	}
+    }
 	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister register) {
-		sideIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt");
+		dirtIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt-dirt");
+		grassIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt-grass");
+		myceliumIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt-mycelium");
+		podzolIcon = register.registerIcon(GrowingTrees.MODID + ":" + "rootydirt-podzol");
 	}
 
 	@Override
 	public GrowingTree getTree(IBlockAccess blockAccess, int x, int y, int z) {
-		//TODO: Get the tree sitting above this block... or null
-		return null;
+		return TreeHelper.isBranch(blockAccess, x, y + 1, z) ? TreeHelper.getSafeTreePart(blockAccess, x, y + 1, z).getTree(blockAccess, x, y + 1, z) : null;
 	}
 
+	@Override
+	public int getRenderType() {
+		return RendererRootyDirt.renderId;
+	}
+	
 }

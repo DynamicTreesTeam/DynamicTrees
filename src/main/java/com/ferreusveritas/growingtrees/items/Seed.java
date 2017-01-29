@@ -92,6 +92,6 @@ public class Seed extends Item {
 	}
 	
 	public boolean isAcceptableSoil(Block soilBlock){
-		return soilBlock == Blocks.dirt || soilBlock == Blocks.grass || soilBlock == GrowingTrees.blockRootyDirt;
+		return soilBlock == Blocks.dirt || soilBlock == Blocks.grass || soilBlock == Blocks.mycelium || soilBlock == GrowingTrees.blockRootyDirt;
 	}
 }

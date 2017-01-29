@@ -14,6 +14,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -127,8 +128,10 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
 		int dy = y + dir.offsetY;
 		int dz = z + dir.offsetZ;
 	
-		if(TreeHelper.getSafeTreePart(world, dx, dy, dz).getTree(world, dx, dy, dz).getGrowingLeaves() == this){//Attempt to match the proper growing leaves for the tree being clicked on
-			return TreeHelper.getSafeTreePart(world, dx, dy, dz).getTree(world, dx, dy, dz).getGrowingLeavesSub() << 2;//Return matched metadata
+		GrowingTree tree = TreeHelper.getSafeTreePart(world, dx, dy, dz).getTree(world, dx, dy, dz);
+		
+		if(tree != null && tree.getGrowingLeaves() == this){//Attempt to match the proper growing leaves for the tree being clicked on
+			return tree.getGrowingLeavesSub() << 2;//Return matched metadata
 		}
 		
 		return 0;
@@ -454,13 +457,48 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
 	// DROPS FUNCTIONS
 	//////////////////////////////
 	
+    @Override
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+        int chance = this.func_150123_b(metadata);
+
+        //Hokey fortune stuff here.
+        if (fortune > 0) {
+            chance -= 2 << fortune;
+            if (chance < 10) chance = 10;
+        }
+
+        //It's mostly for seeds.. mostly.
+        //Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
+        if (world.rand.nextInt(chance) == 0){
+        	ret.add(new ItemStack(this.getItemDropped(metadata, world.rand, fortune), 1, this.damageDropped(metadata)));
+        }
+
+        //More fortune contrivances here.  Vanilla compatible returns.
+        chance = 200; //1 in 200 chance of returning an "apple"
+        if (fortune > 0) {
+            chance -= 10 << fortune;
+            if (chance < 40) chance = 40;
+        }
+
+        //Get species specific drops.. apples or cocoa for instance
+        getTree(getSubBlockNumFromMetadata(metadata)).getDrops(world, x, y, z, chance, ret);
+
+        return ret;
+    }
+	
+    @Override
+    protected boolean canSilkHarvest() {
+        return false;
+    }
+    
 	//Drop a seed when the player destroys the block
     @Override
     public Item getItemDropped(int meta, Random random, int fortune) {
     	return getTree(getSubBlockNumFromMetadata(meta)).getSeed();
     }
 
-    //1 in 64 chance to drop a seed on destruction
+    //1 in 64 chance to drop a seed on destruction.. This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
     @Override
     public int quantityDropped(Random random) {
         return random.nextInt(64) == 0 ? 1 : 0;
@@ -468,7 +506,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
     
     @Override
     public int damageDropped(int metadata) {
-        return 0;
+        return 0;//Seeds don't use metadata
     }
     
     //When the leaves are sheared just return vanilla leaves for usability

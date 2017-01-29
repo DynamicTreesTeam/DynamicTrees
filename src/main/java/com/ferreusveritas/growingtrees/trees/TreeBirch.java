@@ -35,7 +35,7 @@ public class TreeBirch extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.75f;//Suitability
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         

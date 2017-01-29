@@ -1,6 +1,7 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
+import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
@@ -37,36 +38,28 @@ public class TreeSpruce extends GrowingTree {
 	}
 	
 	@Override
-	public ForgeDirection selectNewDirection(World world, int x, int y, int z, BlockBranch branch, GrowSignal signal) {
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+
 		ForgeDirection originDir = signal.dir.getOpposite();
 		
-		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.originX, signal.originY, signal.originZ)){
-			return ForgeDirection.UP;
-		}
-		
-		int radius = branch.getRadius(world, x, y, z);//radius of this node
-		
-		//Create probability map for direction change
-		int probMap[] = new int[6];
+		//Alter probability map for direction change
 		probMap[0] = 0;//Down is always disallowed
-		probMap[1] = signal.inTrunk ? getUpProbability(): 0;
+		probMap[1] = signal.isInTrunk() ? getUpProbability(): 0;
 		probMap[2] = probMap[3] = probMap[4] = probMap[5] = //Only allow turns when we aren't in the trunk(or the branch is not a twig and step is odd)
-				!signal.inTrunk || (signal.inTrunk && signal.numSteps % 2 == 1 && radius > 1) ? 2 : 0;
+				!signal.isInTrunk() || (signal.isInTrunk() && signal.numSteps % 2 == 1 && radius > 1) ? 2 : 0;
 		probMap[originDir.ordinal()] = 0;//Disable the direction we came from
-		probMap[signal.dir.ordinal()] += signal.inTrunk ? 0 : signal.numTurns == 1 ? 2 : 1;//Favor current travel direction 
-		
-		probMap = customDirectionManipulation(world, x, y, z, radius, signal, probMap);
-		
-		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		ForgeDirection newDir = ForgeDirection.getOrientation(choice);
+		probMap[signal.dir.ordinal()] += signal.isInTrunk() ? 0 : signal.numTurns == 1 ? 2 : 1;//Favor current travel direction 
 
-		if(signal.inTrunk && newDir != ForgeDirection.UP){//Turned out of trunk
+		return probMap;
+	}
+
+	@Override
+	protected ForgeDirection newDirectionSelected(ForgeDirection newDir, GrowSignal signal){
+		if(signal.isInTrunk() && newDir != ForgeDirection.UP){//Turned out of trunk
 			signal.energy /= 3.0f;
 		}
-		
 		return newDir;
 	}
-	
 	
 	@Override
 	public int getBranchHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
@@ -107,7 +100,7 @@ public class TreeSpruce extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.85f;//Suitability(Should be just barely less than the biome suitabilities)
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         

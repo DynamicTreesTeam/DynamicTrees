@@ -33,7 +33,7 @@ public class TreeJungle extends GrowingTree {
 	}
 
 	@Override
-	public int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
 		//Jungle Trees grow a maximum of 16 meters tall
 		
 		//Amplify cardinal directions to encourage spread
@@ -74,7 +74,7 @@ public class TreeJungle extends GrowingTree {
 			return 1.00f;
 		}
 
-		float s = 0.60f;
+		float s = defaultSuitability();
 		float temp = biome.getFloatTemperature(x, y, z);
         float rain = biome.rainfall;
         
