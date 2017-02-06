@@ -361,7 +361,9 @@ public class BlockBranch extends Block implements ITreePart {
 						signal.localRootDir = dir;
 					}
 				}
-			}		
+			}
+			
+			signal.returnRun(world, this, x, y, z, fromDir);
 		} else {
 			world.setBlockToAir(x, y, z);//Destroy one of the offending nodes
 			signal.overflow = true;

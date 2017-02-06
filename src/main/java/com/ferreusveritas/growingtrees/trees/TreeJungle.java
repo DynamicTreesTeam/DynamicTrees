@@ -1,6 +1,5 @@
 package com.ferreusveritas.growingtrees.trees;
 
-import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.blocks.GrowSignal;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
@@ -10,6 +9,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TreeJungle extends GrowingTree {
@@ -17,23 +18,27 @@ public class TreeJungle extends GrowingTree {
 	public TreeJungle(int seq) {
 		super("jungle", seq);
 		
-		tapering = 0.15f;
-		signalEnergy = 16.0f;
-		upProbability = 3;//Jungle tree grows around wildly
-		lowestBranchHeight = 2;//A little lower than normal to provide inconvenient obstruction and climbing
+		//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
+		setBasicGrowingParameters(0.15f, 16.0f, 3, 2, 1.0f);
+
 		retries = 2;//Very fast growing
 		soilLongevity = 10;//Lasts a bit longer than average(8)
-		smotherLeavesMax = 3;//thin canopy
-
+		
 		setPrimitiveLeaves(Blocks.leaves, 3);//Vanilla Jungle Leaves
 		setPrimitiveLog(Blocks.log, 3);//Vanilla Jungle Log
+		setPrimitiveSapling(Blocks.sapling, 3);
+
+		envFactor(Type.COLD, 0.15f);
+		envFactor(Type.DRY,  0.20f);
+		envFactor(Type.HOT, 1.1f);
+		envFactor(Type.WET, 1.1f);
 		
 		registerBottomSpecials(new BottomListenerPodzol(), new BottomListenerVine());
 		
 	}
 
 	@Override
-	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]) {
 		//Jungle Trees grow a maximum of 16 meters tall
 		
 		//Amplify cardinal directions to encourage spread
@@ -58,39 +63,13 @@ public class TreeJungle extends GrowingTree {
 	
 	//Jungle trees grow taller in suitable biomes
 	@Override
-	public float getEnergy(World world, int x, int y, int z){
+	public float getEnergy(World world, int x, int y, int z) {
         return super.getEnergy(world, x, y, z) * biomeSuitability(world, x, y, z);
 	}
 	
 	@Override
-	public float biomeSuitability(World world, int x, int y, int z){
-		if(ConfigHandler.ignoreBiomeGrowthRate){
-			return 1.0f;
-		}
-		
-		BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-
-		if(isOneOfBiomes(biome, BiomeGenBase.jungle, BiomeGenBase.jungleHills, BiomeGenBase.jungleEdge)){
-			return 1.00f;
-		}
-
-		float s = defaultSuitability();
-		float temp = biome.getFloatTemperature(x, y, z);
-        float rain = biome.rainfall;
-        
-        s *=
-        	temp < 0.30f ? 0.25f ://Excessively Cold
-        	temp < 0.50f ? 0.50f ://Fairly Cold
-        	temp > 0.85f ? 1.25f ://Nice and warm 
-        	temp > 1.30f ? 0.75f ://Excessively Hot(Hell)
-        	1.0f *
-        	rain < 0.10f ? 0.25f ://Very Dry(Desert, Savanna, Hell)
-        	rain < 0.30f ? 0.50f ://Fairly Dry (Extreme Hills, Taiga)
-        	rain > 0.85f ? 1.50f ://Humid(Jungle, Mushroom Island)
-        	1.0f;
-        	
-		return MathHelper.clamp_float(s, 0.0f, 1.0f);
-	}
-
+	public boolean isBiomePerfect(BiomeGenBase biome) {
+		return BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE);
+	};
 	
 }

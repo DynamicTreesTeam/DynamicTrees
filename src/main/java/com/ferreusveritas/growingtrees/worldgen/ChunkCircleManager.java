@@ -6,19 +6,25 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import com.ferreusveritas.growingtrees.Dir;
+import com.ferreusveritas.growingtrees.util.Circle;
+import com.ferreusveritas.growingtrees.util.Dir;
+import com.ferreusveritas.growingtrees.util.Vec2d;
 
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
 public class ChunkCircleManager {
 
-	static private ChunkCircleManager instance = new ChunkCircleManager();
-	
+	static private ChunkCircleManager instance = new ChunkCircleManager();	
 	NoiseGeneratorPerlin noiseGenerator;
 	
 	HashMap<Vec2d, ChunkCircleSet> chunkCircles;
 	
-	static ChunkCircleManager getInstance(){
+	public static ChunkCircleManager getInstance(){
+		return instance;
+	}
+	
+	public static ChunkCircleManager newInstance(){
+		instance = new ChunkCircleManager();
 		return instance;
 	}
 	
@@ -182,6 +188,18 @@ public class ChunkCircleManager {
 		}		
 		
 		return cSet;
+	}
+	
+	public byte[] getChunkCircleData(int chunkX, int chunkZ) {
+		return getChunkCircleSet(chunkX, chunkZ).getCircleData();
+	}
+	
+	public void setChunkCircleData(int chunkX, int chunkZ, byte[] circleData) {
+		getChunkCircleSet(chunkX, chunkZ).setCircleData(circleData);
+	}
+	
+	public void unloadChunkCircleData(int chunkX, int chunkZ){
+		chunkCircles.remove(new Vec2d(chunkX, chunkZ));
 	}
 	
 	private ArrayList<Circle> getChunkCircles(int chunkX, int chunkZ){

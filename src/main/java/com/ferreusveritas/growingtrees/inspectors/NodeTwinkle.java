@@ -26,6 +26,11 @@ public class NodeTwinkle implements INodeInspector {
 		return false;
 	}
 
+	@Override
+	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+		return false;
+	}
+
 	public static void spawnParticles(World world, String particleName, int x, int y, int z, int numParticles, Random random){
         for (int i1 = 0; i1 < numParticles; ++i1) {
             double d0 = random.nextGaussian() * 0.02D;

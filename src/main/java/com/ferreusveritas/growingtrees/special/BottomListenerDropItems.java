@@ -2,8 +2,8 @@ package com.ferreusveritas.growingtrees.special;
 
 import java.util.Random;
 
-import com.ferreusveritas.growingtrees.Dir;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
+import com.ferreusveritas.growingtrees.util.Dir;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;

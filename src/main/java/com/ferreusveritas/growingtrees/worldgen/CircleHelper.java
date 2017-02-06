@@ -3,6 +3,9 @@ package com.ferreusveritas.growingtrees.worldgen;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import com.ferreusveritas.growingtrees.util.Circle;
+import com.ferreusveritas.growingtrees.util.Vec2d;
+
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 

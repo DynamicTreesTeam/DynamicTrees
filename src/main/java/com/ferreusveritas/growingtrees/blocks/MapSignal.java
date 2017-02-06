@@ -11,15 +11,15 @@ public class MapSignal {
 
 	protected ArrayList<INodeInspector> nodeInspectors;
 	
-	int rootX;
-	int rootY;
-	int rootZ;
-	int depth;
+	public int rootX;
+	public int rootY;
+	public int rootZ;
+	public int depth;
 	
 	ForgeDirection localRootDir;
 	
-	boolean overflow;
-	boolean found;
+	public boolean overflow;
+	public boolean found;
 	
 	public MapSignal(){
 		localRootDir = ForgeDirection.UNKNOWN;
@@ -37,6 +37,13 @@ public class MapSignal {
 	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir){
 		for(INodeInspector inspector: nodeInspectors){
 			inspector.run(world, block, x, y, z, fromDir);
+		}
+		return false;
+	}
+	
+	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir){
+		for(INodeInspector inspector: nodeInspectors){
+			inspector.returnRun(world, block, x, y, z, fromDir);
 		}
 		return false;
 	}

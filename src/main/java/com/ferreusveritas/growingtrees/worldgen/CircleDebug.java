@@ -9,6 +9,8 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import com.ferreusveritas.growingtrees.util.Circle;
+
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
 public class CircleDebug {

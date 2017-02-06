@@ -36,6 +36,11 @@ public class NodeDestroyer implements INodeInspector {
 		return true;
 	}
 
+	@Override
+	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+		return false;
+	}
+
 	//Clumsy hack to eliminate leaves
 	public void killSurroundingLeaves(World world, int x, int y, int z){
 		for(int iz = z - 3; iz <= z + 3; iz++){
@@ -43,7 +48,7 @@ public class NodeDestroyer implements INodeInspector {
 				for(int ix = x - 3; ix <= x + 3; ix++){
 					if(tree.isCompatibleGenericLeaves(world, ix, iy, iz)){
 						world.setBlockToAir(ix, iy, iz);
-						int qty = tree.getGrowingLeaves().quantityDropped(world.rand);
+						int qty = tree.getGrowingLeaves().quantitySeedDropped(world.rand);
 						if(qty != 0){
 							EntityItem itemEntity = new EntityItem(world, x, y, z, new ItemStack(tree.getSeed(), qty));
 							itemEntity.setPosition(x, y, z);

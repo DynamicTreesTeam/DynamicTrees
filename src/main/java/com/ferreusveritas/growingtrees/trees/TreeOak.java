@@ -1,64 +1,43 @@
 package com.ferreusveritas.growingtrees.trees;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-import com.ferreusveritas.growingtrees.ConfigHandler;
 import com.ferreusveritas.growingtrees.TreeHelper;
-import com.ferreusveritas.growingtrees.special.BottomListenerDropItems;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeOak extends GrowingTree {
 
 	public TreeOak(int seq) {
 		super("oak", seq);
 		
-		tapering = 0.3f;
-		signalEnergy = 12.0f;
-		growthRate = 0.8f;
-
+		//Oak trees are about as average as you can get
+		setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
+		
 		setPrimitiveLeaves(Blocks.leaves, 0);
 		setPrimitiveLog(Blocks.log, 0);
+		setPrimitiveSapling(Blocks.sapling, 0);
+
+		envFactor(Type.COLD, 0.75f);
+		envFactor(Type.HOT, 0.50f);
+		envFactor(Type.DRY, 0.50f);
+		envFactor(Type.FOREST, 1.05f);
 		
 		registerBottomSpecials(new BottomListenerPodzol());
 	}
 
 	@Override
-	public float biomeSuitability(World world, int x, int y, int z){
-		if(ConfigHandler.ignoreBiomeGrowthRate){
-			return 1.0f;
-		}
-		
-		BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-
-		if(isOneOfBiomes(biome, BiomeGenBase.forest, BiomeGenBase.forestHills)){
-			return 1.00f;
-		}
-
-		float s = defaultSuitability();
-		float temp = biome.getFloatTemperature(x, y, z);
-        float rain = biome.rainfall;
-        
-        s *=
-        	temp < 0.30f ? 0.75f ://Excessively Cold
-        	temp > 1.00f ? 0.50f ://Excessively Hot
-        	1.0f *
-        	rain < 0.10f ? 0.25f ://Very Dry(Desert, Savanna, Hell)
-        	rain < 0.30f ? 0.50f ://Fairly Dry (Extreme Hills, Taiga)
-        	rain > 0.95f ? 0.75f ://Too Humid(Mushroom Island)
-        	1.0f;
-		
-		return MathHelper.clamp_float(s, 0.0f, 1.0f);
-	}
+	public boolean isBiomePerfect(BiomeGenBase biome) {
+		return isOneOfBiomes(biome, BiomeGenBase.forest, BiomeGenBase.forestHills);
+	};
 	
 	@Override
 	public boolean rot(World world, int x, int y, int z, int neighborCount, int radius, Random random){

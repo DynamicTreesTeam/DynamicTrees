@@ -1,5 +1,7 @@
 package com.ferreusveritas.growingtrees.renderers;
 
+import org.lwjgl.opengl.GL11;
+
 import com.ferreusveritas.growingtrees.blocks.BlockAndMeta;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
 
@@ -27,6 +29,8 @@ public class RendererRootyDirt implements ISimpleBlockRenderingHandler {
 	
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
+        GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 	    Tessellator tessellator = Tessellator.instance;
 	    tessellator.startDrawingQuads();
 	    tessellator.setNormal(0.0F, -1.0F, 0.0F);
@@ -74,6 +78,4 @@ public class RendererRootyDirt implements ISimpleBlockRenderingHandler {
 		return renderId;
 	}
 
-	
-	
 }

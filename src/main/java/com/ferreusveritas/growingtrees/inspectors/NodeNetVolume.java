@@ -16,6 +16,11 @@ public class NodeNetVolume implements INodeInspector {
 		return true;
 	}
 
+	@Override
+	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+		return false;
+	}
+
 	public int getVolume(){
 		return volume;
 	}

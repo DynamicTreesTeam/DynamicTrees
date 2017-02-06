@@ -3,6 +3,8 @@ package com.ferreusveritas.growingtrees.worldgen;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.ferreusveritas.growingtrees.util.Circle;
+
 /**
  * <h1>Chunk Circle Set</h1>
  * <p>
@@ -98,4 +100,11 @@ public class ChunkCircleSet {
 		return false;
 	}
 	
+	public byte[] getCircleData(){
+		return circleData;
+	}
+	
+	public void setCircleData(byte[] circleData){
+		this.circleData = Arrays.copyOf(circleData, 16);
+	}
 }

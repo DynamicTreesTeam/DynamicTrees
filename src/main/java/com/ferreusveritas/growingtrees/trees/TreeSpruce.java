@@ -1,18 +1,19 @@
 package com.ferreusveritas.growingtrees.trees;
 
-import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
 import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.growingtrees.blocks.GrowSignal;
 import com.ferreusveritas.growingtrees.special.BottomListenerPodzol;
+import com.ferreusveritas.growingtrees.util.SimpleVoxmap;
+import com.ferreusveritas.growingtrees.util.Vec3d;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TreeSpruce extends GrowingTree {
@@ -20,15 +21,16 @@ public class TreeSpruce extends GrowingTree {
 	public TreeSpruce(int seq) {
 		super("spruce", seq);
 
-		tapering = 0.25f;
-		signalEnergy = 16.0f;
-		upProbability = 3;
-		secondaryThickness = 2.0f;
-		lowestBranchHeight = 3;//Enough to walk under
-		growthRate = 0.9f;
+		//Spruce conical thick slower growing trees
+		setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
 		
 		setPrimitiveLeaves(Blocks.leaves, 1);
 		setPrimitiveLog(Blocks.log, 1);
+		setPrimitiveSapling(Blocks.sapling, 1);
+
+		envFactor(Type.HOT, 0.50f);
+		envFactor(Type.DRY, 0.25f);
+		envFactor(Type.WET, 0.75f);
 		
 		cellSolution = TreeHelper.cellSolverConifer;
 		hydroSolution = TreeHelper.hydroSolverConifer;
@@ -38,12 +40,12 @@ public class TreeSpruce extends GrowingTree {
 	}
 	
 	@Override
-	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]){
+	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]) {
 
 		ForgeDirection originDir = signal.dir.getOpposite();
 		
 		//Alter probability map for direction change
-		probMap[0] = 0;//Down is always disallowed
+		probMap[0] = 0;//Down is always disallowed for spruce
 		probMap[1] = signal.isInTrunk() ? getUpProbability(): 0;
 		probMap[2] = probMap[3] = probMap[4] = probMap[5] = //Only allow turns when we aren't in the trunk(or the branch is not a twig and step is odd)
 				!signal.isInTrunk() || (signal.isInTrunk() && signal.numSteps % 2 == 1 && radius > 1) ? 2 : 0;
@@ -54,7 +56,7 @@ public class TreeSpruce extends GrowingTree {
 	}
 
 	@Override
-	protected ForgeDirection newDirectionSelected(ForgeDirection newDir, GrowSignal signal){
+	protected ForgeDirection newDirectionSelected(ForgeDirection newDir, GrowSignal signal) {
 		if(signal.isInTrunk() && newDir != ForgeDirection.UP){//Turned out of trunk
 			signal.energy /= 3.0f;
 		}
@@ -63,8 +65,8 @@ public class TreeSpruce extends GrowingTree {
 	
 	@Override
 	public int getBranchHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
-		if(branch.getRadius(blockAccess, x, y, z) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)){
-			if(dir == ForgeDirection.DOWN && blockAccess.getBlock(x, y - 1, z) == branch){
+		if(branch.getRadius(blockAccess, x, y, z) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)) {
+			if(dir == ForgeDirection.DOWN && blockAccess.getBlock(x, y - 1, z) == branch) {
 				return 5;
 			}
 			return (dir == ForgeDirection.UP || dir ==  ForgeDirection.DOWN) ? 2 : 3;
@@ -76,42 +78,42 @@ public class TreeSpruce extends GrowingTree {
 	//but we don't want the trees to always be the same height all the time when planted in the same location
 	//so we feed the hash function the in-game month
 	@Override
-	public float getEnergy(World world, int x, int y, int z){
+	public float getEnergy(World world, int x, int y, int z) {
 		long day = world.getTotalWorldTime() / 24000L;
 		int month = (int)day / 30;//Change the hashs every in-game month
 		
 		return super.getEnergy(world, x, y, z) * biomeSuitability(world, x, y, z) + (coordHashCode(x, y + month, z) % 5);//Vary the height energy by a psuedorandom hash function
 	}
 	
-    public static int coordHashCode(int x, int y, int z){
+    public static int coordHashCode(int x, int y, int z) {
         int hash = (x * 9973 ^ y * 8287 ^ z * 9721) >> 1;
         return hash & 0xFFFF;
     }
+
+    @Override
+    public boolean isBiomePerfect(BiomeGenBase biome) {
+    	return BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS);
+    }
 	
-	@Override
-	public float biomeSuitability(World world, int x, int y, int z){
-		if(ConfigHandler.ignoreBiomeGrowthRate){
-			return 1.0f;
-		}
+	public void createLeafCluster(){
 
-		BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
+		leafCluster = new SimpleVoxmap(5, 2, 5, new byte[] {
 
-		if(isOneOfBiomes(biome, BiomeGenBase.taiga, BiomeGenBase.taigaHills, BiomeGenBase.coldTaiga, BiomeGenBase.coldTaigaHills, BiomeGenBase.megaTaiga, BiomeGenBase.megaTaigaHills)){
-			return 1.00f;
-		}
+				//Layer 0(Bottom)
+				0, 0, 1, 0, 0,
+				0, 1, 2, 1, 0,
+				1, 2, 0, 2, 1,
+				0, 1, 2, 1, 0,
+				0, 0, 1, 0, 0,
 
-		float s = defaultSuitability();
-		float temp = biome.getFloatTemperature(x, y, z);
-        float rain = biome.rainfall;
-        
-        s *=
-        	temp > 0.80f ? 0.50f ://Excessively Hot
-        	1.0f *
-        	rain < 0.10f ? 0.25f ://Very Dry(Desert, Savanna, Hell)
-        	rain > 0.95f ? 0.75f ://Too Humid(Mushroom Island)
-        	1.0f;
-		
-		return MathHelper.clamp_float(s, 0.0f, 1.0f);
+				//Layer 1 (Top)
+				0, 0, 0, 0, 0,
+				0, 0, 1, 0, 0,
+				0, 1, 1, 1, 0,
+				0, 0, 1, 0, 0,
+				0, 0, 0, 0, 0
+
+		}).setCenter(new Vec3d(2, 0, 2));
+
 	}
-	
 }

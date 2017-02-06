@@ -23,6 +23,11 @@ public class NodeFreezer implements INodeInspector {
 		return true;
 	}
 	
+	@Override
+	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+		return false;
+	}
+
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, int x, int y, int z){
 		BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
 		int noDecayBits = 0x04;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.TreeHelper;
+import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
 
 import cpw.mods.fml.relauncher.Side;
@@ -101,23 +102,6 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
 			getTree(sub).bottomSpecial(world, x, y, z, random);
 		}
 	}
-	
-	/*
-	@Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float px, float py, float pz){
-
-		ItemStack equippedItem = player.getCurrentEquippedItem();
-		
-		if(equippedItem == null){//Bare hand
-			if(world.isRemote){
-				int metadata = world.getBlockMetadata(x, y, z);
-				Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Leaves Metadata: " + Integer.toBinaryString(metadata)));
-			}
-		}
-
-		return false;
-    }
-    */
 
 	@Override
     public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata) {
@@ -283,7 +267,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
 	 * @param solution Array of solver elements to solve the cell automata
 	 * @return
 	 */
-	public int solveCell(int[] nv, short[] solution){
+	public static int solveCell(int[] nv, short[] solution){
 		for(int d: solution){
 			if(nv[(d >> 8) & 15] >= ((d >> 4) & 15)){
 				return d & 15;
@@ -397,10 +381,21 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
 		return signal;
 	}
 
+	/**
+	 * Will place a leaves block if the position is air.
+	 * Otherwise it will check to see if the block is already there.
+	 * 
+	 * @param world
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param tree
+	 * @return True if the leaves are now at the coordinates.
+	 */
 	public boolean needLeaves(World world, int x, int y, int z, GrowingTree tree){
-		if(world.isAirBlock(x, y, z)){
+		if(world.isAirBlock(x, y, z)){//Place Leaves if Air
 			return this.growLeaves(world, x, y, z, tree.getGrowingLeavesSub(), tree.defaultHydration);
-		} else {
+		} else {//Otherwise check if there's already this type of leaves there.
 			ITreePart treepart = TreeHelper.getSafeTreePart(world, x, y, z);
 			return treepart == this && tree.getGrowingLeavesSub() == getSubBlockNum(world, x, y, z);//Check if this is the same type of leaves
 		}
@@ -471,7 +466,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
         //It's mostly for seeds.. mostly.
         //Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
         if (world.rand.nextInt(chance) == 0){
-        	ret.add(new ItemStack(this.getItemDropped(metadata, world.rand, fortune), 1, this.damageDropped(metadata)));
+        	ret.add(new ItemStack(getSeedDropped(metadata)));
         }
 
         //More fortune contrivances here.  Vanilla compatible returns.
@@ -491,22 +486,31 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart {
     protected boolean canSilkHarvest() {
         return false;
     }
-    
+
 	//Drop a seed when the player destroys the block
-    @Override
-    public Item getItemDropped(int meta, Random random, int fortune) {
+    public Seed getSeedDropped(int meta){
     	return getTree(getSubBlockNumFromMetadata(meta)).getSeed();
     }
 
     //1 in 64 chance to drop a seed on destruction.. This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
+    public int quantitySeedDropped(Random random) {
+        return random.nextInt(64) == 0 ? 1 : 0;
+    }
+    
+    //Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
+    @Override
+    public Item getItemDropped(int meta, Random random, int fortune) {
+    	return null;
+    }
+
     @Override
     public int quantityDropped(Random random) {
-        return random.nextInt(64) == 0 ? 1 : 0;
+        return 0;
     }
     
     @Override
     public int damageDropped(int metadata) {
-        return 0;//Seeds don't use metadata
+        return 0;
     }
     
     //When the leaves are sheared just return vanilla leaves for usability

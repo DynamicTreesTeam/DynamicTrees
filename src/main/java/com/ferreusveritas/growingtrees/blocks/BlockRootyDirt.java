@@ -3,9 +3,9 @@ package com.ferreusveritas.growingtrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.growingtrees.ConfigHandler;
-import com.ferreusveritas.growingtrees.Dir;
 import com.ferreusveritas.growingtrees.GrowingTrees;
 import com.ferreusveritas.growingtrees.TreeHelper;
+import com.ferreusveritas.growingtrees.inspectors.NodeCoder;
 import com.ferreusveritas.growingtrees.inspectors.NodeDisease;
 import com.ferreusveritas.growingtrees.inspectors.NodeFreezer;
 import com.ferreusveritas.growingtrees.inspectors.NodeTwinkle;
@@ -13,6 +13,7 @@ import com.ferreusveritas.growingtrees.renderers.RendererBranch;
 import com.ferreusveritas.growingtrees.renderers.RendererRootyDirt;
 import com.ferreusveritas.growingtrees.renderers.RendererRootyDirt.RenderType;
 import com.ferreusveritas.growingtrees.trees.GrowingTree;
+import com.ferreusveritas.growingtrees.util.Dir;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -125,7 +126,9 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		
 		if(branch != null && branch.getTree().applySubstance(world, x, y, z, this, itemStack)){
 			if(itemStack.getItem() == Items.potionitem){
-				player.setCurrentItemOrArmor(0, new ItemStack(Items.glass_bottle));
+				if(!player.capabilities.isCreativeMode){
+					player.setCurrentItemOrArmor(0, new ItemStack(Items.glass_bottle));
+				}
 			} else {
 				itemStack.stackSize--;
 			}

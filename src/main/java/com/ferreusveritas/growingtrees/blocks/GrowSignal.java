@@ -79,6 +79,6 @@ public class GrowSignal {
 	}
 	
 	public boolean isInTrunk(){
-		return numTurns > 0;
+		return numTurns == 0;
 	}
 }
