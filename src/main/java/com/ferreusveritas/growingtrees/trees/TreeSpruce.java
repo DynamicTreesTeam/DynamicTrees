@@ -23,7 +23,7 @@ public class TreeSpruce extends GrowingTree {
 
 		//Spruce conical thick slower growing trees
 		setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
-		
+
 		setPrimitiveLeaves(Blocks.leaves, 1);
 		setPrimitiveLog(Blocks.log, 1);
 		setPrimitiveSapling(Blocks.sapling, 1);
@@ -31,14 +31,14 @@ public class TreeSpruce extends GrowingTree {
 		envFactor(Type.HOT, 0.50f);
 		envFactor(Type.DRY, 0.25f);
 		envFactor(Type.WET, 0.75f);
-		
+
 		cellSolution = TreeHelper.cellSolverConifer;
 		hydroSolution = TreeHelper.hydroSolverConifer;
 		smotherLeavesMax = 2;
 
 		registerBottomSpecials(new BottomListenerPodzol());
 	}
-	
+
 	@Override
 	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]) {
 
@@ -62,7 +62,7 @@ public class TreeSpruce extends GrowingTree {
 		}
 		return newDir;
 	}
-	
+
 	@Override
 	public int getBranchHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
 		if(branch.getRadius(blockAccess, x, y, z) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)) {
@@ -73,7 +73,7 @@ public class TreeSpruce extends GrowingTree {
 		}
 		return 0;
 	}
-	
+
 	//Spruce trees are so similar that it makes sense to randomize their height for a little variation
 	//but we don't want the trees to always be the same height all the time when planted in the same location
 	//so we feed the hash function the in-game month
@@ -84,18 +84,19 @@ public class TreeSpruce extends GrowingTree {
 		
 		return super.getEnergy(world, x, y, z) * biomeSuitability(world, x, y, z) + (coordHashCode(x, y + month, z) % 5);//Vary the height energy by a psuedorandom hash function
 	}
-	
-    public static int coordHashCode(int x, int y, int z) {
-        int hash = (x * 9973 ^ y * 8287 ^ z * 9721) >> 1;
-        return hash & 0xFFFF;
-    }
 
-    @Override
-    public boolean isBiomePerfect(BiomeGenBase biome) {
-    	return BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS);
-    }
-	
-	public void createLeafCluster(){
+	public static int coordHashCode(int x, int y, int z) {
+		int hash = (x * 9973 ^ y * 8287 ^ z * 9721) >> 1;
+		return hash & 0xFFFF;
+	}
+
+	@Override
+	public boolean isBiomePerfect(BiomeGenBase biome) {
+		return BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS);
+	}
+
+	@Override
+	public void createLeafCluster() {
 
 		leafCluster = new SimpleVoxmap(5, 2, 5, new byte[] {
 

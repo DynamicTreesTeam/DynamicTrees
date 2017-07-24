@@ -12,6 +12,7 @@ public class ConfigHandler {
 	public static float treeHarvestMultiplier;
 	public static boolean ignoreBiomeGrowthRate;
 	public static float diseaseChance;
+	public static boolean vineGen;
 	public static boolean worldGen;
 	
 	public static void preInit(FMLPreInitializationEvent event) {
@@ -27,8 +28,9 @@ public class ConfigHandler {
 		ignoreBiomeGrowthRate = config.getBoolean("ignoreBiomeGrowthRate", "trees", false, "If enabled all trees grow as if they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
 
+		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
 		worldGen = config.getBoolean("worldGen", "world", false, "For development purposes only at the moment.  Go ahead and enable if you feel like trashing your world.");
-		
+
 		config.save();
 	}
 }

@@ -31,60 +31,60 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 	}
 
 	public void renderStandardInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer){
-	    Tessellator tessellator = Tessellator.instance;
-	    tessellator.startDrawingQuads();
-	    tessellator.setNormal(0.0F, -1.0F, 0.0F);
-	    renderer.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 0, metadata));
-	    tessellator.setNormal(0.0F, 1.0F, 0.0F);
-	    renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 1, metadata));
-	    tessellator.setNormal(0.0F, 0.0F, -1.0F);
-	    renderer.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 2, metadata));
-	    tessellator.setNormal(0.0F, 0.0F, 1.0F);
-	    renderer.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 3, metadata));
-	    tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-	    renderer.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 4, metadata));
-	    tessellator.setNormal(1.0F, 0.0F, 0.0F);
-	    renderer.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 5, metadata));
-	    tessellator.draw();
+		Tessellator tessellator = Tessellator.instance;
+		tessellator.startDrawingQuads();
+		tessellator.setNormal(0.0F, -1.0F, 0.0F);
+		renderer.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 0, metadata));
+		tessellator.setNormal(0.0F, 1.0F, 0.0F);
+		renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 1, metadata));
+		tessellator.setNormal(0.0F, 0.0F, -1.0F);
+		renderer.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 2, metadata));
+		tessellator.setNormal(0.0F, 0.0F, 1.0F);
+		renderer.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 3, metadata));
+		tessellator.setNormal(-1.0F, 0.0F, 0.0F);
+		renderer.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 4, metadata));
+		tessellator.setNormal(1.0F, 0.0F, 0.0F);
+		renderer.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 5, metadata));
+		tessellator.draw();
 	}
-	
+
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
 		
 		BlockBranch branch = (BlockBranch)block;
-	    float rad = 0.1875f;
+		float rad = 0.1875f;
 
-	    GL11.glTranslatef(-0.5F - rad, -0.5F, -0.5F);
-	    
-	    renderRingSides = faceUp | faceDown;
-	    renderer.setRenderBounds(0.25, 0.0, 0.25, 0.75, 1.0, 0.75);
-	    renderStandardInventoryBlock(block, metadata, modelId, renderer);
-	    
-	    renderRingSides = faceWest | faceEast;
-	    renderer.setRenderBounds(0.75, 0.4375, 0.4375, 1.0, 0.5625, 0.5625);
-	    renderStandardInventoryBlock(block, metadata, modelId, renderer);
+		GL11.glTranslatef(-0.5F - rad, -0.5F, -0.5F);
 
-	    renderRingSides = faceNorth | faceSouth;
-	    renderer.setRenderBounds(0.375, 0.375, 0.75, 0.625, 0.625, 1.0);
-	    renderStandardInventoryBlock(block, metadata, modelId, renderer);
-	    
-	    GL11.glTranslatef(0.5f + rad, 0, 0);
+		renderRingSides = faceUp | faceDown;
+		renderer.setRenderBounds(0.25, 0.0, 0.25, 0.75, 1.0, 0.75);
+		renderStandardInventoryBlock(block, metadata, modelId, renderer);
 
-	    int color = branch.getTree().getGrowingLeaves().getRenderColor(branch.getTree().getGrowingLeavesSub() << 2);
-        float r = (color >> 16 & 255) / 255.0F;
-        float g = (color >> 8 & 255) / 255.0F;
-        float b = (color & 255) / 255.0F;
+		renderRingSides = faceWest | faceEast;
+		renderer.setRenderBounds(0.75, 0.4375, 0.4375, 1.0, 0.5625, 0.5625);
+		renderStandardInventoryBlock(block, metadata, modelId, renderer);
 
-        GL11.glColor4f(r, g, b, 1.0f);
-	    renderer.setRenderBounds(0.5 - rad, 0.5 - rad, 0.5 - rad, 0.5 + rad, 0.5 + rad, 0.5 + rad);
-	    BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
-	    renderStandardInventoryBlock(primLeaves.getBlock(), primLeaves.getMeta(), modelId, renderer);
-	    GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	    GL11.glTranslatef(-0.5f - rad, 0, 0);
-	    
-	    GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+		renderRingSides = faceNorth | faceSouth;
+		renderer.setRenderBounds(0.375, 0.375, 0.75, 0.625, 0.625, 1.0);
+		renderStandardInventoryBlock(block, metadata, modelId, renderer);
+
+		GL11.glTranslatef(0.5f + rad, 0, 0);
+
+		int color = branch.getTree().getGrowingLeaves().getRenderColor(branch.getTree().getGrowingLeavesSub() << 2);
+		float r = (color >> 16 & 255) / 255.0F;
+		float g = (color >> 8 & 255) / 255.0F;
+		float b = (color & 255) / 255.0F;
+
+		GL11.glColor4f(r, g, b, 1.0f);
+		renderer.setRenderBounds(0.5 - rad, 0.5 - rad, 0.5 - rad, 0.5 + rad, 0.5 + rad, 0.5 + rad);
+		BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
+		renderStandardInventoryBlock(primLeaves.getBlock(), primLeaves.getMeta(), modelId, renderer);
+		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		GL11.glTranslatef(-0.5f - rad, 0, 0);
+
+		GL11.glTranslatef(0.5F, 0.5F, 0.5F);
 	}
-	
+
 	@Override
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer){
 
@@ -105,7 +105,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			int largestConnection = 0;
 			int numConnections = 0;
 			int sourceDir = 0;
-			
+
 			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS){
 				int connRadius = branch.getSideConnectionRadius(world, x, y, z, radius, dir);
 				if(connRadius > 0){
@@ -120,13 +120,10 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 				}
 			}
 
-			
-			
-			
 			if(largestConnection < radius){
 				sourceDir = -1;//Has no source node
 			}
-			
+
 			if(sourceDir == -1){//Block doesn't seem to have a source
 				sourceDir = 0;//default to down
 				radii[0] = radius;//create a fake source
@@ -216,7 +213,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			renderer.uvRotateWest = 1;
 			renderer.uvRotateTop = 1;
 			renderer.uvRotateBottom = 1;
-			if(radii[4] == radii[5] && radii[4] > 1){//Opposites are the same radius and therefore a single block
+			if(radii[4] == radii[5] && radii[4] > 1) {//Opposites are the same radius and therefore a single block
 				min = 0.5f - radii[4] / 16.0f;
 				max = 0.5f + radii[4] / 16.0f;
 				renderer.setRenderBounds(0.0d, min, min, 1.0f, max, max);
@@ -238,7 +235,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 					renderer.setRenderBounds(sourceDir == 5 ? min : max, min, min, 1.0d, max, max);
 					renderer.renderStandardBlock(block, x, y, z);
 				}
-			}			
+			}
 			renderer.uvRotateEast = 0;
 			renderer.uvRotateWest = 0;
 			renderer.uvRotateTop = 0;
@@ -248,10 +245,10 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 		}
 
 		return false;
-	}						
+	}
 
-	public boolean renderSapling(IBlockAccess blockAcces, int x, int y, int z, BlockBranch branch, int modelId, RenderBlocks renderer){
-		
+	public boolean renderSapling(IBlockAccess blockAcces, int x, int y, int z, BlockBranch branch, int modelId, RenderBlocks renderer) {
+
 		//Draw trunk
 		renderer.setRenderBounds(0.4375, 0.0, 0.4375, 0.5625, 0.3125, 0.5625);
 		renderer.renderStandardBlock(branch, x, y, z);
@@ -260,17 +257,17 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 		renderer.setRenderBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		renderer.setOverrideBlockTexture(branch.getLeavesIcon());
 		int multiplier = branch.getTree().getGrowingLeaves().colorMultiplier(blockAcces, x, y, z);
-		
+
 		float r = (multiplier >> 16 & 255) / 255.0F;
-        float g = (multiplier >> 8 & 255) / 255.0F;
-        float b = (multiplier & 255) / 255.0F;
-		
+		float g = (multiplier >> 8 & 255) / 255.0F;
+		float b = (multiplier & 255) / 255.0F;
+
 		renderer.renderStandardBlockWithColorMultiplier(branch, x, y, z, r, g, b);
 		renderer.clearOverrideBlockTexture();
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public boolean shouldRender3DInInventory(int modelId) {
 		return true;

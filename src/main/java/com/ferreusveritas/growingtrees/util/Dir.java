@@ -10,15 +10,15 @@ public enum Dir {
 	NW(-1,-1),
 	SE( 1, 1),
 	SW(-1, 1);
-	
+
 	Dir(int x, int z){
 		xOffset = x;
 		zOffset = z;
 	}
-	
+
 	public final int xOffset;
 	public final int zOffset;
-	
-    public static final Dir[] SURROUND = {N, S, E, W, NE, NW, SE, SW};
-    public static final Dir[] CARDINAL = {N, S, E, W};
+
+	public static final Dir[] SURROUND = {N, S, E, W, NE, NW, SE, SW};
+	public static final Dir[] CARDINAL = {N, S, E, W};
 }

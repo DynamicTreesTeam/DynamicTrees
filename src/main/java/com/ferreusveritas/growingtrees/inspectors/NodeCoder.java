@@ -17,31 +17,29 @@ public class NodeCoder implements INodeInspector {
 		int forks;
 		Link links[];//Links to the other possible 6 directions
 		
-		public Link(int x, int y, int z){
+		public Link(int x, int y, int z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
 			links = new Link[6];
 		}
 	}
-	
+
 	private ArrayList<Link> links;
-	private ArrayList<Byte> codes;
-	
+
 	public NodeCoder() {
 		links = new ArrayList<Link>();
-		codes = new ArrayList<Byte>();
 	}
-	
+
 	@Override
 	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
 
 		Link link = new Link(x, y, z);
 		
 		//We've reached the end of a branch and we're starting again.
-		for(int i = links.size() - 1; i >= 0; i--){//We start at the end because that's the most likely place we came from
+		for(int i = links.size() - 1; i >= 0; i--) {//We start at the end because that's the most likely place we came from
 			Link l = links.get(i);
-			if(x + fromDir.offsetX == l.x && y + fromDir.offsetY == l.y && z + fromDir.offsetZ == l.z){
+			if(x + fromDir.offsetX == l.x && y + fromDir.offsetY == l.y && z + fromDir.offsetZ == l.z) {
 				//Create linkage
 				l.links[fromDir.getOpposite().ordinal()] = link;
 				link.links[fromDir.ordinal()] = l;
@@ -59,24 +57,26 @@ public class NodeCoder implements INodeInspector {
 	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
 		return false;
 	}
-		
-	public void compile(JoCode joCode){
-		if(links.size() > 0){
+	
+	public void compile(JoCode joCode, ForgeDirection facingDir) {
+		if(links.size() > 0) {
 			nextLink(links.get(0), null, joCode);
 		}
+	
+		joCode.rotate(facingDir);
 	}
-
-	private void nextLink(Link link, Link fromLink, JoCode joCode){
+	
+	private void nextLink(Link link, Link fromLink, JoCode joCode) {
 		
-		for(int i = 0; i < 6; i++){
+		for(int i = 0; i < 6; i++) {
 			Link l = link.links[i];
-			if(l != null && l != fromLink){
+			if(l != null && l != fromLink) {
 				if(link.forks > 0){
 					joCode.addFork();
 				}
 				joCode.addDirection((byte) i);
 				nextLink(l, link, joCode);
-				if(link.forks > 0){
+				if(link.forks > 0) {
 					joCode.addReturn();
 					link.forks--;
 				}

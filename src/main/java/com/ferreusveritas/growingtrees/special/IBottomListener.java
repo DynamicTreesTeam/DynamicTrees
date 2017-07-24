@@ -13,7 +13,7 @@ public interface IBottomListener {
 
 	//Returns 0 to 1 chance of something happening. Must return a positive non-zero number.  Return 1 to always run
 	public float chance();
-	
+
 	//Name of the special effect
 	public String getName();
 }

@@ -14,7 +14,7 @@ public class NullTreePart implements ITreePart {
 
 	//This is a safe dump for blocks that aren't tree parts
 	//Handles some vanilla blocks
-	
+
 	@Override
 	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir,	GrowingTree leavesTree) {
 		return 0;
@@ -54,8 +54,8 @@ public class NullTreePart implements ITreePart {
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, int x, int y, int z, ForgeDirection dir,	int radius) {
 		Block block = blockAccess.getBlock(x, y, z);
-		if(block instanceof BlockLeaves){//Vanilla leaves can be used for support
-			if(branch.getTree().getPrimitiveLeaves().matches(blockAccess, x, y, z, 3)){
+		if(block instanceof BlockLeaves) {//Vanilla leaves can be used for support
+			if(branch.getTree().getPrimitiveLeaves().matches(blockAccess, x, y, z, 3)) {
 				return 0x01;
 			}
 		}
@@ -63,7 +63,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack){
+	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack) {
 		return false;
 	}
 

@@ -16,23 +16,23 @@ public class BlockAndMeta {
 	public BlockAndMeta(){
 		set(Blocks.dirt, 0);
 	}
-	
+
 	public BlockAndMeta(Block block, int meta) {
 		set(block).set(meta);
 	}
-	
+
 	public BlockAndMeta(IBlockAccess blockAccess, int x, int y, int z){
 		setFromCoords(blockAccess, x, y, z);
 	}
-	
+
 	public Block getBlock(){
 		return block;
 	}
-	
+
 	public int getMeta(){
 		return meta;
 	}
-	
+
 	public BlockAndMeta set(Block block, int meta){
 		return set(block).set(meta);
 	}
@@ -41,21 +41,21 @@ public class BlockAndMeta {
 		this.block = block;
 		return this;
 	}
-	
+
 	public BlockAndMeta set(int meta){
 		this.meta = meta;
 		return this;
 	}
-	
+
 	public BlockAndMeta setFromCoords(IBlockAccess blockAccess, int x, int y, int z){
 		return set(blockAccess.getBlock(x, y, z), blockAccess.getBlockMetadata(x, y, z));
 	}
-	
+
 	//Comparison functions for other vanilla blocks
 	public boolean equals(BlockAndMeta other){
 		return getBlock() == other.getBlock() && getMeta() == other.getMeta();
 	}
-	
+
 	public boolean matches(IBlockAccess blockAccess, int x, int y, int z, int mask){
 		return matches(blockAccess.getBlock(x, y, z), blockAccess.getBlockMetadata(x, y, z) & mask);
 	}
@@ -63,7 +63,7 @@ public class BlockAndMeta {
 	public boolean matches(IBlockAccess blockAccess, int x, int y, int z){
 		return matches(blockAccess,x, y, z, 7);
 	}
-	
+
 	public boolean matches(Block block, int meta){
 		return matches(block) && matches(meta);
 	}
@@ -76,17 +76,16 @@ public class BlockAndMeta {
 		return meta == getMeta();
 	}
 
-	
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side) {
 		return block.getIcon(side, meta);
 	}
-	
+
 	public ItemStack toItemStack(int qty){
 		return new ItemStack(block, qty, meta);
 	}
-	
+
 	public ItemStack toItemStack(){
-        return toItemStack(1);
+		return toItemStack(1);
 	}
 }

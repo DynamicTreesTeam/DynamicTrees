@@ -1,5 +1,7 @@
 package com.ferreusveritas.growingtrees;
 
+import com.ferreusveritas.growingtrees.blocks.BlockDendroCoil;
+import com.ferreusveritas.growingtrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.growingtrees.items.Staff;
 import com.ferreusveritas.growingtrees.proxy.CommonProxy;
@@ -11,7 +13,7 @@ import com.ferreusveritas.growingtrees.trees.TreeOak;
 import com.ferreusveritas.growingtrees.trees.TreeSpruce;
 import com.ferreusveritas.growingtrees.worldgen.DecorateEventHandler;
 import com.ferreusveritas.growingtrees.worldgen.TreeGenerator;
-
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -25,33 +27,33 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
- * <p><pre><tt><b>
- *  ╭─────────────────╮
- *  │                 │
- *  │       ▓▓        │
- *  │      ▓▓▓▓▓      │
- *  │     ▓▓▓┼▓▓▓     │
- *  │    ▓▓▓▓│▓▓▓     │
- *  │    ▓▓└─┧ ▓▓▓    │
- *  │     ▓  ┠─┘▓     │
- *  │        ┃        │
- *  │  █████████████  │
- *  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
- *  │  ░░░░░░░░░░░░░  │
- *  ╞═════════════════╡
- *  │  GROWING TREES  │
- *  ╰─────────────────╯
- * </b></tt></pre></p>
- * 
- * <p>
- * 2016-2017 Ferreusveritas
- * </p>
- * 
- * @author ferreusveritas
- * @version 0.4.7
- *
- */
-@Mod(modid = GrowingTrees.MODID, version=GrowingTrees.VERSION)
+* <p><pre><tt><b>
+*  ╭─────────────────╮
+*  │                 │
+*  │       ▓▓        │
+*  │      ▓▓▓▓▓      │
+*  │     ▓▓▓┼▓▓▓     │
+*  │    ▓▓▓▓│▓▓▓     │
+*  │    ▓▓└─┧ ▓▓▓    │
+*  │     ▓  ┠─┘▓     │
+*  │        ┃        │
+*  │  █████████████  │
+*  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+*  │  ░░░░░░░░░░░░░  │
+*  ╞═════════════════╡
+*  │  GROWING TREES  │
+*  ╰─────────────────╯
+* </b></tt></pre></p>
+* 
+* <p>
+* 2016-2017 Ferreusveritas
+* </p>
+* 
+* @author ferreusveritas
+* @version 0.4.7
+*
+*/
+@Mod(modid = GrowingTrees.MODID, version=GrowingTrees.VERSION,dependencies="after:ComputerCraft;")
 public class GrowingTrees {
 
 	public static final String MODID = "growingtrees";
@@ -60,24 +62,25 @@ public class GrowingTrees {
 	public static final GrowingTreesTab growingTreesTab = new GrowingTreesTab(MODID);
 	
 	public static BlockRootyDirt blockRootyDirt;
+	public static BlockFruitCocoa blockFruitCocoa;
 	public static Staff treeStaff;
 
 	public static ForgeDirection cardinalDirs[] = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
-	
+
 	@Instance(MODID)
 	public static GrowingTrees instance;
 
 	@SidedProxy(clientSide = "com.ferreusveritas.growingtrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.growingtrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
-	
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		//Run before anything else. Read your config, create blocks, items, etc, and register them with the GameRegistry.
-		
+
 		//CircleDebug.initCircleTests();
-		
+
 		ConfigHandler.preInit(event);
-		
+
 		//Dirt
 		blockRootyDirt = (BlockRootyDirt) new BlockRootyDirt().setBlockName(GrowingTrees.MODID + "_rootydirt");
 		GameRegistry.registerBlock(blockRootyDirt, "rootydirt");
@@ -89,9 +92,19 @@ public class GrowingTrees {
 		TreeRegistry.registerTree(new TreeJungle(3));
 		TreeRegistry.registerTree(new TreeAcacia(4));
 		TreeRegistry.registerTree(new TreeDarkOak(5));
+
+		//Fruit
+		blockFruitCocoa = new BlockFruitCocoa();
+		blockFruitCocoa.setBlockName(GrowingTrees.MODID + "_" + "fruitcocoa");
+		GameRegistry.registerBlock(blockFruitCocoa, "fruitcocoa");
 		
+		//Creative Mode Stuff
 		treeStaff = new Staff();
-		
+
+		if(Loader.isModLoaded("ComputerCraft")){
+			new BlockDendroCoil();//For Testing
+		}
+
 		growingTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
 
 		//Conveniently accessible disaster
@@ -99,18 +112,18 @@ public class GrowingTrees {
 			GameRegistry.registerWorldGenerator(new TreeGenerator(), 20);
 			MinecraftForge.TERRAIN_GEN_BUS.register(new DecorateEventHandler());
 		}
-		
+
 		proxy.preInit();
-		
+
 		proxy.registerEventHandlers();
 	}
-	
+
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		//Do your mod setup. Build whatever data structures you care about. Register recipes.
-		
+
 		TreeRegistry.registerAllTreeRecipes();
-		
+
 		proxy.init();
 	}
 
@@ -119,6 +132,4 @@ public class GrowingTrees {
 		//Handle interaction with other mods, complete your setup based on this.
 	}
 
-	
-	
 }

@@ -13,6 +13,7 @@ import com.ferreusveritas.growingtrees.blocks.BlockBranch;
 import com.ferreusveritas.growingtrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.growingtrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.growingtrees.blocks.GrowSignal;
+import com.ferreusveritas.growingtrees.inspectors.NodeFruit;
 import com.ferreusveritas.growingtrees.items.Seed;
 import com.ferreusveritas.growingtrees.special.BottomListenerDropItems;
 import com.ferreusveritas.growingtrees.special.IBottomListener;
@@ -21,6 +22,7 @@ import com.ferreusveritas.growingtrees.util.Vec3d;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -33,10 +35,10 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
- * All data related to a tree species
- * 
- * @author ferreusveritas
- */
+* All data related to a tree species
+* 
+* @author ferreusveritas
+*/
 public class GrowingTree {
 
 	/** Simple name of the tree e.g. "oak" */
@@ -63,13 +65,17 @@ public class GrowingTree {
 	public float signalEnergy;
 	/** The stick that is returned when a whole log can't be dropped */
 	ItemStack stick;
-	
+
+	public boolean canSupportCocoa;
+
+
 	//Dirt
 	/** Ideal growth rate */
 	public float growthRate;
 	/** Ideal soil longevity */
 	public int soilLongevity;
-	
+
+
 	//Leaves
 	/** The growing leaves used by this tree */
 	BlockGrowingLeaves growingLeaves;
@@ -88,8 +94,10 @@ public class GrowingTree {
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	BlockAndMeta primitiveLeaves;
 	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
-	SimpleVoxmap leafCluster;
-	
+	protected SimpleVoxmap leafCluster;
+
+
+
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
 	Seed seed;
@@ -97,18 +105,20 @@ public class GrowingTree {
 	public boolean enableSaplingRecipe;
 
 	/** A map of environmental biome factors that change a tree's suitability */
-    Map <Type, Float> envFactors;//Environmental factors
+	Map <Type, Float> envFactors;//Environmental factors
 
+	/** A unique identifier for the tree species */
+	private int id;
 
 	/** Only growing trees mod should use this */
 	public GrowingTree(String name, int seq) {
 		this(GrowingTrees.MODID, name, seq);
 	}
-	
+
 	/** Constructor suitable for derivative mods */
 	public GrowingTree(String modid, String name, int seq) {
 		this.name = name;
-		
+
 		//Some generic defaults that will be inherited by all tree branches
 		//Branches
 		tapering = 0.3f;
@@ -121,31 +131,36 @@ public class GrowingTree {
 		//Dirt
 		growthRate = 1.0f;
 		soilLongevity = 8;
-		
+
 		//Leaves
 		defaultHydration = 4;
 		smotherLeavesMax = 4;
 		//Default solvers for deciduous trees
 		cellSolution = TreeHelper.cellSolverDeciduous;
 		hydroSolution = TreeHelper.hydroSolverDeciduous;
-		
+
 		setPrimitiveLeaves(Blocks.leaves, 0);//Set to plain Oak leaves by default
 		setPrimitiveLog(Blocks.log, 0);//Set to plain Oak log by default
 		setPrimitiveSapling(Blocks.sapling, 0);//Set to plain Oak sapling by default
 		enableSaplingRecipe = true;
-		
+
 		setGrowingLeaves(TreeHelper.getLeavesBlockForSequence(modid, name, seq), seq & 3);
 		setGrowingBranch(new BlockBranch());
 		growingBranch.setBlockName(modid + "_" + name + "branch");
 		setSeed((Seed) new Seed().setTextureName(modid + ":" + name + "seed").setCreativeTab(GrowingTrees.growingTreesTab).setUnlocalizedName(modid + "_" + name + "seed"));
-		
+
 		setStick(new ItemStack(Items.stick));
-		
+		canSupportCocoa = false;
+
 		envFactors = new HashMap<Type, Float>();
-		
+
 		createLeafCluster();
-		
+
 		registerBottomSpecials(new BottomListenerDropItems(new ItemStack(getSeed()), ConfigHandler.seedDropRate, true));
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -155,14 +170,14 @@ public class GrowingTree {
 		this.lowestBranchHeight = lowestBranchHeight;
 		this.growthRate = growthRate;
 	}
-	
+
 	public boolean applySubstance(World world, int x, int y, int z, BlockRootyDirt dirt, ItemStack itemStack) {
-		
+
 		//Bonemeal fertilizes the soil
 		if( itemStack.getItem() == Items.dye && itemStack.getItemDamage() == 15) {
 			return dirt.substanceFertilize(world, x, y, z, 1);
 		}
-		
+
 		if( itemStack.getItem() == Items.potionitem) {
 			switch(itemStack.getItemDamage()) {
 			case 8268://Harming
@@ -191,21 +206,27 @@ public class GrowingTree {
 		
 		return false;
 	}
+
+	public boolean onTreeActivated(World world, int x, int y, int z, EntityPlayer player, int side, float px, float py, float pz) {
+		return false;
+	}
+
 	
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
-	
-	public GrowingTree register() {
+
+	public GrowingTree register(int id) {
 		GameRegistry.registerBlock(growingBranch, name + "branch");
 		GameRegistry.registerItem(seed, name + "seed");
+		this.id = id;
 		return this;
 	}
-	
+
 	public GrowingTree registerRecipes() {
 		//Creates a seed from a vanilla sapling and a wooden bowl
 		GameRegistry.addShapelessRecipe(new ItemStack(seed), new Object[]{ primitiveSapling.toItemStack(), Items.bowl});
-		
+
 		//Creates a vanilla sapling from a seed and dirt 
 		if(enableSaplingRecipe) {
 			GameRegistry.addShapelessRecipe(primitiveSapling.toItemStack(), new Object[]{ seed, Blocks.dirt });
@@ -220,7 +241,7 @@ public class GrowingTree {
 	public String getName() {
 		return name;
 	}
-	
+
 	public GrowingTree setGrowingLeaves(BlockGrowingLeaves gLeaves, int sub) {
 		growingLeaves = gLeaves;
 		leavesSubBlock = sub;
@@ -231,67 +252,67 @@ public class GrowingTree {
 	public BlockGrowingLeaves getGrowingLeaves() {
 		return growingLeaves;
 	}
-	
+
 	public int getGrowingLeavesSub() {
 		return leavesSubBlock;
 	}
-	
+
 	public GrowingTree setGrowingBranch(BlockBranch gBranch) {
 		growingBranch = gBranch;
 		growingBranch.setTree(this);
 		return this;
 	}
-	
+
 	public BlockBranch getGrowingBranch() {
 		return growingBranch;
 	}
-	
+
 	public GrowingTree setSeed(Seed newSeed) {
 		seed = newSeed;
 		seed.setTree(this);
 		return this;
 	}
-	
+
 	public Seed getSeed() {
 		return seed;
 	}
-	
+
 	public GrowingTree setStick(ItemStack itemStack) {
 		stick = itemStack;
 		return this;
 	}
-	
+
 	public ItemStack getStick() {
 		return stick;
 	}
-	
+
 	public GrowingTree setPrimitiveLeaves(Block primLeaves, int meta) {
 		primitiveLeaves = new BlockAndMeta(primLeaves, meta);
 		return this;
 	}
-	
+
 	public BlockAndMeta getPrimitiveLeaves() {
 		return primitiveLeaves;
 	}
-	
+
 	public GrowingTree setPrimitiveLog(Block primLog, int meta) {
 		primitiveLog = new BlockAndMeta(primLog, meta);
 		return this;
 	}
-	
+
 	public BlockAndMeta getPrimitiveLog() {
 		return primitiveLog;
 	}
-	
+
 	public GrowingTree setPrimitiveSapling(Block primSapling, int meta) {
 		primitiveSapling = new BlockAndMeta(primSapling, meta);
 		return this;
 	}
-	
+
 	public BlockAndMeta getPrimitiveSapling() {
 		return primitiveSapling;
 	}
-	
+
 	public float getEnergy(World world, int x, int y, int z) {
 		return signalEnergy;
 	}
@@ -299,7 +320,7 @@ public class GrowingTree {
 	public float getGrowthRate(World world, int x, int y, int z) {
 		return growthRate;
 	}
-	
+
 	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
 	public int getUpProbability() {
 		return upProbability;
@@ -309,18 +330,18 @@ public class GrowingTree {
 	public int getReinfTravel() {
 		return 1;
 	}
-	
+
 	/**
-	 * @param world
-	 * @param x X-Axis
-	 * @param y Y-Axis
-	 * @param z Z-Axis
-	 * @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
-	 */
+	* @param world
+	* @param x X-Axis
+	* @param y Y-Axis
+	* @param z Z-Axis
+	* @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
+	*/
 	public int getLowestBranchHeight(World world, int x, int y, int z) {
 		return lowestBranchHeight;
 	}
-	
+
 	public int getSoilLongevity(World world, int x, int y, int z) {
 		return (int)(biomeSuitability(world, x, y, z) * soilLongevity);
 	}
@@ -333,11 +354,11 @@ public class GrowingTree {
 	public BlockRootyDirt getRootyDirtBlock() {
 		return GrowingTrees.blockRootyDirt;
 	}
-	
+
 	//////////////////////////////
 	// LEAVES HANDLING
 	//////////////////////////////
-	
+
 	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, int x, int y, int z) {
 		return isCompatibleGrowingLeaves(blockAccess, blockAccess.getBlock(x, y, z), x, y, z);
 	}
@@ -345,87 +366,87 @@ public class GrowingTree {
 	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		return isCompatibleGrowingLeaves(block, BlockGrowingLeaves.getSubBlockNum(blockAccess, x, y, z));
 	}
-	
+
 	public boolean isCompatibleGrowingLeaves(Block leaves, int sub) {
 		return leaves == getGrowingLeaves() && sub == getGrowingLeavesSub();
 	}
-	
+
 	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, int x, int y, int z) {
 		return getPrimitiveLeaves().matches(blockAccess, x, y, z, 3);
 	}
-		
+
 	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, int x, int y, int z) {
 		return isCompatibleGrowingLeaves(blockAccess, x, y, z) || isCompatibleVanillaLeaves(blockAccess, x, y, z);
 	}
-	
+
 	//////////////////////////////
 	// DROPS HANDLING
 	//////////////////////////////
-	
+
 	/** 
-	 * Override to add items to the included list argument. For apples and whatnot.
-	 * Pay Attention!  Add items to drops parameter.
-	 * 
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param chance
-	 * @param drops
-	 * @return
-	 */
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int chance, ArrayList<ItemStack> drops) {
-    	return drops;
-    }
-	    
+	* Override to add items to the included list argument. For apples and whatnot.
+	* Pay Attention!  Add items to drops parameter.
+	* 
+	* @param world
+	* @param x
+	* @param y
+	* @param z
+	* @param chance
+	* @param drops
+	* @return
+	*/
+	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int chance, ArrayList<ItemStack> drops) {
+		return drops;
+	}
+
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
 
-    public GrowingTree envFactor(Type type, float factor) {
-    	envFactors.put(type, factor);
-    	return this;
-    }
-    
-    /**
-     *
-     * @param world The World
-     * @param x X-Axis
-     * @param y Y-Axis
-     * @param z Z-Axis
-     * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
-     */
-    public float biomeSuitability(World world, int x, int y, int z) {
+	public GrowingTree envFactor(Type type, float factor) {
+		envFactors.put(type, factor);
+		return this;
+	}
+
+	/**
+	*
+	* @param world The World
+	* @param x X-Axis
+	* @param y Y-Axis
+	* @param z Z-Axis
+	* @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
+	*/
+	public float biomeSuitability(World world, int x, int y, int z) {
 		BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
 		if(ConfigHandler.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
 
 		float s = defaultSuitability();
-        
-        for(Type t : BiomeDictionary.getTypesForBiome(biome)) {
-       		s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
-        }
+		
+		for(Type t : BiomeDictionary.getTypesForBiome(biome)) {
+			s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
+		}
 		
 		return MathHelper.clamp_float(s, 0.0f, 1.0f);
 	}
-	
-    public boolean isBiomePerfect(BiomeGenBase biome) {
-    	return false;
-    }
-    
-    /** A value that determines what a tree's suitability is before climate manipulation occurs. */
+
+	public boolean isBiomePerfect(BiomeGenBase biome) {
+		return false;
+	}
+
+	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
 	public static final float defaultSuitability() {
 		return 0.85f;
 	}
 
 	/**
-	 * A convenience function to test if a biome is one of the many options passed.
-	 * 
-	 * @param biomeToCheck The biome we are matching
-	 * @param biomes Multiple biomes to match against
-	 * @return True if a match is found. False if not.
-	 */
+	* A convenience function to test if a biome is one of the many options passed.
+	* 
+	* @param biomeToCheck The biome we are matching
+	* @param biomes Multiple biomes to match against
+	* @return True if a match is found. False if not.
+	*/
 	public static boolean isOneOfBiomes(BiomeGenBase biomeToCheck, BiomeGenBase ... biomes) {
 		for(BiomeGenBase biome: biomes) {
 			if(biomeToCheck.biomeID == biome.biomeID) {
@@ -436,31 +457,31 @@ public class GrowingTree {
 	}
 		
 	/**
-	 * Handle rotting branches
-	 * @param world The world
-	 * @param x X-Axis
-	 * @param y Y-Axis
-	 * @param z Z-Axis
-	 * @param neighborCount Count of neighbors reinforcing this block
-	 * @param radius The radius of the branch
-	 * @param random Access to a random number generator
-	 * @return true if the branch should rot
-	 */
+	* Handle rotting branches
+	* @param world The world
+	* @param x X-Axis
+	* @param y Y-Axis
+	* @param z Z-Axis
+	* @param neighborCount Count of neighbors reinforcing this block
+	* @param radius The radius of the branch
+	* @param random Access to a random number generator
+	* @return true if the branch should rot
+	*/
 	public boolean rot(World world, int x, int y, int z, int neighborCount, int radius, Random random) {
 		
 		final ForgeDirection upFirst[] = {ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
 		
-		if(radius <= 1){
+		if(radius <= 1) {
 			for(ForgeDirection dir: upFirst) {
-				if(getGrowingLeaves().growLeaves(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, getGrowingLeavesSub(), 0)) {
+				if(getGrowingLeaves().growLeaves(world, this, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, 0)) {
 					return false;
 				}
 			}
-		} 
+		}
 		world.setBlockToAir(x, y, z);
 		return true;
 	}
-	
+
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
@@ -470,17 +491,17 @@ public class GrowingTree {
 	}
 
 	/**
-	 * Selects a new direction for the branch(grow) signal to turn to.
-	 * This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
-	 * Can be overridden for different species but it's preferable to override customDirectionManipulation.
-	 * 
-	 * @param world The World
-	 * @param x X-Axis
-	 * @param y Y-Axis
-	 * @param z Z-Axis
-	 * @param branch The branch block the GrowSignal is traveling in.
-	 * @param signal The grow signal.
-	 * @return
+	* Selects a new direction for the branch(grow) signal to turn to.
+	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
+	* Can be overridden for different species but it's preferable to override customDirectionManipulation.
+	* 
+	* @param world The World
+	* @param x X-Axis
+	* @param y Y-Axis
+	* @param z Z-Axis
+	* @param branch The branch block the GrowSignal is traveling in.
+	* @param signal The grow signal.
+	* @return
 	*/
 	public ForgeDirection selectNewDirection(World world, int x, int y, int z, BlockBranch branch, GrowSignal signal) {
 		ForgeDirection originDir = signal.dir.getOpposite();
@@ -489,13 +510,13 @@ public class GrowingTree {
 		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.originX, signal.originY, signal.originZ)) {
 			return ForgeDirection.UP;
 		}
-		
+
 		int probMap[] = new int[6];//6 directions possible DUNSWE
 
 		//Probability taking direction into account
-		probMap[ForgeDirection.UP.ordinal()] = signal.dir != ForgeDirection.DOWN ? getUpProbability(): 0;//Favor up 
+		probMap[ForgeDirection.UP.ordinal()] = signal.dir != ForgeDirection.DOWN ? getUpProbability(): 0;//Favor up
 		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
-		
+
 		//Create probability map for direction change
 		for(int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
@@ -503,16 +524,16 @@ public class GrowingTree {
 				int dx = x + dir.offsetX;
 				int dy = y + dir.offsetY;
 				int dz = z + dir.offsetZ;
-				
+
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
 				probMap[i] += TreeHelper.getSafeTreePart(world, dx, dy, dz).probabilityForBlock(world, dx, dy, dz, branch);
 			}
 		}
-		
+
 		//Do custom stuff or override probability map for various species
 		probMap = customDirectionManipulation(world, x, y, z, branch.getRadius(world, x, y, z), signal, probMap);
-		
+
 		//Select a direction from the probability map
 		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
 		return newDirectionSelected(ForgeDirection.getOrientation(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
@@ -522,17 +543,17 @@ public class GrowingTree {
 	protected int[] customDirectionManipulation(World world, int x, int y, int z, int radius, GrowSignal signal, int probMap[]) {
 		return probMap;
 	}
-	
+
 	/** Species can override to take action once a new direction is selected **/
 	protected ForgeDirection newDirectionSelected(ForgeDirection newDir, GrowSignal signal) {
 		return newDir;
 	}
-	
-	//Select a random direction weighted from the probability map 
+
+	/** Select a random direction weighted from the probability map **/ 
 	public static int selectRandomFromDistribution(Random random, int distMap[]) {
 
 		int distSize = 0;
-		
+
 		for(int i = 0; i < distMap.length; i++) {
 			distSize += distMap[i];
 		}
@@ -541,9 +562,9 @@ public class GrowingTree {
 			System.err.println("Warning: Zero sized distribution");
 			return -1;
 		}
-		
+
 		int rnd = random.nextInt(distSize) + 1;
-		
+
 		for(int i = 0; i < 6; i++) {
 			if(rnd > distMap[i]) {
 				rnd -= distMap[i];
@@ -555,19 +576,30 @@ public class GrowingTree {
 		return 0;
 	}	
 
+	/** Gets the fruiting node analyzer for this tree
+	*  
+	* @param world The World
+	* @param x X-Axis of block
+	* @param y Y-Axis of block
+	* @param z Z-Axis of block
+	*/
+	public NodeFruit getNodeFruit(World world, int x, int y, int z) {
+		return null;//Return null to disable fruiting. Most species do.
+	}
+
 	//////////////////////////////
 	// BOTTOM SPECIAL
 	//////////////////////////////
-	
+
 	/**
-	 * Run special effects for bottom blocks
-	 * 
-	 * @param world The World
-	 * @param x X-Axis
-	 * @param y Y-Axis
-	 * @param z Z-Axis
-	 * @param random Random number access
-	 */
+	* Run special effects for bottom blocks
+	* 
+	* @param world The World
+	* @param x X-Axis of block
+	* @param y Y-Axis of block
+	* @param z Z-Axis of block
+	* @param random Random number access
+	*/
 	public void bottomSpecial(World world, int x, int y, int z, Random random) {
 		for(IBottomListener special: bottomSpecials) {
 			float chance = special.chance();
@@ -578,18 +610,18 @@ public class GrowingTree {
 	}
 
 	/**
-	 * Provides an interface for other mods to add special effects like fruit, spawns or whatever
-	 *  
-	 * @param specials
-	 * @return GrowingTree for function chaining
-	 */
+	* Provides an interface for other mods to add special effects like fruit, spawns or whatever
+	*  
+	* @param specials
+	* @return GrowingTree for function chaining
+	*/
 	public GrowingTree registerBottomSpecials(IBottomListener ... specials) {
 		for(IBottomListener special: specials) {
 			bottomSpecials.add(special);
 		}
 		return this;
 	}
-	
+
 	//////////////////////////////
 	// WORLD GENERATION
 	//////////////////////////////
@@ -641,5 +673,5 @@ public class GrowingTree {
 	public String toString() {
 		return getName();
 	}
-	
+
 }

@@ -14,7 +14,7 @@ public class EntityParticleLeaf extends EntityAuraFX {
 	}
 	
 	@Override
-	public void onUpdate(){
+	public void onUpdate() {
 		super.onUpdate();
 	}
 

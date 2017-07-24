@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 public class GrowingTreesTab extends CreativeTabs {
 
 	private ItemStack stack;
-	
+
 	public GrowingTreesTab(String lable) {
 		super(lable);
 	}
@@ -22,12 +22,11 @@ public class GrowingTreesTab extends CreativeTabs {
 	public ItemStack getIconItemStack() {
 		return stack;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Item getTabIconItem() {
 		return stack.getItem();
 	}
 
-	
 }

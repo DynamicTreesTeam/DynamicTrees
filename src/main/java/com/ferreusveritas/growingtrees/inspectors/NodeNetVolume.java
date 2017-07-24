@@ -8,7 +8,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class NodeNetVolume implements INodeInspector {
 
 	private int volume;//number of voxels(1x1x1 pixels) of wood accumulated from network analysis
-	
+
 	@Override
 	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
 		int radius = TreeHelper.getSafeTreePart(block).getRadius(world, x, y, z);
@@ -21,8 +21,8 @@ public class NodeNetVolume implements INodeInspector {
 		return false;
 	}
 
-	public int getVolume(){
+	public int getVolume() {
 		return volume;
 	}
-	
+
 }

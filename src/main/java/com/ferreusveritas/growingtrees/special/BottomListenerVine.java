@@ -20,7 +20,7 @@ public class BottomListenerVine implements IBottomListener {
 		int dy = y + dir.offsetY;
 		int dz = z + dir.offsetZ;
 		
-		if(world.isAirBlock(dx, dy, dz) && (coordHashCode(dx, dy, dz) & 7) == 0){
+		if(world.isAirBlock(dx, dy, dz) && (coordHashCode(dx, dy, dz) & 7) == 0) {
 			int metadata =
 				dir == ForgeDirection.NORTH ? 1 :
 				dir == ForgeDirection.SOUTH ? 4 :
@@ -41,9 +41,9 @@ public class BottomListenerVine implements IBottomListener {
 		return "vine";
 	}
 
-    public static int coordHashCode(int x, int y, int z) {
-        int hash = (x * 4111 ^ y * 271 ^ z * 3067) >> 1;
-        return hash & 0xFFFF;
-    }
-	
+	public static int coordHashCode(int x, int y, int z) {
+		int hash = (x * 4111 ^ y * 271 ^ z * 3067) >> 1;
+		return hash & 0xFFFF;
+	}
+
 }

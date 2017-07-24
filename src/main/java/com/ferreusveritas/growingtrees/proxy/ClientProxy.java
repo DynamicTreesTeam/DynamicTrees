@@ -21,7 +21,7 @@ public class ClientProxy extends CommonProxy {
 		RenderingRegistry.registerBlockHandler(new RendererBranch());
 		RenderingRegistry.registerBlockHandler(new RendererRootyDirt());
 	}
-	
+
 	@Override
 	public EntityPlayer getClientPlayer() {
 		return Minecraft.getMinecraft().thePlayer;
@@ -31,12 +31,13 @@ public class ClientProxy extends CommonProxy {
 	public World getClientWorld() {
 		return Minecraft.getMinecraft().theWorld;
 	}
-	
-    @Override 
-    public void registerEventHandlers() { 
-        super.registerEventHandlers();
-        ClientEventHandler ev = new ClientEventHandler(); 
-        FMLCommonHandler.instance().bus().register(ev); 
-        MinecraftForge.EVENT_BUS.register(ev); 
-    } 
+
+	@Override 
+	public void registerEventHandlers() {
+		super.registerEventHandlers();
+		ClientEventHandler ev = new ClientEventHandler();
+		FMLCommonHandler.instance().bus().register(ev);
+		MinecraftForge.EVENT_BUS.register(ev);
+	}
+
 }

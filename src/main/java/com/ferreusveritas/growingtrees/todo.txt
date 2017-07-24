@@ -1,29 +1,28 @@
 ////////////////////////////////////////////////////////////////
-// TODO
+// TODO (RoadMap)
 ////////////////////////////////////////////////////////////////
 
+[X]Use biome dictionary to control tree biome suitability
+[X]customDirectionManipulation() should be used for all species.. and spruce shouldn't override selectNewDirection()
+[X]Creative tree staff
+[X]Add fortune to wood harvesting
 [ ]World Gen:
-    [ ]Finish circle packing algo
-    [ ]Circle sizes dependent on biome and noise. 
-    [ ]Grow Model Trees
+    [X]Finish circle packing algo
+    [X]Circle sizes dependent on biome and noise. 
+    [X]Grow Model Trees
+    [ ]Create models
     [X]Save and load circles from chunks
     [X]Base64 tree codes
-
-[X]customDirectionManipulation() should be used for all species.. and spruce shouldn't override selectNewDirection()
-[ ]Revamp jungle tree growth algorithm
-[X]Creative tree staff
-[X]Use biome dictionary to control tree biome suitability
 [ ]Cocoa Pods
-[X]Add fortune to wood harvesting
-[X]Check disease code update
-
-[ ]Custom Potions:
-    [ ]Potion of Depletion: Depletes soil completely so tree stops growing
-    [ ]Potion of Poison: Kills tree by destroying it's leaves and leaving it to rot
-    [ ]Potion of Burgeoning: Instantly causes a single growth cycle
-    [ ]Potion of Fertility: Fully fertilizes the soil
+[ ]Revamp jungle tree growth algorithm
+[ ]Custom Tree Potions(to replace the confusing vanilla ones):
+    [ ]Charcoal Potion(Base for all other tree potions, also cures poison) Awkward potion + Charcoal
+    [ ]Potion of Depletion: Depletes soil completely so tree stops growing. Charcoal potion + Slime
+    [ ]Potion of Defoliance: Kills tree by destroying it's leaves and leaving it to rot. Charcoal potion + Blue Orchid Flower
+    [ ]Potion of Burgeoning: Instantly causes a single growth cycle. Charcoal + Bone
+    [ ]Potion of Fertility: Fully fertilizes the soil. Charcoal potion + Raw Fish
     [ ]Potion of Persistence: Freezes the tree by changing all of it's growing leaves blocks with vanilla leaves block and completely depletes the soil.  
-        The tree will no longer grow, die in the dark, or drop seeds.
+        The tree will no longer grow, die in the dark, or drop seeds. Charcoal potion + Lapis Lazuli
 
 [X]Known Bugs:
     [X]Creative right click crash bug
@@ -37,6 +36,7 @@
 	[X]Can't plant in mycelium
 	[X]Potions shouldn't empty in creative mode
 	[X]Rooty dirt block isn't quite centered in GUI
+	[ ]Leaves Blocks appear and disappear because automata can't find stable configuration 
 
 ////////////////////////////////////////////////////////////////
 //  Circle Generation Algorithm  ///////////////////////////////

@@ -1,5 +1,3 @@
 package com.ferreusveritas.growingtrees.event;
 
-public class ClientEventHandler {
-
-}
+public class ClientEventHandler {}

@@ -25,11 +25,11 @@ public class CommonProxy {
 	public World getClientWorld() {
 		return null;
 	}
-	
-    public void registerEventHandlers() { 
-        CommonEventHandler ev = new CommonEventHandler(); 
-        FMLCommonHandler.instance().bus().register(ev); 
-        MinecraftForge.EVENT_BUS.register(ev); 
-    }
-	
+
+	public void registerEventHandlers() {
+		CommonEventHandler ev = new CommonEventHandler();
+		FMLCommonHandler.instance().bus().register(ev);
+		MinecraftForge.EVENT_BUS.register(ev);
+	}
+
 }

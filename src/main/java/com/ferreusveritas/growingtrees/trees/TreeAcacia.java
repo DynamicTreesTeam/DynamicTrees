@@ -16,7 +16,7 @@ public class TreeAcacia extends GrowingTree {
 
 	public TreeAcacia(int seq) {
 		super("acacia", seq);
-		
+
 		//Acacia Trees are short, very slowly growing trees
 		setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
 
@@ -24,10 +24,10 @@ public class TreeAcacia extends GrowingTree {
 		setPrimitiveLog(Blocks.log2, 0);
 		setPrimitiveSapling(Blocks.sapling, 4);
 
-        envFactor(Type.COLD, 0.25f);
-        envFactor(Type.NETHER, 0.75f);
-        envFactor(Type.WET, 0.75f);
-		
+		envFactor(Type.COLD, 0.25f);
+		envFactor(Type.NETHER, 0.75f);
+		envFactor(Type.WET, 0.75f);
+
 		cellSolution = new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211};
 		hydroSolution = new short[]{0x02F0, 0x0143, 0x0133, 0x01F0};
 		smotherLeavesMax = 2;//very thin canopy
@@ -46,12 +46,13 @@ public class TreeAcacia extends GrowingTree {
 
 		return 0;
 	}
-	
+
 	@Override
 	public boolean isBiomePerfect(BiomeGenBase biome) {
 		return BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA);
 	}
-	
+
+	@Override
 	public void createLeafCluster(){
 
 		leafCluster = new SimpleVoxmap(7, 2, 7, new byte[] {
@@ -77,6 +78,5 @@ public class TreeAcacia extends GrowingTree {
 		}).setCenter(new Vec3d(3, 0, 3));
 
 	}
-	
-	
+
 }

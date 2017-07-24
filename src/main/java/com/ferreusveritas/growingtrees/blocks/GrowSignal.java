@@ -15,16 +15,16 @@ public class GrowSignal {
 	public int numSteps;
 	private GrowingTree tree;
 	public BlockBranch branchBlock;
-	
+
 	public int originX;
 	public int originY;
 	public int originZ;
-	
+
 	//Delta coords
 	public int dx;
 	public int dy;
 	public int dz;
-	
+
 	//Back data
 	float radius;
 	float tapering;
@@ -32,8 +32,8 @@ public class GrowSignal {
 
 	//Utility
 	public Random rand;
-	
-	public GrowSignal(BlockBranch branch, int x, int y, int z, float energy){
+
+	public GrowSignal(BlockBranch branch, int x, int y, int z, float energy) {
 		tree = branch.getTree();
 		this.branchBlock = branch;
 		this.energy = energy;
@@ -50,26 +50,26 @@ public class GrowSignal {
 		originZ = z;
 		dx = dy = dz = 0;
 	}
-	
-	public GrowingTree getTree(){
+
+	public GrowingTree getTree() {
 		return tree;
 	}
-	
-	public boolean step(){
+
+	public boolean step() {
 		numSteps++;
-		
+
 		dx += dir.offsetX;
 		dy += dir.offsetY;
 		dz += dir.offsetZ;
-		
-		if(--energy <= 0.0f){
+
+		if(--energy <= 0.0f) {
 			success = false;//Ran out of energy before it could grow
 		}
-		
+
 		return success;
 	}
-	
-	public boolean doTurn(ForgeDirection targetDir){
+
+	public boolean doTurn(ForgeDirection targetDir) {
 		if(dir != targetDir) {//Check for a direction change
 			dir = targetDir;
 			numTurns++;
@@ -77,8 +77,8 @@ public class GrowSignal {
 		}
 		return false;
 	}
-	
-	public boolean isInTrunk(){
+
+	public boolean isInTrunk() {
 		return numTurns == 0;
 	}
 }
