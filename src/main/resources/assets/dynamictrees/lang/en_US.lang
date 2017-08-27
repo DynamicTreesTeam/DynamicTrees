@@ -1,0 +1,23 @@
+itemGroup.dynamictrees=Dynamic Trees
+
+tile.dynamictrees_rootydirt.name=Rooty Dirt
+
+tile.dynamictrees_leaves0.name=Dynamic Leaves
+tile.dynamictrees_leaves1.name=Dynamic Leaves
+
+tile.dynamictrees_oakbranch.name=Dynamic Oak Tree
+tile.dynamictrees_sprucebranch.name=Dynamic Spruce Tree
+tile.dynamictrees_birchbranch.name=Dynamic Birch Tree
+tile.dynamictrees_junglebranch.name=Dynamic Jungle Tree
+tile.dynamictrees_darkoakbranch.name=Dynamic Dark Oak Tree
+tile.dynamictrees_acaciabranch.name=Dynamic Acacia Tree
+
+item.dynamictrees_oakseed.name=Oak Acorn
+item.dynamictrees_spruceseed.name=Spruce Cone
+item.dynamictrees_birchseed.name=Birch Catkin
+item.dynamictrees_jungleseed.name=Jungle Pod
+item.dynamictrees_darkoakseed.name=Dark Oak Acorn
+item.dynamictrees_acaciaseed.name=Acacia Seed
+
+item.dynamictrees_staff.name=Woodland Staff
+tile.dynamictrees_dendrocoil.name=Dendrocoil
