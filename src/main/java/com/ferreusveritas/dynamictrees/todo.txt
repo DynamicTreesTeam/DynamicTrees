@@ -1,0 +1,97 @@
+////////////////////////////////////////////////////////////////
+// TODO (RoadMap)
+////////////////////////////////////////////////////////////////
+
+[X]Use biome dictionary to control tree biome suitability
+[X]customDirectionManipulation() should be used for all species.. and spruce shouldn't override selectNewDirection()
+[X]Creative tree staff
+[X]Add fortune to wood harvesting
+[ ]World Gen:
+    [X]Finish circle packing algo
+    [X]Circle sizes dependent on biome and noise.
+    [X]Grow Model Trees
+    [X]Create models
+    [X]Save and load circles from chunks
+    [X]Base64 tree codes
+    [ ]Roofed forest generation
+[X]Cocoa Pods
+[X]Revamp jungle tree growth algorithm
+[ ]Custom Tree Potions(to replace the confusing vanilla ones):
+    [ ]Charcoal Potion(Base for all other tree potions, also cures poison) Awkward potion + Charcoal
+    [ ]Potion of Depletion: Depletes soil completely so tree stops growing. Charcoal potion + Slime
+    [ ]Potion of Defoliance: Kills tree by destroying it's leaves and leaving it to rot. Charcoal potion + Blue Orchid Flower
+    [ ]Potion of Burgeoning: Instantly causes a single growth cycle. Charcoal + Bone
+    [ ]Potion of Fertility: Fully fertilizes the soil. Charcoal potion + Raw Fish
+    [ ]Potion of Persistence: Freezes the tree by changing all of it's growing leaves blocks with vanilla leaves block and completely depletes the soil.  
+        The tree will no longer grow, die in the dark, or drop seeds. Charcoal potion + Lapis Lazuli
+
+[X]Known Bugs:
+    [X]Creative right click crash bug
+    [X]Growing leaves blocks are dropped in survival
+    [X]Dirt texture adaptability
+    [X]Remove dropping apples
+    [X]Podzol won't appear under branches
+    [X]Dark Oak Leaves need to drop apples
+    [X]Disease shouldn't destroy leaves instantly
+    [X]Drops occuring near unloaded chunks
+	[X]Can't plant in mycelium
+	[X]Potions shouldn't empty in creative mode
+	[X]Rooty dirt block isn't quite centered in GUI
+	[ ]Leaves Blocks appear and disappear because automata can't find stable configuration 
+
+////////////////////////////////////////////////////////////////
+//  Circle Generation Algorithm  ///////////////////////////////
+////////////////////////////////////////////////////////////////
+
+┌──┬──┬──┐
+│1 │2 │3 │
+├──┼──┼──┤
+│4 │⑤ │6 │
+├──┼──┼──┤
+│7 │8 │9 │
+└──┴──┴──┘
+
+Start chunk build:
+	Gather any circles in the Yard.
+	Mask arcs of circles not in chunk 5 such that the only viable arc is facing zone 5. Half open for zones 2,4,6,8 Quarter open for zones 1,3,7,9
+	Mutually mark off arc masks of all adjacent circles
+	Are there circles present?
+		Y: Proceed to Chain Circles
+		N: Proceed to Create first circle
+
+
+Create First Circle:
+	Create Circle at random x, z within stage with radius according to perlin map at coords.
+	Proceed to Chain Circles
+
+
+Chain Circles:
+	Unhandled(arc masks not filled) circles exist?
+		Y: Pick any circle in the stage and inspect its arc mask.
+			Inspect arc mask:
+				FILLED: Pick another circle
+				EMPTY: New angle is random
+				MIXED: New angle is determined by arc mask.
+			Proceed to 2nd Circle
+		N: Proceed to Circles Complete
+	
+
+2nd Circle:
+	Create temporary 2nd Circle at new angle from 1st circle on it's tangent with radius according to perlin map at coords.
+	Does 2nd Circle intersect with other existing circles?
+		Y: Mark intersected circle as 2nd Circle proceed to 3rd Circle
+		N: Continue
+	Make 2nd circle permanant
+	Mutually mark off arc masks on 1st and 2nd circle.
+	Proceed to Chain Circles
+
+3rd Circle:
+	Create temporary 3rd Circle at tangent to 1st and 2nd circle
+	Mark off arc masks on 1st and 2nd circle for 3rd circle
+	Does 3rd Circle intersect with other existing circles?
+		Y: 3rd circle fails
+		N: Make 3rd circle permanant. Mark off arc masks on 3rd circle for 1st and 2nd circle.
+	Proceed to Chain Circles
+
+Circles Complete:
+	
