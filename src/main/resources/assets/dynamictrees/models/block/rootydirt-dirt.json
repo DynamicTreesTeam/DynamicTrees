@@ -1,0 +1,9 @@
+{
+    "parent": "block/cube_bottom_top",
+    "textures": {
+        "particle": "blocks/dirt",
+        "bottom": "blocks/dirt",
+        "top": "blocks/dirt",
+        "side": "dynamictrees:blocks/rootydirt-dirt"
+    }
+}

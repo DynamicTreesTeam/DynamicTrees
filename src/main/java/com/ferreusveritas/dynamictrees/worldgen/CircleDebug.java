@@ -155,15 +155,15 @@ public class CircleDebug {
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
 
-					float noise = (float) ((noiseGenerator.func_151601_a(i / 64.0, j / 64.0) + 1D) / 2.0D);
+					float noise = (float) ((noiseGenerator.getValue(i / 64.0, j / 64.0) + 1D) / 2.0D);
 
 					switch(oct){
-					case 6:	noise += (float) ((noiseGenerator.func_151601_a(i / 1.0, j / 1.0) + 1D) / 2.0D) / 64;
-					case 5:	noise += (float) ((noiseGenerator.func_151601_a(i / 2.0, j / 2.0) + 1D) / 2.0D) / 32;
-					case 4:	noise += (float) ((noiseGenerator.func_151601_a(i / 4.0, j / 4.0) + 1D) / 2.0D) / 16;
-					case 3:	noise += (float) ((noiseGenerator.func_151601_a(i / 8.0, j / 8.0) + 1D) / 2.0D) / 8;
-					case 2:	noise += (float) ((noiseGenerator.func_151601_a(i / 16.0, j / 16.0) + 1D) / 2.0D) / 4;
-					case 1: noise += (float) ((noiseGenerator.func_151601_a(i / 32.0, j / 32.0) + 1D) / 2.0D) / 2;
+					case 6:	noise += (float) ((noiseGenerator.getValue(i / 1.0, j / 1.0) + 1D) / 2.0D) / 64;
+					case 5:	noise += (float) ((noiseGenerator.getValue(i / 2.0, j / 2.0) + 1D) / 2.0D) / 32;
+					case 4:	noise += (float) ((noiseGenerator.getValue(i / 4.0, j / 4.0) + 1D) / 2.0D) / 16;
+					case 3:	noise += (float) ((noiseGenerator.getValue(i / 8.0, j / 8.0) + 1D) / 2.0D) / 8;
+					case 2:	noise += (float) ((noiseGenerator.getValue(i / 16.0, j / 16.0) + 1D) / 2.0D) / 4;
+					case 1: noise += (float) ((noiseGenerator.getValue(i / 32.0, j / 32.0) + 1D) / 2.0D) / 2;
 					}
 
 					noise /= 2;

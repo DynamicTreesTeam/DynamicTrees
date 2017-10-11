@@ -14,10 +14,7 @@ import com.ferreusveritas.dynamictrees.potion.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -26,9 +23,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 
-public class DendroPotion extends ItemReg implements ISubstanceEffectProvider, IEmptiable {
+public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
 
 	public static final String name = "dendropotion";
 
@@ -85,7 +85,7 @@ public class DendroPotion extends ItemReg implements ISubstanceEffectProvider, I
 	}
 
 	@Override
-	public void getSubItems(Item item, CreativeTabs tab, List subItems) {
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for(DendroPotionType type : DendroPotionType.values()) {
 			subItems.add(new ItemStack(this, 1, type.getIndex()));
 		}
@@ -141,53 +141,53 @@ public class DendroPotion extends ItemReg implements ISubstanceEffectProvider, I
 	
 	public DendroPotion registerRecipes() {
 		
-		int awkward = 16;
+		PotionType awkward = PotionType.REGISTRY.getObject(new ResourceLocation("awkward"));
 		
-		GameRegistry.addBrewingRecipe(
-				new ItemStack(Items.potionitem, 1, awkward),
-				new ItemStack(Items.coal, 1, 1), //Charcoal
+		BrewingRecipeRegistry.addRecipe(
+				PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), awkward),
+				new ItemStack(Items.COAL, 1, 1), //Charcoal
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()));
 
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Items.slime_ball), //Slimeball
+				new ItemStack(Items.SLIME_BALL), //Slimeball
 				new ItemStack(this, 1, DendroPotionType.DEPLETION.getIndex()));
 		
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Items.pumpkin_seeds), //Pumpkin seeds
+				new ItemStack(Items.PUMPKIN_SEEDS), //Pumpkin seeds
 				new ItemStack(this, 1, DendroPotionType.DEFOLIANCE.getIndex()));
 
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Items.ghast_tear), //Ghast Tear
+				new ItemStack(Items.GHAST_TEAR), //Ghast Tear
 				new ItemStack(this, 1, DendroPotionType.BURGEONING.getIndex()));
 
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Items.fish), //Raw Fish
+				new ItemStack(Items.FISH), //Raw Fish
 				new ItemStack(this, 1, DendroPotionType.FERTILITY.getIndex()));
 
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Blocks.red_flower, 1, 1), //Blue Orchid
+				new ItemStack(Blocks.RED_FLOWER, 1, 1), //Blue Orchid
 				new ItemStack(this, 1, DendroPotionType.PERSISTANCE.getIndex()));
 
-		GameRegistry.addBrewingRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-				new ItemStack(Items.diamond), //Prismarine Crystals
+				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 
 		for(DynamicTree tree : DynamicTrees.baseTrees) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-			GameRegistry.addBrewingRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
+			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
 		}
 
 		return this;
 	}
-	
+
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		super.addInformation(stack, playerIn, tooltip, advanced);
 		
 		DendroPotionType potionType = getPotionType(stack);
@@ -211,29 +211,7 @@ public class DendroPotion extends ItemReg implements ISubstanceEffectProvider, I
 	
 	@Override
 	public ItemStack getEmptyContainer() {
-		return new ItemStack(Items.glass_bottle);
-	}
-	
-	///////////////////////////////////////////
-	// RENDERING
-	///////////////////////////////////////////
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean requiresMultipleRenderPasses() {
-		return true;
+		return new ItemStack(Items.GLASS_BOTTLE);
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack stack, int pass) {
-		return pass == 1 ? 0x00FFFFFF : getColor(stack);
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(ItemStack itemStack, int pass) {
-		return Items.potionitem.getIconFromDamageForRenderPass(0, pass);//delegate to vanilla potion
-	}
-	
 }

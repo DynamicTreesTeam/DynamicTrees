@@ -4,19 +4,21 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
-import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 /**
@@ -98,7 +100,7 @@ public class JoCode {
 	* @param radius Constraint radius
 	*/
 	public void growTree(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
-		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getRootyDirtBlock(), 0, 3);//Set to unfertilized rooty dirt
+		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//Create tree
 		setFacing(facing);
@@ -131,9 +133,10 @@ public class JoCode {
 						for(int ix = x - radius; ix < x + radius; ix++) {
 							byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
 							if((value & 7) != 0) {
-								Block testBlock = world.getBlock(ix, iy, iz);
-								if(testBlock.isReplaceable(world, ix, iy, iz)) {
-									world.setBlock(ix, iy, iz, leavesBlock, ((treeSub << 2) & 12) | ((value - 1) & 3), careful ? 2 : 0);
+								BlockPos iPos = new BlockPos(ix, iy, iz);
+								Block testBlock = world.getBlockState(iPos).getBlock();
+								if(testBlock.isReplaceable(world, iPos)) {
+									world.setBlockState(iPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(value, 1, 4)), careful ? 2 : 0);
 								}
 							}
 						}
@@ -142,16 +145,16 @@ public class JoCode {
 			}
 
 			for(int pass = 0; pass < 5; pass++) {
-				for(int iy = pos.getY() + 1; iy < pos.getY() + maxH + 1; iy++) {
+				for(int iy = y + 1; iy < y + maxH + 1; iy++) {
 					if(leafMap.isYTouched(iy)) {
-						for(int iz = pos.getZ() - radius; iz < pos.getZ() + radius; iz++) {
-							for(int ix = pos.getX() - radius; ix < pos.getX() + radius; ix++) {
-								BlockPos iPos = new BlockPos(ix, iy, iz);
-								byte value = leafMap.getVoxel(iPos);
+						for(int iz = z - radius; iz < z + radius; iz++) {
+							for(int ix = x - radius; ix < x + radius; ix++) {
+								byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
 								if(value != 0) {
-									Block block = iPos.getBlock(world);
+									IBlockState blockState = world.getBlockState(new BlockPos(ix, iy, iz));
+									Block block = blockState.getBlock();
 									if(block instanceof IAgeable) {
-										((IAgeable)block).age(world, iPos, world.rand, true);
+										((IAgeable)block).age(world, new BlockPos(ix, iy, iz), blockState, world.rand, true);
 									}
 								}
 							}
@@ -160,7 +163,7 @@ public class JoCode {
 				}
 			}
 		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, careful ? 3 : 2);
+			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
 		}
 
 	}
@@ -174,11 +177,11 @@ public class JoCode {
 			} else if(code == returnCode) {
 				return codePos + 1;
 			} else {
-				EnumFacing dir = EnumFacing.getOrientation(code);
+				EnumFacing dir = EnumFacing.getFront(code);
 				pos = pos.offset(dir);
 				if(!disabled) {
-					if(pos.getBlock(world).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getGrowingBranch(), 0, careful ? 3 : 2);
+					if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+						world.setBlockState(pos, tree.getGrowingBranch().getDefaultState(), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}

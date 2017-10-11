@@ -1,38 +1,44 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.renderers.RendererSapling;
+import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockSapling;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockDynamicSapling extends BlockBackport {
+public class BlockDynamicSapling extends Block {
 
 	protected Map<Integer, DynamicTree> trees = new HashMap<Integer, DynamicTree>();
 	
 	public BlockDynamicSapling(String name) {
-		super(Material.plants);
-		setStepSound(soundTypeGrass);
+		super(Material.PLANTS);
+		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
+		setSoundType(SoundType.PLANT);
 		setTickRandomly(true);
-		setUnlocalizedNameReg(name);
+		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
 
@@ -41,38 +47,39 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random rand) {
-		generateTree(world, new BlockPos(x, y, z), rand);
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+		generateTree(world, pos, state, rand);
 	}
 
-	public static boolean canSaplingStay(IBlockAccess blockAccess, DynamicTree tree, BlockPos pos) {
+	public static boolean canSaplingStay(IBlockAccess world, DynamicTree tree, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
-		for(ForgeDirection dir: Dir.HORIZONTALS) {
-			Block block = pos.offset(dir).getBlock(blockAccess);
+		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+			IBlockState blockState = world.getBlockState(pos.offset(dir));
+			Block block = blockState.getBlock();
 			if(TreeHelper.isBranch(block) || block instanceof BlockDynamicSapling) {
 				return false;
 			}
 		}
 
 		//Air above and acceptable soil below
-		return pos.up().isAirBlock(blockAccess) && tree.isAcceptableSoil(pos.down().getBlockState(blockAccess));
+		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()));
 	}
 
-	@Override
-	public boolean canBlockStay(World world, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
-		return canSaplingStay(world, getTree(world, pos), pos);
+	public boolean canBlockStay(IBlockAccess world, BlockPos pos, IBlockState state) {
+		return canSaplingStay(world, getTree(state), pos);
 	}
 
-	public void generateTree(World world, BlockPos pos, Random rand) {
-		DynamicTree tree = getTree(world, pos);
-		if(canBlockStay(world, pos.getX(), pos.getY(), pos.getZ())) {
+	public void generateTree(World world, BlockPos pos, IBlockState state, Random rand) {
+		DynamicTree tree = getTree(state);
+		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			world.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), tree.getRootyDirtBlock(), 15, 3);//Set to fully fertilized rooty dirt
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getGrowingBranch(), 0, 3);//Set to a single branch with 1 radius
-			tree.getGrowingLeaves().growLeaves(world, tree, pos.up());//Make a single block of leaves above the trunk
+			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()))) {
+				world.setBlockState(pos, tree.getGrowingBranch().getDefaultState());//set to a single branch with 1 radius
+				world.setBlockState(pos.up(), tree.getGrowingLeavesState());
+				world.setBlockState(pos.down(), tree.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt
+			}
 		} else {
-			dropBlock(world, tree, pos);
+			dropBlock(world, tree, state, pos);
 		}
 	}
 
@@ -80,23 +87,24 @@ public class BlockDynamicSapling extends BlockBackport {
 	// TREE INFORMATION
 	///////////////////////////////////////////
 
-	public DynamicTree getTree(int metadata) {
-		return trees.get(metadata);
+	public DynamicTree getTree(IBlockState state) {
+		if(state.getBlock() == this) {
+			return trees.get(state.getValue(BlockSapling.TYPE).ordinal());
+		}
+    	return trees.get(0);
 	}
 
-	public DynamicTree getTree(IBlockAccess world, BlockPos pos) {
-		return getTree(pos.getMeta(world));
-	}
-
-	public BlockDynamicSapling setTree(int metadata, DynamicTree tree) {
-		trees.put(metadata, tree);
+	public BlockDynamicSapling setTree(IBlockState state, DynamicTree tree) {
+		if(state.getBlock() == this) {
+			trees.put(state.getValue(BlockSapling.TYPE).ordinal(), tree);
+		}
 		return this;
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
-		if (!this.canBlockStay(world, pos.getX(), pos.getY(), pos.getZ())) {
-			dropBlock(world, getTree(world, pos), pos);
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+		if (!this.canBlockStay(world, pos, state)) {
+			dropBlock(world, getTree(state), state, pos);
 		}
 	}
 
@@ -104,49 +112,60 @@ public class BlockDynamicSapling extends BlockBackport {
 	// DROPS
 	///////////////////////////////////////////
 
-	private void dropBlock(World world, DynamicTree tree, BlockPos pos) {
-		world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());
-		dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(tree.getSeed()));
+	private void dropBlock(World world, DynamicTree tree, IBlockState state, BlockPos pos) {
+		world.setBlockToAir(pos);
+		dropBlockAsItem(world, pos, state, 0);
 	}
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-		ArrayList<ItemStack> dropped = super.getDrops(world, x, y, z, metadata, fortune);
-		dropped.add(new ItemStack(getTree(metadata).getSeed()));
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
+		dropped.add(getTree(state).getSeedStack());
 		return dropped;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World world, int x, int y, int z) {
-		return getTree(world, new BlockPos(x, y, z)).getSeed();
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		return getTree(state).getSeedStack();
 	}
 
 	@Override
-	public Item getItemDropped(int par1, Random par2Random, int par3) {
+	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
-	}
-
-	public int getDamageValue(World world, int x, int y, int z) {
-		return 0;
 	}
 
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
+	
+    /**
+     * Convert the given metadata into a BlockState for this Block
+     */
+    @Override
+	public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.byMetadata(meta & 0xF));
+    }
 
+    /**
+     * Convert the BlockState into the correct metadata value
+     */
+    @Override
+	public int getMetaFromState(IBlockState state) {
+        return state.getValue(BlockSapling.TYPE).getMetadata();
+    }
+
+    @Override
+	protected BlockStateContainer createBlockState() {
+    	return new BlockStateContainer(this, new IProperty[] {BlockSapling.TYPE});
+    }
+    
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
 	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess blockAccess, int x, int y, int z) {
-		this.setBlockBounds(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
-	}
-
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-		this.setBlockBoundsBasedOnState(world, x, y, z);
-		return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
 	}
 
 	///////////////////////////////////////////
@@ -154,25 +173,19 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	//Bark or wood Ring texture for branches
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metadata) {
-		return getTree(metadata).getPrimitiveLog().getIcon(2);//0:Ring, 2:Bark
 	}
 	
 	@Override
-	public int getRenderType() {
-		return RendererSapling.id;
+	public boolean isOpaqueCube(IBlockState state) {
+		return false;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 
 }

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**

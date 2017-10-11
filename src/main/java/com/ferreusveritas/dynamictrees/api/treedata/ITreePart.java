@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -9,6 +7,9 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -97,6 +98,8 @@ public interface ITreePart {
 	*/
 	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
 
+	//TODO: Do we need a getTree for IBlockState?
+	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
 	* Valid supports are other branches(always), leaves(for twigs), and rooty dirt(under special circumstances)
@@ -124,7 +127,7 @@ public interface ITreePart {
 	* @param itemStack The itemstack to be used.
 	* @return true if item was used, false otherwise
 	*/
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack);
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
 
 	/**
 	* The single root node of a tree.

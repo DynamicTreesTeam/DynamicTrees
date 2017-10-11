@@ -4,12 +4,12 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.util.math.BlockPos;
 
 public class BottomListenerDropItems implements IBottomListener {
 
@@ -33,7 +33,7 @@ public class BottomListenerDropItems implements IBottomListener {
 
 			//Spawn seed
 			if(!onlyEdge || tree.getGrowingLeaves().getHydrationLevel(world, pos) == 1) {
-				EntityItem itemEntity = new EntityItem(world, pos.getX(), pos.getY() - 1, pos.getZ(), toDrop.copy());
+				EntityItem itemEntity = new EntityItem(world, pos.getX(),  pos.getY() - 1, pos.getZ(), toDrop.copy());
 				world.spawnEntityInWorld(itemEntity);
 			}
 		}

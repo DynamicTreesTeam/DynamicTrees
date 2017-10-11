@@ -7,8 +7,8 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class NodeCoder implements INodeInspector {
 

@@ -2,10 +2,11 @@ package com.ferreusveritas.dynamictrees.api.network;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class GrowSignal {
 

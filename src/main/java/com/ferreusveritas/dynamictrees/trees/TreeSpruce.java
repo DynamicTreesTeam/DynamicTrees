@@ -1,27 +1,28 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeSpruce extends DynamicTree {
 
 	public TreeSpruce() {
-		super(VanillaTreeData.EnumType.SPRUCE);
+		super(BlockPlanks.EnumType.SPRUCE);
 
 		//Spruce are conical thick slower growing trees
 		setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
@@ -64,7 +65,7 @@ public class TreeSpruce extends DynamicTree {
 	@Override
 	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
 		if(branch.getRadius(blockAccess, pos) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)) {
-			if(dir == EnumFacing.DOWN && pos.down().getBlock(blockAccess) == branch) {
+			if(dir == EnumFacing.DOWN && blockAccess.getBlockState(pos.down()).getBlock() == branch) {
 				return 5;
 			}
 			return (dir == EnumFacing.UP || dir ==  EnumFacing.DOWN) ? 2 : 3;
@@ -89,13 +90,13 @@ public class TreeSpruce extends DynamicTree {
 	}
 
 	@Override
-	public boolean isBiomePerfect(BiomeGenBase biome) {
+	public boolean isBiomePerfect(Biome biome) {
 		return BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockAccess blockAccess, int x, int y, int z) {
+	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return ColorizerFoliage.getFoliageColorPine();
 	}
 	

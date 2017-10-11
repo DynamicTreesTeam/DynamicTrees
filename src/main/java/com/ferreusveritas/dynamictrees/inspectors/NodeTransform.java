@@ -7,9 +7,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeTransform implements INodeInspector {
@@ -29,7 +29,7 @@ public class NodeTransform implements INodeInspector {
 		if(branch != null && fromTree == branch.getTree()) {
 			int radius = branch.getRadius(world, pos);
 			if(radius > 0) {
-				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), toTree.getGrowingBranch(), toTree.getGrowingBranch().radiusToMeta(radius), 3);
+				world.setBlockState(pos, toTree.getGrowingBranch().getDefaultState().withProperty(BlockBranch.RADIUS, radius));
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}
@@ -50,12 +50,12 @@ public class NodeTransform implements INodeInspector {
 				if(fromTree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(fromTree.isCompatibleGenericLeaves(world, leavesPos)) {
 						int hydro = 2;
-						IBlockState state = leavesPos.getBlockState(world);
+						IBlockState state = world.getBlockState(leavesPos);
 						if(state.getBlock() instanceof BlockGrowingLeaves) {
 							BlockGrowingLeaves growingLeaves = (BlockGrowingLeaves) state.getBlock();
 							hydro = growingLeaves.getHydrationLevel(state);
 						}
-						toTree.getGrowingLeaves().setBlockToLeaves(world, toTree, leavesPos, hydro);
+						world.setBlockState(leavesPos, toTree.getGrowingLeavesState(hydro));
 					}
 				}
 			}

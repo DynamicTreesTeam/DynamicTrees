@@ -25,20 +25,22 @@ import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
-import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
-import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
 * <p><pre><tt><b>
@@ -175,19 +177,19 @@ public class DynamicTrees {
 	@EventHandler
 	public void missingMappings(FMLMissingMappingsEvent event) {
 		for(MissingMapping missing: event.getAll()) {
-			ResourceLocation resLoc = new ResourceLocation(missing.name);
+			ResourceLocation resLoc = missing.resourceLocation;
 			String domain = resLoc.getResourceDomain();
 			String path = resLoc.getResourcePath();
 			if(domain.equals("growingtrees")) {
 				Logger.getLogger(MODID).log(Level.CONFIG, "Remapping Missing Object: " + missing.name);
 				if(missing.type == GameRegistry.Type.BLOCK) {
-					Block mappedBlock = cpw.mods.fml.common.registry.GameRegistry.findBlock(DynamicTrees.MODID, path);
-					if(mappedBlock != null) { //Null is what you get when do don't get what you're looking for.
+					Block mappedBlock = Block.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, path));
+					if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
 						missing.remap(mappedBlock);
 					}
 				}
 				else if(missing.type == GameRegistry.Type.ITEM) {
-					Item mappedItem = cpw.mods.fml.common.registry.GameRegistry.findItem(DynamicTrees.MODID, path);
+					Item mappedItem = Item.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, path));
 					if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
 						missing.remap(mappedItem);
 					}
@@ -232,8 +234,18 @@ public class DynamicTrees {
 			GameRegistry.register(dendroPotion);
 			GameRegistry.register(dirtBucket);
 
-			//We don't need to register ItemBlocks in 1.7.10
+			for(BlockGrowingLeaves leavesBlock: TreeHelper.leavesArray.values()) {
+				GameRegistry.register(new ItemBlock(leavesBlock).setRegistryName(leavesBlock.getRegistryName()));
+			}
 
+			ItemBlock itemBlock = new ItemBlock(blockRootyDirt);
+			itemBlock.setRegistryName(blockRootyDirt.getRegistryName());
+			GameRegistry.register(itemBlock);
+
+			ItemBlock itemBonsaiBlock = new ItemBlock(blockBonsaiPot);
+			itemBonsaiBlock.setRegistryName(blockBonsaiPot.getRegistryName());
+			GameRegistry.register(itemBonsaiBlock);
+			
 			ccproxy.registerItems();
 		}
 

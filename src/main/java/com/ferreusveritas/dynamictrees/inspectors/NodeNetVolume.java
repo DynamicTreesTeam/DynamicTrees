@@ -5,8 +5,8 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class NodeNetVolume implements INodeInspector {
 

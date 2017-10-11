@@ -8,91 +8,61 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.ILorable;
-import com.ferreusveritas.dynamictrees.util.IRegisterable;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class BlockDendroCoil extends BlockContainer implements IPeripheralProvider, IRegisterable, ILorable {
+public class BlockDendroCoil extends BlockContainer implements IPeripheralProvider {
 
-	IIcon topIcon;
-	IIcon sideIcon;
-	IIcon bottomIcon;
-
-	protected String registryName;
-	
 	public BlockDendroCoil() {
 		this("dendrocoil");
 	}
 	
 	public BlockDendroCoil(String name) {
-		super(Material.iron);
-		setBlockName(name);
+		super(Material.IRON);
+		setUnlocalizedName(name);
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		ComputerCraftAPI.registerPeripheralProvider(this);
 		setRegistryName(name);
-		setUnlocalizedNameReg(name);
 		GameRegistry.registerTileEntity(TileEntityDendroCoil.class, name);
 	}
 
 	@Override
-	public void setRegistryName(String regName) {
-		registryName = regName;
-	}
-
-	@Override
-	public String getRegistryName() {
-		return registryName;
-	}
-	
-	@Override
-	public void setUnlocalizedNameReg(String unlocalName) {
-		setBlockName(unlocalName);
-	}
-	
-	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if (world.isBlockIndirectlyGettingPowered(x, y, z)) {
-			growPulse(world, new BlockPos(x, y, z));
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+		if (world.isBlockIndirectlyGettingPowered(pos) != 0) {
+			growPulse(world, pos);
 		}
 	}
 
 	public void growPulse(World world, BlockPos pos){
 		
-		for(int iy = 0; iy < 32; iy++){
-			for(int iz = -8; iz <= 8; iz++){
-				for(int ix = -8; ix <= 8; ix++){
-					BlockPos iPos = pos.add(new BlockPos(ix, iy, iz));
-					Block block = iPos.getBlock(world);
-					if(block instanceof IAgeable) {
-						((IAgeable)block).age(world, iPos, world.rand, true);
-					} else
-					if(block instanceof BlockRootyDirt){
-						if(world.rand.nextInt(8) == 0){
-							block.updateTick(world, iPos.getX(), iPos.getY(), iPos.getZ(), world.rand);
-						}
-					}
+		for(BlockPos iPos: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
+			IBlockState blockState = world.getBlockState(iPos);
+			Block block = blockState.getBlock();
+			if(block instanceof IAgeable){
+				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+			} else
+			if(block instanceof BlockRootyDirt){
+				if(world.rand.nextInt(8) == 0){
+					block.updateTick(world, iPos, blockState, world.rand);
 				}
 			}
 		}
@@ -100,9 +70,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public String getCode(World world, BlockPos pos) {
-		pos = pos.up();
-		if(TreeHelper.isRootyDirt(world, pos)) {
-			return new JoCode().buildFromTree(world, pos).toString();
+		if(TreeHelper.isRootyDirt(world, pos.up())) {
+			return new JoCode().buildFromTree(world, pos.up()).toString();
 		}
 		
 		return "";
@@ -171,13 +140,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
+	public TileEntity createNewTileEntity(World world, int meta) {
 		return new TileEntityDendroCoil();
 	}
 
 	@Override
-	public IPeripheral getPeripheral(World world, int x, int y, int z, int side) {
-		TileEntity te = world.getTileEntity(x, y, z);
+	public IPeripheral getPeripheral(World world, BlockPos pos, EnumFacing facing) {
+		TileEntity te = world.getTileEntity(pos);
 		
 		if(te instanceof TileEntityDendroCoil) {
 			return (TileEntityDendroCoil)te;
@@ -196,17 +165,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister reg) {
-		topIcon = reg.registerIcon(DynamicTrees.MODID + ":" + "coil-top");
-		sideIcon = reg.registerIcon(DynamicTrees.MODID + ":" + "coil-side");
-		bottomIcon = reg.registerIcon(DynamicTrees.MODID + ":" + "coil-bottom");
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metadata) {
-		return side == 0 ? bottomIcon : side == 1 ? topIcon : sideIcon;
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
 	}
 
 }

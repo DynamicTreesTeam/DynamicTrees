@@ -1,16 +1,16 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -30,14 +30,24 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
-		return fromRadius == 1 && from.getTree().getPrimitiveLeaves().matches(pos.getBlockState(world), 3) ? 1 : 0;
+		if(fromRadius == 1) {
+			IBlockState blockState = blockAccess.getBlockState(pos);
+			IBlockState primState = from.getTree().getPrimitiveLeaves();
+			if(blockState.getBlock() == primState.getBlock()) {
+				//Ignore "no decay" and "check decay" flags and only compare leaves type.
+				if((blockState.getBlock().getMetaFromState(blockState) & 3) == (primState.getBlock().getMetaFromState(primState) & 3)) {
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return pos.isAirBlock(blockAccess) ? 1 : 0;
+		return blockAccess.isAirBlock(pos) ? 1 : 0;
 	}
 
 	@Override
@@ -56,10 +66,12 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir,	int radius) {
-		Block block = pos.getBlock(blockAccess);
-		if(block instanceof BlockLeaves) {//Vanilla leaves can be used for support
-			if(branch.getTree().getPrimitiveLeaves().matches(pos.getBlockState(blockAccess), 3)) {
+	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+		IBlockState blockState = blockAccess.getBlockState(pos);
+		IBlockState primState = branch.getTree().getPrimitiveLeaves();
+		
+		if(blockState.getBlock() == primState.getBlock()) {//Vanilla leaves can be used for support
+			if ( (primState.getBlock().getMetaFromState(primState) & 3) == (blockState.getBlock().getMetaFromState(blockState) & 3) ) {//Compare meta
 				return 0x01;
 			}
 		}
@@ -67,7 +79,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		return false;
 	}
 

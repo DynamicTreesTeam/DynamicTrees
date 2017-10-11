@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import java.util.Arrays;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
 * A simple implementation of a voxel map

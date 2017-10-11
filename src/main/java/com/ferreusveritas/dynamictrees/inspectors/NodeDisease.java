@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
 * Destroys all thin(radius == 1) branches on a tree.. leaving it to rot.
@@ -28,7 +28,7 @@ public class NodeDisease implements INodeInspector {
 		
 		if(branch != null && tree == branch.getTree()) {
 			if(branch.getRadius(world, pos) == 1) {
-				world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());//Destroy the thin branch
+				world.setBlockToAir(pos);//Destroy the thin branch
 			}
 		}
 

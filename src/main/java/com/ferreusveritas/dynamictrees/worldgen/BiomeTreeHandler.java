@@ -5,8 +5,9 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.init.Biomes;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -34,7 +35,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	}
 
 	@Override
-	public DynamicTree getTree(BiomeGenBase biome) {
+	public DynamicTree getTree(Biome biome) {
 
 		if(BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA)) {
 			return acacia;
@@ -61,7 +62,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 		}
 
 		if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {
-			if(DynamicTree.isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills)) {
+			if(DynamicTree.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 				return birch;
 			} else {
 				return oak;
@@ -72,7 +73,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	}
 
 	@Override
-	public double getDensity(BiomeGenBase biome, double noiseDensity, Random random) {
+	public double getDensity(Biome biome, double noiseDensity, Random random) {
 
 		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
 			if(random.nextInt(4) == 0) {
@@ -89,7 +90,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	} 
 
 	@Override
-	public boolean chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
+	public boolean chance(Biome biome, DynamicTree tree, int radius, Random random) {
 		
 		//Never miss a chance to spawn a tree in the roofed forest.
 		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {//Roofed Forest

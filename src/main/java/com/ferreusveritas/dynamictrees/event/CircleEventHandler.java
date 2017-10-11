@@ -7,7 +7,7 @@ import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class CircleEventHandler {
 
@@ -18,15 +18,15 @@ public class CircleEventHandler {
 	/** We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:( */
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
-		World world = event.world;
-		if(world.provider.dimensionId == 0 && !world.isRemote) {
+		World world = event.getWorld();
+		if(world.provider.getDimension() == 0 && !world.isRemote) {
 			DynamicTrees.treeGenerator.onWorldUnload();//clears the circles
 		}
 	}
 
 	@SubscribeEvent 
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
-		if(event.world.provider.dimensionId == 0){//Overworld
+		if(event.getWorld().provider.getDimension() == 0){//Overworld
 			byte circleData[] = event.getData().getByteArray("GTCD");
 			DynamicTrees.treeGenerator.getChunkCircleManager().setChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition, circleData);
 		}
@@ -38,14 +38,14 @@ public class CircleEventHandler {
 
 	@SubscribeEvent 
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
-		if(event.world.provider.dimensionId == 0) {//Overworld
+		if(event.getWorld().provider.getDimension() == 0) {//Overworld
 			ChunkCircleManager cm = DynamicTrees.treeGenerator.getChunkCircleManager();
 			byte circleData[] = cm.getChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition);
 			NBTTagByteArray circleByteArray = new NBTTagByteArray(circleData);
 			event.getData().setTag("GTCD", circleByteArray);//Growing Trees Circle Data
 
 			// Unload circles here if the chunk is no longer loaded.
-			if(!event.getChunk().isChunkLoaded) {
+			if(!event.getChunk().isLoaded()) {
 				cm.unloadChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition);
 			}
 		}

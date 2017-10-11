@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 /**
 * A simple bitmap that favors speed over safety.  Consider yourself disclaimed.

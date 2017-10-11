@@ -4,27 +4,28 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
-import com.ferreusveritas.dynamictrees.util.Dir;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.block.BlockDirt;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeDarkOak extends DynamicTree {
 
 	public TreeDarkOak() {
-		super(VanillaTreeData.EnumType.DARKOAK);
+		super(BlockPlanks.EnumType.DARK_OAK);
 
 		//Dark Oak Trees are tall, slowly growing, thick trees
 		setBasicGrowingParameters(0.35f, 18.0f, 6, 8, 0.8f);
@@ -62,8 +63,8 @@ public class TreeDarkOak extends DynamicTree {
 	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
 
 		if(signal.numTurns >= 1) {//Disallow up/down turns after having turned out of the trunk once.
-			probMap[ForgeDirection.UP.ordinal()] = 0;
-			probMap[ForgeDirection.DOWN.ordinal()] = 0;
+			probMap[EnumFacing.UP.getIndex()] = 0;
+			probMap[EnumFacing.DOWN.getIndex()] = 0;
 		}
 
 		//Amplify cardinal directions to encourage spread(beware! this algorithm is wacked-out poo brain and should be redone)
@@ -71,7 +72,7 @@ public class TreeDarkOak extends DynamicTree {
 		float spreadPush = energyRatio * energyRatio * energyRatio * 4;
 		spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
 		
-		for(ForgeDirection dir: Dir.HORIZONTALS) {
+		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			probMap[dir.ordinal()] *= spreadPush;
 		}
 
@@ -79,16 +80,16 @@ public class TreeDarkOak extends DynamicTree {
 	}
 
 	@Override
-	public boolean isBiomePerfect(BiomeGenBase biome) {
-		return isOneOfBiomes(biome, BiomeGenBase.roofedForest);
+	public boolean isBiomePerfect(Biome biome) {
+		return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
 	};
 
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getSavedLightValue(EnumSkyBlock.Sky, pos.getX(), pos.getY(), pos.getZ()) < 6) {
-				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.red_mushroom);//Change branch to a red mushroom
-				world.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), Blocks.dirt, 2, 3);//Change rooty dirt to Podzol
+			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
+				world.setBlockState(pos, Blocks.RED_MUSHROOM.getDefaultState());//Change branch to a red mushroom
+				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));//Change rooty dirt to Podzol
 			}
 			return true;
 		}
@@ -100,7 +101,7 @@ public class TreeDarkOak extends DynamicTree {
 	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
         Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
 		if ((rand.nextInt(chance) == 0)) {
-			drops.add(new ItemStack(Items.apple, 1, 0));
+			drops.add(new ItemStack(Items.APPLE, 1, 0));
 		}
 		return drops;
 	}

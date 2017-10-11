@@ -6,11 +6,11 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class ChunkCircleManager {
@@ -54,8 +54,8 @@ public class ChunkCircleManager {
 		ArrayList<Circle> unsolvedCircles = new ArrayList<Circle>(64);
 
 		//Collect circles
-		for(Dir dir: Dir.SURROUND) {
-			getChunkCircles(circles, chunkX + dir.xOffset, chunkZ + dir.zOffset);
+		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+			getChunkCircles(circles, chunkX + dir.getFrontOffsetX(), chunkZ + dir.getFrontOffsetZ());
 		}
 
 		int chunkXStart = chunkX << 4;

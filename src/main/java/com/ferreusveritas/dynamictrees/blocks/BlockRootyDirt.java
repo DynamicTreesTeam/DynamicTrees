@@ -3,66 +3,128 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
-import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt;
-import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt.RenderType;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.Dir;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockGrass;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleDigging;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockRootyDirt extends BlockBackport implements ITreePart {
+public class BlockRootyDirt extends Block implements ITreePart {
 
 	static String name = "rootydirt";
 	
-	public IIcon dirtIcon;
-	public IIcon grassIcon;
-	public IIcon myceliumIcon;
-	public IIcon podzolIcon;
+	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
+	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicType.class);
 	
 	public BlockRootyDirt() {
-		super(Material.ground);
-		setStepSound(soundTypeGrass);
+		super(Material.GROUND);
+		setSoundType(SoundType.GROUND);
+		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15).withProperty(MIMIC, EnumMimicType.DIRT));
 		setTickRandomly(true);
-		setUnlocalizedNameReg(name);
+		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
 
 	///////////////////////////////////////////
-	// REGISTRATION
+	// BLOCKSTATES
 	///////////////////////////////////////////
 
+	public static enum EnumMimicType implements IStringSerializable {
+
+		DIRT(Blocks.DIRT.getDefaultState(), "dirt"),
+		GRASS(Blocks.GRASS.getDefaultState(), "grass"),
+		PODZOL( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL) , "podzol"),
+		MYCELIUM(Blocks.MYCELIUM.getDefaultState(), "mycelium"),
+		COARSEDIRT( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT) , "coarsedirt"),
+		SNOWY(Blocks.GRASS.getDefaultState().withProperty(BlockGrass.SNOWY, true), "snowy");
+
+		private final IBlockState muse;
+		private final String name;
+
+		private EnumMimicType(IBlockState muse, String name) {
+			this.muse = muse;
+			this.name = name;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		} 
+		
+		public IBlockState getBlockState() {
+			return muse;
+		}
+		
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[]{LIFE, MIMIC});
+	}
+		
+	/**
+	 * Convert the given metadata into a BlockState for this Block
+	 */
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState().withProperty(LIFE, meta);
+	}
+
+	/**
+	 * Convert the BlockState into the correct metadata value
+	 */
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(LIFE).intValue();
+	}
+
+	@Override
+	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+		return state.withProperty(MIMIC, getMimicType(worldIn, pos));
+	}
 
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, Random random) {
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
 		grow(world, pos, random);
 	}
 
@@ -102,7 +164,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 				}
 			} while(--growthRate > 0.0f);
 		} else {
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, 3);
+			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
 			return false;
 		}
 
@@ -110,12 +172,12 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public Item getItemDropped(int metadata, Random random, int fortune) {
-		return Item.getItemFromBlock(Blocks.dirt);
+	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+		return Item.getItemFromBlock(Blocks.DIRT);
 	}
 
 	@Override
-	public float getBlockHardness(World world, BlockPos pos) {
+	public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
 		return 20.0f;//Encourage proper tool usage and discourage bypassing tree felling by digging the root from under the tree
 	};
 
@@ -125,37 +187,42 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public boolean hasComparatorInputOverride() {
+	public boolean hasComparatorInputOverride(IBlockState state) {
 		return true;
 	}
 
 	@Override
-	public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-		return getSoilLife(world, new BlockPos(x, y, z));
+	public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
+		return getSoilLife(world, pos);
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		ItemStack heldItem = player.getCurrentEquippedItem();
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 
 		if(heldItem != null) {//Something in the hand
-			return applyItemSubstance(world, new BlockPos(x, y, z), player, heldItem);
+			return applyItemSubstance(world, pos, player, hand, heldItem);
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 
 		if(branch != null && branch.getTree().applySubstance(world, pos, this, itemStack)) {
-			if(itemStack.getItem() == Items.potionitem) {
+			if (itemStack.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
 				if(!player.capabilities.isCreativeMode) {
-					player.setCurrentItemOrArmor(0, new ItemStack(Items.glass_bottle));
+					IEmptiable emptiable = (IEmptiable) itemStack.getItem();
+					player.setHeldItem(hand, emptiable.getEmptyContainer());
+				}
+			}
+			else if(itemStack.getItem() == Items.POTIONITEM) {//An actual potion
+				if(!player.capabilities.isCreativeMode) {
+					player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
 				}
 			} else {
-				itemStack.stackSize--;
+				itemStack.stackSize--; //Just a regular item like bonemeal
 			}
 			return true;
 		}
@@ -170,22 +237,22 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public void onBlockHarvested(World world, int x, int y, int z, int localMeta, EntityPlayer player) {
-		destroyTree(world, new BlockPos(x, y, z));
+	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		destroyTree(world, pos);
 	}
 
 	@Override
-	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
-		destroyTree(world, new BlockPos(x, y, z));
+	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
+		destroyTree(world, pos);
 	}
 
 	public int getSoilLife(IBlockAccess blockAccess, BlockPos pos) {
-		return pos.getMeta(blockAccess);
+		return blockAccess.getBlockState(pos).getValue(LIFE);
 	}
 
 	public void setSoilLife(World world, BlockPos pos, int life) {
-		world.setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), MathHelper.clamp_int(life, 0, 15), 3);
-		world.func_147453_f(pos.getX(), pos.getY(), pos.getZ(), this);//Notify all neighbors of NSEWUD neighbors
+		world.setBlockState(pos, getDefaultState().withProperty(LIFE, MathHelper.clamp_int(life, 0, 15)), 3);
+		world.notifyNeighborsOfStateChange(pos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
 	}
 
 	public boolean fertilize(World world, BlockPos pos, int amount) {
@@ -239,12 +306,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		if(dir == EnumFacing.DOWN) {
-			//1.) If it's a twig(radius == 1) and the soil is barren then don't count the rooty dirt block as support
-			//2.) If it's a stocky piece(radius > 1) then count the soil as support regardless of soil life(for preserving mature trees)
-			return radius == 1 && pos.up(2).isAirBlock(blockAccess) && getSoilLife(blockAccess, pos) > 0 ? 0x12 : 0x11;
-		}
-		return 0;
+		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
 
 	@Override
@@ -253,8 +315,8 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public int getMobilityFlag() {
-		return 2;
+	public EnumPushReaction getMobilityFlag(IBlockState state) {
+		return EnumPushReaction.BLOCK;
 	}
 
 	///////////////////////////////////////////
@@ -263,110 +325,64 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
-		if(RendererRootyDirt.renderPass == 1) {//First Pass
-			switch(side) {
-				case 0: return dirtIcon;//Bottom
-				case 1: switch(RendererRootyDirt.renderType) {//Top
-					case GRASS: return Blocks.grass.getIcon(side, 0);
-					case MYCELIUM: return Blocks.mycelium.getIcon(side, 0);
-					case PODZOL: return Blocks.dirt.getIcon(side, 2);
-					default: return Blocks.dirt.getIcon(side, 0);
-					}
-				default: switch(RendererRootyDirt.renderType) {//All other sides
-					case GRASS: return grassIcon;
-					case MYCELIUM: return myceliumIcon;
-					case PODZOL: return podzolIcon;
-					default: return dirtIcon;
-				}
-			}
-		} else {//Second Pass
-			if(RendererRootyDirt.renderType == RenderType.GRASS) {
-				if(side == 1) {//Top
-					return Blocks.grass.getIcon(side, 0);
-				} else if(side != 0) {//NSWE
-					return BlockGrass.getIconSideOverlay();
-				}
-			}
-		}
-
-		return dirtIcon;//Everything else
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metadata) {
-		if(side == 1) {
-			return Blocks.dirt.getIcon(side, 0);
-		}
-		return dirtIcon;
-	}
-
-	public RenderType getRenderType(IBlockAccess blockAccess, int x, int y, int z) {
-
+	public EnumMimicType getMimicType(IBlockAccess blockAccess, BlockPos pos) {
 		final int dMap[] = {0, -1, 1};
 
-		for(int depth = 0; depth < 3; depth++) {
-			for(Dir d: Dir.CARDINAL) {
-				BlockPos pos = new BlockPos(x + d.xOffset, y + dMap[depth], z + d.zOffset);
-				IBlockState mimic = pos.getBlockState(blockAccess);
+		for(int depth: dMap) {
+			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+				IBlockState mimic = blockAccess.getBlockState(pos.offset(dir).down(depth));
 
-				if(mimic.equals(Blocks.grass)) {
-					return RenderType.GRASS;
-				} else if(mimic.equals(Blocks.mycelium)) {
-					return RenderType.MYCELIUM;
-				} else if(mimic.equals(Blocks.dirt, 2)) {
-					return RenderType.PODZOL;
+				for(EnumMimicType muse: EnumMimicType.values()) {
+					if(muse != EnumMimicType.DIRT) {
+						if(mimic == muse.getBlockState()) {
+							return muse;
+						}
+					}
 				}
 			}
 		}
 
-		return RenderType.DIRT;//Default to plain old dirt
+		return EnumMimicType.DIRT;//Default to plain old dirt
 	}
 
+	/**
+	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.
+	 * So dirt bits end up green if we don't.
+	 */
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(IBlockAccess access, int x, int y, int z, int side) {
+	public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
 
-		if(super.shouldSideBeRendered(access, x, y, z, side)) {
-			if(RendererRootyDirt.renderPass == 1) {//First Pass
-				if(RendererRootyDirt.renderType == RenderType.GRASS) {
-					return side != 1;//Don't render top of grass block on first pass	
-				}
-				return true;//Render all sides of dirt, mycelium and podzol block on first pass
-			} else {//Second Pass
-				if(RendererRootyDirt.renderType == RenderType.GRASS) {
-					return side != 0;//Don't render bottom of grass block on second pass	
-				}
-				return false;//Render nothing for dirt, mycelium and podzol block on second pass
-			}
+		BlockPos pos = target.getBlockPos();
+		Random rand = world.rand;
+
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
+		AxisAlignedBB axisalignedbb = state.getBoundingBox(world, pos);
+		double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
+		double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
+		double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
+
+		switch(target.sideHit) {
+			case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
+			case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
+			case NORTH: d2 = z + axisalignedbb.minZ - 0.1D; break;
+			case SOUTH: d2 = z + axisalignedbb.maxZ + 0.1D; break;
+			case WEST:  d0 = x + axisalignedbb.minX - 0.1D; break;
+			case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
 		}
 
-		return false;
-	}
+		//Safe to spawn particles here since this is a client side only member function
+		ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_DUST.getParticleID(), d0, d1, d2, 0, 0, 0, new int[]{Block.getStateId(state)});
+		particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F).setRBGColorF(0.6f, 0.6f, 0.6f);
+		
+		return true;
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int colorMultiplier(IBlockAccess blockAccess, int x, int y, int z) {
-		if(RendererRootyDirt.renderType == RenderType.GRASS && RendererRootyDirt.renderPass == 2) {
-			return Blocks.grass.colorMultiplier(blockAccess, x, y, z);
-		} else {
-			return super.colorMultiplier(blockAccess, x, y, z);
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister register) {
-		dirtIcon = register.registerIcon(DynamicTrees.MODID + ":" + "rootydirt-dirt");
-		grassIcon = register.registerIcon(DynamicTrees.MODID + ":" + "rootydirt-grass");
-		myceliumIcon = register.registerIcon(DynamicTrees.MODID + ":" + "rootydirt-mycelium");
-		podzolIcon = register.registerIcon(DynamicTrees.MODID + ":" + "rootydirt-podzol");
-	}
-
-	@Override
-	public int getRenderType() {
-		return RendererRootyDirt.renderId;
-	}
 
 }

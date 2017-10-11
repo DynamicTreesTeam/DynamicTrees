@@ -1,14 +1,13 @@
 package com.ferreusveritas.dynamictrees.entities;
 
-import java.util.List;
-
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class EntityLingeringEffector extends Entity {
@@ -27,7 +26,7 @@ public class EntityLingeringEffector extends Entity {
 
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
-			for(EntityLingeringEffector effector : (List<EntityLingeringEffector>)world.getEntitiesWithinAABB(EntityLingeringEffector.class, pos.getAxisAlignedBB()) ) {
+			for(EntityLingeringEffector effector : world.getEntitiesWithinAABB(EntityLingeringEffector.class, new AxisAlignedBB(pos))) {
 				if(effector.getBlockPos().equals(pos) && effector.getEffect().getName().equals(effect.getName())) {
 					effector.setDead();//Kill old effector if it's the same
 				}
@@ -66,7 +65,7 @@ public class EntityLingeringEffector extends Entity {
 		super.onUpdate();
 
 		if(effect != null) {
-			IBlockState blockState = blockPos.getBlockState(worldObj);
+			IBlockState blockState = worldObj.getBlockState(blockPos);
 
 			if(blockState.getBlock() instanceof BlockRootyDirt) {
 				BlockRootyDirt rootyDirt = (BlockRootyDirt) blockState.getBlock();

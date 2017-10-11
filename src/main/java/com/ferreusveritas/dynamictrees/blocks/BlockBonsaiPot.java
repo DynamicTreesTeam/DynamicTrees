@@ -1,53 +1,60 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.renderers.RendererBonsai;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockSapling;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockBonsaiPot extends BlockBackport {
+public class BlockBonsaiPot extends Block {
 
 	protected Map<Integer, DynamicTree> trees = new HashMap<Integer, DynamicTree>();
 	
 	public static final String name = "bonsaipot";
+	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
 	public BlockBonsaiPot() {
 		this(name);
 	}
 	
 	public BlockBonsaiPot(String name) {
-		super(Blocks.flower_pot.getMaterial());
-		setDefaultState(new BlockAndMeta(this, 0));
-		setUnlocalizedNameReg(name);
+		super(Blocks.FLOWER_POT.getMaterial(Blocks.FLOWER_POT.getDefaultState()));
+		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
+		setUnlocalizedName(name);
 		setRegistryName(name);
 		mapTrees();
-		setBlockBoundsForItemRender();
 	}
 
 	private void mapTrees() {
 		for(DynamicTree tree: DynamicTrees.baseTrees) {
-			trees.put(tree.getPrimitiveSapling().getMeta(), tree);
+			trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
 		}
 	}
 
@@ -57,14 +64,14 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	public DynamicTree getTree(IBlockState state) {
 		if(state.getBlock() == this) {
-			return trees.get(state.getMeta());
+			return trees.get(state.getValue(BlockSapling.TYPE).ordinal());
 		}
     	return trees.get(0);
 	}
 	
 	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
-		int woodType = tree.getPrimitiveSapling().getMeta();
-		getDefaultState().withMeta(woodType).setInWorld(world, pos);
+		BlockPlanks.EnumType woodType = tree.getPrimitiveSapling().getValue(BlockSapling.TYPE);
+		world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
 		return true;
 	}
 		
@@ -73,21 +80,18 @@ public class BlockBonsaiPot extends BlockBackport {
 	///////////////////////////////////////////
 	
 	//Unlike a regular flower pot this is only used to eject the contents
-	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
-		ItemStack heldItem = player.getHeldItem();
-		IBlockState state = pos.getBlockState(world);
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
-		if(heldItem == null) { //Empty hand
+		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
 			
 			if(!world.isRemote) {
 				ItemStack seedStack = tree.getSeedStack();
-				ItemStack saplingStack = tree.getPrimitiveSapling().toItemStack();
+				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
 				world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
-			new BlockAndMeta(Blocks.flower_pot).setInWorld(world, pos);
+			world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState());
 
 			return true;
 		}
@@ -95,32 +99,31 @@ public class BlockBonsaiPot extends BlockBackport {
 		return false;
 	}
 
+	
 	@Override
-	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
-		return new ItemStack(Items.flower_pot);
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		return new ItemStack(Items.FLOWER_POT);
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
 	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return Items.flower_pot;
+		return Items.FLOWER_POT;
 	}
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState state = pos.getBlockState(world);
-		ArrayList<ItemStack> ret = super.getDrops(world, x, y, z, metadata, fortune);
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
 		DynamicTree tree = getTree(state);
 		ret.add(tree.getSeedStack());
 		return ret;
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
-	if (!World.doesBlockHaveSolidTopSurface(world, pos.getX(), pos.getY() - 1, pos.getZ())) {
-            this.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), pos.getMeta(world), 0);
-            pos.setBlockToAir(world);
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+	if (!worldIn.getBlockState(pos.down()).isFullyOpaque()) {
+            this.dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
         }
     }
 	
@@ -128,14 +131,31 @@ public class BlockBonsaiPot extends BlockBackport {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
+	/** Convert the given metadata into a BlockState for this Block */
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.byMetadata(meta & 0xF));
+	}
+
+	/**
+	 * Convert the BlockState into the correct metadata value
+	 */
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(BlockSapling.TYPE).getMetadata();
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[] {BlockSapling.TYPE});
+	}
+
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
-	public void setBlockBoundsForItemRender() {
-		float f = 0.375F;
-		float f1 = f / 2.0F;
-		this.setBlockBounds(0.5F - f1, 0.0F, 0.5F - f1, 0.5F + f1, f, 0.5F + f1);
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return FLOWER_POT_AABB;
 	}
 
 	///////////////////////////////////////////
@@ -143,22 +163,19 @@ public class BlockBonsaiPot extends BlockBackport {
 	///////////////////////////////////////////
 	
 	@Override
-	public IIcon getIcon(int side, int meta) {
-		return Blocks.flower_pot.getIcon(side, meta);
+	public boolean isFullCube(IBlockState state) {
+		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
-	public int getRenderType() {
-		return RendererBonsai.id;
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
 	}
-
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-	
 
 }

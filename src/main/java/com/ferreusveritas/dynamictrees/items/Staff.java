@@ -6,41 +6,36 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
 * Try the following in a command block to demonstrate the extra tag functionality.
 * /give @p dynamictrees:staff 1 0 tag:{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"birch",display:{Name:"Frog"}}
 */
-public class Staff extends ItemReg {
-
-	IIcon overlayIcon;
-	IIcon glimmerIcon;
+public class Staff extends Item {
 
 	public Staff() {
 		this("staff");
@@ -49,65 +44,50 @@ public class Staff extends ItemReg {
 	public Staff(String name) {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setMaxStackSize(1);
-		setTextureName(DynamicTrees.MODID + ":" + name);
-		setUnlocalizedNameReg(name);
+		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float sideX, float sideY, float sideZ) {
+	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 
-		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState clickedBlock = pos.getBlockState(world);
-		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock.getBlock());
-		BlockPos root = pos;
+		IBlockState clickedBlock = world.getBlockState(pos);
+		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock);
+		BlockPos rootPos = pos;
 		
-		/*if(clickedBlock instanceof BlockGrowingLeaves ){
-			if(world.isRemote){
-				int metadata = world.getBlockMetadata(x, y, z);
-				Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Leaves Metadata: " + Integer.toBinaryString(metadata)));
-			}
-		}*/
-
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
-				root = signal.root;
-				treePart = TreeHelper.getSafeTreePart(world, root);
-				
-				if(world.isRemote && treePart.isRootNode()) {
-					BlockRootyDirt rootyDirt = (BlockRootyDirt) treePart;
-					int soilLife = rootyDirt.getSoilLife(world, root);
-					Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Rooty Soil Life: " + soilLife));
-				}
+				rootPos = new BlockPos(signal.root);
+				treePart = TreeHelper.getSafeTreePart(world, signal.root);
 			}
 		}
 
 		//Get the code from a tree or rooty dirt and set it in the staff
-		if(!isReadOnly(itemStack) && treePart.isRootNode()) {
-			DynamicTree tree = treePart.getTree(world, root);
+		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
+			DynamicTree tree = treePart.getTree(world, rootPos);
 			if(tree != null) {
 				if(!player.isSneaking()) {
-					String code = new JoCode().buildFromTree(world, root, getPlayerDirection(player)).toString();
-					setCode(itemStack, code);
+					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
+					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
-				setTree(itemStack, tree);
-				return true;
+				setTree(heldStack, tree);
+				return EnumActionResult.SUCCESS;
 			}
 		}
 
 		//Create a tree from right clicking on soil
-		DynamicTree tree = getTree(itemStack);
+		DynamicTree tree = getTree(heldStack);
 		if(tree != null && tree.isAcceptableSoil(clickedBlock)) {
-			new JoCode(getCode(itemStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
-			itemStack.stackSize--;//If the player is in creative this will have no effect.
-			return true;
+			new JoCode(getCode(heldStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
+			heldStack.stackSize--;//If the player is in creative this will have no effect.
+			return EnumActionResult.SUCCESS;
 		}
 
-		return false;
+		return EnumActionResult.FAIL;
 	}
 
 	/**
@@ -195,13 +175,7 @@ public class Staff extends ItemReg {
 	}
 
 	public EnumFacing getPlayerDirection(EntityPlayer player) {
-		switch(MathHelper.floor_float(player.rotationYaw * 4.0F / 360.0F + 0.5F) & 3) {
-			case 0: return EnumFacing.SOUTH;
-			case 1: return EnumFacing.WEST;
-			case 2: return EnumFacing.NORTH;
-			case 3: return EnumFacing.EAST;
-			default: return null;
-		}
+		return player.getHorizontalFacing();
 	}
 	
 	/**
@@ -209,7 +183,7 @@ public class Staff extends ItemReg {
 	*/
 	@Override
 	public EnumAction getItemUseAction(ItemStack itemStack) {
-		return EnumAction.block;
+		return EnumAction.BLOCK;
 	}
 
 	/**
@@ -222,7 +196,7 @@ public class Staff extends ItemReg {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean advancedTooltips) {
+	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advancedTooltips) {
 		DynamicTree tree = getTree(stack);
 		tooltip.add("Tree: " + tree != null ? tree.getName() : "none");
 		tooltip.add("Code: §6" + getCode(stack));
@@ -232,53 +206,17 @@ public class Staff extends ItemReg {
 	* Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
 	*/
 	@Override
-	public Multimap getAttributeModifiers(ItemStack stack) {
-		Multimap multimap = super.getAttributeModifiers(stack);
-		multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(field_111210_e, "Weapon modifier", 5.0, 0));
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
+		Multimap multimap = super.getAttributeModifiers(equipmentSlot, stack);
+		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED. getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
+		}
 		return multimap;
 	}
 
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean requiresMultipleRenderPasses() {
-		return true;
-	}
-
-	@Override
-	public int getRenderPasses(int metadata) {
-		return 3;
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack stack, int pass) {
-		return pass == 1 ? getColor(stack) : 0x00FFFFFF;
-	}
-
-	/**
-	* Gets an icon index based on an item's damage value and the given render pass
-	*/
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(ItemStack itemStack, int pass) {
-		switch(pass) {
-			default:
-			case 0: return itemIcon;
-			case 1: return overlayIcon;
-			case 2: return glimmerIcon;
-		}
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister iconRegister) {
-		super.registerIcons(iconRegister);
-		overlayIcon = iconRegister.registerIcon(this.getIconString() + "-overlay");
-		glimmerIcon = iconRegister.registerIcon(this.getIconString() + "-glimmer");
-	}
 
 }

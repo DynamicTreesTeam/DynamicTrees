@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.proxy;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CCProxyActive extends CCProxyBase {
 
@@ -24,7 +25,9 @@ public class CCProxyActive extends CCProxyBase {
 	
 	@Override
 	public void registerItems() {
-		//No need to register ItemBlocks in 1.7.10
+		ItemBlock itemBlock = new ItemBlock(blockDendroCoil);
+		itemBlock.setRegistryName(blockDendroCoil.getRegistryName());
+		GameRegistry.register(itemBlock);
 	}
 	
 }

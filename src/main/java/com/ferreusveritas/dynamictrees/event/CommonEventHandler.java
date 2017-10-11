@@ -1,3 +1,21 @@
 package com.ferreusveritas.dynamictrees.event;
 
-public class CommonEventHandler {}
+import com.ferreusveritas.dynamictrees.seasons.SeasonManager;
+
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Type;
+import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
+
+public class CommonEventHandler {
+	
+	SeasonManager seasonManager = new SeasonManager();
+	
+	@SubscribeEvent
+	public void onWorldTick(WorldTickEvent event) {
+		if(event.type == Type.WORLD && event.phase == Phase.START && event.world.provider.getDimension() == 0) {
+			seasonManager.updateTick(event.world, event.world.getWorldTime());
+		}
+	}
+	
+}

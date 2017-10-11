@@ -5,11 +5,6 @@ import java.util.ArrayList;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
-
 public class CircleHelper {
 
 	private static int looseMasks[][] = new int[7][7];
@@ -121,29 +116,6 @@ public class CircleHelper {
 		double phi = Math.abs(beta - alpha) % (Math.PI * 2);// This is either the distance or 360 - distance
 		double distance = phi > Math.PI ? (Math.PI * 2) - phi : phi;
 		return distance;
-	}
-
-	public static int getRadiusAtCoords(World world, Circle cA, NoiseGeneratorPerlin noiseGenerator) {
-		float angle = (float)cA.getFreeAngle();
-
-		double x = cA.x + (MathHelper.sin(angle) * cA.radius * 1.5);
-		double z = cA.z + (MathHelper.cos(angle) * cA.radius * 1.5);
-
-		return getRadiusAtCoords(world, x, z, noiseGenerator);
-	}
-
-	public static int getRadiusAtCoords(World world, double x, double z, NoiseGeneratorPerlin noiseGenerator) {
-		double scale = 128;//Effectively scales up the noisemap
-		BiomeGenBase biome = world.getBiomeGenForCoords((int)x, (int)z);
-		double biomeDensity = MathHelper.clamp_float((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
-		double noiseDensity = (noiseGenerator.func_151601_a(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = noiseDensity * (biomeDensity * 1.5f);
-		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
-
-		int shake = world.rand.nextInt(4);
-		shake = (shake == 2) ? 1 : (shake == 3) ? 2 : 0;
-
-		return MathHelper.clamp_int((int) size, 2 + shake, 8 - shake);//Clamp to tree volume radius range
 	}
 
 	/**

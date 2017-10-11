@@ -1,21 +1,21 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeAcacia extends DynamicTree {
 
 	public TreeAcacia() {
-		super(VanillaTreeData.EnumType.ACACIA);
+		super(BlockPlanks.EnumType.ACACIA);
 
 		//Acacia Trees are short, very slowly growing trees
 		setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
@@ -44,7 +44,7 @@ public class TreeAcacia extends DynamicTree {
 	}
 
 	@Override
-	public boolean isBiomePerfect(BiomeGenBase biome) {
+	public boolean isBiomePerfect(Biome biome) {
 		return BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA);
 	}
 

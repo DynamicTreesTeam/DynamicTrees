@@ -5,21 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesAutomata;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -30,23 +28,34 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockNewLeaf;
+import net.minecraft.block.BlockNewLog;
+import net.minecraft.block.BlockOldLeaf;
+import net.minecraft.block.BlockOldLog;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockSapling;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
 * All data related to a tree species
@@ -132,11 +141,8 @@ public class DynamicTree implements ILeavesAutomata {
 	/** A unique identifier for the tree species */
 	private int id;
 
-	/** In 1.7.10 we use this to register the texture name for seeds */
-	private String modId;
-	
 	/** Only dynamictrees mod should use this and only for vanilla trees */
-	public DynamicTree(VanillaTreeData.EnumType treeType) {
+	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(treeType.getName().replace("_",""), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
 	}
@@ -155,13 +161,12 @@ public class DynamicTree implements ILeavesAutomata {
 	 */
 	public DynamicTree(String modid, String name, int seq) {
 		this.name = name;
-		this.modId = modid;
 
-		simpleVanillaSetup(VanillaTreeData.EnumType.OAK);//Just default to Oak for the convenience of derivative mods
+		simpleVanillaSetup(BlockPlanks.EnumType.OAK);//Just default to Oak for the convenience of derivative mods
 
 		setGrowingLeaves(modid, seq);
 		setGrowingBranch(new BlockBranch(name + "branch"));
-		setStick(new ItemStack(Items.stick));
+		setStick(new ItemStack(Items.STICK));
 
 		createLeafCluster();
 	}
@@ -170,13 +175,33 @@ public class DynamicTree implements ILeavesAutomata {
 	 * This is for use with Vanilla Tree types only.  Mods depending on the dynamictrees mod should 
 	 * call the here contained primitive assignment functions in their constructor instead.
 	 * 
-	 * @param treeType
+	 * @param wood
 	 */
-	protected void simpleVanillaSetup(VanillaTreeData.EnumType treeType) {
-		setPrimitiveLeaves(treeType.getLeavesBlockAndMeta(), treeType.getLeavesBlockAndMeta().toItemStack());
-		setPrimitiveLog(treeType.getLogBlockAndMeta(), treeType.getLogBlockAndMeta().toItemStack());
-		setPrimitiveSapling(new BlockAndMeta(Blocks.sapling, treeType.getMetadata()));
-		setDynamicSapling(new BlockAndMeta(DynamicTrees.blockDynamicSapling, treeType.getMetadata()));
+	protected void simpleVanillaSetup(BlockPlanks.EnumType wood) {
+		
+		switch(wood) {
+			case OAK:
+			case SPRUCE:
+			case BIRCH:
+			case JUNGLE: {
+				IBlockState primLeaves = Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, wood);
+				IBlockState primLog = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, wood);
+				setPrimitiveLeaves(primLeaves, new ItemStack(primLeaves.getBlock(), 1, primLeaves.getValue(BlockOldLeaf.VARIANT).getMetadata() & 3));
+				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockOldLog.VARIANT).getMetadata() & 3));
+			}
+			break;
+			case ACACIA:
+			case DARK_OAK: {
+				IBlockState primLeaves = Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, wood);
+				IBlockState primLog = Blocks.LOG2.getDefaultState().withProperty(BlockNewLog.VARIANT, wood);
+				setPrimitiveLeaves(primLeaves, new ItemStack(primLeaves.getBlock(), 1, primLeaves.getValue(BlockNewLeaf.VARIANT).getMetadata() & 3));
+				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockNewLog.VARIANT).getMetadata() & 3));
+			}
+			break;
+		}
+		
+		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		setDynamicSapling(DynamicTrees.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
 	public int getId() {
@@ -194,7 +219,7 @@ public class DynamicTree implements ILeavesAutomata {
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
 		//Bonemeal fertilizes the soil
-		if( itemStack.getItem() == Items.dye && itemStack.getItemDamage() == 15) {
+		if( itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
 			return new SubstanceFertilize().setAmount(1);
 		}
 		
@@ -227,7 +252,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return false;
 	}
 
-	public boolean onTreeActivated(World world, BlockPos pos, EntityPlayer player, int side, float px, float py, float pz) {
+	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
 
@@ -256,7 +281,7 @@ public class DynamicTree implements ILeavesAutomata {
 		//Link the sapling to the Tree
 		if(saplingBlock.getBlock() instanceof BlockDynamicSapling) {
 			BlockDynamicSapling dynSap = (BlockDynamicSapling) saplingBlock.getBlock();
-			dynSap.setTree(saplingBlock.getMeta(), this);
+			dynSap.setTree(saplingBlock, this);
 		}
 		
 		return this;
@@ -267,7 +292,7 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 	
 	public void registerItems() {
-		//No need to register ItemBlocks in 1.7.10
+		GameRegistry.register(new ItemBlock(growingBranch).setRegistryName(growingBranch.getRegistryName()));
 		if(genSeed) {//If the seed was generated internally then register it too.
 			GameRegistry.register(seed);
 		}
@@ -276,7 +301,7 @@ public class DynamicTree implements ILeavesAutomata {
 	public void registerRecipes() {
 		//Creates a seed from a vanilla sapling and a wooden bowl
 		ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
-		saplingStack.setItemDamage(primitiveSapling.getMeta());
+		saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
 
 		//Create a seed from a sapling and dirt bucket
 		GameRegistry.addShapelessRecipe(seedStack, new Object[]{ saplingStack, DynamicTrees.dirtBucket});
@@ -328,6 +353,14 @@ public class DynamicTree implements ILeavesAutomata {
 		return leavesSubBlock;
 	}
 
+	public IBlockState getGrowingLeavesState() {
+		return getGrowingLeaves().getDefaultState().withProperty(BlockGrowingLeaves.TREE, this.getGrowingLeavesSub());
+	}
+
+	public IBlockState getGrowingLeavesState(int hydro) {
+		return getGrowingLeavesState().withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(hydro, 1, 4));
+	}
+
 	protected DynamicTree setGrowingBranch(BlockBranch gBranch) {
 		growingBranch = gBranch;
 		growingBranch.setTree(this);
@@ -342,7 +375,6 @@ public class DynamicTree implements ILeavesAutomata {
 	private DynamicTree generateSeed() {
 		genSeed = true;
 		seed = new Seed(getName() + "seed");
-		seed.setTextureName(modId + ":" + name + "seed");
 		return setSeedStack(new ItemStack(seed));
 	}
 	
@@ -506,7 +538,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 	public boolean isAcceptableSoil(IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock(); 
-		return soilBlock == Blocks.dirt || soilBlock == Blocks.grass || soilBlock == Blocks.mycelium || soilBlock == DynamicTrees.blockRootyDirt;
+		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == DynamicTrees.blockRootyDirt;
 	}
 	
 	///////////////////////////////////////////
@@ -514,9 +546,9 @@ public class DynamicTree implements ILeavesAutomata {
 	///////////////////////////////////////////
 	
 	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockAccess blockAccess, int x, int y, int z) {
-		if(blockAccess != null) {
-			return Blocks.leaves2.colorMultiplier(blockAccess, x, y, z);//Access the default leaves colorizer
+	public int foliageColorMultiplier(IBlockState state, @Nullable IBlockAccess world, @Nullable BlockPos pos) {
+		if(world != null && pos != null) {
+			return BiomeColorHelper.getFoliageColorAtPos(world, pos);
 		}
 		return ColorizerFoliage.getFoliageColorBasic();
 	}
@@ -610,11 +642,15 @@ public class DynamicTree implements ILeavesAutomata {
 	//////////////////////////////
 
 	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isCompatibleGrowingLeaves(blockAccess, pos.getBlock(blockAccess), pos);
-	}
 
-	public boolean isCompatibleGrowingLeaves(IBlockAccess blockAccess, Block block, BlockPos pos) {
-		return isCompatibleGrowingLeaves(block, BlockGrowingLeaves.getSubBlockNum(blockAccess, pos));
+		IBlockState state = blockAccess.getBlockState(pos);
+		ITreePart treePart = TreeHelper.getTreePart(state);
+		
+		if (treePart != null && treePart instanceof BlockGrowingLeaves) {
+			return this == ((BlockGrowingLeaves)treePart).getTree(state);			
+		}
+		
+		return false;
 	}
 
 	public boolean isCompatibleGrowingLeaves(Block leaves, int sub) {
@@ -622,7 +658,18 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 
 	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return getPrimitiveLeaves().matches(pos.getBlockState(blockAccess), 3);
+		IBlockState primState = getPrimitiveLeaves();
+		IBlockState otherState = blockAccess.getBlockState(pos);
+
+		Block primBlock = primState.getBlock();
+		Block otherBlock = otherState.getBlock();
+		
+		if(primBlock == otherBlock) {//Blocks Match
+			//Does it break the BlockState convention? You bet.  Do I not care? You bet!
+			return ((primBlock.getMetaFromState(primState) & 3) == (otherBlock.getMetaFromState(otherState) & 3));
+		}
+		
+		return false;
 	}
 
 	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, BlockPos pos) {
@@ -673,7 +720,7 @@ public class DynamicTree implements ILeavesAutomata {
 			}
 		}
 			
-		BiomeGenBase biome = world.getBiomeGenForCoords(pos.getX(), pos.getZ());
+		Biome biome = world.getBiome(pos);
 		if(ConfigHandler.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
@@ -687,7 +734,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return MathHelper.clamp_float(s, 0.0f, 1.0f);
 	}
 
-	public boolean isBiomePerfect(BiomeGenBase biome) {
+	public boolean isBiomePerfect(Biome biome) {
 		return false;
 	}
 
@@ -703,9 +750,9 @@ public class DynamicTree implements ILeavesAutomata {
 	* @param biomes Multiple biomes to match against
 	* @return True if a match is found. False if not.
 	*/
-	public static boolean isOneOfBiomes(BiomeGenBase biomeToCheck, BiomeGenBase ... biomes) {
-		for(BiomeGenBase biome: biomes) {
-			if(biomeToCheck.biomeID == biome.biomeID) {
+	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome ... biomes) {
+		for(Biome biome: biomes) {
+			if(biomeToCheck == biome) {
 				return true;
 			}
 		}
@@ -723,14 +770,16 @@ public class DynamicTree implements ILeavesAutomata {
 	*/
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		
+		final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+		
 		if(radius <= 1) {
-			for(EnumFacing dir: EnumFacing.UPFIRST) {
+			for(EnumFacing dir: upFirst) {
 				if(getGrowingLeaves().growLeaves(world, this, pos.offset(dir), 0)) {
 					return false;
 				}
 			}
 		}
-		world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());
+		world.setBlockToAir(pos);
 		return true;
 	}
 	
@@ -768,13 +817,12 @@ public class DynamicTree implements ILeavesAutomata {
 		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
 
 		//Create probability map for direction change
-		for(int i = 0; i < 6; i++) {
-			EnumFacing dir = EnumFacing.getOrientation(i);
+		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(!dir.equals(originDir)) {
 				BlockPos deltaPos = pos.offset(dir);
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[i] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
+				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
 			}
 		}
 
@@ -783,7 +831,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 		//Select a direction from the probability map
 		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return newDirectionSelected(EnumFacing.getOrientation(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
+		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
 	}
 
 	/** Species can override the probability map here **/

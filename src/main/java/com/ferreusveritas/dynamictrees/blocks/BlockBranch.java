@@ -1,50 +1,110 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.List;
 import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
-import com.ferreusveritas.dynamictrees.renderers.RendererBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties;
 
-public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
+public class BlockBranch extends Block implements ITreePart, IAgeable {
 
-	private DynamicTree tree;//The tree this branch type creates
+	private DynamicTree tree; //The tree this branch type creates
+	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
+
+	// This is a nightmare
+	public static final IUnlistedProperty<Integer> RADIUSD = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8));
+	public static final IUnlistedProperty<Integer> RADIUSU = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8));
+	public static final IUnlistedProperty<Integer> RADIUSN = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8));
+	public static final IUnlistedProperty<Integer> RADIUSS = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8));
+	public static final IUnlistedProperty<Integer> RADIUSW = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8));
+	public static final IUnlistedProperty<Integer> RADIUSE = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8));
+	public static final IUnlistedProperty CONNECTIONS[] = { RADIUSD, RADIUSU, RADIUSN, RADIUSS, RADIUSW, RADIUSE };
 
 	public BlockBranch(String name) {
-		super(Material.wood); //Trees are made of wood. Brilliant.
-		setStepSound(soundTypeWood); //aaaaand they also sound like wood.
+		super(Material.WOOD); //Trees are made of wood. Brilliant.
+		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
 		setHarvestLevel("axe", 0);
+		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setTickRandomly(true); //We need this to facilitate decay when supporting neighbors are lacking
-		setUnlocalizedNameReg(name);
+		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
 
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		IProperty[] listedProperties = { RADIUS };
+		return new ExtendedBlockState(this, listedProperties, CONNECTIONS);
+	}
+
+	/**
+	 * Convert the given metadata into a BlockState for this Block
+	 */
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState().withProperty(RADIUS, (meta & 7) + 1);
+	}
+
+	/**
+	 * Convert the BlockState into the correct metadata value
+	 */
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(RADIUS) - 1;
+	}
+
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state instanceof IExtendedBlockState) {
+			IExtendedBlockState retval = (IExtendedBlockState) state;
+			int thisRadius = getRadius(state);
+
+			for (EnumFacing dir : EnumFacing.VALUES) {
+				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+			}
+			return retval;
+		}
+
+		return state;
+	}
 
 	///////////////////////////////////////////
 	// TREE INFORMATION
@@ -86,12 +146,12 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, Random random) {
-		age(world, pos, random, false);
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+		age(world, pos, state, random, false);
 	}
 
 	@Override
-	public void age(World world, BlockPos pos, Random rand, boolean fast) {
+	public void age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
 		int radius = getRadius(world, pos);
 		if (fast || rand.nextInt(radius * 2) == 0) {// Thicker branches take longer to rot
 			checkForRot(world, pos, radius, rand, fast);
@@ -118,87 +178,69 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-		if (tree != null && tree.onTreeActivated(world, pos, player, facing, hitX, hitY, hitZ)) {
+		if (tree != null && tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ)) {
 			return true;
 		}
 
-		ItemStack heldItem = player.getCurrentEquippedItem();
 		if (heldItem != null) {
-			return applyItemSubstance(world, pos, player, heldItem);
+			return applyItemSubstance(world, pos, player, hand, heldItem);
 		}
 		return false;
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 
 		BlockPos down = pos.down();
 
-		if(down.getBlock(world) != this) { // Make sure the below block is not another branch block
+		if (world.getBlockState(down).getBlock() != this) { // Make sure the below block is not another branch block
 			// This is most likely rooty soil.
-			return TreeHelper.getSafeTreePart(world, down).applyItemSubstance(world, down, player, itemStack);
+			return TreeHelper.getSafeTreePart(world, down).applyItemSubstance(world, down, player, hand, itemStack);
 		}
 		return false;
 	}
 
 	@Override
-	public float getBlockHardness(World world, BlockPos pos) {
+	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		int radius = getRadius(world, pos);
-		return getTree().getPrimitiveLog().getBlock().getBlockHardness(world, pos.getX(), pos.getY(), pos.getZ()) * (radius * radius) / 64.0f * 8.0f;
+		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
 
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		// return 300;
-		return getTree().getPrimitiveLog().getBlock().getFlammability(world, pos.getX(), pos.getY(), pos.getZ(), face.toForgeDirection());
+		return getTree().getPrimitiveLog().getBlock().getFlammability(world, pos, face);
 	}
 
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		// return 4096;
-		return getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos.getX(), pos.getY(), pos.getZ(), face.toForgeDirection());
+		return getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos, face);
 	}
 
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
+
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
+	}
 	
 	@Override
-	public boolean isOpaqueCube() {
-		return false;
+	public boolean isOpaqueCube(IBlockState state) {
+		return getRadius(state) == 8;
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(IBlockAccess access, int x, int y, int z, int side) {
-		if(RendererBranch.renderFaceFlags == RendererBranch.faceAll) {// Behave like a regular block
-			return super.shouldSideBeRendered(access, x, y, z, side);
+	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
+		if (getRadius(blockState) == 8) {
+			return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+		} else {
+			return true;
 		}
-		return (1 << side & RendererBranch.renderFaceFlags) != 0;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	//Bark or wood Ring texture for branches
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metadata) {
-		return getTree().getPrimitiveLog().getIcon((1 << side & RendererBranch.renderRingSides) != 0 ? 0 : 2);//0:Ring, 2:Bark
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister iconRegister) {
-	}
-
-	@Override
-	public int getRenderType() {
-		return RendererBranch.id;
 	}
 
 	///////////////////////////////////////////
@@ -212,18 +254,21 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 
 	@Override
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
-		return (pos.getMeta(blockAccess) & 7) + 1;
+		return getRadius(blockAccess.getBlockState(pos));
+	}
+
+	public int getRadius(IBlockState blockState) {
+		if (blockState.getBlock() == this) {
+			return blockState.getValue(RADIUS);
+		} else {
+			return 0;
+		}
 	}
 
 	public void setRadius(World world, BlockPos pos, int radius) {
-		radius = MathHelper.clamp_int(radius, 0, 8);
-		world.setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), (radius - 1) & 7, 2);
+		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp_int(radius, 1, 8)), 2);
 	}
 
-	public int radiusToMeta(int radius) {
-		return MathHelper.clamp_int(radius, 1, 8) - 1;
-	}
-	
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
@@ -256,8 +301,8 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
 				if (treepart != null) {
-					signal = treepart.growSignal(world, deltaPos, signal);//Recurse
-				} else if (deltaPos.isAirBlock(world)) {
+					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
+				} else if (world.isAirBlock(deltaPos)) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(world, pos));
 				}
 			}
@@ -265,8 +310,8 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 			// Calculate Branch Thickness based on neighboring branches
 			float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
 
-			for(EnumFacing dir: EnumFacing.VALUES) {
-				if(!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
+			for (EnumFacing dir : EnumFacing.VALUES) {
+				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
 					BlockPos deltaPos = pos.offset(dir);
 
 					// If it is decided to implement a special block(like a squirrel hole, tree
@@ -283,8 +328,8 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp_float((float)Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
-			setRadius(world, pos, (int)Math.floor(signal.radius));
+			signal.radius = MathHelper.clamp_float((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
+			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 
 		return signal;
@@ -297,54 +342,49 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
 	// The result is that only thin branches and trunks can be climbed
 	@Override
-	public boolean isLadder(IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
+	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
 		return true;
 	}
 
 	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess blockAccess, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
-		int radius = getRadius(blockAccess, pos);
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
 
-		if(radius > 0) {
-			float rad = radius / 16.0f;
-			float minx = 0.5f - rad;
-			float miny = 0.5f - rad;
-			float minz = 0.5f - rad;
-			float maxx = 0.5f + rad;
-			float maxy = 0.5f + rad;
-			float maxz = 0.5f + rad;
-
-			boolean connectionMade = false;
-			
-			for(EnumFacing dir: EnumFacing.VALUES) {
-				if(getSideConnectionRadius(blockAccess, pos, radius, dir) > 0) {
-					connectionMade = true;
-					switch(dir){
-						case DOWN: miny = 0.0f; break;
-						case UP: maxy = 1.0f; break;
-						case NORTH: minz = 0.0f; break;
-						case SOUTH: maxz = 1.0f; break;
-						case WEST: minx = 0.0f; break;
-						case EAST: maxx = 1.0f; break;
-						default: break;
-					}
-				}
-			}
-
-			if(!connectionMade) {
-				miny = 0.0f;
-				maxy = 1.0f;
-			}
-
-			this.setBlockBounds(minx, miny, minz, maxx, maxy, maxz);
+		if (state.getBlock() != this) {
+			return NULL_AABB;
 		}
+
+		int thisRadius = getRadius(state);
+
+		boolean connectionMade = false;
+		double radius = thisRadius / 16.0;
+		double gap = 0.5 - radius;
+		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).expandXyz(radius);
+		for (EnumFacing dir : EnumFacing.VALUES) {
+			if (getSideConnectionRadius(blockAccess, pos, thisRadius, dir) > 0) {
+				connectionMade = true;
+				aabb = aabb.addCoord(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap);
+			}
+		}
+		if (connectionMade) {
+			return aabb.offset(0.5, 0.5, 0.5);
+		}
+		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-		this.setBlockBoundsBasedOnState(world, x, y, z);
-		return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn) {
+		int thisRadius = getRadius(state);
+
+		for (EnumFacing dir : EnumFacing.VALUES) {
+			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
+			if (connRadius > 0) {
+				double radius = MathHelper.clamp_int(connRadius, 1, thisRadius) / 16.0;
+				double gap = 0.5 - radius;
+				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).expandXyz(radius);
+				aabb = aabb.addCoord(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
+				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
+			}
+		}
 	}
 
 	@Override
@@ -363,12 +403,13 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 
 	@Override
 	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
-		// Note: fromDir will be ForgeDirection.UNKNOWN in the origin node
+		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
-			for(EnumFacing dir: EnumFacing.VALUES) {// Spread signal in various directions
-				if(dir != fromDir) {//don't count where the signal originated from
+			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
+				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
+
 					signal = TreeHelper.getSafeTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
 
 					// This should only be true for the originating block when the root node is found
@@ -379,7 +420,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 			}
 			signal.returnRun(world, this, pos, fromDir);
 		} else {
-			world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());// Destroy one of the offending nodes
+			world.setBlockToAir(pos);// Destroy one of the offending nodes
 			signal.overflow = true;
 		}
 		signal.depth--;
@@ -399,7 +440,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	public void destroyEntireTree(World world, BlockPos pos) {
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
-		dropWood(world, pos, volumeSum.getVolume());//Drop an amount of wood calculated from the body of the tree network
+		dropWood(world, pos, volumeSum.getVolume());// Drop an amount of wood calculated from the body of the tree network
 	}
 
 	///////////////////////////////////////////
@@ -412,26 +453,36 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 			DynamicTree tree = getTree();
 			ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
 			ItemStack stickStack = tree.getStick((volume % 4096) / 512);// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
-			dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), logStack);//Drop vanilla logs or whatever
-			dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), stickStack);//Give him the stick!
+			spawnAsEntity(world, pos, logStack);// Drop vanilla logs or whatever
+			spawnAsEntity(world, pos, stickStack);// Give him the stick!
 		}
 	}
 
 	@Override
-	public void onBlockHarvested(World world, BlockPos pos, int localMeta, EntityPlayer player) {
-		int fortune = EnchantmentHelper.getFortuneModifier(player);
+	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+	}
+
+	@Override
+	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+		return null;
+	}
+
+	@Override
+	public int quantityDropped(Random random) {
+		return 0;
+	}
+
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+		ItemStack heldItem = player.getHeldItemMainhand();
+		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		destroyTreeFromNode(world, pos, 1.0f + 0.25f * fortune);
+		return true;// Block was destroyed
 	}
 
 	@Override
-	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
-		//Normally just sets the block to air but we've already done that.
-		return false;//False prevents block harvest as we've already done that also.
-	}
-
-	@Override
-	public int getMobilityFlag() {
-		return 2;
+	public EnumPushReaction getMobilityFlag(IBlockState state) {
+		return EnumPushReaction.BLOCK;
 	}
 
 	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.

@@ -1,19 +1,29 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
+import javax.annotation.Nullable;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class DirtBucket extends ItemReg {
+public class DirtBucket extends Item {
 
 	public static final String name = "dirtbucket";
 
@@ -25,62 +35,66 @@ public class DirtBucket extends ItemReg {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setTextureName(DynamicTrees.MODID + ":" + name);
 		setMaxStackSize(1);
 		setContainerItem(this);
 	}
 
-	//[VanillaCopy] ItemBucket member function modified for purpose
-    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-        MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, false);
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStack, World world, EntityPlayer player, EnumHand hand) {
 
-        if (movingobjectposition == null) {
-            return stack;
-        }
-        else {
-            if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                BlockPos pos = new BlockPos(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ);
-                
-                if (!world.canMineBlock(player, pos.getX(), pos.getY(), pos.getZ())) {
-                	return stack;
-                }
+		RayTraceResult raytraceresult = this.rayTrace(world, player, false);
 
-                pos = pos.offset(EnumFacing.getOrientation(movingobjectposition.sideHit));
-                
-                if (!player.canPlayerEdit(pos.getX(), pos.getY(), pos.getZ(), movingobjectposition.sideHit, stack)) {
-                	return stack;
-                }
+		if (raytraceresult == null) {
+			return new ActionResult(EnumActionResult.PASS, itemStack);
+		}
+		else if (raytraceresult.typeOfHit != RayTraceResult.Type.BLOCK) {
+			return new ActionResult(EnumActionResult.PASS, itemStack);
+		}
+		else {
+			BlockPos blockpos = raytraceresult.getBlockPos();
 
-                if (this.tryPlaceContainedDirt(player, world, pos) && !player.capabilities.isCreativeMode) {
-                	return new ItemStack(Items.bucket);
-                }                
-            }
+			if (!world.isBlockModifiable(player, blockpos)) {
+				return new ActionResult(EnumActionResult.FAIL, itemStack);
+			}
+			else {
+				boolean isReplacable = world.getBlockState(blockpos).getBlock().isReplaceable(world, blockpos);
+				BlockPos workingBlockPos = isReplacable && raytraceresult.sideHit == EnumFacing.UP ? blockpos : blockpos.offset(raytraceresult.sideHit);
 
-            return stack;
-        }
-    }
-    
-    public boolean tryPlaceContainedDirt(EntityPlayer player, World world, BlockPos pos) {
+				if (!player.canPlayerEdit(workingBlockPos, raytraceresult.sideHit, itemStack)) {
+					return new ActionResult(EnumActionResult.FAIL, itemStack);
+				}
+				else if (this.tryPlaceContainedDirt(player, world, workingBlockPos)) {
+					player.addStat(StatList.getObjectUseStats(this));
+					return !player.capabilities.isCreativeMode ? new ActionResult(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult(EnumActionResult.SUCCESS, itemStack);
+				}
+				else {
+					return new ActionResult(EnumActionResult.FAIL, itemStack);
+				}
+			}
+		}
+	}
 
-    	IBlockState blockState = pos.getBlockState(world);
-    	boolean replaceable = blockState.getBlock().isReplaceable(world, pos.getX(), pos.getY(), pos.getZ());
+	public boolean tryPlaceContainedDirt(@Nullable EntityPlayer player, World world, BlockPos posIn) {
+		IBlockState iblockstate = world.getBlockState(posIn);
+		boolean replaceable = iblockstate.getBlock().isReplaceable(world, posIn);
 
-    	if(replaceable) {
-    		if (!world.isRemote) {
-    			world.func_147480_a(pos.getX(), pos.getY(), pos.getZ(), true);
-    		}
+		if(replaceable) {
+			if (!world.isRemote) {
+				world.destroyBlock(posIn, true);
+			}
 
-    		String soundevent = "dig.grass";
-    		world.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), soundevent, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);                    
-    		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, 3);
-    	}
-
-    	return true;
-    }
+			SoundEvent soundevent = SoundEvents.BLOCK_GRASS_PLACE;
+			world.playSound(player, posIn, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+			world.setBlockState(posIn, Blocks.DIRT.getDefaultState(), 11);
+			return true;
+		}
+		
+		return false;
+	}
 
 	public DirtBucket registerRecipes() {
 		//Create a dirt bucket from dirt and a bucket
-		GameRegistry.addShapelessRecipe(new ItemStack(DynamicTrees.dirtBucket), new Object[]{ Blocks.dirt, Items.bucket});
+		GameRegistry.addShapelessRecipe(new ItemStack(DynamicTrees.dirtBucket), new Object[]{ Blocks.DIRT, Items.BUCKET});
 		return this;
 	}
 	

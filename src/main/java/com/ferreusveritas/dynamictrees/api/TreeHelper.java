@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
@@ -10,20 +9,17 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 
 import net.minecraft.block.Block;
-import com.ferreusveritas.dynamictrees.util.Dir;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TreeHelper {
 
-	public static final short cellSolverDeciduous[] = {0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211};
-	public static final short cellSolverConifer[] = {0x0514, 0x0413, 0x0312, 0x0211};
-	public static final short hydroSolverDeciduous[] = null;
-	public static final short hydroSolverConifer[] = {0x02F0, 0x0144, 0x0742, 0x0132, 0x0730};
-
 	public static HashMap<String, BlockGrowingLeaves> leavesArray = new HashMap<String, BlockGrowingLeaves>();
 
-	public static ITreePart nullTreePart = new NullTreePart();
+	public static final ITreePart nullTreePart = new NullTreePart();
 
 	/**
 	 * A convenience function for packing 4 growing leaves blocks into one Minecraft block using metadata.
@@ -40,16 +36,16 @@ public class TreeHelper {
 			return leavesArray.get(key);
 		} else {
 			BlockGrowingLeaves leavesBlock = new BlockGrowingLeaves();
-			leavesBlock.setRegistryName("leaves" + leavesBlockNum);
-			leavesBlock.setUnlocalizedNameReg("leaves" + leavesBlockNum);
+			leavesBlock.setRegistryName(modid, "leaves" + leavesBlockNum);
+			leavesBlock.setUnlocalizedName("leaves" + leavesBlockNum);
 			leavesArray.put(key, leavesBlock);
 			return leavesBlock;
 		}
 	}
 
 	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
-		for(Dir d: Dir.SURROUND) {
-			if(!world.getChunkProvider().chunkExists((pos.getX() >> 4) + d.xOffset, (pos.getZ() >> 4) + d.zOffset)) {
+		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getFrontOffsetX(), (pos.getZ() >> 4) + dir.getFrontOffsetZ()) == null ){
 				return false;
 			}
 		}
@@ -64,7 +60,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return isTreePart(pos.getBlock(blockAccess));
+		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
 
 	public static ITreePart getTreePart(Block block) {
@@ -72,7 +68,11 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(pos.getBlock(blockAccess));
+		return getTreePart(blockAccess.getBlockState(pos).getBlock());
+	}
+
+	public static ITreePart getTreePart(IBlockState state) {
+		return getTreePart(state.getBlock());
 	}
 
 	public static ITreePart getSafeTreePart(Block block) {
@@ -80,7 +80,11 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getSafeTreePart(pos.getBlock(blockAccess));
+		return getSafeTreePart(blockAccess.getBlockState(pos));
+	}
+
+	public static ITreePart getSafeTreePart(IBlockState blockState) {
+		return getSafeTreePart(blockState.getBlock());
 	}
 
 	//Branches
@@ -90,7 +94,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return isBranch(pos.getBlock(blockAccess));
+		return isBranch(blockAccess.getBlockState(pos).getBlock());
 	}
 
 	public static BlockBranch getBranch(Block block) {
@@ -102,7 +106,7 @@ public class TreeHelper {
 	}
 
 	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(pos.getBlock(blockAccess));
+		return getBranch(blockAccess.getBlockState(pos).getBlock());
 	}
 
 	//Leaves
@@ -112,7 +116,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isLeaves(pos.getBlock(blockAccess));
+		return isLeaves(blockAccess.getBlockState(pos).getBlock());
 	}
 
 	//Rooty Dirt
@@ -122,7 +126,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(pos.getBlock(blockAccess));
+		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
 	}
 
 }

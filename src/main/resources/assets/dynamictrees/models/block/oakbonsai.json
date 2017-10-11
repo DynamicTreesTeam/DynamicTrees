@@ -1,0 +1,8 @@
+{
+    "parent": "dynamictrees:block/bonsai",
+    "textures": {
+        "particle": "blocks/leaves_oak",
+        "log": "blocks/log_oak",
+        "leaves": "blocks/leaves_oak"
+    }
+}

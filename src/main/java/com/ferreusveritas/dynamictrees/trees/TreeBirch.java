@@ -2,24 +2,26 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeBirch extends DynamicTree {
 
 	public TreeBirch() {
-		super(VanillaTreeData.EnumType.BIRCH);
+		super(BlockPlanks.EnumType.BIRCH);
 
 		//Birch are tall, skinny, fast growing trees
 		setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
@@ -33,16 +35,16 @@ public class TreeBirch extends DynamicTree {
 	}
 
 	@Override
-	public boolean isBiomePerfect(BiomeGenBase biome) {
-		return isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills);
+	public boolean isBiomePerfect(Biome biome) {
+		return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
 	};
 
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getSavedLightValue(EnumSkyBlock.Sky, pos.getX(), pos.getY(), pos.getZ()) < 4) {
-				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.brown_mushroom);//Change branch to a brown mushroom
-				world.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), Blocks.dirt, 0, 3);//Change rooty dirt to dirt
+			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+				world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a brown mushroom
+				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 3);//Change rooty dirt to dirt
 			}
 			return true;
 		}
@@ -52,7 +54,7 @@ public class TreeBirch extends DynamicTree {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockAccess blockAccess, int x, int y, int z) {
+	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return ColorizerFoliage.getFoliageColorBirch();
 	}
 }

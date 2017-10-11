@@ -8,8 +8,8 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.world.World;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
 * Destroys all branches on a tree and the surrounding leaves.
@@ -31,7 +31,7 @@ public class NodeDestroyer implements INodeInspector {
 			if(branch.getRadius(world, pos) == 1) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
-			world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());//Destroy the branch
+			world.setBlockToAir(pos);//Destroy the branch
 		}
 
 		return true;
@@ -47,7 +47,7 @@ public class NodeDestroyer implements INodeInspector {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
-						leavesPos.setBlockToAir(world);
+						world.setBlockToAir(leavesPos);
 						int qty = tree.getGrowingLeaves().quantitySeedDropped(world.rand);
 						if(qty > 0) {
 							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
@@ -57,7 +57,6 @@ public class NodeDestroyer implements INodeInspector {
 				//}
 			}
 		}
-		
 	}
 
 }
