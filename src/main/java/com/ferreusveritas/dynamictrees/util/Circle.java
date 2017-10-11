@@ -84,7 +84,7 @@ public class Circle extends Vec2d {
 	}
 
 	public Circle setRadius(int radius) {
-		this.radius = MathHelper.clamp_int(radius, 2, 8);
+		this.radius = MathHelper.clamp(radius, 2, 8);
 		return this;
 	}
 

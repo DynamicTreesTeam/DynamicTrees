@@ -26,14 +26,9 @@ public class SubstanceTransform implements ISubstanceEffect {
 	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
 
 		if(toTree != null) {
-			BlockPos basePos = pos.up();//Position of base of tree
-			if(world.isRemote) {
-				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.CRIT, 8)));
-			} else {
-				BlockBranch branch = TreeHelper.getBranch(world, basePos);
-				if(branch != null) {
-					branch.analyse(world, basePos, EnumFacing.DOWN, new MapSignal(new NodeTransform(branch.getTree(), toTree), new NodeTwinkle(EnumParticleTypes.FIREWORKS_SPARK, 8)));
-				}
+			BlockBranch branch = TreeHelper.getBranch(world, pos.up());
+			if(branch != null) {
+				branch.analyse(world, pos, EnumFacing.DOWN, new MapSignal(new NodeTransform(branch.getTree(), toTree), new NodeTwinkle(EnumParticleTypes.FIREWORKS_SPARK, 8)));
 			}
 			return true;
 		}

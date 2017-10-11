@@ -242,7 +242,7 @@ public class DynamicTree implements ILeavesAutomata {
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				world.spawnEntityInWorld(new EntityLingeringEffector(world, pos, effect));
+				world.spawnEntity(new EntityLingeringEffector(world, pos, effect));
 				return true;
 			} else {
 				return effect.apply(world, dirt, pos);
@@ -358,7 +358,7 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 
 	public IBlockState getGrowingLeavesState(int hydro) {
-		return getGrowingLeavesState().withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(hydro, 1, 4));
+		return getGrowingLeavesState().withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp(hydro, 1, 4));
 	}
 
 	protected DynamicTree setGrowingBranch(BlockBranch gBranch) {
@@ -399,7 +399,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 	public ItemStack getSeedStack(int qty) {
 		ItemStack newSeedStack = seedStack.copy();
-		newSeedStack.stackSize = qty;
+		newSeedStack.setCount(qty);
 		return newSeedStack;
 	}
 	
@@ -410,7 +410,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 	public ItemStack getStick(int qty) {
 		ItemStack stack = stick.copy();
-		stack.stackSize = MathHelper.clamp_int(qty, 0, 64);
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return stack;
 	}
 
@@ -442,7 +442,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 	public ItemStack getPrimitiveLeavesItemStack(int qty) {
 		ItemStack stack = primitiveLeavesItemStack.copy();
-		stack.stackSize = MathHelper.clamp_int(qty, 0, 64);
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return stack;
 	}
 
@@ -458,7 +458,7 @@ public class DynamicTree implements ILeavesAutomata {
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
 		ItemStack stack = primitiveLogItemStack.copy();
-		stack.stackSize = MathHelper.clamp_int(qty, 0, 64);
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return stack;
 	}
 
@@ -727,11 +727,11 @@ public class DynamicTree implements ILeavesAutomata {
 
 		float s = defaultSuitability();
 		
-		for(Type t : BiomeDictionary.getTypesForBiome(biome)) {
+		for(Type t : BiomeDictionary.getTypes(biome)) {
 			s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
 		}
 		
-		return MathHelper.clamp_float(s, 0.0f, 1.0f);
+		return MathHelper.clamp(s, 0.0f, 1.0f);
 	}
 
 	public boolean isBiomePerfect(Biome biome) {
@@ -774,7 +774,8 @@ public class DynamicTree implements ILeavesAutomata {
 		
 		if(radius <= 1) {
 			for(EnumFacing dir: upFirst) {
-				if(getGrowingLeaves().growLeaves(world, this, pos.offset(dir), 0)) {
+				BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec()); 
+				if(getGrowingLeaves().growLeaves(world, this, deltaPos, 0)) {
 					return false;
 				}
 			}
@@ -819,7 +820,7 @@ public class DynamicTree implements ILeavesAutomata {
 		//Create probability map for direction change
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(!dir.equals(originDir)) {
-				BlockPos deltaPos = pos.offset(dir);
+				BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
 				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);

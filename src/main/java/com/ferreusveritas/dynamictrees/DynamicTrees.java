@@ -30,6 +30,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
@@ -140,7 +141,7 @@ public class DynamicTrees {
 		ccproxy.createBlocks();
 		
 		//Set the creative tabs icon
-		dynamicTreesTab.setTabIconItemStack(TreeRegistry.findTree("oak").getSeedStack());
+		dynamicTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
 
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
@@ -205,7 +206,7 @@ public class DynamicTrees {
 	///////////////////////////////////////////
 	
 	public static class RegistrationHandler {
-
+		
 		public static void registerBlocks() {
 
 			GameRegistry.register(blockRootyDirt);

@@ -124,7 +124,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
 		grow(world, pos, random);
 	}
 
@@ -197,7 +197,8 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack heldItem = player.getHeldItem(hand);
 
 		if(heldItem != null) {//Something in the hand
 			return applyItemSubstance(world, pos, player, hand, heldItem);
@@ -222,7 +223,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 					player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
 				}
 			} else {
-				itemStack.stackSize--; //Just a regular item like bonemeal
+				itemStack.shrink(1); //Just a regular item like bonemeal
 			}
 			return true;
 		}
@@ -251,8 +252,8 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 
 	public void setSoilLife(World world, BlockPos pos, int life) {
-		world.setBlockState(pos, getDefaultState().withProperty(LIFE, MathHelper.clamp_int(life, 0, 15)), 3);
-		world.notifyNeighborsOfStateChange(pos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
+		world.setBlockState(pos, getDefaultState().withProperty(LIFE, MathHelper.clamp(life, 0, 15)), 3);
+		world.notifyNeighborsOfStateChange(pos, this, false);//Notify all neighbors of NSEWUD neighbors(for comparator)
 	}
 
 	public boolean fertilize(World world, BlockPos pos, int amount) {

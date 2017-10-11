@@ -37,31 +37,31 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	@Override
 	public DynamicTree getTree(Biome biome) {
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA)) {
+		if(BiomeDictionary.hasType(biome, Type.SAVANNA)) {
 			return acacia;
 		}
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS)) {
+		if(BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
 			return spruce;
 		}
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE)) {
+		if(BiomeDictionary.hasType(biome, Type.JUNGLE)) {
 			return jungle;
 		}
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {
+		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {
 			return darkoak;
 		}
 		
-		if(BiomeDictionary.isBiomeOfType(biome, Type.WASTELAND)) {
+		if(BiomeDictionary.hasType(biome, Type.WASTELAND)) {
 			return null;
 		}
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SANDY)) {
+		if(BiomeDictionary.hasType(biome, Type.SANDY)) {
 			return null;
 		}
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {
+		if(BiomeDictionary.hasType(biome, Type.FOREST)) {
 			if(DynamicTree.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 				return birch;
 			} else {
@@ -75,7 +75,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	@Override
 	public double getDensity(Biome biome, double noiseDensity, Random random) {
 
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
+		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Roofed Forest
 			if(random.nextInt(4) == 0) {
 				return 1.0f;
 			}
@@ -85,7 +85,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 			return (noiseDensity * 0.25) + 0.25;
 		}
 
-		double naturalDensity = MathHelper.clamp_float((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
+		double naturalDensity = MathHelper.clamp((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return noiseDensity * (naturalDensity * 1.5f);
 	} 
 
@@ -93,7 +93,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	public boolean chance(Biome biome, DynamicTree tree, int radius, Random random) {
 		
 		//Never miss a chance to spawn a tree in the roofed forest.
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {//Roofed Forest
+		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {//Roofed Forest
 			return true;
 		}
 		

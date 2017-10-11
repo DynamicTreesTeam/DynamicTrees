@@ -29,7 +29,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		int shake = world.rand.nextInt(4);
 		shake = (shake == 2) ? 1 : (shake == 3) ? 2 : 0;
 
-		return MathHelper.clamp_int((int) size, 2 + shake, 8 - shake);//Clamp to tree volume radius range
+		return MathHelper.clamp((int) size, 2 + shake, 8 - shake);//Clamp to tree volume radius range
 	}
 	
 }

@@ -164,7 +164,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
 
 		for (EnumFacing dir : EnumFacing.VALUES) {
-			BlockPos deltaPos = pos.offset(dir);
+			BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
 			neigh += TreeHelper.getSafeTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
 			if (neigh >= 0x10 && (neigh & 0x0F) >= 2) {// Need two neighbors.. one of which must be another branch
 				return false;// We've proven that this branch is reinforced so there is no need to continue
@@ -178,7 +178,8 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack heldItem = player.getHeldItem(hand);
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
 		if (tree != null && tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ)) {
 			return true;
@@ -266,7 +267,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	public void setRadius(World world, BlockPos pos, int radius) {
-		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp_int(radius, 1, 8)), 2);
+		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp(radius, 1, 8)), 2);
 	}
 
 	// Directionless probability grabber
@@ -296,7 +297,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			signal.doTurn(targetDir);
 
 			{
-				BlockPos deltaPos = pos.offset(targetDir);
+				BlockPos deltaPos = new BlockPos(pos).add(targetDir.getDirectionVec());
 
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
@@ -312,7 +313,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-					BlockPos deltaPos = pos.offset(dir);
+					BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
 
 					// If it is decided to implement a special block(like a squirrel hole, tree
 					// swing, rotting, burned or infested branch, etc) then this new block could be
@@ -328,7 +329,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp_float((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 
@@ -372,16 +373,16 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn) {
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
 		int thisRadius = getRadius(state);
 
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
 			if (connRadius > 0) {
-				double radius = MathHelper.clamp_int(connRadius, 1, thisRadius) / 16.0;
+				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).expandXyz(radius);
-				aabb = aabb.addCoord(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
+				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
 		}
@@ -408,7 +409,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
-					BlockPos deltaPos = pos.offset(dir);
+					BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
 
 					signal = TreeHelper.getSafeTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
 

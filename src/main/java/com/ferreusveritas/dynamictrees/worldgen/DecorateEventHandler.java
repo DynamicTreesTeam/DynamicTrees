@@ -58,7 +58,7 @@ public class DecorateEventHandler {
 		if(event.getType() == EventType.BIG_SHROOM){
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			//We need to disable Giant Mushroom creation until after the trees are built
-			if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Disable shrooms for roofedForest only
+			if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Disable shrooms for roofedForest only
 				event.setResult(Result.DENY);
 			}
 		}

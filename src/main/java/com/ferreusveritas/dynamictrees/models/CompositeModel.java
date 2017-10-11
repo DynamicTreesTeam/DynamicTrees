@@ -3,14 +3,11 @@ package com.ferreusveritas.dynamictrees.models;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.google.common.base.Function;
 
-import javax.vecmath.Matrix4f;
-import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.util.vector.Vector3f;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
@@ -22,7 +19,6 @@ import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.block.model.SimpleBakedModel;
@@ -32,12 +28,10 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
-import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class CompositeModel implements IPerspectiveAwareModel {
+public class CompositeModel implements IBakedModel {
 
 	private ModelBlock modelBlock;
 	
@@ -231,7 +225,7 @@ public class CompositeModel implements IPerspectiveAwareModel {
 		int[] connections = new int[6];
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			int connection = getConnectionRadius(extendedBlockState, BlockBranch.CONNECTIONS[dir.getIndex()]);
-			connections[dir.getIndex()] = MathHelper.clamp_int(connection, 0, coreRadius);//Do not allow connections to exceed core radius
+			connections[dir.getIndex()] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
 		}
 		return connections;
 	}
@@ -316,35 +310,6 @@ public class CompositeModel implements IPerspectiveAwareModel {
 	@Override
 	public ItemOverrideList getOverrides() {
 		return null;
-	}
-
-	/** this method is necessary because Forge has deprecated getItemCameraTransforms(), and modelCore.getItemCameraTransforms()
-	 * may not return anything meaningful.  But if the base model doesn't implement IPerspectiveAwareModel then you
-	 * need to generate it.
-	 * @param cameraTransformType
-	 * @return
-	 */
-	@Override
-	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
-		if (sleeves[0][0] instanceof IPerspectiveAwareModel) {
-			Matrix4f matrix4f = ((IPerspectiveAwareModel)sleeves[0][0]).handlePerspective(cameraTransformType).getRight();
-			return Pair.of(this, matrix4f);
-		} else {
-			// If the parent model isn't an IPerspectiveAware, we'll need to generate the correct matrix ourselves using the
-			//  ItemCameraTransforms.
-			
-			ItemCameraTransforms itemCameraTransforms = sleeves[0][0].getItemCameraTransforms();
-			ItemTransformVec3f itemTransformVec3f = itemCameraTransforms.getTransform(cameraTransformType);
-			TRSRTransformation tr = new TRSRTransformation(itemTransformVec3f);
-			Matrix4f mat = null;
-			if (tr != null) { // && tr != TRSRTransformation.identity()) {
-				mat = tr.getMatrix();
-			}
-			// The TRSRTransformation for vanilla items have blockCenterToCorner() applied, however handlePerspective
-			//  reverses it back again with blockCornerToCenter().  So we don't need to apply it here.
-			
-			return Pair.of(this, mat);
-		}
 	}
 
 }

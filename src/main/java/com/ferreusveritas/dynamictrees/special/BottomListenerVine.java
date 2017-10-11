@@ -16,7 +16,8 @@ public class BottomListenerVine implements IBottomListener {
 	@Override
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 
-		EnumFacing dir = EnumFacing.HORIZONTALS[random.nextInt(EnumFacing.HORIZONTALS.length)];
+		EnumFacing around[] = { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+		EnumFacing dir = around[random.nextInt(around.length)];
 		
 		BlockPos deltaPos = pos.offset(dir);
 		

@@ -46,7 +46,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		if (world.isBlockIndirectlyGettingPowered(pos) != 0) {
 			growPulse(world, pos);
 		}
@@ -54,15 +54,15 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void growPulse(World world, BlockPos pos){
 		
-		for(BlockPos iPos: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
-			IBlockState blockState = world.getBlockState(iPos);
+		for(BlockPos p: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
+			IBlockState blockState = world.getBlockState(p);
 			Block block = blockState.getBlock();
 			if(block instanceof IAgeable){
-				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				((IAgeable)block).age(world, p, blockState, world.rand, true);
 			} else
 			if(block instanceof BlockRootyDirt){
 				if(world.rand.nextInt(8) == 0){
-					block.updateTick(world, iPos, blockState, world.rand);
+					block.updateTick(world, pos, blockState, world.rand);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
 		entityItem.motionZ = 0;
-		world.spawnEntityInWorld(entityItem);
+		world.spawnEntity(entityItem);
 	}
 
 	public String getTree(World world, BlockPos pos) {

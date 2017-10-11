@@ -106,7 +106,7 @@ public class JoCode {
 		setFacing(facing);
 		growTreeFork(world, tree, 0, pos, false);
 
-		radius = MathHelper.clamp_int(radius, 2, 8);
+		radius = MathHelper.clamp(radius, 2, 8);
 
 		//Fix branch thicknesses and map out leaf locations
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
@@ -136,7 +136,7 @@ public class JoCode {
 								BlockPos iPos = new BlockPos(ix, iy, iz);
 								Block testBlock = world.getBlockState(iPos).getBlock();
 								if(testBlock.isReplaceable(world, iPos)) {
-									world.setBlockState(iPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(value, 1, 4)), careful ? 2 : 0);
+									world.setBlockState(iPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp(value, 1, 4)), careful ? 2 : 0);
 								}
 							}
 						}

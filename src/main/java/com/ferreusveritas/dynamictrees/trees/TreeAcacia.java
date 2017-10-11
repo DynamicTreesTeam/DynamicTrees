@@ -45,7 +45,7 @@ public class TreeAcacia extends DynamicTree {
 
 	@Override
 	public boolean isBiomePerfect(Biome biome) {
-		return BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA);
+		return BiomeDictionary.hasType(biome, Type.SAVANNA);
 	}
 
 	@Override

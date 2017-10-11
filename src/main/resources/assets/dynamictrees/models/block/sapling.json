@@ -1,9 +1,15 @@
 {   "parent": "block/block",
-	"ambientocclusion": false,
     "textures": {
         "particle": "blocks/leaves_oak",
         "log": "blocks/log_oak",
         "leaves": "blocks/leaves_oak"
+    },
+    "display": {
+        "fixed": {
+            "rotation": [ 0, 90, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        }
     },
     "elements": [
         {   "__comment": "Leaves",

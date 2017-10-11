@@ -65,11 +65,11 @@ public class EntityLingeringEffector extends Entity {
 		super.onUpdate();
 
 		if(effect != null) {
-			IBlockState blockState = worldObj.getBlockState(blockPos);
+			IBlockState blockState = world.getBlockState(blockPos);
 
 			if(blockState.getBlock() instanceof BlockRootyDirt) {
 				BlockRootyDirt rootyDirt = (BlockRootyDirt) blockState.getBlock();
-				if(!effect.update(worldObj, rootyDirt, blockPos, ticksExisted)) {
+				if(!effect.update(world, rootyDirt, blockPos, ticksExisted)) {
 					setDead();
 				}
 			} else {

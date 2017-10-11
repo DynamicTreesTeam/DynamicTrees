@@ -88,7 +88,7 @@ public class BlockBonsaiPot extends Block {
 			if(!world.isRemote) {
 				ItemStack seedStack = tree.getSeedStack();
 				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
-				world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
+				world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
 			world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState());
@@ -120,10 +120,10 @@ public class BlockBonsaiPot extends Block {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-	if (!worldIn.getBlockState(pos.down()).isFullyOpaque()) {
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockToAir(pos);
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
+        if (!world.getBlockState(pos.down()).isSideSolid(world, pos, EnumFacing.UP)) {
+            this.dropBlockAsItem(world, pos, state, 0);
+            world.setBlockToAir(pos);
         }
     }
 	

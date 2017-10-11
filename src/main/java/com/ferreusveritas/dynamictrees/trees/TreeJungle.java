@@ -58,11 +58,11 @@ public class TreeJungle extends DynamicTree {
 						pos = pos.offset(side);
 					}
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, 0, player);
+						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, player);
 						EnumFacing facing = cocoaState.getValue(BlockHorizontal.FACING);
 						world.setBlockState(pos, DynamicTrees.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
 						if (!player.capabilities.isCreativeMode) {
-							--heldItem.stackSize;
+							heldItem.shrink(1);
 						}
 					}
 				}
@@ -120,7 +120,7 @@ public class TreeJungle extends DynamicTree {
 
 	@Override
 	public boolean isBiomePerfect(Biome biome) {
-		return BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE);
+		return BiomeDictionary.hasType(biome, Type.JUNGLE);
 	};
 
 	@Override

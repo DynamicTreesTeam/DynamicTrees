@@ -43,20 +43,20 @@ public class Seed extends Item {
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
 		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!entityItem.worldObj.isRemote) {//Server side only
-				BlockPos pos = new BlockPos(entityItem);
-				if(entityItem.worldObj.canBlockSeeSky(pos)) {
+			if(!entityItem.world.isRemote) {//Server side only
+				BlockPos pos = new BlockPos((int)Math.floor(entityItem.posX), (int)Math.floor(entityItem.posY), (int)Math.floor(entityItem.posZ));
+				if(entityItem.world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
 					ItemStack seedStack = entityItem.getEntityItem();
-					int count = seedStack.stackSize;
+					int count = seedStack.getCount();
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.worldObj, pos) ){//1 in 16 chance if ideal
-							if(plantSapling(entityItem.worldObj, pos, seedStack)) {
+						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.world, pos) ){//1 in 16 chance if ideal
+							if(plantSapling(entityItem.world, pos, seedStack)) {
 								break;
 							}
 						}
 					}
-					entityItem.getEntityItem().stackSize = 0;;
+					entityItem.getEntityItem().setCount(0);
 				}
 			}
 			entityItem.setDead();
@@ -66,7 +66,8 @@ public class Seed extends Item {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack heldItem, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack heldItem = player.getHeldItem(hand);
 
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
@@ -74,14 +75,14 @@ public class Seed extends Item {
 			DynamicTree tree = getTree(heldItem);
 			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
 			bonzaiPot.setTree(world, tree, pos);
-			heldItem.stackSize--;
+			heldItem.shrink(1);
 			return EnumActionResult.SUCCESS;
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, heldItem) && player.canPlayerEdit(pos.up(), facing, heldItem)) {//Ensure permissions to edit block
 				if(plantSapling(world, pos.up(), heldItem)) {//Do the planting
-					heldItem.stackSize--;
+					heldItem.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}
 			}

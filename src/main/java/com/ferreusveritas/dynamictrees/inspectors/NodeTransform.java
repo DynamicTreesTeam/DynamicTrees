@@ -28,11 +28,12 @@ public class NodeTransform implements INodeInspector {
 		
 		if(branch != null && fromTree == branch.getTree()) {
 			int radius = branch.getRadius(world, pos);
-			if(radius > 0) {
+			if(radius != 0) {
 				world.setBlockState(pos, toTree.getGrowingBranch().getDefaultState().withProperty(BlockBranch.RADIUS, radius));
-				if(radius == 1) {
-					transformSurroundingLeaves(world, pos);
-				}
+			}
+			
+			if(radius == 1) {
+				transformSurroundingLeaves(world, pos);
 			}
 		}
 
@@ -53,7 +54,7 @@ public class NodeTransform implements INodeInspector {
 						IBlockState state = world.getBlockState(leavesPos);
 						if(state.getBlock() instanceof BlockGrowingLeaves) {
 							BlockGrowingLeaves growingLeaves = (BlockGrowingLeaves) state.getBlock();
-							hydro = growingLeaves.getHydrationLevel(state);
+							hydro = growingLeaves.getHydrationLevelFromBlockState(state);
 						}
 						world.setBlockState(leavesPos, toTree.getGrowingLeavesState(hydro));
 					}

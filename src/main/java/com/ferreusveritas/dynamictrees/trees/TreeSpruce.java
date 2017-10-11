@@ -91,7 +91,7 @@ public class TreeSpruce extends DynamicTree {
 
 	@Override
 	public boolean isBiomePerfect(Biome biome) {
-		return BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS);
+		return BiomeDictionary.hasType(biome, Type.CONIFEROUS);
 	}
 
 	@Override

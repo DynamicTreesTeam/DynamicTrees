@@ -49,8 +49,10 @@ public class Staff extends Item {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 
+		ItemStack heldStack = player.getHeldItem(hand);
+		
 		IBlockState clickedBlock = world.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock);
 		BlockPos rootPos = pos;
@@ -83,7 +85,7 @@ public class Staff extends Item {
 		DynamicTree tree = getTree(heldStack);
 		if(tree != null && tree.isAcceptableSoil(clickedBlock)) {
 			new JoCode(getCode(heldStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
-			heldStack.stackSize--;//If the player is in creative this will have no effect.
+			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
 
@@ -209,8 +211,8 @@ public class Staff extends Item {
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
 		Multimap multimap = super.getAttributeModifiers(equipmentSlot, stack);
 		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED. getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
 		}
 		return multimap;
 	}

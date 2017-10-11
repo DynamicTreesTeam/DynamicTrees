@@ -71,7 +71,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-		if(BiomeDictionary.isBiomeOfType(world.getBiome(pos), Type.SPOOKY)) {
+		if(BiomeDictionary.hasType(world.getBiome(pos), Type.SPOOKY)) {
 			roofedForestCompensation(world, random, pos);
 		}
 	}

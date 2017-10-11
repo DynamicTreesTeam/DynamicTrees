@@ -32,7 +32,7 @@ public class NodeFruitCocoa extends NodeFruit {
 					EnumFacing dir = EnumFacing.getFront(side);
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.onBlockPlaced(world, pos, dir, 0, 0, 0, 0, null);
+						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
 						world.setBlockState(pos, cocoaState, 2);
 					}
 				} else {

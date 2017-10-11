@@ -102,7 +102,7 @@ public class BlockDynamicSapling extends Block {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		if (!this.canBlockStay(world, pos, state)) {
 			dropBlock(world, getTree(state), state, pos);
 		}
@@ -120,13 +120,13 @@ public class BlockDynamicSapling extends Block {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(getTree(state).getSeedStack());
+		dropped.add(new ItemStack(getTree(state).getSeed()));
 		return dropped;
 	}
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getTree(state).getSeedStack();
+		return new ItemStack(getTree(state).getSeed());
 	}
 
 	@Override
