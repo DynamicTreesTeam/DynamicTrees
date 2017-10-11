@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
 
 import dan200.computercraft.api.lua.ILuaContext;
@@ -56,10 +57,11 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 	public void updateEntity() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-
+		BlockPos pos = new BlockPos(xCoord, yCoord, zCoord);
+		
 		synchronized(this) {
-			treeName = new String(dendroCoil.getTree(worldObj, xCoord, yCoord, zCoord));
-			soilLife = dendroCoil.getSoilLife(worldObj, xCoord, yCoord, zCoord);
+			treeName = new String(dendroCoil.getTree(worldObj, pos));
+			soilLife = dendroCoil.getSoilLife(worldObj, pos);
 		}
 
 		//Run commands that are cached that shouldn't be in the lua thread
@@ -68,12 +70,12 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 				if(dendroCoil != null) {
 					for(CachedCommand command:  cachedCommands) {
 						switch(command.method) {
-							case growPulse: dendroCoil.growPulse(worldObj, xCoord, yCoord, zCoord);	break;
-							case killTree: dendroCoil.killTree(worldObj, xCoord, yCoord, zCoord); break;
-							case plantTree: dendroCoil.plantTree(worldObj, xCoord, yCoord, zCoord, (String)command.arguments[0]); break;
-							case setCode: dendroCoil.setCode(worldObj, xCoord, yCoord, zCoord, (String)command.arguments[0], (String)command.arguments[1]); break;
-							case setSoilLife: dendroCoil.setSoilLife(worldObj, xCoord, yCoord, zCoord, ((Double)command.arguments[0]).intValue()); break;
-							case createStaff: dendroCoil.createStaff(worldObj, xCoord, yCoord, zCoord, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case growPulse: dendroCoil.growPulse(worldObj, pos);	break;
+							case killTree: dendroCoil.killTree(worldObj, pos); break;
+							case plantTree: dendroCoil.plantTree(worldObj, pos, (String)command.arguments[0]); break;
+							case setCode: dendroCoil.setCode(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
+							case setSoilLife: dendroCoil.setSoilLife(worldObj, pos, ((Double)command.arguments[0]).intValue()); break;
+							case createStaff: dendroCoil.createStaff(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
 							default: break;
 						}
 					}
@@ -107,7 +109,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		if(!worldObj.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
-					return new Object[]{ dendroCoil.getCode(worldObj, xCoord, yCoord, zCoord) };
+					return new Object[]{ dendroCoil.getCode(worldObj, new BlockPos(xCoord, yCoord, zCoord)) };
 				case getSoilLife:
 					synchronized(this) {
 						return new Object[]{soilLife};

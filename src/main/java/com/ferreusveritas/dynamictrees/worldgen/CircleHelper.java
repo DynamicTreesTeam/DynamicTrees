@@ -147,7 +147,8 @@ public class CircleHelper {
 	}
 
 	/**
-	* TODO
+	* TODO: Document this function
+	* 
 	* @param cA The base circle
 	* @param cBrad The radius of the created second circle
 	* @return
@@ -176,7 +177,8 @@ public class CircleHelper {
 	}
 
 	/**
-	* TODO
+	* TODO: Document this function
+	* 
 	* @param cA
 	* @param cB
 	* @param cCrad

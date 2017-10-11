@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.world.biome.BiomeGenBase;
 
-
 /**
  * Provides the forest density for a given biome
  * 

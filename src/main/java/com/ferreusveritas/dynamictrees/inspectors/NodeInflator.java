@@ -1,29 +1,30 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.ITreePart;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.Vec3d;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeInflator implements INodeInspector {
 
 	private float radius;
-	private Vec3d last;
+	private BlockPos last;
 
 	SimpleVoxmap leafMap;
 
 	public NodeInflator(SimpleVoxmap leafMap) {
 		this.leafMap = leafMap;
-		last = new Vec3d(0, -1, 0);
+		last = new BlockPos(0, -1, 0);
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
 		if(branch != null){
@@ -34,7 +35,7 @@ public class NodeInflator implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		//Calculate Branch Thickness based on neighboring branches
 
 		BlockBranch branch = TreeHelper.getBranch(block);
@@ -43,21 +44,19 @@ public class NodeInflator implements INodeInspector {
 			float areaAccum = radius * radius;//Start by accumulating the branch we just came from
 			boolean isTwig = true;
 
-			Vec3d d = new Vec3d();//delta coordinates
-
-			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS) {
+			for(EnumFacing dir: EnumFacing.VALUES) {
 				if(!dir.equals(fromDir)) {//Don't count where the signal originated from
 					
-					d.set(x, y, z).add(dir);
+					BlockPos dPos = pos.offset(dir);
 
-					if(d.equals(last)) {//or the branch we just came back from
+					if(dPos.equals(last)) {//or the branch we just came back from
 						isTwig = false;//on the return journey if the block we just came from is a branch we are obviously not the endpoint(twig)
 						continue;
 					}
 
-					ITreePart treepart = TreeHelper.getTreePart(world, d.x, d.y, d.z);
+					ITreePart treepart = TreeHelper.getTreePart(world, dPos);
 					if(branch.isSameWood(treepart)) {
-						int branchRadius = treepart.getRadius(world, d.x, d.y, d.z);
+						int branchRadius = treepart.getRadius(world, dPos);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}
@@ -65,24 +64,24 @@ public class NodeInflator implements INodeInspector {
 
 			if(isTwig) {
 				//Handle leaves here
-				leafMap.setVoxel(x, y, z, (byte) 16);//16(bit 5) is code for a twig
+				leafMap.setVoxel(pos, (byte) 16);//16(bit 5) is code for a twig
 				SimpleVoxmap leafCluster = branch.getTree().getLeafCluster();
-				leafMap.BlitMax(x, y, z, leafCluster);
+				leafMap.BlitMax(pos, leafCluster);
 			} else {
 				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				radius = (float)Math.sqrt(areaAccum) + branch.getTree().getTapering();
 
 				//Make sure that non-twig branches are at least radius 2
-				float secondaryThickness = branch.getTree().secondaryThickness;
+				float secondaryThickness = branch.getTree().getSecondaryThickness();
 				if(radius < secondaryThickness) {
 					radius = secondaryThickness;
 				}
 
-				branch.setRadius(world, x, y, z, (int)Math.floor(radius));
-				leafMap.setVoxel(x, y, z, (byte) 32);//32(bit 6) is code for a branch
+				branch.setRadius(world, pos, (int)Math.floor(radius));
+				leafMap.setVoxel(pos, (byte) 32);//32(bit 6) is code for a branch
 			}
 
-			last.set(x, y, z);
+			last = pos;
 		}
 
 		return false;

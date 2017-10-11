@@ -6,8 +6,8 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Dir;
+import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
 import net.minecraft.util.MathHelper;
@@ -77,7 +77,6 @@ public class ChunkCircleManager {
 			int x = chunkXStart + random.nextInt(16);
 			int z = chunkZStart + random.nextInt(16);
 			int radius = radiusCoordinator.getRadiusAtCoords(world, x, z);
-			//int radius = 5;
 			Circle rootCircle = new Circle(x, z, radius);
 			rootCircle.real = true;
 			circles.add(rootCircle);

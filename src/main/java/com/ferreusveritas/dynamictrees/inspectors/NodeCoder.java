@@ -2,25 +2,23 @@ package com.ferreusveritas.dynamictrees.inspectors;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeCoder implements INodeInspector {
 
 	private class Link {
-		long x;
-		long y;
-		long z;
+		BlockPos pos;
 		int forks;
 		Link links[];//Links to the other possible 6 directions
 		
-		public Link(int x, int y, int z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
+		public Link(BlockPos pos) {
+			this.pos = pos;
 			links = new Link[6];
 		}
 	}
@@ -32,14 +30,16 @@ public class NodeCoder implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
-		Link link = new Link(x, y, z);
+		Link link = new Link(pos);
 		
 		//We've reached the end of a branch and we're starting again.
 		for(int i = links.size() - 1; i >= 0; i--) {//We start at the end because that's the most likely place we came from
 			Link l = links.get(i);
-			if(x + fromDir.offsetX == l.x && y + fromDir.offsetY == l.y && z + fromDir.offsetZ == l.z) {
+			if(	pos.getX() + fromDir.getFrontOffsetX() == l.pos.getX() && 
+				pos.getY() + fromDir.getFrontOffsetY() == l.pos.getY() && 
+				pos.getZ() + fromDir.getFrontOffsetZ() == l.pos.getZ()) {
 				//Create linkage
 				l.links[fromDir.getOpposite().ordinal()] = link;
 				link.links[fromDir.ordinal()] = l;
@@ -54,11 +54,11 @@ public class NodeCoder implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	
-	public void compile(JoCode joCode, ForgeDirection facingDir) {
+	public void compile(JoCode joCode, EnumFacing facingDir) {
 		if(links.size() > 0) {
 			nextLink(links.get(0), null, joCode);
 		}

@@ -2,16 +2,16 @@ package com.ferreusveritas.dynamictrees.renderers;
 
 import org.lwjgl.opengl.GL11;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class RendererBranch implements ISimpleBlockRenderingHandler {
 
@@ -30,24 +30,6 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 		id = RenderingRegistry.getNextAvailableRenderId();
 	}
 
-	public void renderStandardInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer){
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.setNormal(0.0F, -1.0F, 0.0F);
-		renderer.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 0, metadata));
-		tessellator.setNormal(0.0F, 1.0F, 0.0F);
-		renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 1, metadata));
-		tessellator.setNormal(0.0F, 0.0F, -1.0F);
-		renderer.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 2, metadata));
-		tessellator.setNormal(0.0F, 0.0F, 1.0F);
-		renderer.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 3, metadata));
-		tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-		renderer.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 4, metadata));
-		tessellator.setNormal(1.0F, 0.0F, 0.0F);
-		renderer.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, renderer.getBlockIconFromSideAndMetadata(block, 5, metadata));
-		tessellator.draw();
-	}
-
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
 		
@@ -58,15 +40,15 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 		renderRingSides = faceUp | faceDown;
 		renderer.setRenderBounds(0.25, 0.0, 0.25, 0.75, 1.0, 0.75);
-		renderStandardInventoryBlock(block, metadata, modelId, renderer);
+		RendererHelper.renderStandardInventoryBlock(block, metadata, modelId, renderer);
 
 		renderRingSides = faceWest | faceEast;
 		renderer.setRenderBounds(0.75, 0.4375, 0.4375, 1.0, 0.5625, 0.5625);
-		renderStandardInventoryBlock(block, metadata, modelId, renderer);
+		RendererHelper.renderStandardInventoryBlock(block, metadata, modelId, renderer);
 
 		renderRingSides = faceNorth | faceSouth;
 		renderer.setRenderBounds(0.375, 0.375, 0.75, 0.625, 0.625, 1.0);
-		renderStandardInventoryBlock(block, metadata, modelId, renderer);
+		RendererHelper.renderStandardInventoryBlock(block, metadata, modelId, renderer);
 
 		GL11.glTranslatef(0.5f + rad, 0, 0);
 
@@ -77,8 +59,8 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 		GL11.glColor4f(r, g, b, 1.0f);
 		renderer.setRenderBounds(0.5 - rad, 0.5 - rad, 0.5 - rad, 0.5 + rad, 0.5 + rad, 0.5 + rad);
-		BlockAndMeta primLeaves = branch.getTree().getPrimitiveLeaves();
-		renderStandardInventoryBlock(primLeaves.getBlock(), primLeaves.getMeta(), modelId, renderer);
+		IBlockState primLeaves = branch.getTree().getPrimitiveLeaves();
+		RendererHelper.renderStandardInventoryBlock(primLeaves.getBlock(), primLeaves.getMeta(), modelId, renderer);
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		GL11.glTranslatef(-0.5f - rad, 0, 0);
 
@@ -93,12 +75,9 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			renderRingSides = 0;
 			int faceOverrides = 0;
 
+			BlockPos pos = new BlockPos(x, y, z);
 			BlockBranch branch = (BlockBranch)block;
-			int radius = branch.getRadius(world, x, y, z);
-
-			if(radius == 1 && branch.isSapling(world, x, y, z)){
-				return renderSapling(world, x, y, z, branch, modelId, renderer);
-			}
+			int radius = branch.getRadius(world, pos);
 
 			//Survey Radii
 			int radii[] = new int[6];
@@ -106,8 +85,8 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			int numConnections = 0;
 			int sourceDir = 0;
 
-			for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS){
-				int connRadius = branch.getSideConnectionRadius(world, x, y, z, radius, dir);
+			for(EnumFacing dir: EnumFacing.VALUES){
+				int connRadius = branch.getSideConnectionRadius(world, pos, radius, dir);
 				if(connRadius > 0){
 					numConnections++;
 					connRadius = connRadius > radius ? radius : connRadius;//Connection radius can't be larger than node radius
@@ -133,7 +112,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 			if(radius == 8){//Simply render a standard block if the radius is large enough to fill the entire block
 				if(numConnections == 1){
-					renderRingSides = 1 << ForgeDirection.getOrientation(sourceDir).getOpposite().ordinal();
+					renderRingSides = 1 << EnumFacing.getOrientation(sourceDir).getOpposite().ordinal();
 				}
 				renderer.setRenderBounds(0.0d, 0.0d, 0.0d, 1.0d, 1.0d, 1.0d);
 				renderer.renderStandardBlock(block, x, y, z);
@@ -245,27 +224,6 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 		}
 
 		return false;
-	}
-
-	public boolean renderSapling(IBlockAccess blockAcces, int x, int y, int z, BlockBranch branch, int modelId, RenderBlocks renderer) {
-
-		//Draw trunk
-		renderer.setRenderBounds(0.4375, 0.0, 0.4375, 0.5625, 0.3125, 0.5625);
-		renderer.renderStandardBlock(branch, x, y, z);
-		
-		//Draw leaves
-		renderer.setRenderBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-		renderer.setOverrideBlockTexture(branch.getLeavesIcon());
-		int multiplier = branch.getTree().getGrowingLeaves().colorMultiplier(blockAcces, x, y, z);
-
-		float r = (multiplier >> 16 & 255) / 255.0F;
-		float g = (multiplier >> 8 & 255) / 255.0F;
-		float b = (multiplier & 255) / 255.0F;
-
-		renderer.renderStandardBlockWithColorMultiplier(branch, x, y, z, r, g, b);
-		renderer.clearOverrideBlockTexture();
-
-		return true;
 	}
 
 	@Override

@@ -2,21 +2,22 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.IAgeable;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
-import com.ferreusveritas.dynamictrees.blocks.MapSignal;
-import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
+import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.Vec3d;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -70,7 +71,7 @@ public class JoCode {
 		return unfacingMap[instructions.get(pos)];
 	}
 
-	public JoCode setFacing(ForgeDirection facing) {
+	public JoCode setFacing(EnumFacing facing) {
 		facingMap = dirmap[facing.ordinal()];
 		int faceNum = facing.ordinal();
 		faceNum = (faceNum == 4) ? 5 : (faceNum == 5) ? 4 : faceNum;//Swap West and East
@@ -78,7 +79,7 @@ public class JoCode {
 		return this;
 	}
 
-	public JoCode rotate(ForgeDirection dir) {
+	public JoCode rotate(EnumFacing dir) {
 		setFacing(dir);
 		for(int c = 0; c < instructions.size(); c++) {
 			instructions.set(c, (byte) facingMap[instructions.get(c)]);
@@ -96,41 +97,43 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void growTree(World world, DynamicTree tree, int x, int y, int z, ForgeDirection facing, int radius) {
-		world.setBlock(x, y, z, tree.getRootyDirtBlock(), 0, 3);//Set to unfertilized rooty dirt
+	public void growTree(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
+		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getRootyDirtBlock(), 0, 3);//Set to unfertilized rooty dirt
 
 		//Create tree
 		setFacing(facing);
-		growTreeFork(world, tree, 0, x, y, z, false);
+		growTreeFork(world, tree, 0, pos, false);
 
 		radius = MathHelper.clamp_int(radius, 2, 8);
 
 		//Fix branch thicknesses and map out leaf locations
-		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
+		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null){//If a branch exists then the growth was successful
-			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(new Vec3d(x, y + 1, z), new Vec3d(radius, 0, radius));
-			//leafMap.clear();
-			//leafMap.setMap(new Vec3d(x, y + 1, z));
+			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
 			NodeInflator integrator = new NodeInflator(leafMap);
 			MapSignal signal = new MapSignal(integrator);
-			branch.analyse(world, x, y + 1, z, ForgeDirection.DOWN, signal);
+			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
 
 			smother(leafMap, branch.getTree());
 
 			BlockGrowingLeaves leavesBlock = branch.getTree().getGrowingLeaves();
-			int sub = branch.getTree().getGrowingLeavesSub();
+			int treeSub = branch.getTree().getGrowingLeavesSub();
 
 			final int maxH = 32;
-						
+
+			int x = pos.getX();
+			int y = pos.getY();
+			int z = pos.getZ();
+
 			for(int iy = y + 1; iy < y + maxH + 1; iy++) {
 				if(leafMap.isYTouched(iy)) {
 					for(int iz = z - radius; iz < z + radius; iz++) {
 						for(int ix = x - radius; ix < x + radius; ix++) {
-							byte value = leafMap.getVoxel(ix, iy, iz);
+							byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
 							if((value & 7) != 0) {
 								Block testBlock = world.getBlock(ix, iy, iz);
 								if(testBlock.isReplaceable(world, ix, iy, iz)) {
-									world.setBlock(ix, iy, iz, leavesBlock, ((sub << 2) & 12) | ((value - 1) & 3), careful ? 2 : 0);
+									world.setBlock(ix, iy, iz, leavesBlock, ((treeSub << 2) & 12) | ((value - 1) & 3), careful ? 2 : 0);
 								}
 							}
 						}
@@ -139,18 +142,16 @@ public class JoCode {
 			}
 
 			for(int pass = 0; pass < 5; pass++) {
-				for(int iy = y + 1; iy < y + maxH + 1; iy++) {
+				for(int iy = pos.getY() + 1; iy < pos.getY() + maxH + 1; iy++) {
 					if(leafMap.isYTouched(iy)) {
-						for(int iz = z - radius; iz < z + radius; iz++) {
-							for(int ix = x - radius; ix < x + radius; ix++) {
-								byte value = leafMap.getVoxel(ix, iy, iz);
+						for(int iz = pos.getZ() - radius; iz < pos.getZ() + radius; iz++) {
+							for(int ix = pos.getX() - radius; ix < pos.getX() + radius; ix++) {
+								BlockPos iPos = new BlockPos(ix, iy, iz);
+								byte value = leafMap.getVoxel(iPos);
 								if(value != 0) {
-									Block block = world.getBlock(ix, iy, iz);
-									if(block instanceof BlockGrowingLeaves) {
-										((BlockGrowingLeaves)block).updateLeaves(world, ix, iy, iz, world.rand, false);
-									}
-									else if(block instanceof BlockBranch) {
-										block.updateTick(world, ix, iy, iz, world.rand);
+									Block block = iPos.getBlock(world);
+									if(block instanceof IAgeable) {
+										((IAgeable)block).age(world, iPos, world.rand, true);
 									}
 								}
 							}
@@ -159,42 +160,39 @@ public class JoCode {
 				}
 			}
 		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlock(x, y, z, Blocks.dirt, 0, careful ? 3 : 2);
+			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, careful ? 3 : 2);
 		}
-
 
 	}
 
-	private int growTreeFork(World world, DynamicTree tree, int pos, int x, int y, int z, boolean disabled) {
+	private int growTreeFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
 
-		while(pos < instructions.size()) {
-			int code = getCode(pos);
+		while(codePos < instructions.size()) {
+			int code = getCode(codePos);
 			if(code == forkCode) {
-				pos = growTreeFork(world, tree, pos + 1, x, y, z, disabled);
+				codePos = growTreeFork(world, tree, codePos + 1, pos, disabled);
 			} else if(code == returnCode) {
-				return pos + 1;
+				return codePos + 1;
 			} else {
-				ForgeDirection dir = ForgeDirection.getOrientation(code);
-				x += dir.offsetX;
-				y += dir.offsetY;
-				z += dir.offsetZ;
+				EnumFacing dir = EnumFacing.getOrientation(code);
+				pos = pos.offset(dir);
 				if(!disabled) {
-					if(world.getBlock(x, y, z).isReplaceable(world, x, y, z) && (!careful || isClearOfNearbyBranches(world, x, y, z, dir.getOpposite()))) {
-						world.setBlock(x, y, z, tree.getGrowingBranch(), 0, careful ? 3 : 2);
+					if(pos.getBlock(world).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+						world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getGrowingBranch(), 0, careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}
 				}
-				pos++;
+				codePos++;
 			}
 		}
 
-		return pos;
+		return codePos;
 	}
 
 	private void smother(SimpleVoxmap leafMap, DynamicTree tree) {
-		Vec3d saveCenter = new Vec3d(leafMap.getCenter());
-		leafMap.setCenter(new Vec3d());
+		BlockPos saveCenter = leafMap.getCenter();
+		leafMap.setCenter(new BlockPos(0, 0, 0));
 
 		int startY;
 
@@ -210,19 +208,19 @@ public class JoCode {
 			for(int ix = 0; ix < leafMap.getLenX(); ix++) {
 				int count = 0;
 				for(int iy = startY; iy >= 0; iy--) {
-					int v = leafMap.getVoxel(ix, iy, iz);
+					int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
 					if(v == 0) {
 						count = 0;//Reset the count
 					} else
 					if(v <= 4) {
 						count++;
-						if(count > tree.smotherLeavesMax){//Smother value
-							leafMap.setVoxel(ix, iy, iz, (byte)0);
+						if(count > tree.getSmotherLeavesMax()){//Smother value
+							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
 						}
 					} else
 					if(v == 16) {//Twig
 						count++;
-						leafMap.setVoxel(ix, iy + 1, iz, (byte)4);
+						leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
 					}
 				}
 			}
@@ -232,19 +230,18 @@ public class JoCode {
 		for(int pass = 0; pass < 2; pass++) {
 			for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
 				for(int ix = 0; ix < leafMap.getLenX(); ix++){
-					int count = 0;
 					for(int iy = startY; iy >= 0; iy--) {
-						int v = leafMap.getVoxel(ix, iy, iz);
+						int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
 						if(v > 0 && v <= 4) {
 							int nv[] = new int[16];
-							for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS) {
-								int h = leafMap.getVoxel(ix + dir.offsetX, iy + dir.offsetY, iz + dir.offsetZ);
+							for(EnumFacing dir: EnumFacing.VALUES) {
+								int h = leafMap.getVoxel(new BlockPos(ix, iy, iz).offset(dir));
 								if(h == 16){
 									h = 5;
 								}
 								nv[h & 15]++;
 							}
-							leafMap.setVoxel(ix, iy, iz, (byte) BlockGrowingLeaves.solveCell(nv, tree.cellSolution));//Find center cell's value from neighbors  
+							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte) BlockGrowingLeaves.solveCell(nv, tree.getCellSolution()));//Find center cell's value from neighbors  
 						}
 					}
 				}
@@ -254,10 +251,10 @@ public class JoCode {
 		leafMap.setCenter(saveCenter);
 	}
 
-	private boolean isClearOfNearbyBranches(World world, int x, int y, int z, ForgeDirection except) {
+	private boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
 
-		for(ForgeDirection dir: ForgeDirection.VALID_DIRECTIONS) {
-			if(dir != except && TreeHelper.getBranch(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ) != null) {
+		for(EnumFacing dir: EnumFacing.VALUES) {
+			if(dir != except && TreeHelper.getBranch(world, pos.offset(dir)) != null) {
 				return false;
 			}
 		}
@@ -272,19 +269,19 @@ public class JoCode {
 	* @param z Z-Axis coordinate of rootyDirt block
 	* @return JoCode for chaining
 	*/
-	public JoCode buildFromTree(World world, int x, int y, int z, ForgeDirection facing) {
-		BlockBranch branch = TreeHelper.getBranch(world, x, y + 1, z);
+	public JoCode buildFromTree(World world, BlockPos pos, EnumFacing facing) {
+		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {
 			NodeCoder coder = new NodeCoder();
-			branch.analyse(world, x, y, z, ForgeDirection.DOWN, new MapSignal(coder));
+			branch.analyse(world, pos, EnumFacing.DOWN, new MapSignal(coder));
 			coder.compile(this, facing);
 			instructions.trimToSize();
 		}
 		return this;
 	}
 
-	public JoCode buildFromTree(World world, int x, int y, int z) {
-		return buildFromTree(world, x, y, z, ForgeDirection.NORTH);
+	public JoCode buildFromTree(World world, BlockPos pos) {
+		return buildFromTree(world, pos, EnumFacing.NORTH);
 	}
 
 	static public String encode(ArrayList<Byte> instructions) {

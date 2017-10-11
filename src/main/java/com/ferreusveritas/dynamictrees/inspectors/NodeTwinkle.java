@@ -3,41 +3,44 @@ package com.ferreusveritas.dynamictrees.inspectors;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeTwinkle implements INodeInspector {
 
-	String particleName;
+	EnumParticleTypes particleType;
 	int numParticles;
 
-	public NodeTwinkle(String name, int num) {
-		particleName = name;
+	public NodeTwinkle(EnumParticleTypes type, int num) {
+		particleType = type;
 		numParticles = num;
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		if(world.isRemote && TreeHelper.isBranch(block)) {
-			spawnParticles(world, particleName, x, y + 1, z, numParticles, world.rand);
+			spawnParticles(world, particleType, pos.getX(), pos.getY() + 1, pos.getZ(), numParticles, world.rand);
 		}
 		return false;
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
-	public static void spawnParticles(World world, String particleName, int x, int y, int z, int numParticles, Random random) {
+	public static void spawnParticles(World world, EnumParticleTypes particleType, int x, int y, int z, int numParticles, Random random) {
 		for (int i1 = 0; i1 < numParticles; ++i1) {
 			double mx = random.nextGaussian() * 0.02D;
 			double my = random.nextGaussian() * 0.02D;
 			double mz = random.nextGaussian() * 0.02D;
-			DynamicTrees.proxy.spawnParticle(world, particleName, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
+			DynamicTrees.proxy.spawnParticle(world, particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
 		}
 	}
 

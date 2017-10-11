@@ -2,11 +2,9 @@
 // TODO (RoadMap)
 ////////////////////////////////////////////////////////////////
 
-[ ]Custom Tree Potions(to replace the confusing vanilla ones):
-    [ ]Charcoal Potion(Base for all other tree potions, also cures poison) Awkward potion + Charcoal
-    [ ]Potion of Depletion: Depletes soil completely so tree stops growing. Charcoal potion + Slime
-    [ ]Potion of Defoliance: Kills tree by destroying it's leaves and leaving it to rot. Charcoal potion + Blue Orchid Flower
-    [ ]Potion of Burgeoning: Instantly causes a single growth cycle. Charcoal + Bone
-    [ ]Potion of Fertility: Fully fertilizes the soil. Charcoal potion + Raw Fish
-    [ ]Potion of Persistence: Freezes the tree by changing all of it's growing leaves blocks with vanilla leaves block and completely depletes the soil.  
-        The tree will no longer grow, die in the dark, or drop seeds. Charcoal potion + Lapis Lazuli
+[ ]API
+[ ]Seasons
+[ ]Thick trees
+[ ]Fix swamp worldgen(oaks too sparse, no vines)
+[ ]Fix jungle worldgen(forest floor is bare, vines don't spawn)
+[ ]Fix spruce trees for worldgen(trees are anemic)

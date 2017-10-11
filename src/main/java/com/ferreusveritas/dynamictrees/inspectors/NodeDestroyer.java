@@ -1,14 +1,15 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 /**
 * Destroys all branches on a tree and the surrounding leaves.
@@ -23,41 +24,40 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 
 		if(branch != null && tree == branch.getTree()) {
-			if(branch.getRadius(world, x, y, z) == 1) {
-				killSurroundingLeaves(world, x, y, z);//Destroy the surrounding leaves
+			if(branch.getRadius(world, pos) == 1) {
+				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
-			world.setBlockToAir(x, y, z);//Destroy the branch
+			world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());//Destroy the branch
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
-	//Clumsy hack to eliminate leaves
-	public void killSurroundingLeaves(World world, int x, int y, int z) {
-		for(int iz = z - 3; iz <= z + 3; iz++) {
-			for(int iy = y - 3; iy <= y + 3; iy++) {
-				for(int ix = x - 3; ix <= x + 3; ix++) {
-					if(tree.isCompatibleGenericLeaves(world, ix, iy, iz)) {
-						world.setBlockToAir(ix, iy, iz);
+	public void killSurroundingLeaves(World world, BlockPos twigPos) {
+		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
+				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
+					if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
+						leavesPos.setBlockToAir(world);
 						int qty = tree.getGrowingLeaves().quantitySeedDropped(world.rand);
-						if(qty != 0){
-							EntityItem itemEntity = new EntityItem(world, x, y, z, new ItemStack(tree.getSeed(), qty));
-							itemEntity.setPosition(x, y, z);
+						if(qty > 0) {
+							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
 							world.spawnEntityInWorld(itemEntity);
 						}
 					}
-				}
+				//}
 			}
 		}
+		
 	}
 
 }

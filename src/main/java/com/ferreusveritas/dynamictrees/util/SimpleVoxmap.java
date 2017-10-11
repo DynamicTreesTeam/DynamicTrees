@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.util;
 
 import java.util.Arrays;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+
 /**
 * A simple implementation of a voxel map
 * 
@@ -16,11 +18,7 @@ public class SimpleVoxmap {
 	private int lenY;
 	private int lenZ;
 
-	Vec3d center = new Vec3d(0, 0, 0);
-
-	//private static int blitX;
-	//private static int blitY;
-	//private static int blitZ;
+	BlockPos center = new BlockPos(0, 0, 0);
 
 	public SimpleVoxmap(int lenX, int lenY, int lenZ) {
 		data = new byte[lenX * lenY * lenZ];
@@ -56,23 +54,23 @@ public class SimpleVoxmap {
 	* @param zCenter
 	* @return
 	*/
-	public SimpleVoxmap setMapAndCenter(Vec3d mapPos, Vec3d centerPos) {
+	public SimpleVoxmap setMapAndCenter(BlockPos mapPos, BlockPos centerPos) {
 		setCenter(centerPos);
-		center.sub(mapPos);
+		center = center.subtract(mapPos);
 		return this;
 	}
 
-	public SimpleVoxmap setMap(Vec3d mapPos) {
-		center.sub(mapPos);
+	public SimpleVoxmap setMap(BlockPos mapPos) {
+		center = center.subtract(mapPos);
 		return this;
 	}
 
-	public SimpleVoxmap setCenter(Vec3d centerPos) {
-		center.set(centerPos);
+	public SimpleVoxmap setCenter(BlockPos centerPos) {
+		center = centerPos;
 		return this;
 	}
 
-	public Vec3d getCenter() {
+	public BlockPos getCenter() {
 		return center;
 	}
 
@@ -105,17 +103,17 @@ public class SimpleVoxmap {
 		return (a >= b) ? a : b;
 	}
 
-	public void BlitMax(int x, int y, int z, SimpleVoxmap src) {
+	public void BlitMax(BlockPos pos, SimpleVoxmap src) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
-			int srcY = iy - src.center.y;
-			int dstY = y + srcY;
+			int srcY = iy - src.center.getY();
+			int dstY = pos.getY() + srcY;
 			setYTouched(dstY);
 			for(int iz = 0; iz < src.getLenZ(); iz++) {
-				int srcZ = iz - src.center.z;
-				int dstZ = z + srcZ;
+				int srcZ = iz - src.center.getZ();
+				int dstZ = pos.getZ() + srcZ;
 				for(int ix = 0; ix < src.getLenX(); ix++) {
-					int srcX = ix - src.center.x;
-					int dstX = x + srcX;
+					int srcX = ix - src.center.getX();
+					int dstX = pos.getX() + srcX;
 					byte srcValue = src.getVoxel(srcX, srcY, srcZ);
 					byte dstValue = getVoxel(dstX, dstY, dstZ);
 					setVoxel(dstX, dstY, dstZ, max(srcValue, dstValue));
@@ -124,20 +122,19 @@ public class SimpleVoxmap {
 		}
 	}
 
-	public void BlitClear(int x, int y, int z, SimpleVoxmap src) {
+	public void BlitClear(BlockPos pos, SimpleVoxmap src) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
-			int srcY = iy - src.center.y;
-			int dstY = y + srcY;
+			int srcY = iy - src.center.getY();
+			int dstY = pos.getY() + srcY;
 			setYTouched(dstY);
 			for(int iz = 0; iz < src.getLenZ(); iz++) {
-				int srcZ = iz - src.center.z;
-				int dstZ = z + srcZ;
+				int srcZ = iz - src.center.getZ();
+				int dstZ = pos.getZ() + srcZ;
 				for(int ix = 0; ix < src.getLenX(); ix++) {
-					int srcX = ix - src.center.x;
-					int dstX = x + srcX;
+					int srcX = ix - src.center.getX();
+					int dstX = pos.getX() + srcX;
 					byte srcValue = src.getVoxel(srcX, srcY, srcZ);
 					if(srcValue > 0) {
-						byte dstValue = getVoxel(dstX, dstY, dstZ);
 						setVoxel(dstX, dstY, dstZ, (byte)0);
 					}
 				}
@@ -146,38 +143,45 @@ public class SimpleVoxmap {
 
 	}
 
-	private boolean prepBlit(int x, int y, int z, SimpleVoxmap src) {
-		if(x <= -src.getLenX() || x >= this.getLenX() || z <= -src.getLenZ() || z >= this.getLenZ() || y <= -src.getLenY() || y >= this.getLenY()) {
-			return false;
-		}
-		return true;
-	}
-
-	private int calcPos(Vec3d pos) {
-		return pos.y * lenX * lenZ + pos.z * lenX + pos.x;
-	}
-
 	private int calcPos(int x, int y, int z) {
 		return y * lenX * lenZ + z * lenX + x;
 	}
 
-	public void setVoxelUnsafe(int x, int y, int z, byte value) {
-		data[calcPos(x, y, z)] = value;
+	public void setVoxel(BlockPos pos, byte value) {
+		setVoxel(pos.getX(), pos.getY(), pos.getZ(), value);
 	}
 
 	public void setVoxel(int x, int y, int z, byte value) {
-		x += center.x;
-		y += center.y;
-		z += center.z;
+		x += center.getX();
+		y += center.getY();
+		z += center.getZ();
 		if(testBounds(x, y, z)) {
 			data[calcPos(x, y, z)] = value;
 		}
 	}
 
+	/**
+	 * Get voxel data relative to world coords
+	 * 
+	 * @param relPos The position of the center in the world
+	 * @param pos The world position of the data request
+	 * @return voxel data at coordinates
+	 */
+	public byte getVoxel(BlockPos relPos, BlockPos pos) {
+		return getVoxel(
+				pos.getX() - relPos.getX(),
+				pos.getY() - relPos.getY(),
+				pos.getZ() - relPos.getZ());
+	}
+	
+	public byte getVoxel(BlockPos pos) {
+		return getVoxel(pos.getX(), pos.getY(), pos.getZ());
+	}
+
 	public byte getVoxel(int x, int y, int z) {
-		x += center.x;
-		y += center.y;
-		z += center.z;
+		x += center.getX();
+		y += center.getY();
+		z += center.getZ();
 		return testBounds(x, y, z) ? data[calcPos(x, y, z)] : 0;
 	}
 
@@ -186,12 +190,12 @@ public class SimpleVoxmap {
 	}
 
 	public boolean isYTouched(int y) {
-		y += center.y;
+		y += center.getY();
 		return y >= 0 && y < lenY && touched[y];
 	}
 
 	public void setYTouched(int y) {
-		y += center.y;
+		y += center.getY();
 		if(y >= 0 && y < lenY) {
 			touched[y] = true;
 		}
@@ -203,7 +207,7 @@ public class SimpleVoxmap {
 			for(int z = 0; z < lenZ; z++) {
 				buffer = "";
 				for(int x = 0; x < lenX; x++) {
-					buffer += Integer.toHexString(getVoxel(x - center.x, y - center.y, z - center.z) & 0xF);
+					buffer += Integer.toHexString(getVoxel(x - center.getX(), y - center.getY(), z - center.getZ()) & 0xF);
 				}
 				System.out.println(buffer);
 			}

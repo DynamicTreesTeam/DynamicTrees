@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import net.minecraftforge.common.util.ForgeDirection;
+
 public enum Dir {
 	C ( 0, 0),
 	N ( 0,-1),
@@ -21,4 +23,5 @@ public enum Dir {
 
 	public static final Dir[] SURROUND = {N, S, E, W, NE, NW, SE, SW};
 	public static final Dir[] CARDINAL = {N, S, E, W};
+	public static ForgeDirection HORIZONTALS[] = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
 }

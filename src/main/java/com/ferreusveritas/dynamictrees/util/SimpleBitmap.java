@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.Arrays;
-
 import net.minecraft.util.MathHelper;
 
 /**

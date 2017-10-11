@@ -1,10 +1,8 @@
 package com.ferreusveritas.dynamictrees.entities;
 
-import net.minecraft.client.particle.EntityAuraFX;
-import net.minecraft.world.World;
-
-public class EntityParticleLeaf extends EntityAuraFX {
-
+public class EntityParticleLeaf //extends EntityAuraFX
+{
+/*
 	public EntityParticleLeaf(World world, double x, double y, double z, double velx, double vely, double velz) {
 		super(world, x, y, z, velx, vely, velz);
 		motionY = vely;
@@ -17,5 +15,5 @@ public class EntityParticleLeaf extends EntityAuraFX {
 	public void onUpdate() {
 		super.onUpdate();
 	}
-
+*/
 }

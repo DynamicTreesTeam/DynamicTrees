@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.util.MathHelper;
@@ -73,7 +73,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 
 	@Override
 	public double getDensity(BiomeGenBase biome, double noiseDensity, Random random) {
-		
+
 		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
 			if(random.nextInt(4) == 0) {
 				return 1.0f;
@@ -87,7 +87,6 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 		double naturalDensity = MathHelper.clamp_float((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return noiseDensity * (naturalDensity * 1.5f);
 	} 
-	
 
 	@Override
 	public boolean chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
@@ -105,6 +104,5 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 
 		return random.nextInt(chance) == 0;
 	}
-
 
 }

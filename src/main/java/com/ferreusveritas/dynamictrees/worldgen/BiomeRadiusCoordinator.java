@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 

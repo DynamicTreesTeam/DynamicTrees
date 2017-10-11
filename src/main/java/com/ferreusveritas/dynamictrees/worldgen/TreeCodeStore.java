@@ -8,9 +8,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 public class TreeCodeStore {
@@ -29,7 +31,7 @@ public class TreeCodeStore {
 
 	public void loadCodesFromFile(DynamicTree tree, String filename) {
 		try {
-			//System.out.println("Loading Tree Codes for " + tree.getName() + " tree from file: " + filename);
+			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for " + tree.getName() + " tree from file: " + filename);
 			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
 			String line;
 			while((line = readIn.readLine()) != null) {
@@ -48,7 +50,7 @@ public class TreeCodeStore {
 	}
 
 	//Lease significant 4 bits store the radius 0-15
-	//The remaining more siginificant bits encode the tree id.
+	//The remaining more significant bits encode the tree id.
 	static private int getKey(DynamicTree tree, int radius) {
 		return (tree.getId() << 4) | radius;
 	}

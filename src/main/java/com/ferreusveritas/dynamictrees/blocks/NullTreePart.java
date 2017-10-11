@@ -1,5 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
@@ -8,7 +13,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class NullTreePart implements ITreePart {
 
@@ -16,33 +20,33 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection dir,	DynamicTree leavesTree) {
+	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
 		return 0;
 	}
 
 	@Override
-	public GrowSignal growSignal(World world, int x, int y, int z, GrowSignal signal) {
+	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		return signal;
 	}
 
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, int x, int y, int z, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
-		return fromRadius == 1 && from.getTree().getPrimitiveLeaves().matches(world, x, y, z, 3) ? 1 : 0;
+		return fromRadius == 1 && from.getTree().getPrimitiveLeaves().matches(pos.getBlockState(world), 3) ? 1 : 0;
 	}
 
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, int x, int y, int z, BlockBranch from) {
-		return blockAccess.isAirBlock(x, y, z) ? 1 : 0;
+	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+		return pos.isAirBlock(blockAccess) ? 1 : 0;
 	}
 
 	@Override
-	public int getRadius(IBlockAccess blockAccess, int x, int y, int z) {
+	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
 
 	@Override
-	public MapSignal analyse(World world, int x, int y, int z, ForgeDirection fromDir, MapSignal signal) {
+	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
 
@@ -52,10 +56,10 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, int x, int y, int z, ForgeDirection dir,	int radius) {
-		Block block = blockAccess.getBlock(x, y, z);
+	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir,	int radius) {
+		Block block = pos.getBlock(blockAccess);
 		if(block instanceof BlockLeaves) {//Vanilla leaves can be used for support
-			if(branch.getTree().getPrimitiveLeaves().matches(blockAccess, x, y, z, 3)) {
+			if(branch.getTree().getPrimitiveLeaves().matches(pos.getBlockState(blockAccess), 3)) {
 				return 0x01;
 			}
 		}
@@ -63,12 +67,12 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, int x, int y, int z, EntityPlayer player, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack) {
 		return false;
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, int x, int y, int z) {
+	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
 		return null;
 	}
 

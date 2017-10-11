@@ -2,6 +2,8 @@
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.IBottomListener;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.init.Blocks;
@@ -11,22 +13,20 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class BottomListenerVine implements IBottomListener {
 
 	@Override
-	public void run(World world, DynamicTree tree, int x, int y, int z, Random random) {
+	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 
-		ForgeDirection around[] = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST, ForgeDirection.DOWN };
-		ForgeDirection dir = around[random.nextInt(around.length)];
+		ForgeDirection HORIZONTALS[] = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST, ForgeDirection.DOWN };
+		ForgeDirection dir = HORIZONTALS[random.nextInt(HORIZONTALS.length)];
 		
-		int dx = x + dir.offsetX;
-		int dy = y + dir.offsetY;
-		int dz = z + dir.offsetZ;
+		BlockPos deltaPos = pos.offset(dir);
 		
-		if(world.isAirBlock(dx, dy, dz) && (coordHashCode(dx, dy, dz) & 7) == 0) {
+		if(deltaPos.isAirBlock(world) && (coordHashCode(deltaPos) & 7) == 0) {
 			int metadata =
 				dir == ForgeDirection.NORTH ? 1 :
 				dir == ForgeDirection.SOUTH ? 4 :
 				dir == ForgeDirection.EAST ? 2 :
 				dir == ForgeDirection.WEST ? 8 : 0;
-			world.setBlock(x + dir.offsetX, y, z + dir.offsetZ, Blocks.vine, metadata, 2);
+			world.setBlock(pos.getX() + dir.offsetX, pos.getY(), pos.getZ() + dir.offsetZ, Blocks.vine, metadata, 2);
 		}
 		
 	}
@@ -41,8 +41,8 @@ public class BottomListenerVine implements IBottomListener {
 		return "vine";
 	}
 
-	public static int coordHashCode(int x, int y, int z) {
-		int hash = (x * 4111 ^ y * 271 ^ z * 3067) >> 1;
+	public static int coordHashCode(BlockPos pos) {
+		int hash = (pos.getX() * 4111 ^ pos.getY() * 271 ^ pos.getZ() * 3067) >> 1;
 		return hash & 0xFFFF;
 	}
 

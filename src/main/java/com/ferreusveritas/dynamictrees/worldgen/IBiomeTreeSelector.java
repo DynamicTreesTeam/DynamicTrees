@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-
 import net.minecraft.world.biome.BiomeGenBase;
 
 /**

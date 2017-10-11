@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.special;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.IBottomListener;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
@@ -19,34 +21,36 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class BottomListenerPodzol implements IBottomListener {
 
 	@Override
-	public void run(World world, DynamicTree tree, int x, int y, int z, Random random) {
+	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 
-		x = + random.nextInt(3) - 1;
-		y = + random.nextInt(3) - 1;
+		int x = pos.getX() + random.nextInt(3) - 1;
+		int z = pos.getZ() + random.nextInt(3) - 1;
 
 		final int darkThreshold = 4;
 
 		for(int i = 0; i < 32; i++) {
-			int offy = y - 1 - i;
-			if(!world.isAirBlock(x, offy, z)) {
-				Block block = world.getBlock(x, offy, z);
+			
+			BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
+			
+			if(!offPos.isAirBlock(world)) {
+				Block block = offPos.getBlock(world);
 
 				if(block instanceof BlockBranch || block instanceof BlockMushroom) {//Skip past Mushrooms and branches on the way down
 					continue;
 				}
 				else 
 					if(block instanceof BlockFlower || block instanceof BlockTallGrass || block instanceof BlockDoublePlant) {//Kill Plants
-						if(world.getSavedLightValue(EnumSkyBlock.Sky, x, offy, z) <= darkThreshold) {
-							world.setBlockToAir(x, y, z);
+						if(world.getSavedLightValue(EnumSkyBlock.Sky, offPos.getX(), offPos.getY(), offPos.getZ()) <= darkThreshold) {
+							world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());
 						}
 						continue;
 					}
 					else
 						if(block == Blocks.dirt || block == Blocks.grass) {//Convert grass and dirt to podzol
-							if(world.getSavedLightValue(EnumSkyBlock.Sky, x, offy + 1, z) <= darkThreshold) {
-								world.setBlock(x, offy, z, Blocks.dirt, 2, 3);//Set to podzol
+							if(world.getSavedLightValue(EnumSkyBlock.Sky, offPos.getX(), offPos.getY(), offPos.getZ()) <= darkThreshold) {
+								world.setBlock(offPos.getX(), offPos.getY(), offPos.getZ(), Blocks.dirt, 2, 3);//Set to podzol
 							} else {
-								spreadPodzol(world, x, y, z);
+								spreadPodzol(world, pos);
 							}
 						}
 				break;
@@ -65,21 +69,19 @@ public class BottomListenerPodzol implements IBottomListener {
 		return "podzol";
 	}
 
-	public static void spreadPodzol(World world, int x, int y, int z) {
+	public static void spreadPodzol(World world, BlockPos pos) {
 
-		final ForgeDirection dirs[] = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST };
+		final ForgeDirection HORIZONTALS[] = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST };
 
 		int Podzolish = 0;
 
-		for(ForgeDirection dir: dirs) {
-			int dx = x + dir.offsetX;
-			int dy = y + dir.offsetY;
-			int dz = z + dir.offsetZ;
-			Block testBlock = world.getBlock(dx, dy, dz);
-			Podzolish += testBlock == Blocks.dirt && world.getBlockMetadata(dx, dy, dz) == 2 ? 1 : 0;
+		for(ForgeDirection dir: HORIZONTALS) {
+			BlockPos deltaPos = pos.offset(dir);
+			Block testBlock = deltaPos.getBlock(world);
+			Podzolish += testBlock == Blocks.dirt && deltaPos.getMeta(world) == 2 ? 1 : 0;
 			Podzolish += testBlock == DynamicTrees.blockRootyDirt ? 1 : 0;
 			if(Podzolish >= 3) {
-				world.setBlock(x, y, z, Blocks.dirt, 2, 3);
+				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 2, 3);
 				break;
 			}
 		}

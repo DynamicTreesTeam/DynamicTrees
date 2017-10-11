@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
@@ -40,7 +43,7 @@ public class CircleDebug {
 			name = "unresolved-" + chunkX + ":" + chunkZ;
 		}
 
-		//System.out.println("Writing:" + name + ".png");
+		Logger.getLogger(DynamicTrees.MODID).log(Level.INFO, "Writing:" + name + ".png");
 
 		try {
 			ImageIO.write(img, "png", new File("./unsolved/" + name + ".png"));
@@ -151,7 +154,7 @@ public class CircleDebug {
 
 			for(int i = 0; i < width; i++) {
 				for(int j = 0; j < height; j++) {
-										
+
 					float noise = (float) ((noiseGenerator.func_151601_a(i / 64.0, j / 64.0) + 1D) / 2.0D);
 
 					switch(oct){
@@ -182,10 +185,10 @@ public class CircleDebug {
 
 	////////////////////////////////////////////////////////////
 
-	public static void initCircleTests(){
-
-		ArrayList<Circle> circles = new ArrayList<Circle>();
+	public static void initCircleTests() {
 		/*
+		ArrayList<Circle> circles = new ArrayList<Circle>();
+
 		Circle c1 = new Circle(8, 8, 8);//Right in the middle
 		c1.real = true;
 		circles.add(c1);

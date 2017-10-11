@@ -1,15 +1,14 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import javax.swing.text.AbstractDocument.BranchElement;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class NodeFruitCocoa extends NodeFruit {
 
@@ -21,19 +20,18 @@ public class NodeFruitCocoa extends NodeFruit {
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		if(!finished) {
-			int hashCode = coordHashCode(x, y, z);
+			int hashCode = coordHashCode(pos);
 			if((hashCode % 97) % 29 == 0) {
-				BlockBranch branch = TreeHelper.getBranch(world, x, y, z);
-				if(branch != null && branch.getRadius(world, x, y, z) == 8) {
+				BlockBranch branch = TreeHelper.getBranch(world, pos);
+				if(branch != null && branch.getRadius(world, pos) == 8) {
 					int side = (hashCode % 4) + 2;
-					ForgeDirection dir = ForgeDirection.getOrientation(side);
-					x += dir.offsetX;
-					z += dir.offsetZ;
-					if (world.isAirBlock(x, y, z)) {
-						int meta = DynamicTrees.blockFruitCocoa.onBlockPlaced(world, x, y, z, side, 0, 0, 0, 0);
-						world.setBlock(x, y, z, DynamicTrees.blockFruitCocoa, meta, 2);
+					EnumFacing dir = EnumFacing.getOrientation(side);
+					pos = pos.offset(dir);
+					if (pos.isAirBlock(world)) {
+						int meta = DynamicTrees.blockFruitCocoa.onBlockPlaced(world, pos.getX(), pos.getY(), pos.getZ(), side, 0, 0, 0, 0);
+						world.setBlock(pos.getX(), pos.getY(), pos.getZ(), DynamicTrees.blockFruitCocoa, meta, 2);
 					}
 				} else {
 					finished = true;
@@ -43,8 +41,8 @@ public class NodeFruitCocoa extends NodeFruit {
 		return false;
 	}
 
-	public static int coordHashCode(int x, int y, int z) {
-		int hash = (x * 7933711 ^ y * 6144389 ^ z * 9538033) >> 1;
+	public static int coordHashCode(BlockPos pos) {
+		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
 		return hash & 0xFFFF;
 	}
 

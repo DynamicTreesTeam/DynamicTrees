@@ -1,23 +1,33 @@
 itemGroup.dynamictrees=Dynamic Trees
 
-tile.dynamictrees_rootydirt.name=Rooty Dirt
+tile.rootydirt.name=Rooty Dirt
 
-tile.dynamictrees_leaves0.name=Dynamic Leaves
-tile.dynamictrees_leaves1.name=Dynamic Leaves
+tile.leaves0.name=Dynamic Leaves
+tile.leaves1.name=Dynamic Leaves
 
-tile.dynamictrees_oakbranch.name=Dynamic Oak Tree
-tile.dynamictrees_sprucebranch.name=Dynamic Spruce Tree
-tile.dynamictrees_birchbranch.name=Dynamic Birch Tree
-tile.dynamictrees_junglebranch.name=Dynamic Jungle Tree
-tile.dynamictrees_darkoakbranch.name=Dynamic Dark Oak Tree
-tile.dynamictrees_acaciabranch.name=Dynamic Acacia Tree
+tile.oakbranch.name=Dynamic Oak Tree
+tile.sprucebranch.name=Dynamic Spruce Tree
+tile.birchbranch.name=Dynamic Birch Tree
+tile.junglebranch.name=Dynamic Jungle Tree
+tile.darkoakbranch.name=Dynamic Dark Oak Tree
+tile.acaciabranch.name=Dynamic Acacia Tree
 
-item.dynamictrees_oakseed.name=Oak Acorn
-item.dynamictrees_spruceseed.name=Spruce Cone
-item.dynamictrees_birchseed.name=Birch Catkin
-item.dynamictrees_jungleseed.name=Jungle Pod
-item.dynamictrees_darkoakseed.name=Dark Oak Acorn
-item.dynamictrees_acaciaseed.name=Acacia Seed
+item.oakseed.name=Oak Acorn
+item.spruceseed.name=Spruce Cone
+item.birchseed.name=Birch Catkin
+item.jungleseed.name=Jungle Pod
+item.darkoakseed.name=Dark Oak Acorn
+item.acaciaseed.name=Acacia Seed
 
-item.dynamictrees_staff.name=Woodland Staff
-tile.dynamictrees_dendrocoil.name=Dendrocoil
+item.dendropotion.biochar.name=Biochar Base Potion
+item.dendropotion.depletion.name=Potion of Depletion
+item.dendropotion.defoliance.name=Potion of Defoliance
+item.dendropotion.burgeoning.name=Potion of Burgeoning
+item.dendropotion.fertility.name=Potion of Fertility
+item.dendropotion.persistance.name=Potion of Persistance
+item.dendropotion.transform.name=Potion of Transformation
+
+item.dirtbucket.name=Dirt Bucket
+item.staff.name=Woodland Staff
+tile.dendrocoil.name=Dendrocoil
+tile.bonsaipot.name=Bonsai Pot

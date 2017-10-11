@@ -1,12 +1,14 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import com.ferreusveritas.dynamictrees.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 /**
 * Destroys all thin(radius == 1) branches on a tree.. leaving it to rot.
@@ -21,12 +23,12 @@ public class NodeDisease implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
 		if(branch != null && tree == branch.getTree()) {
-			if(branch.getRadius(world, x, y, z) == 1) {
-				world.setBlockToAir(x, y, z);//Destroy the thin branch
+			if(branch.getRadius(world, pos) == 1) {
+				world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());//Destroy the thin branch
 			}
 		}
 
@@ -34,7 +36,7 @@ public class NodeDisease implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, int x, int y, int z, ForgeDirection fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 

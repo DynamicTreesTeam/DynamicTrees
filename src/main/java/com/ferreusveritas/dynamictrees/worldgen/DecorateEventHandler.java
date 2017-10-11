@@ -37,12 +37,15 @@ public class DecorateEventHandler {
 		//I didn't want to have to do this but you've given me no choice. This is only necessary in 1.7.10
 		//BiomeGenForest(the secret of the Roofed Forest): BiomeGenForest.field_150632_aF == 3; see: new BiomeGenForest(29(BiomeID), 3) in BiomeGenBase
 		ReflectionHelper.setPrivateValue(BiomeGenForest.class, (BiomeGenForest)BiomeGenBase.roofedForest, 0, 0);//Modify field_150632_aF and revoke roofedForest's privileges.
-		//Roofed Forest Seed for testing: 1488218954
 	}
-	
+		
+	//Seeds:
+	//Forest, Roofed Forest, Desert, Village: 3036345388435907851
+	//Roofed Forest Seed:  1488218954
+
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
-		if(event.type == EventType.TREE) {//Does not affect roofed forests
+		if(event.type == EventType.TREE) {//Does not affect roofed forests in 1.7.10
 			BiomeGenBase biome = event.world.getBiomeGenForCoords(event.chunkX * 16, event.chunkZ * 16);
 			String biomeCanonicalName = biome.getClass().getCanonicalName();
 			//Only deny tree decoration for Vanilla Minecraft Biomes
