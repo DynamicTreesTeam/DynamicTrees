@@ -120,13 +120,13 @@ public class BlockDynamicSapling extends Block {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(new ItemStack(getTree(state).getSeed()));
+		dropped.add(getTree(state).getSeedStack());
 		return dropped;
 	}
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return new ItemStack(getTree(state).getSeed());
+		return getTree(state).getSeedStack();
 	}
 
 	@Override

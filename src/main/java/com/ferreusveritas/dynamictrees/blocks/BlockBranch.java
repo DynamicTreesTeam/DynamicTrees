@@ -164,7 +164,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
 
 		for (EnumFacing dir : EnumFacing.VALUES) {
-			BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
+			BlockPos deltaPos = pos.offset(dir);
 			neigh += TreeHelper.getSafeTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
 			if (neigh >= 0x10 && (neigh & 0x0F) >= 2) {// Need two neighbors.. one of which must be another branch
 				return false;// We've proven that this branch is reinforced so there is no need to continue
@@ -297,7 +297,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			signal.doTurn(targetDir);
 
 			{
-				BlockPos deltaPos = new BlockPos(pos).add(targetDir.getDirectionVec());
+				BlockPos deltaPos = pos.offset(targetDir);
 
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
@@ -313,7 +313,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-					BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
+					BlockPos deltaPos = pos.offset(dir);
 
 					// If it is decided to implement a special block(like a squirrel hole, tree
 					// swing, rotting, burned or infested branch, etc) then this new block could be

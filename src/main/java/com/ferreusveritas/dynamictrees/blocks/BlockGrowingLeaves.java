@@ -46,30 +46,30 @@ import net.minecraft.world.WorldServer;
 
 public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeable {
 	
-    public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
-    public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
+	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
+	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
 	
 	private DynamicTree trees[] = new DynamicTree[4];
 	
 	public BlockGrowingLeaves() {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
 		leavesFancy = true;//True for alpha transparent leaves
 	}
-
+	
 	@Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE});
     }
 	
 	@Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(TREE, (meta >> 2) & 3).withProperty(HYDRO, (meta & 3) + 1);
-    }
-
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState().withProperty(TREE, (meta >> 2) & 3).withProperty(HYDRO, (meta & 3) + 1);
+	}
+	
 	@Override
-    public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(IBlockState state) {
 		return (state.getValue(HYDRO) - 1) | (state.getValue(TREE) << 2); 
-    }
+	}
 	
 	public void setTree(int treeNum, DynamicTree tree) {
 		trees[treeNum & 3] = tree;
@@ -384,12 +384,12 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 		int nv[] = new int[16];//neighbor hydration values
 
 		for(EnumFacing dir: EnumFacing.VALUES) {
-			BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
+			BlockPos deltaPos = pos.offset(dir);
 			int val = TreeHelper.getSafeTreePart(world, deltaPos).getHydrationLevel(world, deltaPos, dir, tree);
 			nv[val]++;
 		}
-
-		return solveCell(nv, tree.getCellSolution());//Find center cell's value from neighbors  
+		
+		return solveCell(nv, tree.getCellSolution());//Find center cell's value from neighbors
 	}
 
 	/**
