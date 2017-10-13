@@ -48,14 +48,14 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
 	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
-
+	
 	private DynamicTree trees[] = new DynamicTree[4];
 	
 	public BlockGrowingLeaves() {
-	this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
 		leavesFancy = true;//True for alpha transparent leaves
 	}
-
+	
 	@Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE});
@@ -65,7 +65,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(TREE, (meta >> 2) & 3).withProperty(HYDRO, (meta & 3) + 1);
 	}
-
+	
 	@Override
 	public int getMetaFromState(IBlockState state) {
 		return (state.getValue(HYDRO) - 1) | (state.getValue(TREE) << 2); 
@@ -79,11 +79,11 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
 		return getTree(blockAccess.getBlockState(pos));
 	}
-
+	
 	public DynamicTree getTree(IBlockState blockState) {
 		return getTree(blockState.getValue(TREE));
 	}
-
+	
 	public DynamicTree getTree(int treeNum) {
 		return trees[treeNum & 3];
 	}
@@ -151,7 +151,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {}
-
+	
 	/**
 	 * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
 	 */
@@ -159,7 +159,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public boolean addLandingEffects(IBlockState state, WorldServer worldObj, BlockPos blockPosition, IBlockState iblockstate, EntityLivingBase entity, int numberOfParticles) {
 		return true;
 	}
-
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return FULL_BLOCK_AABB;
@@ -222,9 +222,9 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 				DynamicTree tree = treePart.getTree(world, pos);
 				if(tree != null) {
 					int color = DynamicTrees.proxy.getTreeFoliageColor(tree, world, blockState, pos);
-			        	float r = (color >> 16 & 255) / 255.0F;
-			        	float g = (color >> 8 & 255) / 255.0F;
-			        	float b = (color & 255) / 255.0F;
+			        float r = (color >> 16 & 255) / 255.0F;
+			        float g = (color >> 8 & 255) / 255.0F;
+			        float b = (color & 255) / 255.0F;
 					for(int dz = 0; dz < 8; dz++) {
 						for(int dy = 0; dy < 8; dy++) {
 							for(int dx = 0; dx < 8; dx++) {
@@ -388,7 +388,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 			int val = TreeHelper.getSafeTreePart(world, deltaPos).getHydrationLevel(world, deltaPos, dir, tree);
 			nv[val]++;
 		}
-
+		
 		return solveCell(nv, tree.getCellSolution());//Find center cell's value from neighbors
 	}
 

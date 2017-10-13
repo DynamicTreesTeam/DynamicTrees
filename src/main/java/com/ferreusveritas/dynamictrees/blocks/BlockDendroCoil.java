@@ -57,7 +57,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		for(BlockPos iPos: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
 			IBlockState blockState = world.getBlockState(iPos);
 			Block block = blockState.getBlock();
-			if(block instanceof IAgeable){
+			if(block instanceof IAgeable) {
 				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
 			} else
 			if(block instanceof BlockRootyDirt){
@@ -70,8 +70,9 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public String getCode(World world, BlockPos pos) {
-		if(TreeHelper.isRootyDirt(world, pos.up())) {
-			return new JoCode().buildFromTree(world, pos.up()).toString();
+		pos = pos.up();
+		if(TreeHelper.isRootyDirt(world, pos)) {
+			return new JoCode().buildFromTree(world, pos).toString();
 		}
 		
 		return "";

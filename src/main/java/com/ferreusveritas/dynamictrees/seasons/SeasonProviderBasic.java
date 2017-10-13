@@ -32,10 +32,10 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	@Override
 	public void updateTick(World world, long worldTicks) {
 		
-		if(worldTicks % 200 == 0) {
+		/*if(worldTicks % 200 == 0) {
 			System.out.println("Ticks:" + worldTicks + "," + " TotalWorldTicks:" + world.getTotalWorldTime());
 			notifyPlayersOfDate(world);
-		}
+		}*/
 		
 		year = worldTicks / (ticksPerDay * daysPerMonth * monthsPerYear); //years since epoch
 		month = (int) ((worldTicks / (ticksPerDay * daysPerMonth)) % monthsPerYear); //month of the year

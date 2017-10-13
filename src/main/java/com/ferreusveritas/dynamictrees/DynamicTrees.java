@@ -205,7 +205,7 @@ public class DynamicTrees {
 	///////////////////////////////////////////
 	
 	public static class RegistrationHandler {
-
+		
 		public static void registerBlocks() {
 
 			GameRegistry.register(blockRootyDirt);

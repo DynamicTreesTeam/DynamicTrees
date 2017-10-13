@@ -10,6 +10,7 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITickable {
 
@@ -57,10 +58,11 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 	public void update() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
+		World world = worldObj;
 
 		synchronized(this) {
-			treeName = new String(dendroCoil.getTree(worldObj, pos));
-			soilLife = dendroCoil.getSoilLife(worldObj, pos);
+			treeName = new String(dendroCoil.getTree(world, pos));
+			soilLife = dendroCoil.getSoilLife(world, pos);
 		}
 
 		//Run commands that are cached that shouldn't be in the lua thread
@@ -69,12 +71,12 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 				if(dendroCoil != null) {
 					for(CachedCommand command:  cachedCommands) {
 						switch(command.method) {
-							case growPulse: dendroCoil.growPulse(worldObj, pos);	break;
-							case killTree: dendroCoil.killTree(worldObj, pos); break;
-							case plantTree: dendroCoil.plantTree(worldObj, pos, (String)command.arguments[0]); break;
-							case setCode: dendroCoil.setCode(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
-							case setSoilLife: dendroCoil.setSoilLife(worldObj, pos, ((Double)command.arguments[0]).intValue()); break;
-							case createStaff: dendroCoil.createStaff(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case growPulse: dendroCoil.growPulse(world, pos);	break;
+							case killTree: dendroCoil.killTree(world, pos); break;
+							case plantTree: dendroCoil.plantTree(world, pos, (String)command.arguments[0]); break;
+							case setCode: dendroCoil.setCode(world, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
+							case setSoilLife: dendroCoil.setSoilLife(world, pos, ((Double)command.arguments[0]).intValue()); break;
+							case createStaff: dendroCoil.createStaff(world, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
 							default: break;
 						}
 					}

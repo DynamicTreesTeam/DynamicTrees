@@ -381,7 +381,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 				double radius = MathHelper.clamp_int(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).expandXyz(radius);
-				aabb = aabb.addCoord(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
+				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
 		}
