@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
@@ -150,12 +151,18 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 
 		if(branch != null && branch.getTree().applySubstance(world, pos, this, itemStack)) {
-			if(itemStack.getItem() == Items.potionitem) {
+			if (itemStack.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
+				if(!player.capabilities.isCreativeMode) {
+					IEmptiable emptiable = (IEmptiable) itemStack.getItem();
+					player.setCurrentItemOrArmor(0, emptiable.getEmptyContainer());
+				}
+			}
+			else if(itemStack.getItem() == Items.potionitem) {//An actual potion
 				if(!player.capabilities.isCreativeMode) {
 					player.setCurrentItemOrArmor(0, new ItemStack(Items.glass_bottle));
 				}
 			} else {
-				itemStack.stackSize--;
+				itemStack.stackSize--; //Just a regular item like bonemeal
 			}
 			return true;
 		}

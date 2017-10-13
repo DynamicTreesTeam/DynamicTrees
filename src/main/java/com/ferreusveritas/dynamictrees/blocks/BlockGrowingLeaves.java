@@ -172,7 +172,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 		if(entity instanceof EntityLivingBase) { //We are only interested in Living things crashing through the canopy.
 			entity.fallDistance--;
 
-			AxisAlignedBB aabb = entity.getBoundingBox();
+			AxisAlignedBB aabb = entity.boundingBox;
 			
 			int minX = MathHelper.floor_double(aabb.minX + 0.001D);
 			int minZ = MathHelper.floor_double(aabb.minZ + 0.001D);
