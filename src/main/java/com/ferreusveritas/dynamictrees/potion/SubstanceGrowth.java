@@ -31,8 +31,8 @@ public class SubstanceGrowth implements ISubstanceEffect{
 				TreeHelper.getSafeTreePart(world, pos.up()).analyse(world, pos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.SPELL, 2)));
 			}
 		} else {
-			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks
-				dirt.grow(world, pos, world.rand);
+			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks(2 seconds)
+				TreeHelper.growPulse(world, pos);
 			}
 		}
 

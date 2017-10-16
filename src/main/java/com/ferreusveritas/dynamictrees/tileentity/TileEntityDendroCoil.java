@@ -70,7 +70,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 				if(dendroCoil != null) {
 					for(CachedCommand command:  cachedCommands) {
 						switch(command.method) {
-							case growPulse: dendroCoil.growPulse(worldObj, pos);	break;
+							case growPulse: dendroCoil.growPulse(worldObj, pos); break;
 							case killTree: dendroCoil.killTree(worldObj, pos); break;
 							case plantTree: dendroCoil.plantTree(worldObj, pos, (String)command.arguments[0]); break;
 							case setCode: dendroCoil.setCode(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1]); break;

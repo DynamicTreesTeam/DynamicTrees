@@ -5,12 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -75,25 +73,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
 		if (world.isBlockIndirectlyGettingPowered(x, y, z)) {
-			growPulse(world, new BlockPos(x, y, z));
+			TreeHelper.ageVolume(world, new BlockPos(x, y, z));
 		}
-	}
-
-	public void growPulse(World world, BlockPos pos){
-		
-		for(BlockPos iPos: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
-			IBlockState blockState = iPos.getBlockState(world);
-			Block block = blockState.getBlock();
-			if(block instanceof IAgeable) {
-				((IAgeable)block).age(world, iPos, world.rand, true);
-			} else
-			if(block instanceof BlockRootyDirt){
-				if(world.rand.nextInt(8) == 0){
-					block.updateTick(world, iPos.getX(), iPos.getY(), iPos.getZ(), world.rand);
-				}
-			}
-		}
-
 	}
 
 	public String getCode(World world, BlockPos pos) {
@@ -145,6 +126,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 
+	public void growPulse(World world, BlockPos pos) {
+		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
+		if(part.isRootNode()) {
+			TreeHelper.growPulse(world, pos.up());
+		}
+	}
+	
 	public void killTree(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {

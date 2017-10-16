@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.google.common.collect.AbstractIterator;
 
 /**
 * A simple implementation of a voxel map
@@ -156,6 +158,9 @@ public class SimpleVoxmap {
 		y += center.getY();
 		z += center.getZ();
 		if(testBounds(x, y, z)) {
+			if(value != 0) {
+				setYTouched(y);
+			}
 			data[calcPos(x, y, z)] = value;
 		}
 	}
@@ -179,10 +184,14 @@ public class SimpleVoxmap {
 	}
 
 	public byte getVoxel(int x, int y, int z) {
-		x += center.getX();
-		y += center.getY();
-		z += center.getZ();
-		return testBounds(x, y, z) ? data[calcPos(x, y, z)] : 0;
+		if(isYTouched(y)) {
+			x += center.getX();
+			y += center.getY();
+			z += center.getZ();
+			return testBounds(x, y, z) ? data[calcPos(x, y, z)] : 0;
+		}
+		
+		return 0;
 	}
 
 	private boolean testBounds(int x, int y, int z) {
@@ -201,6 +210,119 @@ public class SimpleVoxmap {
 		}
 	}
 
+	public class Cell {
+		private byte value;
+		private BlockPos pos;
+
+		public Cell(byte value, BlockPos pos) {
+			this.value = value;
+			this.pos = pos;
+		}
+
+		public byte getValue() {
+			return value;
+		}
+		
+		public BlockPos getPos() {
+			return pos;
+		}
+	}
+
+	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	public Iterable<Cell> getAllNonZeroCells() {
+		
+		return new Iterable<Cell>() {
+			@Override
+			public Iterator<Cell> iterator() {
+				return new AbstractIterator<Cell>() {
+					private int x = 0;
+					private int y = 0;
+					private int z = 0;
+
+					@Override
+					protected Cell computeNext() {
+						
+						while(true) {
+							if (x < lenX) {
+								++x;
+							}
+							else if (z < lenZ) {
+								x = 0;
+								++z;
+							}
+							else {
+								x = 0;
+								z = 0;
+								++y;
+							} 
+							
+							if (y >= lenY) {
+								return this.endOfData();
+							}
+
+							if(touched[y]) {
+								byte value = data[calcPos(x, y, z)];
+								if(value > 0) {
+									return new Cell(value, new BlockPos(x, y, z).subtract(center));
+								}
+							} else {
+								++y;
+							}
+						}
+						
+					}
+				};
+			}
+		};
+	}
+
+	
+	/** Create an Iterable that returns all positions in the map whose value is non-zero */
+	public Iterable<BlockPos> getAllNonZero() {
+		
+		return new Iterable<BlockPos>() {
+			@Override
+			public Iterator<BlockPos> iterator() {
+				return new AbstractIterator<BlockPos>() {
+					private int x = 0;
+					private int y = 0;
+					private int z = 0;
+					@Override
+					protected BlockPos computeNext() {
+
+						while(true) {
+							if (x < lenX) {
+								++x;
+							}
+							else if (z < lenZ) {
+								x = 0;
+								++z;
+							}
+							else {
+								x = 0;
+								z = 0;
+								++y;
+							} 
+
+							if (y >= lenY) {
+								return this.endOfData();
+							}
+							
+							if(touched[y]) {
+								if(data[calcPos(x, y, z)] > 0) {
+									return new BlockPos(x, y, z).subtract(center);
+								}
+							} else {
+								++y;
+							}
+						}
+						
+					}
+				};
+			}
+		};
+	}
+	
 	public void print() {
 		String buffer;
 		for(int y = 0; y < lenY; y++) {

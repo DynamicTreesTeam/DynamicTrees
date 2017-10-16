@@ -11,6 +11,8 @@ import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.util.Dir;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -55,6 +57,54 @@ public class TreeHelper {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Convenience method to pulse a single growth cycle and age the cuboid volume.
+	 * Used by the growth potion and the dendrocoil.
+	 * 
+	 * @param world
+	 * @param pos
+	 */
+	public static void growPulse(World world, BlockPos pos) {
+		Block dirtCandidate = pos.getBlock(world);
+		if(dirtCandidate instanceof BlockRootyDirt) {
+			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
+			dirt.grow(world, pos, world.rand);
+			ageVolume(world, pos);
+		}
+	}
+	
+	/** 
+	 * Shortcut to blindly age a cuboid volume.
+	 * 
+	 * @param world
+	 * @param pos The position of the bottom most block of a trees trunk
+	 */
+	public static void ageVolume(World world, BlockPos pos) {
+		ageVolume(world, pos, 8, 32, null);
+	}
+	
+	/**
+	 * Pulses an entire cuboid volume of blocks each with an age signal.
+	 * Warning: CPU intensive and should be used sparingly
+	 * 
+	 * @param world The world
+	 * @param pos The position of the bottom most block of a trees trunk
+	 * @param halfWidth The "radius" of the cuboid volume
+	 * @param height The height of the cuboid volume
+	 */
+	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap){
+		
+		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
+			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
+		
+		for(BlockPos iPos: iterable) {
+			Block block = iPos.getBlock(world);
+			if(block instanceof IAgeable) {
+				((IAgeable)block).age(world, iPos, world.rand, true);
+			}
+		}
 	}
 	
 	//Treeparts

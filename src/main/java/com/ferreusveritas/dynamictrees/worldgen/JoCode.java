@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
@@ -13,6 +12,7 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -118,47 +118,23 @@ public class JoCode {
 
 			BlockGrowingLeaves leavesBlock = branch.getTree().getGrowingLeaves();
 			int treeSub = branch.getTree().getGrowingLeavesSub();
-
-			final int maxH = 32;
-
-			int x = pos.getX();
-			int y = pos.getY();
-			int z = pos.getZ();
-
-			for(int iy = y + 1; iy < y + maxH + 1; iy++) {
-				if(leafMap.isYTouched(iy)) {
-					for(int iz = z - radius; iz < z + radius; iz++) {
-						for(int ix = x - radius; ix < x + radius; ix++) {
-							byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-							if((value & 7) != 0) {
-								Block testBlock = world.getBlock(ix, iy, iz);
-								if(testBlock.isReplaceable(world, ix, iy, iz)) {
-									world.setBlock(ix, iy, iz, leavesBlock, ((treeSub << 2) & 12) | ((value - 1) & 3), careful ? 2 : 0);
-								}
-							}
-						}
+			
+			//Place Growing Leaves Blocks
+			for(Cell cell: leafMap.getAllNonZeroCells()) {
+				if((cell.getValue() & 7) != 0) {
+					BlockPos cellPos = cell.getPos();
+					Block testBlock = cellPos.getBlock(world);
+					if(testBlock.isReplaceable(world, cellPos.getX(), cellPos.getY(), cellPos.getZ())) {
+						world.setBlock(cellPos.getX(), cellPos.getY(), cellPos.getZ(), leavesBlock, ((treeSub << 2) & 12) | ((cell.getValue() - 1) & 3), careful ? 2 : 0);
 					}
 				}
 			}
-
+			
+			//Age volume
 			for(int pass = 0; pass < 5; pass++) {
-				for(int iy = pos.getY() + 1; iy < pos.getY() + maxH + 1; iy++) {
-					if(leafMap.isYTouched(iy)) {
-						for(int iz = pos.getZ() - radius; iz < pos.getZ() + radius; iz++) {
-							for(int ix = pos.getX() - radius; ix < pos.getX() + radius; ix++) {
-								BlockPos iPos = new BlockPos(ix, iy, iz);
-								byte value = leafMap.getVoxel(iPos);
-								if(value != 0) {
-									Block block = iPos.getBlock(world);
-									if(block instanceof IAgeable) {
-										((IAgeable)block).age(world, iPos, world.rand, true);
-									}
-								}
-							}
-						}
-					}
-				}
+				TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap);
 			}
+		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, careful ? 3 : 2);
 		}
