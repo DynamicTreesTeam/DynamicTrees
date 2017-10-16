@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -80,9 +81,11 @@ public class BlockBonsaiPot extends Block {
 	///////////////////////////////////////////
 	
 	//Unlike a regular flower pot this is only used to eject the contents
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		
-		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack heldItem = player.getHeldItem(hand);		
+
+		if(hand == EnumHand.MAIN_HAND && heldItem.getItem() == ItemBlock.getItemFromBlock(Blocks.AIR)) { //Empty hand
 			DynamicTree tree = getTree(state);
 			
 			if(!world.isRemote) {
@@ -106,6 +109,7 @@ public class BlockBonsaiPot extends Block {
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
+	@Override
 	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.FLOWER_POT;
@@ -121,10 +125,10 @@ public class BlockBonsaiPot extends Block {
 
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
-        if (!world.getBlockState(pos.down()).isSideSolid(world, pos, EnumFacing.UP)) {
-            this.dropBlockAsItem(world, pos, state, 0);
-            world.setBlockToAir(pos);
-        }
+		if (!world.getBlockState(pos.down()).isSideSolid(world, pos, EnumFacing.UP)) {
+			this.dropBlockAsItem(world, pos, state, 0);
+			world.setBlockToAir(pos);
+		}
     }
 	
 	///////////////////////////////////////////
@@ -154,6 +158,7 @@ public class BlockBonsaiPot extends Block {
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
+	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return FLOWER_POT_AABB;
 	}

@@ -52,23 +52,6 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 
-	public void growPulse(World world, BlockPos pos){
-		
-		for(BlockPos iPos: BlockPos.getAllInBox(pos.add(new BlockPos(-8, 0, -8)), pos.add(new BlockPos(8, 32, 8)))) {
-			IBlockState blockState = world.getBlockState(iPos);
-			Block block = blockState.getBlock();
-			if(block instanceof IAgeable) {
-				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
-			} else
-			if(block instanceof BlockRootyDirt){
-				if(world.rand.nextInt(8) == 0){
-					block.updateTick(world, iPos, blockState, world.rand);
-				}
-			}
-		}
-
-	}
-
 	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
 		if(TreeHelper.isRootyDirt(world, pos)) {
@@ -118,6 +101,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 
+	public void growPulse(World world, BlockPos pos) {
+		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
+		if(part.isRootNode()) {
+			TreeHelper.growPulse(world, pos.up());
+		}
+	}
+	
 	public void killTree(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
