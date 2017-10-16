@@ -2,6 +2,12 @@ package com.ferreusveritas.dynamictrees.seasons;
 
 import net.minecraft.world.World;
 
+/**
+ * Season adapter for Tough As Nails mod
+ * 
+ * @author ferreusveritas
+ *
+ */
 public class SeasonProviderTaN implements ISeasonProvider {
 
 	@Override

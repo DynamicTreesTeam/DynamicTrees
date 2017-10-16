@@ -4,6 +4,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
+/**
+ * Basic season provider with minimal features
+ * 
+ * @author ferreusveritas
+ *
+ */
 public class SeasonProviderBasic implements ISeasonProvider {
 
 	protected int currentDay = 0;
@@ -31,11 +37,6 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	
 	@Override
 	public void updateTick(World world, long worldTicks) {
-		
-		/*if(worldTicks % 200 == 0) {
-			System.out.println("Ticks:" + worldTicks + "," + " TotalWorldTicks:" + world.getTotalWorldTime());
-			notifyPlayersOfDate(world);
-		}*/
 		
 		year = worldTicks / (ticksPerDay * daysPerMonth * monthsPerYear); //years since epoch
 		month = (int) ((worldTicks / (ticksPerDay * daysPerMonth)) % monthsPerYear); //month of the year

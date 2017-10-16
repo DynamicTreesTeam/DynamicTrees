@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -12,6 +11,7 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -120,48 +120,24 @@ public class JoCode {
 
 			BlockGrowingLeaves leavesBlock = branch.getTree().getGrowingLeaves();
 			int treeSub = branch.getTree().getGrowingLeavesSub();
-
-			final int maxH = 32;
-
-			int x = pos.getX();
-			int y = pos.getY();
-			int z = pos.getZ();
-
-			for(int iy = y + 1; iy < y + maxH + 1; iy++) {
-				if(leafMap.isYTouched(iy)) {
-					for(int iz = z - radius; iz < z + radius; iz++) {
-						for(int ix = x - radius; ix < x + radius; ix++) {
-							byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-							if((value & 7) != 0) {
-								BlockPos iPos = new BlockPos(ix, iy, iz);
-								Block testBlock = world.getBlockState(iPos).getBlock();
-								if(testBlock.isReplaceable(world, iPos)) {
-									world.setBlockState(iPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(value, 1, 4)), careful ? 2 : 0);
-								}
-							}
-						}
+			
+			//Place Growing Leaves Blocks
+			for(Cell cell: leafMap.getAllNonZeroCells()) {
+				if((cell.getValue() & 7) != 0) {
+					BlockPos cellPos = cell.getPos();
+					IBlockState testBlockState = world.getBlockState(cellPos);
+					Block testBlock = testBlockState.getBlock();
+					if(testBlock.isReplaceable(world, cellPos)) {
+						world.setBlockState(cellPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(cell.getValue(), 1, 4)), careful ? 2 : 0);
 					}
 				}
 			}
-
+			
+			//Age volume
 			for(int pass = 0; pass < 5; pass++) {
-				for(int iy = y + 1; iy < y + maxH + 1; iy++) {
-					if(leafMap.isYTouched(iy)) {
-						for(int iz = z - radius; iz < z + radius; iz++) {
-							for(int ix = x - radius; ix < x + radius; ix++) {
-								byte value = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-								if(value != 0) {
-									IBlockState blockState = world.getBlockState(new BlockPos(ix, iy, iz));
-									Block block = blockState.getBlock();
-									if(block instanceof IAgeable) {
-										((IAgeable)block).age(world, new BlockPos(ix, iy, iz), blockState, world.rand, true);
-									}
-								}
-							}
-						}
-					}
-				}
+				TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap);
 			}
+		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
 		}

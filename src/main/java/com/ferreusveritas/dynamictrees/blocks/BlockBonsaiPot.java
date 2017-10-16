@@ -80,6 +80,7 @@ public class BlockBonsaiPot extends Block {
 	///////////////////////////////////////////
 	
 	//Unlike a regular flower pot this is only used to eject the contents
+	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
@@ -106,6 +107,7 @@ public class BlockBonsaiPot extends Block {
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
+	@Override
 	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.FLOWER_POT;
@@ -120,11 +122,11 @@ public class BlockBonsaiPot extends Block {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-	if (!worldIn.getBlockState(pos.down()).isFullyOpaque()) {
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockToAir(pos);
-        }
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+		if (!world.getBlockState(pos.down()).isFullyOpaque()) {
+			this.dropBlockAsItem(world, pos, state, 0);
+			world.setBlockToAir(pos);
+		}
     }
 	
 	///////////////////////////////////////////
@@ -154,6 +156,7 @@ public class BlockBonsaiPot extends Block {
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
+	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return FLOWER_POT_AABB;
 	}
