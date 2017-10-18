@@ -1,0 +1,46 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "dynamictrees:sapling"
+	},
+	"variants": {
+		"type": {
+			"oak": { 
+				"textures": {
+					"log": "blocks/log_oak",
+					"leaves": "blocks/leaves_oak"
+				}
+			},
+			"birch": {
+				"textures": {
+					"log": "blocks/log_birch",
+					"leaves": "blocks/leaves_birch"
+				}
+			},
+			"jungle": { 
+				"textures": {
+					"log": "blocks/log_jungle",
+					"leaves": "blocks/leaves_jungle"
+				}
+			},
+			"spruce": { 
+				"textures": {
+					"log": "blocks/log_spruce",
+					"leaves": "blocks/leaves_spruce"
+				}
+			},
+			"acacia": { 
+				"textures": {
+					"log": "blocks/log_acacia",
+					"leaves": "blocks/leaves_acacia"
+				}
+			},
+			"dark_oak": { 
+				"textures": {
+					"log": "blocks/log_big_oak",
+					"leaves": "blocks/leaves_big_oak"
+				}
+			}
+		}
+	}
+}

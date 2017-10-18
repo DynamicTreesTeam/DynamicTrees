@@ -1,0 +1,16 @@
+[
+{
+  "modid": "dynamictrees",
+  "name": "Dynamic Trees",
+  "description": "Trees that grow.. forests that spread",
+  "version": "0.6.4",
+  "mcversion": "1.12.1",
+  "url": "",
+  "updateUrl": "",
+  "authorList": [ "Ferreus Veritas" ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

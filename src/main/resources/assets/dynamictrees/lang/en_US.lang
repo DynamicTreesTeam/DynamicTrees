@@ -1,0 +1,33 @@
+itemGroup.dynamictrees=Dynamic Trees
+
+tile.rootydirt.name=Rooty Dirt
+
+tile.leaves0.name=Dynamic Leaves
+tile.leaves1.name=Dynamic Leaves
+
+tile.oakbranch.name=Dynamic Oak Tree
+tile.sprucebranch.name=Dynamic Spruce Tree
+tile.birchbranch.name=Dynamic Birch Tree
+tile.junglebranch.name=Dynamic Jungle Tree
+tile.darkoakbranch.name=Dynamic Dark Oak Tree
+tile.acaciabranch.name=Dynamic Acacia Tree
+
+item.oakseed.name=Oak Acorn
+item.spruceseed.name=Spruce Cone
+item.birchseed.name=Birch Catkin
+item.jungleseed.name=Jungle Pod
+item.darkoakseed.name=Dark Oak Acorn
+item.acaciaseed.name=Acacia Seed
+
+item.dendropotion.biochar.name=Biochar Base Potion
+item.dendropotion.depletion.name=Potion of Depletion
+item.dendropotion.defoliance.name=Potion of Defoliance
+item.dendropotion.burgeoning.name=Potion of Burgeoning
+item.dendropotion.fertility.name=Potion of Fertility
+item.dendropotion.persistance.name=Potion of Persistance
+item.dendropotion.transform.name=Potion of Transformation
+
+item.dirtbucket.name=Dirt Bucket
+item.staff.name=Woodland Staff
+tile.dendrocoil.name=Dendrocoil
+tile.bonsaipot.name=Bonsai Pot

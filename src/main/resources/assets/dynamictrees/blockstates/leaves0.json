@@ -1,0 +1,16 @@
+{
+    "multipart": [
+        {   "when": { "tree": "0" },
+            "apply": { "model": "oak_leaves" }
+        },
+        {   "when": { "tree": "1" },
+            "apply": { "model": "spruce_leaves" }
+        },
+        {   "when": { "tree": "2" },
+            "apply": { "model": "birch_leaves" }
+        },
+        {   "when": { "tree": "3" },
+            "apply": { "model": "jungle_leaves" }
+        }
+    ]
+}
