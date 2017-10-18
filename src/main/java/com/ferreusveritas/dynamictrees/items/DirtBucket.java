@@ -84,4 +84,8 @@ public class DirtBucket extends ItemReg {
 		return this;
 	}
 	
+	@Override
+	public boolean doesContainerItemLeaveCraftingGrid(ItemStack itemStack) {
+		return false;
+	}
 }
