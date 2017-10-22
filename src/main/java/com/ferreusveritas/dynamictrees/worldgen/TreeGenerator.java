@@ -3,10 +3,11 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -24,14 +25,14 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
 
-	public BiomeTreeHandler treeHandler; //Provides forest properties for a biome
+	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 
 	public TreeGenerator() {
-		treeHandler = new BiomeTreeHandler();
-		radiusCoordinator = new BiomeRadiusCoordinator(treeHandler);
+		biomeTreeHandler = new BiomeTreeHandler();
+		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		codeStore = new TreeCodeStore();
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 	}
@@ -111,13 +112,13 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 
 	private void makeTree(World world, Circle circle) {
-
+		
 		circle.add(8, 8);//Move the circle into the "stage"
-
+		
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z));
 		IBlockState blockState = null;
-
-		while(pos.getY() > 1) {
+		
+		/*while(pos.getY() > 1) {
 			blockState = world.getBlockState(pos);
 			Block block = blockState.getBlock();
 			if(block == Blocks.GRASS || 
@@ -132,23 +133,25 @@ public class TreeGenerator implements IWorldGenerator {
 				break;
 			}
 			pos = pos.down();
-		}
-
+		}*/
+		
 		//Uncomment below to display wool circles for testing the circle growing algorithm
 		//makeWoolCircle(world, circle, pos.getY());
-
-		Biome biome = world.getBiome(new BlockPos(circle.x, 0, circle.z));
-		DynamicTree tree = treeHandler.getTree(biome);
-
-		if(tree != null && tree.getSeed().isAcceptableSoil(blockState, tree.getSeedStack())) {
-			if(treeHandler.chance(biome, tree, circle.radius, world.rand)) {
-				JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
-				if(code != null) {
-					code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+		
+		Biome biome = world.getBiome(pos);
+		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState);
+		if(decision.isHandled()) {
+			DynamicTree tree = decision.getTree();
+			if(tree != null && tree.getSeed().isAcceptableSoil(blockState, tree.getSeedStack())) {
+				if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
+					JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
+					if(code != null) {
+						code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+					}
 				}
 			}
 		}
-
+		
 		circle.add(-8, -8);//Move the circle back to normal coords
 	}
 

@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
+
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;

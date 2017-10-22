@@ -13,6 +13,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
+/**
+ * Manages and creates all the Poisson discs in the world.
+ * 
+ * @author ferreusveritas
+ */
 public class ChunkCircleManager {
 
 	IRadiusCoordinator radiusCoordinator;

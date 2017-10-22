@@ -711,16 +711,17 @@ public class DynamicTree implements ILeavesAutomata {
 	*/
 	public float biomeSuitability(World world, BlockPos pos) {
 
+		Biome biome = world.getBiome(pos);
+		
 		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
 		if(TreeRegistry.isBiomeSuitabilityOverrideEnabled()) {
-			IBiomeSuitabilityDecider.Decision override = TreeRegistry.getBiomeSuitability(world, this, pos);
+			IBiomeSuitabilityDecider.Decision override = TreeRegistry.getBiomeSuitability(world, biome, this, pos);
 
 			if(override.isHandled()) {
 				return override.getSuitability();
 			}
 		}
-			
-		Biome biome = world.getBiome(pos);
+		
 		if(ConfigHandler.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
