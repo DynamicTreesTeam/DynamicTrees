@@ -101,7 +101,7 @@ public class TreeGenerator implements IWorldGenerator {
 	@SuppressWarnings("unused")
 	private void makeWoolCircle(World world, Circle circle, int h) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
-
+		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
@@ -115,8 +115,9 @@ public class TreeGenerator implements IWorldGenerator {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
-		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z));
-		IBlockState blockState = null;
+		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
+		//IBlockState blockState = null;
+		IBlockState blockState = world.getBlockState(pos);
 		
 		/*while(pos.getY() > 1) {
 			blockState = world.getBlockState(pos);
@@ -136,7 +137,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}*/
 		
 		//Uncomment below to display wool circles for testing the circle growing algorithm
-		//makeWoolCircle(world, circle, pos.getY());
+		makeWoolCircle(world, circle, pos.getY());
 		
 		Biome biome = world.getBiome(pos);
 		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState);
@@ -148,8 +149,14 @@ public class TreeGenerator implements IWorldGenerator {
 					if(code != null) {
 						code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
 					}
+				} else {
+					world.setBlockState(pos, Blocks.GLOWSTONE.getDefaultState());
 				}
+			} else {
+				world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
 			}
+		} else {
+			world.setBlockState(pos, Blocks.BONE_BLOCK.getDefaultState());
 		}
 		
 		circle.add(-8, -8);//Move the circle back to normal coords
