@@ -28,7 +28,17 @@ public class ChunkCircleManager {
 		radiusCoordinator = radCoord;
 	}
 
-	public ArrayList<Circle> getCircles(World world, Random random, int chunkX, int chunkZ) {
+	/**
+	 * Function is synchronized to prevent chunk generation from grabbing circles while other circles are being
+	 * generated in the same area.  If this is not in place then circles will be generated over each other.
+	 * 
+	 * @param world
+	 * @param random
+	 * @param chunkX
+	 * @param chunkZ
+	 * @return
+	 */
+	public synchronized ArrayList<Circle> getCircles(World world, Random random, int chunkX, int chunkZ) {
 		ChunkCircleSet cSet = getChunkCircleSet(chunkX, chunkZ);
 		if(cSet.generated) {
 			return getChunkCircles(chunkX, chunkZ);
@@ -181,21 +191,21 @@ public class ChunkCircleManager {
 			}
 		}
 		circles.clear();
-
+		
 		return cSet.getCircles(circles, chunkX, chunkZ);
 	}
 
 	private ChunkCircleSet getChunkCircleSet(int chunkX, int chunkZ) {
 		Vec2d key = new Vec2d(chunkX, chunkZ);
 		ChunkCircleSet cSet;
-
+		
 		if(chunkCircles.containsKey(key)) {
 			cSet = chunkCircles.get(key);
 		} else {
 			cSet = new ChunkCircleSet();
 			chunkCircles.put(key, cSet);
 		}
-
+		
 		return cSet;
 	}
 

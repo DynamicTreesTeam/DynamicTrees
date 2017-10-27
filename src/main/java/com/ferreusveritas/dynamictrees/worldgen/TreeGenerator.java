@@ -33,6 +33,7 @@ public class TreeGenerator implements IWorldGenerator {
 
 	public enum EnumGeneratorResult {
 		GENERATED,
+		NOTREE,
 		UNHANDLEDBIOME,
 		FAILSOIL,
 		FAILCHANCE,
@@ -107,7 +108,6 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	private void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
 		
@@ -135,6 +135,8 @@ public class TreeGenerator implements IWorldGenerator {
 				break;
 				case UNHANDLEDBIOME: color = EnumDyeColor.RED;
 				break;
+				case NOTREE: color = EnumDyeColor.BLACK;
+				break;
 			}
 
 			world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
@@ -155,23 +157,28 @@ public class TreeGenerator implements IWorldGenerator {
 		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState);
 		if(decision.isHandled()) {
 			DynamicTree tree = decision.getTree();
-			if(tree != null && tree.getSeed().isAcceptableSoil(blockState, tree.getSeedStack())) {
-				if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
-					JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
-					if(code != null) {
-						code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+			if(tree != null) {
+				if(tree.getSeed().isAcceptableSoil(blockState, tree.getSeedStack())) {
+					if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
+						JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
+						if(code != null) {
+							code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+						} else {
+							result = EnumGeneratorResult.NOJOCODE;
+						}
 					} else {
-						result = EnumGeneratorResult.NOJOCODE;
+						result = EnumGeneratorResult.FAILCHANCE;
 					}
 				} else {
-					result = EnumGeneratorResult.FAILCHANCE;
+					result = EnumGeneratorResult.FAILSOIL;
 				}
 			} else {
-				result = EnumGeneratorResult.FAILSOIL;
+				result = EnumGeneratorResult.NOTREE;
 			}
 		} else {
 			result = EnumGeneratorResult.UNHANDLEDBIOME;
 		}
+
 
 		//Display wool circles for testing the circle growing algorithm
 		if(ConfigHandler.worldGenDebug) {
