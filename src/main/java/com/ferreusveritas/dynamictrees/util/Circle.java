@@ -57,9 +57,14 @@ public class Circle extends Vec2d {
 	}
 
 	public Circle() {
-		set(0, 0, 2);
+		this(0, 0, 2);
 	}
 
+	public Circle(int x, int z, int radius, boolean real) {
+		this(x, z, radius);
+		this.real = real;
+	}
+	
 	public Circle(int x, int z, int radius) {
 		set(x, z, radius);
 	}

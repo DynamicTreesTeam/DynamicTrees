@@ -86,7 +86,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		if(part.isRootNode()) {
 			DynamicTree tree = part.getTree(world, pos.up());
 			if(tree != null) {
-				return tree.getName();
+				return tree.getFullName();
 			}
 		}
 		

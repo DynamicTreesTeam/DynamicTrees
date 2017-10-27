@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.util.math.BlockPos;
@@ -23,8 +19,13 @@ import net.minecraft.world.biome.Biome;
 public class TreeRegistry {
 
 	private static Map<String, DynamicTree> treesByName = new HashMap<String, DynamicTree>();
+	private static Map<String, DynamicTree> treesByFullName = new HashMap<String, DynamicTree>();
 	private static ArrayList<DynamicTree> treesById = new ArrayList<DynamicTree>();
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
+	
+	//////////////////////////////
+	// TREE REGISTRY
+	//////////////////////////////
 	
 	/**
 	 * Mods should use this to register their {@link DynamicTree}
@@ -36,16 +37,30 @@ public class TreeRegistry {
 	 */
 	public static DynamicTree registerTree(DynamicTree tree) {
 		treesByName.put(tree.getName(), tree);
+		treesByFullName.put(tree.getFullName(), tree);
 		int currId = treesById.size();
 		treesById.add(tree);
 		tree.register(currId);
 		return tree;
 	}
 
+	/**
+	 * Searches first for the full tree name.  If that fails then it
+	 * will find the first tree matching the simple name and return it instead otherwise null
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public static DynamicTree findTree(String name) {
-		return treesByName.get(name);
+		DynamicTree tree = treesByFullName.get(name);
+		
+		if(tree == null) {
+			tree = treesByName.get(name);
+		}
+		
+		return tree;
 	}
-
+	
 	public static DynamicTree getTreeById(int id) {
 		return treesById.get(id);
 	}
@@ -84,31 +99,5 @@ public class TreeRegistry {
 		return !biomeSuitabilityDeciders.isEmpty();
 	}
 	
-	/**
-	 * Mods should call this to register an {@link IBiomeTreeSelector}.
-	 * 
-	 * @param treeSelector The tree selector being registered
-	 * @return
-	 */
-	public static boolean registerBiomeTreeSelector(IBiomeTreeSelector treeSelector) {
-		if(ConfigHandler.worldGen && DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addTreeSelector(treeSelector);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Mods should call this to register an {@link IBiomeDensityProvider}
-	 * 
-	 * @param densityProvider The density provider being registered
-	 * @return
-	 */
-	public static boolean registerBiomeDensityProvider(IBiomeDensityProvider densityProvider) {
-		if(ConfigHandler.worldGen && DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addDensityProvider(densityProvider);
-			return true;
-		}
-		return false;
-	}
+
 }

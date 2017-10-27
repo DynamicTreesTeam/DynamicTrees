@@ -12,24 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 public class TreeCodeStore {
 
 	HashMap<Integer, ArrayList<JoCode>> store = new HashMap<Integer, ArrayList<JoCode>>();
 
-	public TreeCodeStore() {
-		loadCodesFromFile();
-	}
-
-	public void loadCodesFromFile() {
-		for(DynamicTree tree: TreeRegistry.getTrees()) {
-			loadCodesFromFile(tree, "assets/" + DynamicTrees.MODID + "/trees/"+ tree.getName() + ".txt");
-		}
-	}
-
-	public void loadCodesFromFile(DynamicTree tree, String filename) {
+	public void addCodesFromFile(DynamicTree tree, String filename) {
 		try {
 			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for " + tree.getName() + " tree from file: " + filename);
 			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
@@ -57,18 +46,18 @@ public class TreeCodeStore {
 
 	public void addCode(DynamicTree tree, int radius, String code) {
 		int key = getKey(tree, radius);
-
+		
 		ArrayList<JoCode> list;
-
+		
 		if(store.containsKey(key)) {
 			list = store.get(key);
 		} else {
 			list = new ArrayList<JoCode>();
 			store.put(key, list);
 		}
-
+		
 		JoCode joCode = new JoCode(code);
-
+		
 		/*
 		//Code reserved for collecting WorldGen JoCodes
 		ForgeDirection dirs[] = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
@@ -77,7 +66,7 @@ public class TreeCodeStore {
 			joCode.rotate(dir);
 			arr.add(joCode.toString());
 		}
-
+		
 		Collections.sort(arr);
 		System.out.print(tree.getName() + ":" + radius + ":");
 		for(String s: arr) {
@@ -85,18 +74,18 @@ public class TreeCodeStore {
 		}
 		System.out.println();
 		*/
-
+		
 		list.add(joCode.setCareful(false));
 	}
 
 	public JoCode getRandomCode(DynamicTree tree, int radius, Random rand) {
 		int key = getKey(tree, radius);
-
+		
 		if(store.containsKey(key)) {
 			ArrayList<JoCode> list = store.get(key);
 			return list.get(rand.nextInt(list.size()));
 		}
-
+		
 		return null;
 	}
 

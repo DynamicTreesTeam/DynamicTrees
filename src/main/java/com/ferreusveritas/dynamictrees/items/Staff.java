@@ -113,7 +113,7 @@ public class Staff extends Item {
 
 	public Staff setTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", tree.getName());
+		nbt.setString("tree", tree.getFullName());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -198,7 +198,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advancedTooltips) {
 		DynamicTree tree = getTree(stack);
-		tooltip.add("Tree: " + tree != null ? tree.getName() : "none");
+		tooltip.add("Tree: " + ((tree != null) ? tree.getFullName() : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 

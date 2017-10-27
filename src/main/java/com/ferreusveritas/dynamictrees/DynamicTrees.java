@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
@@ -103,6 +104,10 @@ public class DynamicTrees {
 
 		ConfigHandler.preInit(event);
 
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			treeGenerator = new TreeGenerator();
+		}
+		
 		//Dirt
 		blockRootyDirt = new BlockRootyDirt();
 		blockDynamicSapling = new BlockDynamicSapling("sapling");

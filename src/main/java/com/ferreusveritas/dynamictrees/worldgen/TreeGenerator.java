@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -30,6 +31,14 @@ public class TreeGenerator implements IWorldGenerator {
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 
+	public enum EnumGeneratorResult {
+		GENERATED,
+		UNHANDLEDBIOME,
+		FAILSOIL,
+		FAILCHANCE,
+		NOJOCODE
+	}
+	
 	public TreeGenerator() {
 		biomeTreeHandler = new BiomeTreeHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
@@ -99,7 +108,7 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	@SuppressWarnings("unused")
-	private void makeWoolCircle(World world, Circle circle, int h) {
+	private void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
@@ -109,35 +118,38 @@ public class TreeGenerator implements IWorldGenerator {
 				}
 			}
 		}
+		
+		if(resultType != EnumGeneratorResult.GENERATED) {
+
+			BlockPos pos = new BlockPos(circle.x, h, circle.z);
+			EnumDyeColor color;
+
+			switch(resultType) {
+				default: color = EnumDyeColor.WHITE;
+				break;
+				case FAILCHANCE: color = EnumDyeColor.BLUE; 
+				break;
+				case FAILSOIL: color = EnumDyeColor.BROWN;
+				break;
+				case NOJOCODE: color = EnumDyeColor.GRAY;
+				break;
+				case UNHANDLEDBIOME: color = EnumDyeColor.RED;
+				break;
+			}
+
+			world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
+			world.setBlockState(pos.up(), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
+		}
 	}
 
-	private void makeTree(World world, Circle circle) {
+	private EnumGeneratorResult makeTree(World world, Circle circle) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
-		//IBlockState blockState = null;
 		IBlockState blockState = world.getBlockState(pos);
 		
-		/*while(pos.getY() > 1) {
-			blockState = world.getBlockState(pos);
-			Block block = blockState.getBlock();
-			if(block == Blocks.GRASS || 
-				block == Blocks.DIRT ||
-				block == Blocks.MYCELIUM || 
-				block == Blocks.SAND || 
-				block == Blocks.GRAVEL || 
-				block == Blocks.STONE || 
-				block == Blocks.BEDROCK || 
-				block == Blocks.WATER || 
-				block == Blocks.FLOWING_WATER){
-				break;
-			}
-			pos = pos.down();
-		}*/
-		
-		//Uncomment below to display wool circles for testing the circle growing algorithm
-		makeWoolCircle(world, circle, pos.getY());
+		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		Biome biome = world.getBiome(pos);
 		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState);
@@ -148,18 +160,27 @@ public class TreeGenerator implements IWorldGenerator {
 					JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
 					if(code != null) {
 						code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+					} else {
+						result = EnumGeneratorResult.NOJOCODE;
 					}
 				} else {
-					world.setBlockState(pos, Blocks.GLOWSTONE.getDefaultState());
+					result = EnumGeneratorResult.FAILCHANCE;
 				}
 			} else {
-				world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+				result = EnumGeneratorResult.FAILSOIL;
 			}
 		} else {
-			world.setBlockState(pos, Blocks.BONE_BLOCK.getDefaultState());
+			result = EnumGeneratorResult.UNHANDLEDBIOME;
+		}
+
+		//Display wool circles for testing the circle growing algorithm
+		if(ConfigHandler.worldGenDebug) {
+			makeWoolCircle(world, circle, pos.getY(), result);
 		}
 		
 		circle.add(-8, -8);//Move the circle back to normal coords
+		
+		return result;
 	}
 
 }

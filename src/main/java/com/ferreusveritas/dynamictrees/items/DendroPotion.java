@@ -134,7 +134,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public ItemStack setTargetTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
-		nbtTag.setString("target", tree.getName());
+		nbtTag.setString("target", tree.getFullName());
 		itemStack.setTagCompound(nbtTag);
 		return itemStack;
 	}

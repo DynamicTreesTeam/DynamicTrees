@@ -15,6 +15,7 @@ public class ConfigHandler {
 	public static boolean replaceVanillaSapling;
 	public static boolean vineGen;
 	public static boolean worldGen;
+	public static boolean worldGenDebug;
 	
 	public static void preInit(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -34,6 +35,8 @@ public class ConfigHandler {
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
 		worldGen = config.getBoolean("worldGen", "world", false, "Experimental world generation.  Generate Dynamic Trees instead of Vanilla trees.");
 
+		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles");
+		
 		config.save();
 	}
 }

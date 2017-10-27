@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -25,10 +26,13 @@ import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockNewLog;
@@ -63,9 +67,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * @author ferreusveritas
 */
 public class DynamicTree implements ILeavesAutomata {
-
+	
 	/** Simple name of the tree e.g. "oak" */
 	private String name;
+	/** ModID of mod registering this tree */
+	private String modId;
 	
 	//Branches
 	/** The growing branch used by this tree */
@@ -90,15 +96,15 @@ public class DynamicTree implements ILeavesAutomata {
 	private ItemStack stick;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
-
-
+	
+	
 	//Dirt
 	/** Ideal growth rate [default = 1.0]*/
 	private float growthRate = 1.0f;
 	/** Ideal soil longevity [default = 8]*/
 	private int soilLongevity = 8;
 	
-
+	
 	//Leaves
 	/** The growing leaves used by this tree */
 	private BlockGrowingLeaves growingLeaves;
@@ -122,7 +128,7 @@ public class DynamicTree implements ILeavesAutomata {
 	private ItemStack primitiveLeavesItemStack;
 	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
 	private SimpleVoxmap leafCluster;
-
+	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
 	private Seed seed;
@@ -137,10 +143,10 @@ public class DynamicTree implements ILeavesAutomata {
 	
 	/** A map of environmental biome factors that change a tree's suitability */
 	public Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
-
-	/** A unique identifier for the tree species */
+	
+	/** A unique runtime(could change between sessions) identifier for the tree species */
 	private int id;
-
+	
 	/** Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(treeType.getName().replace("_",""), treeType.getMetadata());
@@ -151,7 +157,7 @@ public class DynamicTree implements ILeavesAutomata {
 	public DynamicTree(String name, int seq) {
 		this(DynamicTrees.MODID, name, seq);
 	}
-
+	
 	/**
 	 * Constructor suitable for derivative mods 
 	 * @param modid The MODID of the mod that is registering this tree
@@ -161,16 +167,19 @@ public class DynamicTree implements ILeavesAutomata {
 	 */
 	public DynamicTree(String modid, String name, int seq) {
 		this.name = name;
-
+		this.modId = modid;
+		
 		simpleVanillaSetup(BlockPlanks.EnumType.OAK);//Just default to Oak for the convenience of derivative mods
-
-		setGrowingLeaves(modid, seq);
+		
+		if(seq >= 0) {
+			setGrowingLeaves(modid, seq);
+		}
 		setGrowingBranch(new BlockBranch(name + "branch"));
 		setStick(new ItemStack(Items.STICK));
-
+		
 		createLeafCluster();
 	}
-
+	
 	/**
 	 * This is for use with Vanilla Tree types only.  Mods depending on the dynamictrees mod should 
 	 * call the here contained primitive assignment functions in their constructor instead.
@@ -204,10 +213,6 @@ public class DynamicTree implements ILeavesAutomata {
 		setDynamicSapling(DynamicTrees.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
-	public int getId() {
-		return id;
-	}
-
 	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
 		this.tapering = tapering;
 		this.signalEnergy = energy;
@@ -217,7 +222,7 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
-
+		
 		//Bonemeal fertilizes the soil
 		if( itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
 			return new SubstanceFertilize().setAmount(1);
@@ -228,16 +233,17 @@ public class DynamicTree implements ILeavesAutomata {
 			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
 			return provider.getSubstanceEffect(itemStack);
 		}
-
+		
 		return null;
 	}
-		
+	
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
 	
 	public boolean applySubstance(World world, BlockPos pos, BlockRootyDirt dirt, ItemStack itemStack) {
-
+		
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
 		if(effect != null) {
@@ -248,7 +254,7 @@ public class DynamicTree implements ILeavesAutomata {
 				return effect.apply(world, dirt, pos);
 			}
 		}
-
+		
 		return false;
 	}
 
@@ -274,7 +280,7 @@ public class DynamicTree implements ILeavesAutomata {
 		if(seed == null) {
 			generateSeed();
 		}
-
+		
 		//Set up the tree to drop seeds of it's kind.
 		registerBottomListener(new BottomListenerDropItems(getSeedStack(), ConfigHandler.seedDropRate, true));
 		
@@ -283,6 +289,9 @@ public class DynamicTree implements ILeavesAutomata {
 			BlockDynamicSapling dynSap = (BlockDynamicSapling) saplingBlock.getBlock();
 			dynSap.setTree(saplingBlock, this);
 		}
+		
+		//Add JoCodes for WorldGen
+		addJoCodes();
 		
 		return this;
 	}
@@ -302,24 +311,37 @@ public class DynamicTree implements ILeavesAutomata {
 		//Creates a seed from a vanilla sapling and a wooden bowl
 		ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
 		saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
-
+		
 		//Create a seed from a sapling and dirt bucket
 		GameRegistry.addShapelessRecipe(seedStack, new Object[]{ saplingStack, DynamicTrees.dirtBucket});
-
+		
 		//Creates a vanilla sapling from a seed and dirt bucket
 		if(enableSaplingRecipe) {
 			GameRegistry.addShapelessRecipe(saplingStack, new Object[]{ seedStack, DynamicTrees.dirtBucket });
 		}
 	}
-
+	
+	
 	//////////////////////////////
 	// TREE PROPERTIES
 	//////////////////////////////
-
+	
 	public String getName() {
 		return name;
 	}
-
+	
+	public String getModID() {
+		return modId;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public String getFullName() {
+		return getModID() + ":" + getName();
+	}
+	
 	/**
 	 * Sets the Growing Leaves for this tree.
 	 * 
@@ -327,7 +349,7 @@ public class DynamicTree implements ILeavesAutomata {
 	 * @param sub The subtype number (0-3) for using 4 leaves type per BlockGrowingLeaves (e.g. oak=0, spruce=1, etc)
 	 * @return this tree for chaining
 	 */
-	protected DynamicTree setGrowingLeaves(BlockGrowingLeaves gLeaves, int sub) {
+	public DynamicTree setGrowingLeaves(BlockGrowingLeaves gLeaves, int sub) {
 		growingLeaves = gLeaves;
 		leavesSubBlock = sub;
 		growingLeaves.setTree(leavesSubBlock, this);
@@ -519,6 +541,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return tapering;
 	}
 
+	
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
@@ -541,6 +564,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == DynamicTrees.blockRootyDirt;
 	}
 	
+	
 	///////////////////////////////////////////
 	//RENDERING
 	///////////////////////////////////////////
@@ -556,6 +580,7 @@ public class DynamicTree implements ILeavesAutomata {
 	///////////////////////////////////////////
 	// LEAVES AUTOMATA
 	///////////////////////////////////////////
+	
 	
 	public void setSmotherLeavesMax(int smotherLeavesMax) {
 		this.smotherLeavesMax = smotherLeavesMax;
@@ -598,6 +623,11 @@ public class DynamicTree implements ILeavesAutomata {
 		return leafCluster;
 	}
 	
+	/**
+	 * A voxelmap of a leaf cluser for this species.  Values represent hydration value.
+	 * This leaf cluster map is "stamped" on to each branch end during worldgen.  Should be
+	 * representative of what the species actually produces.
+	 */
 	public void createLeafCluster(){
 
 		leafCluster = new SimpleVoxmap(5, 4, 5, new byte[] {
@@ -637,6 +667,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return leafCluster.getVoxel(twigPos, leafPos);
 	}
 	
+	
 	//////////////////////////////
 	// LEAVES HANDLING
 	//////////////////////////////
@@ -675,11 +706,12 @@ public class DynamicTree implements ILeavesAutomata {
 	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		return isCompatibleGrowingLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
-
+	
+	
 	//////////////////////////////
 	// DROPS HANDLING
 	//////////////////////////////
-
+	
 	/** 
 	* Override to add items to the included list argument. For apples and whatnot.
 	* Pay Attention!  Add items to drops parameter.
@@ -693,16 +725,17 @@ public class DynamicTree implements ILeavesAutomata {
 	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 		return drops;
 	}
-
+	
+	
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
-
+	
 	public DynamicTree envFactor(Type type, float factor) {
 		envFactors.put(type, factor);
 		return this;
 	}
-
+	
 	/**
 	*
 	* @param world The World
@@ -783,6 +816,7 @@ public class DynamicTree implements ILeavesAutomata {
 		world.setBlockToAir(pos);
 		return true;
 	}
+	
 	
 	///////////////////////////////////////////
 	// GROWTH
@@ -872,7 +906,7 @@ public class DynamicTree implements ILeavesAutomata {
 		return 0;
 	}	
 
-	/** Gets the fruiting node analyzer for this tree
+	/** Gets the fruiting node analyzer for this tree.  See {@link NodeFruitCocoa} for an example.
 	*  
 	* @param world The World
 	* @param x X-Axis of block
@@ -882,7 +916,8 @@ public class DynamicTree implements ILeavesAutomata {
 	public NodeFruit getNodeFruit(World world, BlockPos pos) {
 		return null;//Return null to disable fruiting. Most species do.
 	}
-
+	
+	
 	//////////////////////////////
 	// BOTTOM SPECIAL
 	//////////////////////////////
@@ -918,9 +953,28 @@ public class DynamicTree implements ILeavesAutomata {
 		return this;
 	}
 	
+	/**
+	 * Provides the {@link BlockBonsaiPot} for this tree.  Each mod will
+	 * have to derive it's own BonzaiPot subclass if it wants this feature.
+	 * 
+	 * @return
+	 */
 	public BlockBonsaiPot getBonzaiPot() {
 		return DynamicTrees.blockBonsaiPot;
 	}
+	
+	
+	//////////////////////////////
+	// JOCODE STUFF
+	//////////////////////////////
+	
+	/**
+	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
+	 */
+	public void addJoCodes() {
+		WorldGenRegistry.addJoCodesFromFile(this, "assets/" + getModID() + "/trees/"+ getName() + ".txt");
+	}
+	
 	
 	//////////////////////////////
 	// JAVA OBJECT STUFF
@@ -930,5 +984,5 @@ public class DynamicTree implements ILeavesAutomata {
 	public String toString() {
 		return getName();
 	}
-
+	
 }
