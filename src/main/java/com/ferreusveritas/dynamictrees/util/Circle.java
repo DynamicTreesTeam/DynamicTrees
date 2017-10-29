@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class Circle extends Vec2d {
@@ -60,6 +61,10 @@ public class Circle extends Vec2d {
 		this(0, 0, 2);
 	}
 
+	public Circle(BlockPos pos, int radius) {
+		this(pos.getX(), pos.getZ(), radius);
+	}
+	
 	public Circle(int x, int z, int radius, boolean real) {
 		this(x, z, radius);
 		this.real = real;
@@ -214,7 +219,7 @@ public class Circle extends Vec2d {
 	*/
 	public int getFreeBit() {
 		if(arc == 0) {
-			return ((x ^ z) & 31);//Psuedorandom angle
+			return ((x ^ z) & 31);//Pseudorandom angle
 		}
 
 		int pos = Integer.numberOfTrailingZeros(arc);

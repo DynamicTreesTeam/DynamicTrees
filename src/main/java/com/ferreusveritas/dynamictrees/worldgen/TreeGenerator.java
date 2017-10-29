@@ -108,13 +108,17 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
-	private void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
+		makeWoolCircle(world, circle, h, resultType, 0);
+	}
+	
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
-		
+				
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata((circle.x ^ circle.z) & 0xF)), 0);
+					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata((circle.x ^ circle.z) & 0xF)), flags);
 				}
 			}
 		}

@@ -23,7 +23,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		killTree,
 		getSoilLife,
 		setSoilLife,
-		createStaff
+		createStaff,
+		testPoisson
 	}
 	
 	private class CachedCommand {
@@ -77,6 +78,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 							case setCode: dendroCoil.setCode(world, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
 							case setSoilLife: dendroCoil.setSoilLife(world, pos, ((Double)command.arguments[0]).intValue()); break;
 							case createStaff: dendroCoil.createStaff(world, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case testPoisson: dendroCoil.testPoisson(world, pos, ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
 							default: break;
 						}
 					}
@@ -159,6 +161,17 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 				case killTree:
 					cacheCommand(method, arguments);
 					break;
+				case testPoisson:
+					if(arguments.length >= 4 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>");
+					}
+					break;
+					
 				default:
 					break;
 			}

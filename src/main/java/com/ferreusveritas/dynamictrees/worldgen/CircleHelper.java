@@ -19,26 +19,26 @@ public class CircleHelper {
 		createPairData(8, 4, 24, 0x0004AADF, 0x0004AA90);
 		createPairData(8, 3, 22, 0x0002556F, 0x00025548);
 		createPairData(8, 2, 20, 0x0000956F, 0x00009548);
-		createPairData(7, 7, 30, 0x012556DF, 0x01255490);
-		createPairData(7, 6, 28, 0x004956DF, 0x00495490);
-		createPairData(7, 5, 26, 0x0012AADF, 0x0012AA90);
-		createPairData(7, 4, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(7, 3, 22, 0x0002556F, 0x00025548);
-		createPairData(7, 2, 20, 0x0000956F, 0x00009548);
-		createPairData(6, 6, 26, 0x001256DF, 0x00125490);
-		createPairData(6, 5, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(6, 4, 22, 0x00012ADF, 0x00012A90);
-		createPairData(6, 3, 20, 0x0000956F, 0x00009548);
-		createPairData(6, 2, 18, 0x0000256F, 0x00002548);
-		createPairData(5, 5, 22, 0x0001555F, 0x00015550);
-		createPairData(5, 4, 20, 0x0000555F, 0x00005550);
-		createPairData(5, 3, 18, 0x00002AAF, 0x00002AA8);
-		createPairData(5, 2, 16, 0x00000AAF, 0x00000AA8);
-		createPairData(4, 4, 18, 0x0000155F, 0x00001550);
-		createPairData(4, 3, 16, 0x00000AAF, 0x00000AA8);
-		createPairData(4, 2, 14, 0x000002AF, 0x000002A8);
-		createPairData(3, 3, 14, 0x00000557, 0x00000554);
-		createPairData(3, 2, 12, 0x0000016D, 0x00000148);
+		createPairData(7, 7, 28, 0x004956DF, 0x00495490);
+		createPairData(7, 6, 26, 0x001256DF, 0x00125490);
+		createPairData(7, 5, 24, 0x0004AADF, 0x0004AA90);
+		createPairData(7, 4, 22, 0x00012ADF, 0x00012A90);
+		createPairData(7, 3, 20, 0x0000956F, 0x00009548);
+		createPairData(7, 2, 18, 0x0000256F, 0x00002548);
+		createPairData(6, 6, 24, 0x000496DF, 0x00049490);
+		createPairData(6, 5, 22, 0x00012ADF, 0x00012A90);
+		createPairData(6, 4, 20, 0x00004ADF, 0x00004A90);
+		createPairData(6, 3, 18, 0x0000256F, 0x00002548);
+		createPairData(6, 2, 16, 0x0000096F, 0x00000948);
+		createPairData(5, 5, 20, 0x0000555F, 0x00005550);
+		createPairData(5, 4, 18, 0x0000155F, 0x00001550);
+		createPairData(5, 3, 16, 0x00000AAF, 0x00000AA8);
+		createPairData(5, 2, 14, 0x000002AF, 0x000002A8);
+		createPairData(4, 4, 16, 0x0000055F, 0x00000550);
+		createPairData(4, 3, 14, 0x000002AF, 0x000002A8);
+		createPairData(4, 2, 12, 0x000000AF, 0x000000A8);
+		createPairData(3, 3, 12, 0x00000157, 0x00000154);
+		createPairData(3, 2, 10, 0x00000057, 0x00000054);
 		createPairData(2, 2,  8, 0x00000017, 0x00000014);
 	}
 	
@@ -169,7 +169,7 @@ public class CircleHelper {
 		double closestAngle = Math.PI;
 
 		for(Vec2d c: coordList) {
-			if(!c.isLoose()) {
+			if(!c.isLoose()) {//Reject loose circles when finding 2nd
 				double deltaAngle = deltaAngle(c.angle(), angle);
 				if(deltaAngle < closestAngle) {
 					closestCoord = c;
@@ -181,6 +181,40 @@ public class CircleHelper {
 		return (Circle) new Circle(closestCoord, cBrad).add(cA.x, cA.z);
 	}
 
+	/**
+	* TODO: Document this function
+	* 
+	* @param cA The base circle
+	* @param cBrad The radius of the created second circle
+	* @return
+	*/
+	public static Circle findSecondCircle(Circle cA, int cBrad, double angle) {
+
+		angle = Math.toRadians(angle);
+		
+		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
+
+		Vec2d[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		Vec2d closestCoord = coordList[0];
+		double closestAngle = Math.PI;
+		boolean isLoose = false;
+		
+		for(Vec2d c: coordList) {
+			double deltaAngle = deltaAngle(c.angle(), angle);
+			if(deltaAngle < closestAngle) {
+				closestCoord = c;
+				closestAngle = deltaAngle;
+				isLoose = c.isLoose();
+			}
+		}
+
+		Circle result = (Circle) new Circle(closestCoord, cBrad).add(cA.x, cA.z);
+		result.loose = isLoose;
+		
+		return result;
+	}
+
+	
 	/**
 	* TODO: Document this function
 	* 
