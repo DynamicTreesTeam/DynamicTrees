@@ -430,6 +430,12 @@ public class DynamicTree implements ILeavesAutomata {
 		return this;
 	}
 
+	/**
+	 * Get a quantity of whatever is considered a stick for this tree's type of wood.
+	 * 
+	 * @param qty Number of sticks
+	 * @return an {@link ItemStack} of sticky things
+	 */
 	public ItemStack getStick(int qty) {
 		ItemStack stack = stick.copy();
 		stack.stackSize = MathHelper.clamp_int(qty, 0, 64);
