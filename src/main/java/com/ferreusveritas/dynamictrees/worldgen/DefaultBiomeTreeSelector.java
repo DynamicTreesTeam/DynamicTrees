@@ -21,7 +21,11 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	DynamicTree jungle;
 	DynamicTree darkoak;
 	
-	public DefaultBiomeTreeSelector() {
+	public DefaultBiomeTreeSelector() {		
+	}
+	
+	@Override
+	public void init() {
 		oak = TreeRegistry.findTree("oak");
 		birch = TreeRegistry.findTree("birch");
 		spruce = TreeRegistry.findTree("spruce");
@@ -42,7 +46,7 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	
 	@Override
 	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt) {
-				
+		
 		if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {
 			
 			if(BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS)) {

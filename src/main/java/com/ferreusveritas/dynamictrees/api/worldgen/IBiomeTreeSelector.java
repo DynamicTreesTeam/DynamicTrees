@@ -19,6 +19,9 @@ public interface IBiomeTreeSelector {
 
 	public String getName();
 	
+	
+	public void init();
+	
 	/**
 	 * 
 	 * @param world

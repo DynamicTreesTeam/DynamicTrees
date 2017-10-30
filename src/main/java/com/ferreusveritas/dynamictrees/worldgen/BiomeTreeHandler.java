@@ -50,6 +50,13 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	}
 	
 	@Override
+	public void init() {
+		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
+			selector.init();
+		}
+	}
+	
+	@Override
 	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt) {
 		
 		for(IBiomeTreeSelector selector : biomeTreeSelectors) {

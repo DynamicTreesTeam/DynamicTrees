@@ -124,7 +124,7 @@ public class DynamicTrees {
 		for(DynamicTree tree: baseTrees) {
 			TreeRegistry.registerTree(tree);
 		}
-
+		
 		//Potions
 		dendroPotion = new DendroPotion();
 		
@@ -157,6 +157,11 @@ public class DynamicTrees {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			treeGenerator.biomeTreeHandler.init();
+		}
+		
 		//Do your mod setup. Build whatever data structures you care about.
 		//Register recipes.
 		RegistrationHandler.registerRecipes();
