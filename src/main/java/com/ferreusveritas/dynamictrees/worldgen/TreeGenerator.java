@@ -76,7 +76,7 @@ public class TreeGenerator implements IWorldGenerator {
 
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		ArrayList<Circle> circles = circleMan.getCircles(world, random, chunkX, chunkZ);
-
+		
 		for(Circle c: circles) {
 			makeTree(world, c);
 		}
@@ -182,7 +182,6 @@ public class TreeGenerator implements IWorldGenerator {
 		} else {
 			result = EnumGeneratorResult.UNHANDLEDBIOME;
 		}
-
 
 		//Display wool circles for testing the circle growing algorithm
 		if(ConfigHandler.worldGenDebug) {

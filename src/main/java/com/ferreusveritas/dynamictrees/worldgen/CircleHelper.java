@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
@@ -9,10 +10,10 @@ public class CircleHelper {
 
 	private static int looseMasks[][] = new int[7][7];
 	private static byte pairdata[][][] = new byte[7][7][];
-
+	
 	//Tighter Circles
 	static { //Yuh.. magic.
-		createPairData(8, 8, 30, 0x012AABDF, 0x012AAA10);
+		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
 		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
 		createPairData(8, 6, 28, 0x004956DF, 0x00495490);
 		createPairData(8, 5, 26, 0x0012AADF, 0x0012AA90);
@@ -104,8 +105,13 @@ public class CircleHelper {
 		int coordIter = 0;
 		
 		for(int angleIter = startAngle; angleIter <= stopAngle; angleIter++) {
-			int vAngle = angleIter % (codesize * 4);//Wrap angle
-
+			
+			//Wrap angle
+			int vAngle = angleIter % (codesize * 4);
+			if(vAngle < 0) {
+				vAngle += (codesize * 4);
+			}
+				
 			int modulus = Math.abs(((vAngle + codesize) % (codesize * 2) ) - codesize);
 
 			Vec2d tc = c[coordIter++ % c.length] = new Vec2d();
@@ -225,6 +231,7 @@ public class CircleHelper {
 	*/
 	public static Circle findThirdCircle(Circle cA, Circle cB, int cCrad) {
 		if(cA == null || cB == null || cCrad < 2 || cCrad > 8) {
+			System.err.println("3rd circle condition: Radius out of bounds or null circles");
 			return null;
 		}
 
@@ -233,8 +240,8 @@ public class CircleHelper {
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
 		double lenAB = delta.len();
-		int lenAC = cA.radius + cC.radius + 1;//We add one because the circles are a bit weird and the radius value is actually 0.5 more per circle
-		int lenBC = cB.radius + cC.radius + 1;
+		int lenAC = cA.radius + cC.radius;//We add one because the circles are a bit weird and the radius value is actually 0.5 more per circle
+		int lenBC = cB.radius + cC.radius;
 
 		//Use law of cosines to determine missing angles of triangle ABC
 		double angA = Math.acos((lenAC * lenAC + lenAB * lenAB - lenBC * lenBC) / (2 * lenAC * lenAB));
@@ -254,7 +261,7 @@ public class CircleHelper {
 		Vec2d a = new Vec2d();
 		Vec2d b = new Vec2d();
 		boolean solution = false;
-
+		
 		for(int ac = 0; ac < coordListAC.length; ac++) {
 			for(int bc = 0; bc < coordListBC.length; bc++) {
 				a.set(coordListAC[ac]).add(cA.x, cA.z);
@@ -269,9 +276,16 @@ public class CircleHelper {
 			}
 		}
 
+		if(!solution && ConfigHandler.worldGenDebug) {
+			System.err.println("3rd circle condition: No solution found");
+			System.err.println("CircleA:" + cA);
+			System.err.println("CircleB:" + cB);
+			System.err.println("RadiusC:" + cCrad);
+		}
+		
 		return solution ? cC : null;
 	}
-
+	
 	public static void maskCircles(Circle c1, Circle c2) {
 		maskCircles(c1, c2, false);
 	}

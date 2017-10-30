@@ -7,18 +7,43 @@ import net.minecraft.util.math.MathHelper;
 
 public class Circle extends Vec2d {
 
+	/**
+	 *   ▄▀▀
+	 * ▄▀
+	 * █
+	 * █▄▀
+	 * 
+	 */
+	
 	public int radius;
 	public int arc;
 	public boolean real;
-
-	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Circle Bitmaps
+	
+	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles 
+	private static SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
 
 	static {
 		int circledata[] = {0x48,0x488,0x36D1,0x248D1,0x16D919,0xDB5B19,0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
-		for(int r = 2; r <= 8; r++){//Circles with radius 2 - 8
-			cbm[r] = circleBitmapGen(r, circledata[r - 2]);//Unpack circle bitmaps
+		for(int r = 2; r <= 8; r++) {//Circles with radius 2 - 8
+			SimpleBitmap whole = circleBitmapGen(r, circledata[r - 2]);//Unpack circle bitmaps
+			SimpleBitmap inside = new SimpleBitmap(whole.getW(), whole.getH());//Make a bitmap the same size that will serve as the inner circle pixels(non-edge)
+
+			//Generate interior circle bitmap
+			for(int z = 0; z < inside.getH(); z++) {
+				for(int x = 0; x < inside.getW(); x++) {
+					//A pixel is considered interior(non-edge) if it is both ON and surrounded on all four sides by ON pixels;
+					boolean in = whole.isPixelOn(x, z) && whole.isPixelOn(x + 1, z) && whole.isPixelOn(x - 1, z) && whole.isPixelOn(x, z + 1) && whole.isPixelOn(x, z - 1);
+					inside.setPixel(x, z, in ? 1 : 0);
+				}
+			}
+
+			cbm[r] = whole;
+			icbm[r] = inside;
 		}
-		cbm[0] = cbm[1] = cbm[2];//Treat radius 0 and 1 as if they are 2
+
+		//Treat radius 0 and 1 as if they are 2
+		cbm[0] = cbm[1] = cbm[2];
+		icbm[0] = icbm[1] = icbm[2];
 	}
 
 	private static SimpleBitmap circleBitmapGen(int radius, int points) {
@@ -57,6 +82,14 @@ public class Circle extends Vec2d {
 		return getCircleBitmap(radius);
 	}
 
+	private static SimpleBitmap getCircleInteriorBitmap(int radius) {
+		return icbm[radius];
+	}
+	
+	private SimpleBitmap getCircleInteriorBitmap() {
+		return getCircleInteriorBitmap(radius);
+	}
+		
 	public Circle() {
 		this(0, 0, 2);
 	}
@@ -99,7 +132,7 @@ public class Circle extends Vec2d {
 	}
 
 	/**
-	* Test if a coordinate point is inside of raster circle
+	* Test if a coordinate point is inside of a whole raster circle
 	* 
 	* @param x X-Axis
 	* @param z Z-Axis(Y)
@@ -110,16 +143,28 @@ public class Circle extends Vec2d {
 	}
 
 	/**
-	* Returns true if the point is the edge pixel(voxel) of the circle
+	* Test if a coordinate point is inside of a raster circle's interior pixels(non-edge)
+	* 
+	* @param x X-Axis
+	* @param z Z-Axis(Y)
+	* @return True if inside. False if outside
+	*/
+	public boolean isInterior(int x, int z) {
+		return getCircleInteriorBitmap().isPixelOn(x - this.x + radius, z - this.z + radius);
+	}
+	
+	/**
+	* Returns true if the point one of the edge pixels of the circle
 	* 
 	* @param x X-Axis
 	* @param z Z-Axis(Y)
 	* @return True if on edge. False otherwise.
 	*/
 	public boolean isEdge(int x, int z) {
-		return isInside(x, z) && ( !isInside(x + 1, z) || !isInside(x - 1, z) || !isInside(x, z + 1) || !isInside(x, z - 1) );
+		return isInside(x, z) && !isInterior(x, z);
+		//return isInside(x, z) && ( !isInside(x + 1, z) || !isInside(x - 1, z) || !isInside(x, z + 1) || !isInside(x, z - 1) );
 	}
-
+	
 	/**
 	* 
 	* Uses a simple bitmap to detect collisions of raster circles
@@ -137,6 +182,23 @@ public class Circle extends Vec2d {
 		return thisbm.isColliding( ((thisbm.getW() - otherbm.getW()) / 2) + dx, ((thisbm.getH() - otherbm.getH()) / 2) + dz, otherbm);
 	}
 
+	/**
+	 * Uses a simple bitmap to detect collisions of raster circles.
+	 * This variation allows for edge pixels to intersect without creating a collision.
+	 * 
+	* @param other The other circle to test against
+	* @return true if padded intersection detected, false otherwise.
+	 */
+	public boolean doCirclesIntersectPadding(Circle other) {
+		SimpleBitmap thisbm = getCircleBitmap();
+		SimpleBitmap otherbm = other.getCircleInteriorBitmap();
+
+		int dx = other.x - this.x;
+		int dz = other.z - this.z;
+		
+		return thisbm.isColliding( ((thisbm.getW() - otherbm.getW()) / 2) + dx, ((thisbm.getH() - otherbm.getH()) / 2) + dz, otherbm);
+	}	
+	
 	/**
 	* Mask off an arc CW in 1/32 increments. From 0 to PI * 2.  
 	* 0 PI is pointing +X(East) increasing from 0 PI starts toward +Z(South) ⟳
@@ -286,7 +348,7 @@ public class Circle extends Vec2d {
 
 	@Override
 	public String toString() {
-		return "Circle " + x + "," + z + "," + radius + "," + (real ? "T" : "F") + "," + Integer.toHexString(arc);
+		return "Circle x" + x + ", z" + z + ", r" + radius + ", " + (real ? "T" : "F") + ", " + Integer.toHexString(arc);
 	}
 
 }

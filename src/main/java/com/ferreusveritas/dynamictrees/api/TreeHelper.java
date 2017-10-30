@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -42,16 +41,6 @@ public class TreeHelper {
 			leavesArray.put(key, leavesBlock);
 			return leavesBlock;
 		}
-	}
-
-	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
-		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getFrontOffsetX(), (pos.getZ() >> 4) + dir.getFrontOffsetZ()) == null ){
-				return false;
-			}
-		}
-		
-		return true;
 	}
 	
 	/**

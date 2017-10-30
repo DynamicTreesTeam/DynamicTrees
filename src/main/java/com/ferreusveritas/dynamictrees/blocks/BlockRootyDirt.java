@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -138,7 +139,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			do {
 				if(random.nextFloat() < growthRate) {
 					int life = getSoilLife(world, pos);
-					if(life > 0 && TreeHelper.isSurroundedByExistingChunks(world, pos)){
+					if(life > 0 && CoordUtils.isSurroundedByExistingChunks(world, pos)){
 						boolean success = false;
 
 						float energy = tree.getEnergy(world, pos.up());
@@ -152,11 +153,11 @@ public class BlockRootyDirt extends Block implements ITreePart {
 							setSoilLife(world, pos, life - 1);//decrement soil life
 						}
 					} else {
-						if(random.nextFloat() < ConfigHandler.diseaseChance && TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+						if(random.nextFloat() < ConfigHandler.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 							branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
 						} else {
 							NodeFruit nodeFruit = tree.getNodeFruit(world, pos.up());
-							if(nodeFruit != null && TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 								branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(nodeFruit));
 							}
 						}

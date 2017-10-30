@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.special;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -27,7 +27,7 @@ public class BottomListenerDropItems implements IBottomListener {
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			//Don't spawn drops if this block is in a chunk that is next to an unloaded chunk
-			if(!TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+			if(!CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 				return;
 			}
 

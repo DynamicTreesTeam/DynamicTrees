@@ -26,6 +26,7 @@ public class CircleDebug {
 
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
+		//Draw virtual chunks
 		Color lightGrey = new Color(186, 189, 182);
 		Color darkGrey = new Color(136, 138, 133);
 
@@ -35,10 +36,30 @@ public class CircleDebug {
 			}
 		}
 
+		//Draw actual chunks(circles are shifted by x+8, z+8)
+		Color blue1 = new Color(0, 0, 128, 32);
+		Color blue2 = new Color(0, 64, 128, 32);
+		
+		for(int gz = 0; gz < 3; gz++) {
+			for(int gx = 0; gx < 3; gx++) {
+				drawRect(img, ((gx * 16) - 8) * scale, ((gz * 16) - 8) * scale, 16 * scale, 16 * scale, ((gz * 3 + gx) % 2) == 0 ? blue1 : blue2);
+			}
+		}
+		
+		//Draw circles
 		for(Circle c: circles) {
 			drawCircle(img, c, (chunkX - 1) * 16, (chunkZ - 1) * 16);
 		}
 
+		//Draw the compass
+		drawLine(img, 4, 4, 4, 12, Color.BLACK);
+		drawLine(img, 4, 4, 12, 12, Color.BLACK);
+		drawLine(img, 12, 4, 12, 12, Color.BLACK);
+		drawLine(img, 8, 16, 8, 32, Color.RED);
+		drawLine(img, 8, 16, 8 - 5, 16 + 5, Color.RED);
+		drawLine(img, 8, 16, 8 + 5, 16 + 5, Color.RED);
+
+		
 		if(name.isEmpty()) {
 			name = "unresolved-" + chunkX + ":" + chunkZ;
 		}
