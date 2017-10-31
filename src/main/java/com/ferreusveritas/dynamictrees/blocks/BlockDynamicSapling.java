@@ -62,7 +62,7 @@ public class BlockDynamicSapling extends Block {
 		}
 
 		//Air above and acceptable soil below
-		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()));
+		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
 	}
 
 	public boolean canBlockStay(IBlockAccess world, BlockPos pos, IBlockState state) {
@@ -73,7 +73,7 @@ public class BlockDynamicSapling extends Block {
 		DynamicTree tree = getTree(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()))) {
+			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getGrowingBranch().getDefaultState());//set to a single branch with 1 radius
 				world.setBlockState(pos.up(), tree.getGrowingLeavesState());
 				world.setBlockState(pos.down(), tree.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt

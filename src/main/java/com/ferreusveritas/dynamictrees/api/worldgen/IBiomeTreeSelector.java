@@ -19,7 +19,10 @@ public interface IBiomeTreeSelector {
 
 	public String getName();
 	
-	
+	/**
+	 * This is called during the init phase of the DynamicTrees mod.  Use this to get references to trees
+	 * that have been registered during the preInit phase.
+	 */
 	public void init();
 	
 	/**

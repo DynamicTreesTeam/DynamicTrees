@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -153,6 +154,10 @@ public class TreeGenerator implements IWorldGenerator {
 		circle.add(8, 8);//Move the circle into the "stage"
 		
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
+		while(world.isAirBlock(pos) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
+			pos = pos.down();
+		}
+		
 		IBlockState blockState = world.getBlockState(pos);
 		
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
@@ -162,13 +167,16 @@ public class TreeGenerator implements IWorldGenerator {
 		if(decision.isHandled()) {
 			DynamicTree tree = decision.getTree();
 			if(tree != null) {
-				if(tree.getSeed().isAcceptableSoil(blockState, tree.getSeedStack())) {
+				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
 						JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
 						if(code != null) {
-							code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+							code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius);
 						} else {
 							result = EnumGeneratorResult.NOJOCODE;
+							if(tree.growTree(world, pos, getRandomDir(world.rand), circle.radius)) {
+								result = EnumGeneratorResult.GENERATED;
+							}
 						}
 					} else {
 						result = EnumGeneratorResult.FAILCHANCE;
@@ -185,7 +193,7 @@ public class TreeGenerator implements IWorldGenerator {
 
 		//Display wool circles for testing the circle growing algorithm
 		if(ConfigHandler.worldGenDebug) {
-			makeWoolCircle(world, circle, pos.getY(), result);
+			//makeWoolCircle(world, circle, pos.getY(), result);
 		}
 		
 		circle.add(-8, -8);//Move the circle back to normal coords

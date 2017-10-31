@@ -98,8 +98,5 @@ public class Seed extends Item {
 
 		return false;
 	}
-
-	public boolean isAcceptableSoil(IBlockState soilBlockState, ItemStack seedStack) {
-		return getTree(seedStack).isAcceptableSoil(soilBlockState);
-	}
+	
 }

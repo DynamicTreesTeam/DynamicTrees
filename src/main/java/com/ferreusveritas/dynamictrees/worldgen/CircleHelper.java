@@ -240,7 +240,7 @@ public class CircleHelper {
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
 		double lenAB = delta.len();
-		int lenAC = cA.radius + cC.radius;//We add one because the circles are a bit weird and the radius value is actually 0.5 more per circle
+		int lenAC = cA.radius + cC.radius;
 		int lenBC = cB.radius + cC.radius;
 
 		//Use law of cosines to determine missing angles of triangle ABC
@@ -276,12 +276,38 @@ public class CircleHelper {
 			}
 		}
 
+		/*
 		if(!solution && ConfigHandler.worldGenDebug) {
+			ArrayList<Circle> circles = new ArrayList<Circle>();
+			Circle cAtemp = new Circle(cA);
+			Circle cBtemp = new Circle(cB);
+			
+			if(cAtemp.x < cBtemp.x) {
+				cBtemp.x -= cAtemp.x;
+				cAtemp.x = 0;
+			} else {
+				cAtemp.x -= cBtemp.x;
+				cBtemp.x = 0;
+			}
+
+			if(cAtemp.z < cBtemp.z) {
+				cBtemp.z -= cAtemp.z;
+				cAtemp.z = 0;
+			} else {
+				cAtemp.z -= cBtemp.z;
+				cBtemp.z = 0;
+			}
+			
+			circles.add(cAtemp);
+			circles.add(cBtemp);
+			circles.add(new Circle(24, 24, cCrad));
+			CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
 			System.err.println("3rd circle condition: No solution found");
 			System.err.println("CircleA:" + cA);
 			System.err.println("CircleB:" + cB);
 			System.err.println("RadiusC:" + cCrad);
 		}
+		*/
 		
 		return solution ? cC : null;
 	}

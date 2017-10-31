@@ -81,7 +81,7 @@ public class Staff extends Item {
 
 		//Create a tree from right clicking on soil
 		DynamicTree tree = getTree(heldStack);
-		if(tree != null && tree.isAcceptableSoil(clickedBlock)) {
+		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
 			new JoCode(getCode(heldStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
 			heldStack.stackSize--;//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;

@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -17,6 +18,7 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeOak extends DynamicTree {
@@ -62,4 +64,20 @@ public class TreeOak extends DynamicTree {
 		return drops;
 	}
 
+	@Override
+	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+
+		if(soilBlockState.getBlock() == Blocks.WATER) {
+			Biome biome = blockAccess.getBiome(pos);
+			if(BiomeDictionary.isBiomeOfType(biome, Type.SWAMP)) {
+				BlockPos down = pos.down();
+				if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
+					return true;
+				}
+			}
+		}
+		
+		return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
+	}
+	
 }

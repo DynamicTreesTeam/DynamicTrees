@@ -56,7 +56,10 @@ public class JoCode {
 		return this;
 	}
 
-	int dirmap[][] = {
+	/**
+	 * A facing matrix for mapping instructions to different rotations
+	 */
+	private int dirmap[][] = {
 		//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
@@ -66,21 +69,41 @@ public class JoCode {
 			{0, 1, 4, 5, 3, 2, 6, 7},//FACING EAST:	 N->W S->E W->S E->N 90 CCW
 		};
 
-	int facingMap[] = dirmap[2];
-	int unfacingMap[] = dirmap[2];
+	//"Pointers" to the current rotation direction.
+	private int facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private int unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 
+	/**
+	 * Get the instruction at a locus.  
+	 * Automatically performs rotation based on what facing matrix is selected.
+	 * 
+	 * @param pos
+	 * @return
+	 */
 	private int getCode(int pos) {
 		return unfacingMap[instructions.get(pos)];
 	}
 
+	/**
+	 * Sets the active facing matrix to a specific direction
+	 * 
+	 * @param facing
+	 * @return
+	 */
 	public JoCode setFacing(EnumFacing facing) {
-		facingMap = dirmap[facing.ordinal()];
 		int faceNum = facing.ordinal();
+		facingMap = dirmap[faceNum];
 		faceNum = (faceNum == 4) ? 5 : (faceNum == 5) ? 4 : faceNum;//Swap West and East
 		unfacingMap = dirmap[faceNum];
 		return this;
 	}
 
+	/**
+	 * Rotates the JoCode such that the model's "north" faces a new direction.
+	 * 
+	 * @param dir
+	 * @return
+	 */
 	public JoCode rotate(EnumFacing dir) {
 		setFacing(dir);
 		for(int c = 0; c < instructions.size(); c++) {
@@ -144,6 +167,16 @@ public class JoCode {
 
 	}
 
+	/**
+	 * Recursive function that "draws" a branch of a tree
+	 * 
+	 * @param world
+	 * @param tree
+	 * @param codePos
+	 * @param pos
+	 * @param disabled
+	 * @return
+	 */
 	private int growTreeFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {

@@ -30,10 +30,11 @@ public class TreeRegistry {
 	/**
 	 * Mods should use this to register their {@link DynamicTree}
 	 * 
-	 * Places the tree in a central registry and gives the tree a runtime numeric serial ID 
+	 * Places the tree in a central registry and gives the tree a runtime numeric serial ID.
+	 * The proper place to use this is during the preInit phase of your mod.
 	 * 
 	 * @param tree The dynamic tree being registered
-	 * @return
+	 * @return DynamicTree for chaining
 	 */
 	public static DynamicTree registerTree(DynamicTree tree) {
 		treesByName.put(tree.getName(), tree);
@@ -61,12 +62,18 @@ public class TreeRegistry {
 		return tree;
 	}
 	
+	/**
+	 * Search for the tree by it's runtime id number
+	 * 
+	 * @param id runtime id of the tree being searched for
+	 * @return the tree if found or null otherwise
+	 */
 	public static DynamicTree getTreeById(int id) {
-		return treesById.get(id);
-	}
-
-	public static ArrayList<DynamicTree> getTrees() {
-		return treesById;
+		if(id >=0 && id < treesById.size()) {
+			return treesById.get(id);
+		}
+		
+		return null;
 	}
 	
 	//////////////////////////////

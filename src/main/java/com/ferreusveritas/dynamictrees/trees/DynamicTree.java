@@ -565,11 +565,42 @@ public class DynamicTree implements ILeavesAutomata {
 		return DynamicTrees.blockRootyDirt;
 	}
 
+	/**
+	 * soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 * 
+	 * @param soilBlockState
+	 * @return
+	 */
 	public boolean isAcceptableSoil(IBlockState soilBlockState) {
-		Block soilBlock = soilBlockState.getBlock(); 
+		Block soilBlock = soilBlockState.getBlock();
 		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == DynamicTrees.blockRootyDirt;
 	}
 	
+	/**
+	 * Position sensitive version of soil acceptability tester
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(soilBlockState);
+	}
+	
+	/**
+	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(blockAccess, pos, soilBlockState);
+	}
 	
 	///////////////////////////////////////////
 	//RENDERING
@@ -980,7 +1011,30 @@ public class DynamicTree implements ILeavesAutomata {
 	public void addJoCodes() {
 		WorldGenRegistry.addJoCodesFromFile(this, "assets/" + getModID() + "/trees/"+ getName() + ".txt");
 	}
-	
+
+	/**
+	 * Custom function for overriding the default worldgen spawn mechanism.
+	 * This will run if there are no JoCodes registered for this tree
+	 * 
+	 * @param world
+	 * @param pos
+	 * @param facing
+	 * @param radius
+	 * @return
+	 */
+	public boolean growTree(World world, BlockPos pos, EnumFacing facing, int radius) {
+		return false;
+	}
+
+	/**
+	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
+	 * This factor is an attempt to compensate for the problem.
+	 * 
+	 * @return
+	 */
+	public float getWorldGenTaperingFactor() {
+		return 1.5f;
+	}
 	
 	//////////////////////////////
 	// JAVA OBJECT STUFF

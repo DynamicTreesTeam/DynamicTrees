@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
@@ -12,6 +13,35 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 
+	private interface IChanceCalc {
+		float getChance(int radius);
+	}
+
+	private class ChanceCalcStatic implements IChanceCalc {
+		float value;
+		
+		public ChanceCalcStatic(float value) {
+			this.value = value;
+		}
+		
+		@Override
+		public float getChance(int radius) {
+			return value;
+		}
+	}
+	
+	private class ChanceCalcByRadius implements IChanceCalc {
+		@Override
+		public float getChance(int radius) {
+			if(radius > 3) {//Start dropping tree spawn opportunities when the radius gets bigger than 3
+				return 2.0f / radius;
+			}
+			return 1.0f;
+		}
+	}
+		
+	HashMap<Integer, IChanceCalc> fastChanceLookup = new HashMap<Integer, IChanceCalc>();
+	
 	@Override
 	public String getName() {
 		return "default";
@@ -41,20 +71,31 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
 	@Override
 	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
+
+		int biomeId = Biome.getIdForBiome(biome);
+		IChanceCalc chanceCalc;
 		
-		//Never miss a chance to spawn a tree in the roofed forest.
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {//Roofed Forest
-			return EnumChance.OK;
+		if(fastChanceLookup.containsKey(biomeId)) {
+			chanceCalc = fastChanceLookup.get(biomeId);
+		} else {
+			if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
+				chanceCalc = new ChanceCalcStatic(1.0f);
+			}
+			else if(BiomeDictionary.isBiomeOfType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
+				chanceCalc = new ChanceCalcStatic(0.5f);
+			} 
+			else if(biome.theBiomeDecorator.treesPerChunk == -999) {//Deserts, Mesas, Beaches
+				chanceCalc = new ChanceCalcStatic(0.0f);
+			}
+			else {
+				chanceCalc = new ChanceCalcByRadius();//Let the radius determine the chance
+			}
+
+			fastChanceLookup.put(biomeId, chanceCalc);
 		}
 		
-		int chance = 1;//"1" always returns OK
-		
-		if(radius > 3) {//Start dropping tree spawn opportunities when the radius gets bigger than 3
-			chance = (int) (radius / 1.5f);
-		}
-		
-		//the last call should never be UNHANDLED
-		return random.nextInt(chance) == 0 ? EnumChance.OK : EnumChance.CANCEL;
+		//the last call should never be UNHANDLED for the DefaultBiomeDensityProvider since it is the last in the chain
+		return random.nextFloat() < chanceCalc.getChance(radius) ? EnumChance.OK : EnumChance.CANCEL;
 	}
 	
 }
