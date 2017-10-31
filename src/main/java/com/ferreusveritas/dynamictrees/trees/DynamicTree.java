@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -31,7 +30,9 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
@@ -143,6 +144,9 @@ public class DynamicTree implements ILeavesAutomata {
 	
 	/** A map of environmental biome factors that change a tree's suitability */
 	public Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
+	
+	/** A list of JoCodes for world generation */
+	public TreeCodeStore joCodeStore;
 	
 	/** A unique runtime(could change between sessions) identifier for the tree species */
 	private int id;
@@ -1009,20 +1013,30 @@ public class DynamicTree implements ILeavesAutomata {
 	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
 	 */
 	public void addJoCodes() {
-		WorldGenRegistry.addJoCodesFromFile(this, "assets/" + getModID() + "/trees/"+ getName() + ".txt");
+		joCodeStore = new TreeCodeStore(this);
+		joCodeStore.addCodesFromFile("assets/" + getModID() + "/trees/"+ getName() + ".txt");
 	}
 
 	/**
-	 * Custom function for overriding the default worldgen spawn mechanism.
-	 * This will run if there are no JoCodes registered for this tree
+	 * Default worldgen spawn mechanism.
+	 * This method uses JoCodes to generate tree models.
+	 * Override to use other methods.
 	 * 
 	 * @param world
 	 * @param pos
+	 * @param biome 
 	 * @param facing
 	 * @param radius
-	 * @return
+	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean growTree(World world, BlockPos pos, EnumFacing facing, int radius) {
+	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
+		EnumFacing facing = CoordUtils.getRandomDir(random);
+		JoCode code = joCodeStore.getRandomCode(this, radius, random);
+		if(code != null) {
+			code.generate(world, this, pos, facing, radius);
+			return true;
+		}
+		
 		return false;
 	}
 

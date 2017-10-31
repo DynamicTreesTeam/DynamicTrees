@@ -14,7 +14,6 @@ import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -38,13 +37,12 @@ public class TreeGenerator implements IWorldGenerator {
 		UNHANDLEDBIOME,
 		FAILSOIL,
 		FAILCHANCE,
-		NOJOCODE
+		FAILGENERATION
 	}
 	
 	public TreeGenerator() {
 		biomeTreeHandler = new BiomeTreeHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
-		codeStore = new TreeCodeStore();
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 	}
 
@@ -69,10 +67,6 @@ public class TreeGenerator implements IWorldGenerator {
 
 			break;
 		}
-	}
-
-	EnumFacing getRandomDir(Random rand) {
-		return EnumFacing.getFront(2 + rand.nextInt(4));//Return NSWE
 	}
 
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
@@ -136,11 +130,11 @@ public class TreeGenerator implements IWorldGenerator {
 				break;
 				case FAILSOIL: color = EnumDyeColor.BROWN;
 				break;
-				case NOJOCODE: color = EnumDyeColor.GRAY;
-				break;
-				case UNHANDLEDBIOME: color = EnumDyeColor.RED;
+				case UNHANDLEDBIOME: color = EnumDyeColor.YELLOW;
 				break;
 				case NOTREE: color = EnumDyeColor.BLACK;
+				break;
+				case FAILGENERATION: color = EnumDyeColor.RED;
 				break;
 			}
 
@@ -169,14 +163,10 @@ public class TreeGenerator implements IWorldGenerator {
 			if(tree != null) {
 				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
-						JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
-						if(code != null) {
-							code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius);
+						if(tree.generate(world, pos, biome, world.rand, circle.radius)) {
+							result = EnumGeneratorResult.GENERATED;
 						} else {
-							result = EnumGeneratorResult.NOJOCODE;
-							if(tree.growTree(world, pos, getRandomDir(world.rand), circle.radius)) {
-								result = EnumGeneratorResult.GENERATED;
-							}
+							result = EnumGeneratorResult.FAILGENERATION;
 						}
 					} else {
 						result = EnumGeneratorResult.FAILCHANCE;

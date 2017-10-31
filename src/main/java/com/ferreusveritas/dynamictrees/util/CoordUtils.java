@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import java.util.Random;
+
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -25,5 +28,9 @@ public class CoordUtils {
 		}
 		
 		return true;
+	}
+	
+	public static EnumFacing getRandomDir(Random rand) {
+		return EnumFacing.getFront(2 + rand.nextInt(4));//Return NSWE
 	}
 }

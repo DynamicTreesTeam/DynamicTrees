@@ -122,12 +122,12 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void growTree(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
+	public void generate(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
 		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//Create tree
 		setFacing(facing);
-		growTreeFork(world, tree, 0, pos, false);
+		generateFork(world, tree, 0, pos, false);
 
 		radius = MathHelper.clamp_int(radius, 2, 8);
 
@@ -177,12 +177,12 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	private int growTreeFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);
 			if(code == forkCode) {
-				codePos = growTreeFork(world, tree, codePos + 1, pos, disabled);
+				codePos = generateFork(world, tree, codePos + 1, pos, disabled);
 			} else if(code == returnCode) {
 				return codePos + 1;
 			} else {

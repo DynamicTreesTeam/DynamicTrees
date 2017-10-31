@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 public class WorldGenRegistry {
 
@@ -39,37 +38,7 @@ public class WorldGenRegistry {
 		}
 		return false;
 	}
-	
-	
-	//////////////////////////////
-	// JOCODES FOR WORLDGEN
-	//////////////////////////////
-	
-	/**
-	 * Mods should call this to register JoCodes for their trees
-	 * 
-	 * @param tree The tree for which the code is being registered
-	 * @param radius The radius of the model.  Model should not have branches that exceed this boundary
-	 * @param code The code being registered
-	 */
-	public static void addJoCode(DynamicTree tree, int radius, String code) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.codeStore.addCode( tree,  radius,  code);
-		}
-	}
-
-	/**
-	 * Mods should call this to register JoCodes for their trees from a file
-	 * 
-	 * @param tree The tree for which the code is being registered
-	 * @param filename The filename of a file with a list of JoCodes
-	 */
-	public static void addJoCodesFromFile(DynamicTree tree, String filename) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.codeStore.addCodesFromFile(tree, filename);
-		}
-	}
-	
+		
 	/**
 	 * Mods should use this function to determine if worldgen is enabled for Dynamic Trees
 	 * 

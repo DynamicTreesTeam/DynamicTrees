@@ -68,7 +68,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		JoCode jo = new JoCode(JoCode);
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		if(tree != null) {
-			jo.growTree(world, tree, pos.up(), EnumFacing.NORTH, 8);
+			jo.generate(world, tree, pos.up(), EnumFacing.NORTH, 8);
 		} else {
 			Logger.getLogger(DynamicTrees.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
 		}
