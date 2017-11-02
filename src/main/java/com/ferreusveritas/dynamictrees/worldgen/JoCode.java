@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -33,7 +33,6 @@ public class JoCode {
 	static private final String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	static private final byte forkCode = 6;
 	static private final byte returnCode = 7;
-	//static private SimpleVoxmap leafMap = new SimpleVoxmap(17, 32, 17).setCenter(new Vec3d(8, 0, 8));
 
 	public ArrayList<Byte> instructions;
 	private boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
@@ -113,12 +112,11 @@ public class JoCode {
 	}
 
 	/**
+	* Generate a tree from a JoCode instruction list.
 	* 
 	* @param world The world
 	* @param seed The seed used to create the tree
-	* @param x X-Axis of rootyDirtBlock
-	* @param y Y-Axis of rootyDirtBlock
-	* @param z Z-Axis of rootyDirtBlock
+	* @param pos The position of what will become the rootydirt block
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
@@ -141,8 +139,8 @@ public class JoCode {
 
 			smother(leafMap, branch.getTree());
 
-			BlockGrowingLeaves leavesBlock = branch.getTree().getGrowingLeaves();
-			int treeSub = branch.getTree().getGrowingLeavesSub();
+			BlockDynamicLeaves leavesBlock = branch.getTree().getDynamicLeaves();
+			int treeSub = branch.getTree().getDynamicLeavesSub();
 			
 			//Place Growing Leaves Blocks
 			for(Cell cell: leafMap.getAllNonZeroCells()) {
@@ -151,7 +149,7 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesBlock.getDefaultState().withProperty(BlockGrowingLeaves.TREE, treeSub).withProperty(BlockGrowingLeaves.HYDRO, MathHelper.clamp_int(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesBlock.getDefaultState().withProperty(BlockDynamicLeaves.TREE, treeSub).withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp_int(cell.getValue(), 1, 4)), careful ? 2 : 0);
 					}
 				}
 			}
@@ -190,7 +188,7 @@ public class JoCode {
 				pos = pos.offset(dir);
 				if(!disabled) {
 					if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlockState(pos, tree.getGrowingBranch().getDefaultState(), careful ? 3 : 2);
+						world.setBlockState(pos, tree.getDynamicBranch().getDefaultState(), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}
@@ -202,6 +200,12 @@ public class JoCode {
 		return codePos;
 	}
 
+	/**
+	 * Precompute leaf smothering before applying to the world.
+	 * 
+	 * @param leafMap
+	 * @param tree
+	 */
 	private void smother(SimpleVoxmap leafMap, DynamicTree tree) {
 		BlockPos saveCenter = leafMap.getCenter();
 		leafMap.setCenter(new BlockPos(0, 0, 0));
@@ -253,7 +257,7 @@ public class JoCode {
 								}
 								nv[h & 15]++;
 							}
-							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte) BlockGrowingLeaves.solveCell(nv, tree.getCellSolution()));//Find center cell's value from neighbors  
+							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte) BlockDynamicLeaves.solveCell(nv, tree.getCellSolution()));//Find center cell's value from neighbors  
 						}
 					}
 				}
@@ -276,9 +280,7 @@ public class JoCode {
 
 	/**
 	* @param world The world
-	* @param x X-Axis coordinate of rootyDirt block
-	* @param y Y-Axis coordinate of rootyDirt block
-	* @param z Z-Axis coordinate of rootyDirt block
+	* @param pos Block position of rootyDirt block
 	* @return JoCode for chaining
 	*/
 	public JoCode buildFromTree(World world, BlockPos pos, EnumFacing facing) {
@@ -292,6 +294,13 @@ public class JoCode {
 		return this;
 	}
 
+	/**
+	 * Build a JoCode instruction set from the tree found at pos.
+	 * 
+	 * @param world The world
+	 * @param pos Position of the rooty dirt block
+	 * @return resulting JoCode or nul" if no tree is found.
+	 */
 	public JoCode buildFromTree(World world, BlockPos pos) {
 		return buildFromTree(world, pos, EnumFacing.NORTH);
 	}

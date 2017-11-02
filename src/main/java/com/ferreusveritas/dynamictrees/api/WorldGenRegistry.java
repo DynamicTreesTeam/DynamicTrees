@@ -38,7 +38,7 @@ public class WorldGenRegistry {
 		}
 		return false;
 	}
-		
+	
 	/**
 	 * Mods should use this function to determine if worldgen is enabled for Dynamic Trees
 	 * 

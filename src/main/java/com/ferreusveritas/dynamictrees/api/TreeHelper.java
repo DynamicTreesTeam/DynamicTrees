@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -17,30 +17,52 @@ import net.minecraft.world.World;
 
 public class TreeHelper {
 
-	public static HashMap<String, BlockGrowingLeaves> leavesArray = new HashMap<String, BlockGrowingLeaves>();
-
+	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
+	
 	public static final ITreePart nullTreePart = new NullTreePart();
 
 	/**
-	 * A convenience function for packing 4 growing leaves blocks into one Minecraft block using metadata.
+	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
 	 * 
 	 * @param modid
 	 * @param seq
 	 * @return
 	 */
-	public static BlockGrowingLeaves getLeavesBlockForSequence(String modid, int seq) {
-		int leavesBlockNum = seq / 4;
-		String key = modid + ":" + leavesBlockNum;
+	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
 
-		if(leavesArray.containsKey(key)) {
-			return leavesArray.get(key);
+		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
+		int leavesBlockNum = seq / 4;
+		int key = leavesBlockNum;		
+		
+		if(leavesMap.containsKey(key)) {
+			return leavesMap.get(key);
 		} else {
-			BlockGrowingLeaves leavesBlock = new BlockGrowingLeaves();
+			BlockDynamicLeaves leavesBlock = new BlockDynamicLeaves();
 			leavesBlock.setRegistryName(modid, "leaves" + leavesBlockNum);
 			leavesBlock.setUnlocalizedName("leaves" + leavesBlockNum);
-			leavesArray.put(key, leavesBlock);
+			leavesMap.put(key, leavesBlock);
 			return leavesBlock;
 		}
+	}
+	
+	/**
+	 * 	Get the map of leaves from for the appropriate modid.
+	 *  If the map does not exist then one is created.
+	 * 
+	 * @param modid The ModId of the mod accessing this
+	 * @return The map of {@link BlockDynamicLeaves}
+	 */
+	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
+		HashMap<Integer, BlockDynamicLeaves> leavesMap;
+		
+		if(modLeavesArray.containsKey(modid)) {
+			leavesMap = modLeavesArray.get(modid);
+		} else {
+			leavesMap = new HashMap<Integer, BlockDynamicLeaves>();
+			modLeavesArray.put(modid, leavesMap);
+		}
+
+		return leavesMap;
 	}
 	
 	/**
@@ -151,7 +173,7 @@ public class TreeHelper {
 	//Leaves
 
 	public static boolean isLeaves(Block block) {
-		return block instanceof BlockGrowingLeaves;
+		return block instanceof BlockDynamicLeaves;
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {

@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
@@ -20,7 +21,6 @@ public class TreeRegistry {
 
 	private static Map<String, DynamicTree> treesByName = new HashMap<String, DynamicTree>();
 	private static Map<String, DynamicTree> treesByFullName = new HashMap<String, DynamicTree>();
-	private static ArrayList<DynamicTree> treesById = new ArrayList<DynamicTree>();
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	
 	//////////////////////////////
@@ -30,7 +30,7 @@ public class TreeRegistry {
 	/**
 	 * Mods should use this to register their {@link DynamicTree}
 	 * 
-	 * Places the tree in a central registry and gives the tree a runtime numeric serial ID.
+	 * Places the tree in a central registry.
 	 * The proper place to use this is during the preInit phase of your mod.
 	 * 
 	 * @param tree The dynamic tree being registered
@@ -39,12 +39,21 @@ public class TreeRegistry {
 	public static DynamicTree registerTree(DynamicTree tree) {
 		treesByName.put(tree.getName(), tree);
 		treesByFullName.put(tree.getFullName(), tree);
-		int currId = treesById.size();
-		treesById.add(tree);
-		tree.register(currId);
+		tree.register();//Let the tree setup everything it needs
 		return tree;
 	}
 
+	/**
+	 * Method for registering a list of trees
+	 * 
+	 * @param list
+	 */
+	public static void registerTrees(List<DynamicTree> list) {
+		for(DynamicTree tree: list) {
+			registerTree(tree);
+		}
+	}
+	
 	/**
 	 * Searches first for the full tree name.  If that fails then it
 	 * will find the first tree matching the simple name and return it instead otherwise null
@@ -61,21 +70,7 @@ public class TreeRegistry {
 		
 		return tree;
 	}
-	
-	/**
-	 * Search for the tree by it's runtime id number
-	 * 
-	 * @param id runtime id of the tree being searched for
-	 * @return the tree if found or null otherwise
-	 */
-	public static DynamicTree getTreeById(int id) {
-		if(id >=0 && id < treesById.size()) {
-			return treesById.get(id);
-		}
 		
-		return null;
-	}
-	
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////

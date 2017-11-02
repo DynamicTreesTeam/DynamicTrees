@@ -32,7 +32,7 @@ public class BottomListenerDropItems implements IBottomListener {
 			}
 
 			//Spawn seed
-			if(!onlyEdge || tree.getGrowingLeaves().getHydrationLevel(world, pos) == 1) {
+			if(!onlyEdge || tree.getDynamicLeaves().getHydrationLevel(world, pos) == 1) {
 				EntityItem itemEntity = new EntityItem(world, pos.getX(),  pos.getY() - 1, pos.getZ(), toDrop.copy());
 				world.spawnEntityInWorld(itemEntity);
 			}

@@ -249,7 +249,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 	@Override
 	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getGrowingLeaves(), leavesTree.getGrowingLeavesSub());
+		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getDynamicLeaves(), leavesTree.getDynamicLeavesSub());
 	}
 
 	@Override
@@ -276,7 +276,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		BlockGrowingLeaves leaves = getTree().getGrowingLeaves();
+		BlockDynamicLeaves leaves = getTree().getDynamicLeaves();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeaves(world, getTree(), pos, 0);

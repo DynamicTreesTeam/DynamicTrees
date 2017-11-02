@@ -13,34 +13,51 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 
-	private interface IChanceCalc {
-		float getChance(int radius);
+	private interface IChance {
+		EnumChance getChance(Random random, int radius);
 	}
 
-	private class ChanceCalcStatic implements IChanceCalc {
-		float value;
+	private class ChanceStatic implements IChance {
+		private final EnumChance chance;
 		
-		public ChanceCalcStatic(float value) {
+		public ChanceStatic(EnumChance chance) {
+			this.chance = chance;
+		}
+		
+		@Override
+		public EnumChance getChance(Random random, int radius) {
+			return chance;
+		}
+	}
+
+	private class ChanceRandom implements IChance {
+		private final float value;
+		
+		public ChanceRandom(float value) {
 			this.value = value;
 		}
 		
 		@Override
-		public float getChance(int radius) {
-			return value;
+		public EnumChance getChance(Random random, int radius) {
+			return random.nextFloat() < value ? EnumChance.OK : EnumChance.CANCEL;
 		}
 	}
 	
-	private class ChanceCalcByRadius implements IChanceCalc {
+	private class ChanceByRadius implements IChance {
 		@Override
-		public float getChance(int radius) {
+		public EnumChance getChance(Random random, int radius) {
+			float chance = 1.0f;
+			
 			if(radius > 3) {//Start dropping tree spawn opportunities when the radius gets bigger than 3
-				return 2.0f / radius;
+				chance = 2.0f / radius;
+				return random.nextFloat() < chance ? EnumChance.OK : EnumChance.CANCEL;
 			}
-			return 1.0f;
+
+			return random.nextFloat() < chance ? EnumChance.OK : EnumChance.CANCEL;
 		}
 	}
 		
-	HashMap<Integer, IChanceCalc> fastChanceLookup = new HashMap<Integer, IChanceCalc>();
+	HashMap<Integer, IChance> fastChanceLookup = new HashMap<Integer, IChance>();
 	
 	@Override
 	public String getName() {
@@ -73,29 +90,29 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
 
 		int biomeId = Biome.getIdForBiome(biome);
-		IChanceCalc chanceCalc;
+		IChance chance;
 		
 		if(fastChanceLookup.containsKey(biomeId)) {
-			chanceCalc = fastChanceLookup.get(biomeId);
+			chance = fastChanceLookup.get(biomeId);
 		} else {
 			if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
-				chanceCalc = new ChanceCalcStatic(1.0f);
+				chance = new ChanceStatic(EnumChance.OK);
 			}
 			else if(BiomeDictionary.isBiomeOfType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-				chanceCalc = new ChanceCalcStatic(0.5f);
+				chance = new ChanceRandom(0.5f);
 			} 
 			else if(biome.theBiomeDecorator.treesPerChunk == -999) {//Deserts, Mesas, Beaches
-				chanceCalc = new ChanceCalcStatic(0.0f);
+				chance = new ChanceStatic(EnumChance.CANCEL);
 			}
 			else {
-				chanceCalc = new ChanceCalcByRadius();//Let the radius determine the chance
+				chance = new ChanceByRadius();//Let the radius determine the chance
 			}
 
-			fastChanceLookup.put(biomeId, chanceCalc);
+			fastChanceLookup.put(biomeId, chance);
 		}
 		
 		//the last call should never be UNHANDLED for the DefaultBiomeDensityProvider since it is the last in the chain
-		return random.nextFloat() < chanceCalc.getChance(radius) ? EnumChance.OK : EnumChance.CANCEL;
+		return chance.getChance(random, radius);
 	}
 	
 }

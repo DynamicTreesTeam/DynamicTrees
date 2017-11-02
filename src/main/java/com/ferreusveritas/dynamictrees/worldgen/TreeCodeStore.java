@@ -17,6 +17,14 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 
+/**
+ * A storage class for {@link JoCode} objects.
+ * Stores JoCodes by radius.  Can be used to call random JoCodes
+ * during worldgen.
+ * 
+ * @author ferreusveritas
+ *
+ */
 public class TreeCodeStore {
 
 	ArrayList<ArrayList<JoCode>> store = new ArrayList<ArrayList<JoCode>>(7);//Radius values 2,3,4,5,6,7,8
@@ -25,7 +33,7 @@ public class TreeCodeStore {
 	public TreeCodeStore(DynamicTree tree) {
 		this.tree = tree;
 		for(int i = 0; i < 7; i++) {
-			store.set(i, new ArrayList<JoCode>());
+			store.add(new ArrayList<JoCode>());
 		}
 	}
 	
@@ -85,7 +93,7 @@ public class TreeCodeStore {
 		System.out.println(tree.getName() + ":" + radius + ":" + arr.get(0));
 	}
 	
-	public JoCode getRandomCode(DynamicTree tree, int radius, Random rand) {		
+	public JoCode getRandomCode(int radius, Random rand) {		
 		ArrayList<JoCode> list = getListForRadius(radius);
 		if(!list.isEmpty()) {
 			return list.get(rand.nextInt(list.size()));
