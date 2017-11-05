@@ -503,11 +503,11 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 		//For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, harvesters.get());
 		
-        for (ItemStack item : items) {
-            if (world.rand.nextFloat() <= chance) {
-                spawnAsEntity(world, pos, item);
-            }
-        }
+		for (ItemStack item : items) {
+			if (world.rand.nextFloat() <= chance) {
+				spawnAsEntity(world, pos, item);
+			}
+		}
 		
 		return true;// Function returns true if Block was destroyed
 	}
@@ -552,9 +552,9 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		int woodVolume = destroyTreeFromNode(world, pos);
-        for (ItemStack item : getWoodDrops(world, pos, woodVolume)) {
-        	spawnAsEntity(world, pos, item);
-        }
+		for (ItemStack item : getWoodDrops(world, pos, woodVolume)) {
+			spawnAsEntity(world, pos, item);
+		}
 	}
 	
 	

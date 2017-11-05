@@ -32,15 +32,15 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
-
+	
 	@Override
 	public void preInit() {
 		registerModels();
 	}
-
+	
 	@Override
 	public void init() {
-
+		
 		//Register Rootydirt Mesher and Colorizer
 		TreeModelHelper.regMesher(Item.getItemFromBlock(DynamicTrees.blockRootyDirt));
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
@@ -49,7 +49,7 @@ public class ClientProxy extends CommonProxy {
 				return worldIn != null && pos != null ? BiomeColorHelper.getGrassColorAtPos(worldIn, pos) : ColorizerGrass.getGrassColor(0.5D, 1.0D);
 			}
 		}, new Block[] {DynamicTrees.blockRootyDirt});
-
+		
 		//Register Potion Mesher and Colorizer
 		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
 			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(DynamicTrees.dendroPotion, type.getIndex(), new ModelResourceLocation(DynamicTrees.dendroPotion.getRegistryName(), "inventory"));
@@ -72,7 +72,7 @@ public class ClientProxy extends CommonProxy {
 				return tintIndex == 1 ? DynamicTrees.treeStaff.getColor(stack) : 0x00FFFFFF;
 			}
 		}, new Item[] {DynamicTrees.treeStaff});
-
+		
 		//Register Sapling Colorizer
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
 			@Override
@@ -80,7 +80,7 @@ public class ClientProxy extends CommonProxy {
 				return DynamicTrees.blockDynamicSapling.getTree(state).foliageColorMultiplier(state, world, pos);
 			}
 		}, new Block[] {DynamicTrees.blockDynamicSapling});
-
+		
 		//Register Bonsai Pot Colorizer
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
 			@Override
@@ -89,13 +89,13 @@ public class ClientProxy extends CommonProxy {
 			}
 		}, new Block[] {DynamicTrees.blockBonsaiPot});
 		TreeModelHelper.regMesher(Item.getItemFromBlock(DynamicTrees.blockBonsaiPot));//Register this just in case something weird happens
-
+		
 		//Register DendroCoil Mesher if it exists
 		Block dendroCoil = Block.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, "dendrocoil"));
 		if(dendroCoil != Blocks.AIR) {
 			TreeModelHelper.regMesher(Item.getItemFromBlock(dendroCoil));
 		}
-
+		
 		//Register Meshers for Branches and Seeds
 		for(DynamicTree tree: DynamicTrees.baseTrees) {
 			TreeModelHelper.regMesher(Item.getItemFromBlock(tree.getDynamicBranch()));
@@ -120,7 +120,7 @@ public class ClientProxy extends CommonProxy {
 						return 0x00ff00ff;//Magenta shading to indicate error
 					}
 				}, new Block[] {leaves});
-
+				
 				Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
 					@Override
 					public int getColorFromItemstack(ItemStack stack, int tintIndex) {
@@ -129,13 +129,13 @@ public class ClientProxy extends CommonProxy {
 				}, new Item[] {Item.getItemFromBlock(leaves)});
 			}
 		}
-
+		
 		//makePlantsBlue();
 	}
-
+	
 	@Override
 	public void registerModels() {
-
+		
 		for(DynamicTree tree: DynamicTrees.baseTrees) {
 			TreeModelHelper.registerTreeModels(tree);
 			//ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranch.RADIUS).build());
@@ -158,18 +158,18 @@ public class ClientProxy extends CommonProxy {
 	public EntityPlayer getClientPlayer() {
 		return Minecraft.getMinecraft().thePlayer;
 	}
-
+	
 	@Override
 	public World getClientWorld() {
 		return Minecraft.getMinecraft().theWorld;
 	}
-
+	
 	@Override 
 	public void registerEventHandlers() {
 		super.registerEventHandlers();//Registers Common Handlers
 		MinecraftForge.EVENT_BUS.register(new ClientEventHandler());//Registers Client Handler
 	}
-
+	
 	@Override
 	public int getTreeFoliageColor(DynamicTree tree, World world, IBlockState blockState, BlockPos pos) {
 		return tree.foliageColorMultiplier(blockState, world, pos);
@@ -178,13 +178,13 @@ public class ClientProxy extends CommonProxy {
 	///////////////////////////////////////////
 	// PARTICLES
 	///////////////////////////////////////////
-
+	
 	@Override
 	public void addDustParticle(double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {
 		Particle particle = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.BLOCK_DUST.getParticleID(), fx, fy, fz, mx, my, mz, new int[]{Block.getStateId(blockState)});
 		particle.setRBGColorF(r, g, b);
 	}
-
+	
 	/**
 	 * Not strictly necessary. But adds a little more isolation to the server for particle effects
 	 */

@@ -43,7 +43,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 		biomeDensityProvider.add(densityProvider);
 		biomeDensityProvider.sort(new Comparator<IBiomeDensityProvider>() {
 			@Override
-			public int compare(IBiomeDensityProvider sel2, IBiomeDensityProvider sel1) {
+			public int compare(IBiomeDensityProvider sel1, IBiomeDensityProvider sel2) {
 				return sel2.getPriority() - sel1.getPriority();//Sort backwards so higher values are on top.
 			}
 		});
@@ -57,11 +57,11 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	}
 	
 	@Override
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt) {
+	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
 		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
-			Decision decision = selector.getTree(world, biome, pos, dirt);
-			if(decision.isHandled()) {
+			Decision decision = selector.getTree(world, biome, pos, dirt, random);
+			if(decision != null && decision.isHandled()) {
 				return decision;
 			}
 		}
@@ -79,19 +79,19 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 			}
 		}
 		
-		return 0.0;
+		return noiseDensity;
 	}
 	
 	@Override
 	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
-		
+				
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
 			EnumChance c = provider.chance(biome, tree, radius, random);
 			if(c != EnumChance.UNHANDLED) {
 				return c;
 			}
 		}
-		
+				
 		return EnumChance.OK;
 	}
 	

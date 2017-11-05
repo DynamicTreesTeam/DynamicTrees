@@ -160,7 +160,8 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 	
 	/**
-	 * Constructor suitable for derivative mods 
+	 * Constructor suitable for derivative mods
+	 * 
 	 * @param modid The MODID of the mod that is registering this tree
 	 * @param name The simple name of the tree e.g. "oak"
 	 * @param seq The registration sequence number for this MODID. Used for registering 4 leaves types per {@link BlockDynamicLeaves}.
@@ -187,7 +188,7 @@ public class DynamicTree implements ILeavesAutomata {
 	 * 
 	 * @param wood
 	 */
-	protected void simpleVanillaSetup(BlockPlanks.EnumType wood) {
+	private void simpleVanillaSetup(BlockPlanks.EnumType wood) {
 		
 		switch(wood) {
 			case OAK:
@@ -273,7 +274,6 @@ public class DynamicTree implements ILeavesAutomata {
 	 * This registers the tree itself.  This is not used to
 	 * register blocks or items with minecraft.
 	 * 
-	 * @param id Numerical id created in the TreeRegistry for this tree.
 	 * @return this tree for chaining
 	 */
 	public DynamicTree register() {
@@ -392,7 +392,7 @@ public class DynamicTree implements ILeavesAutomata {
 	public BlockBranch getDynamicBranch() {
 		return dynamicBranch;
 	}
-
+	
 	/**
 	 * This is run internally if no seed is set for the tree when it's registered
 	 */
@@ -575,7 +575,7 @@ public class DynamicTree implements ILeavesAutomata {
 	}
 
 	/**
-	 * soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
 	 * species.
 	 * 
@@ -626,7 +626,6 @@ public class DynamicTree implements ILeavesAutomata {
 	///////////////////////////////////////////
 	// LEAVES AUTOMATA
 	///////////////////////////////////////////
-	
 	
 	public void setSmotherLeavesMax(int smotherLeavesMax) {
 		this.smotherLeavesMax = smotherLeavesMax;

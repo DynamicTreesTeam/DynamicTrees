@@ -51,7 +51,7 @@ public class TreeOak extends DynamicTree {
 			}
 			return true;
 		}
-
+		
 		return false;
 	}
 	
@@ -63,7 +63,7 @@ public class TreeOak extends DynamicTree {
 		}
 		return drops;
 	}
-
+	
 	@Override
 	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
 

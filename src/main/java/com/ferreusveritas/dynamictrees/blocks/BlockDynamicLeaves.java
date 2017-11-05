@@ -57,9 +57,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE});
-    }
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE});
+	}
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -623,7 +623,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		//It's mostly for seeds.. mostly.
 		//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
-        Random rand = world instanceof World ? ((World)world).rand : new Random();
+		Random rand = world instanceof World ? ((World)world).rand : new Random();
 		if (rand.nextInt(chance) == 0) {
 			ret.add(tree.getSeedStack());
 		}

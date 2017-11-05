@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.worldgen;
 
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
@@ -17,6 +19,12 @@ import net.minecraft.world.biome.Biome;
  */
 public interface IBiomeTreeSelector {
 
+	/**
+	 * A unique name to identify this {@link IBiomeTreeSelector}.
+	 * It's recommended to use something like "modid:name"
+	 * 
+	 * @return
+	 */
 	public String getName();
 	
 	/**
@@ -33,7 +41,7 @@ public interface IBiomeTreeSelector {
 	 * @param dirt
 	 * @return A decision on which tree to use.  Set decision to null for no tree.
 	 */
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt);
+	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random);
 	
 	/**
 	 * Used to determine which selector should run first.  Higher values are executed first.  Negative values are allowed.

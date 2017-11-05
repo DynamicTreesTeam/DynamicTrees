@@ -15,6 +15,12 @@ import net.minecraft.world.biome.Biome;
  */
 public interface IBiomeDensityProvider {
 	
+	/**
+	 * A unique name to identify this {@link IBiomeDensityProvider}.
+	 * It's recommended to use something like "modid:name"
+	 * 
+	 * @return
+	 */
 	public String getName();
 	
 	/**

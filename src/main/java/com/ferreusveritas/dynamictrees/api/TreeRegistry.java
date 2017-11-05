@@ -58,8 +58,8 @@ public class TreeRegistry {
 	 * Searches first for the full tree name.  If that fails then it
 	 * will find the first tree matching the simple name and return it instead otherwise null
 	 * 
-	 * @param name
-	 * @return
+	 * @param name The name of the tree.  Either the simple name or the full name
+	 * @return The tree that was found or null if not found
 	 */
 	public static DynamicTree findTree(String name) {
 		DynamicTree tree = treesByFullName.get(name);
@@ -70,7 +70,19 @@ public class TreeRegistry {
 		
 		return tree;
 	}
-		
+	
+	/**
+	 * Convenience function that uses the modId and name for
+	 * the search.
+	 * 
+	 * @param modId
+	 * @param name
+	 * @return
+	 */
+	public static DynamicTree findTree(String modId, String name) {
+		return findTree(modId + ":" + name);
+	}
+	
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
@@ -101,5 +113,4 @@ public class TreeRegistry {
 		return !biomeSuitabilityDeciders.isEmpty();
 	}
 	
-
 }

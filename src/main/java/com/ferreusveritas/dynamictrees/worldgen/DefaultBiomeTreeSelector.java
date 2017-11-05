@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.HashMap;
+import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -57,7 +59,7 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	
 	@Override
 	public String getName() {
-		return "default";
+		return DynamicTrees.MODID + ":default";
 	}
 	
 	@Override
@@ -66,11 +68,11 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	}
 	
 	@Override
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt) {
+	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
 		int biomeId = Biome.getIdForBiome(biome);
 		ITreeSelector select;
-		
+				
 		if(fastTreeLookup.containsKey(biomeId)) {
 			select = fastTreeLookup.get(biomeId);//Speedily look up the type of tree
 		}
@@ -85,6 +87,8 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 				} else {
 					select = new StaticDecision(new Decision(oak));
 				}
+			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
+				select = new StaticDecision(new Decision(darkoak));
 			}
 			else if(BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE)) {
 				select = new StaticDecision(new Decision(jungle));

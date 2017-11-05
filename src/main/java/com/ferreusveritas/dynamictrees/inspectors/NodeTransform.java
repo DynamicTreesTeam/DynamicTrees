@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeTransform implements INodeInspector {
-
+	
 	DynamicTree fromTree;
 	DynamicTree toTree;
 	
@@ -35,15 +35,15 @@ public class NodeTransform implements INodeInspector {
 				}
 			}
 		}
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
-
+	
 	public void transformSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote) {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {

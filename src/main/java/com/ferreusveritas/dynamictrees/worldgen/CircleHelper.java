@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
@@ -9,8 +10,7 @@ public class CircleHelper {
 
 	private static int looseMasks[][] = new int[7][7];
 	private static byte pairdata[][][] = new byte[7][7][];
-	
-	//Tighter Circles
+
 	static { //Yuh.. magic.
 		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
 		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
@@ -247,7 +247,7 @@ public class CircleHelper {
 			}
 		}
 
-		/*
+		
 		if(!solution && ConfigHandler.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
 			Circle cAtemp = new Circle(cA);
@@ -278,7 +278,7 @@ public class CircleHelper {
 			System.err.println("CircleB:" + cB);
 			System.err.println("RadiusC:" + cCrad);
 		}
-		*/
+		
 		
 		return solution ? cC : null;
 	}

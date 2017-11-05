@@ -30,6 +30,7 @@ public class TreeGenerator implements IWorldGenerator {
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
+	protected RandomXOR random;
 
 	public enum EnumGeneratorResult {
 		GENERATED,
@@ -44,6 +45,7 @@ public class TreeGenerator implements IWorldGenerator {
 		biomeTreeHandler = new BiomeTreeHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
+		random = new RandomXOR();
 	}
 
 	public void onWorldUnload() {
@@ -55,16 +57,18 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 
 	@Override
-	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+
+		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
+		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
+		
 		switch (world.provider.getDimension()) {
 		case 0: //Overworld
 			generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
 			break;
 		case -1: //Nether
-
 			break;
 		case 1: //End
-
 			break;
 		}
 	}
@@ -109,7 +113,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
-				
+		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
@@ -157,13 +161,13 @@ public class TreeGenerator implements IWorldGenerator {
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		Biome biome = world.getBiome(pos);
-		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState);
+		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState, random);
 		if(decision.isHandled()) {
 			DynamicTree tree = decision.getTree();
 			if(tree != null) {
 				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
-					if(biomeTreeHandler.chance(biome, tree, circle.radius, world.rand) == EnumChance.OK) {
-						if(tree.generate(world, pos, biome, world.rand, circle.radius)) {
+					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
+						if(tree.generate(world, pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;
@@ -183,7 +187,7 @@ public class TreeGenerator implements IWorldGenerator {
 
 		//Display wool circles for testing the circle growing algorithm
 		if(ConfigHandler.worldGenDebug) {
-			//makeWoolCircle(world, circle, pos.getY(), result);
+			makeWoolCircle(world, circle, pos.getY(), result);
 		}
 		
 		circle.add(-8, -8);//Move the circle back to normal coords

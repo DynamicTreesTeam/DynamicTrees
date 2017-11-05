@@ -6,14 +6,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class Circle extends Vec2d {
-
-	/**
-	 *   ▄▀▀
-	 * ▄▀
-	 * █
-	 * █▄▀
-	 * 
-	 */
 	
 	public int radius;
 	public int arc;
@@ -21,13 +13,13 @@ public class Circle extends Vec2d {
 	
 	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles 
 	private static SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
-
+	
 	static {
 		int circledata[] = {0x48,0x488,0x36D1,0x248D1,0x16D919,0xDB5B19,0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
 		for(int r = 2; r <= 8; r++) {//Circles with radius 2 - 8
 			SimpleBitmap whole = circleBitmapGen(r, circledata[r - 2]);//Unpack circle bitmaps
 			SimpleBitmap inside = new SimpleBitmap(whole.getW(), whole.getH());//Make a bitmap the same size that will serve as the inner circle pixels(non-edge)
-
+			
 			//Generate interior circle bitmap
 			for(int z = 0; z < inside.getH(); z++) {
 				for(int x = 0; x < inside.getW(); x++) {
@@ -36,30 +28,30 @@ public class Circle extends Vec2d {
 					inside.setPixel(x, z, in ? 1 : 0);
 				}
 			}
-
+			
 			cbm[r] = whole;
 			icbm[r] = inside;
 		}
-
+		
 		//Treat radius 0 and 1 as if they are 2
 		cbm[0] = cbm[1] = cbm[2];
 		icbm[0] = icbm[1] = icbm[2];
 	}
-
+	
 	private static SimpleBitmap circleBitmapGen(int radius, int points) {
 		int dim = radius * 2 + 1;
 		int top = 0;
 		int bot = dim - 1;
 		int lines[] = new int[dim];
-
+		
 		while(top <= bot) {
 			int slice = ((points >> (top * 3)) & 0x7) + 1;
 			lines[top++] = lines[bot--] = bitRun(radius - slice, radius + 1 + slice);
 		}
-
+		
 		return new SimpleBitmap(dim, dim, lines);
 	}
-
+	
 	/**
 	* 
 	* @param start range [0, 31] inclusive
@@ -73,15 +65,15 @@ public class Circle extends Vec2d {
 			return (int) ((0xFFFFFFFFL >>> (32 - stop)) | (0xFFFFFFFFL << start));
 		}
 	}
-
+	
 	private static SimpleBitmap getCircleBitmap(int radius) {
 		return cbm[radius];
 	}
-
+	
 	private SimpleBitmap getCircleBitmap() {
 		return getCircleBitmap(radius);
 	}
-
+	
 	private static SimpleBitmap getCircleInteriorBitmap(int radius) {
 		return icbm[radius];
 	}
@@ -93,7 +85,7 @@ public class Circle extends Vec2d {
 	public Circle() {
 		this(0, 0, 2);
 	}
-
+	
 	public Circle(BlockPos pos, int radius) {
 		this(pos.getX(), pos.getZ(), radius);
 	}
@@ -106,31 +98,31 @@ public class Circle extends Vec2d {
 	public Circle(int x, int z, int radius) {
 		set(x, z, radius);
 	}
-
+	
 	public Circle(Vec2d c, int radius) {
 		set(c.x, c.z, radius);
 	}
-
+	
 	public Circle(Circle o) {
 		set(o.x, o.z, o.radius);
 		arc = o.arc;
 	}
-
+	
 	public Circle set(int x, int z, int radius) {
 		return set(x, z).setRadius(radius);
 	}
-
+	
 	@Override
 	public Circle set(int x, int z) {
 		super.set(x, z);
 		return this;
 	}
-
+	
 	public Circle setRadius(int radius) {
 		this.radius = MathHelper.clamp_int(radius, 2, 8);
 		return this;
 	}
-
+	
 	/**
 	* Test if a coordinate point is inside of a whole raster circle
 	* 
@@ -141,7 +133,7 @@ public class Circle extends Vec2d {
 	public boolean isInside(int x, int z) {
 		return getCircleBitmap().isPixelOn(x - this.x + radius, z - this.z + radius);
 	}
-
+	
 	/**
 	* Test if a coordinate point is inside of a raster circle's interior pixels(non-edge)
 	* 
@@ -181,7 +173,7 @@ public class Circle extends Vec2d {
 		
 		return thisbm.isColliding( ((thisbm.getW() - otherbm.getW()) / 2) + dx, ((thisbm.getH() - otherbm.getH()) / 2) + dz, otherbm);
 	}
-
+	
 	/**
 	 * Uses a simple bitmap to detect collisions of raster circles.
 	 * This variation allows for edge pixels to intersect without creating a collision.
@@ -211,21 +203,21 @@ public class Circle extends Vec2d {
 		int end =   Math.round(CircleHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
 		arc |= bitRun(start, end);
 	}
-
+	
 	/**
 	* Fill or Solve the entire circle.
 	*/
 	public void fillArc() {
 		arc = 0xFFFFFFFF;
 	}
-
+	
 	/**
 	* Clear arc mask so all bit angles are free.
 	*/
 	public void clearArc() {
 		arc = 0;
 	}
-
+	
 	/**
 	* Sets the arc masking for the circle depending on which 9set chunk it's in.
 	* 
@@ -233,30 +225,30 @@ public class Circle extends Vec2d {
 	* @param chunkZStart starting position on the Z axis in blocks
 	*/
 	public void edgeMask(int chunkXStart, int chunkZStart) {
-
+		
 		int x = this.x - chunkXStart + 16;
 		int z = this.z - chunkZStart + 16;
-
+		
 		//Sometimes findThirdCircle will push a circle out of the 3x3 park..  Catch it and set the circle to solved and forget about it.
 		if(x < 0 || z < 0 || x >= 48 || z >= 48) {
 			fillArc();
 			return;
 		}
-
+		
 		byte pointMap[] = {6,4,12,2,0,13,3,11,9,0,0,0,0,0,0,0};//Bitfields: [--,--,--,--,Bz,Bx,Az,Ax]
 		byte points = pointMap[( (x >> 4) + (z >> 4) * 3) & 15];
 		if(points == 0) {//Check for center chunk
-
+			
 			double adjs[] = {//⟳
 				31.5 - x,	//East +X
 				31.5 - z,	//Down +Z
 				x - 15.5,	//West -X
 				z - 15.5,	//North -Z
 			};
-
+			
 			double r = radius + 2;//We add 2 to the radius because we can't fit the smallest circle(radius == 2) in the space anyway
 			double offset = 0;//Offset in radians..  Starts pointing East +X
-
+			
 			for(int edge = 0; edge < 4; edge++) {
 				double cos = adjs[edge] / r;//If the cos is < 0 then the circle is outside of the chunk(not possible since we are testing the middle chunk)
 				if(cos < 1.0) {//If the cos is > 1 then the circle edge isn't overlapping the chunk edge.   
@@ -270,9 +262,9 @@ public class Circle extends Vec2d {
 			double angle2 = Math.atan2( 15.5 + (((points >> 3) & 1) << 4) - z, 15.5 + (((points >> 2) & 1) << 4) - x );
 			maskArc(angle1, angle2);
 		}
-
+		
 	}
-
+	
 	/**
 	* Detects the transition from 0 to 1 around the circle arc mask in the clockwise direction starting from 0 degrees.
 	* 
@@ -283,18 +275,18 @@ public class Circle extends Vec2d {
 		if(arc == 0) {
 			return ((x ^ z) & 31);//Pseudorandom angle
 		}
-
+		
 		int pos = Integer.numberOfTrailingZeros(arc);
-
+		
 		if(pos == 0) {
 			pos = Integer.numberOfTrailingZeros(~arc);
 			pos += Integer.numberOfTrailingZeros(Integer.rotateRight(arc, pos));
 		} // 16
-
+		
 		return ((pos - 1) & 31);
-
+		
 	}
-
+	
 	/**
 	* Convert bit angle to radians
 	* 
@@ -304,7 +296,7 @@ public class Circle extends Vec2d {
 	public double bitToAngle(int bit) {
 		return bit / 16.0 * Math.PI;
 	}
-
+	
 	/**
 	* Gets the next free angle for placing a new neighboring circle.
 	* 
@@ -323,7 +315,7 @@ public class Circle extends Vec2d {
 	public boolean hasFreeAngles() {
 		return arc != 0xFFFFFFFF;
 	}
-
+	
 	/**
 	* Measure how deeply a circle penetrates another circle.
 	* 
@@ -334,7 +326,7 @@ public class Circle extends Vec2d {
 		Vec2d delta = new Vec2d(x - o.x, z - o.z);
 		return delta.len() - (this.radius + o.radius + 1);
 	}
-
+	
 	/**
 	* Returns true if the circles center is inside the center chunk in a 3x3 chunk grid 
 	* 
@@ -345,10 +337,10 @@ public class Circle extends Vec2d {
 	public boolean isInCenterChunk(int chunkXStart, int chunkZStart) {
 		return x >= chunkXStart && z >= chunkZStart && x < chunkXStart + 16 && z < chunkZStart + 16;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Circle x" + x + ", z" + z + ", r" + radius + ", " + (real ? "T" : "F") + ", " + Integer.toHexString(arc);
 	}
-
+	
 }

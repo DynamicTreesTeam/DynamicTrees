@@ -11,7 +11,7 @@ import net.minecraft.world.World;
  *
  */
 public class SeasonProviderBasic implements ISeasonProvider {
-
+	
 	protected int currentDay = 0;
 	protected int day;//24000 ticks(20 ticks/second)
 	protected int month;//8 days
@@ -26,10 +26,10 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	int monthsPerYear = 8;//Set to 8 because it's a nice power of two number that makes each season 2 months long
 	int daysPerMonth = 8;//Set to 8 because WorldProvider.getMoonPhase returns 0-7.  Therefore a Minecraft month is 8 days. Deal with it.
 	final int ticksPerDay = 24000;//This is pretty well known and standard.
-
+	
 	public SeasonProviderBasic() {
 	}
-
+	
 	public SeasonProviderBasic(int monthsPerYear, int daysPerMonth) {
 		this.monthsPerYear = monthsPerYear;
 		this.daysPerMonth = daysPerMonth;
@@ -49,7 +49,7 @@ public class SeasonProviderBasic implements ISeasonProvider {
 		}
 		
 	}
-
+	
 	public void notifyPlayersOfDate(World world) {
 		
 		String dayString = String.valueOf(day + 1) + numeralSuffix[(day + 1) % 10]; 
@@ -70,17 +70,17 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	public float getSeasonValue() {
 		return season;
 	}
-
+	
 	public int getDayOfMonth() {
 		return day;
 	}
-
+	
 	public int getMonth() {
 		return month;
 	}
-
+	
 	public long getYear() {
 		return year;
 	}
-
+	
 }

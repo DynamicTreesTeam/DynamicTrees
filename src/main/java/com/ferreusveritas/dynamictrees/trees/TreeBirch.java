@@ -19,26 +19,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeBirch extends DynamicTree {
-
+	
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
-
+		
 		//Birch are tall, skinny, fast growing trees
 		setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
-
+		
 		setRetries(1);//Special fast growing
-
+		
 		envFactor(Type.COLD, 0.75f);
 		envFactor(Type.HOT, 0.50f);
 		envFactor(Type.DRY, 0.50f);
 		envFactor(Type.FOREST, 1.05f);
 	}
-
+	
 	@Override
 	public boolean isBiomePerfect(Biome biome) {
 		return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
 	};
-
+	
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
@@ -48,13 +48,14 @@ public class TreeBirch extends DynamicTree {
 			}
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return ColorizerFoliage.getFoliageColorBirch();
 	}
+	
 }

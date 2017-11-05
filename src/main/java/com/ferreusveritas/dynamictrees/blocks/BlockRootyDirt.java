@@ -383,7 +383,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F).setRBGColorF(0.6f, 0.6f, 0.6f);
 		
 		return true;
-    }
+	}
 
 
 }
