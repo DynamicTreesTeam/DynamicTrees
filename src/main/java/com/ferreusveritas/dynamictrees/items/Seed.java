@@ -30,15 +30,15 @@ public class Seed extends Item {
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
-
+	
 	public void setTree(DynamicTree tree, ItemStack seedStack) {
 		this.tree = tree;
 	}
-
+	
 	public DynamicTree getTree(ItemStack seedStack) {
 		return tree;
 	}
-
+	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
@@ -90,7 +90,15 @@ public class Seed extends Item {
 
 		return EnumActionResult.FAIL;
 	}
-
+	
+	/**
+	 * Checks surroundings and places a dynamic sapling block.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @param seedStack
+	 * @return
+	 */
 	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
 			world.setBlockState(pos, getTree(seedStack).getDynamicSapling());
@@ -99,8 +107,5 @@ public class Seed extends Item {
 
 		return false;
 	}
-
-	public boolean isAcceptableSoil(IBlockState soilBlockState, ItemStack seedStack) {
-		return getTree(seedStack).isAcceptableSoil(soilBlockState);
-	}
+	
 }

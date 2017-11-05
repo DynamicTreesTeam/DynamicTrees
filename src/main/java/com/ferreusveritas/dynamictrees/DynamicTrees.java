@@ -6,10 +6,12 @@ import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
@@ -104,10 +106,14 @@ public class DynamicTrees {
 
 		ConfigHandler.preInit(event);
 
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			treeGenerator = new TreeGenerator();
+		}
+		
 		//Dirt
 		blockRootyDirt = new BlockRootyDirt();
-		blockDynamicSapling = new BlockDynamicSapling("sapling");
-
+		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");
+		
 		//Trees
 		baseTrees.add(new TreeOak());
 		baseTrees.add(new TreeSpruce());
@@ -115,18 +121,16 @@ public class DynamicTrees {
 		baseTrees.add(new TreeJungle());
 		baseTrees.add(new TreeAcacia());
 		baseTrees.add(new TreeDarkOak());
-
+		
 		//Register Trees
-		for(DynamicTree tree: baseTrees) {
-			TreeRegistry.registerTree(tree);
-		}
-
+		TreeRegistry.registerTrees(baseTrees);
+		
 		//Potions
 		dendroPotion = new DendroPotion();
 		
 		//Dirt Bucket
 		dirtBucket = new DirtBucket();
-
+		
 		//Bonsai Pot
 		blockBonsaiPot = new BlockBonsaiPot();
 		
@@ -135,17 +139,17 @@ public class DynamicTrees {
 		
 		//Creative Mode Stuff
 		treeStaff = new Staff();
-
+		
 		//Computercraft Creative Mode Stuff
 		ccproxy = CCProxyBase.hasComputerCraft() ? new CCProxyActive() : new CCProxyBase();
 		ccproxy.createBlocks();
 		
 		//Set the creative tabs icon
 		dynamicTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
-
+		
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
-
+		
 		proxy.preInit();
 		
 		proxy.registerEventHandlers();
@@ -153,8 +157,12 @@ public class DynamicTrees {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		//Do your mod setup. Build whatever data structures you care about.
-		//Register recipes.
+		//Do your mod setup. Build whatever data structures you care about. Register recipes.
+		
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			treeGenerator.biomeTreeHandler.init();
+		}
+
 		RegistrationHandler.registerRecipes();
 
 		proxy.init();
@@ -218,7 +226,7 @@ public class DynamicTrees {
 				tree.registerBlocks();
 			}
 
-			for(BlockGrowingLeaves leavesBlock: TreeHelper.leavesArray.values()) {
+			for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(MODID).values()) {
 				GameRegistry.register(leavesBlock);
 			}
 
@@ -234,8 +242,8 @@ public class DynamicTrees {
 
 			GameRegistry.register(dendroPotion);
 			GameRegistry.register(dirtBucket);
-
-			for(BlockGrowingLeaves leavesBlock: TreeHelper.leavesArray.values()) {
+			
+			for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(MODID).values()) {
 				GameRegistry.register(new ItemBlock(leavesBlock).setRegistryName(leavesBlock.getRegistryName()));
 			}
 

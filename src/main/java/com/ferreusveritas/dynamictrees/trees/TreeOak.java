@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -17,16 +18,17 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeOak extends DynamicTree {
-
+	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
-
+		
 		//Oak trees are about as average as you can get
 		setBasicGrowingParameters(0.3f, 12.0f, getUpProbability(), getLowestBranchHeight(), 0.8f);
-
+		
 		envFactor(Type.COLD, 0.75f);
 		envFactor(Type.HOT, 0.50f);
 		envFactor(Type.DRY, 0.50f);
@@ -34,12 +36,12 @@ public class TreeOak extends DynamicTree {
 		
 		registerBottomListener(new BottomListenerPodzol());
 	}
-
+	
 	@Override
 	public boolean isBiomePerfect(Biome biome) {
 		return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
 	}
-
+	
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
@@ -49,10 +51,10 @@ public class TreeOak extends DynamicTree {
 			}
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
 	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 		Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
@@ -61,5 +63,21 @@ public class TreeOak extends DynamicTree {
 		}
 		return drops;
 	}
+	
+	@Override
+	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
 
+		if(soilBlockState.getBlock() == Blocks.WATER) {
+			Biome biome = blockAccess.getBiome(pos);
+			if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+				BlockPos down = pos.down();
+				if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
+					return true;
+				}
+			}
+		}
+		
+		return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
+	}
+	
 }

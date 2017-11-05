@@ -48,8 +48,8 @@ public class NodeDestroyer implements INodeInspector {
 				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
 						world.setBlockToAir(leavesPos);
-						int qty = tree.getGrowingLeaves().quantitySeedDropped(world.rand);
-						if(qty > 0){
+						int qty = tree.getDynamicLeaves().quantitySeedDropped(world.rand);
+						if(qty > 0) {
 							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
 							world.spawnEntity(itemEntity);
 						}

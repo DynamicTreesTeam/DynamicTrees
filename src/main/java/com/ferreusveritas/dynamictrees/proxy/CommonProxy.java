@@ -2,12 +2,12 @@ package com.ferreusveritas.dynamictrees.proxy;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,8 +45,7 @@ public class CommonProxy {
 		}
 		
 		//Conveniently accessible disaster(Optional World Generation)
-		if(ConfigHandler.worldGen) {
-			DynamicTrees.treeGenerator = new TreeGenerator();
+		if(WorldGenRegistry.isWorldGenEnabled()) {
 			GameRegistry.registerWorldGenerator(DynamicTrees.treeGenerator, 20);
 			MinecraftForge.TERRAIN_GEN_BUS.register(new DecorateEventHandler());
 			MinecraftForge.EVENT_BUS.register(new CircleEventHandler());

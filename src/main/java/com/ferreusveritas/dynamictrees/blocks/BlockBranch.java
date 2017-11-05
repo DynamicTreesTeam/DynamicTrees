@@ -250,7 +250,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 	@Override
 	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getGrowingLeaves(), leavesTree.getGrowingLeavesSub());
+		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getDynamicLeaves(), leavesTree.getDynamicLeavesSub());
 	}
 
 	@Override
@@ -277,7 +277,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		BlockGrowingLeaves leaves = getTree().getGrowingLeaves();
+		BlockDynamicLeaves leaves = getTree().getDynamicLeaves();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeaves(world, getTree(), pos, 0);
@@ -409,7 +409,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
-					BlockPos deltaPos = new BlockPos(pos).add(dir.getDirectionVec());
+					BlockPos deltaPos = pos.offset(dir);
 
 					signal = TreeHelper.getSafeTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
 
@@ -430,68 +430,135 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	// Destroys all branches recursively not facing the branching direction with the root node
-	public void destroyTreeFromNode(World world, BlockPos pos, float fortuneFactor) {
+	public int destroyTreeFromNode(World world, BlockPos pos) {//, float fortuneFactor) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
 		// Analyze only part of the tree beyond the break point and calculate it's volume
-		dropWood(world, pos, (int) (volumeSum.getVolume() * fortuneFactor));// Drop an amount of wood calculated from the body of the tree network
+		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
+		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 
-	public void destroyEntireTree(World world, BlockPos pos) {
+	public int destroyEntireTree(World world, BlockPos pos) {
 		NodeNetVolume volumeSum = new NodeNetVolume();
+		// Analyze the entire tree and calculate it's volume
 		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
-		dropWood(world, pos, volumeSum.getVolume());// Drop an amount of wood calculated from the body of the tree network
+		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 
 	///////////////////////////////////////////
-	// DROPS
+	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 
-	public void dropWood(World world, BlockPos pos, int volume) {
-		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
-			volume *= ConfigHandler.treeHarvestMultiplier;// For cheaters.. you know who you are.
-			DynamicTree tree = getTree();
-			ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
-			ItemStack stickStack = tree.getStick((volume % 4096) / 512);// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
-			spawnAsEntity(world, pos, logStack);// Drop vanilla logs or whatever
-			spawnAsEntity(world, pos, stickStack);// Give him the stick!
+	public List<ItemStack> getWoodDrops(World world, BlockPos pos, int volume) {
+		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
+
+		volume *= ConfigHandler.treeHarvestMultiplier;// For cheaters.. you know who you are.
+		DynamicTree tree = getTree();
+		ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
+		ItemStack stickStack = tree.getStick((volume % 4096) / 512);// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
+		ret.add(logStack);// Drop vanilla logs or whatever
+		ret.add(stickStack);// Give him the stick!
+		return ret;
+	}
+	
+	/*
+	1.10.2 Simplified Block Harvesting Logic Flow(for no silk touch)
+
+	tryHarvestBlock {
+		canHarvest = canHarvestBlock() <- (ForgeHooks.canHarvestBlock occurs in here)
+		removed = removeBlock(canHarvest) {
+			removedByPlayer() {
+				onBlockHarvested()
+				world.setBlockState() <- block is set to air here
+			}
+		}
+		
+		if (removed) harvestBlock() {
+			fortune = getEnchantmentLevel(FORTUNE)
+			dropBlockAsItem(fortune) {
+				dropBlockAsItemWithChance(fortune) {
+					items = getDrops(fortune) {
+						getItemDropped(fortune) {
+							Item.getItemFromBlock(this) <- (Standard block behavior)
+						}
+					}
+					ForgeEventFactory.fireBlockHarvesting(items) <- (BlockEvent.HarvestDropsEvent)
+					(for all items) -> spawnAsEntity(item)
+				}
+			}
 		}
 	}
+	*/
+	
+	// We override the standard behaviour because we need to preserve the tree network structure to calculate
+	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
+	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean canHarvest) {
+		ItemStack heldItem = player.getHeldItemMainhand();
+		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
+		float fortuneFactor = 1.0f + 0.25f * fortune;
+		int woodVolume = destroyTreeFromNode(world, pos);
+		List<ItemStack> items = getWoodDrops(world, pos, (int)(woodVolume * fortuneFactor));
+		
+		//For An-Sar's PrimalCore mod :)
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, harvesters.get());
+		
+		for (ItemStack item : items) {
+			if (world.rand.nextFloat() <= chance) {
+				spawnAsEntity(world, pos, item);
+			}
+		}
+		
+		return true;// Function returns true if Block was destroyed
+	}
 
+	// Super member also does nothing
 	@Override
 	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
 	}
-
+	
+	// Since we already created drops in removedByPlayer() we must disable this.
+	// Also we should definitely not return BlockBranch itemBlocks and here's why:
+	//	* Players can use these blocks to make branch network loops that will grow artificially large in a short time.
+	//	* Players can create invalid networks with more than one root node.
+	//  * Players can exploit fortune enchanted tools by building a tree with parts and cutting it down for more wood.
+	//	* Players can attach the wrong kind of branch to a tree leading to undefined behavior.
+	// If a player in creative wants to do these things then that's their prerogative. 
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
 	}
 
+	// Similar to above.. We already created drops in removedByPlayer() so no quantity should be expressed
 	@Override
 	public int quantityDropped(Random random) {
 		return 0;
 	}
 
+	// We do not allow silk harvest for all the reasons listed in getItemDropped
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-		ItemStack heldItem = player.getHeldItemMainhand();
-		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
-		destroyTreeFromNode(world, pos, 1.0f + 0.25f * fortune);
-		return true;// Block was destroyed
+	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		return false;
 	}
-
+	
+	// We do not allow the tree branches to be pushed by a piston for reasons that should be obvious if you
+	// are paying attention.
 	@Override
 	public EnumPushReaction getMobilityFlag(IBlockState state) {
 		return EnumPushReaction.BLOCK;
 	}
-
+	
 	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-		destroyTreeFromNode(world, pos, 1.0f);
+		int woodVolume = destroyTreeFromNode(world, pos);
+		for (ItemStack item : getWoodDrops(world, pos, woodVolume)) {
+			spawnAsEntity(world, pos, item);
+		}
 	}
-
+	
+	
 	///////////////////////////////////////////
 	// IRRELEVANT
 	///////////////////////////////////////////

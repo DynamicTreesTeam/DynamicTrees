@@ -7,12 +7,18 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.Vec2d;
 
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
+/**
+ * Manages and creates all the Poisson discs in the world.
+ * 
+ * @author ferreusveritas
+ */
 public class ChunkCircleManager {
 
 	IRadiusCoordinator radiusCoordinator;
@@ -23,7 +29,17 @@ public class ChunkCircleManager {
 		radiusCoordinator = radCoord;
 	}
 
-	public ArrayList<Circle> getCircles(World world, Random random, int chunkX, int chunkZ) {
+	/**
+	 * Function is synchronized to prevent chunk generation from grabbing circles while other circles are being
+	 * generated in the same area.  If this is not in place then circles will be generated over each other.
+	 * 
+	 * @param world
+	 * @param random
+	 * @param chunkX
+	 * @param chunkZ
+	 * @return
+	 */
+	public synchronized ArrayList<Circle> getCircles(World world, Random random, int chunkX, int chunkZ) {
 		ChunkCircleSet cSet = getChunkCircleSet(chunkX, chunkZ);
 		if(cSet.generated) {
 			return getChunkCircles(chunkX, chunkZ);
@@ -48,30 +64,30 @@ public class ChunkCircleManager {
 		return radiusCoordinator.getRadiusAtCoords(world, x, z);
 	}
 	
-	private ArrayList<Circle> generateCircles(World world, Random random, int chunkX, int chunkZ) {
-
+	public ArrayList<Circle> generateCircles(World world, Random random, int chunkX, int chunkZ) {
+		
 		ArrayList<Circle> circles = new ArrayList<Circle>(64);//64 is above the typical range to expect for 9 chunks
 		ArrayList<Circle> unsolvedCircles = new ArrayList<Circle>(64);
 
-		//Collect circles
-		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-			getChunkCircles(circles, chunkX + dir.getFrontOffsetX(), chunkZ + dir.getFrontOffsetZ());
+		//Collect already solved circles from surrounding chunks
+		for(Vec3i dir: CoordUtils.surround) {
+			getChunkCircles(circles, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
-
+		
 		int chunkXStart = chunkX << 4;
 		int chunkZStart = chunkZ << 4;
 
 		for(Circle c: circles) {
 			c.edgeMask(chunkXStart, chunkZStart);//Do edge masking
 		}
-
+		
 		//Mask out circles against one another
 		for(int i = 0; i < circles.size() - 1; i++) {
 			for(int j = i + 1; j < circles.size(); j++) {
 				CircleHelper.maskCircles(circles.get(i), circles.get(j));
 			}
 		}
-
+		
 		//Handle no existing circles by creating a single circle to build off of
 		if(circles.size() == 0) {
 			int x = chunkXStart + random.nextInt(16);
@@ -95,7 +111,7 @@ public class ChunkCircleManager {
 
 			Circle slave = CircleHelper.findSecondCircle(master, radius);//Create a second circle tangential to the master circle.
 			Vec2d slavePos = new Vec2d(slave);//Cache slave position
-
+			
 			//Mask off the master so it won't happen again.
 			master.arc |= 1 << master.getFreeBit();//Clear specific arc bit for good measure
 			CircleHelper.maskCircles(master, slave, true);
@@ -104,7 +120,7 @@ public class ChunkCircleManager {
 			int i = 0;
 			TreeMap<Integer, Circle> intersecting = new TreeMap<Integer, Circle>();
 			for(Circle c: circles) {
-				if(slave.doCirclesIntersect(c)) {
+				if(slave.doCirclesIntersectPadding(c)) {
 					int depth = 16 + (int)c.circlePenetration(slave);
 					intersecting.put(depth << 8 | i++, c);
 				}
@@ -164,33 +180,34 @@ public class ChunkCircleManager {
 				CircleDebug.outputCirclesToPng(circles, chunkX, chunkZ, "");
 				break;//Something went terribly wrong and we shouldn't hang the system for it.
 			}
+
 		}
 		
 		//Add circles to circle set
 		ChunkCircleSet cSet = getChunkCircleSet(chunkX, chunkZ);
 		cSet.generated = true;
-		
+
 		for(Circle c: circles) {
 			if(c.isInCenterChunk(chunkXStart, chunkZStart)) {
 				cSet.addCircle(c);
 			}
 		}
 		circles.clear();
-
+		
 		return cSet.getCircles(circles, chunkX, chunkZ);
 	}
 
 	private ChunkCircleSet getChunkCircleSet(int chunkX, int chunkZ) {
 		Vec2d key = new Vec2d(chunkX, chunkZ);
 		ChunkCircleSet cSet;
-
+		
 		if(chunkCircles.containsKey(key)) {
 			cSet = chunkCircles.get(key);
 		} else {
 			cSet = new ChunkCircleSet();
 			chunkCircles.put(key, cSet);
 		}
-
+		
 		return cSet;
 	}
 
