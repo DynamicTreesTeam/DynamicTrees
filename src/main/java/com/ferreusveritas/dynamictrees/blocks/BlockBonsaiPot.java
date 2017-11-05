@@ -45,7 +45,7 @@ public class BlockBonsaiPot extends Block {
 		this(name);
 	}
 	
-	public BlockBonsaiPot(String name) {		
+	public BlockBonsaiPot(String name) {
 		super(Blocks.FLOWER_POT.getMaterial(Blocks.FLOWER_POT.getDefaultState()));
 		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
 		setUnlocalizedName(name);

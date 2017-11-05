@@ -1,57 +1,69 @@
 package com.ferreusveritas.dynamictrees.api;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TreeHelper {
 
-	public static HashMap<String, BlockGrowingLeaves> leavesArray = new HashMap<String, BlockGrowingLeaves>();
-
+	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
+	
 	public static final ITreePart nullTreePart = new NullTreePart();
 
 	/**
-	 * A convenience function for packing 4 growing leaves blocks into one Minecraft block using metadata.
+	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
 	 * 
 	 * @param modid
 	 * @param seq
 	 * @return
 	 */
-	public static BlockGrowingLeaves getLeavesBlockForSequence(String modid, int seq) {
-		int leavesBlockNum = seq / 4;
-		String key = modid + ":" + leavesBlockNum;
+	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
 
-		if(leavesArray.containsKey(key)) {
-			return leavesArray.get(key);
+		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
+		int leavesBlockNum = seq / 4;
+		int key = leavesBlockNum;		
+		
+		if(leavesMap.containsKey(key)) {
+			return leavesMap.get(key);
 		} else {
-			BlockGrowingLeaves leavesBlock = new BlockGrowingLeaves();
+			BlockDynamicLeaves leavesBlock = new BlockDynamicLeaves();
 			leavesBlock.setRegistryName(modid, "leaves" + leavesBlockNum);
 			leavesBlock.setUnlocalizedName("leaves" + leavesBlockNum);
-			leavesArray.put(key, leavesBlock);
+			leavesMap.put(key, leavesBlock);
 			return leavesBlock;
 		}
 	}
-
-	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
-		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getFrontOffsetX(), (pos.getZ() >> 4) + dir.getFrontOffsetZ()) == null ){
-				return false;
-			}
-		}
+	
+	/**
+	 * 	Get the map of leaves from for the appropriate modid.
+	 *  If the map does not exist then one is created.
+	 * 
+	 * @param modid The ModId of the mod accessing this
+	 * @return The map of {@link BlockDynamicLeaves}
+	 */
+	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
+		HashMap<Integer, BlockDynamicLeaves> leavesMap;
 		
-		return true;
+		if(modLeavesArray.containsKey(modid)) {
+			leavesMap = modLeavesArray.get(modid);
+		} else {
+			leavesMap = new HashMap<Integer, BlockDynamicLeaves>();
+			modLeavesArray.put(modid, leavesMap);
+		}
+
+		return leavesMap;
 	}
 	
 	/**
@@ -66,7 +78,7 @@ public class TreeHelper {
 		if(dirtCandidate instanceof BlockRootyDirt) {
 			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
 			dirt.grow(world, pos, world.rand);
-			ageVolume(world, pos);
+			ageVolume(world, pos, 1);
 		}
 	}
 	
@@ -76,9 +88,37 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos The position of the bottom most block of a trees trunk
 	 */
-	public static void ageVolume(World world, BlockPos pos) {
-		ageVolume(world, pos, 8, 32, null);
+	public static void ageVolume(World world, BlockPos pos, int interations) {
+		ageVolume(world, pos, 8, 32, null, interations);
 	}
+	
+	private static class AgeQueueEntry {
+		private IAgeable ageable;
+		private BlockPos pos;
+		private IBlockState state;
+		
+		public AgeQueueEntry(IAgeable ageable, BlockPos pos, IBlockState state) {
+			set(ageable, pos, state);
+		}
+		
+		public void set(IAgeable ageable, BlockPos pos, IBlockState state) {
+			this.ageable = ageable;
+			this.pos = pos;
+			this.state = state;
+		}
+		
+		public void set(AgeQueueEntry other) {
+			this.ageable = other.ageable;
+			this.pos = other.pos;
+			this.state = other.state;
+		}
+		
+		public boolean age(World world) {
+			return ageable.age(world, pos, state, world.rand, true);			
+		}
+	}
+	
+	private static ArrayList<AgeQueueEntry> ageQueue = new ArrayList<AgeQueueEntry>();
 	
 	/**
 	 * Pulses an entire cuboid volume of blocks each with an age signal.
@@ -89,16 +129,44 @@ public class TreeHelper {
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
 	 */
-	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap){
+	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
 			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
-		for(BlockPos iPos: iterable) {
-			IBlockState blockState = world.getBlockState(iPos);
-			Block block = blockState.getBlock();
-			if(block instanceof IAgeable) {
-				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+		if(iterations == 1) {//Just do an age over the entire volume
+			for(BlockPos iPos: iterable) {
+				IBlockState blockState = world.getBlockState(iPos);
+				Block block = blockState.getBlock();
+				if(block instanceof IAgeable) {
+					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				}
+			}
+		}
+		else {
+			int count = 0;
+			
+			for(BlockPos iPos: iterable) {
+				IBlockState blockState = world.getBlockState(iPos);
+				Block block = blockState.getBlock();
+				if(block instanceof IAgeable) {
+					if(count >= ageQueue.size()) {
+						ageQueue.add(new AgeQueueEntry((IAgeable) block, iPos, blockState));
+					} else {
+						ageQueue.get(count).set((IAgeable)block, iPos, blockState);
+					}
+					count++;
+				}
+			}
+			
+			for(int i = 0; i < iterations; i++) {
+				for(int b = 0; b < count; b++) {
+					if(ageQueue.get(b).age(world)) {//True if the block was destroyed as a result of aging
+						ageQueue.get(b).set(ageQueue.get(count-1));//Since order is unimportant we'll just move the last list item to this spot
+						count--;//reduce the number of items in the list by one
+						b--;//Process this spot again.
+					}
+				}
 			}
 		}
 	}
@@ -162,7 +230,7 @@ public class TreeHelper {
 	//Leaves
 
 	public static boolean isLeaves(Block block) {
-		return block instanceof BlockGrowingLeaves;
+		return block instanceof BlockDynamicLeaves;
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {

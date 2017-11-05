@@ -10,6 +10,7 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITickable {
 
@@ -22,7 +23,9 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		killTree,
 		getSoilLife,
 		setSoilLife,
-		createStaff
+		createStaff,
+		testPoisson,
+		testPoisson2
 	}
 	
 	private class CachedCommand {
@@ -75,6 +78,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 							case setCode: dendroCoil.setCode(world, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
 							case setSoilLife: dendroCoil.setSoilLife(world, pos, ((Double)command.arguments[0]).intValue()); break;
 							case createStaff: dendroCoil.createStaff(world, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case testPoisson: dendroCoil.testPoisson(world, pos, ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
+							case testPoisson2: dendroCoil.testPoisson2(world, pos, ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2], ((Double)command.arguments[3]).intValue()); break;
 							default: break;
 						}
 					}
@@ -156,6 +161,27 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 				case growPulse:
 				case killTree:
 					cacheCommand(method, arguments);
+					break;
+				case testPoisson:
+					if(arguments.length >= 3 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>");
+					}
+					break;
+				case testPoisson2:
+					if(arguments.length >= 4 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double &&
+						arguments[3] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>, radius3<Number>");
+					}
 					break;
 				default:
 					break;

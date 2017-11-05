@@ -2,10 +2,8 @@
 // TODO (RoadMap)
 ////////////////////////////////////////////////////////////////
 
-[ ]Fix tree spacing
-[ ]Fix swamp worldgen(oaks too sparse, no vines)
-[ ]Fix jungle worldgen(forest floor is bare, vines don't spawn)
-[ ]Fix spruce trees for worldgen(trees are anemic)
+[ ]Vines need to spawn in jungle and swamp
+[ ]Fix jungle worldgen(forest floor is bare)
 [ ]API
 [ ]Seasons
 [ ]Thick trees

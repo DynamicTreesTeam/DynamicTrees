@@ -161,6 +161,13 @@ public class SimpleBitmap {
 		return true;
 	}
 
+	/**
+	 * Set a pixel
+	 * 
+	 * @param x 
+	 * @param y
+	 * @param mode The value to set 0 or 1
+	 */
 	public void setPixel(int x, int y, int mode) {
 		if(x >= 0 && y >= 0 && x < w && y < h) {
 			mode &= 1;

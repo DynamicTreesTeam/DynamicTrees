@@ -1,20 +1,14 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -30,12 +24,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicSapling extends Block {
-
-	protected Map<Integer, DynamicTree> trees = new HashMap<Integer, DynamicTree>();
+	
+	public DynamicTree tree;
 	
 	public BlockDynamicSapling(String name) {
 		super(Material.PLANTS);
-		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
+		setDefaultState(this.blockState.getBaseState());
 		setSoundType(SoundType.PLANT);
 		setTickRandomly(true);
 		setUnlocalizedName(name);
@@ -62,7 +56,7 @@ public class BlockDynamicSapling extends Block {
 		}
 
 		//Air above and acceptable soil below
-		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()));
+		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
 	}
 
 	public boolean canBlockStay(IBlockAccess world, BlockPos pos, IBlockState state) {
@@ -73,9 +67,9 @@ public class BlockDynamicSapling extends Block {
 		DynamicTree tree = getTree(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world.getBlockState(pos.down()))) {
-				world.setBlockState(pos, tree.getGrowingBranch().getDefaultState());//set to a single branch with 1 radius
-				world.setBlockState(pos.up(), tree.getGrowingLeavesState());
+			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch with 1 radius
+				world.setBlockState(pos.up(), tree.getDynamicLeavesState());
 				world.setBlockState(pos.down(), tree.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt
 			}
 		} else {
@@ -88,18 +82,17 @@ public class BlockDynamicSapling extends Block {
 	///////////////////////////////////////////
 
 	public DynamicTree getTree(IBlockState state) {
-		if(state.getBlock() == this) {
-			return trees.get(state.getValue(BlockSapling.TYPE).ordinal());
-		}
-    	return trees.get(0);
+		return this.tree;
 	}
 
 	public BlockDynamicSapling setTree(IBlockState state, DynamicTree tree) {
-		if(state.getBlock() == this) {
-			trees.put(state.getValue(BlockSapling.TYPE).ordinal(), tree);
-		}
+		this.tree = tree;
 		return this;
 	}
+
+	///////////////////////////////////////////
+	// DROPS
+	///////////////////////////////////////////
 
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
@@ -107,11 +100,7 @@ public class BlockDynamicSapling extends Block {
 			dropBlock(world, getTree(state), state, pos);
 		}
 	}
-
-	///////////////////////////////////////////
-	// DROPS
-	///////////////////////////////////////////
-
+	
 	private void dropBlock(World world, DynamicTree tree, IBlockState state, BlockPos pos) {
 		world.setBlockToAir(pos);
 		dropBlockAsItem(world, pos, state, 0);
@@ -125,40 +114,15 @@ public class BlockDynamicSapling extends Block {
 	}
 
 	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getTree(state).getSeedStack();
-	}
-
-	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
 	}
 
-	///////////////////////////////////////////
-	// BLOCKSTATES
-	///////////////////////////////////////////
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		return getTree(state).getSeedStack();
+	}
 	
-    /**
-     * Convert the given metadata into a BlockState for this Block
-     */
-    @Override
-	public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.byMetadata(meta & 0xF));
-    }
-
-    /**
-     * Convert the BlockState into the correct metadata value
-     */
-    @Override
-	public int getMetaFromState(IBlockState state) {
-        return state.getValue(BlockSapling.TYPE).getMetadata();
-    }
-
-    @Override
-	protected BlockStateContainer createBlockState() {
-    	return new BlockStateContainer(this, new IProperty[] {BlockSapling.TYPE});
-    }
-    
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////

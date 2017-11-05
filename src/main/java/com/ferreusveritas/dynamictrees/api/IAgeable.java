@@ -8,6 +8,15 @@ import net.minecraft.world.World;
 
 public interface IAgeable {
 
-	public void age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast);
+	/**
+	 * 
+	 * @param world
+	 * @param pos
+	 * @param state
+	 * @param rand
+	 * @param fast
+	 * @return true if block was destroyed after the ageing, false otherwise
+	 */
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast);
 	
 }

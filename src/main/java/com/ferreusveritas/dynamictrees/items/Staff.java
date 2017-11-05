@@ -84,8 +84,8 @@ public class Staff extends Item {
 
 		//Create a tree from right clicking on soil
 		DynamicTree tree = getTree(heldStack);
-		if(tree != null && tree.isAcceptableSoil(clickedBlock)) {
-			new JoCode(getCode(heldStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
+		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
+			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
 			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
@@ -201,7 +201,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		DynamicTree tree = getTree(stack);
-		tooltip.add("Tree: " + tree != null ? tree.getName() : "none");
+		tooltip.add("Tree: " + ((tree != null) ? tree.getFullName() : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 
