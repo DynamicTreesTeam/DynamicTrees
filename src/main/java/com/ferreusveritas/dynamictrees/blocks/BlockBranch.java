@@ -6,6 +6,8 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
@@ -172,7 +174,20 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 				return false;// We've proven that this branch is reinforced so there is no need to continue
 			}
 		}
-		return getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+		
+		boolean didRot = getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+
+		if(fast && didRot) {// Speedily rot back dead branches if this block rotted
+			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
+				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
+				IBlockState state = world.getBlockState(neighPos);
+				if(state.getBlock() == this) { // Only check blocks logs that are the same as this one
+					checkForRot(world, neighPos, getRadius(state), rand, true);
+				}
+			}
+		}
+		
+		return didRot;
 	}
 
 	///////////////////////////////////////////
@@ -245,16 +260,23 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			return true;
 		}
 	}
-
+	
+	
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
 
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getDynamicLeaves(), leavesTree.getDynamicLeavesSub());
-	}
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+		DynamicTree thisTree = getTree();
 
+		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
+			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
+		} else {
+			return Cells.nullCell;
+		}
+	}
+	
 	@Override
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return getRadius(blockAccess.getBlockState(pos));

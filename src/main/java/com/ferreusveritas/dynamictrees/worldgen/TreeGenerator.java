@@ -56,6 +56,7 @@ public class TreeGenerator implements IWorldGenerator {
 		biomeTreeHandler = new BiomeTreeHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
+		random = new RandomXOR();
 	}
 	
 	public void onWorldUnload() {

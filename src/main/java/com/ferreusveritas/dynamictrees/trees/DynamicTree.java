@@ -12,11 +12,13 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesAutomata;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -72,7 +74,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 * 
 * @author ferreusveritas
 */
-public class DynamicTree implements ILeavesAutomata {
+public class DynamicTree {
 	
 	/** Simple name of the tree e.g. "oak" */
 	private String name;
@@ -124,16 +126,14 @@ public class DynamicTree implements ILeavesAutomata {
 	private ArrayList<IBottomListener> bottomSpecials = new ArrayList<IBottomListener>(4);
 	/** The default hydration level of a newly created leaf block [default = 4]**/
 	protected byte defaultHydration = 4;
-	/** Automata input data for hydration solver [default = Deciduous]*/
-	private short hydroSolution[] = hydroSolverDeciduous;
-	/** Automata input data for cell solver [default = Deciduous]*/
-	private short cellSolution[] = cellSolverDeciduous;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	private IBlockState primitiveLeaves;
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
 	private ItemStack primitiveLeavesItemStack;
 	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
 	private SimpleVoxmap leafCluster;
+	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
+	private ICellSolver cellSolver = Cells.deciduousSolver;
 	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
@@ -561,6 +561,14 @@ public class DynamicTree implements ILeavesAutomata {
 		return tapering;
 	}
 
+	///////////////////////////////////////////
+	//BRANCHES
+	///////////////////////////////////////////
+
+	
+	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
+	}
 	
 	///////////////////////////////////////////
 	//DIRT
@@ -649,22 +657,14 @@ public class DynamicTree implements ILeavesAutomata {
 		return defaultHydration;
 	}
 	
-	public void setHydroSolution(short[] solution) {
-		hydroSolution = solution;
+	public void setCellSolver(ICellSolver solver) {
+		cellSolver = solver;
 	}
 	
-	public short[] getHydroSolution() {
-		return hydroSolution;
+	public ICellSolver getCellSolver(IBlockAccess blockAccess, BlockPos pos) {
+		return cellSolver;
 	}
-	
-	public void setCellSolution(short[] solution) {
-		cellSolution = solution;
-	}
-	
-	public short[] getCellSolution() {
-		return cellSolution;
-	}
-	
+		
 	public void setLeafCluster(SimpleVoxmap leafCluster) {
 		this.leafCluster = leafCluster;
 	}
@@ -757,6 +757,9 @@ public class DynamicTree implements ILeavesAutomata {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
 	
+	public ICell getCellForLeaves(int hydro) {
+		return Cells.normalCells[hydro];
+	}
 	
 	//////////////////////////////
 	// DROPS HANDLING
@@ -872,10 +875,6 @@ public class DynamicTree implements ILeavesAutomata {
 	// GROWTH
 	///////////////////////////////////////////
 	
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
-		return branch.getRadius(blockAccess, pos) == 1 && this == fromBlock.getTree(fromSub) ? 5 : 0;
-	}
-
 	/**
 	* Selects a new direction for the branch(grow) signal to turn to.
 	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.

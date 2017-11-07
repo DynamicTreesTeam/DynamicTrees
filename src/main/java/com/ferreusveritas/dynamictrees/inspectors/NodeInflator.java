@@ -16,7 +16,7 @@ public class NodeInflator implements INodeInspector {
 
 	private float radius;
 	private BlockPos last;
-
+	
 	SimpleVoxmap leafMap;
 
 	public NodeInflator(SimpleVoxmap leafMap) {
@@ -54,7 +54,7 @@ public class NodeInflator implements INodeInspector {
 						isTwig = false;//on the return journey if the block we just came from is a branch we are obviously not the endpoint(twig)
 						continue;
 					}
-
+					
 					ITreePart treepart = TreeHelper.getTreePart(world, dPos);
 					if(branch.isSameWood(treepart)) {
 						int branchRadius = treepart.getRadius(world, dPos);
@@ -62,7 +62,7 @@ public class NodeInflator implements INodeInspector {
 					}
 				}
 			}
-
+			
 			if(isTwig) {
 				//Handle leaves here
 				leafMap.setVoxel(pos, (byte) 16);//16(bit 5) is code for a twig
@@ -85,6 +85,7 @@ public class NodeInflator implements INodeInspector {
 			}
 
 			last = pos;
+			
 		}
 
 		return false;

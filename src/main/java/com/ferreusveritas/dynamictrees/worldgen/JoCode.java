@@ -131,14 +131,14 @@ public class JoCode {
 
 		//Fix branch thicknesses and map out leaf locations
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
-		if(branch != null){//If a branch exists then the growth was successful
+		if(branch != null) {//If a branch exists then the growth was successful
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
 			NodeInflator integrator = new NodeInflator(leafMap);
 			MapSignal signal = new MapSignal(integrator);
 			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
-
+			
 			smother(leafMap, branch.getTree());
-
+			
 			BlockDynamicLeaves leavesBlock = branch.getTree().getDynamicLeaves();
 			int treeSub = branch.getTree().getDynamicLeavesSub();
 			
@@ -155,7 +155,7 @@ public class JoCode {
 			}
 			
 			//Age volume
-			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 5);
+			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
@@ -239,29 +239,7 @@ public class JoCode {
 				}
 			}
 		}
-
-		//Precompute leaf death from dryness
-		for(int pass = 0; pass < 2; pass++) {
-			for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
-				for(int ix = 0; ix < leafMap.getLenX(); ix++){
-					for(int iy = startY; iy >= 0; iy--) {
-						int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-						if(v > 0 && v <= 4) {
-							int nv[] = new int[16];
-							for(EnumFacing dir: EnumFacing.VALUES) {
-								int h = leafMap.getVoxel(new BlockPos(ix, iy, iz).offset(dir));
-								if(h == 16){
-									h = 5;
-								}
-								nv[h & 15]++;
-							}
-							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte) BlockDynamicLeaves.solveCell(nv, tree.getCellSolution()));//Find center cell's value from neighbors  
-						}
-					}
-				}
-			}
-		}
-
+		
 		leafMap.setCenter(saveCenter);
 	}
 

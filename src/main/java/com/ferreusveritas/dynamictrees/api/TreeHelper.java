@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
@@ -91,35 +90,7 @@ public class TreeHelper {
 	public static void ageVolume(World world, BlockPos pos, int interations) {
 		ageVolume(world, pos, 8, 32, null, interations);
 	}
-	
-	private static class AgeQueueEntry {
-		private IAgeable ageable;
-		private BlockPos pos;
-		private IBlockState state;
 		
-		public AgeQueueEntry(IAgeable ageable, BlockPos pos, IBlockState state) {
-			set(ageable, pos, state);
-		}
-		
-		public void set(IAgeable ageable, BlockPos pos, IBlockState state) {
-			this.ageable = ageable;
-			this.pos = pos;
-			this.state = state;
-		}
-		
-		public void set(AgeQueueEntry other) {
-			this.ageable = other.ageable;
-			this.pos = other.pos;
-			this.state = other.state;
-		}
-		
-		public boolean age(World world) {
-			return ageable.age(world, pos, state, world.rand, true);			
-		}
-	}
-	
-	private static ArrayList<AgeQueueEntry> ageQueue = new ArrayList<AgeQueueEntry>();
-	
 	/**
 	 * Pulses an entire cuboid volume of blocks each with an age signal.
 	 * Warning: CPU intensive and should be used sparingly
@@ -134,7 +105,7 @@ public class TreeHelper {
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
 			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
-		if(iterations == 1) {//Just do an age over the entire volume
+		for(int i = 0; i < iterations; i++) {
 			for(BlockPos iPos: iterable) {
 				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
@@ -143,32 +114,7 @@ public class TreeHelper {
 				}
 			}
 		}
-		else {
-			int count = 0;
-			
-			for(BlockPos iPos: iterable) {
-				IBlockState blockState = world.getBlockState(iPos);
-				Block block = blockState.getBlock();
-				if(block instanceof IAgeable) {
-					if(count >= ageQueue.size()) {
-						ageQueue.add(new AgeQueueEntry((IAgeable) block, iPos, blockState));
-					} else {
-						ageQueue.get(count).set((IAgeable)block, iPos, blockState);
-					}
-					count++;
-				}
-			}
-			
-			for(int i = 0; i < iterations; i++) {
-				for(int b = 0; b < count; b++) {
-					if(ageQueue.get(b).age(world)) {//True if the block was destroyed as a result of aging
-						ageQueue.get(b).set(ageQueue.get(count-1));//Since order is unimportant we'll just move the last list item to this spot
-						count--;//reduce the number of items in the list by one
-						b--;//Process this spot again.
-					}
-				}
-			}
-		}
+		
 	}
 	
 	//Treeparts
