@@ -15,9 +15,9 @@ version = "1.10.2-0.6.5"
 group= "com.ferreusveritas.dynamictrees" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "DynamicTrees"
 
-sourceCompatibility = targetCompatibility = "1.6" // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {
-    sourceCompatibility = targetCompatibility = "1.6"
+    sourceCompatibility = targetCompatibility = "1.8"
 }
 
 minecraft {
