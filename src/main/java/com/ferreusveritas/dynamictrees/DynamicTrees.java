@@ -13,11 +13,10 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
-import com.ferreusveritas.dynamictrees.proxy.CCProxyActive;
-import com.ferreusveritas.dynamictrees.proxy.CCProxyBase;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
@@ -76,7 +75,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 * @version 0.6.5
 *
 */
-@Mod(modid = DynamicTrees.MODID, version=DynamicTrees.VERSION,dependencies="after:computercraft;")
+@Mod(modid = DynamicTrees.MODID, version=DynamicTrees.VERSION,dependencies="after:computercraft;after:quark")
 public class DynamicTrees {
 
 	public static final String MODID = "dynamictrees";
@@ -98,7 +97,9 @@ public class DynamicTrees {
 
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
-	public static CCProxyBase ccproxy;
+	
+	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.compat.ClientProxyCompat", serverSide = "com.ferreusveritas.dynamictrees.compat.CommonProxyCompat")
+	public static CommonProxyCompat compatProxy;
 
 	public static ArrayList<DynamicTree> baseTrees = new ArrayList<DynamicTree>();
 	
@@ -144,14 +145,11 @@ public class DynamicTrees {
 		//Creative Mode Stuff
 		treeStaff = new Staff();
 		
-		//Computercraft Creative Mode Stuff
-		ccproxy = CCProxyBase.hasComputerCraft() ? new CCProxyActive() : new CCProxyBase();
-		ccproxy.createBlocks();
-		
 		//Set the creative tabs icon
 		dynamicTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
 		
 		proxy.preInit();
+		compatProxy.preInit();
 		
 		proxy.registerEventHandlers();
 	}
@@ -163,8 +161,9 @@ public class DynamicTrees {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
 			treeGenerator.biomeTreeHandler.init();
 		}
-
+		
 		proxy.init();
+		compatProxy.init();
 	}
 
 	@EventHandler
@@ -239,7 +238,7 @@ public class DynamicTrees {
 				registry.register(leavesBlock);
 			}
 
-			ccproxy.registerBlocks(registry);
+			compatProxy.registerBlocks(event);
 		}
 		
 		@SubscribeEvent
@@ -267,7 +266,7 @@ public class DynamicTrees {
 			itemBonsaiBlock.setRegistryName(blockBonsaiPot.getRegistryName());
 			registry.register(itemBonsaiBlock);
 			
-			ccproxy.registerItems(registry);
+			compatProxy.registerItems(event);
 		}
 
 		@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -280,6 +279,8 @@ public class DynamicTrees {
 
 			dirtBucket.registerRecipes(registry);			
 			dendroPotion.registerRecipes(registry);
+			
+			compatProxy.registerRecipes(event);
 		}
 		
 	}

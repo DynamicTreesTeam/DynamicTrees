@@ -24,8 +24,8 @@ public class Cells {
 	//General purpose solvers
 	public static final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211});
 	public static final BasicSolver coniferSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0211});
-	public static final BasicSolver acaciaSolver = new Cells.BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
-	public static final BasicSolver darkOakSolver = new Cells.BasicSolver(new short[] {0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
+	public static final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
+	public static final BasicSolver darkOakSolver = new BasicSolver(new short[] {0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
 
 	/**
 	* Cellular automata function that determines the behavior of the center cell from it's neighbors.

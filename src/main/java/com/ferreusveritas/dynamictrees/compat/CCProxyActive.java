@@ -1,10 +1,11 @@
-package com.ferreusveritas.dynamictrees.proxy;
+package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CCProxyActive extends CCProxyBase {
@@ -33,4 +34,7 @@ public class CCProxyActive extends CCProxyBase {
 		registry.register(itemBlock);
 	}
 	
+	@Override
+	public void registerRecipes(IForgeRegistry<IRecipe> registry) {}
+
 }

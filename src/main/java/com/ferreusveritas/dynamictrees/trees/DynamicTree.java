@@ -135,6 +135,7 @@ public class DynamicTree {
 	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
 	private ICellSolver cellSolver = Cells.deciduousSolver;
 	
+	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
 	private Seed seed;
@@ -661,7 +662,7 @@ public class DynamicTree {
 		cellSolver = solver;
 	}
 	
-	public ICellSolver getCellSolver(IBlockAccess blockAccess, BlockPos pos) {
+	public ICellSolver getCellSolver() {
 		return cellSolver;
 	}
 		

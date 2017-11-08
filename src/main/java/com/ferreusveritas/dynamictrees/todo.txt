@@ -2,8 +2,10 @@
 // TODO (RoadMap)
 ////////////////////////////////////////////////////////////////
 
-[ ]Vines need to spawn in jungle and swamp
+[ ]Vines need to spawn in jungle and swamp oaks
+[ ]Cocoa pods need to spawn on jungle trees during worldgen
 [ ]Fix jungle worldgen(forest floor is bare)
 [ ]API
+[ ]Cacti
 [ ]Seasons
 [ ]Thick trees

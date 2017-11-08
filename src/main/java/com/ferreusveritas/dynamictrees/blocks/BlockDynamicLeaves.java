@@ -398,7 +398,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			cells[dir.ordinal()] = TreeHelper.getSafeTreePart(state).getHydrationCell(world, deltaPos, state, dir, tree);
 		}
 		
-		return tree.getCellSolver(world, pos).solve(cells);//Find center cell's value from neighbors		
+		return tree.getCellSolver().solve(cells);//Find center cell's value from neighbors		
 	}
 	
 	public int getHydrationLevel(IBlockState blockState) {
