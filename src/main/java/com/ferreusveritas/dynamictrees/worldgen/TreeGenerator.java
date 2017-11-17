@@ -25,20 +25,31 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
-
+	
 	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 	protected RandomXOR random;
-
+	
 	public enum EnumGeneratorResult {
-		GENERATED,
-		NOTREE,
-		UNHANDLEDBIOME,
-		FAILSOIL,
-		FAILCHANCE,
-		FAILGENERATION
+		GENERATED(EnumDyeColor.WHITE),
+		NOTREE(EnumDyeColor.BLACK),
+		UNHANDLEDBIOME(EnumDyeColor.YELLOW),
+		FAILSOIL(EnumDyeColor.BROWN),
+		FAILCHANCE(EnumDyeColor.BLUE),
+		FAILGENERATION(EnumDyeColor.RED);
+		
+		private final EnumDyeColor color;
+		
+		private EnumGeneratorResult(EnumDyeColor color) {
+			this.color = color;
+		}
+		
+		public EnumDyeColor getColor() {
+			return this.color;
+		}
+	
 	}
 	
 	public TreeGenerator() {
@@ -47,18 +58,18 @@ public class TreeGenerator implements IWorldGenerator {
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
-
+	
 	public void onWorldUnload() {
 		circleMan = new ChunkCircleManager(radiusCoordinator);//Clears the cached circles
 	}
-
+	
 	public ChunkCircleManager getChunkCircleManager() {
 		return circleMan;
 	}
-
+	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-
+		
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
 		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 		
@@ -72,7 +83,7 @@ public class TreeGenerator implements IWorldGenerator {
 			break;
 		}
 	}
-
+	
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		ArrayList<Circle> circles = circleMan.getCircles(world, random, chunkX, chunkZ);
 		
@@ -85,7 +96,7 @@ public class TreeGenerator implements IWorldGenerator {
 			roofedForestCompensation(world, random, pos);
 		}
 	}
-
+	
 	/**
 	 * Decorate the roofedForest exactly like Minecraft, except leave out the trees and just make giant mushrooms
 	 * 
@@ -123,30 +134,13 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		if(resultType != EnumGeneratorResult.GENERATED) {
-
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
-			EnumDyeColor color;
-
-			switch(resultType) {
-				default: color = EnumDyeColor.WHITE;
-				break;
-				case FAILCHANCE: color = EnumDyeColor.BLUE; 
-				break;
-				case FAILSOIL: color = EnumDyeColor.BROWN;
-				break;
-				case UNHANDLEDBIOME: color = EnumDyeColor.YELLOW;
-				break;
-				case NOTREE: color = EnumDyeColor.BLACK;
-				break;
-				case FAILGENERATION: color = EnumDyeColor.RED;
-				break;
-			}
-
+			EnumDyeColor color = resultType.getColor();
 			world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
 			world.setBlockState(pos.up(), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
 		}
 	}
-
+	
 	private EnumGeneratorResult makeTree(World world, Circle circle) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
@@ -184,7 +178,7 @@ public class TreeGenerator implements IWorldGenerator {
 		} else {
 			result = EnumGeneratorResult.UNHANDLEDBIOME;
 		}
-
+		
 		//Display wool circles for testing the circle growing algorithm
 		if(ConfigHandler.worldGenDebug) {
 			makeWoolCircle(world, circle, pos.getY(), result);
@@ -194,5 +188,5 @@ public class TreeGenerator implements IWorldGenerator {
 		
 		return result;
 	}
-
+	
 }
