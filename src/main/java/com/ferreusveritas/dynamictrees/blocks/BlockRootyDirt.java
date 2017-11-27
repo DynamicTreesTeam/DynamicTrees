@@ -151,7 +151,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 
 						int soilLongevity = tree.getSoilLongevity(world, pos.up()) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
-						if(random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+						if(soilLongevity > 0 && random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 							setSoilLife(world, pos, life - 1);//decrement soil life
 						}
 					} else {
