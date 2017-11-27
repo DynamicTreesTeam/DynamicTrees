@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
 
 /**
  * A storage class for {@link JoCode} objects.
