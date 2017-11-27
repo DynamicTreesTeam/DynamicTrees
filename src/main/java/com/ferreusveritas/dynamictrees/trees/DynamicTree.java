@@ -177,8 +177,6 @@ public class DynamicTree {
 		this.name = name;
 		this.modId = modid;
 		
-		simpleVanillaSetup(BlockPlanks.EnumType.OAK);//Just default to Oak for the convenience of derivative mods
-		
 		if(seq >= 0) {
 			setDynamicLeaves(modid, seq);
 		}
@@ -313,17 +311,21 @@ public class DynamicTree {
 
 	/** Used to register the recipes this tree uses. */
 	public void registerRecipes(IForgeRegistry<IRecipe> registry) {
-		//Creates a seed from a vanilla sapling and a wooden bowl
-		ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
-		saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
 		
-		//Create a seed from a sapling and dirt bucket
-		GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(DynamicTrees.dirtBucket)});
-		
-		//Creates a vanilla sapling from a seed and dirt bucket
-		if(enableSaplingRecipe) {
-			GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(DynamicTrees.dirtBucket)});
+		if(primitiveSapling != null) {
+			//Creates a seed from a vanilla sapling and a wooden bowl
+			ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
+			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
+
+			//Create a seed from a sapling and dirt bucket
+			GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(DynamicTrees.dirtBucket)});
+
+			//Creates a vanilla sapling from a seed and dirt bucket
+			if(enableSaplingRecipe) {
+				GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(DynamicTrees.dirtBucket)});
+			}
 		}
+		
 	}
 	
 	

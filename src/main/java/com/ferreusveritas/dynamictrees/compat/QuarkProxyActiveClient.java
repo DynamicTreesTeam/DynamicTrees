@@ -24,7 +24,7 @@ import vazkii.quark.client.feature.GreenerGrass;
  *
  */
 public class QuarkProxyActiveClient extends QuarkProxyBase {
-
+	
 	private GreenerGrass greenerGrass;
 	private Method registrationMethod;
 	private boolean affectFolliage;
@@ -37,7 +37,7 @@ public class QuarkProxyActiveClient extends QuarkProxyBase {
 		if(greenerGrass != null && greenerGrass.enabled) {// Does there Quark?
 			// Register the RootyDirtBlock(Put meat in Quark)
 			registerGreenerColor(DynamicTrees.blockRootyDirt);
-
+			
 			// Conditionally register all of the base mod leaves(Fill Quark with more meats)
 			if(affectFolliage) {
 				HashMap<Integer, BlockDynamicLeaves> map = TreeHelper.getLeavesMapForModId(DynamicTrees.MODID);
