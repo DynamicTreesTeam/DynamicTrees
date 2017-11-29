@@ -32,6 +32,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -154,13 +155,13 @@ public class DynamicTree {
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	public TreeCodeStore joCodeStore;
 	
-	/** Only dynamictrees mod should use this and only for vanilla trees */
+	/** Hands Off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(treeType.getName().replace("_",""), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
 	}
 	
-	/** Only {@link DynamicTrees} mod should use this */
+	/** Hands Off! Only {@link DynamicTrees} mod should use this */
 	public DynamicTree(String name, int seq) {
 		this(DynamicTrees.MODID, name, seq);
 	}
@@ -254,7 +255,7 @@ public class DynamicTree {
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				world.spawnEntity(new EntityLingeringEffector(world, pos, effect));
+				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, pos, effect));
 				return true;
 			} else {
 				return effect.apply(world, dirt, pos);
@@ -316,10 +317,10 @@ public class DynamicTree {
 			//Creates a seed from a vanilla sapling and a wooden bowl
 			ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
 			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
-
+			
 			//Create a seed from a sapling and dirt bucket
 			GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(DynamicTrees.dirtBucket)});
-
+			
 			//Creates a vanilla sapling from a seed and dirt bucket
 			if(enableSaplingRecipe) {
 				GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(DynamicTrees.dirtBucket)});

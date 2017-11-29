@@ -3,8 +3,6 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 public interface ILeavesAutomata {
-
-
 	
 	/** Maximum amount of leaves in a stack before the bottom-most leaf block dies [default = 4] **/
 	public int getSmotherLeavesMax();

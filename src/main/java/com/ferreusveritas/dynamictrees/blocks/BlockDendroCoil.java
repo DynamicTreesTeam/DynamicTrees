@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator.EnumGeneratorResult;
@@ -82,7 +83,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
 		entityItem.motionZ = 0;
-		world.spawnEntity(entityItem);
+		CompatHelper.spawnEntity(world, entityItem);
 	}
 
 	public String getTree(World world, BlockPos pos) {

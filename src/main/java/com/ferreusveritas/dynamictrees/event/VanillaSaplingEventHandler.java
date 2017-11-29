@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockSapling;
@@ -26,7 +27,7 @@ public class VanillaSaplingEventHandler {
 				double y = event.getPos().getY() + 0.5;
 				double z = event.getPos().getZ() + 0.5;
 				EntityItem itemEntity = new EntityItem(event.getWorld(), x, y, z, tree.getSeedStack());
-				event.getWorld().spawnEntity(itemEntity);
+				CompatHelper.spawnEntity(event.getWorld(), itemEntity);
 			}
 		}
 	}

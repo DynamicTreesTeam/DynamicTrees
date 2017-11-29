@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.entity.item.EntityItem;
@@ -34,7 +35,7 @@ public class BottomListenerDropItems implements IBottomListener {
 			//Spawn seed
 			if(!onlyEdge || tree.getDynamicLeaves().getHydrationLevel(world, pos) == 1) {
 				EntityItem itemEntity = new EntityItem(world, pos.getX(),  pos.getY() - 1, pos.getZ(), toDrop.copy());
-				world.spawnEntity(itemEntity);
+				CompatHelper.spawnEntity(world, itemEntity);
 			}
 		}
 	}

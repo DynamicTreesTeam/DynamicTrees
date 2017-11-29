@@ -26,7 +26,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeDarkOak extends DynamicTree {
-		
+	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		

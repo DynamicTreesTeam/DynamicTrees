@@ -146,7 +146,7 @@ public class DynamicTrees {
 		treeStaff = new Staff();
 		
 		//Set the creative tabs icon
-		dynamicTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
+		dynamicTreesTab.setTabIconItemStack(TreeRegistry.findTree("oak").getSeedStack());
 		
 		proxy.preInit();
 		compatProxy.preInit();
