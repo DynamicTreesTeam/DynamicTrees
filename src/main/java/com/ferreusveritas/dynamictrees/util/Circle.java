@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 
 public class Circle extends Vec2d {
 	

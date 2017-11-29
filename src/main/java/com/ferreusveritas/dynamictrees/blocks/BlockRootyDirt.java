@@ -4,6 +4,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -12,6 +14,7 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -38,7 +41,6 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
@@ -149,7 +151,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 
 						int soilLongevity = tree.getSoilLongevity(world, pos.up()) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
-						if(random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 							setSoilLife(world, pos, life - 1);//decrement soil life
 						}
 					} else {
@@ -267,8 +269,8 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return 0;
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+		return Cells.nullCell;
 	}
 
 	@Override

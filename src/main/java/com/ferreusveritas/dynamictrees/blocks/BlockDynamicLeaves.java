@@ -7,10 +7,13 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
@@ -38,7 +41,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -108,7 +110,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
 		DynamicTree tree = getTree(state);
 		int preHydro = getHydrationLevel(state);
 
@@ -116,21 +118,28 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
 		if(hydro == 0 || !hasAdequateLight(world, tree, pos)){
 			removeLeaves(world, pos);//No water, no light .. no leaves
+			return true;//Leaves were destroyed
 		} else { 
 			//Encode new hydration level in metadata for this leaf
 			if(preHydro != hydro) {//A little performance gain
-				setHydrationLevel(world, pos, hydro, state);
+				if(setHydrationLevel(world, pos, hydro, state)) {
+					return true;//Leaves were destroyed
+				}
 			}
 		}
 
-		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
-			growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
+		if(hydro > 1) {
+			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
+				growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
+			}
 		}
 
 		//Do special things if the leaf block is/was on the bottom
 		if(!fast && isBottom(world, pos)) {
 			tree.bottomSpecial(world, pos, rand);
 		}
+		
+		return false;//Leaves were not destroyed
 	}
 
 	@Override
@@ -381,44 +390,17 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	/** Gathers hydration levels from neighbors before pushing the values into the solver */
 	public int getHydrationLevelFromNeighbors(IBlockAccess world, BlockPos pos, DynamicTree tree) {
 
-		int nv[] = new int[16];//neighbor hydration values
-
+		ICell cells[] = new ICell[6];
+		
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
-			int val = TreeHelper.getSafeTreePart(world, deltaPos).getHydrationLevel(world, deltaPos, dir, tree);
-			nv[val]++;
+			IBlockState state = world.getBlockState(deltaPos);
+			cells[dir.ordinal()] = TreeHelper.getSafeTreePart(state).getHydrationCell(world, deltaPos, state, dir, tree);
 		}
 		
-		return solveCell(nv, tree.getCellSolution());//Find center cell's value from neighbors
+		return tree.getCellSolver().solve(cells);//Find center cell's value from neighbors		
 	}
-
-	/**
-	* Cellular automata function that determines the behavior of the center cell from it's neighbors.
-	* Values here are the number of neighbors for each hydration level.  Must be 16 elements.
-	* Override member function to create unique species behavior
-	*	4 Hex digits.. 0xXHCR  
-	*	X: Reserved
-	*	H: Selected hydration value
-	*	C: Minimum count of neighbor blocks with selected hydration H
-	*	R: Resulting Hydration
-	*
-	* Example:
-	*	exampleSolver = 0x0514, 0x0413, 0x0312, 0x0211
-	*	0x0514.. (5 X 1 = 4)  If there's 1 or more neighbor blocks with hydration 5 then make this block hydration 4
-	* 
-	* @param nv Array of counts of neighbor hydration values
-	* @param solution Array of solver elements to solve the cell automata
-	* @return
-	*/
-	public static int solveCell(int[] nv, short[] solution) {
-		for(int d: solution) {
-			if(nv[(d >> 8) & 15] >= ((d >> 4) & 15)) {
-				return d & 15;
-			}
-		}
-		return 0;
-	}
-
+	
 	public int getHydrationLevel(IBlockState blockState) {
 		if(blockState.getBlock() instanceof BlockDynamicLeaves) {
 			return blockState.getValue(HYDRO);
@@ -430,79 +412,16 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return getHydrationLevel(blockAccess.getBlockState(pos));
 	}
 
-	/**
-	* 0xODHR:Operation DirectionMask Hydrovalue Result
-	*
-	* Operations:
-	*	0: return Result only
-	*	1: return sum of Hydro and Result
-	*	2: return diff of Hydro and Result
-	*	3: return product of Hydro and Result
-	*	4: return dividend of Hydro and Result
-	* 
-	*Directions bits:
-	*	0x0100:Down
-	*	0x0200:Up
-	*	0x0400:Horizontal
-	*
-	*Hydrovalue:
-	*	Any number you want to conditionally compare.  15(F) means any Hydrovalue
-	*
-	*Result:
-	*	The number to return
-	*
-	*Example:
-	*	solverData = { 0x02F0, 0x0144, 0x0742, 0x0132, 0x0730 } 
-	*
-	*	INIT ->	if dir or solution is undefined then return hydro
-	*	02F0 -> else if dir is up(2) and hydro is equal to hydro(F) then return 0 (Always returns zero when direction is up)
-	*	0144 -> else if dir is down(1) and hydro is equal to 4 then return 4
-	*	0742 -> else if dir is any(7) and hydro is equal to 4 then return 2
-	*	0132 -> else if dir is down(1) and hydro is equal to 3 then return 2
-	*	0730 -> else if dir is any(7) and hydro is equal to 3 then return 0
-	*	else return hydro
-	*/
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-
-		IBlockState state = blockAccess.getBlockState(pos);
-		int hydro = getHydrationLevel(state);
-
-		if(dir != null) {
-			DynamicTree tree = getTree(state);
-			if(tree == null) {
-				return 0;
-			}
-			if(leavesTree != tree) {//Only allow hydration requests from the same type of leaves
-				return 0;
-			}
-			short[] solution = tree.getHydroSolution();
-			if(solution != null) {
-				int dirBits = dir == EnumFacing.DOWN ? 0x100 : dir == EnumFacing.UP ? 0x200 : 0x400;
-				for(int d: solution) {
-					if((d & dirBits) != 0) {
-						int hydroCond = (d >> 4) & 15;
-						hydroCond = hydroCond == 15 ? hydro : hydroCond;//15 is special and means the actual hydro value
-						int result = d & 15;
-						result = result == 15 ? hydro : result;
-						if(hydro == hydroCond) {
-							int op = (d >> 12) & 15;
-							switch(op) {
-							case 0: break;
-							case 1: result = hydro + result; break;
-							case 2: result = hydro - result; break;
-							case 3: result = hydro * result; break;
-							case 4: result = hydro / result; break;
-							default: break;
-							}
-							return MathHelper.clamp(result, 0, 4);
-						}
-					}
-				}
-			}
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+		int hydro = getHydrationLevel(blockState);
+		DynamicTree tree = getTree(blockState);
+		
+		if(dir != null && tree != null) {
+			return tree.getCellForLeaves(hydro);
+		} else {
+			return Cells.normalCells[hydro];
 		}
-
-		return hydro;
 	}
 
 	public static void removeLeaves(World world, BlockPos pos) {
@@ -511,15 +430,17 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	//Variable hydration levels are only appropriate for leaf blocks
-	public static void setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
+	public static boolean setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
 		hydro = MathHelper.clamp(hydro, 0, 4);
 		
 		if(hydro == 0) {
 			removeLeaves(world, pos);
+			return true;
 		} else {
 			//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
 			//does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
 			world.setBlockState(pos, currentBlockState.withProperty(HYDRO, hydro), 4);
+			return false;
 		}
 	}
 	

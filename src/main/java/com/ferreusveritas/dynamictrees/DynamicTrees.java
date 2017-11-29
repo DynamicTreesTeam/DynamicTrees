@@ -13,11 +13,10 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
-import com.ferreusveritas.dynamictrees.proxy.CCProxyActive;
-import com.ferreusveritas.dynamictrees.proxy.CCProxyBase;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
@@ -32,7 +31,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
@@ -69,14 +67,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 * </p>
 * 
 * @author ferreusveritas
-* @version 0.6.5
+* @version 0.6.6
 *
 */
-@Mod(modid = DynamicTrees.MODID, version=DynamicTrees.VERSION,dependencies="after:ComputerCraft;")
+@Mod(modid = DynamicTrees.MODID, version=DynamicTrees.VERSION,dependencies="after:ComputerCraft;after:Quark")
 public class DynamicTrees {
 
 	public static final String MODID = "dynamictrees";
-	public static final String VERSION = "0.6.5";
+	public static final String VERSION = "0.6.6";
 
 	public static final DynamicTreesTab dynamicTreesTab = new DynamicTreesTab(MODID);
 	
@@ -94,7 +92,9 @@ public class DynamicTrees {
 
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
-	public static CCProxyBase ccproxy;
+	
+	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.compat.ClientProxyCompat", serverSide = "com.ferreusveritas.dynamictrees.compat.CommonProxyCompat")
+	public static CommonProxyCompat compatProxy;
 
 	public static ArrayList<DynamicTree> baseTrees = new ArrayList<DynamicTree>();
 	
@@ -140,17 +140,15 @@ public class DynamicTrees {
 		//Creative Mode Stuff
 		treeStaff = new Staff();
 		
-		//Computercraft Creative Mode Stuff
-		ccproxy = CCProxyBase.hasComputerCraft() ? new CCProxyActive() : new CCProxyBase();
-		ccproxy.createBlocks();
-		
 		//Set the creative tabs icon
-		dynamicTreesTab.setTabIconItemStack(new ItemStack(TreeRegistry.findTree("oak").getSeed()));
+		dynamicTreesTab.setTabIconItemStack(TreeRegistry.findTree("oak").getSeedStack());
+		
+		proxy.preInit();
+		compatProxy.preInit();
 		
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
-		
-		proxy.preInit();
+		proxy.registerModels();
 		
 		proxy.registerEventHandlers();
 	}
@@ -162,10 +160,11 @@ public class DynamicTrees {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
 			treeGenerator.biomeTreeHandler.init();
 		}
-
+		
 		RegistrationHandler.registerRecipes();
-
+		
 		proxy.init();
+		compatProxy.init();
 	}
 
 	@EventHandler
@@ -230,7 +229,7 @@ public class DynamicTrees {
 				GameRegistry.register(leavesBlock);
 			}
 
-			ccproxy.registerBlocks();
+			compatProxy.registerBlocks();
 		}
 
 		public static void registerItems() {
@@ -255,7 +254,7 @@ public class DynamicTrees {
 			itemBonsaiBlock.setRegistryName(blockBonsaiPot.getRegistryName());
 			GameRegistry.register(itemBonsaiBlock);
 			
-			ccproxy.registerItems();
+			compatProxy.registerItems();
 		}
 
 		public static void registerRecipes() {
@@ -265,6 +264,8 @@ public class DynamicTrees {
 
 			dirtBucket.registerRecipes();			
 			dendroPotion.registerRecipes();
+			
+			compatProxy.registerRecipes();
 		}
 		
 	}

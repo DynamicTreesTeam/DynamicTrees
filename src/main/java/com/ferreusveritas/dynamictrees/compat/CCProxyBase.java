@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.proxy;
+package com.ferreusveritas.dynamictrees.compat;
 
 import net.minecraftforge.fml.common.Loader;
 
@@ -19,4 +19,7 @@ public class CCProxyBase {
 	public void registerBlocks() {}
 	
 	public void registerItems() {}
+	
+	public void registerRecipes() {}
+
 }

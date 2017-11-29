@@ -1,6 +1,7 @@
-package com.ferreusveritas.dynamictrees.proxy;
+package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
+
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -30,4 +31,7 @@ public class CCProxyActive extends CCProxyBase {
 		GameRegistry.register(itemBlock);
 	}
 	
+	@Override
+	public void registerRecipes() {}
+
 }

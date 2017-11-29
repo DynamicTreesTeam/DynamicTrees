@@ -329,7 +329,15 @@ public class SimpleVoxmap {
 			for(int z = 0; z < lenZ; z++) {
 				buffer = "";
 				for(int x = 0; x < lenX; x++) {
-					buffer += Integer.toHexString(getVoxel(x - center.getX(), y - center.getY(), z - center.getZ()) & 0xF);
+					byte b = getVoxel(x - center.getX(), y - center.getY(), z - center.getZ());
+					if((b & 32) != 0) {
+						buffer += "B";
+					}
+					else if((b & 16) != 0) {
+						buffer += "T";
+					} else {
+						buffer += Integer.toHexString(b & 0xF);
+					}
 				}
 				System.out.println(buffer);
 			}

@@ -44,7 +44,7 @@ public class Seed extends Item {
 
 		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
 			if(!entityItem.world.isRemote) {//Server side only
-				BlockPos pos = new BlockPos((int)Math.floor(entityItem.posX), (int)Math.floor(entityItem.posY), (int)Math.floor(entityItem.posZ));
+				BlockPos pos = new BlockPos(entityItem);
 				if(entityItem.world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
 					ItemStack seedStack = entityItem.getEntityItem();

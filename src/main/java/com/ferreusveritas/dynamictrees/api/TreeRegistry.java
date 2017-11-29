@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 /**
-* A registry for all of the dynamic trees. For this mod or other mods.
+* A registry for all of the dynamic trees. Use this for this mod or other mods.
 * 
 * @author ferreusveritas
 */

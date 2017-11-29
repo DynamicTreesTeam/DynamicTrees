@@ -8,6 +8,7 @@ import com.google.common.base.Function;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
@@ -27,7 +28,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 

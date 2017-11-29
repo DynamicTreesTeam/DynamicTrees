@@ -35,11 +35,12 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void preInit() {
-		registerModels();
+		super.preInit();
 	}
 	
 	@Override
 	public void init() {
+		super.init();
 		
 		//Register Rootydirt Mesher and Colorizer
 		TreeModelHelper.regMesher(Item.getItemFromBlock(DynamicTrees.blockRootyDirt));
@@ -49,7 +50,7 @@ public class ClientProxy extends CommonProxy {
 				return worldIn != null && pos != null ? BiomeColorHelper.getGrassColorAtPos(worldIn, pos) : ColorizerGrass.getGrassColor(0.5D, 1.0D);
 			}
 		}, new Block[] {DynamicTrees.blockRootyDirt});
-		
+				
 		//Register Potion Mesher and Colorizer
 		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
 			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(DynamicTrees.dendroPotion, type.getIndex(), new ModelResourceLocation(DynamicTrees.dendroPotion.getRegistryName(), "inventory"));
@@ -129,7 +130,7 @@ public class ClientProxy extends CommonProxy {
 				}, new Item[] {Item.getItemFromBlock(leaves)});
 			}
 		}
-		
+				
 		//makePlantsBlue();
 	}
 	

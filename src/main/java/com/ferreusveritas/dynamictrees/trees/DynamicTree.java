@@ -12,11 +12,13 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesAutomata;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -30,7 +32,9 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
@@ -50,7 +54,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -67,7 +70,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * 
 * @author ferreusveritas
 */
-public class DynamicTree implements ILeavesAutomata {
+public class DynamicTree {
 	
 	/** Simple name of the tree e.g. "oak" */
 	private String name;
@@ -119,16 +122,15 @@ public class DynamicTree implements ILeavesAutomata {
 	private ArrayList<IBottomListener> bottomSpecials = new ArrayList<IBottomListener>(4);
 	/** The default hydration level of a newly created leaf block [default = 4]**/
 	protected byte defaultHydration = 4;
-	/** Automata input data for hydration solver [default = Deciduous]*/
-	private short hydroSolution[] = hydroSolverDeciduous;
-	/** Automata input data for cell solver [default = Deciduous]*/
-	private short cellSolution[] = cellSolverDeciduous;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	private IBlockState primitiveLeaves;
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
 	private ItemStack primitiveLeavesItemStack;
 	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
 	private SimpleVoxmap leafCluster;
+	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
+	private ICellSolver cellSolver = Cells.deciduousSolver;
+	
 	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
@@ -148,13 +150,13 @@ public class DynamicTree implements ILeavesAutomata {
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	public TreeCodeStore joCodeStore;
 	
-	/** Only dynamictrees mod should use this and only for vanilla trees */
+	/** Hands Off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(treeType.getName().replace("_",""), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
 	}
 	
-	/** Only {@link DynamicTrees} mod should use this */
+	/** Hands Off! Only {@link DynamicTrees} mod should use this */
 	public DynamicTree(String name, int seq) {
 		this(DynamicTrees.MODID, name, seq);
 	}
@@ -170,8 +172,6 @@ public class DynamicTree implements ILeavesAutomata {
 	public DynamicTree(String modid, String name, int seq) {
 		this.name = name;
 		this.modId = modid;
-		
-		simpleVanillaSetup(BlockPlanks.EnumType.OAK);//Just default to Oak for the convenience of derivative mods
 		
 		if(seq >= 0) {
 			setDynamicLeaves(modid, seq);
@@ -250,7 +250,7 @@ public class DynamicTree implements ILeavesAutomata {
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				world.spawnEntity(new EntityLingeringEffector(world, pos, effect));
+				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, pos, effect));
 				return true;
 			} else {
 				return effect.apply(world, dirt, pos);
@@ -307,17 +307,21 @@ public class DynamicTree implements ILeavesAutomata {
 
 	/** Used to register the recipes this tree uses. */
 	public void registerRecipes() {
-		//Creates a seed from a vanilla sapling and a wooden bowl
-		ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
-		saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
 		
-		//Create a seed from a sapling and dirt bucket
-		GameRegistry.addShapelessRecipe(seedStack, new Object[]{ saplingStack, DynamicTrees.dirtBucket});
-		
-		//Creates a vanilla sapling from a seed and dirt bucket
-		if(enableSaplingRecipe) {
-			GameRegistry.addShapelessRecipe(saplingStack, new Object[]{ seedStack, DynamicTrees.dirtBucket });
+		if(primitiveSapling != null) {
+			//Creates a seed from a vanilla sapling and a wooden bowl
+			ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
+			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
+			
+			//Create a seed from a sapling and dirt bucket
+			GameRegistry.addShapelessRecipe(seedStack, new Object[]{ saplingStack, DynamicTrees.dirtBucket});
+			
+			//Creates a vanilla sapling from a seed and dirt bucket
+			if(enableSaplingRecipe) {
+				GameRegistry.addShapelessRecipe(saplingStack, new Object[]{ seedStack, DynamicTrees.dirtBucket });
+			}
 		}
+		
 	}
 	
 	
@@ -556,6 +560,14 @@ public class DynamicTree implements ILeavesAutomata {
 		return tapering;
 	}
 
+	///////////////////////////////////////////
+	//BRANCHES
+	///////////////////////////////////////////
+
+	
+	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
+	}
 	
 	///////////////////////////////////////////
 	//DIRT
@@ -644,22 +656,14 @@ public class DynamicTree implements ILeavesAutomata {
 		return defaultHydration;
 	}
 	
-	public void setHydroSolution(short[] solution) {
-		hydroSolution = solution;
+	public void setCellSolver(ICellSolver solver) {
+		cellSolver = solver;
 	}
 	
-	public short[] getHydroSolution() {
-		return hydroSolution;
+	public ICellSolver getCellSolver() {
+		return cellSolver;
 	}
-	
-	public void setCellSolution(short[] solution) {
-		cellSolution = solution;
-	}
-	
-	public short[] getCellSolution() {
-		return cellSolution;
-	}
-	
+		
 	public void setLeafCluster(SimpleVoxmap leafCluster) {
 		this.leafCluster = leafCluster;
 	}
@@ -752,6 +756,9 @@ public class DynamicTree implements ILeavesAutomata {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
 	
+	public ICell getCellForLeaves(int hydro) {
+		return Cells.normalCells[hydro];
+	}
 	
 	//////////////////////////////
 	// DROPS HANDLING
@@ -867,10 +874,6 @@ public class DynamicTree implements ILeavesAutomata {
 	// GROWTH
 	///////////////////////////////////////////
 	
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
-		return branch.getRadius(blockAccess, pos) == 1 && this == fromBlock.getTree(fromSub) ? 5 : 0;
-	}
-
 	/**
 	* Selects a new direction for the branch(grow) signal to turn to.
 	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
@@ -1045,7 +1048,7 @@ public class DynamicTree implements ILeavesAutomata {
 		
 		return false;
 	}
-
+	
 	/**
 	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
 	 * This factor is an attempt to compensate for the problem.

@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
 
 /**
  * A storage class for {@link JoCode} objects.
@@ -76,7 +76,6 @@ public class TreeCodeStore {
 	 * sorts them alphanumerically.  By sorting the rotated JoCodes you can eliminate duplicates
 	 * who are only different by the direction they are facing.
 	 * 
-	 * @param tree
 	 * @param radius
 	 * @param joCode
 	 */

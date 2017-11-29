@@ -1,25 +1,23 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.math.MathHelper;
-
 /**
 * A simple bitmap that favors speed over safety.  Consider yourself disclaimed.
 * 
 * @author ferreusveritas
 */
 public class SimpleBitmap {
-
+	
 	private int h;
 	private int w;
 	private int bits[];
-
+	
 	public boolean touched;//useful for ruling out entire layers for the voxelmap 
-
+	
 	//Not thread safe at all but whatevers.
 	private static int dstOffsety;
 	private static int srcOffsety;
 	private static int runH;
-
+	
 	/**
 	* @param w Width not to exceed 32
 	* @param h Height 
@@ -30,7 +28,7 @@ public class SimpleBitmap {
 		this.bits = new int[this.h];
 		touched = false;
 	}
-
+	
 	/**
 	* @param w Width not to exceed 32
 	* @param h Height
@@ -46,7 +44,7 @@ public class SimpleBitmap {
 		}
 		touched = true;
 	}
-
+	
 	public SimpleBitmap(SimpleBitmap bmp) {
 		this(bmp.w, bmp.h);
 		for(int i = 0; i < this.bits.length; i++) {
@@ -54,25 +52,25 @@ public class SimpleBitmap {
 		}
 		touched = bmp.touched;
 	}
-
+	
 	public int[] getBits() {
 		return bits;
 	}
-
+	
 	public int getH() {
 		return h;
 	}
-
+	
 	public int getW() {
 		return w;
 	}
-
+	
 	public SimpleBitmap clear() {
 		bits = new int[h];
 		touched = false;
 		return this;
 	}
-
+	
 	public boolean isColliding(int relX, int relY, SimpleBitmap src) {
 		if(prepBlit(relX, relY, src)) {
 			if(relX < 0) {
@@ -92,7 +90,7 @@ public class SimpleBitmap {
 		}		
 		return false;
 	}
-
+	
 	public void BlitOr(int relX, int relY, SimpleBitmap src) {
 		if(prepBlit(relX, relY, src)) {
 			if(relX < 0) {
@@ -108,7 +106,7 @@ public class SimpleBitmap {
 			touched = true;
 		}
 	}
-
+	
 	public void BlitSub(int relX, int relY, SimpleBitmap src) {
 		if(prepBlit(relX, relY, src)) {
 			if(relX < 0) {
@@ -124,7 +122,7 @@ public class SimpleBitmap {
 			touched = true;
 		}
 	}
-
+	
 	public void BlitAnd(int relX, int relY, SimpleBitmap src) {
 		if(prepBlit(relX, relY, src)) {
 			if(relX < 0) {
@@ -141,13 +139,13 @@ public class SimpleBitmap {
 		}
 		
 	}
-
+	
 	private boolean prepBlit(int relX, int relY, SimpleBitmap src) {
 
 		if(relX <= -src.w || relX >= this.w || relY <= -src.h || relY >= this.h || (!touched && !src.touched)) {
 			return false;
 		}
-
+		
 		if(relY >= 0) {
 			dstOffsety = relY;
 			srcOffsety = 0;
@@ -155,12 +153,12 @@ public class SimpleBitmap {
 			dstOffsety = 0;
 			srcOffsety = -relY;
 		}
-
+		
 		runH = Math.min(this.h - dstOffsety, Math.min(src.h, this.h - relY) - srcOffsety);
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * Set a pixel
 	 * 
@@ -175,15 +173,15 @@ public class SimpleBitmap {
 			touched = true;
 		}
 	}
-
+	
 	public boolean isPixelOn(int x, int y) {
 		return x >= 0 && y >= 0 && x < w && y < h && ((bits[y] >> x) & 1) == 1;
 	}
-
+	
 	public boolean isRowBlank(int y) {
 		return y >= 0 && y < h && bits[y] == 0;
 	}
-
+	
 	public void print() {
 		String buff;
 		for(int y = 0; y < h; y++) {
@@ -194,5 +192,5 @@ public class SimpleBitmap {
 			System.out.println(buff);
 		}
 	}
-
+	
 }

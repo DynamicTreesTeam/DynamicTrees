@@ -1,8 +1,12 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
+import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
+import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -31,9 +35,8 @@ public class TreeSpruce extends DynamicTree {
 		envFactor(Type.DRY, 0.25f);
 		envFactor(Type.WET, 0.75f);
 		
-		setCellSolution(cellSolverConifer);
-		setHydroSolution(hydroSolverConifer);
-		setSmotherLeavesMax(2);
+		setCellSolver(Cells.coniferSolver);
+		setSmotherLeavesMax(3);
 		
 		registerBottomListener(new BottomListenerPodzol());
 	}
@@ -62,15 +65,28 @@ public class TreeSpruce extends DynamicTree {
 		return newDir;
 	}
 	
-	@Override
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
-		if(branch.getRadius(blockAccess, pos) == 1 && isCompatibleDynamicLeaves(fromBlock, fromSub)) {
-			if(dir == EnumFacing.DOWN && blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				return 5;
-			}
-			return (dir == EnumFacing.UP || dir ==  EnumFacing.DOWN) ? 2 : 3;
+	protected static final ICell spruceBranch = new CellConiferBranch();
+	protected static final ICell spruceTopBranch = new CellConiferTopBranch();
+
+	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		if(branch.getRadius(blockState) == 1) {
+			return blockAccess.getBlockState(pos.down()).getBlock() == branch ? spruceTopBranch : spruceBranch;
+		} else {
+			return Cells.nullCell;
 		}
-		return 0;
+	}
+
+	protected static final ICell spruceLeafCells[] = {
+		Cells.nullCell,
+		new CellConiferLeaf(1),
+		new CellConiferLeaf(2),
+		new CellConiferLeaf(3),
+		new CellConiferLeaf(4)
+	};
+	
+	@Override
+	public ICell getCellForLeaves(int hydro) {
+		return spruceLeafCells[hydro];
 	}
 	
 	//Spruce trees are so similar that it makes sense to randomize their height for a little variation
