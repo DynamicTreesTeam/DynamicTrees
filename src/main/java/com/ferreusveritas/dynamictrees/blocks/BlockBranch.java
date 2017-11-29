@@ -6,12 +6,15 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -32,7 +35,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -151,11 +153,13 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public void age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
 		int radius = getRadius(world, pos);
 		if (fast || rand.nextInt(radius * 2) == 0) {// Thicker branches take longer to rot
-			checkForRot(world, pos, radius, rand, fast);
+			return checkForRot(world, pos, radius, rand, fast);
 		}
+		
+		return false;
 	}
 
 	public boolean checkForRot(World world, BlockPos pos, int radius, Random rand, boolean fast) {
@@ -170,7 +174,20 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 				return false;// We've proven that this branch is reinforced so there is no need to continue
 			}
 		}
-		return getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+		
+		boolean didRot = getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+
+		if(fast && didRot) {// Speedily rot back dead branches if this block rotted
+			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
+				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
+				IBlockState state = world.getBlockState(neighPos);
+				if(state.getBlock() == this) { // Only check blocks logs that are the same as this one
+					checkForRot(world, neighPos, getRadius(state), rand, true);
+				}
+			}
+		}
+		
+		return didRot;
 	}
 
 	///////////////////////////////////////////
@@ -242,16 +259,23 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 			return true;
 		}
 	}
-
+	
+	
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
 
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return getTree().getBranchHydrationLevel(blockAccess, pos, dir, this, leavesTree.getDynamicLeaves(), leavesTree.getDynamicLeavesSub());
-	}
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+		DynamicTree thisTree = getTree();
 
+		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
+			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
+		} else {
+			return Cells.nullCell;
+		}
+	}
+	
 	@Override
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return getRadius(blockAccess.getBlockState(pos));
@@ -266,7 +290,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	public void setRadius(World world, BlockPos pos, int radius) {
-		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp_int(radius, 1, 8)), 2);
+		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp(radius, 1, 8)), 2);
 	}
 
 	// Directionless probability grabber
@@ -328,7 +352,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp_float((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 
@@ -378,7 +402,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
 			if (connRadius > 0) {
-				double radius = MathHelper.clamp_int(connRadius, 1, thisRadius) / 16.0;
+				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).expandXyz(radius);
 				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);

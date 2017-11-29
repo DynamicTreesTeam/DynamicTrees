@@ -77,7 +77,7 @@ public class TreeHelper {
 		if(dirtCandidate instanceof BlockRootyDirt) {
 			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
 			dirt.grow(world, pos, world.rand);
-			ageVolume(world, pos);
+			ageVolume(world, pos, 1);
 		}
 	}
 	
@@ -87,8 +87,8 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos The position of the bottom most block of a trees trunk
 	 */
-	public static void ageVolume(World world, BlockPos pos) {
-		ageVolume(world, pos, 8, 32, null);
+	public static void ageVolume(World world, BlockPos pos, int interations) {
+		ageVolume(world, pos, 8, 32, null, interations);
 	}
 	
 	/**
@@ -100,18 +100,21 @@ public class TreeHelper {
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
 	 */
-	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap){
+	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
 			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
-		for(BlockPos iPos: iterable) {
-			IBlockState blockState = world.getBlockState(iPos);
-			Block block = blockState.getBlock();
-			if(block instanceof IAgeable) {
-				((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+		for(int i = 0; i < iterations; i++) {
+			for(BlockPos iPos: iterable) {
+				IBlockState blockState = world.getBlockState(iPos);
+				Block block = blockState.getBlock();
+				if(block instanceof IAgeable) {
+					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				}
 			}
 		}
+		
 	}
 	
 	//Treeparts

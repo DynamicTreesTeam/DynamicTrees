@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 
 public class Circle extends Vec2d {
 	
@@ -119,7 +118,7 @@ public class Circle extends Vec2d {
 	}
 	
 	public Circle setRadius(int radius) {
-		this.radius = MathHelper.clamp_int(radius, 2, 8);
+		this.radius = MathHelper.clamp(radius, 2, 8);
 		return this;
 	}
 	

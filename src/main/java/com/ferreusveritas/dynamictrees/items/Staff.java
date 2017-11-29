@@ -113,7 +113,7 @@ public class Staff extends Item {
 
 	public Staff setTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", tree.getFullName());
+		nbt.setString("tree", tree.getName());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}

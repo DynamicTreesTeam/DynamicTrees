@@ -110,11 +110,12 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		}
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
+		World world = worldObj;
 
-		if(!worldObj.isRemote && dendroCoil != null) {
+		if(!world.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
-					return new Object[]{ dendroCoil.getCode(worldObj, pos) };
+					return new Object[]{ dendroCoil.getCode(world, pos) };
 				case getSoilLife:
 					synchronized(this) {
 						return new Object[]{soilLife};

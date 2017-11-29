@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -51,7 +52,7 @@ public class NodeDestroyer implements INodeInspector {
 						int qty = tree.getDynamicLeaves().quantitySeedDropped(world.rand);
 						if(qty > 0) {
 							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
-							world.spawnEntityInWorld(itemEntity);
+							CompatHelper.spawnEntity(world, itemEntity);
 						}
 					}
 				//}

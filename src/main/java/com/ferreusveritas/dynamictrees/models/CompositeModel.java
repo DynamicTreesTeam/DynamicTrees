@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.base.Function;
 
 import javax.vecmath.Matrix4f;
@@ -31,7 +32,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -231,7 +231,7 @@ public class CompositeModel implements IPerspectiveAwareModel {
 		int[] connections = new int[6];
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			int connection = getConnectionRadius(extendedBlockState, BlockBranch.CONNECTIONS[dir.getIndex()]);
-			connections[dir.getIndex()] = MathHelper.clamp_int(connection, 0, coreRadius);//Do not allow connections to exceed core radius
+			connections[dir.getIndex()] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
 		}
 		return connections;
 	}

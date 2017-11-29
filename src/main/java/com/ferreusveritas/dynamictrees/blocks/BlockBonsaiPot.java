@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
@@ -89,7 +90,7 @@ public class BlockBonsaiPot extends Block {
 			if(!world.isRemote) {
 				ItemStack seedStack = tree.getSeedStack();
 				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
-				world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
+				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
 			world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState());

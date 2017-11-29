@@ -1,10 +1,13 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -24,23 +27,42 @@ public class TreeAcacia extends DynamicTree {
 		envFactor(Type.NETHER, 0.75f);
 		envFactor(Type.WET, 0.75f);
 		
-		setCellSolution(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
-		setHydroSolution(new short[]{0x02F0, 0x0143, 0x0133, 0x01F0});
+		setCellSolver(Cells.acaciaSolver);
+		
 		setSmotherLeavesMax(2);//very thin canopy
 	}
 	
-	@Override
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
-		if(branch.getRadius(blockAccess, pos) == 1 && isCompatibleDynamicLeaves(fromBlock, fromSub)) {//Only compatible leaves
-			if(dir == EnumFacing.DOWN) {
-				return 3;
-			} else
-			if(dir != EnumFacing.UP) {//Disallow hydration from above.
-				return 5;
-			}
+	protected static final ICell acaciaBranch = new ICell() {
+		@Override
+		public int getValue() {
+			return 5;
+		}
+
+		final int map[] = {0, 3, 5, 5, 5, 5};
+		
+		@Override
+		public int getValueFromSide(EnumFacing side) {
+			return map[side.ordinal()];
 		}
 		
-		return 0;
+	};
+	
+	@Override
+	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		return (branch.getRadius(blockState) == 1) ? acaciaBranch : Cells.nullCell;
+	}
+	
+	protected static final ICell acaciaLeafCells[] = {
+			Cells.nullCell,
+			new CellAcaciaLeaf(1),
+			new CellAcaciaLeaf(2),
+			new CellAcaciaLeaf(3),
+			new CellAcaciaLeaf(4)
+		}; 
+	
+	@Override
+	public ICell getCellForLeaves(int hydro) {
+		return acaciaLeafCells[hydro];
 	}
 	
 	@Override

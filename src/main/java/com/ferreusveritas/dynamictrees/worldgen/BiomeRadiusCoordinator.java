@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
@@ -38,7 +38,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		shakelow = (shakelow == 2) ? 1 : (shakelow == 3) ? 2 : 0;
 		shakehigh = (shakehigh == 2) ? 1 : (shakehigh == 3) ? 2 : 0;
 		
-		return MathHelper.clamp_int((int) size, 2 + shakelow, 8 - shakehigh);//Clamp to tree volume radius range
+		return MathHelper.clamp((int) size, 2 + shakelow, 8 - shakehigh);//Clamp to tree volume radius range
 	}
 	
 }

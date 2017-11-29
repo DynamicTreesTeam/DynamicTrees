@@ -7,10 +7,10 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -75,7 +75,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
 			double density = provider.getDensity(biome, noiseDensity, random);
 			if(density >= 0) {
-				return MathHelper.clamp_double(density, 0.0, 1.0);
+				return MathHelper.clamp(density, 0.0, 1.0);
 			}
 		}
 		

@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -33,7 +33,7 @@ public interface IBiomeSuitabilityDecider {
 		 * @param suitability Suitability factor from 0.0 - 1.0 range.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
 		 */
 		public Decision(float suitability) {
-			this.suitability = MathHelper.clamp_float(suitability, 0f, 1f);
+			this.suitability = MathHelper.clamp(suitability, 0f, 1f);
 			handled = true;
 		}
 		

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -37,9 +40,8 @@ public class TreeDarkOak extends DynamicTree {
 		envFactor(Type.DRY, 0.25f);
 		envFactor(Type.MUSHROOM, 1.25f);
 		
+		setCellSolver(Cells.darkOakSolver);
 		setSmotherLeavesMax(3);//thin canopy
-		setCellSolution(new short[] {0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
-		setHydroSolution(new short[] {0x0243, 0x0233, 0x0143, 0x0133});
 		
 		registerBottomListener(new BottomListenerPodzol());
 	}
@@ -57,6 +59,19 @@ public class TreeDarkOak extends DynamicTree {
 	@Override
 	public float getGrowthRate(World world, BlockPos pos) {
 		return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
+	}
+	
+	protected static final ICell darkOakLeafCells[] = {
+			Cells.nullCell,
+			new CellDarkOakLeaf(1),
+			new CellDarkOakLeaf(2),
+			new CellDarkOakLeaf(3),
+			new CellDarkOakLeaf(4)
+		}; 
+	
+	@Override
+	public ICell getCellForLeaves(int hydro) {
+		return darkOakLeafCells[hydro];
 	}
 	
 	@Override
