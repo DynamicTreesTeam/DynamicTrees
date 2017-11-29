@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.inspectors;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
@@ -51,8 +51,8 @@ public class NodeTransform implements INodeInspector {
 					if(fromTree.isCompatibleGenericLeaves(world, leavesPos)) {
 						int hydro = 2;
 						IBlockState state = leavesPos.getBlockState(world);
-						if(state.getBlock() instanceof BlockGrowingLeaves) {
-							BlockGrowingLeaves growingLeaves = (BlockGrowingLeaves) state.getBlock();
+						if(state.getBlock() instanceof BlockDynamicLeaves) {
+							BlockDynamicLeaves growingLeaves = (BlockDynamicLeaves) state.getBlock();
 							hydro = growingLeaves.getHydrationLevel(state);
 						}
 						toTree.getGrowingLeaves().setBlockToLeaves(world, toTree, leavesPos, hydro);

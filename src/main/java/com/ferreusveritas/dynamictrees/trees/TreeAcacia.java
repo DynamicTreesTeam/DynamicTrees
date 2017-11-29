@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.world.IBlockAccess;
@@ -30,7 +30,7 @@ public class TreeAcacia extends DynamicTree {
 	}
 
 	@Override
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
+	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
 		if(branch.getRadius(blockAccess, pos) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)) {//Only compatible leaves
 			if(dir == EnumFacing.DOWN) {
 				return 3;

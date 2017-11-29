@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
@@ -215,7 +215,7 @@ public class DynamicTrees {
 				tree.registerBlocks();
 			}
 
-			for(BlockGrowingLeaves leavesBlock: TreeHelper.leavesArray.values()) {
+			for(BlockDynamicLeaves leavesBlock: TreeHelper.leavesArray.values()) {
 				GameRegistry.register(leavesBlock);
 			}
 

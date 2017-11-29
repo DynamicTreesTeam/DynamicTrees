@@ -5,28 +5,30 @@ import net.minecraftforge.common.util.ForgeDirection;
 public enum EnumFacing {
 	
 	    /** -Y */
-	    DOWN(0, -1, 0),
+	    DOWN(0, 0, -1, 0),
 
 	    /** +Y */
-	    UP(0, 1, 0),
+	    UP(1, 0, 1, 0),
 
 	    /** -Z */
-	    NORTH(0, 0, -1),
+	    NORTH(2, 0, 0, -1),
 
 	    /** +Z */
-	    SOUTH(0, 0, 1),
+	    SOUTH(3, 0, 0, 1),
 
 	    /** -X */
-	    WEST(-1, 0, 0),
+	    WEST(4, -1, 0, 0),
 
 	    /** +X */
-	    EAST(1, 0, 0);
+	    EAST(5, 1, 0, 0);
 
+    	/** Ordering index for D-U-N-S-W-E */
+    	private final int index;
+    	
 	    private final int offsetX;
 	    private final int offsetY;
 	    private final int offsetZ;
 	    public static final EnumFacing[] VALUES = {DOWN, UP, NORTH, SOUTH, WEST, EAST};
-	    public static final EnumFacing[] UPFIRST = {UP, DOWN, NORTH, SOUTH, WEST, EAST};
 	    public static final EnumFacing[] HORIZONTALS = {NORTH, SOUTH, WEST, EAST};
 	    
 	    public static final int[] OPPOSITES = {1, 0, 3, 2, 5, 4, 6};
@@ -41,14 +43,19 @@ public enum EnumFacing {
 	    	{0, 1, 2, 3, 4, 5, 6},
 	    };
 
-	    private EnumFacing(int x, int y, int z) {
+	    private EnumFacing(int i, int x, int y, int z) {
+	    	index = i;
 	        offsetX = x;
 	        offsetY = y;
 	        offsetZ = z;
 	    }
 
+	    public int getIndex() {
+	        return index;
+	    }
+	    
 	    public static EnumFacing fromForgeDirection(ForgeDirection dir) {
-	    	return getOrientation(dir.ordinal());
+	    	return getFront(dir.ordinal());
 	    }
 	    
 	    public ForgeDirection toForgeDirection() {
@@ -67,7 +74,7 @@ public enum EnumFacing {
 	        return this.offsetZ;
 	    }
 
-	    public static EnumFacing getOrientation(int id) {
+	    public static EnumFacing getFront(int id) {
 	        if (id >= 0 && id < VALUES.length) {
 	            return VALUES[id];
 	        }
@@ -75,10 +82,10 @@ public enum EnumFacing {
 	    }
 
 	    public EnumFacing getOpposite() {
-	        return getOrientation(OPPOSITES[ordinal()]);
+	        return getFront(OPPOSITES[ordinal()]);
 	    }
 
 	    public EnumFacing getRotation(ForgeDirection axis) {
-	    	return getOrientation(ROTATION_MATRIX[axis.ordinal()][ordinal()]);
+	    	return getFront(ROTATION_MATRIX[axis.ordinal()][ordinal()]);
 	    }
 }

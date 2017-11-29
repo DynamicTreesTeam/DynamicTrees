@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -62,7 +62,7 @@ public class TreeSpruce extends DynamicTree {
 	}
 
 	@Override
-	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockGrowingLeaves fromBlock, int fromSub) {
+	public int getBranchHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, BlockBranch branch, BlockDynamicLeaves fromBlock, int fromSub) {
 		if(branch.getRadius(blockAccess, pos) == 1 && isCompatibleGrowingLeaves(fromBlock, fromSub)) {
 			if(dir == EnumFacing.DOWN && pos.down().getBlock(blockAccess) == branch) {
 				return 5;

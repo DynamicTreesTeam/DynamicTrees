@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.network;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public interface INodeInspector {
 

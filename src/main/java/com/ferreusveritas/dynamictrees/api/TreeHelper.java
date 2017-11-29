@@ -2,49 +2,46 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockGrowingLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.util.Dir;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TreeHelper {
 
-	public static final short cellSolverDeciduous[] = {0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211};
-	public static final short cellSolverConifer[] = {0x0514, 0x0413, 0x0312, 0x0211};
-	public static final short hydroSolverDeciduous[] = null;
-	public static final short hydroSolverConifer[] = {0x02F0, 0x0144, 0x0742, 0x0132, 0x0730};
-
-	public static HashMap<String, BlockGrowingLeaves> leavesArray = new HashMap<String, BlockGrowingLeaves>();
-
-	public static ITreePart nullTreePart = new NullTreePart();
+	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
+	
+	public static final ITreePart nullTreePart = new NullTreePart();
 
 	/**
-	 * A convenience function for packing 4 growing leaves blocks into one Minecraft block using metadata.
+	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
 	 * 
 	 * @param modid
 	 * @param seq
 	 * @return
 	 */
-	public static BlockGrowingLeaves getLeavesBlockForSequence(String modid, int seq) {
-		int leavesBlockNum = seq / 4;
-		String key = modid + ":" + leavesBlockNum;
+	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
 
-		if(leavesArray.containsKey(key)) {
-			return leavesArray.get(key);
+		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
+		int leavesBlockNum = seq / 4;
+		int key = leavesBlockNum;		
+		
+		if(leavesMap.containsKey(key)) {
+			return leavesMap.get(key);
 		} else {
-			BlockGrowingLeaves leavesBlock = new BlockGrowingLeaves();
+			BlockDynamicLeaves leavesBlock = new BlockDynamicLeaves();
 			leavesBlock.setRegistryName("leaves" + leavesBlockNum);
 			leavesBlock.setUnlocalizedNameReg("leaves" + leavesBlockNum);
-			leavesArray.put(key, leavesBlock);
+			leavesMap.put(key, leavesBlock);
 			return leavesBlock;
 		}
 	}
@@ -60,6 +57,26 @@ public class TreeHelper {
 	}
 	
 	/**
+	 * 	Get the map of leaves from for the appropriate modid.
+	 *  If the map does not exist then one is created.
+	 * 
+	 * @param modid The ModId of the mod accessing this
+	 * @return The map of {@link BlockDynamicLeaves}
+	 */
+	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
+		HashMap<Integer, BlockDynamicLeaves> leavesMap;
+		
+		if(modLeavesArray.containsKey(modid)) {
+			leavesMap = modLeavesArray.get(modid);
+		} else {
+			leavesMap = new HashMap<Integer, BlockDynamicLeaves>();
+			modLeavesArray.put(modid, leavesMap);
+		}
+
+		return leavesMap;
+	}
+	
+	/**
 	 * Convenience method to pulse a single growth cycle and age the cuboid volume.
 	 * Used by the growth potion and the dendrocoil.
 	 * 
@@ -71,7 +88,7 @@ public class TreeHelper {
 		if(dirtCandidate instanceof BlockRootyDirt) {
 			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
 			dirt.grow(world, pos, world.rand);
-			ageVolume(world, pos);
+			ageVolume(world, pos, 1);
 		}
 	}
 	
@@ -81,8 +98,8 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos The position of the bottom most block of a trees trunk
 	 */
-	public static void ageVolume(World world, BlockPos pos) {
-		ageVolume(world, pos, 8, 32, null);
+	public static void ageVolume(World world, BlockPos pos, int interations) {
+		ageVolume(world, pos, 8, 32, null, interations);
 	}
 	
 	/**
@@ -94,17 +111,21 @@ public class TreeHelper {
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
 	 */
-	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap){
+	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
 			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
-		for(BlockPos iPos: iterable) {
-			Block block = iPos.getBlock(world);
-			if(block instanceof IAgeable) {
-				((IAgeable)block).age(world, iPos, world.rand, true);
+		for(int i = 0; i < iterations; i++) {
+			for(BlockPos iPos: iterable) {
+				IBlockState blockState = iPos.getBlockState(world);
+				Block block = blockState.getBlock();
+				if(block instanceof IAgeable) {
+					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				}
 			}
 		}
+		
 	}
 	
 	//Treeparts
@@ -125,12 +146,20 @@ public class TreeHelper {
 		return getTreePart(pos.getBlock(blockAccess));
 	}
 
+	public static ITreePart getTreePart(IBlockState state) {
+		return getTreePart(state.getBlock());
+	}
+
 	public static ITreePart getSafeTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
 	}
 
 	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return getSafeTreePart(pos.getBlock(blockAccess));
+	}
+
+	public static ITreePart getSafeTreePart(IBlockState blockState) {
+		return getSafeTreePart(blockState.getBlock());
 	}
 
 	//Branches
@@ -158,7 +187,7 @@ public class TreeHelper {
 	//Leaves
 
 	public static boolean isLeaves(Block block) {
-		return block instanceof BlockGrowingLeaves;
+		return block instanceof BlockDynamicLeaves;
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {

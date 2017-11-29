@@ -37,19 +37,21 @@ public class BlockBackport extends Block implements IRegisterable {
 	
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random rand) {
-		this.updateTick(world, new BlockPos(x, y, z), rand);
+		BlockPos pos = new BlockPos(x, y, z);
+		this.updateTick(world, pos, pos.getBlockState(world), rand);
 	}
 	
-	public void updateTick(World world, BlockPos pos, Random rand) {
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
 		super.updateTick(world, pos.getX(), pos.getY(),  pos.getZ(), rand);
 	}
 	
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
-		return this.onBlockActivated(world, new BlockPos(x, y, z), player, facing, hitX,	hitY, hitZ);
+		BlockPos pos = new BlockPos(x, y, z);
+		return this.onBlockActivated(world, pos, pos.getBlockState(world), player, facing, hitX,	hitY, hitZ);
 	}
 	
-	public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
 		return super.onBlockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player, facing, hitX, hitY, hitZ);
 	}
 	
@@ -126,13 +128,26 @@ public class BlockBackport extends Block implements IRegisterable {
 	}
 	
 	public void onNeighborBlockChange(World world, int x, int y, int z,	Block block) {
-		this.onNeighborBlockChange(world, new BlockPos(x, y, z), block);
+		BlockPos pos = new BlockPos(x, y, z);
+		IBlockState state = pos.getBlockState(world); 
+		this.neighborChanged(state, world, pos, block);
 	}
 	
-	public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
 		super.onNeighborBlockChange(world, pos.getX(), pos.getY(), pos.getZ(), block);
 	}
+
+	@Override
+	public boolean canBlockStay(World world, int x, int y, int z) {
+		BlockPos pos = new BlockPos(x, y, z);
+		IBlockState state = pos.getBlockState(world);
+		return this.canBlockStay(world, pos, state);
+	}
 	
+	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
+		return super.canBlockStay(world, pos.getX(), pos.getY(), pos.getZ());
+	}
+		
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////

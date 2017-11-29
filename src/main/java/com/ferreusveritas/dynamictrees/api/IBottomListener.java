@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.world.World;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public interface IBottomListener {
 
@@ -14,9 +14,7 @@ public interface IBottomListener {
 	 * 
 	 * @param world
 	 * @param tree
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos
 	 * @param random
 	 */
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random);

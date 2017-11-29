@@ -35,13 +35,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeable, IRegisterable {
+public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable, IRegisterable {
 	
 	private String[] species = {"X", "X", "X", "X"};
 	private DynamicTree trees[] = new DynamicTree[4];
 	protected String registryName;
 	
-	public BlockGrowingLeaves() {
+	public BlockDynamicLeaves() {
 		field_150121_P = true;//True for alpha transparent leaves
 	}
 	
@@ -211,7 +211,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 		if(world.isRemote) {
 			Random random = world.rand;
 			ITreePart treePart = TreeHelper.getTreePart(world, pos);
-			if(treePart instanceof BlockGrowingLeaves) {
+			if(treePart instanceof BlockDynamicLeaves) {
 				DynamicTree tree = treePart.getTree(world, pos);
 				if(tree != null) {
 					int metadata = pos.getMeta(world);
@@ -273,7 +273,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public boolean isLocationSuitableForNewLeaves(World world, DynamicTree tree, BlockPos pos) {
 		Block block = pos.getBlock(world);
 		
-		if(block instanceof BlockGrowingLeaves) {
+		if(block instanceof BlockDynamicLeaves) {
 			return false;
 		}
 
@@ -407,7 +407,7 @@ public class BlockGrowingLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	public int getHydrationLevel(IBlockState blockState) {
-		if(blockState.getBlock() instanceof BlockGrowingLeaves) {
+		if(blockState.getBlock() instanceof BlockDynamicLeaves) {
 			return getHydrationLevelFromMetadata(blockState.getMeta());
 		}
 		return 0;

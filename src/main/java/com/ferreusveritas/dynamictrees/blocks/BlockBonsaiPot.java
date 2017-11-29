@@ -95,12 +95,14 @@ public class BlockBonsaiPot extends BlockBackport {
 		return false;
 	}
 
+	
 	@Override
 	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
 		return new ItemStack(Items.flower_pot);
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
+	@Override
 	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.flower_pot;
