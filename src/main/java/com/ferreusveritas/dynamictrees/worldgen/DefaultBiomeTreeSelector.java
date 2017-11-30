@@ -5,14 +5,13 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -68,9 +67,9 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	}
 	
 	@Override
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
+	public Decision getTree(World world, BiomeGenBase biome, BlockPos pos, IBlockState dirt, Random random) {
 		
-		int biomeId = Biome.getIdForBiome(biome);
+		int biomeId = biome.biomeID;
 		ITreeSelector select;
 				
 		if(fastTreeLookup.containsKey(biomeId)) {
@@ -82,14 +81,14 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 					select = new StaticDecision(new Decision(spruce));
 				} else if (BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {
 					select = new StaticDecision(new Decision(darkoak));
-				} else if (DynamicTree.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
+				} else if (DynamicTree.isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills)) {
 					select = new StaticDecision(new Decision(birch));
 				} else {
 					select = new StaticDecision(new Decision(oak));
 				}
-			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
+			} /*else if(biome == BiomeGenBase.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
 				select = new StaticDecision(new Decision(darkoak));
-			}
+			}*/
 			else if(BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE)) {
 				select = new StaticDecision(new Decision(jungle));
 			}

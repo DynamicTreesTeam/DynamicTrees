@@ -8,8 +8,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.init.Biomes;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -72,7 +71,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	}
 
 	@Override
-	public double getDensity(Biome biome, double noiseDensity, Random random) {
+	public double getDensity(BiomeGenBase biome, double noiseDensity, Random random) {
 		
 		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
 			return 0.5f + (noiseDensity / 2.0f);
@@ -83,9 +82,9 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	}
 	
 	@Override
-	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
+	public EnumChance chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
 
-		int biomeId = Biome.getIdForBiome(biome);
+		int biomeId = biome.biomeID;
 		IChance chance;
 				
 		if(fastChanceLookup.containsKey(biomeId)) {
@@ -106,9 +105,9 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 			else if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
 				chance = new ChanceStatic(EnumChance.OK);
 			}
-			else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
+			/*else if(biome == BiomeGenBase.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
 				chance = new ChanceStatic(EnumChance.OK);
-			}
+			}*/
 			else if(BiomeDictionary.isBiomeOfType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
 				chance = new ChanceRandom(0.5f);
 			} 
