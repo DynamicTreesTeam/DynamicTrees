@@ -28,7 +28,7 @@ public class RendererSapling implements ISimpleBlockRenderingHandler {
 
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockDynamicSapling sapling = (BlockDynamicSapling) block;
-		DynamicTree tree = sapling.getTree(blockAccess, pos);
+		DynamicTree tree = sapling.getTree(pos.getBlockState(blockAccess));
 		
 		renderSapling(blockAccess, x, y, z, tree, renderer, 0);
 

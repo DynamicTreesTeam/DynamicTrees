@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.cells;
 
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-
-import net.minecraft.util.EnumFacing;
 
 public class CellConiferTopBranch implements ICell {
 

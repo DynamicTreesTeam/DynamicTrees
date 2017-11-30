@@ -3,9 +3,13 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
+import com.ferreusveritas.dynamictrees.api.backport.EnumDyeColor;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
@@ -20,49 +24,68 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import cpw.mods.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
-
-	public BiomeTreeHandler treeHandler; //Provides forest properties for a biome
+	
+	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
-
-	public TreeGenerator() {
-		treeHandler = new BiomeTreeHandler();
-		radiusCoordinator = new BiomeRadiusCoordinator(treeHandler);
-		codeStore = new TreeCodeStore();
-		circleMan = new ChunkCircleManager(radiusCoordinator);
+	protected RandomXOR random;
+	
+	public enum EnumGeneratorResult {
+		GENERATED(EnumDyeColor.WHITE),
+		NOTREE(EnumDyeColor.BLACK),
+		UNHANDLEDBIOME(EnumDyeColor.YELLOW),
+		FAILSOIL(EnumDyeColor.BROWN),
+		FAILCHANCE(EnumDyeColor.BLUE),
+		FAILGENERATION(EnumDyeColor.RED);
+		
+		private final EnumDyeColor color;
+		
+		private EnumGeneratorResult(EnumDyeColor color) {
+			this.color = color;
+		}
+		
+		public EnumDyeColor getColor() {
+			return this.color;
+		}
+	
 	}
-
+	
+	public TreeGenerator() {
+		biomeTreeHandler = new BiomeTreeHandler();
+		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
+		circleMan = new ChunkCircleManager(radiusCoordinator);
+		random = new RandomXOR();
+	}
+	
 	public void onWorldUnload() {
 		circleMan = new ChunkCircleManager(radiusCoordinator);//Clears the cached circles
 	}
-
+	
 	public ChunkCircleManager getChunkCircleManager() {
 		return circleMan;
 	}
-
+	
 	@Override
-	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator,	IChunkProvider chunkProvider) {
+	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+		
+		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
+		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
+		
 		switch (world.provider.dimensionId) {
 		case 0: //Overworld
 			generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
 			break;
 		case -1: //Nether
-
 			break;
 		case 1: //End
-
 			break;
 		}
 	}
-
-	EnumFacing getRandomDir(Random rand) {
-		return EnumFacing.getOrientation(2 + rand.nextInt(4));//Return NSWE
-	}
-
+	
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
 		ArrayList<Circle> circles = circleMan.getCircles(world, random, chunkX, chunkZ);
-
+		
 		for(Circle c: circles) {
 			makeTree(world, c);
 		}
@@ -72,7 +95,7 @@ public class TreeGenerator implements IWorldGenerator {
 			roofedForestCompensation(world, random, pos);
 		}
 	}
-
+	
 	/**
 	 * Decorate the roofedForest exactly like Minecraft, except leave out the trees and just make giant mushrooms
 	 * 
@@ -94,10 +117,13 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
-	@SuppressWarnings("unused")
-	private void makeWoolCircle(World world, Circle circle, int h) {
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
+		makeWoolCircle(world, circle, h, resultType, 0);
+	}
+	
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
-
+		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
@@ -105,48 +131,62 @@ public class TreeGenerator implements IWorldGenerator {
 				}
 			}
 		}
+		
+		if(resultType != EnumGeneratorResult.GENERATED) {
+			BlockPos pos = new BlockPos(circle.x, h, circle.z);
+			EnumDyeColor color = resultType.getColor();
+			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.stained_hardened_clay, color.getMetadata(), 3);
+			world.setBlock(pos.getX(), pos.getY() + 1, pos.getZ(), Blocks.stained_hardened_clay, color.getMetadata(), 3);
+		}
 	}
-
-	private void makeTree(World world, Circle circle) {
-
+	
+	private EnumGeneratorResult makeTree(World world, Circle circle) {
+		
 		circle.add(8, 8);//Move the circle into the "stage"
-
-		BlockPos pos = new BlockPos(circle.x, world.getHeightValue(circle.x, circle.z), circle.z);
-		IBlockState blockAndMeta = null;
-
-		while(pos.getY() > 1) {
-			blockAndMeta = pos.getBlockState(world);
-			Block block = blockAndMeta.getBlock();
-			if(block == Blocks.grass || 
-				block == Blocks.dirt ||
-				block == Blocks.mycelium || 
-				block == Blocks.sand || 
-				block == Blocks.gravel || 
-				block == Blocks.stone || 
-				block == Blocks.bedrock || 
-				block == Blocks.water || 
-				block == Blocks.flowing_water){
-				break;
-			}
+		
+		BlockPos pos = new BlockPos(circle.x, world.getHeightValue(circle.x, circle.z), circle.z).down();
+		
+		while(pos.isAirBlock(world) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
 			pos = pos.down();
 		}
-
-		//Uncomment below to display wool circles for testing the circle growing algorithm
-		//makeWoolCircle(world, circle, pos.getY());
-
-		BiomeGenBase biome = world.getBiomeGenForCoords(circle.x, circle.z);
-		DynamicTree tree = treeHandler.getTree(world.getBiomeGenForCoords(circle.x, circle.z));
-
-		if(tree != null && tree.getSeed().isAcceptableSoil(blockAndMeta, tree.getSeedStack())) {
-			if(treeHandler.chance(biome, tree, circle.radius, world.rand)) {
-				JoCode code = codeStore.getRandomCode(tree, circle.radius, world.rand);
-				if(code != null) {
-					code.growTree(world, tree, pos, getRandomDir(world.rand), circle.radius + 3);
+		
+		IBlockState blockState = pos.getBlockState(world);
+		
+		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
+		
+		BiomeGenBase biome = world.getBiomeGenForCoords(pos.getX(), pos.getZ());
+		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState, random);
+		if(decision.isHandled()) {
+			DynamicTree tree = decision.getTree();
+			if(tree != null) {
+				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
+					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
+						if(tree.generate(world, pos, biome, random, circle.radius)) {
+							result = EnumGeneratorResult.GENERATED;
+						} else {
+							result = EnumGeneratorResult.FAILGENERATION;
+						}
+					} else {
+						result = EnumGeneratorResult.FAILCHANCE;
+					}
+				} else {
+					result = EnumGeneratorResult.FAILSOIL;
 				}
+			} else {
+				result = EnumGeneratorResult.NOTREE;
 			}
+		} else {
+			result = EnumGeneratorResult.UNHANDLEDBIOME;
 		}
-
+		
+		//Display wool circles for testing the circle growing algorithm
+		if(ConfigHandler.worldGenDebug) {
+			makeWoolCircle(world, circle, pos.getY(), result);
+		}
+		
 		circle.add(-8, -8);//Move the circle back to normal coords
+		
+		return result;
 	}
-
+	
 }

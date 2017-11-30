@@ -7,21 +7,21 @@ package com.ferreusveritas.dynamictrees.util;
  *
  */
 public class MathHelper {
-
+	
 	public static int clamp(int num, int min, int max) {
-		return net.minecraft.util.math.MathHelper.clamp_int(num, min, max);
+		return net.minecraft.util.MathHelper.clamp_int(num, min, max);
 	}
 
 	public static float clamp(float num, float min, float max) {
-		return net.minecraft.util.math.MathHelper.clamp_float(num, min, max);
+		return net.minecraft.util.MathHelper.clamp_float(num, min, max);
 	}
 
 	public static double clamp(double num, double min, double max) {
-		return net.minecraft.util.math.MathHelper.clamp_double(num, min, max);
+		return net.minecraft.util.MathHelper.clamp_double(num, min, max);
 	}
 
     public static int floor(double value) {
-    	return net.minecraft.util.math.MathHelper.floor_double(value);
+    	return net.minecraft.util.MathHelper.floor_double(value);
     }
-	
+    
 }

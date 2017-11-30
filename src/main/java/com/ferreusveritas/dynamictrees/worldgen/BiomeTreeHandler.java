@@ -1,14 +1,18 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
 
 /**
 * Selects a tree appropriate for a biome
@@ -17,92 +21,87 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 */
 public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelector {
 
-	DynamicTree oak;
-	DynamicTree birch;
-	DynamicTree spruce;
-	DynamicTree acacia;
-	DynamicTree jungle;
-	DynamicTree darkoak;
-
+	private ArrayList<IBiomeTreeSelector> biomeTreeSelectors = new ArrayList<IBiomeTreeSelector>();
+	private ArrayList<IBiomeDensityProvider> biomeDensityProvider = new ArrayList<IBiomeDensityProvider>();
+	
 	public BiomeTreeHandler() {
-		oak = TreeRegistry.findTree("oak");
-		birch = TreeRegistry.findTree("birch");
-		spruce = TreeRegistry.findTree("spruce");
-		acacia = TreeRegistry.findTree("acacia");
-		jungle = TreeRegistry.findTree("jungle");
-		darkoak = TreeRegistry.findTree("darkoak");
+		addTreeSelector(new DefaultBiomeTreeSelector());
+		addDensityProvider(new DefaultBiomeDensityProvider());
 	}
-
+	
+	public void addTreeSelector(IBiomeTreeSelector treeSelector) {
+		biomeTreeSelectors.add(treeSelector);
+		biomeTreeSelectors.sort(new Comparator<IBiomeTreeSelector>() {
+			@Override
+			public int compare(IBiomeTreeSelector sel1, IBiomeTreeSelector sel2) {
+				return sel2.getPriority() - sel1.getPriority();//Sort backwards so higher values are on top.
+			}
+		});
+	}
+	
+	public void addDensityProvider(IBiomeDensityProvider densityProvider) {
+		biomeDensityProvider.add(densityProvider);
+		biomeDensityProvider.sort(new Comparator<IBiomeDensityProvider>() {
+			@Override
+			public int compare(IBiomeDensityProvider sel1, IBiomeDensityProvider sel2) {
+				return sel2.getPriority() - sel1.getPriority();//Sort backwards so higher values are on top.
+			}
+		});
+	}
+	
 	@Override
-	public DynamicTree getTree(BiomeGenBase biome) {
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA)) {
-			return acacia;
+	public void init() {
+		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
+			selector.init();
 		}
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS)) {
-			return spruce;
-		}
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE)) {
-			return jungle;
-		}
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {
-			return darkoak;
-		}
+	}
+	
+	@Override
+	public Decision getTree(World world, BiomeGenBase biome, BlockPos pos, IBlockState dirt, Random random) {
 		
-		if(BiomeDictionary.isBiomeOfType(biome, Type.WASTELAND)) {
-			return null;
-		}
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SANDY)) {
-			return null;
-		}
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {
-			if(DynamicTree.isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills)) {
-				return birch;
-			} else {
-				return oak;
+		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
+			Decision decision = selector.getTree(world, biome, pos, dirt, random);
+			if(decision != null && decision.isHandled()) {
+				return decision;
 			}
 		}
-
-		return oak;
+		
+		return new Decision(null);//No tree at all
 	}
-
+	
 	@Override
 	public double getDensity(BiomeGenBase biome, double noiseDensity, Random random) {
-
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
-			if(random.nextInt(4) == 0) {
-				return 1.0f;
+		
+		for(IBiomeDensityProvider provider : biomeDensityProvider) {
+			double density = provider.getDensity(biome, noiseDensity, random);
+			if(density >= 0) {
+				return MathHelper.clamp(density, 0.0, 1.0);
 			}
-			if(random.nextInt(8) == 0) {
-				return 0.0f;
-			}
-			return (noiseDensity * 0.25) + 0.25;
 		}
-
-		double naturalDensity = MathHelper.clamp_float((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
-		return noiseDensity * (naturalDensity * 1.5f);
-	} 
-
+		
+		return noiseDensity;
+	}
+	
 	@Override
-	public boolean chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
-		
-		//Never miss a chance to spawn a tree in the roofed forest.
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {//Roofed Forest
-			return true;
+	public EnumChance chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
+				
+		for(IBiomeDensityProvider provider : biomeDensityProvider) {
+			EnumChance c = provider.chance(biome, tree, radius, random);
+			if(c != EnumChance.UNHANDLED) {
+				return c;
+			}
 		}
-		
-		int chance = 1;
-		
-		if(radius > 3) {
-			chance = (int) (radius / 1.5f);
-		}
-
-		return random.nextInt(chance) == 0;
+				
+		return EnumChance.OK;
+	}
+	
+	@Override
+	public int getPriority() {
+		return 0;
 	}
 
+	@Override
+	public String getName() {
+		return "core";
+	}
 }

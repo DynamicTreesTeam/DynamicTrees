@@ -3,13 +3,14 @@ package com.ferreusveritas.dynamictrees.special;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class BottomListenerDropItems implements IBottomListener {
 
@@ -27,14 +28,14 @@ public class BottomListenerDropItems implements IBottomListener {
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			//Don't spawn drops if this block is in a chunk that is next to an unloaded chunk
-			if(!TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+			if(!CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 				return;
 			}
 
 			//Spawn seed
-			if(!onlyEdge || tree.getGrowingLeaves().getHydrationLevel(world, pos) == 1) {
+			if(!onlyEdge || tree.getDynamicLeaves().getHydrationLevel(world, pos) == 1) {
 				EntityItem itemEntity = new EntityItem(world, pos.getX(), pos.getY() - 1, pos.getZ(), toDrop.copy());
-				world.spawnEntityInWorld(itemEntity);
+				CompatHelper.spawnEntity(world, itemEntity);
 			}
 		}
 	}

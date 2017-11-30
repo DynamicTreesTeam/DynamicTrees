@@ -45,7 +45,7 @@ public class DirtBucket extends ItemReg {
                 	return stack;
                 }
 
-                pos = pos.offset(EnumFacing.getOrientation(movingobjectposition.sideHit));
+                pos = pos.offset(EnumFacing.getFront(movingobjectposition.sideHit));
                 
                 if (!player.canPlayerEdit(pos.getX(), pos.getY(), pos.getZ(), movingobjectposition.sideHit, stack)) {
                 	return stack;
@@ -69,7 +69,7 @@ public class DirtBucket extends ItemReg {
     		if (!world.isRemote) {
     			world.func_147480_a(pos.getX(), pos.getY(), pos.getZ(), true);
     		}
-
+			
     		String soundevent = "dig.grass";
     		world.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), soundevent, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);                    
     		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, 3);

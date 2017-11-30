@@ -74,9 +74,8 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	//Unlike a regular flower pot this is only used to eject the contents
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem();
-		IBlockState state = pos.getBlockState(world);
 		
 		if(heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
@@ -102,12 +101,11 @@ public class BlockBonsaiPot extends BlockBackport {
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
-	@Override
 	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.flower_pot;
 	}
-
+	
 	@Override
 	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
 		BlockPos pos = new BlockPos(x, y, z);
@@ -119,9 +117,9 @@ public class BlockBonsaiPot extends BlockBackport {
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, Block block) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
 	if (!World.doesBlockHaveSolidTopSurface(world, pos.getX(), pos.getY() - 1, pos.getZ())) {
-            this.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), pos.getMeta(world), 0);
+            this.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), state.getMeta(), 0);
             pos.setBlockToAir(world);
         }
     }

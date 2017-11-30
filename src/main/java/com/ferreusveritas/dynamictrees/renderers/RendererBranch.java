@@ -52,7 +52,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 		GL11.glTranslatef(0.5f + rad, 0, 0);
 
-		int color = branch.getTree().getGrowingLeaves().getRenderColor(branch.getTree().getGrowingLeavesSub() << 2);
+		int color = branch.getTree().getDynamicLeaves().getRenderColor(branch.getTree().getDynamicLeavesSub() << 2);
 		float r = (color >> 16 & 255) / 255.0F;
 		float g = (color >> 8 & 255) / 255.0F;
 		float b = (color & 255) / 255.0F;
@@ -112,7 +112,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 			if(radius == 8){//Simply render a standard block if the radius is large enough to fill the entire block
 				if(numConnections == 1){
-					renderRingSides = 1 << EnumFacing.getOrientation(sourceDir).getOpposite().ordinal();
+					renderRingSides = 1 << EnumFacing.getFront(sourceDir).getOpposite().ordinal();
 				}
 				renderer.setRenderBounds(0.0d, 0.0d, 0.0d, 1.0d, 1.0d, 1.0d);
 				renderer.renderStandardBlock(block, x, y, z);

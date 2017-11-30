@@ -55,12 +55,12 @@ public class Staff extends ItemReg {
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float sideX, float sideY, float sideZ) {
+	public boolean onItemUse(ItemStack heldStack, EntityPlayer player, World world, int x, int y, int z, int side, float sideX, float sideY, float sideZ) {
 
 		BlockPos pos = new BlockPos(x, y, z);
 		IBlockState clickedBlock = pos.getBlockState(world);
 		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock.getBlock());
-		BlockPos root = pos;
+		BlockPos rootPos = pos;
 		
 		/*if(clickedBlock instanceof BlockGrowingLeaves ){
 			if(world.isRemote){
@@ -74,36 +74,36 @@ public class Staff extends ItemReg {
 		if(branch != null) {
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
-				root = signal.root;
-				treePart = TreeHelper.getSafeTreePart(world, root);
+				rootPos = signal.root;
+				treePart = TreeHelper.getSafeTreePart(world, rootPos);
 				
 				if(world.isRemote && treePart.isRootNode()) {
 					BlockRootyDirt rootyDirt = (BlockRootyDirt) treePart;
-					int soilLife = rootyDirt.getSoilLife(world, root);
+					int soilLife = rootyDirt.getSoilLife(world, rootPos);
 					Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Rooty Soil Life: " + soilLife));
 				}
 			}
 		}
 
 		//Get the code from a tree or rooty dirt and set it in the staff
-		if(!isReadOnly(itemStack) && treePart.isRootNode()) {
-			DynamicTree tree = treePart.getTree(world, root);
+		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
+			DynamicTree tree = treePart.getTree(world, rootPos);
 			if(tree != null) {
 				if(!player.isSneaking()) {
-					String code = new JoCode().buildFromTree(world, root, getPlayerDirection(player)).toString();
-					setCode(itemStack, code);
+					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
+					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
-				setTree(itemStack, tree);
+				setTree(heldStack, tree);
 				return true;
 			}
 		}
 
 		//Create a tree from right clicking on soil
-		DynamicTree tree = getTree(itemStack);
-		if(tree != null && tree.isAcceptableSoil(clickedBlock)) {
-			new JoCode(getCode(itemStack)).setCareful(true).growTree(world, tree, pos, getPlayerDirection(player), 8);
-			itemStack.stackSize--;//If the player is in creative this will have no effect.
+		DynamicTree tree = getTree(heldStack);
+		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
+			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
+			heldStack.stackSize--;//If the player is in creative this will have no effect.
 			return true;
 		}
 
@@ -224,7 +224,7 @@ public class Staff extends ItemReg {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean advancedTooltips) {
 		DynamicTree tree = getTree(stack);
-		tooltip.add("Tree: " + tree != null ? tree.getName() : "none");
+		tooltip.add("Tree: " + ((tree != null) ? tree.getFullName() : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 

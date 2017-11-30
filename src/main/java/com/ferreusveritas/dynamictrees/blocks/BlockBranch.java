@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -139,7 +140,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-		if (tree != null && tree.onTreeActivated(world, pos, player, facing, hitX, hitY, hitZ)) {
+		if (tree != null && tree.onTreeActivated(world, pos, state, player, EnumHand.MAIN_HAND, player.getHeldItem(), EnumFacing.getFront(facing), hitX, hitY, hitZ)) {
 			return true;
 		}
 

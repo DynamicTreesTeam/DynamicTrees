@@ -10,6 +10,7 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 
@@ -22,7 +23,9 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		killTree,
 		getSoilLife,
 		setSoilLife,
-		createStaff
+		createStaff,
+		testPoisson,
+		testPoisson2
 	}
 	
 	private class CachedCommand {
@@ -53,15 +56,19 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		}
 	}
 
+	public BlockPos getPos() {
+		return new BlockPos(xCoord, yCoord, zCoord);
+	}
+
 	@Override
 	public void updateEntity() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-		BlockPos pos = new BlockPos(xCoord, yCoord, zCoord);
+		World world = worldObj;
 		
 		synchronized(this) {
-			treeName = new String(dendroCoil.getTree(worldObj, pos));
-			soilLife = dendroCoil.getSoilLife(worldObj, pos);
+			treeName = new String(dendroCoil.getTree(world, getPos()));
+			soilLife = dendroCoil.getSoilLife(world, getPos());
 		}
 
 		//Run commands that are cached that shouldn't be in the lua thread
@@ -70,12 +77,14 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 				if(dendroCoil != null) {
 					for(CachedCommand command:  cachedCommands) {
 						switch(command.method) {
-							case growPulse: dendroCoil.growPulse(worldObj, pos); break;
-							case killTree: dendroCoil.killTree(worldObj, pos); break;
-							case plantTree: dendroCoil.plantTree(worldObj, pos, (String)command.arguments[0]); break;
-							case setCode: dendroCoil.setCode(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
-							case setSoilLife: dendroCoil.setSoilLife(worldObj, pos, ((Double)command.arguments[0]).intValue()); break;
-							case createStaff: dendroCoil.createStaff(worldObj, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case growPulse: dendroCoil.growPulse(world, getPos()); break;
+							case killTree: dendroCoil.killTree(world, getPos()); break;
+							case plantTree: dendroCoil.plantTree(world, getPos(), (String)command.arguments[0]); break;
+							case setCode: dendroCoil.setCode(world, getPos(), (String)command.arguments[0], (String)command.arguments[1]); break;
+							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), ((Double)command.arguments[0]).intValue()); break;
+							case createStaff: dendroCoil.createStaff(world, getPos(), (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case testPoisson: dendroCoil.testPoisson(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
+							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2], ((Double)command.arguments[3]).intValue()); break;
 							default: break;
 						}
 					}
@@ -105,11 +114,12 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		}
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
+		World world = worldObj;
 
-		if(!worldObj.isRemote && dendroCoil != null) {
+		if(!world.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
-					return new Object[]{ dendroCoil.getCode(worldObj, new BlockPos(xCoord, yCoord, zCoord)) };
+					return new Object[]{ dendroCoil.getCode(world, getPos()) };
 				case getSoilLife:
 					synchronized(this) {
 						return new Object[]{soilLife};
@@ -157,6 +167,27 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 				case growPulse:
 				case killTree:
 					cacheCommand(method, arguments);
+					break;
+				case testPoisson:
+					if(arguments.length >= 3 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>");
+					}
+					break;
+				case testPoisson2:
+					if(arguments.length >= 4 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double &&
+						arguments[3] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>, radius3<Number>");
+					}
 					break;
 				default:
 					break;

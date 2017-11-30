@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -13,6 +14,10 @@ public class CompatHelper {
 		return world.spawnEntityInWorld(entity);
 	}
 
+	public static boolean spawnEntity(WorldDec world, Entity entity) {
+		return world.getWorld().spawnEntityInWorld(entity);
+	}
+	
     /**
      * Spawns the given ItemStack as an EntityItem into the World at the given position
      */

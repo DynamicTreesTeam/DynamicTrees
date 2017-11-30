@@ -1,37 +1,37 @@
 package com.ferreusveritas.dynamictrees.util;
 
-public class Vec2d {
+public class Vec2i {
 
 	public int x;
 	public int z;
 	public boolean loose;//for use with 2nd and 3rd circle finder algorithm
 
-	public Vec2d() {}
+	public Vec2i() {}
 
-	public Vec2d(int x, int z) {
+	public Vec2i(int x, int z) {
 		this();
 		set(x, z);
 	}
 
-	public Vec2d(Vec2d aCoord) {
+	public Vec2i(Vec2i aCoord) {
 		this(aCoord.x, aCoord.z);
 		setLoose(aCoord.loose);
 	}
 
-	public Vec2d set(int x, int z) {
+	public Vec2i set(int x, int z) {
 		this.x = x;
 		this.z = z;
 		return this;
 	}
 
-	public Vec2d set(Vec2d other) {
+	public Vec2i set(Vec2i other) {
 		this.x = other.x;
 		this.z = other.z;
 		this.loose = other.loose;
 		return this;
 	}
 
-	public Vec2d setLoose(boolean state) {
+	public Vec2i setLoose(boolean state) {
 		loose = state;
 		return this;
 	}
@@ -40,23 +40,23 @@ public class Vec2d {
 		return loose;
 	}
 
-	public Vec2d add(int x, int z) {
+	public Vec2i add(int x, int z) {
 		this.x += x;
 		this.z += z;
 		return this;
 	}
 
-	public Vec2d sub(int x, int z) {
+	public Vec2i sub(int x, int z) {
 		this.x -= x;
 		this.z -= z;
 		return this;
 	}
 
-	public Vec2d add(Vec2d other) {
+	public Vec2i add(Vec2i other) {
 		return add(other.x, other.z);
 	}
 
-	public Vec2d sub(Vec2d other) {
+	public Vec2i sub(Vec2i other) {
 		return sub(other.x, other.z);
 	}
 
@@ -68,13 +68,13 @@ public class Vec2d {
 		return Math.atan2(z, x);
 	}
 
-	public static int crossProduct(Vec2d c1, Vec2d c2) {
+	public static int crossProduct(Vec2i c1, Vec2i c2) {
 		return (c1.x * c2.z) - (c1.z * c2.x);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		Vec2d v = (Vec2d) o;
+		Vec2i v = (Vec2i) o;
 		return this.x == v.x && this.z == v.z;
 	}
 

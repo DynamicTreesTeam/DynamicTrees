@@ -9,6 +9,8 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -18,6 +20,7 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt;
 import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt.RenderType;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.Dir;
 
 import cpw.mods.fml.relauncher.Side;
@@ -63,7 +66,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, Random random) {
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
 		grow(world, pos, random);
 	}
 
@@ -77,7 +80,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 			do {
 				if(random.nextFloat() < growthRate) {
 					int life = getSoilLife(world, pos);
-					if(life > 0 && TreeHelper.isSurroundedByExistingChunks(world, pos)){
+					if(life > 0 && CoordUtils.isSurroundedByExistingChunks(world, pos)){
 						boolean success = false;
 
 						float energy = tree.getEnergy(world, pos.up());
@@ -87,15 +90,15 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 
 						int soilLongevity = tree.getSoilLongevity(world, pos.up()) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
-						if(random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 							setSoilLife(world, pos, life - 1);//decrement soil life
 						}
 					} else {
-						if(random.nextFloat() < ConfigHandler.diseaseChance && TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+						if(random.nextFloat() < ConfigHandler.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 							branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
 						} else {
 							NodeFruit nodeFruit = tree.getNodeFruit(world, pos.up());
-							if(nodeFruit != null && TreeHelper.isSurroundedByExistingChunks(world, pos)) {
+							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 								branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(nodeFruit));
 							}
 						}
@@ -205,8 +208,8 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos, EnumFacing dir, DynamicTree leavesTree) {
-		return 0;
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+		return Cells.nullCell;
 	}
 
 	@Override
@@ -246,12 +249,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		if(dir == EnumFacing.DOWN) {
-			//1.) If it's a twig(radius == 1) and the soil is barren then don't count the rooty dirt block as support
-			//2.) If it's a stocky piece(radius > 1) then count the soil as support regardless of soil life(for preserving mature trees)
-			return radius == 1 && pos.up(2).isAirBlock(blockAccess) && getSoilLife(blockAccess, pos) > 0 ? 0x12 : 0x11;
-		}
-		return 0;
+		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
 
 	@Override

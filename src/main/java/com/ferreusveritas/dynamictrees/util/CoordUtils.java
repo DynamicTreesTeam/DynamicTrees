@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 
 import net.minecraft.world.World;
@@ -21,7 +22,7 @@ public class CoordUtils {
 	
 	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
 		for(Vec3i dir: CoordUtils.surround) {
-			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()) == null ){
+			if(world.getChunkProvider().chunkExists((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ())){
 				return false;
 			}
 		}

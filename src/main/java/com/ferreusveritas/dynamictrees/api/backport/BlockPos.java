@@ -58,6 +58,14 @@ public class BlockPos implements Comparable<BlockPos> {
 		return new BlockAndMeta(getBlock(blockAccess), getMeta(blockAccess));
 	}
 	
+	public void setBlockState(World world, IBlockState blockState, int flags) {
+		blockState.setInWorld(world, this, flags);
+	}
+
+	public void setBlockState(World world, IBlockState blockState) {
+		blockState.setInWorld(world, this);
+	}
+	
 	public void setBlockToAir(World world) {
 		world.setBlockToAir(x, y, z);
 	}

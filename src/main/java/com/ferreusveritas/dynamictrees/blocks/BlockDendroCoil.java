@@ -7,14 +7,19 @@ import java.util.logging.Logger;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.ILorable;
 import com.ferreusveritas.dynamictrees.util.IRegisterable;
+import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator.EnumGeneratorResult;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -28,6 +33,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -73,7 +79,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
 		if (world.isBlockIndirectlyGettingPowered(x, y, z)) {
-			TreeHelper.ageVolume(world, new BlockPos(x, y, z));
+			growPulse(world, new BlockPos(x, y, z));
 		}
 	}
 
@@ -90,7 +96,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		JoCode jo = new JoCode(JoCode);
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		if(tree != null) {
-			jo.growTree(world, tree, pos.up(), EnumFacing.NORTH, 8);
+			jo.generate(world, tree, pos.up(), EnumFacing.NORTH, 8);
 		} else {
 			Logger.getLogger(DynamicTrees.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
 		}
@@ -104,7 +110,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
 		entityItem.motionZ = 0;
-		world.spawnEntityInWorld(entityItem);
+		CompatHelper.spawnEntity(world, entityItem);
 	}
 
 	public String getTree(World world, BlockPos pos) {
@@ -112,7 +118,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		if(part.isRootNode()) {
 			DynamicTree tree = part.getTree(world, pos.up());
 			if(tree != null) {
-				return tree.getName();
+				return tree.getFullName();
 			}
 		}
 		
@@ -155,8 +161,61 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 	
+	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle) {
+		pos = pos.up();
+		
+		for(int y = 0; y < 2; y++) {
+			for(int z = -28; z <= 28; z++) {
+				for(int x = -28; x <= 28; x++) {
+					pos.setBlockToAir(world);
+				}
+			}
+		}
+		
+		if(rad1 >= 2 && rad2 >= 2 && rad1 <= 8 && rad2 <= 8) {
+			Circle circleA = new Circle(pos, rad1);
+			DynamicTrees.treeGenerator.makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
+
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			DynamicTrees.treeGenerator.makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
+			new BlockPos(circleB.x, pos.up().getY(), circleB.z).setBlockState(world, circleB.isLoose() ? new BlockAndMeta(Blocks.cobblestone) : new BlockAndMeta(Blocks.diamond_block));
+		}
+	}
+	
+	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3) {
+		pos = pos.up();
+				
+		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
+		
+		for(int y = 0; y < 2; y++) {
+			for(int z = -28; z <= 28; z++) {
+				for(int x = -28; x <= 28; x++) {
+					pos.setBlockToAir(world);
+				}
+			}
+		}
+		
+		if(rad1 >= 2 && rad2 >= 2 && rad1 <= 8 && rad2 <= 8 && rad3 >= 2 && rad3 <= 8) {
+			Circle circleA = new Circle(pos, rad1);
+			DynamicTrees.treeGenerator.makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			DynamicTrees.treeGenerator.makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			CircleHelper.maskCircles(circleA, circleB);
+			
+			Circle circleC = CircleHelper.findThirdCircle(circleA, circleB, rad3);
+			if(circleC != null) {
+				DynamicTrees.treeGenerator.makeWoolCircle(world, circleC, pos.getY(), EnumGeneratorResult.NOTREE, 3);
+			} else {
+				System.out.println("Angle:" + angle);
+				new BlockPos(circleA.x, pos.up().getY(), circleA.z).setBlockState(world, new BlockAndMeta(Blocks.redstone_block));
+			}
+		}
+	}
+	
 	@Override
-	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
+	public TileEntity createNewTileEntity(World world, int meta) {
 		return new TileEntityDendroCoil();
 	}
 

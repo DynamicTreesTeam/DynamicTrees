@@ -2,13 +2,9 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.util.Circle;
-import com.ferreusveritas.dynamictrees.util.Vec2d;
-
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class CircleHelper {
 
@@ -16,36 +12,36 @@ public class CircleHelper {
 	private static byte pairdata[][][] = new byte[7][7][];
 
 	static { //Yuh.. magic.
-		createPairData(8, 8, 34, 0x125556DF, 0x12555490);
-		createPairData(8, 7, 32, 0x049556DF, 0x04955490);
-		createPairData(8, 6, 30, 0x012556DF, 0x01255490);
-		createPairData(8, 5, 28, 0x004AAADF, 0x004AAA90);
-		createPairData(8, 4, 26, 0x0012AADF, 0x0012AA90);
-		createPairData(8, 3, 24, 0x0009556F, 0x00095548);
-		createPairData(8, 2, 22, 0x0002556F, 0x00025548);
-		createPairData(7, 7, 30, 0x012556DF, 0x01255490);
-		createPairData(7, 6, 28, 0x004956DF, 0x00495490);
-		createPairData(7, 5, 26, 0x0012AADF, 0x0012AA90);
-		createPairData(7, 4, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(7, 3, 22, 0x0002556F, 0x00025548);
-		createPairData(7, 2, 20, 0x0000956F, 0x00009548);
-		createPairData(6, 6, 26, 0x001256DF, 0x00125490);
-		createPairData(6, 5, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(6, 4, 22, 0x00012ADF, 0x00012A90);
-		createPairData(6, 3, 20, 0x0000956F, 0x00009548);
-		createPairData(6, 2, 18, 0x0000256F, 0x00002548);
-		createPairData(5, 5, 22, 0x0001555F, 0x00015550);
-		createPairData(5, 4, 20, 0x0000555F, 0x00005550);
-		createPairData(5, 3, 18, 0x00002AAF, 0x00002AA8);
-		createPairData(5, 2, 16, 0x00000AAF, 0x00000AA8);
-		createPairData(4, 4, 18, 0x0000155F, 0x00001550);
-		createPairData(4, 3, 16, 0x00000AAF, 0x00000AA8);
-		createPairData(4, 2, 14, 0x000002AF, 0x00000A28);
-		createPairData(3, 3, 14, 0x00000557, 0x00000554);
-		createPairData(3, 2, 12, 0x00000157, 0x00000154);
-		createPairData(2, 2, 10, 0x00000057, 0x00000054);
+		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
+		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
+		createPairData(8, 6, 28, 0x004956DF, 0x00495490);
+		createPairData(8, 5, 26, 0x0012AADF, 0x0012AA90);
+		createPairData(8, 4, 24, 0x0004AADF, 0x0004AA90);
+		createPairData(8, 3, 22, 0x0002556F, 0x00025548);
+		createPairData(8, 2, 20, 0x0000956F, 0x00009548);
+		createPairData(7, 7, 28, 0x004956DF, 0x00495490);
+		createPairData(7, 6, 26, 0x001256DF, 0x00125490);
+		createPairData(7, 5, 24, 0x0004AADF, 0x0004AA90);
+		createPairData(7, 4, 22, 0x00012ADF, 0x00012A90);
+		createPairData(7, 3, 20, 0x0000956F, 0x00009548);
+		createPairData(7, 2, 18, 0x0000256F, 0x00002548);
+		createPairData(6, 6, 24, 0x000496DF, 0x00049490);
+		createPairData(6, 5, 22, 0x00012ADF, 0x00012A90);
+		createPairData(6, 4, 20, 0x00004ADF, 0x00004A90);
+		createPairData(6, 3, 18, 0x0000256F, 0x00002548);
+		createPairData(6, 2, 16, 0x0000096F, 0x00000948);
+		createPairData(5, 5, 20, 0x0000555F, 0x00005550);
+		createPairData(5, 4, 18, 0x0000155F, 0x00001550);
+		createPairData(5, 3, 16, 0x00000AAF, 0x00000AA8);
+		createPairData(5, 2, 14, 0x000002AF, 0x000002A8);
+		createPairData(4, 4, 16, 0x0000055F, 0x00000550);
+		createPairData(4, 3, 14, 0x000002AF, 0x000002A8);
+		createPairData(4, 2, 12, 0x000000AF, 0x000000A8);
+		createPairData(3, 3, 12, 0x00000157, 0x00000154);
+		createPairData(3, 2, 10, 0x00000057, 0x00000054);
+		createPairData(2, 2,  8, 0x00000017, 0x00000014);
 	}
-
+	
 	private static void createPairData(int rad1, int rad2, int codeSize, int curveCode, int looseMask) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
@@ -63,7 +59,7 @@ public class CircleHelper {
 		return wave;
 	}
 
-	private static Vec2d[] getCoordsForPair(int rad1, int rad2, int startAngle, int stopAngle) {
+	private static Vec2i[] getCoordsForPair(int rad1, int rad2, int startAngle, int stopAngle) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 
@@ -72,19 +68,24 @@ public class CircleHelper {
 		int codesize = vsdata.length - 2;
 		
 		int numAngles = stopAngle - startAngle + 1;
-		Vec2d c[] = new Vec2d[numAngles];
+		Vec2i c[] = new Vec2i[numAngles];
 		int coordIter = 0;
 		
 		for(int angleIter = startAngle; angleIter <= stopAngle; angleIter++) {
-			int vAngle = angleIter % (codesize * 4);//Wrap angle
-
+			
+			//Wrap angle
+			int vAngle = angleIter % (codesize * 4);
+			if(vAngle < 0) {
+				vAngle += (codesize * 4);
+			}
+				
 			int modulus = Math.abs(((vAngle + codesize) % (codesize * 2) ) - codesize);
 
-			Vec2d tc = c[coordIter++ % c.length] = new Vec2d();
+			Vec2i tc = c[coordIter++ % c.length] = new Vec2i();
 			
 			//Avoid branching by using a bit twiddle hack to determine the sign of the data.
 			tc.x = (-( ((vAngle / codesize) + 1) & 2) + 1) * vsdata[codesize - modulus];
-			tc.z = (-(  (vAngle / codesize) 	  & 2) + 1) * vsdata[modulus];
+			tc.z = (-(  (vAngle / codesize)      & 2) + 1) * vsdata[modulus];
 			tc.setLoose(((looseMask >> Math.min(modulus - 1, 32)) & 1) != 0);
 		}
 
@@ -123,31 +124,10 @@ public class CircleHelper {
 		return distance;
 	}
 
-	public static int getRadiusAtCoords(World world, Circle cA, NoiseGeneratorPerlin noiseGenerator) {
-		float angle = (float)cA.getFreeAngle();
-
-		double x = cA.x + (MathHelper.sin(angle) * cA.radius * 1.5);
-		double z = cA.z + (MathHelper.cos(angle) * cA.radius * 1.5);
-
-		return getRadiusAtCoords(world, x, z, noiseGenerator);
-	}
-
-	public static int getRadiusAtCoords(World world, double x, double z, NoiseGeneratorPerlin noiseGenerator) {
-		double scale = 128;//Effectively scales up the noisemap
-		BiomeGenBase biome = world.getBiomeGenForCoords((int)x, (int)z);
-		double biomeDensity = MathHelper.clamp_float((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
-		double noiseDensity = (noiseGenerator.func_151601_a(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = noiseDensity * (biomeDensity * 1.5f);
-		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
-
-		int shake = world.rand.nextInt(4);
-		shake = (shake == 2) ? 1 : (shake == 3) ? 2 : 0;
-
-		return MathHelper.clamp_int((int) size, 2 + shake, 8 - shake);//Clamp to tree volume radius range
-	}
-
 	/**
-	* TODO: Document this function
+	* Creates a tangential circle to cA at a random angle with radius cBrad.
+	* Only returns tightly fitting circles and rejects loose fits with no overlapping
+	* edges.
 	* 
 	* @param cA The base circle
 	* @param cBrad The radius of the created second circle
@@ -159,12 +139,12 @@ public class CircleHelper {
 
 		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
 
-		Vec2d[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
-		Vec2d closestCoord = coordList[0];
+		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		Vec2i closestCoord = coordList[0];
 		double closestAngle = Math.PI;
 
-		for(Vec2d c: coordList) {
-			if(!c.isLoose()) {
+		for(Vec2i c: coordList) {
+			if(!c.isLoose()) {//Reject loose circles when finding 2nd
 				double deltaAngle = deltaAngle(c.angle(), angle);
 				if(deltaAngle < closestAngle) {
 					closestCoord = c;
@@ -177,7 +157,43 @@ public class CircleHelper {
 	}
 
 	/**
-	* TODO: Document this function
+	* Creates a tangential circle to cA at a specific angle with radius cBrad
+	* 
+	* @param cA The base circle
+	* @param cBrad The radius of the created second circle
+	* @return
+	*/
+	public static Circle findSecondCircle(Circle cA, int cBrad, double angle) {
+
+		angle = Math.toRadians(angle);
+		
+		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
+
+		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		Vec2i closestCoord = coordList[0];
+		double closestAngle = Math.PI;
+		boolean isLoose = false;
+		
+		for(Vec2i c: coordList) {
+			double deltaAngle = deltaAngle(c.angle(), angle);
+			if(deltaAngle < closestAngle) {
+				closestCoord = c;
+				closestAngle = deltaAngle;
+				isLoose = c.isLoose();
+			}
+		}
+
+		Circle result = (Circle) new Circle(closestCoord, cBrad).add(cA.x, cA.z);
+		result.loose = isLoose;
+		
+		return result;
+	}
+
+	
+	/**
+	* Finds a circle that is tangential to both circle cA and circle cB of radius cCrad.
+	* Prefers a tight fit for both circles if possible.  Otherwise fits tightly with
+	* circle cA.  If the fit is loose for both circles the result is rejected.
 	* 
 	* @param cA
 	* @param cB
@@ -186,16 +202,17 @@ public class CircleHelper {
 	*/
 	public static Circle findThirdCircle(Circle cA, Circle cB, int cCrad) {
 		if(cA == null || cB == null || cCrad < 2 || cCrad > 8) {
+			System.err.println("3rd circle condition: Radius out of bounds or null circles");
 			return null;
 		}
 
 		Circle cC = new Circle(0, 0, cCrad);
-		Vec2d delta = new Vec2d(cB.x - cA.x, cB.z - cA.z);
+		Vec2i delta = new Vec2i(cB.x - cA.x, cB.z - cA.z);
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
 		double lenAB = delta.len();
-		int lenAC = cA.radius + cC.radius + 1;//We add one because the circles are a bit weird and the radius value is actually 0.5 more per circle
-		int lenBC = cB.radius + cC.radius + 1;
+		int lenAC = cA.radius + cC.radius;
+		int lenBC = cB.radius + cC.radius;
 
 		//Use law of cosines to determine missing angles of triangle ABC
 		double angA = Math.acos((lenAC * lenAC + lenAB * lenAB - lenBC * lenBC) / (2 * lenAC * lenAB));
@@ -209,13 +226,13 @@ public class CircleHelper {
 		int posAC = (int)(radiansToTurns(angBAC) * getNumAnglesInPair(cA.radius, cC.radius));
 		int posBC = (int)(radiansToTurns(angABC) * getNumAnglesInPair(cB.radius, cC.radius));
 
-		Vec2d[] coordListAC = getCoordsForPair(cA.radius, cC.radius, posAC - 2, posAC + 2);
-		Vec2d[] coordListBC = getCoordsForPair(cB.radius, cC.radius, posBC - 2, posBC + 2);
+		Vec2i[] coordListAC = getCoordsForPair(cA.radius, cC.radius, posAC - 2, posAC + 2);
+		Vec2i[] coordListBC = getCoordsForPair(cB.radius, cC.radius, posBC - 2, posBC + 2);
 
-		Vec2d a = new Vec2d();
-		Vec2d b = new Vec2d();
+		Vec2i a = new Vec2i();
+		Vec2i b = new Vec2i();
 		boolean solution = false;
-
+		
 		for(int ac = 0; ac < coordListAC.length; ac++) {
 			for(int bc = 0; bc < coordListBC.length; bc++) {
 				a.set(coordListAC[ac]).add(cA.x, cA.z);
@@ -230,9 +247,42 @@ public class CircleHelper {
 			}
 		}
 
+		
+		if(!solution && ConfigHandler.worldGenDebug) {
+			ArrayList<Circle> circles = new ArrayList<Circle>();
+			Circle cAtemp = new Circle(cA);
+			Circle cBtemp = new Circle(cB);
+			
+			if(cAtemp.x < cBtemp.x) {
+				cBtemp.x -= cAtemp.x;
+				cAtemp.x = 0;
+			} else {
+				cAtemp.x -= cBtemp.x;
+				cBtemp.x = 0;
+			}
+
+			if(cAtemp.z < cBtemp.z) {
+				cBtemp.z -= cAtemp.z;
+				cAtemp.z = 0;
+			} else {
+				cAtemp.z -= cBtemp.z;
+				cBtemp.z = 0;
+			}
+			
+			circles.add(cAtemp);
+			circles.add(cBtemp);
+			circles.add(new Circle(24, 24, cCrad));
+			CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
+			System.err.println("3rd circle condition: No solution found");
+			System.err.println("CircleA:" + cA);
+			System.err.println("CircleB:" + cB);
+			System.err.println("RadiusC:" + cCrad);
+		}
+		
+		
 		return solution ? cC : null;
 	}
-
+	
 	public static void maskCircles(Circle c1, Circle c2) {
 		maskCircles(c1, c2, false);
 	}
@@ -243,7 +293,7 @@ public class CircleHelper {
 			return;
 		}
 
-		Vec2d delta = new Vec2d(c2.x - c1.x, c2.z - c1.z);
+		Vec2i delta = new Vec2i(c2.x - c1.x, c2.z - c1.z);
 		double angle = delta.angle();
 		double dist = delta.len();
 

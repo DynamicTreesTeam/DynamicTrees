@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -230,7 +231,7 @@ public class DynamicTree {
 		return false;
 	}
 
-	public boolean onTreeActivated(World world, BlockPos pos, EntityPlayer player, int side, float px, float py, float pz) {
+	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
 
