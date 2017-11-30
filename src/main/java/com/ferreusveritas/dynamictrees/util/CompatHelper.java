@@ -32,5 +32,8 @@ public class CompatHelper {
         }
     }
 
+    public static void spawnItemStackAsEntity(WorldDec world, BlockPos pos, ItemStack stack)  {
+    	spawnItemStackAsEntity(world.getWorld(), pos, stack);
+    }
 	
 }

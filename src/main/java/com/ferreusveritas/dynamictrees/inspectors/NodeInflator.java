@@ -8,8 +8,8 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeInflator implements INodeInspector {
@@ -25,7 +25,7 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
 		if(branch != null){
@@ -36,7 +36,7 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		//Calculate Branch Thickness based on neighboring branches
 		
 		BlockBranch branch = TreeHelper.getBranch(block);

@@ -5,8 +5,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 public class BlockAndMeta implements IBlockState {
 
@@ -39,21 +37,6 @@ public class BlockAndMeta implements IBlockState {
 	@Override
 	public IBlockState withMeta(int meta) {
 		return new BlockAndMeta(block, meta & 0x0f);
-	}
-	
-	@Override
-	public void setInWorld(World world, BlockPos pos, int flags) {
-		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), block, meta, flags);
-	}
-
-	@Override
-	public void setInWorld(World world, BlockPos pos) {
-		setInWorld(world, pos, 3);
-	}
-	
-	@Override
-	public BlockAndMeta getFromWorld(IBlockAccess access, BlockPos pos) {
-		return new BlockAndMeta(pos.getBlock(access), pos.getMeta(access));
 	}
 	
 	///////////////////////////////////////////

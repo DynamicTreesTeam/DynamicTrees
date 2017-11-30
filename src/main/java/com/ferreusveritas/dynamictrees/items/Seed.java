@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -39,17 +40,18 @@ public class Seed extends ItemReg {
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
+		WorldDec world = new WorldDec(entityItem.worldObj);
 
 		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!entityItem.worldObj.isRemote) {//Server side only
+			if(!world.isRemote()) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
-				if(entityItem.worldObj.canBlockSeeTheSky(pos.getX(), pos.getY(), pos.getZ())) {
+				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
 					ItemStack seedStack = entityItem.getEntityItem();
 					int count = seedStack.stackSize;
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.worldObj, pos) ){//1 in 16 chance if ideal
-							if(plantSapling(entityItem.worldObj, pos, seedStack)) {
+						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(world, pos) ){//1 in 16 chance if ideal
+							if(plantSapling(world, pos, seedStack)) {
 								break;
 							}
 						}
@@ -64,13 +66,14 @@ public class Seed extends ItemReg {
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack heldItem, EntityPlayer player, World world, int x, int y, int z, int side, float px, float py, float pz) {
-
+	public boolean onItemUse(ItemStack heldItem, EntityPlayer player, World _world, int x, int y, int z, int side, float px, float py, float pz) {
+		WorldDec world = new WorldDec(_world);
+		
 		BlockPos pos = new BlockPos(x, y, z);
 		EnumFacing facing = EnumFacing.getFront(side);
 		
 		//Handle Flower Pot interaction
-		IBlockState blockState = pos.getBlockState(world);
+		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(new BlockAndMeta(Blocks.flower_pot, 0))) { //Empty Flower Pot
 			DynamicTree tree = getTree(heldItem);
 			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
@@ -99,11 +102,11 @@ public class Seed extends ItemReg {
 	 * @param seedStack
 	 * @return
 	 */
-	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
+	public boolean plantSapling(WorldDec world, BlockPos pos, ItemStack seedStack) {
 		DynamicTree tree = getTree(seedStack);
 		
-		if(pos.getBlock(world).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
-			tree.getDynamicSapling().setInWorld(world, pos);
+		if(world.getBlock(pos).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
+			world.setBlockState(pos, tree.getDynamicSapling());
 			return true;
 		}
 

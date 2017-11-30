@@ -4,11 +4,8 @@ import java.util.Iterator;
 
 import com.google.common.collect.AbstractIterator;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockPos implements Comparable<BlockPos> {
@@ -46,34 +43,6 @@ public class BlockPos implements Comparable<BlockPos> {
 		return z;
 	}
 	
-	public Block getBlock(IBlockAccess blockAccess) {
-		return blockAccess.getBlock(x, y, z);
-	}
-	
-	public int getMeta(IBlockAccess blockAccess) {
-		return blockAccess.getBlockMetadata(x, y, z);
-	}
-	
-	public IBlockState getBlockState(IBlockAccess blockAccess) {
-		return new BlockAndMeta(getBlock(blockAccess), getMeta(blockAccess));
-	}
-	
-	public void setBlockState(World world, IBlockState blockState, int flags) {
-		blockState.setInWorld(world, this, flags);
-	}
-
-	public void setBlockState(World world, IBlockState blockState) {
-		blockState.setInWorld(world, this);
-	}
-	
-	public void setBlockToAir(World world) {
-		world.setBlockToAir(x, y, z);
-	}
-	
-	public boolean isAirBlock(IBlockAccess blockAccess) {
-		return blockAccess.isAirBlock(x, y, z);
-	}
-
 	public BlockPos add(BlockPos pos) {
 		return pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0 ? this : new BlockPos(this.getX() + pos.getX(), this.getY() + pos.getY(), this.getZ() + pos.getZ());
 	}

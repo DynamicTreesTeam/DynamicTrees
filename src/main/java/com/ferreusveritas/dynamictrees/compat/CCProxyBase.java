@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat;
 
-import net.minecraftforge.fml.common.Loader;
+import cpw.mods.fml.common.Loader;
 
 public class CCProxyBase {
 

@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 
 public interface IBottomListener {
 
@@ -17,7 +17,7 @@ public interface IBottomListener {
 	 * @param pos
 	 * @param random
 	 */
-	public void run(World world, DynamicTree tree, BlockPos pos, Random random);
+	public void run(WorldDec world, DynamicTree tree, BlockPos pos, Random random);
 
 	/**
 	 * @return 0 to 1 chance of something happening. Must return a positive non-zero number.  Return 1 to always run

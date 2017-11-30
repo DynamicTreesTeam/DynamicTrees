@@ -5,11 +5,13 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.renderers.RendererSapling;
 
 import cpw.mods.fml.relauncher.Side;
@@ -40,35 +42,35 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(WorldDec world, BlockPos pos, IBlockState state, Random rand) {
 		generateTree(world, pos, state, rand);
 	}
 
-	public static boolean canSaplingStay(IBlockAccess world, DynamicTree tree, BlockPos pos) {
+	public static boolean canSaplingStay(BlockAccessDec access, DynamicTree tree, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-			Block block = pos.offset(dir).getBlock(world);
+			Block block = access.getBlock(pos.offset(dir));
 			if(TreeHelper.isBranch(block) || block instanceof BlockDynamicSapling) {
 				return false;
 			}
 		}
 
 		//Air above and acceptable soil below
-		return pos.up().isAirBlock(world) && tree.isAcceptableSoil(pos.down().getBlockState(world));
+		return access.isAirBlock(pos) && tree.isAcceptableSoil(access.getBlockState(pos.down()));
 	}
 
 	@Override
-	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
+	public boolean canBlockStay(WorldDec world, BlockPos pos, IBlockState state) {
 		return canSaplingStay(world, getTree(state), pos);
 	}
 
-	public void generateTree(World world, BlockPos pos, IBlockState state, Random rand) {
+	public void generateTree(WorldDec world, BlockPos pos, IBlockState state, Random rand) {
 		DynamicTree tree = getTree(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			if(pos.up().isAirBlock(world) && tree.isAcceptableSoil(world, pos.down(), pos.down().getBlockState(world))) {
-				world.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), tree.getRootyDirtBlock(), 15, 3);//Set to fully fertilized rooty dirt
-				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getDynamicBranch(), 0, 3);//Set to a single branch with 1 radius
+			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+				world.setBlockState(pos.down(), new BlockAndMeta(tree.getRootyDirtBlock(), 15), 3);//Set to fully fertilized rooty dirt
+				world.setBlockState(pos, new BlockAndMeta(tree.getDynamicBranch(), 0), 3);//Set to a single branch with 1 radius
 				tree.getDynamicLeaves().growLeaves(world, tree, pos.up());//Make a single block of leaves above the trunk
 			}
 		} else {
@@ -94,15 +96,15 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+	public void neighborChanged(IBlockState state, WorldDec world, BlockPos pos, Block block) {
 		if (!this.canBlockStay(world, pos, state)) {
 			dropBlock(world, getTree(state), state, pos);
 		}
 	}
 	
-	private void dropBlock(World world, DynamicTree tree, IBlockState state, BlockPos pos) {
-		pos.setBlockToAir(world);
-		dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(tree.getSeed()));
+	private void dropBlock(WorldDec world, DynamicTree tree, IBlockState state, BlockPos pos) {
+		world.setBlockToAir(pos);
+		dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), new ItemStack(tree.getSeed()));
 	}
 
 	@Override
@@ -113,8 +115,9 @@ public class BlockDynamicSapling extends BlockBackport {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public Item getItem(World world, int x, int y, int z) {
-		return getTree(new BlockPos(x, y, z).getBlockState(world)).getSeed();
+	public Item getItem(World _world, int x, int y, int z) {
+		WorldDec world = new WorldDec(_world);
+		return getTree(world.getBlockState(new BlockPos(x, y, z))).getSeed();
 	}
 
 	@Override

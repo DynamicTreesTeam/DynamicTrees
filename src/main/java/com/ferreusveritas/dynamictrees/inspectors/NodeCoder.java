@@ -6,8 +6,8 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeCoder implements INodeInspector {
@@ -30,7 +30,7 @@ public class NodeCoder implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		Link link = new Link(pos);
 		
@@ -54,7 +54,7 @@ public class NodeCoder implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	

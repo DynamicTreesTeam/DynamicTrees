@@ -25,7 +25,7 @@ public class BlockAccessDec implements IBlockAccess {
 	}
 	
 	public IBlockState getBlockState(BlockPos pos) {
-		return new BlockAndMeta(access.getBlock(pos.getX(), pos.getY(), pos.getZ()), access.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ()));
+		return new BlockAndMeta(getBlock(pos), getBlockMetadata(pos));
 	}
 	
 	public boolean isAirBlock(BlockPos pos) {
@@ -51,6 +51,10 @@ public class BlockAccessDec implements IBlockAccess {
 		return access.getLightBrightnessForSkyBlocks(x, y, z, p_72802_4_);
 	}
 
+	public int getBlockMetadata(BlockPos pos) {
+		return access.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ());
+	}
+	
 	@Override
 	public int getBlockMetadata(int x, int y, int z) {
 		return access.getBlockMetadata(x, y, z);

@@ -11,11 +11,13 @@ import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
@@ -51,7 +53,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -215,7 +216,7 @@ public class DynamicTree {
 	// INTERACTION
 	///////////////////////////////////////////
 	
-	public boolean applySubstance(World world, BlockPos pos, BlockRootyDirt dirt, ItemStack itemStack) {
+	public boolean applySubstance(WorldDec world, BlockPos pos, BlockRootyDirt dirt, ItemStack itemStack) {
 		
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
@@ -231,7 +232,7 @@ public class DynamicTree {
 		return false;
 	}
 
-	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(WorldDec world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
 
@@ -476,11 +477,11 @@ public class DynamicTree {
 		return primitiveSapling;
 	}
 
-	public float getEnergy(World world, BlockPos pos) {
+	public float getEnergy(WorldDec world, BlockPos pos) {
 		return signalEnergy;
 	}
 
-	public float getGrowthRate(World world, BlockPos pos) {
+	public float getGrowthRate(WorldDec world, BlockPos pos) {
 		return growthRate;
 	}
 
@@ -508,7 +509,7 @@ public class DynamicTree {
 	* @param pos 
 	* @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
 	*/
-	public int getLowestBranchHeight(World world, BlockPos pos) {
+	public int getLowestBranchHeight(WorldDec world, BlockPos pos) {
 		return getLowestBranchHeight();
 	}
 
@@ -541,7 +542,7 @@ public class DynamicTree {
 		soilLongevity = longevity;
 	}
 	
-	public int getSoilLongevity(World world, BlockPos pos) {
+	public int getSoilLongevity(WorldDec world, BlockPos pos) {
 		return (int)(biomeSuitability(world, pos) * soilLongevity);
 	}
 
@@ -685,9 +686,9 @@ public class DynamicTree {
 	// LEAVES HANDLING
 	//////////////////////////////
 
-	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
+	public boolean isCompatibleDynamicLeaves(BlockAccessDec blockAccess, BlockPos pos) {
 
-		IBlockState state = pos.getBlockState(blockAccess);
+		IBlockState state = blockAccess.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getTreePart(state);
 		
 		if (treePart != null && treePart instanceof BlockDynamicLeaves) {
@@ -701,11 +702,11 @@ public class DynamicTree {
 		return leaves == getDynamicLeaves() && sub == getDynamicLeavesSub();
 	}
 
-	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return getPrimitiveLeaves().matches(pos.getBlockState(blockAccess), 3);
+	public boolean isCompatibleVanillaLeaves(BlockAccessDec blockAccess, BlockPos pos) {
+		return getPrimitiveLeaves().matches(blockAccess.getBlockState(pos), 3);
 	}
 
-	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, BlockPos pos) {
+	public boolean isCompatibleGenericLeaves(BlockAccessDec blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
 	
@@ -747,7 +748,7 @@ public class DynamicTree {
 	* @param pos
 	* @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
 	*/
-	public float biomeSuitability(World world, BlockPos pos) {
+	public float biomeSuitability(WorldDec world, BlockPos pos) {
 
 		BiomeGenBase biome = world.getBiomeGenForCoords(pos.getX(), pos.getZ());
 		
@@ -807,7 +808,7 @@ public class DynamicTree {
 	* @param random Access to a random number generator
 	* @return true if the branch should rot
 	*/
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+	public boolean rot(WorldDec world, BlockPos pos, int neighborCount, int radius, Random random) {
 		
 		final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 		
@@ -818,7 +819,7 @@ public class DynamicTree {
 				}
 			}
 		}
-		world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());
+		world.setBlockToAir(pos);
 		return true;
 	}
 	
@@ -838,7 +839,7 @@ public class DynamicTree {
 	* @param signal The grow signal.
 	* @return
 	*/
-	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
+	public EnumFacing selectNewDirection(WorldDec world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
 		EnumFacing originDir = signal.dir.getOpposite();
 
 		//prevent branches on the ground
@@ -871,7 +872,7 @@ public class DynamicTree {
 	}
 
 	/** Species can override the probability map here **/
-	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+	protected int[] customDirectionManipulation(WorldDec world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
 		return probMap;
 	}
 
@@ -914,7 +915,7 @@ public class DynamicTree {
 	* @param y Y-Axis of block
 	* @param z Z-Axis of block
 	*/
-	public NodeFruit getNodeFruit(World world, BlockPos pos) {
+	public NodeFruit getNodeFruit(WorldDec world, BlockPos pos) {
 		return null;//Return null to disable fruiting. Most species do.
 	}
 	
@@ -932,7 +933,7 @@ public class DynamicTree {
 	* @param z Z-Axis of block
 	* @param random Random number access
 	*/
-	public void bottomSpecial(World world, BlockPos pos, Random random) {
+	public void bottomSpecial(WorldDec world, BlockPos pos, Random random) {
 		for(IBottomListener special: bottomSpecials) {
 			float chance = special.chance();
 			if(chance != 0.0f && random.nextFloat() <= chance) {
@@ -989,7 +990,7 @@ public class DynamicTree {
 	 * @param radius
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(World world, BlockPos pos, BiomeGenBase biome, Random random, int radius) {
+	public boolean generate(WorldDec world, BlockPos pos, BiomeGenBase biome, Random random, int radius) {
 		EnumFacing facing = CoordUtils.getRandomDir(random);
 		if(joCodeStore != null) {
 			JoCode code = joCodeStore.getRandomCode(radius, random);

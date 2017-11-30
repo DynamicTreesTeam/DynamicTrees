@@ -7,8 +7,9 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
 
 public class NodeFruitCocoa extends NodeFruit {
 	
@@ -20,7 +21,7 @@ public class NodeFruitCocoa extends NodeFruit {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		
 		if(!finished) {
 			int hashCode = coordHashCode(pos);
@@ -30,9 +31,9 @@ public class NodeFruitCocoa extends NodeFruit {
 					int side = (hashCode % 4) + 2;
 					EnumFacing dir = EnumFacing.getFront(side);
 					pos = pos.offset(dir);
-					if (pos.isAirBlock(world)) {
-						int meta = DynamicTrees.blockFruitCocoa.onBlockPlaced(world, pos.getX(), pos.getY(), pos.getZ(), side, 0, 0, 0, 0);
-						world.setBlock(pos.getX(), pos.getY(), pos.getZ(), DynamicTrees.blockFruitCocoa, meta, 2);
+					if (world.isAirBlock(pos)) {
+						int meta = DynamicTrees.blockFruitCocoa.onBlockPlaced(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), side, 0, 0, 0, 0);
+						world.setBlockState(pos, new BlockAndMeta(DynamicTrees.blockFruitCocoa, meta), 2);
 					}
 				} else {
 					finished = true;

@@ -5,22 +5,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 public interface IBlockState {
 	
-	///////////////////////////////////////////
-	// GETTERS/SETTERS
-	///////////////////////////////////////////
+	public Block getBlock();
+	public int getMeta();
+	public IBlockState withMeta(int meta);
 	
-	Block getBlock();
-	int getMeta();
-	IBlockState withMeta(int meta);
-	void setInWorld(World world, BlockPos pos, int flags); 
-	void setInWorld(World world, BlockPos pos);
-	IBlockState getFromWorld(IBlockAccess blockAccess, BlockPos pos);
-
 	///////////////////////////////////////////
 	// COMPARISONS
 	///////////////////////////////////////////

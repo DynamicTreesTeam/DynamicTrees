@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.api.network;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class MapSignal {
@@ -32,14 +32,14 @@ public class MapSignal {
 		}
 	}
 
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		for(INodeInspector inspector: nodeInspectors) {
 			inspector.run(world, block, pos, fromDir);
 		}
 		return false;
 	}
 
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		for(INodeInspector inspector: nodeInspectors) {
 			inspector.returnRun(world, block, pos, fromDir);
 		}

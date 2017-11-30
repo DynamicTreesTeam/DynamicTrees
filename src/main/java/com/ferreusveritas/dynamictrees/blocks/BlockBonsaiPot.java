@@ -5,15 +5,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.renderers.RendererBonsai;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -62,9 +65,9 @@ public class BlockBonsaiPot extends BlockBackport {
     	return trees.get(0);
 	}
 	
-	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
+	public boolean setTree(WorldDec world, DynamicTree tree, BlockPos pos) {
 		int woodType = tree.getPrimitiveSapling().getMeta();
-		getDefaultState().withMeta(woodType).setInWorld(world, pos);
+		world.setBlockState(pos, getDefaultState().withMeta(woodType));
 		return true;
 	}
 		
@@ -74,19 +77,18 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	//Unlike a regular flower pot this is only used to eject the contents
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, int facing, float hitX, float hitY, float hitZ) {
-		ItemStack heldItem = player.getHeldItem();
+	public boolean onBlockActivated(WorldDec world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
-		if(heldItem == null) { //Empty hand
+		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
 			
-			if(!world.isRemote) {
+			if(!world.isRemote()) {
 				ItemStack seedStack = tree.getSeedStack();
 				ItemStack saplingStack = tree.getPrimitiveSapling().toItemStack();
-				world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
+				CompatHelper.spawnEntity(world, new EntityItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
-			new BlockAndMeta(Blocks.flower_pot).setInWorld(world, pos);
+			world.setBlockState(pos, new BlockAndMeta(Blocks.flower_pot));
 
 			return true;
 		}
@@ -101,32 +103,33 @@ public class BlockBonsaiPot extends BlockBackport {
 	}
 	
 	/** Get the Item that this Block should drop when harvested. */
-	@Nullable
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.flower_pot;
 	}
-	
+
 	@Override
 	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
 		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState state = pos.getBlockState(world);
+		IBlockState state = new WorldDec(world).getBlockState(pos);
 		ArrayList<ItemStack> ret = super.getDrops(world, x, y, z, metadata, fortune);
 		DynamicTree tree = getTree(state);
 		ret.add(tree.getSeedStack());
 		return ret;
 	}
-
+	
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
-	if (!World.doesBlockHaveSolidTopSurface(world, pos.getX(), pos.getY() - 1, pos.getZ())) {
-            this.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), state.getMeta(), 0);
-            pos.setBlockToAir(world);
-        }
-    }
+	public void neighborChanged(IBlockState state, WorldDec world, BlockPos pos, Block block) {
+		if (!World.doesBlockHaveSolidTopSurface(world, pos.getX(), pos.getY() - 1, pos.getZ())) {
+			this.dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), state.getMeta(), 0);
+			world.setBlockToAir(pos);
+		}
+	}
 	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
+
+	//1.7.10 Does not have blockstates
 
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS

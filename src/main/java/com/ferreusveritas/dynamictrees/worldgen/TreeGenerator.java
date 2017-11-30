@@ -3,17 +3,18 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.api.backport.EnumDyeColor;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -53,7 +54,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public TreeGenerator() {
 		biomeTreeHandler = new BiomeTreeHandler();
-		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
+		radiusCoordinator = new BiomeRadiusCoordinator((IBiomeDensityProvider) biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
@@ -117,17 +118,17 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
-	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
+	public void makeWoolCircle(WorldDec world, Circle circle, int h, EnumGeneratorResult resultType) {
 		makeWoolCircle(world, circle, h, resultType, 0);
 	}
 	
-	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
+	public void makeWoolCircle(WorldDec world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					world.setBlock(circle.x + ix, h, circle.z + iz, Blocks.wool, (circle.x ^ circle.z) & 0xF, 0);
+					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), new BlockAndMeta(Blocks.wool, (circle.x ^ circle.z) & 0xF), 0);
 				}
 			}
 		}
@@ -135,33 +136,32 @@ public class TreeGenerator implements IWorldGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			EnumDyeColor color = resultType.getColor();
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.stained_hardened_clay, color.getMetadata(), 3);
-			world.setBlock(pos.getX(), pos.getY() + 1, pos.getZ(), Blocks.stained_hardened_clay, color.getMetadata(), 3);
+			world.setBlockState(pos, new BlockAndMeta(Blocks.stained_hardened_clay, color.getMetadata()));
+			world.setBlockState(pos.up(), new BlockAndMeta(Blocks.stained_hardened_clay, color.getMetadata()));
 		}
 	}
 	
-	private EnumGeneratorResult makeTree(World world, Circle circle) {
-		
+	private EnumGeneratorResult makeTree(World _world, Circle circle) {
+		WorldDec world = new WorldDec(_world);
 		circle.add(8, 8);//Move the circle into the "stage"
 		
-		BlockPos pos = new BlockPos(circle.x, world.getHeightValue(circle.x, circle.z), circle.z).down();
-		
-		while(pos.isAirBlock(world) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
+		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
+		while(world.isAirBlock(pos) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
 			pos = pos.down();
 		}
 		
-		IBlockState blockState = pos.getBlockState(world);
+		IBlockState blockState = world.getBlockState(pos);
 		
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
-		BiomeGenBase biome = world.getBiomeGenForCoords(pos.getX(), pos.getZ());
-		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState, random);
+		BiomeGenBase biome = world.getBiome(pos);
+		Decision decision = biomeTreeHandler.getTree(world.getWorld(), biome, pos, blockState, random);
 		if(decision.isHandled()) {
 			DynamicTree tree = decision.getTree();
 			if(tree != null) {
 				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
-						if(tree.generate(world, pos, biome, random, circle.radius)) {
+						if(tree.generate(world.getWorld(), pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;

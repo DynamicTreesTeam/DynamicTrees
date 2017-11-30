@@ -12,6 +12,8 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -83,8 +85,8 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos
 	 */
-	public static void growPulse(World world, BlockPos pos) {
-		Block dirtCandidate = pos.getBlock(world);
+	public static void growPulse(WorldDec world, BlockPos pos) {
+		Block dirtCandidate = world.getBlock(pos);
 		if(dirtCandidate instanceof BlockRootyDirt) {
 			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
 			dirt.grow(world, pos, world.rand);
@@ -98,7 +100,7 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos The position of the bottom most block of a trees trunk
 	 */
-	public static void ageVolume(World world, BlockPos pos, int interations) {
+	public static void ageVolume(WorldDec world, BlockPos pos, int interations) {
 		ageVolume(world, pos, 8, 32, null, interations);
 	}
 	
@@ -111,14 +113,14 @@ public class TreeHelper {
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
 	 */
-	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
+	public static void ageVolume(WorldDec world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
 			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
 		for(int i = 0; i < iterations; i++) {
 			for(BlockPos iPos: iterable) {
-				IBlockState blockState = iPos.getBlockState(world);
+				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
 					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
@@ -135,7 +137,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return isTreePart(pos.getBlock(blockAccess));
+		return isTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getTreePart(Block block) {
@@ -143,7 +145,7 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(pos.getBlock(blockAccess));
+		return getTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getTreePart(IBlockState state) {
@@ -155,7 +157,7 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getSafeTreePart(pos.getBlock(blockAccess));
+		return getSafeTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getSafeTreePart(IBlockState blockState) {
@@ -169,7 +171,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return isBranch(pos.getBlock(blockAccess));
+		return isBranch(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	public static BlockBranch getBranch(Block block) {
@@ -181,7 +183,7 @@ public class TreeHelper {
 	}
 
 	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(pos.getBlock(blockAccess));
+		return getBranch(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	//Leaves
@@ -191,7 +193,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isLeaves(pos.getBlock(blockAccess));
+		return isLeaves(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 	//Rooty Dirt
@@ -201,7 +203,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(pos.getBlock(blockAccess));
+		return isRootyDirt(new BlockAccessDec(blockAccess).getBlock(pos));
 	}
 
 }

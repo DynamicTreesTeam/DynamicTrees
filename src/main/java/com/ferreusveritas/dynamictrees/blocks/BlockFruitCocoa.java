@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.util.IRegisterable;
 
 import cpw.mods.fml.relauncher.Side;
@@ -51,7 +52,7 @@ public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
 		z += Direction.offsetZ[dir];
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockBranch branch = TreeHelper.getBranch(world, pos);
-		return branch != null && branch.getRadius(world, pos) == 8 && branch.getTree().canSupportCocoa;
+		return branch != null && branch.getRadius(new WorldDec(world), pos) == 8 && branch.getTree().canSupportCocoa;
 	}
 
 	///////////////////////////////////////////

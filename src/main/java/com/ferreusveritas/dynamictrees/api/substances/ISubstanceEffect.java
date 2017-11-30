@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api.substances;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 
 /**
  * A substance effect is like a potion effect but for trees.
@@ -21,7 +21,7 @@ public interface ISubstanceEffect {
 	 * @param pos
 	 * @return true for success.  false otherwise
 	 */
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos);
+	public boolean apply(WorldDec world, BlockRootyDirt dirt, BlockPos pos);
 	
 	/**
 	 * For a continuously updating effect.
@@ -32,7 +32,7 @@ public interface ISubstanceEffect {
 	 * @param deltaTicks
 	 * @return true to stay alive. false to kill effector
 	 */
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks);
+	public boolean update(WorldDec world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks);
 	
 	/**
 	 * Get the name of the effect.  Used to compare existing effects in the environment.

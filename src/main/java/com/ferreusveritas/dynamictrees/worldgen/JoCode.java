@@ -16,8 +16,9 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -118,8 +119,8 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
-		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getRootyDirtBlock(), 0, 3);//Set to unfertilized rooty dirt
+	public void generate(WorldDec world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
+		world.setBlockState(pos, new BlockAndMeta(tree.getRootyDirtBlock(), 0));//Set to unfertilized rooty dirt
 
 		//Create tree
 		setFacing(facing);
@@ -144,9 +145,9 @@ public class JoCode {
 			for(Cell cell: leafMap.getAllNonZeroCells()) {
 				if((cell.getValue() & 7) != 0) {
 					BlockPos cellPos = cell.getPos();
-					Block testBlock = cellPos.getBlock(world);
+					Block testBlock = world.getBlock(cellPos);
 					if(testBlock.isReplaceable(world, cellPos.getX(), cellPos.getY(), cellPos.getZ())) {
-						world.setBlock(cellPos.getX(), cellPos.getY(), cellPos.getZ(), leavesBlock, ((treeSub << 2) & 12) | ((cell.getValue() - 1) & 3), careful ? 2 : 0);
+						world.setBlockState(cellPos, new BlockAndMeta(leavesBlock, ((treeSub << 2) & 12) | ((cell.getValue() - 1) & 3)), careful ? 2 : 0);
 					}
 				}
 			}
@@ -155,7 +156,7 @@ public class JoCode {
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, careful ? 3 : 2);
+			world.setBlockState(pos, new BlockAndMeta(Blocks.dirt, 0), careful ? 3 : 2);
 		}
 
 	}
@@ -170,7 +171,7 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(WorldDec world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);
@@ -182,8 +183,8 @@ public class JoCode {
 				EnumFacing dir = EnumFacing.getFront(code);
 				pos = pos.offset(dir);
 				if(!disabled) {
-					if(pos.getBlock(world).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlock(pos.getX(), pos.getY(), pos.getZ(), tree.getDynamicBranch(), 0, careful ? 3 : 2);
+					if(world.getBlock(pos).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+						world.setBlockState(pos, new BlockAndMeta(tree.getDynamicBranch(), 0), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}
@@ -240,7 +241,7 @@ public class JoCode {
 		leafMap.setCenter(saveCenter);
 	}
 
-	private boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
+	private boolean isClearOfNearbyBranches(WorldDec world, BlockPos pos, EnumFacing except) {
 
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(dir != except && TreeHelper.getBranch(world, pos.offset(dir)) != null) {
@@ -256,7 +257,7 @@ public class JoCode {
 	* @param pos Block position of rootyDirt block
 	* @return JoCode for chaining
 	*/
-	public JoCode buildFromTree(World world, BlockPos pos, EnumFacing facing) {
+	public JoCode buildFromTree(WorldDec world, BlockPos pos, EnumFacing facing) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {
 			NodeCoder coder = new NodeCoder();
@@ -274,7 +275,7 @@ public class JoCode {
 	 * @param pos Position of the rooty dirt block
 	 * @return resulting JoCode or nul" if no tree is found.
 	 */
-	public JoCode buildFromTree(World world, BlockPos pos) {
+	public JoCode buildFromTree(WorldDec world, BlockPos pos) {
 		return buildFromTree(world, pos, EnumFacing.NORTH);
 	}
 

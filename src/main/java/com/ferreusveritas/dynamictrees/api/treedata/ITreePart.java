@@ -7,12 +7,14 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 public interface ITreePart {
 
@@ -26,7 +28,7 @@ public interface ITreePart {
 	* @param leavesTree The tree data of the leaves the request came from
 	* @return Cell for getting hydration level
 	*/
-	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree);
+	ICell getHydrationCell(BlockAccessDec blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree);
 
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.
@@ -36,7 +38,7 @@ public interface ITreePart {
 	* @param signal Signal structure that keeps track of the growth path
 	* @return Signal parameter for chaining
 	*/
-	GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal);
+	GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal);
 
 	/**
 	* The probability that the branch logic will follow into this block as part of it's path.
@@ -46,7 +48,7 @@ public interface ITreePart {
 	* @param from The branch making the request
 	* @return Probability weight used to determine if the growth path will take this block as a path next. 
 	*/
-	int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
+	int probabilityForBlock(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from);
 
 	/**
 	* The radius of the part that a neighbor is expected to connect with 
@@ -56,7 +58,7 @@ public interface ITreePart {
 	* @param fromRadius The radius of the branch requesting connection data
 	* @return Radius of the connection point to this block from the branch
 	*/
-	int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius);
+	int getRadiusForConnection(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from, int fromRadius);
 
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
@@ -64,7 +66,7 @@ public interface ITreePart {
 	* @param pos Position
 	* @return Radius of the treepart(branch)
 	*/
-	int getRadius(IBlockAccess blockAccess, BlockPos pos);
+	int getRadius(BlockAccessDec blockAccess, BlockPos pos);
 
 	/**
 	* Configurable general purpose branch network scanner to gather data and/or perform operations
@@ -75,7 +77,7 @@ public interface ITreePart {
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
-	MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
+	MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
 
 	/**
 	* Get the appropriate dynamic tree this block is used to build.
@@ -84,7 +86,7 @@ public interface ITreePart {
 	* @param pos Position
 	* @return DynamicTree
 	*/
-	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
+	DynamicTree getTree(BlockAccessDec blockAccess, BlockPos pos);
 
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
@@ -98,7 +100,7 @@ public interface ITreePart {
 	* @param radius The radius of the branch requesting support
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
-	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
+	int branchSupport(BlockAccessDec blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 
 	/**
 	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
@@ -109,7 +111,7 @@ public interface ITreePart {
 	* @param itemStack The itemstack to be used.
 	* @return true if item was used, false otherwise
 	*/
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack);
+	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
 
 	/**
 	* The single root node of a tree.

@@ -8,8 +8,8 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 /**
@@ -25,33 +25,33 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 
 		if(branch != null && tree == branch.getTree()) {
 			if(branch.getRadius(world, pos) == 1) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
-			world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());//Destroy the branch
+			world.setBlockToAir(pos);//Destroy the branch
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
-	public void killSurroundingLeaves(World world, BlockPos twigPos) {
-		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+	public void killSurroundingLeaves(WorldDec world, BlockPos twigPos) {
+		if (!world.isRemote() && !world.restoringBlockSnapshots()) { // do not drop items while restoring blockstates, prevents item dupe
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
-						leavesPos.setBlockToAir(world);
+						world.setBlockToAir(leavesPos);
 						int qty = tree.getDynamicLeaves().quantitySeedDropped(world.rand);
 						if(qty > 0) {
-							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
+							EntityItem itemEntity = new EntityItem(world.getWorld(), leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
 							CompatHelper.spawnEntity(world, itemEntity);
 						}
 					}

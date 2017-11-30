@@ -24,6 +24,8 @@ public class CommonProxy {
 
 	public void init() {}
 
+	public void registerModels() {}
+	
 	public EntityPlayer getClientPlayer() {
 		return null;
 	}
@@ -51,6 +53,8 @@ public class CommonProxy {
 			MinecraftForge.EVENT_BUS.register(new CircleEventHandler());
 		}
 	}
+
+	//1.7.10 Does not register BlockColorHandlers
 
 	///////////////////////////////////////////
 	// PARTICLES

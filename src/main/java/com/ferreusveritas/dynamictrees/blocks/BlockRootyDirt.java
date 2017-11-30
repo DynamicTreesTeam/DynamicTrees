@@ -5,10 +5,14 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -37,7 +41,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 public class BlockRootyDirt extends BlockBackport implements ITreePart {
 
@@ -55,22 +58,26 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
 	}
-
+	
 	///////////////////////////////////////////
-	// REGISTRATION
+	// BLOCKSTATES
 	///////////////////////////////////////////
-
+	
+	// N/A in 1.7.10
+	
+	
+	
 
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+	public void updateTick(WorldDec world, BlockPos pos, IBlockState state, Random random) {
 		grow(world, pos, random);
 	}
 
-	public boolean grow(World world, BlockPos pos, Random random) {
+	public boolean grow(WorldDec world, BlockPos pos, Random random) {
 
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 
@@ -106,7 +113,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 				}
 			} while(--growthRate > 0.0f);
 		} else {
-			world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.dirt, 0, 3);
+			world.setBlockState(pos, new BlockAndMeta(Blocks.dirt));
 			return false;
 		}
 
@@ -119,7 +126,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public float getBlockHardness(World world, BlockPos pos) {
+	public float getBlockHardness(WorldDec world, BlockPos pos) {
 		return 20.0f;//Encourage proper tool usage and discourage bypassing tree felling by digging the root from under the tree
 	};
 
@@ -134,23 +141,22 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
-		return getSoilLife(world, new BlockPos(x, y, z));
+	public int getComparatorInputOverride(WorldDec world, BlockPos pos, int side) {
+		return getSoilLife(world, pos);
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		ItemStack heldItem = player.getCurrentEquippedItem();
+	public boolean onBlockActivated(WorldDec world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 
 		if(heldItem != null) {//Something in the hand
-			return applyItemSubstance(world, new BlockPos(x, y, z), player, heldItem);
+			return applyItemSubstance(world, pos, player, hand, heldItem);
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, ItemStack itemStack) {
+	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 
 		if(branch != null && branch.getTree().applySubstance(world, pos, this, itemStack)) {
@@ -172,7 +178,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		return false;
 	}
 
-	public void destroyTree(World world, BlockPos pos) {
+	public void destroyTree(WorldDec world, BlockPos pos) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {
 			branch.destroyEntireTree(world, pos.up());
@@ -180,25 +186,25 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public void onBlockHarvested(World world, int x, int y, int z, int localMeta, EntityPlayer player) {
-		destroyTree(world, new BlockPos(x, y, z));
+	public void onBlockHarvested(WorldDec world, BlockPos pos, int localMeta, EntityPlayer player) {
+		destroyTree(world, pos);
 	}
 
 	@Override
-	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
-		destroyTree(world, new BlockPos(x, y, z));
+	public void onBlockExploded(WorldDec world, BlockPos pos, Explosion explosion) {
+		destroyTree(world, pos);
 	}
 
-	public int getSoilLife(IBlockAccess blockAccess, BlockPos pos) {
-		return pos.getMeta(blockAccess);
+	public int getSoilLife(BlockAccessDec blockAccess, BlockPos pos) {
+		return blockAccess.getBlockMetadata(pos);
 	}
 
-	public void setSoilLife(World world, BlockPos pos, int life) {
-		world.setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), MathHelper.clamp_int(life, 0, 15), 3);
-		world.func_147453_f(pos.getX(), pos.getY(), pos.getZ(), this);//Notify all neighbors of NSEWUD neighbors
+	public void setSoilLife(WorldDec world, BlockPos pos, int life) {
+		world.getWorld().setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), MathHelper.clamp_int(life, 0, 15), 3);
+		world.getWorld().func_147453_f(pos.getX(), pos.getY(), pos.getZ(), this);//Notify all neighbors of NSEWUD neighbors
 	}
 
-	public boolean fertilize(World world, BlockPos pos, int amount) {
+	public boolean fertilize(WorldDec world, BlockPos pos, int amount) {
 		int soilLife = getSoilLife(world, pos);
 		if((soilLife == 0 && amount < 0) || (soilLife == 15 && amount > 0)) {
 			return false;//Already maxed out
@@ -208,27 +214,27 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(BlockAccessDec blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		return Cells.nullCell;
 	}
 
 	@Override
-	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal) {
 		return signal;
 	}
 
 	@Override
-	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		return 8;
 	}
 
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
 
 	@Override
-	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(BlockAccessDec blockAccess, BlockPos pos) {
 		return 0;
 	}
 
@@ -238,7 +244,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		signal.run(world, this, pos, fromDir);//Run inspector of choice
 
 		signal.root = pos;
@@ -248,12 +254,12 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	}
 
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(BlockAccessDec blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
+	public DynamicTree getTree(BlockAccessDec blockAccess, BlockPos pos) {
 		return TreeHelper.isBranch(blockAccess, pos.up()) ? TreeHelper.getSafeTreePart(blockAccess, pos.up()).getTree(blockAccess, pos.up()) : null;
 	}
 
@@ -307,14 +313,14 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		return dirtIcon;
 	}
 
-	public RenderType getRenderType(IBlockAccess blockAccess, int x, int y, int z) {
+	public RenderType getRenderType(BlockAccessDec blockAccess, int x, int y, int z) {
 
 		final int dMap[] = {0, -1, 1};
 
 		for(int depth = 0; depth < 3; depth++) {
 			for(Dir d: Dir.CARDINAL) {
 				BlockPos pos = new BlockPos(x + d.xOffset, y + dMap[depth], z + d.zOffset);
-				IBlockState mimic = pos.getBlockState(blockAccess);
+				IBlockState mimic = blockAccess.getBlockState(pos);
 
 				if(mimic.equals(Blocks.grass)) {
 					return RenderType.GRASS;
