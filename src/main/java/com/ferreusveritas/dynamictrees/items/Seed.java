@@ -64,7 +64,7 @@ public class Seed extends Item {
 
 		return false;
 	}
-
+	
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
@@ -100,8 +100,10 @@ public class Seed extends Item {
 	 * @return
 	 */
 	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
+		DynamicTree tree = getTree(seedStack);
+		
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
-			world.setBlockState(pos, getTree(seedStack).getDynamicSapling());
+			world.setBlockState(pos, tree.getDynamicSapling());
 			return true;
 		}
 

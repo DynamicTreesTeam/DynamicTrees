@@ -10,6 +10,7 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITickable {
 
@@ -55,14 +56,18 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		}
 	}
 
+	public BlockPos getPos() {
+		return pos;
+	}
+
 	@Override
 	public void update() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-
+		
 		synchronized(this) {
-			treeName = new String(dendroCoil.getTree(world, pos));
-			soilLife = dendroCoil.getSoilLife(world, pos);
+			treeName = new String(dendroCoil.getTree(world, getPos()));
+			soilLife = dendroCoil.getSoilLife(world, getPos());
 		}
 
 		//Run commands that are cached that shouldn't be in the lua thread
@@ -71,14 +76,14 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 				if(dendroCoil != null) {
 					for(CachedCommand command:  cachedCommands) {
 						switch(command.method) {
-							case growPulse: dendroCoil.growPulse(world, pos); break;
-							case killTree: dendroCoil.killTree(world, pos); break;
-							case plantTree: dendroCoil.plantTree(world, pos, (String)command.arguments[0]); break;
-							case setCode: dendroCoil.setCode(world, pos, (String)command.arguments[0], (String)command.arguments[1]); break;
-							case setSoilLife: dendroCoil.setSoilLife(world, pos, ((Double)command.arguments[0]).intValue()); break;
-							case createStaff: dendroCoil.createStaff(world, pos, (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
-							case testPoisson: dendroCoil.testPoisson(world, pos, ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
-							case testPoisson2: dendroCoil.testPoisson2(world, pos, ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2], ((Double)command.arguments[3]).intValue()); break;
+							case growPulse: dendroCoil.growPulse(world, getPos()); break;
+							case killTree: dendroCoil.killTree(world, getPos()); break;
+							case plantTree: dendroCoil.plantTree(world, getPos(), (String)command.arguments[0]); break;
+							case setCode: dendroCoil.setCode(world, getPos(), (String)command.arguments[0], (String)command.arguments[1]); break;
+							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), ((Double)command.arguments[0]).intValue()); break;
+							case createStaff: dendroCoil.createStaff(world, getPos(), (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
+							case testPoisson: dendroCoil.testPoisson(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
+							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2], ((Double)command.arguments[3]).intValue()); break;
 							default: break;
 						}
 					}
@@ -112,7 +117,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		if(!world.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
-					return new Object[]{ dendroCoil.getCode(world, pos) };
+					return new Object[]{ dendroCoil.getCode(world, getPos()) };
 				case getSoilLife:
 					synchronized(this) {
 						return new Object[]{soilLife};
