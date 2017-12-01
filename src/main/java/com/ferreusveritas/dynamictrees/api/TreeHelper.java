@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
-import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
@@ -45,16 +44,6 @@ public class TreeHelper {
 			leavesMap.put(key, leavesBlock);
 			return leavesBlock;
 		}
-	}
-
-	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
-		for(Dir d: Dir.SURROUND) {
-			if(!world.real().getChunkProvider().chunkExists((pos.getX() >> 4) + d.xOffset, (pos.getZ() >> 4) + d.zOffset)) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 	
 	/**

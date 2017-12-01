@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat;
 
+import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
-
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
 public class CCProxyActive extends CCProxyBase {
 

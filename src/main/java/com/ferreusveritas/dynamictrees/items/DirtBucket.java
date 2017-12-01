@@ -4,10 +4,10 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.ItemBackport;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;

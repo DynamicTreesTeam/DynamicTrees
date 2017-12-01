@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
@@ -26,7 +27,6 @@ import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

@@ -55,7 +55,7 @@ public class BlockDynamicSapling extends BlockBackport {
 		}
 
 		//Air above and acceptable soil below
-		return access.isAirBlock(pos) && tree.isAcceptableSoil(access.getBlockState(pos.down()));
+		return access.isAirBlock(pos.up()) && tree.isAcceptableSoil(access.getBlockState(pos.down()));
 	}
 
 	@Override

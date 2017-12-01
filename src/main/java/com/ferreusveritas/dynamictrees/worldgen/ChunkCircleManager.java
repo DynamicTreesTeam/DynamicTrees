@@ -6,10 +6,11 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
+import com.ferreusveritas.dynamictrees.util.Vec3i;
 
 import net.minecraft.util.MathHelper;
 
@@ -48,30 +49,30 @@ public class ChunkCircleManager {
 		return radiusCoordinator.getRadiusAtCoords(world, x, z);
 	}
 	
-	private ArrayList<Circle> generateCircles(World world, Random random, int chunkX, int chunkZ) {
-
+	public ArrayList<Circle> generateCircles(World world, Random random, int chunkX, int chunkZ) {
+		
 		ArrayList<Circle> circles = new ArrayList<Circle>(64);//64 is above the typical range to expect for 9 chunks
 		ArrayList<Circle> unsolvedCircles = new ArrayList<Circle>(64);
-
-		//Collect circles
-		for(Dir dir: Dir.SURROUND) {
-			getChunkCircles(circles, chunkX + dir.xOffset, chunkZ + dir.zOffset);
+		
+		//Collect already solved circles from surrounding chunks
+		for(Vec3i dir: CoordUtils.surround) {
+			getChunkCircles(circles, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
-
+		
 		int chunkXStart = chunkX << 4;
 		int chunkZStart = chunkZ << 4;
 
 		for(Circle c: circles) {
 			c.edgeMask(chunkXStart, chunkZStart);//Do edge masking
 		}
-
+		
 		//Mask out circles against one another
 		for(int i = 0; i < circles.size() - 1; i++) {
 			for(int j = i + 1; j < circles.size(); j++) {
 				CircleHelper.maskCircles(circles.get(i), circles.get(j));
 			}
 		}
-
+		
 		//Handle no existing circles by creating a single circle to build off of
 		if(circles.size() == 0) {
 			int x = chunkXStart + random.nextInt(16);
@@ -81,21 +82,21 @@ public class ChunkCircleManager {
 			rootCircle.real = true;
 			circles.add(rootCircle);
 		}
-
+		
 		//Gather the unsolved circles into a list
 		CircleHelper.gatherUnsolved(unsolvedCircles, circles);
-
+		
 		int count = 0;
-
+		
 		//Keep solving all unsolved circles until there aren't any more to solve.
 		while(!unsolvedCircles.isEmpty()) {
 			Circle master = unsolvedCircles.get(0);//Any circle will do.  May as well be the first.
-
+			
 			int radius = getRadiusAtCircleTangent(world, master);
-
+			
 			Circle slave = CircleHelper.findSecondCircle(master, radius);//Create a second circle tangential to the master circle.
 			Vec2i slavePos = new Vec2i(slave);//Cache slave position
-
+			
 			//Mask off the master so it won't happen again.
 			master.arc |= 1 << master.getFreeBit();//Clear specific arc bit for good measure
 			CircleHelper.maskCircles(master, slave, true);
@@ -109,12 +110,12 @@ public class ChunkCircleManager {
 					intersecting.put(depth << 8 | i++, c);
 				}
 			}
-
+			
 			//Run through all of the circles that were intersecting
 			for(Entry<Integer, Circle> entry: intersecting.entrySet()) {
 				Circle master1 = master;//Cache master value because we do swapping later
 				Circle master2 = entry.getValue();
-
+				
 				//Determine handedness of 3rd circle interaction
 				int cross = Vec2i.crossProduct(new Vec2i(slavePos).sub(master1),new Vec2i(master2).sub(master1));
 				if(cross < 0){//Swap circles if the cross product is negative
@@ -122,7 +123,7 @@ public class ChunkCircleManager {
 					master2 = master1;
 					master1 = temp;
 				}
-
+				
 				slave = CircleHelper.findThirdCircle(master1, master2, radius);//Attempt to triangulate a circle position that is touching tangentially to both master circles
 				if(slave != null) {//Found a 3rd circle candidate
 					for(int ci = 0; ci < circles.size(); ci++) {
@@ -137,12 +138,12 @@ public class ChunkCircleManager {
 						}
 					}
 				}
-
+				
 				if(slave != null) {
 					break;//We found a viable circle.. time to move on
 				}
 			}
-
+			
 			if(slave != null) {//The circle has passed all of the non-intersection tests.  Let's add it to the list of circles
 				slave.edgeMask(chunkXStart, chunkZStart);//Set the proper mask for whatever chunk this circle resides.
 				slave.real = slave.isInCenterChunk(chunkXStart, chunkZStart);//Only circles created in the center chunk are real
@@ -150,9 +151,9 @@ public class ChunkCircleManager {
 				CircleHelper.solveCircles(unsolvedCircles, circles);//run all of the unsolved circles again
 				circles.add(slave);//add the new circle to the full list
 			}
-
+			
 			CircleHelper.gatherUnsolved(unsolvedCircles, circles);//List up the remaining unsolved circles and try again
-
+			
 			//For debug purposes
 			if(++count > 64 && !unsolvedCircles.isEmpty()) {//It shouldn't over take 64 iterations to solve all of the circles
 				System.err.println("-----" + unsolvedCircles.size() + " unsolved circles-----");
@@ -164,6 +165,7 @@ public class ChunkCircleManager {
 				CircleDebug.outputCirclesToPng(circles, chunkX, chunkZ, "");
 				break;//Something went terribly wrong and we shouldn't hang the system for it.
 			}
+			
 		}
 		
 		//Add circles to circle set
@@ -176,44 +178,44 @@ public class ChunkCircleManager {
 			}
 		}
 		circles.clear();
-
+		
 		return cSet.getCircles(circles, chunkX, chunkZ);
 	}
-
+	
 	private ChunkCircleSet getChunkCircleSet(int chunkX, int chunkZ) {
 		Vec2i key = new Vec2i(chunkX, chunkZ);
 		ChunkCircleSet cSet;
-
+		
 		if(chunkCircles.containsKey(key)) {
 			cSet = chunkCircles.get(key);
 		} else {
 			cSet = new ChunkCircleSet();
 			chunkCircles.put(key, cSet);
 		}
-
+		
 		return cSet;
 	}
-
+	
 	public byte[] getChunkCircleData(int chunkX, int chunkZ) {
 		return getChunkCircleSet(chunkX, chunkZ).getCircleData();
 	}
-
+	
 	public void setChunkCircleData(int chunkX, int chunkZ, byte[] circleData) {
 		getChunkCircleSet(chunkX, chunkZ).setCircleData(circleData);
 	}
-
+	
 	public void unloadChunkCircleData(int chunkX, int chunkZ) {
 		chunkCircles.remove(new Vec2i(chunkX, chunkZ));
 	}
-
+	
 	private ArrayList<Circle> getChunkCircles(int chunkX, int chunkZ) {
 		return getChunkCircles(new ArrayList<Circle>(), chunkX, chunkZ);
 	}
-
+	
 	private ArrayList<Circle> getChunkCircles(ArrayList<Circle> circles, int chunkX, int chunkZ) {
 		ChunkCircleSet cSet = getChunkCircleSet(chunkX, chunkZ);
 		cSet.getCircles(circles, chunkX, chunkZ);
 		return circles;
 	}
-
+	
 }

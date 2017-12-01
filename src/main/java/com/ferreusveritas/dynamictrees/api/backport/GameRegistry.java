@@ -1,8 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
-
-import com.ferreusveritas.dynamictrees.api.backport.ILorable;
-import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
-import com.ferreusveritas.dynamictrees.api.backport.ItemBlockLore;
+package com.ferreusveritas.dynamictrees.api.backport;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

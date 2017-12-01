@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.ItemBackport;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
@@ -15,7 +16,6 @@ import com.ferreusveritas.dynamictrees.potion.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

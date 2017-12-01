@@ -1,0 +1,17 @@
+Seeds:
+	[ ]Seed can be planted to produce a sapling of the correct species
+	[ ]Can't plant next to existing tree or sapling
+	[ ]Crafting recipe works for dirtbucket and produces correct species
+	
+Sapling:
+	[ ]Sapling transitions to tree structure
+	[ ]Sapling produces the correct tree species
+	[ ]Sapling returns seed when supporting block is removed
+
+Trees:
+	[ ]Tree produces more branches than the default single block trunk
+	[ ]Tree grows
+	[ ]Branching occurs
+	[ ]Soil life is decremented as growing occurs
+	[ ]Tree stops growing after soil is depleted
+	[ ]Harvesting tree results in wood of the proper species

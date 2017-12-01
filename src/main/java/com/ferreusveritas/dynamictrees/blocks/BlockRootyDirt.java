@@ -25,7 +25,6 @@ import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt;
 import com.ferreusveritas.dynamictrees.renderers.RendererRootyDirt.RenderType;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Dir;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -318,8 +317,8 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		final int dMap[] = {0, -1, 1};
 
 		for(int depth = 0; depth < 3; depth++) {
-			for(Dir d: Dir.CARDINAL) {
-				BlockPos pos = new BlockPos(x + d.xOffset, y + dMap[depth], z + d.zOffset);
+			for(EnumFacing d: EnumFacing.HORIZONTALS) {
+				BlockPos pos = new BlockPos(x + d.getFrontOffsetX(), y + dMap[depth], z + d.getFrontOffsetZ());
 				IBlockState mimic = blockAccess.getBlockState(pos);
 
 				if(mimic.equals(Blocks.grass)) {
