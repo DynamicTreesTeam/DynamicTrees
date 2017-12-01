@@ -4,12 +4,13 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumActionResult;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.ItemBackport;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -71,7 +72,7 @@ public class Seed extends ItemBackport {
 		
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
-		if(blockState.equals(new BlockAndMeta(Blocks.flower_pot, 0))) { //Empty Flower Pot
+		if(blockState.equals(new BlockState(Blocks.flower_pot, 0))) { //Empty Flower Pot
 			DynamicTree tree = getTree(heldItem);
 			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
 			bonzaiPot.setTree(world, tree, pos);

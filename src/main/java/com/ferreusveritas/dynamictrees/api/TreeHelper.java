@@ -13,7 +13,7 @@ import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.util.Dir;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -49,7 +49,7 @@ public class TreeHelper {
 
 	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
 		for(Dir d: Dir.SURROUND) {
-			if(!world.getWorld().getChunkProvider().chunkExists((pos.getX() >> 4) + d.xOffset, (pos.getZ() >> 4) + d.zOffset)) {
+			if(!world.real().getChunkProvider().chunkExists((pos.getX() >> 4) + d.xOffset, (pos.getZ() >> 4) + d.zOffset)) {
 				return false;
 			}
 		}
@@ -136,7 +136,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return isTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
+		return isTreePart(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getTreePart(Block block) {
@@ -144,7 +144,7 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
+		return getTreePart(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getTreePart(IBlockState state) {
@@ -156,7 +156,7 @@ public class TreeHelper {
 	}
 
 	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getSafeTreePart(new BlockAccessDec(blockAccess).getBlock(pos));
+		return getSafeTreePart(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	public static ITreePart getSafeTreePart(IBlockState blockState) {
@@ -170,7 +170,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return isBranch(new BlockAccessDec(blockAccess).getBlock(pos));
+		return isBranch(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	public static BlockBranch getBranch(Block block) {
@@ -182,7 +182,7 @@ public class TreeHelper {
 	}
 
 	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(new BlockAccessDec(blockAccess).getBlock(pos));
+		return getBranch(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	//Leaves
@@ -192,7 +192,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isLeaves(new BlockAccessDec(blockAccess).getBlock(pos));
+		return isLeaves(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 	//Rooty Dirt
@@ -202,7 +202,7 @@ public class TreeHelper {
 	}
 
 	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(new BlockAccessDec(blockAccess).getBlock(pos));
+		return isRootyDirt(new BlockAccess(blockAccess).getBlock(pos));
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
@@ -73,7 +73,7 @@ public class TreeGenerator implements IWorldGenerator {
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
 		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 		
-		switch (world.getWorld().provider.dimensionId) {
+		switch (world.real().provider.dimensionId) {
 		case 0: //Overworld
 			generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
 			break;
@@ -109,10 +109,10 @@ public class TreeGenerator implements IWorldGenerator {
 			for (int zi = 0; zi < 4; ++zi) {
 				int posX = pos.getX() + xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = pos.getZ() + zi * 4 + 1 + 8 + random.nextInt(3);
-				int posY = world.getWorld().getHeightValue(posX, posZ);
+				int posY = world.real().getHeightValue(posX, posZ);
 
 				if (random.nextInt(16) == 0) {
-					new WorldGenBigMushroom().generate(world.getWorld(), random, posX, posY, posZ);
+					new WorldGenBigMushroom().generate(world.real(), random, posX, posY, posZ);
 				}
 			}
 		}
@@ -128,7 +128,7 @@ public class TreeGenerator implements IWorldGenerator {
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), new BlockAndMeta(Blocks.wool, (circle.x ^ circle.z) & 0xF), 0);
+					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), new BlockState(Blocks.wool, (circle.x ^ circle.z) & 0xF), 0);
 				}
 			}
 		}
@@ -136,8 +136,8 @@ public class TreeGenerator implements IWorldGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			EnumDyeColor color = resultType.getColor();
-			world.setBlockState(pos, new BlockAndMeta(Blocks.stained_hardened_clay, color.getMetadata()));
-			world.setBlockState(pos.up(), new BlockAndMeta(Blocks.stained_hardened_clay, color.getMetadata()));
+			world.setBlockState(pos, new BlockState(Blocks.stained_hardened_clay, color.getMetadata()));
+			world.setBlockState(pos.up(), new BlockState(Blocks.stained_hardened_clay, color.getMetadata()));
 		}
 	}
 	
@@ -155,7 +155,7 @@ public class TreeGenerator implements IWorldGenerator {
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		BiomeGenBase biome = world.getBiome(pos);
-		Decision decision = biomeTreeHandler.getTree(world.getWorld(), biome, pos, blockState, random);
+		Decision decision = biomeTreeHandler.getTree(world.real(), biome, pos, blockState, random);
 		if(decision.isHandled()) {
 			DynamicTree tree = decision.getTree();
 			if(tree != null) {

@@ -51,7 +51,7 @@ public class NodeDestroyer implements INodeInspector {
 						world.setBlockToAir(leavesPos);
 						int qty = tree.getDynamicLeaves().quantitySeedDropped(world.rand);
 						if(qty > 0) {
-							EntityItem itemEntity = new EntityItem(world.getWorld(), leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
+							EntityItem itemEntity = new EntityItem(world.real(), leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, tree.getSeedStack(qty));
 							CompatHelper.spawnEntity(world, itemEntity);
 						}
 					}

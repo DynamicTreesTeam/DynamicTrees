@@ -19,7 +19,7 @@ public class EntityLingeringEffector extends Entity {
 	private World world;
 	
 	public EntityLingeringEffector(World world, BlockPos pos, ISubstanceEffect effect) {
-		super(world.getWorld());
+		super(world.real());
 		this.world = world;
 		width = 1.0f;
 		height = 1.0f;
@@ -29,7 +29,7 @@ public class EntityLingeringEffector extends Entity {
 
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
-			for(EntityLingeringEffector effector : (List<EntityLingeringEffector>)world.getWorld().getEntitiesWithinAABB(EntityLingeringEffector.class, pos.getAxisAlignedBB()) ) {
+			for(EntityLingeringEffector effector : (List<EntityLingeringEffector>)world.real().getEntitiesWithinAABB(EntityLingeringEffector.class, pos.getAxisAlignedBB()) ) {
 				if(effector.getBlockPos().equals(pos) && effector.getEffect().getName().equals(effect.getName())) {
 					effector.setDead();//Kill old effector if it's the same
 				}

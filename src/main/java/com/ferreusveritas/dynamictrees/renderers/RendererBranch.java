@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.renderers;
 
 import org.lwjgl.opengl.GL11;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
@@ -70,7 +70,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 	@Override
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer){
-		BlockAccessDec access = new BlockAccessDec(world);
+		BlockAccess access = new BlockAccess(world);
 		
 		if(block instanceof BlockBranch){
 			renderFaceFlags = faceAll;

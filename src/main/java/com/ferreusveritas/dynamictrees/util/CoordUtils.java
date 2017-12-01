@@ -21,7 +21,7 @@ public class CoordUtils {
 	
 	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
 		for(Vec3i dir: CoordUtils.surround) {
-			if(world.getWorld().getChunkProvider().chunkExists((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ())){
+			if(world.real().getChunkProvider().chunkExists((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ())){
 				return false;
 			}
 		}

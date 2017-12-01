@@ -6,7 +6,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
@@ -78,7 +78,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 	
 	@Override
-	public DynamicTree getTree(BlockAccessDec blockAccess, BlockPos pos) {
+	public DynamicTree getTree(BlockAccess blockAccess, BlockPos pos) {
 		return getTree();
 	}
 	
@@ -96,7 +96,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public int branchSupport(BlockAccessDec blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(BlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return isSameWood(branch) ? 0x11 : 0;// Other branches of the same type are always valid support.
 	}
 
@@ -165,7 +165,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	@Override
 	public float getBlockHardness(World world, BlockPos pos) {
 		int radius = getRadius(world, pos);
-		return getTree().getPrimitiveLog().getBlock().getBlockHardness(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()) * (radius * radius) / 64.0f * 8.0f;
+		return getTree().getPrimitiveLog().getBlock().getBlockHardness(world.real(), pos.getX(), pos.getY(), pos.getZ()) * (radius * radius) / 64.0f * 8.0f;
 	};
 
 	@Override
@@ -225,7 +225,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public ICell getHydrationCell(BlockAccessDec blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(BlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		DynamicTree thisTree = getTree();
 
 		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
@@ -236,8 +236,8 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 	
 	@Override
-	public int getRadius(BlockAccessDec blockAccess, BlockPos pos) {
-		return getRadius(new BlockAccessDec(blockAccess).getBlockState(pos));
+	public int getRadius(BlockAccess blockAccess, BlockPos pos) {
+		return getRadius(new BlockAccess(blockAccess).getBlockState(pos));
 	}
 
 	public int getRadius(IBlockState blockState) {
@@ -249,12 +249,12 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	public void setRadius(World world, BlockPos pos, int radius) {
-		world.getWorld().setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), radiusToMeta(radius), 2);
+		world.real().setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), radiusToMeta(radius), 2);
 	}
 
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(BlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return isSameWood(from) ? getRadius(blockAccess, pos) + 2 : 0;
 	}
 
@@ -331,7 +331,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess _blockAccess, int x, int y, int z) {
-		BlockAccessDec blockAccess = new BlockAccessDec(_blockAccess);
+		BlockAccess blockAccess = new BlockAccess(_blockAccess);
 		BlockPos pos = new BlockPos(x, y, z);
 		int radius = getRadius(blockAccess, pos);
 
@@ -377,11 +377,11 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockAccessDec world, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(BlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
 		return getRadius(world, pos);
 	}
 
-	public int getSideConnectionRadius(BlockAccessDec blockAccess, BlockPos pos, int radius, EnumFacing side) {
+	public int getSideConnectionRadius(BlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
 		return TreeHelper.getSafeTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, radius);
 	}
@@ -489,7 +489,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 		List<ItemStack> items = getWoodDrops(world, pos, (int)(woodVolume * fortuneFactor));
 		
 		//For An-Sar's PrimalCore mod :)
-		float chance = ForgeEventFactory.fireBlockHarvesting(new ArrayList(items), world.getWorld(), world.getBlock(pos), pos.getX(), pos.getY(), pos.getZ(), world.getBlockMetadata(pos), fortune, 1.0f, false, player);
+		float chance = ForgeEventFactory.fireBlockHarvesting(new ArrayList(items), world.real(), world.getBlock(pos), pos.getX(), pos.getY(), pos.getZ(), world.getBlockMetadata(pos), fortune, 1.0f, false, player);
 		
 		for (ItemStack item : items) {
 			if (world.rand.nextFloat() <= chance) {

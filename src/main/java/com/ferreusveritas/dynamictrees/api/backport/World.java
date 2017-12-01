@@ -12,7 +12,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * @author ferreusveritas
  *
  */
-public class World extends BlockAccessDec {
+public class World extends BlockAccess {
 
 	private final net.minecraft.world.World world;
 	public Random rand;
@@ -23,7 +23,7 @@ public class World extends BlockAccessDec {
 		this.rand = world.rand;
 	}
 
-	public net.minecraft.world.World getWorld() {
+	public net.minecraft.world.World real() {
 		return world;
 	}
 	
@@ -55,6 +55,7 @@ public class World extends BlockAccessDec {
 		return new BlockPos(pos.getX(), world.getHeightValue(pos.getX(), pos.getZ()), pos.getZ());
 	}
 
+	@Override
 	public BiomeGenBase getBiome(BlockPos pos) {
 		return world.getBiomeGenForCoords(pos.getX(), pos.getZ());
 	}
@@ -79,8 +80,16 @@ public class World extends BlockAccessDec {
 		world.playSoundEffect(x, y, z, soundevent, a, b);
 	}
 	
+    public boolean isBlockIndirectlyGettingPowered(BlockPos pos) {
+		return world.isBlockIndirectlyGettingPowered(pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+    public boolean isBlockIndirectlyGettingPowered(int x, int y, int z) {
+		return world.isBlockIndirectlyGettingPowered(x, y, z);
+	}
+	
 	public static boolean doesBlockHaveSolidTopSurface(World world, BlockPos pos) {
-		return net.minecraft.world.World.doesBlockHaveSolidTopSurface(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+		return net.minecraft.world.World.doesBlockHaveSolidTopSurface(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 }

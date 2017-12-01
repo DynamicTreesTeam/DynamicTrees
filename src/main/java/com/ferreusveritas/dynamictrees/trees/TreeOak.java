@@ -5,8 +5,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
@@ -46,8 +46,8 @@ public class TreeOak extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 4) {
-				world.setBlockState(pos, new BlockAndMeta(random.nextInt(3) == 0 ? Blocks.red_mushroom : Blocks.brown_mushroom));//Change branch to a mushroom
-				world.setBlockState(pos.down(), new BlockAndMeta(Blocks.dirt, 2), 3);//Change rooty dirt to Podzol
+				world.setBlockState(pos, new BlockState(random.nextInt(3) == 0 ? Blocks.red_mushroom : Blocks.brown_mushroom));//Change branch to a mushroom
+				world.setBlockState(pos.down(), new BlockState(Blocks.dirt, 2), 3);//Change rooty dirt to Podzol
 			}
 			return true;
 		}
@@ -56,7 +56,7 @@ public class TreeOak extends DynamicTree {
 	}
 	
 	@Override
-	public ArrayList<ItemStack> getDrops(BlockAccessDec blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+	public ArrayList<ItemStack> getDrops(BlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 		Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
 		if ((rand.nextInt(chance) == 0)) {
 			drops.add(new ItemStack(Items.apple, 1, 0));
@@ -66,7 +66,7 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccessIn, BlockPos pos, IBlockState soilBlockState) {
-		BlockAccessDec blockAccess = new BlockAccessDec(blockAccessIn);
+		BlockAccess blockAccess = new BlockAccess(blockAccessIn);
 		
 		if(soilBlockState.getBlock() == Blocks.water) {
 			BiomeGenBase biome = blockAccess.getBiome(pos);

@@ -10,7 +10,7 @@ import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class NodeTransform implements INodeInspector {
@@ -30,7 +30,7 @@ public class NodeTransform implements INodeInspector {
 		if(branch != null && fromTree == branch.getTree()) {
 			int radius = branch.getRadius(world, pos);
 			if(radius > 0) {
-				world.setBlockState(pos, new BlockAndMeta(toTree.getDynamicBranch(), toTree.getDynamicBranch().radiusToMeta(radius)), 3);
+				world.setBlockState(pos, new BlockState(toTree.getDynamicBranch(), toTree.getDynamicBranch().radiusToMeta(radius)), 3);
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}

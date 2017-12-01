@@ -17,7 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 /**
@@ -120,7 +120,7 @@ public class JoCode {
 	* @param radius Constraint radius
 	*/
 	public void generate(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
-		world.setBlockState(pos, new BlockAndMeta(tree.getRootyDirtBlock(), 0));//Set to unfertilized rooty dirt
+		world.setBlockState(pos, new BlockState(tree.getRootyDirtBlock(), 0));//Set to unfertilized rooty dirt
 
 		//Create tree
 		setFacing(facing);
@@ -147,7 +147,7 @@ public class JoCode {
 					BlockPos cellPos = cell.getPos();
 					Block testBlock = world.getBlock(cellPos);
 					if(testBlock.isReplaceable(world, cellPos.getX(), cellPos.getY(), cellPos.getZ())) {
-						world.setBlockState(cellPos, new BlockAndMeta(leavesBlock, ((treeSub << 2) & 12) | ((cell.getValue() - 1) & 3)), careful ? 2 : 0);
+						world.setBlockState(cellPos, new BlockState(leavesBlock, ((treeSub << 2) & 12) | ((cell.getValue() - 1) & 3)), careful ? 2 : 0);
 					}
 				}
 			}
@@ -156,7 +156,7 @@ public class JoCode {
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlockState(pos, new BlockAndMeta(Blocks.dirt, 0), careful ? 3 : 2);
+			world.setBlockState(pos, new BlockState(Blocks.dirt, 0), careful ? 3 : 2);
 		}
 
 	}
@@ -184,7 +184,7 @@ public class JoCode {
 				pos = pos.offset(dir);
 				if(!disabled) {
 					if(world.getBlock(pos).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlockState(pos, new BlockAndMeta(tree.getDynamicBranch(), 0), careful ? 3 : 2);
+						world.setBlockState(pos, new BlockState(tree.getDynamicBranch(), 0), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}

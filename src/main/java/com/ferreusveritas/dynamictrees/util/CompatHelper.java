@@ -14,7 +14,7 @@ public class CompatHelper {
 	}
 
 	public static boolean spawnEntity(World world, Entity entity) {
-		return world.getWorld().spawnEntityInWorld(entity);
+		return world.real().spawnEntityInWorld(entity);
 	}
 	
     /**
@@ -32,7 +32,7 @@ public class CompatHelper {
     }
 
     public static void spawnItemStackAsEntity(World world, BlockPos pos, ItemStack stack)  {
-    	spawnItemStackAsEntity(world.getWorld(), pos, stack);
+    	spawnItemStackAsEntity(world.real(), pos, stack);
     }
 	
 }

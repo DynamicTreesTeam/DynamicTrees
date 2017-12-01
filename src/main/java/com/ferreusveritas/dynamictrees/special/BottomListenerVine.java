@@ -3,7 +3,7 @@
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.World;
@@ -20,7 +20,7 @@ public class BottomListenerVine implements IBottomListener {
 		BlockPos deltaPos = pos.offset(dir);
 		
 		if(world.isAirBlock(deltaPos) && (coordHashCode(deltaPos) & 7) == 0) {
-			world.setBlockState(deltaPos, new BlockAndMeta(Blocks.vine, 
+			world.setBlockState(deltaPos, new BlockState(Blocks.vine, 
 					dir == EnumFacing.NORTH ? 1 :
 					dir == EnumFacing.SOUTH ? 4 :
 					dir == EnumFacing.EAST ? 2 :

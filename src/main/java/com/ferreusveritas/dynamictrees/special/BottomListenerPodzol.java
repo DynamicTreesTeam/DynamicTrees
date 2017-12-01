@@ -17,12 +17,12 @@ import net.minecraft.world.EnumSkyBlock;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public class BottomListenerPodzol implements IBottomListener {
 
-	private static final IBlockState podzolState = new BlockAndMeta(Blocks.dirt, 2);
+	private static final IBlockState podzolState = new BlockState(Blocks.dirt, 2);
 	
 	@Override
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {

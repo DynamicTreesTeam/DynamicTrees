@@ -7,17 +7,19 @@ import java.util.logging.Logger;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
+import com.ferreusveritas.dynamictrees.api.backport.BlockContainerBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.ILorable;
+import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.util.ILorable;
-import com.ferreusveritas.dynamictrees.util.IRegisterable;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator.EnumGeneratorResult;
@@ -29,7 +31,6 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
@@ -39,7 +40,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 
-public class BlockDendroCoil extends BlockContainer implements IPeripheralProvider, IRegisterable, ILorable {
+public class BlockDendroCoil extends BlockContainerBackport implements IPeripheralProvider, IRegisterable, ILorable {
 
 	IIcon topIcon;
 	IIcon sideIcon;
@@ -77,9 +78,9 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 	
 	@Override
-	public void onNeighborBlockChange(net.minecraft.world.World world, int x, int y, int z, Block block) {
-		if (world.isBlockIndirectlyGettingPowered(x, y, z)) {
-			growPulse(new World(world), new BlockPos(x, y, z));
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+		if (world.isBlockIndirectlyGettingPowered(pos)) {
+			growPulse(world, pos);
 		}
 	}
 
@@ -106,7 +107,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		ItemStack stack = new ItemStack(DynamicTrees.treeStaff, 1, 0);
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		DynamicTrees.treeStaff.setTree(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
-		EntityItem entityItem = new EntityItem(world.getWorld(), pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
+		EntityItem entityItem = new EntityItem(world.real(), pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
 		entityItem.motionZ = 0;
@@ -178,7 +179,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
 			DynamicTrees.treeGenerator.makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
-			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isLoose() ? new BlockAndMeta(Blocks.cobblestone) : new BlockAndMeta(Blocks.diamond_block));
+			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isLoose() ? new BlockState(Blocks.cobblestone) : new BlockState(Blocks.diamond_block));
 		}
 	}
 	
@@ -209,7 +210,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 				DynamicTrees.treeGenerator.makeWoolCircle(world, circleC, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 			} else {
 				System.out.println("Angle:" + angle);
-				world.setBlockState(new BlockPos(circleA.x, pos.up().getY(), circleA.z), new BlockAndMeta(Blocks.redstone_block));
+				world.setBlockState(new BlockPos(circleA.x, pos.up().getY(), circleA.z), new BlockState(Blocks.redstone_block));
 			}
 		}
 	}

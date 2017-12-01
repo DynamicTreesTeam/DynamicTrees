@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -31,14 +31,14 @@ public class VanillaTreeData {
 			return name;
 		}
 		
-		public BlockAndMeta getLeavesBlockAndMeta() {
+		public BlockState getLeavesBlockAndMeta() {
 			Block vLeaves[] = {Blocks.leaves, Blocks.leaves2};
-			return new BlockAndMeta(vLeaves[meta >> 2], meta & 3);
+			return new BlockState(vLeaves[meta >> 2], meta & 3);
 		}
 		
-		public BlockAndMeta getLogBlockAndMeta() {
+		public BlockState getLogBlockAndMeta() {
 			Block vLeaves[] = {Blocks.log, Blocks.log2};
-			return new BlockAndMeta(vLeaves[meta >> 2], meta & 3);
+			return new BlockState(vLeaves[meta >> 2], meta & 3);
 		}
 	};
 	

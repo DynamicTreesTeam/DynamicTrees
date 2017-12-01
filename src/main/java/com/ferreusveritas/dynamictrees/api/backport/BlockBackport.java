@@ -3,8 +3,6 @@ package com.ferreusveritas.dynamictrees.api.backport;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.util.IRegisterable;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,7 +19,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author ferreusveritas
  *
  */
-public class BlockBackport extends Block implements IRegisterable {
+public class BlockBackport extends Block implements IBlockBackport {
 
 	public IBlockState defBlockState;
 	public static final AxisAlignedBB FULL_AABB = AxisAlignedBB.getBoundingBox(0, 0, 0, 1, 1, 1);
@@ -30,10 +28,12 @@ public class BlockBackport extends Block implements IRegisterable {
 		super(material);
 	}
 
+	@Override
 	public void setDefaultState(IBlockState blockState) {
 		this.defBlockState = blockState;
 	}
 	
+	@Override
 	public IBlockState getDefaultState() {
 		return defBlockState;
 	}
@@ -45,8 +45,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		this.updateTick(world, pos, world.getBlockState(pos), rand);
 	}
 	
+	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-		super.updateTick(world.getWorld(), pos.getX(), pos.getY(),  pos.getZ(), rand);
+		super.updateTick(world.real(), pos.getX(), pos.getY(),  pos.getZ(), rand);
 	}
 	
 	@Override
@@ -56,8 +57,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.onBlockActivated(world, pos, world.getBlockState(pos), player, EnumHand.MAIN_HAND, player.getHeldItem(), EnumFacing.getFront(facing), hitX,	hitY, hitZ);
 	}
 	
+	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		return super.onBlockActivated(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), player, side.getIndex(), hitX, hitY, hitZ);
+		return super.onBlockActivated(world.real(), pos.getX(), pos.getY(), pos.getZ(), player, side.getIndex(), hitX, hitY, hitZ);
 	}
 	
 	@Override
@@ -65,8 +67,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getBlockHardness(new World(world), new BlockPos(x, y, z));
 	}
 	
+	@Override
 	public float getBlockHardness(World world, BlockPos pos) {
-		return super.getBlockHardness(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+		return super.getBlockHardness(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	};
 
 	@Override
@@ -74,6 +77,7 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getFlammability(world, new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
 	}
 	
+	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		return super.getFlammability(world, pos.getX(), pos.getY(), pos.getZ(), face.toForgeDirection());
 	}
@@ -83,6 +87,7 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getFireSpreadSpeed(world, new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
 	}
 	
+	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		return super.getFireSpreadSpeed(world, pos.getX(), pos.getY(), pos.getZ(), face.toForgeDirection());
 	}
@@ -92,6 +97,7 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.isLadder(world, new BlockPos(x, y, z), entity);
 	}
 	
+	@Override
 	public boolean isLadder(IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
 		return super.isLadder(world, pos.getX(), pos.getY(), pos.getZ(), entity);
 	}
@@ -101,8 +107,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		this.onBlockHarvested(new World(world), new BlockPos(x, y, z), localMeta, player);
 	}
 	
+	@Override
 	public void onBlockHarvested(World world, BlockPos pos, int localMeta, EntityPlayer player) {
-		super.onBlockHarvested(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), localMeta, player);
+		super.onBlockHarvested(world.real(), pos.getX(), pos.getY(), pos.getZ(), localMeta, player);
 	}
 	
 	@Override
@@ -110,8 +117,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		this.onBlockExploded(new World(world), new BlockPos(x, y, z), explosion);
 	}
 	
+	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-		super.onBlockExploded(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), explosion);
+		super.onBlockExploded(world.real(), pos.getX(), pos.getY(), pos.getZ(), explosion);
 	}
 	
 	@Override
@@ -119,6 +127,7 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.isWood(world, new BlockPos(x, y, z));
 	}
 	
+	@Override
 	public boolean isWood(IBlockAccess world, BlockPos pos) {
 		return super.isWood(world, pos.getX(), pos.getY(), pos.getZ());
 	}
@@ -128,8 +137,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getComparatorInputOverride(new World(world), new BlockPos(x, y, z), side);
 	}
 	
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos pos, int side) {
-		return super.getComparatorInputOverride(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), side);
+		return super.getComparatorInputOverride(world.real(), pos.getX(), pos.getY(), pos.getZ(), side);
 	}
 	
 	@Override
@@ -140,8 +150,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		this.neighborChanged(state, world, pos, block);
 	}
 	
+	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
-		super.onNeighborBlockChange(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), block);
+		super.onNeighborBlockChange(world.real(), pos.getX(), pos.getY(), pos.getZ(), block);
 	}
 
 	@Override
@@ -152,8 +163,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.canBlockStay(world, pos, state);
 	}
 	
+	@Override
 	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
-		return super.canBlockStay(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+		return super.canBlockStay(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	@Override
@@ -161,8 +173,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getCollisionBoundingBoxFromPool(new World(world), new BlockPos(x, y, z));
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, BlockPos pos) {
-		return super.getCollisionBoundingBoxFromPool(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+		return super.getCollisionBoundingBoxFromPool(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	@Override
@@ -170,8 +183,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.removedByPlayer(new World(world), player, new BlockPos(x, y, z), canHarvest);
 	}
 	
+	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, BlockPos pos, boolean canHarvest) {
-		return super.removedByPlayer(world.getWorld(), player, pos.getX(), pos.getY(), pos.getZ(), canHarvest);
+		return super.removedByPlayer(world.real(), player, pos.getX(), pos.getY(), pos.getZ(), canHarvest);
 	}
 	
 	@Override
@@ -179,8 +193,9 @@ public class BlockBackport extends Block implements IRegisterable {
 		return this.getDrops(new World(world), new BlockPos(x, y, z), metadata, fortune);
 	}
 
+	@Override
 	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
-		return super.getDrops(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), metadata, fortune);
+		return super.getDrops(world.real(), pos.getX(), pos.getY(), pos.getZ(), metadata, fortune);
 	}
 	
 	@Override
@@ -188,24 +203,16 @@ public class BlockBackport extends Block implements IRegisterable {
 		this.dropBlockAsItem(new World(world), new BlockPos(x, y, z), stack);
 	}
 	
-	protected void dropBlockAsItem(World world, BlockPos pos, ItemStack stack) {
-		super.dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
-	}
-	
-    public final void dropBlockAsItem(World world, BlockPos pos, int meta, int fortune) {
-    	super.dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), meta, fortune);
-    }
-	
-	/*
 	@Override
-	public void setBlockBoundsForItemRender() {
-		AxisAlignedBB aabb = getBoundingBox(null, null, null);
-		this.setBlockBounds((float)aabb.minX, (float)aabb.minY, (float)aabb.minZ, (float)aabb.maxX, (float)aabb.maxY, (float)aabb.maxZ);
+	public void dropBlockAsItem(World world, BlockPos pos, ItemStack stack) {
+		super.dropBlockAsItem(world.real(), pos.getX(), pos.getY(), pos.getZ(), stack);
 	}
-
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return FULL_AABB;
-	}*/
+	
+    @Override
+	public final void dropBlockAsItem(World world, BlockPos pos, int meta, int fortune) {
+    	super.dropBlockAsItem(world.real(), pos.getX(), pos.getY(), pos.getZ(), meta, fortune);
+    }
+    
 	
 	//////////////////////////////
 	// REGISTRATION

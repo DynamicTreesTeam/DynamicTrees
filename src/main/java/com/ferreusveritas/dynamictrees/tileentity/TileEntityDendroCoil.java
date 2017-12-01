@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
@@ -15,17 +16,35 @@ import net.minecraft.tileentity.TileEntity;
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 
 	public enum ComputerMethod {
-		growPulse,
-		getCode,
-		setCode,
-		getTree,
-		plantTree,
-		killTree,
-		getSoilLife,
-		setSoilLife,
-		createStaff,
-		testPoisson,
-		testPoisson2
+		growPulse(false),
+		getCode(false),
+		setCode(false),
+		getTree(false),
+		plantTree(false),
+		killTree(false),
+		getSoilLife(false),
+		setSoilLife(false),
+		createStaff(false),
+		testPoisson(true),
+		testPoisson2(true);
+		
+		private final boolean debug;
+		
+		private ComputerMethod(boolean debug) {
+			this.debug = debug;
+		}
+		
+		public boolean include() {
+			return !debug || ConfigHandler.worldGenDebug;
+		}
+		
+		public static int countMethods() {
+			int count = 0;
+			for(ComputerMethod method : ComputerMethod.values()) {
+				count += method.include() ? 1: 0;
+			}
+			return count;
+		}
 	}
 	
 	private class CachedCommand {
@@ -42,11 +61,13 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 	private String treeName;
 	private int soilLife;
 
-	public static final int numMethods = ComputerMethod.values().length;
+	public static final int numMethods = ComputerMethod.countMethods();
 	public static final String[] methodNames = new String[numMethods]; 
 	static {
-		for(ComputerMethod method : ComputerMethod.values()) { 
-			methodNames[method.ordinal()] = method.toString(); 
+		for(ComputerMethod method : ComputerMethod.values()) {
+			if(method.include()) {
+				methodNames[method.ordinal()] = method.toString();
+			}
 		}
 	}
 

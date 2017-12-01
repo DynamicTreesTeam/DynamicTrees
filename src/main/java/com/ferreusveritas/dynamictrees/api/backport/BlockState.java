@@ -6,17 +6,17 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class BlockAndMeta implements IBlockState {
+public class BlockState implements IBlockState {
 
 	private final Block block;
 	private final int meta;
 
-	public BlockAndMeta(Block block, int meta) {
+	public BlockState(Block block, int meta) {
 		this.block = block;
 		this.meta = meta & 0x0f;
 	}
 	
-	public BlockAndMeta(Block block) {
+	public BlockState(Block block) {
 		this(block, 0);
 	}
 	
@@ -36,7 +36,7 @@ public class BlockAndMeta implements IBlockState {
 
 	@Override
 	public IBlockState withMeta(int meta) {
-		return new BlockAndMeta(block, meta & 0x0f);
+		return new BlockState(block, meta & 0x0f);
 	}
 	
 	///////////////////////////////////////////

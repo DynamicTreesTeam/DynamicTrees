@@ -1,11 +1,4 @@
-package com.ferreusveritas.dynamictrees.items;
-
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.EnumActionResult;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
-import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.util.IRegisterable;
+package com.ferreusveritas.dynamictrees.api.backport;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -36,7 +29,7 @@ public class ItemBackport extends Item implements IRegisterable {
 	}
 	
 	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		return super.onItemUse(heldStack, player, world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), hitX, hitY, hitZ) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+		return super.onItemUse(heldStack, player, world.real(), pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), hitX, hitY, hitZ) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
 	}
 	
 }

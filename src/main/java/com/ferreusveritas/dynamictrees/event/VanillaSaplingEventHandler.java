@@ -25,7 +25,7 @@ public class VanillaSaplingEventHandler {
 				double x = event.x + 0.5;
 				double y = event.y + 0.5;
 				double z = event.z + 0.5;
-				EntityItem itemEntity = new EntityItem(world.getWorld(), x, y, z, tree.getSeedStack());
+				EntityItem itemEntity = new EntityItem(world.real(), x, y, z, tree.getSeedStack());
 				CompatHelper.spawnEntity(world, itemEntity);
 			}
 		}

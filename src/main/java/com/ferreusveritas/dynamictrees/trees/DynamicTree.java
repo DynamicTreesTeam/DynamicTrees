@@ -11,8 +11,8 @@ import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
@@ -183,8 +183,8 @@ public class DynamicTree {
 	private void simpleVanillaSetup(VanillaTreeData.EnumType wood) {
 		setPrimitiveLeaves(wood.getLeavesBlockAndMeta(), wood.getLeavesBlockAndMeta().toItemStack());
 		setPrimitiveLog(wood.getLogBlockAndMeta(), wood.getLogBlockAndMeta().toItemStack());
-		setPrimitiveSapling(new BlockAndMeta(Blocks.sapling, wood.getMetadata()));
-		setDynamicSapling(new BlockAndMeta(DynamicTrees.blockDynamicSapling, wood.getMetadata()));
+		setPrimitiveSapling(new BlockState(Blocks.sapling, wood.getMetadata()));
+		setDynamicSapling(new BlockState(DynamicTrees.blockDynamicSapling, wood.getMetadata()));
 	}
 	
 	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -686,7 +686,7 @@ public class DynamicTree {
 	// LEAVES HANDLING
 	//////////////////////////////
 
-	public boolean isCompatibleDynamicLeaves(BlockAccessDec blockAccess, BlockPos pos) {
+	public boolean isCompatibleDynamicLeaves(BlockAccess blockAccess, BlockPos pos) {
 
 		IBlockState state = blockAccess.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getTreePart(state);
@@ -702,11 +702,11 @@ public class DynamicTree {
 		return leaves == getDynamicLeaves() && sub == getDynamicLeavesSub();
 	}
 
-	public boolean isCompatibleVanillaLeaves(BlockAccessDec blockAccess, BlockPos pos) {
+	public boolean isCompatibleVanillaLeaves(BlockAccess blockAccess, BlockPos pos) {
 		return getPrimitiveLeaves().matches(blockAccess.getBlockState(pos), 3);
 	}
 
-	public boolean isCompatibleGenericLeaves(BlockAccessDec blockAccess, BlockPos pos) {
+	public boolean isCompatibleGenericLeaves(BlockAccess blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
 	
@@ -728,7 +728,7 @@ public class DynamicTree {
 	* @param drops
 	* @return
 	*/
-	public ArrayList<ItemStack> getDrops(BlockAccessDec blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+	public ArrayList<ItemStack> getDrops(BlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 		return drops;
 	}
 	

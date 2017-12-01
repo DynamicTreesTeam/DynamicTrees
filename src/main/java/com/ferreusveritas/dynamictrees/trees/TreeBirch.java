@@ -9,7 +9,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.init.Blocks;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 
@@ -44,8 +44,8 @@ public class TreeBirch extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 4) {
-				world.setBlockState(pos, new BlockAndMeta(Blocks.brown_mushroom));//Change branch to a brown mushroom
-				world.setBlockState(pos.down(), new BlockAndMeta(Blocks.dirt, 0), 3);//Change rooty dirt to dirt
+				world.setBlockState(pos, new BlockState(Blocks.brown_mushroom));//Change branch to a brown mushroom
+				world.setBlockState(pos.down(), new BlockState(Blocks.dirt, 0), 3);//Change rooty dirt to dirt
 			}
 			return true;
 		}

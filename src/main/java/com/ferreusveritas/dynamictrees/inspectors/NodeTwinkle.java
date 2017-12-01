@@ -40,7 +40,7 @@ public class NodeTwinkle implements INodeInspector {
 			double mx = random.nextGaussian() * 0.02D;
 			double my = random.nextGaussian() * 0.02D;
 			double mz = random.nextGaussian() * 0.02D;
-			DynamicTrees.proxy.spawnParticle(world.getWorld(), particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
+			DynamicTrees.proxy.spawnParticle(world.real(), particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
 		}
 	}
 

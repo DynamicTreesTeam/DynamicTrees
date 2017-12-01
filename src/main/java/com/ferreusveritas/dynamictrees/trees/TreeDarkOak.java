@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.World;
@@ -104,8 +104,8 @@ public class TreeDarkOak extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 6) {
-				world.setBlockState(pos, new BlockAndMeta(Blocks.red_mushroom));//Change branch to a red mushroom
-				world.setBlockState(pos.down(), new BlockAndMeta(Blocks.dirt, 2), 3);//Change rooty dirt to Podzol
+				world.setBlockState(pos, new BlockState(Blocks.red_mushroom));//Change branch to a red mushroom
+				world.setBlockState(pos.down(), new BlockState(Blocks.dirt, 2), 3);//Change rooty dirt to Podzol
 			}
 			return true;
 		}
@@ -114,7 +114,7 @@ public class TreeDarkOak extends DynamicTree {
 	}
 	
 	@Override
-	public ArrayList<ItemStack> getDrops(BlockAccessDec blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+	public ArrayList<ItemStack> getDrops(BlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 		Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
 		if ((rand.nextInt(chance) == 0)) {
 			drops.add(new ItemStack(Items.apple, 1, 0));

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
@@ -22,7 +22,7 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 
 	@Override
-	public ICell getHydrationCell(BlockAccessDec blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(BlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		return Cells.nullCell;
 	}
 
@@ -32,18 +32,18 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(BlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		return fromRadius == 1 && from.getTree().getPrimitiveLeaves().matches(blockAccess.getBlockState(pos), 3) ? 1 : 0;
 	}
 
 	@Override
-	public int probabilityForBlock(BlockAccessDec blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(BlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return blockAccess.isAirBlock(pos) ? 1 : 0;
 	}
 
 	@Override
-	public int getRadius(BlockAccessDec blockAccess, BlockPos pos) {
+	public int getRadius(BlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
 
@@ -58,7 +58,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int branchSupport(BlockAccessDec blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(BlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		if(branch.getTree().getPrimitiveLeaves().matches(blockAccess.getBlockState(pos), 3)) {//Vanilla leaves can be used for support
 			return 0x01;
 		}
@@ -71,7 +71,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public DynamicTree getTree(BlockAccessDec blockAccess, BlockPos pos) {
+	public DynamicTree getTree(BlockAccess blockAccess, BlockPos pos) {
 		return null;
 	}
 

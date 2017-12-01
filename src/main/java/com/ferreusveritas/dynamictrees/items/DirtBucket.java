@@ -1,10 +1,11 @@
 package com.ferreusveritas.dynamictrees.items;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.ItemBackport;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.util.GameRegistry;
 
@@ -34,7 +35,7 @@ public class DirtBucket extends ItemBackport {
 	//[VanillaCopy] ItemBucket member function modified for purpose
 	public ItemStack onItemRightClick(ItemStack stack, net.minecraft.world.World _world, EntityPlayer player) {
 		World world = new World(_world);
-		MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world.getWorld(), player, false);
+		MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world.real(), player, false);
 	
 		if (movingobjectposition == null) {
 			return stack;
@@ -69,12 +70,12 @@ public class DirtBucket extends ItemBackport {
 		
 		if(replaceable) {
 			if (!world.isRemote()) {
-				world.getWorld().func_147480_a(pos.getX(), pos.getY(), pos.getZ(), true);
+				world.real().func_147480_a(pos.getX(), pos.getY(), pos.getZ(), true);
 			}
 			
 			String soundevent = "dig.grass";
 			world.playSoundEffect(pos, soundevent, 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);                    
-			world.setBlockState(pos, new BlockAndMeta(Blocks.dirt, 0), 3);
+			world.setBlockState(pos, new BlockState(Blocks.dirt, 0), 3);
 		}
 	
 		return true;

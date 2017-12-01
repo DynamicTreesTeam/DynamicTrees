@@ -8,7 +8,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
@@ -40,7 +40,7 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	public BlockBonsaiPot(String name) {
 		super(Blocks.flower_pot.getMaterial());
-		setDefaultState(new BlockAndMeta(this, 0));
+		setDefaultState(new BlockState(this, 0));
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
 		mapTrees();
@@ -84,10 +84,10 @@ public class BlockBonsaiPot extends BlockBackport {
 			if(!world.isRemote()) {
 				ItemStack seedStack = tree.getSeedStack();
 				ItemStack saplingStack = tree.getPrimitiveSapling().toItemStack();
-				CompatHelper.spawnEntity(world, new EntityItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
+				CompatHelper.spawnEntity(world, new EntityItem(world.real(), pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
-			world.setBlockState(pos, new BlockAndMeta(Blocks.flower_pot));
+			world.setBlockState(pos, new BlockState(Blocks.flower_pot));
 
 			return true;
 		}

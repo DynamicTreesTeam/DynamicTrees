@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.api.backport;
 
 public interface IRegisterable {
 	public void setRegistryName(String regName);

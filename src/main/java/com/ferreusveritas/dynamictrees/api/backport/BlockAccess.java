@@ -12,22 +12,24 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author ferreusveritas
  *
  */
-public class BlockAccessDec implements IBlockAccess {
+public class BlockAccess implements IBlockAccessBackport {
 
 	private final IBlockAccess access;
 	
-	public BlockAccessDec(IBlockAccess world) {
+	public BlockAccess(IBlockAccess world) {
 		this.access = world;
 	}
 
-	public IBlockAccess getBlockAccess() {
+	public IBlockAccess getRealBlockAccess() {
 		return access;
 	}
 	
+	@Override
 	public IBlockState getBlockState(BlockPos pos) {
-		return new BlockAndMeta(getBlock(pos), getBlockMetadata(pos));
+		return new BlockState(getBlock(pos), getBlockMetadata(pos));
 	}
 	
+	@Override
 	public boolean isAirBlock(BlockPos pos) {
 		return access.isAirBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
@@ -37,20 +39,12 @@ public class BlockAccessDec implements IBlockAccess {
 		return access.getBlock(x, y, z);
 	}
 
+	@Override
 	public Block getBlock(BlockPos pos) {
 		return access.getBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
-	
-	@Override
-	public TileEntity getTileEntity(int x, int y, int z) {
-		return access.getTileEntity(x, y, z);
-	}
 
 	@Override
-	public int getLightBrightnessForSkyBlocks(int x, int y, int z, int p_72802_4_) {
-		return access.getLightBrightnessForSkyBlocks(x, y, z, p_72802_4_);
-	}
-
 	public int getBlockMetadata(BlockPos pos) {
 		return access.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ());
 	}
@@ -61,15 +55,11 @@ public class BlockAccessDec implements IBlockAccess {
 	}
 
 	@Override
-	public int isBlockProvidingPowerTo(int p_72879_1_, int p_72879_2_, int p_72879_3_, int p_72879_4_) {
-		return access.isBlockProvidingPowerTo(p_72879_1_, p_72879_2_, p_72879_3_, p_72879_4_);
-	}
-
-	@Override
 	public boolean isAirBlock(int x, int y, int z) {
 		return access.isAirBlock(x, y, z);
 	}
 
+	@Override
 	public BiomeGenBase getBiome(BlockPos pos) {
 		return getBiomeGenForCoords(pos.getX(), pos.getZ());
 	}
@@ -90,8 +80,43 @@ public class BlockAccessDec implements IBlockAccess {
 	}
 
 	@Override
-	public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default) {
-		return access.isSideSolid(x, y, z, side, _default);
+	public TileEntity getTileEntity(BlockPos pos) {
+		return getTileEntity(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	@Override
+	public TileEntity getTileEntity(int x, int y, int z) {
+		return access.getTileEntity(x, y, z);
+	}
+	
+	@Override
+	public int isBlockProvidingPowerTo(BlockPos pos, EnumFacing side) {
+		return isBlockProvidingPowerTo(pos.getX(), pos.getY(), pos.getZ(), side.getIndex());
+	}
+
+	@Override
+	public int isBlockProvidingPowerTo(int x, int y, int z, int side) {
+		return access.isBlockProvidingPowerTo(x, y, z, side);
+	}
+	
+	@Override
+	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean def) {
+		return isSideSolid(pos.getX(), pos.getY(), pos.getZ(), side.toForgeDirection(), def);
+	}
+
+	@Override
+	public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean def) {
+		return access.isSideSolid(x, y, z, side, def);
+	}
+	
+	@Override
+	public int getLightBrightnessForSkyBlocks(BlockPos pos, int minBlockBrightness) {
+		return getLightBrightnessForSkyBlocks(pos.getX(), pos.getY(), pos.getZ(), minBlockBrightness);
+	}
+
+	@Override
+	public int getLightBrightnessForSkyBlocks(int x, int y, int z, int minBlockBrightness) {
+		return access.getLightBrightnessForSkyBlocks(x, y, z, minBlockBrightness);
 	}
 	
 }
