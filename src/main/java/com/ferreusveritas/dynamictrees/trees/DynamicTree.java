@@ -626,7 +626,7 @@ public class DynamicTree {
 	///////////////////////////////////////////
 	
 	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockState state, @Nullable IBlockAccess world, @Nullable BlockPos pos) {
+	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if(world != null && pos != null) {
 			return BiomeColorHelper.getFoliageColorAtPos(world, pos);
 		}
