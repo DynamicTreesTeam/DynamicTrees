@@ -50,7 +50,7 @@ public class Staff extends Item {
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-
+		
 		IBlockState clickedBlock = world.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock);
 		BlockPos rootPos = pos;
@@ -60,8 +60,8 @@ public class Staff extends Item {
 		if(branch != null) {
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
-				rootPos = new BlockPos(signal.root);
-				treePart = TreeHelper.getSafeTreePart(world, signal.root);
+				rootPos = signal.root;
+				treePart = TreeHelper.getSafeTreePart(world, rootPos);
 			}
 		}
 

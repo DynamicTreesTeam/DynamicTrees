@@ -12,17 +12,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeFruitCocoa extends NodeFruit {
-
+	
 	boolean finished;
-
+	
 	public NodeFruitCocoa(DynamicTree tree) {
 		super(tree);
 		finished = false;
 	}
-
+	
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-
+		
 		if(!finished) {
 			int hashCode = coordHashCode(pos);
 			if((hashCode % 97) % 29 == 0) {
@@ -42,10 +42,10 @@ public class NodeFruitCocoa extends NodeFruit {
 		}
 		return false;
 	}
-
+	
 	public static int coordHashCode(BlockPos pos) {
 		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
 		return hash & 0xFFFF;
 	}
-
+	
 }

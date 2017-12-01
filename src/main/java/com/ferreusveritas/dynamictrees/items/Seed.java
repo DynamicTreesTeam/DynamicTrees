@@ -41,17 +41,18 @@ public class Seed extends Item {
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
+		World world = entityItem.worldObj;
 
 		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!entityItem.worldObj.isRemote) {//Server side only
+			if(!world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
-				if(entityItem.worldObj.canBlockSeeSky(pos)) {
+				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
 					ItemStack seedStack = entityItem.getEntityItem();
 					int count = seedStack.stackSize;
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.worldObj, pos) ){//1 in 16 chance if ideal
-							if(plantSapling(entityItem.worldObj, pos, seedStack)) {
+						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(world, pos) ){//1 in 16 chance if ideal
+							if(plantSapling(world, pos, seedStack)) {
 								break;
 							}
 						}
@@ -67,7 +68,7 @@ public class Seed extends Item {
 	
 	@Override
 	public EnumActionResult onItemUse(ItemStack heldItem, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-
+		
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
@@ -99,8 +100,10 @@ public class Seed extends Item {
 	 * @return
 	 */
 	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
+		DynamicTree tree = getTree(seedStack);
+		
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
-			world.setBlockState(pos, getTree(seedStack).getDynamicSapling());
+			world.setBlockState(pos, tree.getDynamicSapling());
 			return true;
 		}
 

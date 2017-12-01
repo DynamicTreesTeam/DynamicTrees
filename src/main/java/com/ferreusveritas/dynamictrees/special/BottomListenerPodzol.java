@@ -13,6 +13,7 @@ import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.block.BlockTallGrass;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -21,6 +22,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class BottomListenerPodzol implements IBottomListener {
 
+	private static final IBlockState podzolState = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
+	
 	@Override
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 
@@ -49,7 +52,7 @@ public class BottomListenerPodzol implements IBottomListener {
 					else
 						if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass and dirt to podzol
 							if(world.getLightFor(EnumSkyBlock.SKY, offPos.up()) <= darkThreshold) {
-								world.setBlockState(offPos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));//Set to podzol
+								world.setBlockState(offPos, podzolState);
 							} else {
 								spreadPodzol(world, pos);
 							}
@@ -76,11 +79,12 @@ public class BottomListenerPodzol implements IBottomListener {
 
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			BlockPos deltaPos = pos.offset(dir);
-			Block testBlock = world.getBlockState(deltaPos).getBlock();
-			Podzolish += (testBlock == Blocks.DIRT) && (world.getBlockState(deltaPos).getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL) ? 1 : 0;
+			IBlockState testBlockState = world.getBlockState(deltaPos);
+			Block testBlock = testBlockState.getBlock();
+			Podzolish += (testBlock == Blocks.DIRT) && (testBlockState.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL) ? 1 : 0;
 			Podzolish += testBlock == DynamicTrees.blockRootyDirt ? 1 : 0;
 			if(Podzolish >= 3) {
-				world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));
+				world.setBlockState(pos, podzolState);
 				break;
 			}
 		}

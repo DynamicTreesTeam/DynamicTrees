@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -48,7 +46,7 @@ public class TreeJungle extends DynamicTree {
 	}
 	
 	@Override
-	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if(heldItem != null) {
 			if(heldItem.getItem() == Items.DYE && heldItem.getItemDamage() == 3) {

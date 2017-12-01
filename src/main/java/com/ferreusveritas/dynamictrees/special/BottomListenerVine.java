@@ -26,7 +26,7 @@ public class BottomListenerVine implements IBottomListener {
 					.withProperty(BlockVine.NORTH, dir == EnumFacing.NORTH)
 					.withProperty(BlockVine.SOUTH, dir == EnumFacing.SOUTH)
 					.withProperty(BlockVine.EAST, dir == EnumFacing.EAST)
-					.withProperty(BlockVine.WEST, dir == EnumFacing.WEST),2);
+					.withProperty(BlockVine.WEST, dir == EnumFacing.WEST), 2);
 		}
 		
 	}

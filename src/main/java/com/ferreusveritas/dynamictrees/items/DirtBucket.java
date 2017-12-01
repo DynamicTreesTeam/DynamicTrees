@@ -82,7 +82,7 @@ public class DirtBucket extends Item {
 			if (!world.isRemote) {
 				world.destroyBlock(posIn, true);
 			}
-
+			
 			SoundEvent soundevent = SoundEvents.BLOCK_GRASS_PLACE;
 			world.playSound(player, posIn, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
 			world.setBlockState(posIn, Blocks.DIRT.getDefaultState(), 11);
