@@ -6,18 +6,15 @@ import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
 
 public class BottomListenerVine implements IBottomListener {
 
 	@Override
-	public void run(World worldIn, DynamicTree tree, BlockPos pos, Random random) {
-		WorldDec world = new WorldDec(worldIn);
-		
+	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 		EnumFacing dir = EnumFacing.HORIZONTALS[random.nextInt(EnumFacing.HORIZONTALS.length)];
 		
 		BlockPos deltaPos = pos.offset(dir);

@@ -11,8 +11,8 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
 
 public class SubstanceTransform implements ISubstanceEffect {
 
@@ -27,7 +27,7 @@ public class SubstanceTransform implements ISubstanceEffect {
 
 		if(toTree != null) {
 			BlockPos basePos = pos.up();//Position of base of tree
-			if(world.isRemote) {
+			if(world.isRemote()) {
 				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.CRIT, 8)));
 			} else {
 				BlockBranch branch = TreeHelper.getBranch(world, basePos);

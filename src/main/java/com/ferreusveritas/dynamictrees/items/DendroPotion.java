@@ -28,7 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 
-public class DendroPotion extends ItemReg implements ISubstanceEffectProvider, IEmptiable {
+public class DendroPotion extends ItemBackport implements ISubstanceEffectProvider, IEmptiable {
 
 	public static final String name = "dendropotion";
 

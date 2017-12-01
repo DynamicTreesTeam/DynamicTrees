@@ -6,9 +6,11 @@ import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumActionResult;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -17,10 +19,9 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 
 
-public class Seed extends ItemReg {
+public class Seed extends ItemBackport {
 
 	private DynamicTree tree;//The tree this seed creates
 
@@ -40,7 +41,7 @@ public class Seed extends ItemReg {
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
-		WorldDec world = new WorldDec(entityItem.worldObj);
+		World world = new World(entityItem.worldObj);
 
 		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
 			if(!world.isRemote()) {//Server side only
@@ -66,11 +67,7 @@ public class Seed extends ItemReg {
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack heldItem, EntityPlayer player, World _world, int x, int y, int z, int side, float px, float py, float pz) {
-		WorldDec world = new WorldDec(_world);
-		
-		BlockPos pos = new BlockPos(x, y, z);
-		EnumFacing facing = EnumFacing.getFront(side);
+	public EnumActionResult onItemUse(ItemStack heldItem, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
@@ -79,19 +76,19 @@ public class Seed extends ItemReg {
 			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
 			bonzaiPot.setTree(world, tree, pos);
 			heldItem.stackSize--;
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
-			if (player.canPlayerEdit(x, y, z, side, heldItem) && player.canPlayerEdit(x, y + 1, z, side, heldItem)) {//Ensure permissions to edit block
+			if (player.canPlayerEdit(pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), heldItem) && player.canPlayerEdit(pos.getX(), pos.getY() + 1, pos.getZ(), facing.getIndex(), heldItem)) {//Ensure permissions to edit block
 				if(plantSapling(world, pos.up(), heldItem)) {//Do the planting
 					heldItem.stackSize--;
-					return true;
+					return EnumActionResult.SUCCESS;
 				}
 			}
 		}
 
-		return false;
+		return EnumActionResult.FAIL;
 	}
 	
 	/**
@@ -102,7 +99,7 @@ public class Seed extends ItemReg {
 	 * @param seedStack
 	 * @return
 	 */
-	public boolean plantSapling(WorldDec world, BlockPos pos, ItemStack seedStack) {
+	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
 		DynamicTree tree = getTree(seedStack);
 		
 		if(world.getBlock(pos).isReplaceable(world, pos.getX(), pos.getY(), pos.getZ()) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {

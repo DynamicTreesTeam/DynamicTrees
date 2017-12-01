@@ -7,11 +7,11 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.util.Dir;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 
 public class ChunkCircleManager {
 

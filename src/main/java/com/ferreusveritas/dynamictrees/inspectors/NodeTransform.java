@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
@@ -24,7 +24,7 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 		
 		if(branch != null && fromTree == branch.getTree()) {
@@ -41,11 +41,11 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	
-	public void transformSurroundingLeaves(WorldDec world, BlockPos twigPos) {
+	public void transformSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote()) {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(fromTree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be

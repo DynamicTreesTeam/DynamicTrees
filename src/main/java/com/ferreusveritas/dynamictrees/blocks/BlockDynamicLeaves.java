@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -38,7 +38,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable, IRegisterable {
@@ -111,15 +110,15 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random rand) {
+	public void updateTick(net.minecraft.world.World world, int x, int y, int z, Random rand) {
 		//if(random.nextInt() % 4 == 0) {
 			BlockPos pos = new BlockPos(x, y, z);
-			age(new WorldDec(world), pos, new WorldDec(world).getBlockState(pos), rand, false);
+			age(new World(world), pos, new World(world).getBlockState(pos), rand, false);
 		//}
 	}
 
 	@Override
-	public boolean age(WorldDec world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
 		DynamicTree tree = getTree(state);
 		int preHydro = getHydrationLevel(state);
 
@@ -152,13 +151,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata) {
+	public int onBlockPlaced(net.minecraft.world.World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata) {
 		
 		ForgeDirection dir = ForgeDirection.getOrientation(side).getOpposite();
 		
 		BlockPos deltaPos = new BlockPos(x, y, z).offset(dir);
 
-		DynamicTree tree = TreeHelper.getSafeTreePart(world, deltaPos).getTree(new WorldDec(world), deltaPos);
+		DynamicTree tree = TreeHelper.getSafeTreePart(world, deltaPos).getTree(new World(world), deltaPos);
 
 		if(tree != null && tree.getDynamicLeaves() == this) {//Attempt to match the proper growing leaves for the tree being clicked on
 			return tree.getDynamicLeavesSub() << 2;//Return matched metadata
@@ -168,19 +167,19 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, Block block, int metadata){}
+	public void breakBlock(net.minecraft.world.World world, int x, int y, int z, Block block, int metadata){}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
+	public AxisAlignedBB getCollisionBoundingBoxFromPool(net.minecraft.world.World world, int x, int y, int z) {
 		return AxisAlignedBB.getBoundingBox(x + 0.25, y, z + 0.25, x + 0.75, y + 0.50, z + 0.75);
 	}
 
 	@Override
-	public void onFallenUpon(World world, int x, int y, int z, Entity entity, float fallDistance) {
-		onFallenUpon(new WorldDec(world), new BlockPos(x, y, z), entity, fallDistance);
+	public void onFallenUpon(net.minecraft.world.World world, int x, int y, int z, Entity entity, float fallDistance) {
+		onFallenUpon(new World(world), new BlockPos(x, y, z), entity, fallDistance);
 	}
 
-	public void onFallenUpon(WorldDec world, BlockPos pos, Entity entity, float fallDistance) {
+	public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
 
 		if(entity instanceof EntityLivingBase) { //We are only interested in Living things crashing through the canopy.
 			entity.fallDistance--;
@@ -219,7 +218,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	public void crushBlock(WorldDec world, BlockPos pos, Entity entity) {
+	public void crushBlock(World world, BlockPos pos, Entity entity) {
 
 		if(world.isRemote()) {
 			Random random = world.rand;
@@ -248,7 +247,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
+	public void onEntityCollidedWithBlock(net.minecraft.world.World world, int x, int y, int z, Entity entity) {
 		if (entity.motionY < 0.0D && entity.fallDistance < 2.0f) {
 			entity.fallDistance = 0.0f;
 			entity.motionY *= 0.5D;//Slowly sink into the block
@@ -263,10 +262,10 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void beginLeavesDecay(World world, int x, int y, int z) {}
+	public void beginLeavesDecay(net.minecraft.world.World world, int x, int y, int z) {}
 
 	//Set the block at the provided coords to a leaf block if local light, space and hydration requirements are met
-	public void growLeaves(WorldDec world, DynamicTree tree, BlockPos pos){
+	public void growLeaves(World world, DynamicTree tree, BlockPos pos){
 		if(isLocationSuitableForNewLeaves(world, tree, pos)){
 			int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
 			setBlockToLeaves(world, tree, pos, hydro);
@@ -274,7 +273,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	//Set the block at the provided coords to a leaf block if local light and space requirements are met 
-	public boolean growLeaves(WorldDec world, DynamicTree tree, BlockPos pos, int hydro) {
+	public boolean growLeaves(World world, DynamicTree tree, BlockPos pos, int hydro) {
 		hydro = hydro == 0 ? tree.getDefaultHydration() : hydro;
 		if(isLocationSuitableForNewLeaves(world, tree, pos)) {
 			return setBlockToLeaves(world, tree, pos, hydro);
@@ -283,7 +282,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	//Test if the block at this location is capable of being grown into
-	public boolean isLocationSuitableForNewLeaves(WorldDec world, DynamicTree tree, BlockPos pos) {
+	public boolean isLocationSuitableForNewLeaves(World world, DynamicTree tree, BlockPos pos) {
 		Block block = world.getBlock(pos);
 		
 		if(block instanceof BlockDynamicLeaves) {
@@ -316,7 +315,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	/** Set the block at the provided coords to a leaf block and also set it's hydration value.
 	* If hydration value is 0 then it sets the block to air
 	*/
-	public boolean setBlockToLeaves(WorldDec world, DynamicTree tree, BlockPos pos, int hydro) {
+	public boolean setBlockToLeaves(World world, DynamicTree tree, BlockPos pos, int hydro) {
 		hydro = MathHelper.clamp(hydro, 0, 4);
 		if(hydro != 0) {
 			int sub = tree.getDynamicLeavesSub();
@@ -329,7 +328,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/** Check to make sure the leaves have enough light to exist */
-	public boolean hasAdequateLight(WorldDec world, DynamicTree tree, BlockPos pos) {
+	public boolean hasAdequateLight(World world, DynamicTree tree, BlockPos pos) {
 
 		//If clear sky is above the block then we needn't go any further
 		if(world.canBlockSeeSky(pos)) {
@@ -364,13 +363,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/** Used to find if the leaf block is at the bottom of the stack */
-	public static boolean isBottom(WorldDec world, BlockPos pos) {
+	public static boolean isBottom(World world, BlockPos pos) {
 		Block belowBlock = world.getBlock(pos.down());
 		return isBottom(world, pos, belowBlock);
 	}
 
 	/** Used to find if the leaf block is at the bottom of the stack */
-	public static boolean isBottom(WorldDec world, BlockPos pos, Block belowBlock) {
+	public static boolean isBottom(World world, BlockPos pos, Block belowBlock) {
 		if(TreeHelper.isTreePart(belowBlock)) {
 			ITreePart belowTreepart = (ITreePart) belowBlock;
 			return belowTreepart.getRadius(world, pos.down()) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
@@ -419,13 +418,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	public static void removeLeaves(WorldDec world, BlockPos pos) {
+	public static void removeLeaves(World world, BlockPos pos) {
 		world.setBlockToAir(pos);
 		world.getWorld().notifyBlocksOfNeighborChange(pos.getX(), pos.getY(), pos.getZ(), Blocks.air);
 	}
 	
 	//Variable hydration levels are only appropriate for leaf blocks
-	public static boolean setHydrationLevel(WorldDec world, BlockPos pos, int hydro, IBlockState currentBlockState) {
+	public static boolean setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
 		hydro = MathHelper.clamp(hydro, 0, 4);
 		
 		if(hydro == 0) {
@@ -440,7 +439,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		if(signal.step()) {//This is always placed at the beginning of every growSignal function
 			branchOut(world, pos, signal);//When a growth signal hits a leaf block it attempts to become a tree branch
 		}
@@ -458,7 +457,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	* @param tree
 	* @return True if the leaves are now at the coordinates.
 	*/
-	public boolean needLeaves(WorldDec world, BlockPos pos, DynamicTree tree) {
+	public boolean needLeaves(World world, BlockPos pos, DynamicTree tree) {
 		if(world.isAirBlock(pos)){//Place Leaves if Air
 			return this.growLeaves(world, tree, pos, tree.getDefaultHydration());
 		} else {//Otherwise check if there's already this type of leaves there.
@@ -467,7 +466,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	public GrowSignal branchOut(WorldDec world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal branchOut(World world, BlockPos pos, GrowSignal signal) {
 
 		DynamicTree tree = signal.getTree();
 
@@ -518,7 +517,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//////////////////////////////
 	
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+	public ArrayList<ItemStack> getDrops(net.minecraft.world.World _world, int x, int y, int z, int metadata, int fortune) {
+		World world = new World(_world);
 		DynamicTree tree = getTreeFromMetadata(metadata);
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 
@@ -650,7 +650,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;//Shouldn't need to run analysis on leaf blocks
 	}
 
@@ -666,7 +666,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		return false;//Nothing is applied to leaves
 	}
 

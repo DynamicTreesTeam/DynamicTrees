@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.util.IRegisterable;
 
 import cpw.mods.fml.relauncher.Side;
@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 
 public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
 
@@ -46,13 +45,13 @@ public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
 	* Can this block stay at this position.  Similar to canPlaceBlockAt except gets checked often with plants.
 	*/
 	@Override
-	public boolean canBlockStay(World world, int x, int y, int z) {
+	public boolean canBlockStay(net.minecraft.world.World world, int x, int y, int z) {
 		int dir = getDirection(world.getBlockMetadata(x, y, z));
 		x += Direction.offsetX[dir];
 		z += Direction.offsetZ[dir];
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockBranch branch = TreeHelper.getBranch(world, pos);
-		return branch != null && branch.getRadius(new WorldDec(world), pos) == 8 && branch.getTree().canSupportCocoa;
+		return branch != null && branch.getRadius(new World(world), pos) == 8 && branch.getTree().canSupportCocoa;
 	}
 
 	///////////////////////////////////////////

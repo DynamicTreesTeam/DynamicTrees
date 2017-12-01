@@ -7,8 +7,8 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 
 import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
 
 public class SubstanceFertilize implements ISubstanceEffect {
 
@@ -17,7 +17,7 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	@Override
 	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
 		if(dirt.fertilize(world, pos, amount)) {
-			if(world.isRemote) {
+			if(world.isRemote()) {
 				TreeHelper.getSafeTreePart(world, pos.up()).analyse(world, pos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.VILLAGER_HAPPY, 8)));
 			}
 			return true;

@@ -13,7 +13,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.renderers.RendererBonsai;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
@@ -27,7 +27,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.World;
 
 public class BlockBonsaiPot extends BlockBackport {
 
@@ -65,7 +64,7 @@ public class BlockBonsaiPot extends BlockBackport {
     	return trees.get(0);
 	}
 	
-	public boolean setTree(WorldDec world, DynamicTree tree, BlockPos pos) {
+	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
 		int woodType = tree.getPrimitiveSapling().getMeta();
 		world.setBlockState(pos, getDefaultState().withMeta(woodType));
 		return true;
@@ -77,7 +76,7 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	//Unlike a regular flower pot this is only used to eject the contents
 	@Override
-	public boolean onBlockActivated(WorldDec world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
@@ -98,7 +97,7 @@ public class BlockBonsaiPot extends BlockBackport {
 
 	
 	@Override
-	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
+	public ItemStack getPickBlock(MovingObjectPosition target, net.minecraft.world.World world, int x, int y, int z, EntityPlayer player) {
 		return new ItemStack(Items.flower_pot);
 	}
 	
@@ -107,20 +106,20 @@ public class BlockBonsaiPot extends BlockBackport {
 		return Items.flower_pot;
 	}
 
+
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState state = new WorldDec(world).getBlockState(pos);
-		ArrayList<ItemStack> ret = super.getDrops(world, x, y, z, metadata, fortune);
+	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
+		IBlockState state = world.getBlockState(pos);
+		ArrayList<ItemStack> ret = super.getDrops(world, pos, metadata, fortune);
 		DynamicTree tree = getTree(state);
 		ret.add(tree.getSeedStack());
 		return ret;
 	}
 	
 	@Override
-	public void neighborChanged(IBlockState state, WorldDec world, BlockPos pos, Block block) {
-		if (!World.doesBlockHaveSolidTopSurface(world, pos.getX(), pos.getY() - 1, pos.getZ())) {
-			this.dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), state.getMeta(), 0);
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+		if (!World.doesBlockHaveSolidTopSurface(world, pos.down())) {
+			this.dropBlockAsItem(world, pos, state.getMeta(), 0);
 			world.setBlockToAir(pos);
 		}
 	}

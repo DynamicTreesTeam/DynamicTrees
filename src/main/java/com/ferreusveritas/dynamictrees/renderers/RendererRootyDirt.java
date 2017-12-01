@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.renderers;
 
 import org.lwjgl.opengl.GL11;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -52,7 +53,7 @@ public class RendererRootyDirt implements ISimpleBlockRenderingHandler {
 			return false;
 		}
 
-		renderType = ((BlockRootyDirt) block).getRenderType(blockAccess, x, y, z);
+		renderType = ((BlockRootyDirt) block).getRenderType(new BlockAccessDec(blockAccess), x, y, z);
 		renderPass = 1;
 		renderer.renderStandardBlock(block, x, y, z);
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 
@@ -16,9 +16,9 @@ public class EntityLingeringEffector extends Entity {
 	public BlockPos blockPos;
 	public ISubstanceEffect effect;
 	public boolean extended;
-	private WorldDec world;
+	private World world;
 	
-	public EntityLingeringEffector(WorldDec world, BlockPos pos, ISubstanceEffect effect) {
+	public EntityLingeringEffector(World world, BlockPos pos, ISubstanceEffect effect) {
 		super(world.getWorld());
 		this.world = world;
 		width = 1.0f;

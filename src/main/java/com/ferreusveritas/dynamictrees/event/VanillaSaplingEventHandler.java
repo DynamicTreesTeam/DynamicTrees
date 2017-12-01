@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -16,7 +16,7 @@ public class VanillaSaplingEventHandler {
 	@SubscribeEvent
 	public void onPlayerPlaceBlock(PlaceEvent event) {
 		if(event.placedBlock == Blocks.sapling) {
-			WorldDec world = new WorldDec(event.world);
+			World world = new World(event.world);
 			String treeNames[] = {"oak", "spruce", "birch", "jungle", "acacia", "darkoak"};
 			int metadata = event.blockMetadata;
 			DynamicTree tree = TreeRegistry.findTree(treeNames[metadata]);

@@ -7,8 +7,11 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumActionResult;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -31,13 +34,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 
 /**
 * Try the following in a command block to demonstrate the extra tag functionality.
 * /give @p dynamictrees:staff 1 0 tag:{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"birch",display:{Name:"Frog"}}
 */
-public class Staff extends ItemReg {
+public class Staff extends ItemBackport {
 
 	IIcon overlayIcon;
 	IIcon glimmerIcon;
@@ -55,10 +57,9 @@ public class Staff extends ItemReg {
 	}
 	
 	@Override
-	public boolean onItemUse(ItemStack heldStack, EntityPlayer player, World world, int x, int y, int z, int side, float sideX, float sideY, float sideZ) {
-
-		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState clickedBlock = pos.getBlockState(world);
+	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		
+		IBlockState clickedBlock = world.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock.getBlock());
 		BlockPos rootPos = pos;
 		
@@ -77,7 +78,7 @@ public class Staff extends ItemReg {
 				rootPos = signal.root;
 				treePart = TreeHelper.getSafeTreePart(world, rootPos);
 				
-				if(world.isRemote && treePart.isRootNode()) {
+				if(world.isRemote() && treePart.isRootNode()) {
 					BlockRootyDirt rootyDirt = (BlockRootyDirt) treePart;
 					int soilLife = rootyDirt.getSoilLife(world, rootPos);
 					Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Rooty Soil Life: " + soilLife));
@@ -95,7 +96,7 @@ public class Staff extends ItemReg {
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
 				setTree(heldStack, tree);
-				return true;
+				return EnumActionResult.SUCCESS;
 			}
 		}
 
@@ -104,10 +105,10 @@ public class Staff extends ItemReg {
 		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
 			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
 			heldStack.stackSize--;//If the player is in creative this will have no effect.
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
 
-		return false;
+		return EnumActionResult.FAIL;
 	}
 
 	/**

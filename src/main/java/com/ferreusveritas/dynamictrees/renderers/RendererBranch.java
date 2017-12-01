@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.renderers;
 
 import org.lwjgl.opengl.GL11;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
@@ -69,7 +70,8 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 	@Override
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer){
-
+		BlockAccessDec access = new BlockAccessDec(world);
+		
 		if(block instanceof BlockBranch){
 			renderFaceFlags = faceAll;
 			renderRingSides = 0;
@@ -77,7 +79,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 
 			BlockPos pos = new BlockPos(x, y, z);
 			BlockBranch branch = (BlockBranch)block;
-			int radius = branch.getRadius(world, pos);
+			int radius = branch.getRadius(access, pos);
 
 			//Survey Radii
 			int radii[] = new int[6];
@@ -86,7 +88,7 @@ public class RendererBranch implements ISimpleBlockRenderingHandler {
 			int sourceDir = 0;
 
 			for(EnumFacing dir: EnumFacing.VALUES){
-				int connRadius = branch.getSideConnectionRadius(world, pos, radius, dir);
+				int connRadius = branch.getSideConnectionRadius(access, pos, radius, dir);
 				if(connRadius > 0){
 					numConnections++;
 					connRadius = connRadius > radius ? radius : connRadius;//Connection radius can't be larger than node radius

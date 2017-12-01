@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.api.backport;
 
 import java.util.Random;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
 /**
@@ -12,18 +12,18 @@ import net.minecraft.world.biome.BiomeGenBase;
  * @author ferreusveritas
  *
  */
-public class WorldDec extends BlockAccessDec {
+public class World extends BlockAccessDec {
 
-	private final World world;
+	private final net.minecraft.world.World world;
 	public Random rand;
 	
-	public WorldDec(World world) {
+	public World(net.minecraft.world.World world) {
 		super(world);
 		this.world = world;
 		this.rand = world.rand;
 	}
 
-	public World getWorld() {
+	public net.minecraft.world.World getWorld() {
 		return world;
 	}
 	
@@ -62,4 +62,25 @@ public class WorldDec extends BlockAccessDec {
 	public boolean canBlockSeeSky(BlockPos pos) {
 		return world.canBlockSeeTheSky(pos.getX(), pos.getY(), pos.getZ());
 	}
+	
+    public boolean canMineBlock(EntityPlayer player, int x, int y, int z) {
+    	return world.canMineBlock(player, x, y, z);
+	}
+    
+    public boolean canMineBlock(EntityPlayer player, BlockPos pos) {
+    	return canMineBlock(player, pos.getX(), pos.getY(), pos.getZ());
+    }
+    
+	public void playSoundEffect(BlockPos pos, String soundevent, float a, float b) {
+		world.playSoundEffect(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, soundevent, a, b);
+	}
+    
+	public void playSoundEffect(double x, double y, double z, String soundevent, float a, float b) {
+		world.playSoundEffect(x, y, z, soundevent, a, b);
+	}
+	
+	public static boolean doesBlockHaveSolidTopSurface(World world, BlockPos pos) {
+		return net.minecraft.world.World.doesBlockHaveSolidTopSurface(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+	}
+	
 }

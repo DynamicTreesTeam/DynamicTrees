@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -27,7 +27,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		return signal;
 	}
 
@@ -48,7 +48,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
 
@@ -66,7 +66,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		return false;
 	}
 

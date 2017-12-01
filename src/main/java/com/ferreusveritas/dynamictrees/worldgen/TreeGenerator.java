@@ -9,14 +9,13 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.api.backport.EnumDyeColor;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
@@ -54,7 +53,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public TreeGenerator() {
 		biomeTreeHandler = new BiomeTreeHandler();
-		radiusCoordinator = new BiomeRadiusCoordinator((IBiomeDensityProvider) biomeTreeHandler);
+		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
@@ -68,12 +67,13 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	@Override
-	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-		
+	public void generate(Random randomUnused, int chunkX, int chunkZ, net.minecraft.world.World _world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+		World world = new World(_world);
+
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
 		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 		
-		switch (world.provider.dimensionId) {
+		switch (world.getWorld().provider.dimensionId) {
 		case 0: //Overworld
 			generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
 			break;
@@ -109,20 +109,20 @@ public class TreeGenerator implements IWorldGenerator {
 			for (int zi = 0; zi < 4; ++zi) {
 				int posX = pos.getX() + xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = pos.getZ() + zi * 4 + 1 + 8 + random.nextInt(3);
-				int posY = world.getHeightValue(posX, posZ);
+				int posY = world.getWorld().getHeightValue(posX, posZ);
 
 				if (random.nextInt(16) == 0) {
-					new WorldGenBigMushroom().generate(world, random, posX, posY, posZ);
+					new WorldGenBigMushroom().generate(world.getWorld(), random, posX, posY, posZ);
 				}
 			}
 		}
 	}
 	
-	public void makeWoolCircle(WorldDec world, Circle circle, int h, EnumGeneratorResult resultType) {
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
 		makeWoolCircle(world, circle, h, resultType, 0);
 	}
 	
-	public void makeWoolCircle(WorldDec world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
+	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
 		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
@@ -141,8 +141,8 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
-	private EnumGeneratorResult makeTree(World _world, Circle circle) {
-		WorldDec world = new WorldDec(_world);
+	private EnumGeneratorResult makeTree(World world, Circle circle) {
+
 		circle.add(8, 8);//Move the circle into the "stage"
 		
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
@@ -161,7 +161,7 @@ public class TreeGenerator implements IWorldGenerator {
 			if(tree != null) {
 				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
-						if(tree.generate(world.getWorld(), pos, biome, random, circle.radius)) {
+						if(tree.generate(world, pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;

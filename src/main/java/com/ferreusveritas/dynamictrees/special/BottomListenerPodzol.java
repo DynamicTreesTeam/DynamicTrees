@@ -14,10 +14,9 @@ import net.minecraft.block.BlockMushroom;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
@@ -26,8 +25,7 @@ public class BottomListenerPodzol implements IBottomListener {
 	private static final IBlockState podzolState = new BlockAndMeta(Blocks.dirt, 2);
 	
 	@Override
-	public void run(World worldIn, DynamicTree tree, BlockPos pos, Random random) {
-		WorldDec world = new WorldDec(worldIn);
+	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 		
 		int x = pos.getX() + random.nextInt(3) - 1;
 		int z = pos.getZ() + random.nextInt(3) - 1;
@@ -75,7 +73,7 @@ public class BottomListenerPodzol implements IBottomListener {
 		return "podzol";
 	}
 
-	public static void spreadPodzol(WorldDec world, BlockPos pos) {
+	public static void spreadPodzol(World world, BlockPos pos) {
 
 		int Podzolish = 0;
 

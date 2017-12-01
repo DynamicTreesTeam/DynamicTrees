@@ -7,8 +7,8 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 
 import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.World;
 
 public class SubstanceGrowth implements ISubstanceEffect{
 
@@ -26,7 +26,7 @@ public class SubstanceGrowth implements ISubstanceEffect{
 			return false;//Time's up
 		}
 
-		if(world.isRemote) {
+		if(world.isRemote()) {
 			if(deltaTicks % 8 == 0) {//Run twinkles every 8 ticks.
 				TreeHelper.getSafeTreePart(world, pos.up()).analyse(world, pos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.SPELL, 2)));
 			}

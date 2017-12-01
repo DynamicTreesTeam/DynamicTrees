@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 /**
@@ -25,7 +25,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
 
 		if(branch != null && tree == branch.getTree()) {
@@ -39,11 +39,11 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
-	public void killSurroundingLeaves(WorldDec world, BlockPos twigPos) {
+	public void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote() && !world.restoringBlockSnapshots()) { // do not drop items while restoring blockstates, prevents item dupe
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be

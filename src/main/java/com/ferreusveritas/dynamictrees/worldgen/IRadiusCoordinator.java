@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import net.minecraft.world.World;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 
 public interface IRadiusCoordinator {
 

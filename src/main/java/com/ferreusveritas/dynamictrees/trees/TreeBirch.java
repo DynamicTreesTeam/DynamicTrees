@@ -8,11 +8,14 @@ import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.init.Blocks;
+
+import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.World;
+
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -40,9 +43,9 @@ public class TreeBirch extends DynamicTree {
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getSavedLightValue(EnumSkyBlock.Sky, pos.getX(), pos.getY(), pos.getZ()) < 4) {
-				world.setBlock(pos.getX(), pos.getY(), pos.getZ(), Blocks.brown_mushroom);//Change branch to a brown mushroom
-				world.setBlock(pos.getX(), pos.getY() - 1, pos.getZ(), Blocks.dirt, 0, 3);//Change rooty dirt to dirt
+			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 4) {
+				world.setBlockState(pos, new BlockAndMeta(Blocks.brown_mushroom));//Change branch to a brown mushroom
+				world.setBlockState(pos.down(), new BlockAndMeta(Blocks.dirt, 0), 3);//Change rooty dirt to dirt
 			}
 			return true;
 		}

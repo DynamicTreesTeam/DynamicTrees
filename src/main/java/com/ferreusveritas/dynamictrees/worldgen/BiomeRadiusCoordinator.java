@@ -2,9 +2,10 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.backport.World;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 

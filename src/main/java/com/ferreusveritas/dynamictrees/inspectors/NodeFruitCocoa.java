@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
@@ -21,7 +21,7 @@ public class NodeFruitCocoa extends NodeFruit {
 	}
 	
 	@Override
-	public boolean run(WorldDec world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		
 		if(!finished) {
 			int hashCode = coordHashCode(pos);

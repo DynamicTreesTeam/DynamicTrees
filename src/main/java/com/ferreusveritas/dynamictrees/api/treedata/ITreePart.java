@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -38,7 +38,7 @@ public interface ITreePart {
 	* @param signal Signal structure that keeps track of the growth path
 	* @return Signal parameter for chaining
 	*/
-	GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal);
+	GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal);
 
 	/**
 	* The probability that the branch logic will follow into this block as part of it's path.
@@ -77,7 +77,7 @@ public interface ITreePart {
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
-	MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
+	MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
 
 	/**
 	* Get the appropriate dynamic tree this block is used to build.
@@ -111,7 +111,7 @@ public interface ITreePart {
 	* @param itemStack The itemstack to be used.
 	* @return true if item was used, false otherwise
 	*/
-	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
 
 	/**
 	* The single root node of a tree.

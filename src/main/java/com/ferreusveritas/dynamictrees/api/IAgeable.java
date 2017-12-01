@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 
 public interface IAgeable {
 
@@ -17,6 +17,6 @@ public interface IAgeable {
 	 * @param fast
 	 * @return true if block was destroyed after the ageing, false otherwise
 	 */
-	public boolean age(WorldDec world, BlockPos pos, IBlockState state, Random rand, boolean fast);
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast);
 	
 }

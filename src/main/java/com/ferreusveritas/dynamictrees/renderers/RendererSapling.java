@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.renderers;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -28,7 +29,7 @@ public class RendererSapling implements ISimpleBlockRenderingHandler {
 
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockDynamicSapling sapling = (BlockDynamicSapling) block;
-		DynamicTree tree = sapling.getTree(pos.getBlockState(blockAccess));
+		DynamicTree tree = sapling.getTree(new BlockAccessDec(blockAccess).getBlockState(pos));
 		
 		renderSapling(blockAccess, x, y, z, tree, renderer, 0);
 

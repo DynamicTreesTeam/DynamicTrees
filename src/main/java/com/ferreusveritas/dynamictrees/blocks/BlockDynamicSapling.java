@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.renderers.RendererSapling;
 
 import cpw.mods.fml.relauncher.Side;
@@ -23,7 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 public class BlockDynamicSapling extends BlockBackport {
 	
@@ -42,7 +41,7 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(WorldDec world, BlockPos pos, IBlockState state, Random rand) {
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
 		generateTree(world, pos, state, rand);
 	}
 
@@ -60,11 +59,11 @@ public class BlockDynamicSapling extends BlockBackport {
 	}
 
 	@Override
-	public boolean canBlockStay(WorldDec world, BlockPos pos, IBlockState state) {
+	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
 		return canSaplingStay(world, getTree(state), pos);
 	}
 
-	public void generateTree(WorldDec world, BlockPos pos, IBlockState state, Random rand) {
+	public void generateTree(World world, BlockPos pos, IBlockState state, Random rand) {
 		DynamicTree tree = getTree(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
@@ -96,27 +95,27 @@ public class BlockDynamicSapling extends BlockBackport {
 	///////////////////////////////////////////
 
 	@Override
-	public void neighborChanged(IBlockState state, WorldDec world, BlockPos pos, Block block) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
 		if (!this.canBlockStay(world, pos, state)) {
 			dropBlock(world, getTree(state), state, pos);
 		}
 	}
 	
-	private void dropBlock(WorldDec world, DynamicTree tree, IBlockState state, BlockPos pos) {
+	private void dropBlock(World world, DynamicTree tree, IBlockState state, BlockPos pos) {
 		world.setBlockToAir(pos);
 		dropBlockAsItem(world.getWorld(), pos.getX(), pos.getY(), pos.getZ(), new ItemStack(tree.getSeed()));
 	}
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+	public ArrayList<ItemStack> getDrops(net.minecraft.world.World world, int x, int y, int z, int metadata, int fortune) {
 		ArrayList<ItemStack> dropped = super.getDrops(world, x, y, z, metadata, fortune);
 		dropped.add(getTree(new BlockAndMeta(this, metadata)).getSeedStack());
 		return dropped;
 	}
 
 	@SideOnly(Side.CLIENT)
-	public Item getItem(World _world, int x, int y, int z) {
-		WorldDec world = new WorldDec(_world);
+	public Item getItem(net.minecraft.world.World _world, int x, int y, int z) {
+		World world = new World(_world);
 		return getTree(world.getBlockState(new BlockPos(x, y, z))).getSeed();
 	}
 
@@ -139,7 +138,7 @@ public class BlockDynamicSapling extends BlockBackport {
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
+	public AxisAlignedBB getCollisionBoundingBoxFromPool(net.minecraft.world.World world, int x, int y, int z) {
 		this.setBlockBoundsBasedOnState(world, x, y, z);
 		return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
 	}

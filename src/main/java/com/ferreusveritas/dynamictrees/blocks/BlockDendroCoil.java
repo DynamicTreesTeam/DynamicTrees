@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAndMeta;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -38,7 +38,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 
 public class BlockDendroCoil extends BlockContainer implements IPeripheralProvider, IRegisterable, ILorable {
 
@@ -78,13 +77,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 	
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+	public void onNeighborBlockChange(net.minecraft.world.World world, int x, int y, int z, Block block) {
 		if (world.isBlockIndirectlyGettingPowered(x, y, z)) {
-			growPulse(new WorldDec(world), new BlockPos(x, y, z));
+			growPulse(new World(world), new BlockPos(x, y, z));
 		}
 	}
 
-	public String getCode(WorldDec world, BlockPos pos) {
+	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
 		if(TreeHelper.isRootyDirt(world, pos)) {
 			return new JoCode().buildFromTree(world, pos).toString();
@@ -93,7 +92,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		return "";
 	}
 
-	public void setCode(WorldDec world, BlockPos pos, String treeName, String JoCode) {
+	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		if(tree != null) {
@@ -103,7 +102,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 
-	public void createStaff(WorldDec world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
+	public void createStaff(World world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
 		ItemStack stack = new ItemStack(DynamicTrees.treeStaff, 1, 0);
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		DynamicTrees.treeStaff.setTree(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
@@ -114,7 +113,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		CompatHelper.spawnEntity(world, entityItem);
 	}
 
-	public String getTree(WorldDec world, BlockPos pos) {
+	public String getTree(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
 			DynamicTree tree = part.getTree(world, pos.up());
@@ -126,28 +125,28 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		return "";
 	}
 
-	public void plantTree(WorldDec world, BlockPos pos, String treeName) {
+	public void plantTree(World world, BlockPos pos, String treeName) {
 		DynamicTree tree = TreeRegistry.findTree(treeName);
 		if(tree != null) {
 			tree.getSeed().plantSapling(world, pos.up(2), tree.getSeedStack());
 		}
 	}
 
-	public void growPulse(WorldDec world, BlockPos pos) {
+	public void growPulse(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
 			TreeHelper.growPulse(world, pos.up());
 		}
 	}
 	
-	public void killTree(WorldDec world, BlockPos pos) {
+	public void killTree(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
 			((BlockRootyDirt)part).destroyTree(world, pos.up());
 		}
 	}
 
-	public int getSoilLife(WorldDec world, BlockPos pos) {
+	public int getSoilLife(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
 			return ((BlockRootyDirt)part).getSoilLife(world, pos.up());
@@ -155,14 +154,14 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		return 0;
 	}
 
-	public void setSoilLife(WorldDec world, BlockPos pos, int life) {
+	public void setSoilLife(World world, BlockPos pos, int life) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
 			((BlockRootyDirt)part).setSoilLife(world, pos.up(), life);
 		}
 	}
 	
-	public void testPoisson(WorldDec world, BlockPos pos, int rad1, int rad2, double angle) {
+	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle) {
 		pos = pos.up();
 		
 		for(int y = 0; y < 2; y++) {
@@ -183,7 +182,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 	
-	public void testPoisson2(WorldDec world, BlockPos pos, int rad1, int rad2, double angle, int rad3) {
+	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3) {
 		pos = pos.up();
 				
 		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
@@ -216,12 +215,12 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World world, int meta) {
+	public TileEntity createNewTileEntity(net.minecraft.world.World world, int meta) {
 		return new TileEntityDendroCoil();
 	}
 
 	@Override
-	public IPeripheral getPeripheral(World world, int x, int y, int z, int side) {
+	public IPeripheral getPeripheral(net.minecraft.world.World world, int x, int y, int z, int side) {
 		TileEntity te = world.getTileEntity(x, y, z);
 		
 		if(te instanceof TileEntityDendroCoil) {

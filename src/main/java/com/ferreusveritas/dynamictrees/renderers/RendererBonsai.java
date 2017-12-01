@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.renderers;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccessDec;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
@@ -29,7 +30,7 @@ public class RendererBonsai implements ISimpleBlockRenderingHandler {
 	@Override
 	public boolean renderWorldBlock(IBlockAccess blockAccess, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		BlockPos pos = new BlockPos(x, y, z);
-		IBlockState blockState = pos.getBlockState(blockAccess);
+		IBlockState blockState = new BlockAccessDec(blockAccess).getBlockState(pos);
 		DynamicTree tree = ((BlockBonsaiPot) block).getTree(blockState);
 
 		//Render flowerpot

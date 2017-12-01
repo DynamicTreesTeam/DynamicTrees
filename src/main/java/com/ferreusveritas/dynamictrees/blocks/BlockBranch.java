@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.WorldDec;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -105,12 +105,12 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public void updateTick(WorldDec world, BlockPos pos, IBlockState state, Random random) {
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
 		age(world, pos, state, random, false);
 	}
 
 	@Override
-	public boolean age(WorldDec world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
 		int radius = getRadius(world, pos);
 		if (fast || rand.nextInt(radius * 2) == 0) {// Thicker branches take longer to rot
 			return checkForRot(world, pos, radius, rand, fast);
@@ -119,7 +119,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 		return false;
 	}
 
-	public boolean checkForRot(WorldDec world, BlockPos pos, int radius, Random rand, boolean fast) {
+	public boolean checkForRot(World world, BlockPos pos, int radius, Random rand, boolean fast) {
 		// Rooty dirt below the block counts as a branch in this instance
 		// Rooty dirt below for saplings counts as 2 neighbors if the soil is not infertile
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
@@ -139,7 +139,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean onBlockActivated(WorldDec world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
 		if (tree != null && tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ)) {
 			return true;
@@ -152,7 +152,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public boolean applyItemSubstance(WorldDec world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		BlockPos down = pos.down();
 
 		if(world.getBlock(down) != this) { // Make sure the below block is not another branch block
@@ -163,7 +163,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public float getBlockHardness(WorldDec world, BlockPos pos) {
+	public float getBlockHardness(World world, BlockPos pos) {
 		int radius = getRadius(world, pos);
 		return getTree().getPrimitiveLog().getBlock().getBlockHardness(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()) * (radius * radius) / 64.0f * 8.0f;
 	};
@@ -248,7 +248,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 		}
 	}
 
-	public void setRadius(WorldDec world, BlockPos pos, int radius) {
+	public void setRadius(World world, BlockPos pos, int radius) {
 		world.getWorld().setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), radiusToMeta(radius), 2);
 	}
 
@@ -258,7 +258,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 		return isSameWood(from) ? getRadius(blockAccess, pos) + 2 : 0;
 	}
 
-	public GrowSignal growIntoAir(WorldDec world, BlockPos pos, GrowSignal signal, int fromRadius) {
+	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		BlockDynamicLeaves leaves = getTree().getDynamicLeaves();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
@@ -271,7 +271,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public GrowSignal growSignal(WorldDec world, BlockPos pos, GrowSignal signal) {
+	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
@@ -371,7 +371,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(WorldDec world, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, BlockPos pos) {
 		this.setBlockBoundsBasedOnState(world, pos.getX(), pos.getY(), pos.getZ());
 		return AxisAlignedBB.getBoundingBox(pos.getX() + this.minX, pos.getY() + this.minY, pos.getZ() + this.minZ, pos.getX() + this.maxX, pos.getY() + this.maxY, pos.getZ() + this.maxZ);
 	}
@@ -391,7 +391,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	///////////////////////////////////////////
 
 	@Override
-	public MapSignal analyse(WorldDec world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
@@ -418,7 +418,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	}
 
 	// Destroys all branches recursively not facing the branching direction with the root node
-	public int destroyTreeFromNode(WorldDec world, BlockPos pos) {
+	public int destroyTreeFromNode(World world, BlockPos pos) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze only part of the tree beyond the break point and calculate it's volume
@@ -426,7 +426,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 
-	public int destroyEntireTree(WorldDec world, BlockPos pos) {
+	public int destroyEntireTree(World world, BlockPos pos) {
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze the entire tree and calculate it's volume
 		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
@@ -437,7 +437,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 
-	public List<ItemStack> getWoodDrops(WorldDec world, BlockPos pos, int volume) {
+	public List<ItemStack> getWoodDrops(World world, BlockPos pos, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
 
 		volume *= ConfigHandler.treeHarvestMultiplier;// For cheaters.. you know who you are.
@@ -482,7 +482,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
-	public boolean removedByPlayer(WorldDec world, EntityPlayer player, BlockPos pos, boolean canHarvest) {
+	public boolean removedByPlayer(World world, EntityPlayer player, BlockPos pos, boolean canHarvest) {
 		int fortune = EnchantmentHelper.getFortuneModifier(player);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		int woodVolume = destroyTreeFromNode(world, pos);
@@ -502,7 +502,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 
 	// Super member also does nothing
 	@Override
-	public void onBlockHarvested(WorldDec world, BlockPos pos, int localMeta, EntityPlayer player) {
+	public void onBlockHarvested(World world, BlockPos pos, int localMeta, EntityPlayer player) {
 	}
 	
 	// Since we already created drops in removedByPlayer() we must disable this.
@@ -538,7 +538,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IAgeable {
 	
 	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
 	@Override
-	public void onBlockExploded(WorldDec world, BlockPos pos, Explosion explosion) {
+	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		int woodVolume = destroyTreeFromNode(world, pos);
 		for (ItemStack item : getWoodDrops(world, pos, woodVolume)) {
 			CompatHelper.spawnItemStackAsEntity(world, pos, item);

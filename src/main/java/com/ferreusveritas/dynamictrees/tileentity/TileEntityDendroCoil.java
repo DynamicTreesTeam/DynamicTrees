@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
 
 import dan200.computercraft.api.lua.ILuaContext;
@@ -10,7 +11,6 @@ import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 
@@ -64,7 +64,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 	public void updateEntity() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-		World world = worldObj;
+		World world = new World(worldObj);
 		
 		synchronized(this) {
 			treeName = new String(dendroCoil.getTree(world, getPos()));
@@ -114,9 +114,9 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		}
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-		World world = worldObj;
+		World world = new World(worldObj);
 
-		if(!world.isRemote && dendroCoil != null) {
+		if(!world.isRemote() && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
 					return new Object[]{ dendroCoil.getCode(world, getPos()) };
