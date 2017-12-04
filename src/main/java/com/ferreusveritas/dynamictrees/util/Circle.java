@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 
 import net.minecraft.util.math.BlockPos;
 
-public class Circle extends Vec2d {
+public class Circle extends Vec2i {
 	
 	public int radius;
 	public int arc;
@@ -98,7 +98,7 @@ public class Circle extends Vec2d {
 		set(x, z, radius);
 	}
 	
-	public Circle(Vec2d c, int radius) {
+	public Circle(Vec2i c, int radius) {
 		set(c.x, c.z, radius);
 	}
 	
@@ -322,7 +322,7 @@ public class Circle extends Vec2d {
 	* @return penetration depth
 	*/
 	public double circlePenetration(Circle o) {
-		Vec2d delta = new Vec2d(x - o.x, z - o.z);
+		Vec2i delta = new Vec2i(x - o.x, z - o.z);
 		return delta.len() - (this.radius + o.radius + 1);
 	}
 	

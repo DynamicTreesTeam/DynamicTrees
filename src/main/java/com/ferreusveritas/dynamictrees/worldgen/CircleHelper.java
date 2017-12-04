@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.util.Circle;
-import com.ferreusveritas.dynamictrees.util.Vec2d;
+import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class CircleHelper {
 
@@ -59,7 +59,7 @@ public class CircleHelper {
 		return wave;
 	}
 
-	private static Vec2d[] getCoordsForPair(int rad1, int rad2, int startAngle, int stopAngle) {
+	private static Vec2i[] getCoordsForPair(int rad1, int rad2, int startAngle, int stopAngle) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 
@@ -68,7 +68,7 @@ public class CircleHelper {
 		int codesize = vsdata.length - 2;
 		
 		int numAngles = stopAngle - startAngle + 1;
-		Vec2d c[] = new Vec2d[numAngles];
+		Vec2i c[] = new Vec2i[numAngles];
 		int coordIter = 0;
 		
 		for(int angleIter = startAngle; angleIter <= stopAngle; angleIter++) {
@@ -81,7 +81,7 @@ public class CircleHelper {
 				
 			int modulus = Math.abs(((vAngle + codesize) % (codesize * 2) ) - codesize);
 
-			Vec2d tc = c[coordIter++ % c.length] = new Vec2d();
+			Vec2i tc = c[coordIter++ % c.length] = new Vec2i();
 			
 			//Avoid branching by using a bit twiddle hack to determine the sign of the data.
 			tc.x = (-( ((vAngle / codesize) + 1) & 2) + 1) * vsdata[codesize - modulus];
@@ -139,11 +139,11 @@ public class CircleHelper {
 
 		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
 
-		Vec2d[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
-		Vec2d closestCoord = coordList[0];
+		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		Vec2i closestCoord = coordList[0];
 		double closestAngle = Math.PI;
 
-		for(Vec2d c: coordList) {
+		for(Vec2i c: coordList) {
 			if(!c.isLoose()) {//Reject loose circles when finding 2nd
 				double deltaAngle = deltaAngle(c.angle(), angle);
 				if(deltaAngle < closestAngle) {
@@ -169,12 +169,12 @@ public class CircleHelper {
 		
 		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
 
-		Vec2d[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
-		Vec2d closestCoord = coordList[0];
+		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		Vec2i closestCoord = coordList[0];
 		double closestAngle = Math.PI;
 		boolean isLoose = false;
 		
-		for(Vec2d c: coordList) {
+		for(Vec2i c: coordList) {
 			double deltaAngle = deltaAngle(c.angle(), angle);
 			if(deltaAngle < closestAngle) {
 				closestCoord = c;
@@ -207,7 +207,7 @@ public class CircleHelper {
 		}
 
 		Circle cC = new Circle(0, 0, cCrad);
-		Vec2d delta = new Vec2d(cB.x - cA.x, cB.z - cA.z);
+		Vec2i delta = new Vec2i(cB.x - cA.x, cB.z - cA.z);
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
 		double lenAB = delta.len();
@@ -226,11 +226,11 @@ public class CircleHelper {
 		int posAC = (int)(radiansToTurns(angBAC) * getNumAnglesInPair(cA.radius, cC.radius));
 		int posBC = (int)(radiansToTurns(angABC) * getNumAnglesInPair(cB.radius, cC.radius));
 
-		Vec2d[] coordListAC = getCoordsForPair(cA.radius, cC.radius, posAC - 2, posAC + 2);
-		Vec2d[] coordListBC = getCoordsForPair(cB.radius, cC.radius, posBC - 2, posBC + 2);
+		Vec2i[] coordListAC = getCoordsForPair(cA.radius, cC.radius, posAC - 2, posAC + 2);
+		Vec2i[] coordListBC = getCoordsForPair(cB.radius, cC.radius, posBC - 2, posBC + 2);
 
-		Vec2d a = new Vec2d();
-		Vec2d b = new Vec2d();
+		Vec2i a = new Vec2i();
+		Vec2i b = new Vec2i();
 		boolean solution = false;
 		
 		for(int ac = 0; ac < coordListAC.length; ac++) {
@@ -293,7 +293,7 @@ public class CircleHelper {
 			return;
 		}
 
-		Vec2d delta = new Vec2d(c2.x - c1.x, c2.z - c1.z);
+		Vec2i delta = new Vec2i(c2.x - c1.x, c2.z - c1.z);
 		double angle = delta.angle();
 		double dist = delta.len();
 

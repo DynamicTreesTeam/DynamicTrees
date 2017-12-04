@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Vec2d;
+import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
@@ -22,10 +22,10 @@ import net.minecraft.world.World;
 public class ChunkCircleManager {
 
 	IRadiusCoordinator radiusCoordinator;
-	HashMap<Vec2d, ChunkCircleSet> chunkCircles;
+	HashMap<Vec2i, ChunkCircleSet> chunkCircles;
 
 	public ChunkCircleManager(IRadiusCoordinator radCoord) {
-		chunkCircles = new HashMap<Vec2d, ChunkCircleSet>();
+		chunkCircles = new HashMap<Vec2i, ChunkCircleSet>();
 		radiusCoordinator = radCoord;
 	}
 
@@ -110,7 +110,7 @@ public class ChunkCircleManager {
 			int radius = getRadiusAtCircleTangent(world, master);
 
 			Circle slave = CircleHelper.findSecondCircle(master, radius);//Create a second circle tangential to the master circle.
-			Vec2d slavePos = new Vec2d(slave);//Cache slave position
+			Vec2i slavePos = new Vec2i(slave);//Cache slave position
 			
 			//Mask off the master so it won't happen again.
 			master.arc |= 1 << master.getFreeBit();//Clear specific arc bit for good measure
@@ -132,7 +132,7 @@ public class ChunkCircleManager {
 				Circle master2 = entry.getValue();
 
 				//Determine handedness of 3rd circle interaction
-				int cross = Vec2d.crossProduct(new Vec2d(slavePos).sub(master1),new Vec2d(master2).sub(master1));
+				int cross = Vec2i.crossProduct(new Vec2i(slavePos).sub(master1),new Vec2i(master2).sub(master1));
 				if(cross < 0){//Swap circles if the cross product is negative
 					Circle temp = master2;
 					master2 = master1;
@@ -198,7 +198,7 @@ public class ChunkCircleManager {
 	}
 
 	private ChunkCircleSet getChunkCircleSet(int chunkX, int chunkZ) {
-		Vec2d key = new Vec2d(chunkX, chunkZ);
+		Vec2i key = new Vec2i(chunkX, chunkZ);
 		ChunkCircleSet cSet;
 		
 		if(chunkCircles.containsKey(key)) {
@@ -220,7 +220,7 @@ public class ChunkCircleManager {
 	}
 
 	public void unloadChunkCircleData(int chunkX, int chunkZ) {
-		chunkCircles.remove(new Vec2d(chunkX, chunkZ));
+		chunkCircles.remove(new Vec2i(chunkX, chunkZ));
 	}
 
 	private ArrayList<Circle> getChunkCircles(int chunkX, int chunkZ) {
