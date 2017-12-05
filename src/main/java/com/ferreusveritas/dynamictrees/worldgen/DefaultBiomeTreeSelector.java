@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -59,7 +59,7 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	
 	@Override
 	public String getName() {
-		return DynamicTrees.MODID + ":default";
+		return ModConstants.MODID + ":default";
 	}
 	
 	@Override

@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 public class WorldGenRegistry {
 
@@ -18,8 +18,8 @@ public class WorldGenRegistry {
 	 * @return
 	 */
 	public static boolean registerBiomeTreeSelector(IBiomeTreeSelector treeSelector) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addTreeSelector(treeSelector);
+		if(TreeGenerator.getTreeGenerator() != null) {
+			TreeGenerator.getTreeGenerator().biomeTreeHandler.addTreeSelector(treeSelector);
 			return true;
 		}
 		return false;
@@ -32,8 +32,8 @@ public class WorldGenRegistry {
 	 * @return
 	 */
 	public static boolean registerBiomeDensityProvider(IBiomeDensityProvider densityProvider) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addDensityProvider(densityProvider);
+		if(TreeGenerator.getTreeGenerator() != null) {
+			TreeGenerator.getTreeGenerator().biomeTreeHandler.addDensityProvider(densityProvider);
 			return true;
 		}
 		return false;

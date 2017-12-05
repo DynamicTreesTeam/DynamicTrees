@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public interface IBottomListener {
 

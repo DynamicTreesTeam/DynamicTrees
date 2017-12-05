@@ -3,8 +3,9 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import net.minecraft.util.math.BlockPos;
 import com.google.common.collect.AbstractIterator;
+
+import net.minecraft.util.math.BlockPos;
 
 /**
 * A simple implementation of a voxel map

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -32,7 +32,7 @@ public class NodeFruitCocoa extends NodeFruit {
 					EnumFacing dir = EnumFacing.getFront(side);
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
+						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
 						world.setBlockState(pos, cocoaState, 2);
 					}
 				} else {

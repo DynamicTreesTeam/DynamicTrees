@@ -7,7 +7,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -55,7 +55,7 @@ public class BlockBonsaiPot extends Block {
 	}
 
 	private void mapTrees() {
-		for(DynamicTree tree: DynamicTrees.baseTrees) {
+		for(DynamicTree tree: ModTrees.baseTrees) {
 			trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
 		}
 	}

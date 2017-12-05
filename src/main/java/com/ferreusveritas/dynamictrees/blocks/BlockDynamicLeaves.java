@@ -208,9 +208,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				for(int ix = minX; ix <= maxX; ix++) {
 					for(int iz = minZ; iz <= maxZ; iz++) {
 						BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
-						if(TreeHelper.isLeaves(world, iPos)) {
+						IBlockState state = world.getBlockState(iPos);
+						if(TreeHelper.isLeaves(state)) {
 							hasLeaves = true;//This layer has leaves
-							crushBlock(world, iPos, entity);
+							DynamicTrees.proxy.crushLeavesBlock(world, iPos, state, entity);
+							world.setBlockToAir(iPos);
 						} else
 						if (!world.isAirBlock(iPos)) {
 							crushing = false;//We hit something solid thus no longer crushing leaves layers
@@ -221,37 +223,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	public void crushBlock(World world, BlockPos pos, Entity entity) {
-
-		if(world.isRemote) {
-			Random random = world.rand;
-			IBlockState blockState = world.getBlockState(pos);
-			ITreePart treePart = TreeHelper.getTreePart(blockState);
-			if(treePart instanceof BlockDynamicLeaves) {
-				DynamicTree tree = treePart.getTree(world, pos);
-				if(tree != null) {
-					int color = DynamicTrees.proxy.getTreeFoliageColor(tree, world, blockState, pos);
-			        float r = (color >> 16 & 255) / 255.0F;
-			        float g = (color >> 8 & 255) / 255.0F;
-			        float b = (color & 255) / 255.0F;
-					for(int dz = 0; dz < 8; dz++) {
-						for(int dy = 0; dy < 8; dy++) {
-							for(int dx = 0; dx < 8; dx++) {
-								if(random.nextInt(8) == 0) {
-									double fx = pos.getX() + dx / 8.0;
-									double fy = pos.getY() + dy / 8.0;
-									double fz = pos.getZ() + dz / 8.0;
-									DynamicTrees.proxy.addDustParticle(fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		world.setBlockToAir(pos);
-	}
 
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {

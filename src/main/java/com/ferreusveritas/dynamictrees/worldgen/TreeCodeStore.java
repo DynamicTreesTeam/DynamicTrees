@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -44,7 +44,7 @@ public class TreeCodeStore {
 	
 	public void addCodesFromFile(String filename) {
 		try {
-			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + tree.getName() + "\" from file: " + filename);
+			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + tree.getName() + "\" from file: " + filename);
 			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
 			String line;
 			while((line = readIn.readLine()) != null) {

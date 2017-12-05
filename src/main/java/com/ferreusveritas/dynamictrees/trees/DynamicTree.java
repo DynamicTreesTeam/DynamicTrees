@@ -7,6 +7,9 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -20,8 +23,8 @@ import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
@@ -29,10 +32,10 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
@@ -161,7 +164,7 @@ public class DynamicTree {
 	
 	/** Hands Off! Only {@link DynamicTrees} mod should use this */
 	public DynamicTree(String name, int seq) {
-		this(DynamicTrees.MODID, name, seq);
+		this(ModConstants.MODID, name, seq);
 	}
 	
 	/**
@@ -215,7 +218,7 @@ public class DynamicTree {
 		}
 		
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		setDynamicSapling(DynamicTrees.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
 	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -317,11 +320,11 @@ public class DynamicTree {
 			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
 			
 			//Create a seed from a sapling and dirt bucket
-			GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(DynamicTrees.dirtBucket)});
+			GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(ModItems.dirtBucket)});
 			
 			//Creates a vanilla sapling from a seed and dirt bucket
 			if(enableSaplingRecipe) {
-				GameRegistry.addShapelessRecipe(new ResourceLocation(DynamicTrees.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(DynamicTrees.dirtBucket)});
+				GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(ModItems.dirtBucket)});
 			}
 		}
 		
@@ -586,7 +589,7 @@ public class DynamicTree {
 
 	/** Used by seed to determine the proper dirt block to create for planting. */
 	public BlockRootyDirt getRootyDirtBlock() {
-		return DynamicTrees.blockRootyDirt;
+		return ModBlocks.blockRootyDirt;
 	}
 
 	/**
@@ -599,7 +602,7 @@ public class DynamicTree {
 	 */
 	public boolean isAcceptableSoil(IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == DynamicTrees.blockRootyDirt;
+		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
 	}
 	
 	/**
@@ -1011,7 +1014,7 @@ public class DynamicTree {
 	 * @return
 	 */
 	public BlockBonsaiPot getBonzaiPot() {
-		return DynamicTrees.blockBonsaiPot;
+		return ModBlocks.blockBonsaiPot;
 	}
 	
 	

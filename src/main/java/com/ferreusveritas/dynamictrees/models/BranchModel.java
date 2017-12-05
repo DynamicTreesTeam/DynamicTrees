@@ -2,7 +2,9 @@ package com.ferreusveritas.dynamictrees.models;
 
 import java.util.Collection;
 import java.util.function.Function;
+
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

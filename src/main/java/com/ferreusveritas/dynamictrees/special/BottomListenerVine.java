@@ -5,11 +5,11 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
+import net.minecraft.block.BlockVine;
 import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.BlockVine;
+import net.minecraft.world.World;
 
 public class BottomListenerVine implements IBottomListener {
 

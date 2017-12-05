@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
@@ -15,15 +16,15 @@ import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
@@ -184,7 +185,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 
-		for(DynamicTree tree : DynamicTrees.baseTrees) {
+		for(DynamicTree tree : ModTrees.baseTrees) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
 			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
 		}

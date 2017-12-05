@@ -9,8 +9,8 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class BottomListenerDropItems implements IBottomListener {
 

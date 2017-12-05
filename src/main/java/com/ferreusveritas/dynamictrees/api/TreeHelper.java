@@ -183,6 +183,10 @@ public class TreeHelper {
 		return isLeaves(blockAccess.getBlockState(pos).getBlock());
 	}
 
+	public static boolean isLeaves(IBlockState blockState) {
+		return isLeaves(blockState.getBlock());
+	}
+	
 	//Rooty Dirt
 
 	public static boolean isRootyDirt(Block block) {

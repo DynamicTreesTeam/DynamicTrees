@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -17,8 +18,8 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -26,12 +27,35 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
 	
+	private static TreeGenerator INSTANCE;
+	
 	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 	protected RandomXOR random;
 	
+	public static TreeGenerator getTreeGenerator() {
+		return INSTANCE;
+	}
+	
+	public static void preInit() {
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			INSTANCE = new TreeGenerator();
+		}
+	}
+	
+	public static void init() {
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			INSTANCE.biomeTreeHandler.init();
+		}
+	}
+	
+	/**
+	 * This is for world debugging.
+	 * The colors signify the different tree spawn failure modes.
+	 *
+	 */
 	public enum EnumGeneratorResult {
 		GENERATED(EnumDyeColor.WHITE),
 		NOTREE(EnumDyeColor.BLACK),
@@ -136,8 +160,8 @@ public class TreeGenerator implements IWorldGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			EnumDyeColor color = resultType.getColor();
-			world.setBlockState(pos, Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
-			world.setBlockState(pos.up(), Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, color));
+			world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, color));
+			world.setBlockState(pos.up(), Blocks.CARPET.getDefaultState().withProperty(BlockColored.COLOR, color));
 		}
 	}
 	

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.special;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -15,10 +15,10 @@ import net.minecraft.block.BlockMushroom;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.World;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
 
 public class BottomListenerPodzol implements IBottomListener {
 
@@ -81,7 +81,7 @@ public class BottomListenerPodzol implements IBottomListener {
 			BlockPos deltaPos = pos.offset(dir);
 			Block testBlock = world.getBlockState(deltaPos).getBlock();
 			Podzolish += (testBlock == Blocks.DIRT) && (world.getBlockState(deltaPos).getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL) ? 1 : 0;
-			Podzolish += testBlock == DynamicTrees.blockRootyDirt ? 1 : 0;
+			Podzolish += testBlock == ModBlocks.blockRootyDirt ? 1 : 0;
 			if(Podzolish >= 3) {
 				world.setBlockState(pos, podzolState);
 				break;

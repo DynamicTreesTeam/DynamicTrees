@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ConfigHandler;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -58,9 +58,9 @@ public class TreeJungle extends DynamicTree {
 						pos = pos.offset(side);
 					}
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, player);
+						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, player);
 						EnumFacing facing = cocoaState.getValue(BlockHorizontal.FACING);
-						world.setBlockState(pos, DynamicTrees.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
+						world.setBlockState(pos, ModBlocks.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
 						if (!player.capabilities.isCreativeMode) {
 							heldItem.shrink(1);
 						}
