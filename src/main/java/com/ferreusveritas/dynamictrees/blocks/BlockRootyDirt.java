@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -230,7 +231,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 					player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
 				}
 			} else {
-				itemStack.shrink(1); //Just a regular item like bonemeal
+				CompatHelper.shrinkStack(itemStack, 1); //Just a regular item like bonemeal
 			}
 			return true;
 		}

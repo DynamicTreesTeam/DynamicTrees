@@ -20,6 +20,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -117,24 +118,29 @@ public class JoCode {
 	* @param world The world
 	* @param seed The seed used to create the tree
 	* @param pos The position of what will become the rootydirt block
+	* @param biome The biome of the coordinates.
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
+	public void generate(World world, DynamicTree tree, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
 		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
+		//This will store the positions of all of the branch endpoints
+		ArrayList<BlockPos> endPoints = new ArrayList<BlockPos>();
+
+		//A Tree generation boundary radius is at least 2 and at most 8
+		radius = MathHelper.clamp(radius, 2, 8);
+		
 		//Create tree
 		setFacing(facing);
 		generateFork(world, tree, 0, pos, false);
-
-		radius = MathHelper.clamp(radius, 2, 8);
 
 		//Fix branch thicknesses and map out leaf locations
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {//If a branch exists then the growth was successful
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
-			NodeInflator integrator = new NodeInflator(leafMap);
-			MapSignal signal = new MapSignal(integrator);
+			NodeInflator inflator = new NodeInflator(leafMap, endPoints);
+			MapSignal signal = new MapSignal(inflator);
 			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
 			
 			smother(leafMap, branch.getTree());
@@ -156,6 +162,9 @@ public class JoCode {
 			
 			//Age volume
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
+			
+			//Allow for special decorations by the tree itself
+			tree.postGeneration(world, pos, biome, radius, endPoints);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);

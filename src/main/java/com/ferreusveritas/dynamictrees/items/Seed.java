@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
@@ -56,7 +57,7 @@ public class Seed extends Item {
 							}
 						}
 					}
-					entityItem.getItem().setCount(0);
+					CompatHelper.setStackCount(entityItem.getItem(), 0);
 				}
 			}
 			entityItem.setDead();
@@ -75,14 +76,14 @@ public class Seed extends Item {
 			DynamicTree tree = getTree(heldItem);
 			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
 			bonzaiPot.setTree(world, tree, pos);
-			heldItem.shrink(1);
+			CompatHelper.shrinkStack(heldItem, 1);
 			return EnumActionResult.SUCCESS;
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, heldItem) && player.canPlayerEdit(pos.up(), facing, heldItem)) {//Ensure permissions to edit block
 				if(plantSapling(world, pos.up(), heldItem)) {//Do the planting
-					heldItem.shrink(1);
+					CompatHelper.shrinkStack(heldItem, 1);
 					return EnumActionResult.SUCCESS;
 				}
 			}

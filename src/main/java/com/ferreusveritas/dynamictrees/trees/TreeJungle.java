@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.special.BottomListenerVine;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockPlanks;
@@ -62,7 +63,7 @@ public class TreeJungle extends DynamicTree {
 						EnumFacing facing = cocoaState.getValue(BlockHorizontal.FACING);
 						world.setBlockState(pos, ModBlocks.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
 						if (!player.capabilities.isCreativeMode) {
-							heldItem.shrink(1);
+							CompatHelper.shrinkStack(heldItem, 1);
 						}
 					}
 				}

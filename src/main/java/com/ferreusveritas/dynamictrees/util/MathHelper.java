@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.util;
 
 /**
- * This class was made to help cope with version changes from MC 1.7.10 to MC 1.12.2
+ * Maintaining code between Minecraft versions can be a pain.
+ * This is a compatibility layer to abstract the finer points
+ * of what has recently changed from MC 1.7.10 to MC 1.12.2
  * 
  * @author ferreusveritas
  *

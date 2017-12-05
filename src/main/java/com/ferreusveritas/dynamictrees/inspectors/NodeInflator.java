@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
@@ -18,9 +20,11 @@ public class NodeInflator implements INodeInspector {
 	private BlockPos last;
 
 	SimpleVoxmap leafMap;
+	List<BlockPos> endPoints;
 	
-	public NodeInflator(SimpleVoxmap leafMap) {
+	public NodeInflator(SimpleVoxmap leafMap, List<BlockPos> endPoints) {
 		this.leafMap = leafMap;
+		this.endPoints = endPoints;
 		last = new BlockPos(0, -1, 0);
 	}
 	
@@ -64,14 +68,15 @@ public class NodeInflator implements INodeInspector {
 			}
 			
 			if(isTwig) {
+				endPoints.add(pos);
 				//Handle leaves here
 				leafMap.setVoxel(pos, (byte) 16);//16(bit 5) is code for a twig
 				SimpleVoxmap leafCluster = branch.getTree().getLeafCluster();
 				leafMap.BlitMax(pos, leafCluster);
 			} else {
-				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				DynamicTree tree = branch.getTree();
-				
+
+				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				radius = (float)Math.sqrt(areaAccum) + (tree.getTapering() * tree.getWorldGenTaperingFactor());
 				
 				//Make sure that non-twig branches are at least radius 2

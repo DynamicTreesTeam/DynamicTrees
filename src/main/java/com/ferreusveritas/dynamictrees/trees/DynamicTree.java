@@ -434,9 +434,7 @@ public class DynamicTree {
 	}
 
 	public ItemStack getSeedStack(int qty) {
-		ItemStack newSeedStack = seedStack.copy();
-		newSeedStack.setCount(qty);
-		return newSeedStack;
+		return CompatHelper.setStackCount(seedStack.copy(), qty);
 	}
 	
 	protected DynamicTree setStick(ItemStack itemStack) {
@@ -451,9 +449,7 @@ public class DynamicTree {
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		ItemStack stack = stick.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 
 	/** 
@@ -490,9 +486,7 @@ public class DynamicTree {
 	}
 
 	public ItemStack getPrimitiveLeavesItemStack(int qty) {
-		ItemStack stack = primitiveLeavesItemStack.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+		return CompatHelper.setStackCount(primitiveLeavesItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 
 	protected DynamicTree setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
@@ -506,9 +500,7 @@ public class DynamicTree {
 	}
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
-		ItemStack stack = primitiveLogItemStack.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 
 	protected DynamicTree setPrimitiveSapling(IBlockState primSapling) {
@@ -1037,11 +1029,11 @@ public class DynamicTree {
 	 * This method uses JoCodes to generate tree models.
 	 * Override to use other methods.
 	 * 
-	 * @param world
-	 * @param pos
-	 * @param biome 
-	 * @param facing
-	 * @param radius
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param facing The orientation of the tree(rotates JoCode)
+	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
 	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
@@ -1049,13 +1041,24 @@ public class DynamicTree {
 		if(joCodeStore != null) {
 			JoCode code = joCodeStore.getRandomCode(radius, random);
 			if(code != null) {
-				code.generate(world, this, pos, facing, radius);
+				code.generate(world, this, pos, biome, facing, radius);
 				return true;
 			}
 		}
 		
 		return false;
 	}
+	
+	/**
+	 * Allows the tree to decorate itself after it has been generated.  Add vines, fruit, etc.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param radius The radius of the tree generation boundary
+	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
+	 */
+	public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints) {}
 	
 	/**
 	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.

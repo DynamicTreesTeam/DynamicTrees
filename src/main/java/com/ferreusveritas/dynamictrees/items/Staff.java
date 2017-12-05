@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
 
@@ -85,8 +86,8 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		DynamicTree tree = getTree(heldStack);
 		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
-			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
-			heldStack.shrink(1);//If the player is in creative this will have no effect.
+			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, world.getBiome(pos), getPlayerDirection(player), 8);
+			CompatHelper.shrinkStack(heldStack, 1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
 
