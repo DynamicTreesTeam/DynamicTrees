@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -41,7 +41,7 @@ public class TreeJungle extends DynamicTree {
 		
 		canSupportCocoa = true;
 		
-		if(ConfigHandler.vineGen) {
+		if(ModConfigs.vineGen) {
 			registerBottomListener(new BottomListenerPodzol(), new BottomListenerVine());
 		}
 		

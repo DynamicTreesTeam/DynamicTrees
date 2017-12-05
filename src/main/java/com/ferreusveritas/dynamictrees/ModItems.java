@@ -36,7 +36,6 @@ public class ModItems {
 		treeStaff = new Staff();
 	}
 	
-	
 	@SubscribeEvent
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
 		final IForgeRegistry<Item> registry = event.getRegistry();

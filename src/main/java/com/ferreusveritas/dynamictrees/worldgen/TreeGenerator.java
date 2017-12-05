@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
@@ -208,7 +208,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		//Display wool circles for testing the circle growing algorithm
-		if(ConfigHandler.worldGenDebug) {
+		if(ModConfigs.worldGenDebug) {
 			makeWoolCircle(world, circle, pos.getY(), result);
 		}
 		

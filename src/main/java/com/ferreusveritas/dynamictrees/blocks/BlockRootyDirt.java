@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -141,7 +141,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 
 		if(branch != null) {
 			DynamicTree tree = branch.getTree();
-			float growthRate = tree.getGrowthRate(world, pos.up()) * ConfigHandler.treeGrowthRateMultiplier;
+			float growthRate = tree.getGrowthRate(world, pos.up()) * ModConfigs.treeGrowthRateMultiplier;
 			do {
 				if(random.nextFloat() < growthRate) {
 					int life = getSoilLife(world, pos);
@@ -159,7 +159,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 							setSoilLife(world, pos, life - 1);//decrement soil life
 						}
 					} else {
-						if(random.nextFloat() < ConfigHandler.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
+						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
 							branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
 						} else {
 							NodeFruit nodeFruit = tree.getNodeFruit(world, pos.up());

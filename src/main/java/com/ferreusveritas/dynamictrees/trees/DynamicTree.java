@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -290,7 +290,7 @@ public class DynamicTree {
 		}
 		
 		//Set up the tree to drop seeds of it's kind.
-		registerBottomListener(new BottomListenerDropItems(getSeedStack(), ConfigHandler.seedDropRate, true));
+		registerBottomListener(new BottomListenerDropItems(getSeedStack(), ModConfigs.seedDropRate, true));
 		
 		//Add JoCodes for WorldGen
 		addJoCodes();
@@ -815,7 +815,7 @@ public class DynamicTree {
 			}
 		}
 		
-		if(ConfigHandler.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
+		if(ModConfigs.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
 

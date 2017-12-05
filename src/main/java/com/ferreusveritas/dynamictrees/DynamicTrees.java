@@ -68,7 +68,7 @@ public class DynamicTrees {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 
-		ConfigHandler.preInit(event);//Naturally this comes first so we can react to settings
+		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
 		TreeGenerator.preInit();//Create the generator
 		
 		ModBlocks.preInit();

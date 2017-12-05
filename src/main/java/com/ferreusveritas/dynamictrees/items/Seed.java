@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.items;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -42,7 +42,7 @@ public class Seed extends Item {
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
-		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
+		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
 			if(!entityItem.world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
 				if(entityItem.world.canBlockSeeSky(pos)) {
@@ -50,7 +50,7 @@ public class Seed extends Item {
 					ItemStack seedStack = entityItem.getItem();
 					int count = seedStack.getCount();
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.world, pos) ){//1 in 16 chance if ideal
+						if( rand.nextFloat() * (1f/ModConfigs.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.world, pos) ){//1 in 16 chance if ideal
 							if(plantSapling(entityItem.world, pos, seedStack)) {
 								break;
 							}

@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.List;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
@@ -476,7 +476,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	public List<ItemStack> getWoodDrops(World world, BlockPos pos, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
 
-		volume *= ConfigHandler.treeHarvestMultiplier;// For cheaters.. you know who you are.
+		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
 		DynamicTree tree = getTree();
 		ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
 		ItemStack stickStack = tree.getStick((volume % 4096) / 512);// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)

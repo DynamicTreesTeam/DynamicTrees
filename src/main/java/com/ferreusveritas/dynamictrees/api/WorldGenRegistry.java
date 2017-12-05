@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
@@ -45,7 +45,7 @@ public class WorldGenRegistry {
 	 * @return
 	 */
 	public static boolean isWorldGenEnabled() {
-		return ConfigHandler.worldGen;
+		return ModConfigs.worldGen;
 	}
 	
 }

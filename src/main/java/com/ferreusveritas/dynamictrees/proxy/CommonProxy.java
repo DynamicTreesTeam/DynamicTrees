@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.proxy;
 
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
@@ -37,7 +37,7 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
 
 		//An event for dealing with Vanilla Saplings
-		if(ConfigHandler.replaceVanillaSapling) {
+		if(ModConfigs.replaceVanillaSapling) {
 			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
 		}
 		

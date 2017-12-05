@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-public class ConfigHandler {
+public class ModConfigs {
 
 	public static float seedDropRate;
 	public static float seedPlantRate;
