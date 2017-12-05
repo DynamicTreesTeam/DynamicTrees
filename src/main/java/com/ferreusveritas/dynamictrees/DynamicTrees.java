@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
@@ -52,6 +53,7 @@ public class DynamicTrees {
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
+	//This will provide us with a proxy for dealing with compatibility with other mods
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.compat.ClientProxyCompat", serverSide = "com.ferreusveritas.dynamictrees.compat.CommonProxyCompat")
 	public static CommonProxyCompat compatProxy;
 
@@ -59,37 +61,28 @@ public class DynamicTrees {
         @SideOnly(Side.CLIENT)
 		@Override
 		public ItemStack getTabIconItem() {
-			return TreeRegistry.findTree("oak").getSeedStack();
+			return TreeRegistry.findTree(BlockPlanks.EnumType.OAK.getName()).getSeedStack();
 		}
 	};
-		
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		//Run before anything else. Read your config, create blocks, items, etc.
 
-		ConfigHandler.preInit(event);
-
-		TreeGenerator.preInit();
+		ConfigHandler.preInit(event);//Naturally this comes first so we can react to settings
+		TreeGenerator.preInit();//Create the generator
 		
-		//Blocks and Items
 		ModBlocks.preInit();
 		ModItems.preInit();
 		ModTrees.preInit();
 		
-		//Register Trees
-		ModTrees.registerTrees();
-		
 		proxy.preInit();
 		compatProxy.preInit();
-		
-		proxy.registerEventHandlers();
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		//Do your mod setup. Build whatever data structures you care about.
 		
-		TreeGenerator.init();
+		TreeGenerator.init();//This is run during the init phase to cache tree data that was created during the preInit phase
 		
 		proxy.init();
 		compatProxy.init();

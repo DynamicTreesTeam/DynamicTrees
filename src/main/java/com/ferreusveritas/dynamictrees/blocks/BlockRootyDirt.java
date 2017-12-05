@@ -56,6 +56,10 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicType.class);
 	
 	public BlockRootyDirt() {
+		this(name);
+	}
+	
+	public BlockRootyDirt(String name) {
 		super(Material.GROUND);
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15).withProperty(MIMIC, EnumMimicType.DIRT));

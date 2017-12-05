@@ -35,7 +35,7 @@ public class ConfigHandler {
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
 		worldGen = config.getBoolean("worldGen", "world", false, "Experimental world generation.  Generate Dynamic Trees instead of Vanilla trees.");
 
-		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles");
+		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");
 		
 		config.save();
 	}

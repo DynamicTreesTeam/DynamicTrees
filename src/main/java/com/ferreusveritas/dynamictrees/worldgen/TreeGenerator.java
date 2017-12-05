@@ -45,6 +45,10 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
+	/**
+	 * This is run during the init phase to cache 
+	 * tree data that was created during the preInit phase
+	 */
 	public static void init() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
 			INSTANCE.biomeTreeHandler.init();

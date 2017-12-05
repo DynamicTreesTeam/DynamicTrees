@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -51,7 +52,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -298,17 +298,19 @@ public class DynamicTree {
 		return this;
 	}
 
-	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} */
-	public void registerBlocks(IForgeRegistry<Block> registry) {
-		registry.register(dynamicBranch);
+	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
+	 * We intentionally leave out leaves since they are shared between trees */
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList.add(dynamicBranch);
+		return blockList;
 	}
 	
-	/** Used to register the items this tree uses.  Mainly just the {@link Seed} */	
-	public void registerItems(IForgeRegistry<Item> registry) {
-		registry.register(new ItemBlock(dynamicBranch).setRegistryName(dynamicBranch.getRegistryName()));
+	/** Used to register the items this tree uses.  Mainly just the {@link Seed}s */	
+	public List<Item> getRegisterableItems(List<Item> itemList) {
 		if(genSeed) {//If the seed was generated internally then register it too.
-			registry.register(seed);
+			itemList.add(seed);
 		}
+		return itemList;
 	}
 
 	/** Used to register the recipes this tree uses. */

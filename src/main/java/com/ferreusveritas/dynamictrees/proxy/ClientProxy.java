@@ -38,12 +38,12 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit() {
 		super.preInit();
+		registerEventHandlers();
 	}
 	
 	@Override
 	public void init() {
 		super.init();
-
 		registerColorHandlers();
 	}
 	
@@ -188,7 +188,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override 
 	public void registerEventHandlers() {
-		super.registerEventHandlers();//Registers Common Handlers
+		//There are currently no Client Side events to handle
 	}
 	
 	@Override

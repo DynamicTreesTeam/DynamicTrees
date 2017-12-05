@@ -22,7 +22,9 @@ public class CommonProxy {
 
 	public void registerTileEntities() {}
 
-	public void preInit() {}
+	public void preInit() {
+		registerEventHandlers();
+	}
 
 	public void init() {}
 

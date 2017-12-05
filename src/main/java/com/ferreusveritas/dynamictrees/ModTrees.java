@@ -15,6 +15,11 @@ public class ModTrees {
 
 	public static ArrayList<DynamicTree> baseTrees = new ArrayList<DynamicTree>();
 
+	/**
+	 * Pay Attn! This should be run after the Dynamic Trees Mod
+	 * has registered it's Blocks and Items.  These trees depend
+	 * on them.
+	 */
 	public static void preInit() {
 		//Trees
 		baseTrees.add(new TreeOak());
@@ -23,9 +28,7 @@ public class ModTrees {
 		baseTrees.add(new TreeJungle());
 		baseTrees.add(new TreeAcacia());
 		baseTrees.add(new TreeDarkOak());
-	}
-	
-	public static void registerTrees() {
+		
 		//Register Trees
 		TreeRegistry.registerTrees(baseTrees);
 	}
