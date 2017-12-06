@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -10,11 +9,8 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -140,48 +136,28 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		return EnumFacing.UP; 
 	}
 	
+	/**
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param random
+	 * @return false if tree was not found
+	 */
 	public boolean grow(World world, BlockPos rootPos, Random random) {
 		
 		DynamicTree tree = getTree(world, rootPos);
-		BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
-		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
+		boolean viable = false;
 		
-		if(baseTreePart != null) {
-			float growthRate = tree.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
-			do {
-				if(random.nextFloat() < growthRate) {
-					int life = getSoilLife(world, rootPos);
-					if(life > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
-						boolean success = false;
-
-						float energy = tree.getEnergy(world, rootPos);
-						for(int i = 0; !success && i < 1 + tree.getRetries(); i++) {//Some species have multiple growth retry attempts
-							success = baseTreePart.growSignal(world, treePos, new GrowSignal(tree, rootPos, energy)).success;
-						}
-
-						int soilLongevity = tree.getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
-
-						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
-							setSoilLife(world, rootPos, life - 1);//decrement soil life
-						}
-					} else {
-						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
-						} else {
-							NodeFruit nodeFruit = tree.getNodeFruit(world, treePos);
-							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-								baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(nodeFruit));
-							}
-						}
-					}
-				}
-			} while(--growthRate > 0.0f);
-		} else {
+		if(tree != null) {
+			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
+			viable = tree.grow(world, this, rootPos, getSoilLife(world, rootPos), treePos, random);
+		}
+		
+		if(!viable) {
 			world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
-			return false;
 		}
 
-		return true;
+		return viable;
 	}
 	
 	/**

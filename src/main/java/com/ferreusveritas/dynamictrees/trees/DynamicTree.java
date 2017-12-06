@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
@@ -28,6 +29,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -112,7 +114,7 @@ public class DynamicTree {
 	/** Ideal growth rate [default = 1.0]*/
 	private float growthRate = 1.0f;
 	/** Ideal soil longevity [default = 8]*/
-	private int soilLongevity = 8;
+	private int soilLongevity = 8;//TODO: Make a 0.0 to 1.0 float and recode
 	
 	
 	//Leaves
@@ -873,6 +875,56 @@ public class DynamicTree {
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
+	
+	/**
+	 * 
+	 * @param world
+	 * @param rootyDirt
+	 * @param rootPos
+	 * @param soilLife
+	 * @param treePos
+	 * @param random
+	 * @return false if network is not viable(destroys {@link BlockRootyDirt})
+	 */
+	public boolean grow(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, BlockPos treePos, Random random) {
+		
+		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
+		
+		if(baseTreePart != null) {
+			float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
+			do {
+				if(random.nextFloat() < growthRate) {
+					if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
+						boolean success = false;
+
+						float energy = getEnergy(world, rootPos);
+						for(int i = 0; !success && i < 1 + getRetries(); i++) {//Some species have multiple growth retry attempts
+							success = baseTreePart.growSignal(world, treePos, new GrowSignal(this, rootPos, energy)).success;
+						}
+
+						//TODO: Make this a float
+						int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+
+						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+							rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
+						}
+					} else {
+						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+						} else {
+							NodeFruit nodeFruit = getNodeFruit(world, treePos);
+							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+								baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(nodeFruit));
+							}
+						}
+					}
+				}
+			} while(--growthRate > 0.0f);
+			return true;
+		}
+		
+		return false;//Network is not viable
+	}
 	
 	/**
 	* Selects a new direction for the branch(grow) signal to turn to.
