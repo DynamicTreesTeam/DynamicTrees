@@ -32,7 +32,7 @@ public class TreeHelper {
 
 		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
 		int leavesBlockNum = seq / 4;
-		int key = leavesBlockNum;		
+		int key = leavesBlockNum;
 		
 		if(leavesMap.containsKey(key)) {
 			return leavesMap.get(key);

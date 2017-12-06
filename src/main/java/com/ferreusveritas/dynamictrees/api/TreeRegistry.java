@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -98,7 +99,7 @@ public class TreeRegistry {
 	
 	private static final IBiomeSuitabilityDecider.Decision undecided = new IBiomeSuitabilityDecider.Decision();
 	
-	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, DynamicTree tree, BlockPos pos) {
+	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, Species species, BlockPos pos) {
 		for(IBiomeSuitabilityDecider decider: biomeSuitabilityDeciders) {
 			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, tree, pos);
 			if(decision.isHandled()) {

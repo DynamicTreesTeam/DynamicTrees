@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.EnumFacing;
@@ -30,7 +31,7 @@ public class TreeCodeStore {
 	ArrayList<ArrayList<JoCode>> store = new ArrayList<ArrayList<JoCode>>(7);//Radius values 2,3,4,5,6,7,8
 	DynamicTree tree;
 	
-	public TreeCodeStore(DynamicTree tree) {
+	public TreeCodeStore(Species tree) {
 		this.tree = tree;
 		for(int i = 0; i < 7; i++) {
 			store.add(new ArrayList<JoCode>());

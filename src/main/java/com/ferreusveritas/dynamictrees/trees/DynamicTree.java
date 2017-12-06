@@ -1,19 +1,16 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
@@ -21,7 +18,6 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -66,19 +62,17 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeColorHelper;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 /**
-* All data related to a tree species.
+* All data related to a tree family.
 * 
 * @author ferreusveritas
 */
-public class DynamicTree {
+public abstract class DynamicTree {
 	
 	/** Simple name of the tree e.g. "oak" */
 	private String name;
@@ -94,28 +88,6 @@ public class DynamicTree {
 	private ItemStack primitiveLogItemStack;
 	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
 	private IBlockState primitiveSapling;
-	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
-	private float tapering = 0.3f;
-	/** The probability that the direction decider will choose up out of the other possible direction weights [default = 2] */
-	private int upProbability = 2;
-	/** Number of blocks high we have to be before a branch is allowed to form [default = 3](Just high enough to walk under)*/
-	private int lowestBranchHeight = 3;
-	/** Number of times a grow signal retries before failing. Affects growing speed [default = 0] */
-	private int retries = 0;
-	/** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
-	private float signalEnergy = 16.0f;
-	/** The stick that is returned when a whole log can't be dropped */
-	private ItemStack stick;
-	/** Weather the branch can support cocoa pods on it's surface [default = false] */
-	public boolean canSupportCocoa = false;
-	
-	
-	//Dirt
-	/** Ideal growth rate [default = 1.0]*/
-	private float growthRate = 1.0f;
-	/** Ideal soil longevity [default = 8]*/
-	private int soilLongevity = 8;//TODO: Make a 0.0 to 1.0 float and recode
-	
 	
 	//Leaves
 	/** The dynamic leaves used by this tree */
@@ -139,7 +111,6 @@ public class DynamicTree {
 	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
 	private ICellSolver cellSolver = Cells.deciduousSolver;
 	
-	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
 	private Seed seed;
@@ -151,12 +122,12 @@ public class DynamicTree {
 	protected boolean enableSaplingRecipe = true;
 	/** A blockState that will turn itself into this tree */
 	private IBlockState saplingBlock;
-	
-	/** A map of environmental biome factors that change a tree's suitability */
-	public Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
-	
-	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	public TreeCodeStore joCodeStore;
+
+	//Misc
+	/** The stick that is returned when a whole log can't be dropped */
+	private ItemStack stick;
+	/** Weather the branch can support cocoa pods on it's surface [default = false] */
+	public boolean canSupportCocoa = false;
 	
 	/** Hands Off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
@@ -223,13 +194,7 @@ public class DynamicTree {
 		setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
-	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
-		this.tapering = tapering;
-		this.signalEnergy = energy;
-		this.upProbability = upProbability;
-		this.lowestBranchHeight = lowestBranchHeight;
-		this.growthRate = growthRate;
-	}
+	abstract ISpecies getSpecies();
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
@@ -267,16 +232,16 @@ public class DynamicTree {
 		
 		return false;
 	}
-
+	
 	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
-
+	
 	
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
-
+	
 	/**
 	 * This should only be called by the TreeRegistry.
 	 * This registers the tree itself.  This is not used to
@@ -299,7 +264,7 @@ public class DynamicTree {
 		
 		return this;
 	}
-
+	
 	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
 	 * We intentionally leave out leaves since they are shared between trees */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
@@ -314,7 +279,7 @@ public class DynamicTree {
 		}
 		return itemList;
 	}
-
+	
 	/** Used to register the recipes this tree uses. */
 	public void registerRecipes(IForgeRegistry<IRecipe> registry) {
 		
@@ -369,7 +334,7 @@ public class DynamicTree {
 		dynamicLeaves.setTree(leavesSubBlock, this);
 		return this;
 	}
-
+	
 	/**
 	 * Set dynamic leaves from an automatically created source.
 	 * 
@@ -384,25 +349,25 @@ public class DynamicTree {
 	public BlockDynamicLeaves getDynamicLeaves() {
 		return dynamicLeaves;
 	}
-
+	
 	public int getDynamicLeavesSub() {
 		return leavesSubBlock;
 	}
-
+	
 	public IBlockState getDynamicLeavesState() {
 		return getDynamicLeaves().getDefaultState().withProperty(BlockDynamicLeaves.TREE, this.getDynamicLeavesSub());
 	}
-
+	
 	public IBlockState getDynamicLeavesState(int hydro) {
 		return getDynamicLeavesState().withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(hydro, 1, 4));
 	}
-
+	
 	protected DynamicTree setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setTree(this);//Link the branch back to the tree
 		return this;
 	}
-
+	
 	public BlockBranch getDynamicBranch() {
 		return dynamicBranch;
 	}
@@ -426,7 +391,7 @@ public class DynamicTree {
 		}
 		return this;
 	}
-
+	
 	public Seed getSeed() {
 		return seed;
 	}
@@ -434,7 +399,7 @@ public class DynamicTree {
 	public ItemStack getSeedStack() {
 		return seedStack.copy();
 	}
-
+	
 	public ItemStack getSeedStack(int qty) {
 		return CompatHelper.setStackCount(seedStack.copy(), qty);
 	}
@@ -443,7 +408,7 @@ public class DynamicTree {
 		stick = itemStack;
 		return this;
 	}
-
+	
 	/**
 	 * Get a quantity of whatever is considered a stick for this tree's type of wood.
 	 * 
@@ -453,7 +418,7 @@ public class DynamicTree {
 	public ItemStack getStick(int qty) {
 		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
-
+	
 	/** 
 	 * Sets the Dynamic Sapling for this tree type.  Also sets
 	 * the tree type in the dynamic sapling.
@@ -482,21 +447,21 @@ public class DynamicTree {
 		primitiveLeavesItemStack = primLeavesStack;
 		return this;
 	}
-
+	
 	public IBlockState getPrimitiveLeaves() {
 		return primitiveLeaves;
 	}
-
+	
 	public ItemStack getPrimitiveLeavesItemStack(int qty) {
 		return CompatHelper.setStackCount(primitiveLeavesItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
-
+	
 	protected DynamicTree setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
 		primitiveLog = primLog;
 		primitiveLogItemStack = primLogStack;
 		return this;
 	}
-
+	
 	public IBlockState getPrimitiveLog() {
 		return primitiveLog;
 	}
@@ -504,7 +469,7 @@ public class DynamicTree {
 	public ItemStack getPrimitiveLogItemStack(int qty) {
 		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
-
+	
 	protected DynamicTree setPrimitiveSapling(IBlockState primSapling) {
 		primitiveSapling = primSapling;
 		return this;
@@ -513,59 +478,11 @@ public class DynamicTree {
 	public IBlockState getPrimitiveSapling() {
 		return primitiveSapling;
 	}
-
-	public float getEnergy(World world, BlockPos rootPos) {
-		return signalEnergy;
-	}
-
-	public float getGrowthRate(World world, BlockPos rootPos) {
-		return growthRate;
-	}
-
-	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
-	public int getUpProbability() {
-		return upProbability;
-	}
-
-	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
-	public float getSecondaryThickness() {
-		return 2.0f;
-	}
-	
-	/** Probability reinforcer for current travel direction */
-	public int getReinfTravel() {
-		return 1;
-	}
-
-	public int getLowestBranchHeight() {
-		return lowestBranchHeight;
-	}
-	
-	/**
-	* @param world
-	* @param pos 
-	* @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
-	*/
-	public int getLowestBranchHeight(World world, BlockPos pos) {
-		return getLowestBranchHeight();
-	}
-
-	public void setRetries(int retries) {
-		this.retries = retries;
-	}
-	
-	public int getRetries() {
-		return retries;
-	}
-	
-	public float getTapering() {
-		return tapering;
-	}
-
+		
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////
-
+	
 	
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
@@ -575,19 +492,11 @@ public class DynamicTree {
 	//DIRT
 	///////////////////////////////////////////
 	
-	public void setSoilLongevity(int longevity) {
-		soilLongevity = longevity;
-	}
-	
-	public int getSoilLongevity(World world, BlockPos rootPos) {
-		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
-	}
-
 	/** Used by seed to determine the proper dirt block to create for planting. */
 	public BlockRootyDirt getRootyDirtBlock() {
 		return ModBlocks.blockRootyDirt;
 	}
-
+	
 	/**
 	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
@@ -722,9 +631,9 @@ public class DynamicTree {
 	//////////////////////////////
 	// LEAVES HANDLING
 	//////////////////////////////
-
+	
 	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
-
+		
 		IBlockState state = blockAccess.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getTreePart(state);
 		
@@ -734,11 +643,11 @@ public class DynamicTree {
 		
 		return false;
 	}
-
+	
 	public boolean isCompatibleDynamicLeaves(Block leaves, int sub) {
 		return leaves == getDynamicLeaves() && sub == getDynamicLeavesSub();
 	}
-
+	
 	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		IBlockState primState = getPrimitiveLeaves();
 		IBlockState otherState = blockAccess.getBlockState(pos);
@@ -753,7 +662,7 @@ public class DynamicTree {
 		
 		return false;
 	}
-
+	
 	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
@@ -785,68 +694,8 @@ public class DynamicTree {
 	// BIOME HANDLING
 	//////////////////////////////
 	
-	public DynamicTree envFactor(Type type, float factor) {
-		envFactors.put(type, factor);
-		return this;
-	}
+
 	
-	/**
-	*
-	* @param world The World
-	* @param pos
-	* @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
-	*/
-	public float biomeSuitability(World world, BlockPos pos) {
-
-		Biome biome = world.getBiome(pos);
-		
-		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
-		if(TreeRegistry.isBiomeSuitabilityOverrideEnabled()) {
-			IBiomeSuitabilityDecider.Decision override = TreeRegistry.getBiomeSuitability(world, biome, this, pos);
-
-			if(override.isHandled()) {
-				return override.getSuitability();
-			}
-		}
-		
-		if(ModConfigs.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
-			return 1.0f;
-		}
-
-		float s = defaultSuitability();
-		
-		for(Type t : BiomeDictionary.getTypes(biome)) {
-			s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
-		}
-		
-		return MathHelper.clamp(s, 0.0f, 1.0f);
-	}
-
-	public boolean isBiomePerfect(Biome biome) {
-		return false;
-	}
-
-	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
-	public static final float defaultSuitability() {
-		return 0.85f;
-	}
-
-	/**
-	* A convenience function to test if a biome is one of the many options passed.
-	* 
-	* @param biomeToCheck The biome we are matching
-	* @param biomes Multiple biomes to match against
-	* @return True if a match is found. False if not.
-	*/
-	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome ... biomes) {
-		for(Biome biome: biomes) {
-			if(biomeToCheck == biome) {
-				return true;
-			}
-		}
-		return false;
-	}
-		
 	/**
 	* Handle rotting branches
 	* @param world The world
@@ -891,20 +740,22 @@ public class DynamicTree {
 		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
 		
 		if(baseTreePart != null) {
-			float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
+			ISpecies species = getSpecies();
+			
+			float growthRate = species.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 			do {
 				if(random.nextFloat() < growthRate) {
 					if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
 						boolean success = false;
-
-						float energy = getEnergy(world, rootPos);
-						for(int i = 0; !success && i < 1 + getRetries(); i++) {//Some species have multiple growth retry attempts
+						
+						float energy = species.getEnergy(world, rootPos);
+						for(int i = 0; !success && i < 1 + species.getRetries(); i++) {//Some species have multiple growth retry attempts
 							success = baseTreePart.growSignal(world, treePos, new GrowSignal(this, rootPos, energy)).success;
 						}
-
+						
 						//TODO: Make this a float
-						int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
-
+						int soilLongevity = species.getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+						
 						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 							rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 						}
@@ -939,18 +790,18 @@ public class DynamicTree {
 	*/
 	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
 		EnumFacing originDir = signal.dir.getOpposite();
-
+		
 		//prevent branches on the ground
-		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
+		if(signal.numSteps + 1 <= getSpecies().getLowestBranchHeight(world, signal.rootPos)) {
 			return EnumFacing.UP;
 		}
-
+		
 		int probMap[] = new int[6];//6 directions possible DUNSWE
-
+		
 		//Probability taking direction into account
-		probMap[EnumFacing.UP.ordinal()] = signal.dir != EnumFacing.DOWN ? getUpProbability(): 0;//Favor up
-		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
-
+		probMap[EnumFacing.UP.ordinal()] = signal.dir != EnumFacing.DOWN ? getSpecies().getUpProbability(): 0;//Favor up
+		probMap[signal.dir.ordinal()] += getSpecies().getReinfTravel(); //Favor current direction
+		
 		//Create probability map for direction change
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(!dir.equals(originDir)) {
@@ -960,41 +811,41 @@ public class DynamicTree {
 				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
 			}
 		}
-
+		
 		//Do custom stuff or override probability map for various species
 		probMap = customDirectionManipulation(world, pos, branch.getRadius(world, pos), signal, probMap);
-
+		
 		//Select a direction from the probability map
 		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
 		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
 	}
-
+	
 	/** Species can override the probability map here **/
 	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
 		return probMap;
 	}
-
+	
 	/** Species can override to take action once a new direction is selected **/
 	protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
 		return newDir;
 	}
-
+	
 	/** Select a random direction weighted from the probability map **/ 
 	public static int selectRandomFromDistribution(Random random, int distMap[]) {
-
+		
 		int distSize = 0;
-
+		
 		for(int i = 0; i < distMap.length; i++) {
 			distSize += distMap[i];
 		}
-
+		
 		if(distSize <= 0) {
 			System.err.println("Warning: Zero sized distribution");
 			return -1;
 		}
-
+		
 		int rnd = random.nextInt(distSize) + 1;
-
+		
 		for(int i = 0; i < 6; i++) {
 			if(rnd > distMap[i]) {
 				rnd -= distMap[i];
@@ -1002,10 +853,10 @@ public class DynamicTree {
 				return i;
 			}
 		}
-
+		
 		return 0;
 	}	
-
+	
 	/** Gets the fruiting node analyzer for this tree.  See {@link NodeFruitCocoa} for an example.
 	*  
 	* @param world The World
@@ -1021,7 +872,7 @@ public class DynamicTree {
 	//////////////////////////////
 	// BOTTOM SPECIAL
 	//////////////////////////////
-
+	
 	/**
 	* Run special effects for bottom blocks
 	* 
@@ -1039,7 +890,7 @@ public class DynamicTree {
 			}
 		}
 	}
-
+	
 	/**
 	* Provides an interface for other mods to add special effects like fruit, spawns or whatever
 	*  
@@ -1068,13 +919,6 @@ public class DynamicTree {
 	// WORLDGEN STUFF
 	//////////////////////////////
 	
-	/**
-	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
-	 */
-	public void addJoCodes() {
-		joCodeStore = new TreeCodeStore(this);
-		joCodeStore.addCodesFromFile("assets/" + getModID() + "/trees/"+ getName() + ".txt");
-	}
 
 	/**
 	 * Default worldgen spawn mechanism.
@@ -1090,8 +934,8 @@ public class DynamicTree {
 	 */
 	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
 		EnumFacing facing = CoordUtils.getRandomDir(random);
-		if(joCodeStore != null) {
-			JoCode code = joCodeStore.getRandomCode(radius, random);
+		if(getSpecies().getJoCodeStore() != null) {
+			JoCode code = getSpecies().getJoCodeStore().getRandomCode(radius, random);
 			if(code != null) {
 				code.generate(world, this, pos, biome, facing, radius);
 				return true;
