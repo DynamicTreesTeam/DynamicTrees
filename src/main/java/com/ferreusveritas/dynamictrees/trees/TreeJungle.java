@@ -77,7 +77,7 @@ public class TreeJungle extends DynamicTree {
 		
 		EnumFacing originDir = signal.dir.getOpposite();
 		
-		int treeHash = coordHashCode(signal.origin);
+		int treeHash = coordHashCode(signal.rootPos);
 		int posHash = coordHashCode(pos);
 		
 		//Alter probability map for direction change

@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api.network;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.util.EnumFacing;
@@ -16,9 +15,8 @@ public class GrowSignal {
 	public int numTurns;
 	public int numSteps;
 	private DynamicTree tree;
-	public BlockBranch branchBlock;
 
-	public BlockPos origin;
+	public BlockPos rootPos;
 	public BlockPos delta;
 
 	//Back data
@@ -29,9 +27,8 @@ public class GrowSignal {
 	//Utility
 	public Random rand;
 
-	public GrowSignal(BlockBranch branch, BlockPos pos, float energy) {
-		tree = branch.getTree();
-		this.branchBlock = branch;
+	public GrowSignal(DynamicTree tree, BlockPos rootPos, float energy) {
+		this.tree = tree;
 		this.energy = energy;
 		dir = EnumFacing.UP;
 		radius = 0.0f;
@@ -41,7 +38,7 @@ public class GrowSignal {
 		rand = new Random();
 		success = true;
 
-		origin = pos;
+		this.rootPos = rootPos;
 		delta = new BlockPos(0, 0, 0);
 	}
 

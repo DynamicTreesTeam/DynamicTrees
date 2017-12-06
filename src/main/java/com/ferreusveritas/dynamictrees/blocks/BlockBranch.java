@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
@@ -43,7 +44,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
-public class BlockBranch extends Block implements ITreePart, IAgeable {
+public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningListener {
 
 	private DynamicTree tree; //The tree this branch type creates
 	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
@@ -147,6 +148,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	// WORLD UPDATE
 	///////////////////////////////////////////
 
+	//TODO: Should we eliminate ticking for branch blocks and rely on the growth signal for rotting?
 	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
 		age(world, pos, state, random, false);
@@ -301,10 +303,12 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	}
 
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		BlockDynamicLeaves leaves = getTree().getDynamicLeaves();
+		DynamicTree tree = signal.getTree();
+		
+		BlockDynamicLeaves leaves = tree.getDynamicLeaves();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
-				signal.success = leaves.growLeaves(world, getTree(), pos, 0);
+				signal.success = leaves.growLeaves(world, tree, pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
 			}
@@ -316,8 +320,10 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
+			DynamicTree tree = signal.getTree();
+			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
-			EnumFacing targetDir = getTree().selectNewDirection(world, pos, this, signal);// This must be cached on stack for proper recursion
+			EnumFacing targetDir = tree.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
 
 			{
@@ -353,7 +359,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + getTree().getTapering(), getRadius(world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + tree.getTapering(), getRadius(world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 
@@ -582,6 +588,14 @@ public class BlockBranch extends Block implements ITreePart, IAgeable {
 		}
 	}
 	
+	@Override
+	public void neighborWasBurned(World world, IBlockState oldState, BlockPos thisPos, BlockPos burnedPos) {
+		
+		if(oldState.getBlock() == this) {
+			//possible supporting branch was destroyed by fire.
+		}
+
+	}
 	
 	///////////////////////////////////////////
 	// IRRELEVANT

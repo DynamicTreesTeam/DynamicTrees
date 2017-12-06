@@ -136,49 +136,65 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		grow(world, pos, random);
 	}
 
-	public boolean grow(World world, BlockPos pos, Random random) {
-
-		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
-
-		if(branch != null) {
-			DynamicTree tree = branch.getTree();
-			float growthRate = tree.getGrowthRate(world, pos.up()) * ModConfigs.treeGrowthRateMultiplier;
+	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos pos) {
+		return EnumFacing.UP; 
+	}
+	
+	public boolean grow(World world, BlockPos rootPos, Random random) {
+		
+		DynamicTree tree = getTree(world, rootPos);
+		BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
+		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
+		
+		if(baseTreePart != null) {
+			float growthRate = tree.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 			do {
 				if(random.nextFloat() < growthRate) {
-					int life = getSoilLife(world, pos);
-					if(life > 0 && CoordUtils.isSurroundedByExistingChunks(world, pos)){
+					int life = getSoilLife(world, rootPos);
+					if(life > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
 						boolean success = false;
 
-						float energy = tree.getEnergy(world, pos.up());
+						float energy = tree.getEnergy(world, rootPos);
 						for(int i = 0; !success && i < 1 + tree.getRetries(); i++) {//Some species have multiple growth retry attempts
-							success = branch.growSignal(world, pos.up(), new GrowSignal(branch, pos, energy)).success;
+							success = baseTreePart.growSignal(world, treePos, new GrowSignal(tree, rootPos, energy)).success;
 						}
 
-						int soilLongevity = tree.getSoilLongevity(world, pos.up()) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+						int soilLongevity = tree.getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
 						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
-							setSoilLife(world, pos, life - 1);//decrement soil life
+							setSoilLife(world, rootPos, life - 1);//decrement soil life
 						}
 					} else {
-						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
-							branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
+						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(tree)));
 						} else {
-							NodeFruit nodeFruit = tree.getNodeFruit(world, pos.up());
-							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, pos)) {
-								branch.analyse(world, pos.up(), EnumFacing.DOWN, new MapSignal(nodeFruit));
+							NodeFruit nodeFruit = tree.getNodeFruit(world, treePos);
+							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+								baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(nodeFruit));
 							}
 						}
 					}
 				}
 			} while(--growthRate > 0.0f);
 		} else {
-			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
+			world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
 			return false;
 		}
 
 		return true;
 	}
-
+	
+	/**
+	 * This is the state the rooty dirt returns to once it no longer supports a tree structure.
+	 * 
+	 * @param access
+	 * @param pos The position of the {@link BlockRootyDirt}
+	 * @return
+	 */
+	public IBlockState getDecayBlockState(IBlockAccess access, BlockPos pos) {
+		return Blocks.DIRT.getDefaultState();
+	}
+	
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Item.getItemFromBlock(Blocks.DIRT);
@@ -318,9 +334,14 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
 
+	/**
+	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
+	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
+	 */
 	@Override
 	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		return TreeHelper.isBranch(blockAccess, pos.up()) ? TreeHelper.getSafeTreePart(blockAccess, pos.up()).getTree(blockAccess, pos.up()) : null;
+		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
+		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
 	}
 
 	@Override

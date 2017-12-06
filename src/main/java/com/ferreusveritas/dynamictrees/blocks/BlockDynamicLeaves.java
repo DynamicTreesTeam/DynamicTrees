@@ -424,7 +424,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/**
-	* Will place a leaves block if the position is air.
+	* Will place a leaves block if the position is air and it's possible to create one there.
 	* Otherwise it will check to see if the block is already there.
 	* 
 	* @param world
@@ -476,7 +476,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			world.setBlockState(pos, signal.branchBlock.getDefaultState(), 2);
+			world.setBlockState(pos, signal.getTree().getDynamicBranch().getDefaultState(), 2);
 			signal.radius = signal.getTree().getSecondaryThickness();//For the benefit of the parent branch
 		}
 

@@ -512,11 +512,11 @@ public class DynamicTree {
 		return primitiveSapling;
 	}
 
-	public float getEnergy(World world, BlockPos pos) {
+	public float getEnergy(World world, BlockPos rootPos) {
 		return signalEnergy;
 	}
 
-	public float getGrowthRate(World world, BlockPos pos) {
+	public float getGrowthRate(World world, BlockPos rootPos) {
 		return growthRate;
 	}
 
@@ -577,8 +577,8 @@ public class DynamicTree {
 		soilLongevity = longevity;
 	}
 	
-	public int getSoilLongevity(World world, BlockPos pos) {
-		return (int)(biomeSuitability(world, pos) * soilLongevity);
+	public int getSoilLongevity(World world, BlockPos rootPos) {
+		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
 	}
 
 	/** Used by seed to determine the proper dirt block to create for planting. */
@@ -889,7 +889,7 @@ public class DynamicTree {
 		EnumFacing originDir = signal.dir.getOpposite();
 
 		//prevent branches on the ground
-		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.origin)) {
+		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
 			return EnumFacing.UP;
 		}
 
