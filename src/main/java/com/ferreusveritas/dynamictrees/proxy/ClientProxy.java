@@ -84,7 +84,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Meshers for Branches and Seeds
 		for(DynamicTree tree: ModTrees.baseTrees) {
 			ModelHelper.regModel(tree.getDynamicBranch());//Register Branch itemBlock
-			ModelHelper.regModel(tree.getSpecies().getSeedStack().getItem());//Register Seed Item Models
+			ModelHelper.regModel(tree.getCommonSpecies().getSeed());//Register Seed Item Models
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		

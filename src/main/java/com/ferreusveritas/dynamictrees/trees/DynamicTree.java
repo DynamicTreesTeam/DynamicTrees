@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
@@ -18,25 +17,20 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.special.BottomListenerDropItems;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
@@ -51,21 +45,15 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeColorHelper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.registries.IForgeRegistry;
 
 /**
 * All data related to a tree family.
@@ -75,9 +63,9 @@ import net.minecraftforge.registries.IForgeRegistry;
 public abstract class DynamicTree {
 	
 	/** Simple name of the tree e.g. "oak" */
-	private String name;
+	private final String name;
 	/** ModID of mod registering this tree */
-	private String modId;
+	private final String modId;
 	
 	//Branches
 	/** The dynamic branch used by this tree */
@@ -181,10 +169,25 @@ public abstract class DynamicTree {
 		}
 		
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		getSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		
+		configureCommonSpecies(wood);
 	}
 	
-	public abstract ISpecies getSpecies();
+	private void configureCommonSpecies(BlockPlanks.EnumType wood) {
+
+		Species commonSpecies = (Species) getCommonSpecies();
+		
+		//Link up the Dynamic Sapling with the appropriate species
+		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		
+		//Generate a seed
+		commonSpecies.generateSeed();
+		
+		//A JoCode models for worldgen
+		commonSpecies.addJoCodes();
+	}
+	
+	public abstract ISpecies getCommonSpecies();
 	
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
@@ -196,7 +199,7 @@ public abstract class DynamicTree {
 	 * @return
 	 */
 	public ISpecies getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
-		return getSpecies();
+		return getCommonSpecies();
 	}
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
@@ -277,9 +280,10 @@ public abstract class DynamicTree {
 	
 	/** Used to register the items this tree uses.  Mainly just the {@link Seed}s */	
 	public List<Item> getRegisterableItems(List<Item> itemList) {
-		/*if(genSeed) {//If the seed was generated internally then register it too.
+		Seed seed = getCommonSpecies().getSeed();
+		if(seed != null) {//If the seed was generated internally then register it too.
 			itemList.add(seed);
-		}*/
+		}
 		return itemList;
 	}
 	
@@ -622,7 +626,7 @@ public abstract class DynamicTree {
 		
 		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
 		
-		if(baseTreePart != null) {
+		if(baseTreePart != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
 			
 			float growthRate = species.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 			do {
@@ -641,18 +645,17 @@ public abstract class DynamicTree {
 						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 							rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 						}
-					} else {
-						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(species)));
-						} else {
-							NodeFruit nodeFruit = species.getNodeFruit(world, treePos);
-							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-								baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(nodeFruit));
-							}
-						}
 					}
 				}
 			} while(--growthRate > 0.0f);
+
+			if(random.nextFloat() < ModConfigs.diseaseChance) {
+				baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(species)));
+				return true;
+			}
+			
+			species.postGrow(world, rootPos, treePos, soilLife);
+
 			return true;
 		}
 		

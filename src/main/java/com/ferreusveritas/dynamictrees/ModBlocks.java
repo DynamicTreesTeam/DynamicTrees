@@ -38,7 +38,7 @@ public class ModBlocks {
 		
 		//Fruit
 		blockFruitCocoa = new BlockFruitCocoa();
-		
+	
 	}
 	
 	@SubscribeEvent

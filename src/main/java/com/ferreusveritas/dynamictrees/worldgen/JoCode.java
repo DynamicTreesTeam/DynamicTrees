@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -140,7 +140,7 @@ public class JoCode {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {//If a branch exists then the growth was successful
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
-			NodeInflator inflator = new NodeInflator(leafMap, endPoints);
+			NodeInflator inflator = new NodeInflator(species, leafMap, endPoints);
 			MapSignal signal = new MapSignal(inflator);
 			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
 			
@@ -165,7 +165,7 @@ public class JoCode {
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 			
 			//Allow for special decorations by the tree itself
-			species.postGeneration(world, pos, biome, radius, endPoints);
+			species.postGeneration(world, pos, biome, radius, endPoints, !careful);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);

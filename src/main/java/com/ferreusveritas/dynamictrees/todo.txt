@@ -12,4 +12,3 @@
 [ ]Redo drops from smashed Dynamic Leaves block
 	Look for nearest matching branch and fetch species
 [ ]Redo seed dropping by using a signal
-[ ]Redo seed registration

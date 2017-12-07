@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -88,13 +89,14 @@ public class TreeSpruce extends DynamicTree {
 	Species species;
 	
 	@Override
-	public Species getSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		species = new SpeciesSpruce(this);
+		TreeRegistry.registerSpecies(species);
 		
 		setCellSolver(Cells.coniferSolver);
 		setSmotherLeavesMax(3);

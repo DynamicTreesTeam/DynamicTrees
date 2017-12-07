@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.math.BlockPos;
@@ -40,9 +40,8 @@ public class TreeRegistry {
 	 */
 	public static ISpecies registerSpecies(ISpecies species) {
 		treesByName.put(species.getName(), species);
-		String fullName = species.getModId() + ":" + species.getName();
+		String fullName = TreeHelper.getSpeciesFullName(species);
 		treesByFullName.put(fullName, species);
-		species.register();//Let the tree setup everything it needs
 		return species;
 	}
 

@@ -1,13 +1,16 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.special.BottomListenerVine;
@@ -94,23 +97,47 @@ public class TreeJungle extends DynamicTree {
 		public float getEnergy(World world, BlockPos pos) {
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos);
 		}
-	
+		
 		@Override
-		public NodeFruit getNodeFruit(World world, BlockPos pod) {
-			return world.rand.nextInt() % 16 == 0 ? new NodeFruitCocoa(this) : null;
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
+			
+			if(world.rand.nextInt() % 16 == 0) {
+				addCocoa(world, rootPos.up());
+			}
+			
+			// TODO Add Vines
+			
+			// TODO Add underbrush
 		}
+		
+		@Override
+		public void postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
+			super.postGrow(world, rootPos, treePos, soilLife);
+			
+			if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
+				addCocoa(world, treePos);
+			}
+
+		}
+
+		private void addCocoa(World world, BlockPos treePos) {
+			TreeHelper.getTreePart(world, treePos).analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa(this)));
+		}
+		
 	}
 
 	Species species;
 	
 	@Override
-	public Species getSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
 		species = new SpeciesJungle(this);
+		TreeRegistry.registerSpecies(species);
 		
 		canSupportCocoa = true;
 		

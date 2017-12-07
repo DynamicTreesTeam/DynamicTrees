@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.potion;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
@@ -22,7 +23,8 @@ public class SubstanceDisease implements ISubstanceEffect {
 		} else {
 			BlockBranch branch = TreeHelper.getBranch(world, basePos);
 			if(branch != null) {
-				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeDisease(branch.getTree())));
+				ISpecies species = TreeHelper.getExactSpecies(world, basePos);
+				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeDisease(species)));
 				dirt.fertilize(world, pos, -15);//destroy the soil life so it can no longer grow
 			}
 		}

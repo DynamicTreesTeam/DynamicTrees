@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;

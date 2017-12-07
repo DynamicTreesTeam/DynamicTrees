@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.api;
 import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -121,7 +121,9 @@ public class TreeHelper {
 	
 
 	/**
-	 * Only the root node can determine the exact species.
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
 	 * 
 	 * @param world
 	 * @param pos
@@ -137,10 +139,10 @@ public class TreeHelper {
 		
 		if(isBranch(block)) {
 			BlockBranch branch = (BlockBranch) block;
-			commonSpecies = branch.getTree().getSpecies();
+			commonSpecies = branch.getTree().getCommonSpecies();
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 			
-			if(signal.root != null) {// Root node was found
+			if(signal.found) {// Root node was found
 				rootPos = signal.root;
 				block = world.getBlockState(rootPos).getBlock();
 			}
@@ -153,6 +155,14 @@ public class TreeHelper {
 		return commonSpecies;
 	}
 	
+	
+	public static String getSpeciesFullName(ISpecies species) {
+		if(species != null) {
+			return species.getModId() + ":" + species.getName();
+		}
+		
+		return "";
+	}
 	
 	//Treeparts
 

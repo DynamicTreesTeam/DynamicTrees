@@ -1,9 +1,12 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
 import net.minecraft.block.BlockDirt;
@@ -29,7 +32,7 @@ public class TreeOak extends DynamicTree {
 			super(treeFamily.getName(), treeFamily);
 			
 			//Oak trees are about as average as you can get
-			setBasicGrowingParameters(0.3f, 12.0f, getUpProbability(), getLowestBranchHeight(), 0.8f);
+			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
 			envFactor(Type.COLD, 0.75f);
 			envFactor(Type.HOT, 0.50f);
@@ -40,6 +43,25 @@ public class TreeOak extends DynamicTree {
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
+		}
+
+	}
+
+	public class SpeciesSwampOak extends Species {
+
+		SpeciesSwampOak(DynamicTree treeFamily) {
+			super(treeFamily.getName() + "swamp", treeFamily);
+			
+			//Oak trees are about as average as you can get
+			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
+			
+			envFactor(Type.COLD, 0.50f);
+			envFactor(Type.DRY, 0.50f);
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return isOneOfBiomes(biome, Biomes.SWAMPLAND);
 		}
 		
 		@Override
@@ -57,22 +79,48 @@ public class TreeOak extends DynamicTree {
 			
 			return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
 		}
+		
+		@Override
+		public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			super.postGeneration(world, pos, biome, radius, endPoints, worldGen);
+			
+			// TODO Add Vines.
+		}
 	}
+
 	
 	Species species;
+	Species swampSpecies;
 	
 	@Override
-	public Species getSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
 		species = new SpeciesOak(this);
+		swampSpecies = new SpeciesSwampOak(this);
+		TreeRegistry.registerSpecies(species);
+		TreeRegistry.registerSpecies(swampSpecies);
 		
 		registerBottomListener(new BottomListenerPodzol());
 	}
+	
+	/**
+	 * This will cause worldgen to select the swamp variation of the oak
+	 * when the biome is appropriate for it.
+	 * 
+	 */
+	@Override
+	public ISpecies getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
+		if(BiomeDictionary.hasType(access.getBiome(pos), Type.SWAMP)) {
+			return swampSpecies;
+		}
 		
+		return species;
+	}
+	
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
@@ -94,7 +142,5 @@ public class TreeOak extends DynamicTree {
 		}
 		return drops;
 	}
-	
-
 	
 }

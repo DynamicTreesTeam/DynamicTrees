@@ -5,8 +5,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +25,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	private ISpecies acacia;
 	private ISpecies jungle;
 	private ISpecies darkoak;
+	private ISpecies oakswamp;
 	
 	private interface ITreeSelector {
 		Decision getDecision();
@@ -56,6 +57,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		acacia = TreeRegistry.findSpecies("acacia");
 		jungle = TreeRegistry.findSpecies("jungle");
 		darkoak = TreeRegistry.findSpecies("darkoak");
+		oakswamp = TreeRegistry.findSpecies("oakswamp");
 	}
 	
 	@Override
@@ -96,6 +98,9 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			}
 			else if(BiomeDictionary.hasType(biome, Type.SAVANNA)) {
 				select = new StaticDecision(new Decision(acacia));
+			}
+			else if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+				select = new StaticDecision(new Decision(oakswamp));
 			}
 			else if(BiomeDictionary.hasType(biome, Type.SANDY)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree

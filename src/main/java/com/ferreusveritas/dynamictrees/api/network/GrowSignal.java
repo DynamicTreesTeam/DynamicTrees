@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.network;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;

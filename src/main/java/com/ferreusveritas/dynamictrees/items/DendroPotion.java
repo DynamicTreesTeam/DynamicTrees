@@ -131,7 +131,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findSpecies(targetTree);
+					return TreeRegistry.findSpecies(targetTree).getTree();
 				}
 			}
 		}
@@ -187,7 +187,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 
 		for(DynamicTree tree : ModTrees.baseTrees) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
+			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
 		}
 
 		return this;

@@ -517,7 +517,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
 		Random rand = world instanceof World ? ((World)world).rand : new Random();
 		if (rand.nextInt(chance) == 0) {
-			ret.add(tree.getSeedStack());
+			ret.add(tree.getCommonSpecies().getSeedStack(1));//FIXME: This is broken.  Should drop the species specific seed.
 		}
 
 		//More fortune contrivances here.  Vanilla compatible returns.

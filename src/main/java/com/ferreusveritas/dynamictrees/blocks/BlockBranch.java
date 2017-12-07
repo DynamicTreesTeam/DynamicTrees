@@ -11,11 +11,11 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -325,7 +325,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 			//DynamicTree tree = signal.getTree();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
-			EnumFacing targetDir = tree.getSpecies().selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+			EnumFacing targetDir = tree.getCommonSpecies().selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
 
 			{
@@ -461,19 +461,34 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 		return signal;
 	}
 
+	public ISpecies getSpeciesFromSignal(World world, MapSignal signal) {
+		ISpecies species;
+		if(signal.found) {
+			BlockRootyDirt rootyDirt = (BlockRootyDirt) world.getBlockState(signal.root).getBlock();
+			species = rootyDirt.getSpecies(world, signal.root);
+		} else {
+			species = getTree().getCommonSpecies();
+		}
+		
+		return species;
+	}
+	
 	// Destroys all branches recursively not facing the branching direction with the root node
 	public int destroyTreeFromNode(World world, BlockPos pos) {//, float fortuneFactor) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+		ISpecies species = getSpeciesFromSignal(world, signal);//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze only part of the tree beyond the break point and calculate it's volume
-		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
+		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 
 	public int destroyEntireTree(World world, BlockPos pos) {
+		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+		ISpecies species = getSpeciesFromSignal(world, signal);//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze the entire tree and calculate it's volume
-		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(getTree())));
+		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 

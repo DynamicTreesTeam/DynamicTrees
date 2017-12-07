@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -19,10 +19,12 @@ public class NodeInflator implements INodeInspector {
 	private float radius;
 	private BlockPos last;
 
+	ISpecies species;
 	SimpleVoxmap leafMap;
 	List<BlockPos> endPoints;
 	
-	public NodeInflator(SimpleVoxmap leafMap, List<BlockPos> endPoints) {
+	public NodeInflator(ISpecies species, SimpleVoxmap leafMap, List<BlockPos> endPoints) {
+		this.species = species;
 		this.leafMap = leafMap;
 		this.endPoints = endPoints;
 		last = new BlockPos(0, -1, 0);
@@ -74,13 +76,11 @@ public class NodeInflator implements INodeInspector {
 				SimpleVoxmap leafCluster = branch.getTree().getLeafCluster();
 				leafMap.BlitMax(pos, leafCluster);
 			} else {
-				DynamicTree tree = branch.getTree();
-
 				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
-				radius = (float)Math.sqrt(areaAccum) + (tree.getTapering() * tree.getWorldGenTaperingFactor());
+				radius = (float)Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 				
 				//Make sure that non-twig branches are at least radius 2
-				float secondaryThickness = tree.getSecondaryThickness();
+				float secondaryThickness = species.getSecondaryThickness();
 				if(radius < secondaryThickness) {
 					radius = secondaryThickness;
 				}

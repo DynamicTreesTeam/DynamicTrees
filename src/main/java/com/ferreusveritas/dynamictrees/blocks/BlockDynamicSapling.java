@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -111,7 +111,7 @@ public class BlockDynamicSapling extends Block {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(getSpecies(state).getSeedStack());
+		dropped.add(getSpecies(state).getSeedStack(1));
 		return dropped;
 	}
 
@@ -122,7 +122,7 @@ public class BlockDynamicSapling extends Block {
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getSpecies(state).getSeedStack();
+		return getSpecies(state).getSeedStack(1);
 	}
 	
 	///////////////////////////////////////////

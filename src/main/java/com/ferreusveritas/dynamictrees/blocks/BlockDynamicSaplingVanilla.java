@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockSapling;

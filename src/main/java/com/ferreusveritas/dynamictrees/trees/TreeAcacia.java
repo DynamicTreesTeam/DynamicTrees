@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -16,7 +17,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeAcacia extends DynamicTree {
-	
+		
 	public class SpeciesAcacia extends Species {
 
 		SpeciesAcacia(DynamicTree treeFamily) {
@@ -25,9 +26,10 @@ public class TreeAcacia extends DynamicTree {
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
 		
-			getSpecies().envFactor(Type.COLD, 0.25f);
-			getSpecies().envFactor(Type.NETHER, 0.75f);
-			getSpecies().envFactor(Type.WET, 0.75f);
+			envFactor(Type.COLD, 0.25f);
+			envFactor(Type.NETHER, 0.75f);
+			envFactor(Type.WET, 0.75f);
+			
 		}
 		
 		@Override
@@ -40,13 +42,14 @@ public class TreeAcacia extends DynamicTree {
 	Species species;
 	
 	@Override
-	public Species getSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
 		species = new SpeciesAcacia(this);
+		TreeRegistry.registerSpecies(species);
 		
 		setCellSolver(Cells.acaciaSolver);
 		

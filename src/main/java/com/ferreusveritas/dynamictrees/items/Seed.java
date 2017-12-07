@@ -4,9 +4,9 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
@@ -75,9 +75,10 @@ public class Seed extends Item {
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
 			ISpecies species = getSpecies(heldItem);
 			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();//FIXME: Species need their own bonsai pots.. or find another solution
-			bonzaiPot.setSpecies(world, species, pos);
-			CompatHelper.shrinkStack(heldItem, 1);
-			return EnumActionResult.SUCCESS;
+			if(bonzaiPot.setSpecies(world, species, pos)) {
+				CompatHelper.shrinkStack(heldItem, 1);
+				return EnumActionResult.SUCCESS;
+			}
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block

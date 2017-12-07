@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeBirch extends DynamicTree {
-	
+		
 	public class SpeciesBirch extends Species {
 
 		SpeciesBirch(DynamicTree treeFamily) {
@@ -46,13 +47,14 @@ public class TreeBirch extends DynamicTree {
 	Species species;
 	
 	@Override
-	public Species getSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 		species = new SpeciesBirch(this);
+		TreeRegistry.registerSpecies(species);
 	}
 	
 	@Override

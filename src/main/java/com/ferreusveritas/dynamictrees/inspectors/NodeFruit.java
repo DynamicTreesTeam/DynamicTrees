@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;

@@ -9,10 +9,9 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
@@ -73,7 +72,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		JoCode jo = new JoCode(JoCode);
 		ISpecies species = TreeRegistry.findSpecies(treeName);
 		if(species != null) {
-			jo.generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
+			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
 			Logger.getLogger(ModConstants.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
 		}
@@ -90,13 +89,10 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		CompatHelper.spawnEntity(world, entityItem);
 	}
 
-	public String getTree(World world, BlockPos pos) {
+	public String getSpecies(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			DynamicTree tree = part.getTree(world, pos.up());
-			if(tree != null) {
-				return tree.getFullName();
-			}
+			return TreeHelper.getSpeciesFullName(TreeHelper.getExactSpecies(world, pos.up()));
 		}
 		
 		return "";
@@ -105,7 +101,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public void plantTree(World world, BlockPos pos, String treeName) {
 		ISpecies species = TreeRegistry.findSpecies(treeName);
 		if(species != null) {
-			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack());
+			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack(1));
 		}
 	}
 

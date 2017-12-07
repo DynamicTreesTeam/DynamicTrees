@@ -48,12 +48,12 @@ public class ModItems {
 		registry.register(ModItems.dirtBucket);
 		registry.register(ModItems.treeStaff);
 		
-		ArrayList<Item> treeItems = new ArrayList<Item>();
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
+		ArrayList<Item> treeItems = new ArrayList<Item>();
 
 		for(DynamicTree tree: ModTrees.baseTrees) {
-			tree.getRegisterableItems(treeItems);
 			tree.getRegisterableBlocks(treeBlocks);
+			registry.register(tree.getCommonSpecies().getSeed());
 		}
 
 		for(Item item: treeItems) {
