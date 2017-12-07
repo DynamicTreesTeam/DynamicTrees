@@ -194,7 +194,7 @@ public abstract class DynamicTree {
 		setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
-	abstract ISpecies getSpecies();
+	public abstract ISpecies getSpecies();
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
@@ -492,11 +492,6 @@ public abstract class DynamicTree {
 	//DIRT
 	///////////////////////////////////////////
 	
-	/** Used by seed to determine the proper dirt block to create for planting. */
-	public BlockRootyDirt getRootyDirtBlock() {
-		return ModBlocks.blockRootyDirt;
-	}
-	
 	/**
 	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
@@ -735,12 +730,11 @@ public abstract class DynamicTree {
 	 * @param random
 	 * @return false if network is not viable(destroys {@link BlockRootyDirt})
 	 */
-	public boolean grow(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, BlockPos treePos, Random random) {
+	public boolean grow(World world, ISpecies species, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, BlockPos treePos, Random random) {
 		
 		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
 		
 		if(baseTreePart != null) {
-			ISpecies species = getSpecies();
 			
 			float growthRate = species.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 			do {
@@ -750,7 +744,7 @@ public abstract class DynamicTree {
 						
 						float energy = species.getEnergy(world, rootPos);
 						for(int i = 0; !success && i < 1 + species.getRetries(); i++) {//Some species have multiple growth retry attempts
-							success = baseTreePart.growSignal(world, treePos, new GrowSignal(this, rootPos, energy)).success;
+							success = baseTreePart.growSignal(world, treePos, new GrowSignal(species, rootPos, energy)).success;
 						}
 						
 						//TODO: Make this a float
@@ -761,9 +755,9 @@ public abstract class DynamicTree {
 						}
 					} else {
 						if(random.nextFloat() < ModConfigs.diseaseChance && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+							baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(species)));
 						} else {
-							NodeFruit nodeFruit = getNodeFruit(world, treePos);
+							NodeFruit nodeFruit = species.getNodeFruit(world, treePos);
 							if(nodeFruit != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
 								baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(nodeFruit));
 							}
@@ -776,98 +770,6 @@ public abstract class DynamicTree {
 		
 		return false;//Network is not viable
 	}
-	
-	/**
-	* Selects a new direction for the branch(grow) signal to turn to.
-	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
-	* Can be overridden for different species but it's preferable to override customDirectionManipulation.
-	* 
-	* @param world The World
-	* @param pos
-	* @param branch The branch block the GrowSignal is traveling in.
-	* @param signal The grow signal.
-	* @return
-	*/
-	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
-		EnumFacing originDir = signal.dir.getOpposite();
-		
-		//prevent branches on the ground
-		if(signal.numSteps + 1 <= getSpecies().getLowestBranchHeight(world, signal.rootPos)) {
-			return EnumFacing.UP;
-		}
-		
-		int probMap[] = new int[6];//6 directions possible DUNSWE
-		
-		//Probability taking direction into account
-		probMap[EnumFacing.UP.ordinal()] = signal.dir != EnumFacing.DOWN ? getSpecies().getUpProbability(): 0;//Favor up
-		probMap[signal.dir.ordinal()] += getSpecies().getReinfTravel(); //Favor current direction
-		
-		//Create probability map for direction change
-		for(EnumFacing dir: EnumFacing.VALUES) {
-			if(!dir.equals(originDir)) {
-				BlockPos deltaPos = pos.offset(dir);
-				//Check probability for surrounding blocks
-				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
-			}
-		}
-		
-		//Do custom stuff or override probability map for various species
-		probMap = customDirectionManipulation(world, pos, branch.getRadius(world, pos), signal, probMap);
-		
-		//Select a direction from the probability map
-		int choice = selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
-	}
-	
-	/** Species can override the probability map here **/
-	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
-		return probMap;
-	}
-	
-	/** Species can override to take action once a new direction is selected **/
-	protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
-		return newDir;
-	}
-	
-	/** Select a random direction weighted from the probability map **/ 
-	public static int selectRandomFromDistribution(Random random, int distMap[]) {
-		
-		int distSize = 0;
-		
-		for(int i = 0; i < distMap.length; i++) {
-			distSize += distMap[i];
-		}
-		
-		if(distSize <= 0) {
-			System.err.println("Warning: Zero sized distribution");
-			return -1;
-		}
-		
-		int rnd = random.nextInt(distSize) + 1;
-		
-		for(int i = 0; i < 6; i++) {
-			if(rnd > distMap[i]) {
-				rnd -= distMap[i];
-			} else {
-				return i;
-			}
-		}
-		
-		return 0;
-	}	
-	
-	/** Gets the fruiting node analyzer for this tree.  See {@link NodeFruitCocoa} for an example.
-	*  
-	* @param world The World
-	* @param x X-Axis of block
-	* @param y Y-Axis of block
-	* @param z Z-Axis of block
-	*/
-	public NodeFruit getNodeFruit(World world, BlockPos pos) {
-		return null;//Return null to disable fruiting. Most species do.
-	}
-	
 	
 	//////////////////////////////
 	// BOTTOM SPECIAL
@@ -943,27 +845,6 @@ public abstract class DynamicTree {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Allows the tree to decorate itself after it has been generated.  Add vines, fruit, etc.
-	 * 
-	 * @param world The world
-	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
-	 * @param biome The biome this tree is generating in
-	 * @param radius The radius of the tree generation boundary
-	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
-	 */
-	public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints) {}
-	
-	/**
-	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
-	 * This factor is an attempt to compensate for the problem.
-	 * 
-	 * @return
-	 */
-	public float getWorldGenTaperingFactor() {
-		return 1.5f;
 	}
 	
 	//////////////////////////////

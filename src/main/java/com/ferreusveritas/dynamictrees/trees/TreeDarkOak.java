@@ -27,38 +27,79 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeDarkOak extends DynamicTree {
 	
+	public class SpeciesDarkOak extends Species {
+
+		SpeciesDarkOak(DynamicTree treeFamily) {
+			super(treeFamily.getName(), treeFamily);
+			
+			//Dark Oak Trees are tall, slowly growing, thick trees
+			setBasicGrowingParameters(0.35f, 18.0f, 6, 8, 0.8f);
+			
+			setSoilLongevity(14);//Grows for a long long time
+			
+			envFactor(Type.COLD, 0.75f);
+			envFactor(Type.HOT, 0.50f);
+			envFactor(Type.DRY, 0.25f);
+			envFactor(Type.MUSHROOM, 1.25f);
+
+		}
+
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
+		};
+		
+		@Override
+		public int getLowestBranchHeight(World world, BlockPos pos) {
+			return (int)(super.getLowestBranchHeight(world, pos) * biomeSuitability(world, pos));
+		}
+		
+		@Override
+		public float getEnergy(World world, BlockPos pos) {
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos);
+		}
+		
+		@Override
+		public float getGrowthRate(World world, BlockPos pos) {
+			return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
+		}
+
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+			
+			if(signal.numTurns >= 1) {//Disallow up/down turns after having turned out of the trunk once.
+				probMap[EnumFacing.UP.getIndex()] = 0;
+				probMap[EnumFacing.DOWN.getIndex()] = 0;
+			}
+			
+			//Amplify cardinal directions to encourage spread(beware! this algorithm is wacked-out poo brain and should be redone)
+			float energyRatio = signal.delta.getY() / getEnergy(world, pos);
+			float spreadPush = energyRatio * energyRatio * energyRatio * 4;
+			spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
+			
+			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+				probMap[dir.ordinal()] *= spreadPush;
+			}
+			
+			return probMap;
+		}
+	}
+	
+	Species species;
+	
+	@Override
+	public Species getSpecies() {
+		return species;
+	}
+	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
-		
-		//Dark Oak Trees are tall, slowly growing, thick trees
-		setBasicGrowingParameters(0.35f, 18.0f, 6, 8, 0.8f);
-		
-		setSoilLongevity(14);//Grows for a long long time
-		
-		envFactor(Type.COLD, 0.75f);
-		envFactor(Type.HOT, 0.50f);
-		envFactor(Type.DRY, 0.25f);
-		envFactor(Type.MUSHROOM, 1.25f);
+		species = new SpeciesDarkOak(this);
 		
 		setCellSolver(Cells.darkOakSolver);
 		setSmotherLeavesMax(3);//thin canopy
 		
 		registerBottomListener(new BottomListenerPodzol());
-	}
-	
-	@Override
-	public int getLowestBranchHeight(World world, BlockPos pos) {
-		return (int)(super.getLowestBranchHeight(world, pos) * biomeSuitability(world, pos));
-	}
-	
-	@Override
-	public float getEnergy(World world, BlockPos pos) {
-		return super.getEnergy(world, pos) * biomeSuitability(world, pos);
-	}
-	
-	@Override
-	public float getGrowthRate(World world, BlockPos pos) {
-		return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
 	}
 	
 	protected static final ICell darkOakLeafCells[] = {
@@ -73,31 +114,6 @@ public class TreeDarkOak extends DynamicTree {
 	public ICell getCellForLeaves(int hydro) {
 		return darkOakLeafCells[hydro];
 	}
-	
-	@Override
-	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
-		
-		if(signal.numTurns >= 1) {//Disallow up/down turns after having turned out of the trunk once.
-			probMap[EnumFacing.UP.getIndex()] = 0;
-			probMap[EnumFacing.DOWN.getIndex()] = 0;
-		}
-		
-		//Amplify cardinal directions to encourage spread(beware! this algorithm is wacked-out poo brain and should be redone)
-		float energyRatio = signal.delta.getY() / getEnergy(world, pos);
-		float spreadPush = energyRatio * energyRatio * energyRatio * 4;
-		spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
-		
-		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-			probMap[dir.ordinal()] *= spreadPush;
-		}
-		
-		return probMap;
-	}
-	
-	@Override
-	public boolean isBiomePerfect(Biome biome) {
-		return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
-	};
 	
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {

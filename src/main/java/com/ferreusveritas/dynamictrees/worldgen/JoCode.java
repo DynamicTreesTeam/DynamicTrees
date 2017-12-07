@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -122,7 +123,7 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, DynamicTree tree, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
+	public void generate(World world, ISpecies tree, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
 		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//This will store the positions of all of the branch endpoints
@@ -182,7 +183,7 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(World world, ISpecies tree, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +21,8 @@ import net.minecraft.world.biome.Biome;
 */
 public class TreeRegistry {
 
-	private static Map<String, DynamicTree> treesByName = new HashMap<String, DynamicTree>();
-	private static Map<String, DynamicTree> treesByFullName = new HashMap<String, DynamicTree>();
+	private static Map<String, ISpecies> treesByName = new HashMap<String, ISpecies>();
+	private static Map<String, ISpecies> treesByFullName = new HashMap<String, ISpecies>();
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	
 	//////////////////////////////
@@ -37,9 +38,10 @@ public class TreeRegistry {
 	 * @param tree The dynamic tree being registered
 	 * @return DynamicTree for chaining
 	 */
-	public static DynamicTree registerTree(DynamicTree tree) {
+	public static ISpecies registerTree(ISpecies tree) {
 		treesByName.put(tree.getName(), tree);
-		treesByFullName.put(tree.getFullName(), tree);
+		String fullName = tree.getModId() + ":" + tree.getName();
+		treesByFullName.put(fullName, tree);
 		tree.register();//Let the tree setup everything it needs
 		return tree;
 	}
@@ -49,8 +51,8 @@ public class TreeRegistry {
 	 * 
 	 * @param list
 	 */
-	public static void registerTrees(List<DynamicTree> list) {
-		for(DynamicTree tree: list) {
+	public static void registerTrees(List<ISpecies> list) {
+		for(ISpecies tree: list) {
 			registerTree(tree);
 		}
 	}
@@ -62,8 +64,8 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static DynamicTree findTree(String name) {
-		DynamicTree tree = treesByFullName.get(name);
+	public static ISpecies findTree(String name) {
+		ISpecies tree = treesByFullName.get(name);
 		
 		if(tree == null) {
 			tree = treesByName.get(name);
@@ -80,7 +82,7 @@ public class TreeRegistry {
 	 * @param name
 	 * @return
 	 */
-	public static DynamicTree findTree(String modId, String name) {
+	public static ISpecies findTree(String modId, String name) {
 		return findTree(modId + ":" + name);
 	}
 	
@@ -101,7 +103,7 @@ public class TreeRegistry {
 	
 	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, Species species, BlockPos pos) {
 		for(IBiomeSuitabilityDecider decider: biomeSuitabilityDeciders) {
-			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, tree, pos);
+			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, species, pos);
 			if(decision.isHandled()) {
 				return decision;
 			}

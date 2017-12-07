@@ -70,7 +70,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
-		DynamicTree tree = TreeRegistry.findTree(treeName);
+		ISpecies tree = TreeRegistry.findTree(treeName);
 		if(tree != null) {
 			jo.generate(world, tree, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {

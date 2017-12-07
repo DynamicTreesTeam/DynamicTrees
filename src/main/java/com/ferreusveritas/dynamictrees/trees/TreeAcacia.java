@@ -20,7 +20,7 @@ public class TreeAcacia extends DynamicTree {
 	public class SpeciesAcacia extends Species {
 
 		SpeciesAcacia(DynamicTree treeFamily) {
-			super(treeFamily);
+			super(treeFamily.getName(), treeFamily);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
@@ -40,7 +40,7 @@ public class TreeAcacia extends DynamicTree {
 	Species species;
 	
 	@Override
-	Species getSpecies() {
+	public Species getSpecies() {
 		return species;
 	}
 	

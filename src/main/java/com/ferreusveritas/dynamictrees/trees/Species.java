@@ -1,15 +1,24 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -18,8 +27,10 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class Species implements ISpecies {
 
-	/** Simple name of the species e.g. "oak" */
-	String name;
+	/** Simple name of the tree e.g. "oak" */
+	private String name;
+	/** ModID of mod registering this tree */
+	private String modId;
 
 	public final DynamicTree treeFamily;
 	
@@ -33,7 +44,6 @@ public class Species implements ISpecies {
 	int retries = 0;
 	/** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
 	float signalEnergy = 16.0f;
-	/** The stick that is returned when a whole log can't be dropped */
 	
 	/** Ideal growth rate [default = 1.0]*/
 	float growthRate = 1.0f;
@@ -45,10 +55,25 @@ public class Species implements ISpecies {
 	
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected TreeCodeStore joCodeStore;
-
 	
-	public Species(DynamicTree treeFamily) {
+	public Species(String name, DynamicTree treeFamily) {
+		this.name = name;
 		this.treeFamily = treeFamily;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public String getModId() {
+		return modId;
+	}
+	
+	@Override
+	public DynamicTree getTree() {
+		return treeFamily;
 	}
 	
 	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -120,6 +145,11 @@ public class Species implements ISpecies {
 	//DIRT
 	///////////////////////////////////////////
 	
+	@Override
+	public BlockRootyDirt getRootyDirtBlock() {
+		return ModBlocks.blockRootyDirt;
+	}
+	
 	public void setSoilLongevity(int longevity) {
 		soilLongevity = longevity;
 	}
@@ -129,6 +159,65 @@ public class Species implements ISpecies {
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
 	}
 
+	//////////////////////////////
+	// GROWTH
+	//////////////////////////////
+	
+	@Override
+	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
+		EnumFacing originDir = signal.dir.getOpposite();
+		
+		//prevent branches on the ground
+		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
+			return EnumFacing.UP;
+		}
+		
+		int probMap[] = new int[6];//6 directions possible DUNSWE
+		
+		//Probability taking direction into account
+		probMap[EnumFacing.UP.ordinal()] = signal.dir != EnumFacing.DOWN ? getUpProbability(): 0;//Favor up
+		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
+		
+		//Create probability map for direction change
+		for(EnumFacing dir: EnumFacing.VALUES) {
+			if(!dir.equals(originDir)) {
+				BlockPos deltaPos = pos.offset(dir);
+				//Check probability for surrounding blocks
+				//Typically Air:1, Leaves:2, Branches: 2+r
+				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
+			}
+		}
+		
+		//Do custom stuff or override probability map for various species
+		probMap = customDirectionManipulation(world, pos, branch.getRadius(world, pos), signal, probMap);
+		
+		//Select a direction from the probability map
+		int choice = MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
+		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
+	}
+	
+	/** Species can override the probability map here **/
+	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+		return probMap;
+	}
+	
+	/** Species can override to take action once a new direction is selected **/
+	protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
+		return newDir;
+	}
+	
+	/** Gets the fruiting node analyzer for this tree.  See {@link NodeFruitCocoa} for an example.
+	*  
+	* @param world The World
+	* @param x X-Axis of block
+	* @param y Y-Axis of block
+	* @param z Z-Axis of block
+	*/
+	@Override
+	public NodeFruit getNodeFruit(World world, BlockPos pos) {
+		return null;//Return null to disable fruiting. Most species do.
+	}
+	
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
@@ -210,6 +299,20 @@ public class Species implements ISpecies {
 	 */
 	public void addJoCodes() {
 		joCodeStore = new TreeCodeStore(this);
-		joCodeStore.addCodesFromFile("assets/" + getModID() + "/trees/"+ getName() + ".txt");
+		joCodeStore.addCodesFromFile("assets/" + getModId() + "/trees/"+ getName() + ".txt");
+	}
+	
+	@Override
+	public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints) {}
+	
+	/**
+	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
+	 * This factor is an attempt to compensate for the problem.
+	 * 
+	 * @return
+	 */
+	@Override
+	public float getWorldGenTaperingFactor() {
+		return 1.5f;
 	}
 }

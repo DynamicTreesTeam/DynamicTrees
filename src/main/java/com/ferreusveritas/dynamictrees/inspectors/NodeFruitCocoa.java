@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.inspectors;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -15,8 +15,8 @@ public class NodeFruitCocoa extends NodeFruit {
 
 	boolean finished;
 
-	public NodeFruitCocoa(DynamicTree tree) {
-		super(tree);
+	public NodeFruitCocoa(ISpecies species) {
+		super(species);
 		finished = false;
 	}
 

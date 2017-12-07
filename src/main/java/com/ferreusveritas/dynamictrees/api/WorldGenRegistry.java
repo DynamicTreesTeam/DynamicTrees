@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 public class WorldGenRegistry {
@@ -12,12 +12,12 @@ public class WorldGenRegistry {
 	//////////////////////////////
 	
 	/**
-	 * Mods should call this to register an {@link IBiomeTreeSelector}.
+	 * Mods should call this to register an {@link IBiomeSpeciesSelector}.
 	 * 
 	 * @param treeSelector The tree selector being registered
 	 * @return
 	 */
-	public static boolean registerBiomeTreeSelector(IBiomeTreeSelector treeSelector) {
+	public static boolean registerBiomeTreeSelector(IBiomeSpeciesSelector treeSelector) {
 		if(TreeGenerator.getTreeGenerator() != null) {
 			TreeGenerator.getTreeGenerator().biomeTreeHandler.addTreeSelector(treeSelector);
 			return true;

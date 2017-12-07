@@ -23,7 +23,7 @@ public class TreeBirch extends DynamicTree {
 	public class SpeciesBirch extends Species {
 
 		SpeciesBirch(DynamicTree treeFamily) {
-			super(treeFamily);
+			super(treeFamily.getName(), treeFamily);
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
@@ -46,7 +46,7 @@ public class TreeBirch extends DynamicTree {
 	Species species;
 	
 	@Override
-	Species getSpecies() {
+	public Species getSpecies() {
 		return species;
 	}
 	

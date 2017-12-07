@@ -5,8 +5,9 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -16,7 +17,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
+public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 
 	private DynamicTree oak;
 	private DynamicTree birch;
@@ -82,7 +83,7 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 					select = new StaticDecision(new Decision(spruce));
 				} else if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
 					select = new StaticDecision(new Decision(darkoak));
-				} else if (DynamicTree.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
+				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = new StaticDecision(new Decision(birch));
 				} else {
 					select = new StaticDecision(new Decision(oak));

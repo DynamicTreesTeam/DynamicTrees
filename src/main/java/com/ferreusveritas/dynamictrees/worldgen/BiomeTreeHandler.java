@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -19,9 +19,9 @@ import net.minecraft.world.biome.Biome;
 * 
 * @author ferreusveritas
 */
-public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelector {
+public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSelector {
 
-	private ArrayList<IBiomeTreeSelector> biomeTreeSelectors = new ArrayList<IBiomeTreeSelector>();
+	private ArrayList<IBiomeSpeciesSelector> biomeTreeSelectors = new ArrayList<IBiomeSpeciesSelector>();
 	private ArrayList<IBiomeDensityProvider> biomeDensityProvider = new ArrayList<IBiomeDensityProvider>();
 	
 	public BiomeTreeHandler() {
@@ -29,11 +29,11 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 		addDensityProvider(new DefaultBiomeDensityProvider());
 	}
 	
-	public void addTreeSelector(IBiomeTreeSelector treeSelector) {
+	public void addTreeSelector(IBiomeSpeciesSelector treeSelector) {
 		biomeTreeSelectors.add(treeSelector);
-		biomeTreeSelectors.sort(new Comparator<IBiomeTreeSelector>() {
+		biomeTreeSelectors.sort(new Comparator<IBiomeSpeciesSelector>() {
 			@Override
-			public int compare(IBiomeTreeSelector sel1, IBiomeTreeSelector sel2) {
+			public int compare(IBiomeSpeciesSelector sel1, IBiomeSpeciesSelector sel2) {
 				return sel2.getPriority() - sel1.getPriority();//Sort backwards so higher values are on top.
 			}
 		});
@@ -51,7 +51,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	
 	@Override
 	public void init() {
-		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
+		for(IBiomeSpeciesSelector selector : biomeTreeSelectors) {
 			selector.init();
 		}
 	}
@@ -59,7 +59,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeTreeSelect
 	@Override
 	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
-		for(IBiomeTreeSelector selector : biomeTreeSelectors) {
+		for(IBiomeSpeciesSelector selector : biomeTreeSelectors) {
 			Decision decision = selector.getTree(world, biome, pos, dirt, random);
 			if(decision != null && decision.isHandled()) {
 				return decision;

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import java.util.Random;
+
 /**
  * Maintaining code between Minecraft versions can be a pain.
  * This is a compatibility layer to abstract the finer points
@@ -23,6 +25,34 @@ public class MathHelper {
 	}
 
     public static int floor(double value) {
-    	return net.minecraft.util.math.MathHelper.floor(value);    }
+    	return net.minecraft.util.math.MathHelper.floor(value);
+    }
+	
+	/** Select a random direction weighted from the probability map **/ 
+	public static int selectRandomFromDistribution(Random random, int distMap[]) {
+		
+		int distSize = 0;
+		
+		for(int i = 0; i < distMap.length; i++) {
+			distSize += distMap[i];
+		}
+		
+		if(distSize <= 0) {
+			System.err.println("Warning: Zero sized distribution");
+			return -1;
+		}
+		
+		int rnd = random.nextInt(distSize) + 1;
+		
+		for(int i = 0; i < 6; i++) {
+			if(rnd > distMap[i]) {
+				rnd -= distMap[i];
+			} else {
+				return i;
+			}
+		}
+		
+		return 0;
+	}
 	
 }

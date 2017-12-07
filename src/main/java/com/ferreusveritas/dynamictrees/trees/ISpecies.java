@@ -1,12 +1,27 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.List;
+
+import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 public interface ISpecies {
 
+	public String getName();
+	
+	public String getModId();
+	
+	public DynamicTree getTree();
+	
 	public float getEnergy(World world, BlockPos rootPos);
 	
 	public float getGrowthRate(World world, BlockPos rootPos);
@@ -33,12 +48,43 @@ public interface ISpecies {
 	
 	public float getTapering();
 	
+	
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
 	
+	public BlockRootyDirt getRootyDirtBlock();
+	
 	public int getSoilLongevity(World world, BlockPos rootPos);
 
+	
+	///////////////////////////////////////////
+	//GROWTH
+	///////////////////////////////////////////
+	
+	/**
+	* Selects a new direction for the branch(grow) signal to turn to.
+	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
+	* Can be overridden for different species but it's preferable to override customDirectionManipulation.
+	* 
+	* @param world The World
+	* @param pos
+	* @param branch The branch block the GrowSignal is traveling in.
+	* @param signal The grow signal.
+	* @return
+	*/
+	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal);
+
+	/** Gets the fruiting node analyzer for this tree.  See {@link NodeFruitCocoa} for an example.
+	*  
+	* @param world The World
+	* @param x X-Axis of block
+	* @param y Y-Axis of block
+	* @param z Z-Axis of block
+	* @return The NodeFruit or return null to disable fruiting. Most species do return null
+	*/
+	public NodeFruit getNodeFruit(World world, BlockPos pos);
+	
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
@@ -51,5 +97,30 @@ public interface ISpecies {
 	*/
 	public float biomeSuitability(World world, BlockPos pos);
 	
+	
+	//////////////////////////////
+	// WORLDGEN STUFF
+	//////////////////////////////
+		
 	public TreeCodeStore getJoCodeStore();
+	
+	/**
+	 * Allows the tree to decorate itself after it has been generated.  Add vines, fruit, etc.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param radius The radius of the tree generation boundary
+	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
+	 */
+	public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints);
+	
+	/**
+	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
+	 * This factor is an attempt to compensate for the problem.
+	 * 
+	 * @return
+	 */
+	public float getWorldGenTaperingFactor();
+	
 }

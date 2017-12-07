@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
@@ -10,10 +10,10 @@ import net.minecraft.world.World;
 
 public class NodeFruit implements INodeInspector {
 
-	DynamicTree tree;
+	ISpecies species;
 
-	public NodeFruit(DynamicTree tree) {
-		this.tree = tree;
+	public NodeFruit(ISpecies species) {
+		this.species = species;
 	}
 
 	@Override

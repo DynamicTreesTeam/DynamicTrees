@@ -446,7 +446,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	public GrowSignal branchOut(World world, BlockPos pos, GrowSignal signal) {
 
-		DynamicTree tree = signal.getTree();
+		DynamicTree tree = signal.getSpecies();
 
 		//Check to be sure the placement for a branch is valid by testing to see if it would first support a leaves block
 		if(tree == null || !needLeaves(world, pos, tree)){
@@ -476,8 +476,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			world.setBlockState(pos, signal.getTree().getDynamicBranch().getDefaultState(), 2);
-			signal.radius = signal.getTree().getSecondaryThickness();//For the benefit of the parent branch
+			world.setBlockState(pos, signal.getSpecies().getDynamicBranch().getDefaultState(), 2);
+			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
 		}
 
 		signal.success = hasLeaves;

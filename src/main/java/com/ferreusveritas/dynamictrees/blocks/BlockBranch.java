@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -303,7 +304,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	}
 
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		DynamicTree tree = signal.getTree();
+		DynamicTree tree = signal.getSpecies().getTree();
 		
 		BlockDynamicLeaves leaves = tree.getDynamicLeaves();
 		if (leaves != null) {
@@ -320,10 +321,11 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
-			DynamicTree tree = signal.getTree();
+			ISpecies species = signal.getSpecies();
+			//DynamicTree tree = signal.getTree();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
-			EnumFacing targetDir = tree.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+			EnumFacing targetDir = tree.getSpecies().selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
 
 			{
@@ -359,7 +361,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + tree.getTapering(), getRadius(world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 

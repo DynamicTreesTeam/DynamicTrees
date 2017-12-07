@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -29,10 +28,10 @@ import net.minecraft.util.EnumFacing;
 public class TreeCodeStore {
 
 	ArrayList<ArrayList<JoCode>> store = new ArrayList<ArrayList<JoCode>>(7);//Radius values 2,3,4,5,6,7,8
-	DynamicTree tree;
+	Species species;
 	
 	public TreeCodeStore(Species tree) {
-		this.tree = tree;
+		this.species = tree;
 		for(int i = 0; i < 7; i++) {
 			store.add(new ArrayList<JoCode>());
 		}
@@ -45,7 +44,7 @@ public class TreeCodeStore {
 	
 	public void addCodesFromFile(String filename) {
 		try {
-			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + tree.getName() + "\" from file: " + filename);
+			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + species.getName() + "\" from file: " + filename);
 			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
 			String line;
 			while((line = readIn.readLine()) != null) {
@@ -90,7 +89,7 @@ public class TreeCodeStore {
 		}
 		
 		Collections.sort(arr);
-		System.out.println(tree.getName() + ":" + radius + ":" + arr.get(0));
+		System.out.println(species.getName() + ":" + radius + ":" + arr.get(0));
 	}
 	
 	public JoCode getRandomCode(int radius, Random rand) {		

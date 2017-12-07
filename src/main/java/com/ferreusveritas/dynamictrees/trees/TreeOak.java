@@ -23,25 +23,41 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeOak extends DynamicTree {
 	
+	public class SpeciesOak extends Species {
+
+		SpeciesOak(DynamicTree treeFamily) {
+			super(treeFamily.getName(), treeFamily);
+			
+			//Oak trees are about as average as you can get
+			setBasicGrowingParameters(0.3f, 12.0f, getUpProbability(), getLowestBranchHeight(), 0.8f);
+			
+			envFactor(Type.COLD, 0.75f);
+			envFactor(Type.HOT, 0.50f);
+			envFactor(Type.DRY, 0.50f);
+			envFactor(Type.FOREST, 1.05f);
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
+		}
+		
+	}
+	
+	Species species;
+	
+	@Override
+	public Species getSpecies() {
+		return species;
+	}
+	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
-		
-		//Oak trees are about as average as you can get
-		setBasicGrowingParameters(0.3f, 12.0f, getUpProbability(), getLowestBranchHeight(), 0.8f);
-		
-		envFactor(Type.COLD, 0.75f);
-		envFactor(Type.HOT, 0.50f);
-		envFactor(Type.DRY, 0.50f);
-		envFactor(Type.FOREST, 1.05f);
+		species = new SpeciesOak(this);
 		
 		registerBottomListener(new BottomListenerPodzol());
 	}
-	
-	@Override
-	public boolean isBiomePerfect(Biome biome) {
-		return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
-	}
-	
+		
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
