@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -9,8 +10,11 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -48,6 +52,13 @@ public interface ISpecies {
 	
 	public float getTapering();
 	
+	///////////////////////////////////////////
+	//DIRT
+	///////////////////////////////////////////
+		
+	public ItemStack getSeedStack();
+
+	public boolean placeSaplingBlock(World world, BlockPos pos);
 	
 	///////////////////////////////////////////
 	//DIRT
@@ -57,6 +68,36 @@ public interface ISpecies {
 	
 	public int getSoilLongevity(World world, BlockPos rootPos);
 
+	/**
+	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 * 
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockState soilBlockState);
+	
+	/**
+	 * Position sensitive version of soil acceptability tester
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState);
+	
+	/**
+	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState);
+	
 	
 	///////////////////////////////////////////
 	//GROWTH
@@ -101,7 +142,21 @@ public interface ISpecies {
 	//////////////////////////////
 	// WORLDGEN STUFF
 	//////////////////////////////
-		
+	
+	/**
+	 * Default worldgen spawn mechanism.
+	 * This method uses JoCodes to generate tree models.
+	 * Override to use other methods.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param facing The orientation of the tree(rotates JoCode)
+	 * @param radius The radius of the tree generation boundary
+	 * @return true if tree was generated. false otherwise.
+	 */
+	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius);
+	
 	public TreeCodeStore getJoCodeStore();
 	
 	/**

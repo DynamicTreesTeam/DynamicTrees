@@ -2,11 +2,13 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
 
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -116,6 +118,41 @@ public class TreeHelper {
 		}
 		
 	}
+	
+
+	/**
+	 * Only the root node can determine the exact species.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static ISpecies getExactSpecies(World world, BlockPos pos) {
+		
+		IBlockState blockState = world.getBlockState(pos);
+		Block block = blockState.getBlock();
+		
+		BlockPos rootPos = pos;
+		ISpecies commonSpecies = null;
+		
+		if(isBranch(block)) {
+			BlockBranch branch = (BlockBranch) block;
+			commonSpecies = branch.getTree().getSpecies();
+			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+			
+			if(signal.root != null) {// Root node was found
+				rootPos = signal.root;
+				block = world.getBlockState(rootPos).getBlock();
+			}
+		}
+		
+		if(isRootyDirt(block)) {
+			return ((BlockRootyDirt) block).getSpecies(world, rootPos);
+		}
+		
+		return commonSpecies;
+	}
+	
 	
 	//Treeparts
 

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -11,15 +12,24 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruit;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -44,17 +54,25 @@ public class Species implements ISpecies {
 	int retries = 0;
 	/** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
 	float signalEnergy = 16.0f;
-	
 	/** Ideal growth rate [default = 1.0]*/
 	float growthRate = 1.0f;
 	/** Ideal soil longevity [default = 8]*/
 	int soilLongevity = 8;//TODO: Make a 0.0 to 1.0 float and recode
 	
+	//Seeds
+	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
+	private Seed seed;
+	/** The seed stack for the seed.  Hold damage value for seed items with multiple variants */
+	private ItemStack seedStack;
+	/** A blockState that will turn itself into this tree */
+	private IBlockState saplingBlock;
+	
+	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
 	public Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
-	
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected TreeCodeStore joCodeStore;
+	
 	
 	public Species(String name, DynamicTree treeFamily) {
 		this.name = name;
@@ -141,6 +159,78 @@ public class Species implements ISpecies {
 		return tapering;
 	}
 	
+	
+	///////////////////////////////////////////
+	//SEEDS
+	///////////////////////////////////////////
+	
+	@Override
+	public ItemStack getSeedStack() {
+		return seedStack.copy();
+	}
+	
+	public Seed getSeed() {
+		return seed;
+	}
+	
+	public ItemStack getSeedStack(int qty) {
+		return CompatHelper.setStackCount(seedStack.copy(), qty);
+	}
+	
+	/**
+	 * This is run internally if no seed is set for the tree when it's registered
+	 */
+	public Seed generateSeed() {
+		seed = new Seed(getName() + "seed");
+		return setSeedStack(new ItemStack(seed));
+	}
+	
+	public Seed setSeedStack(ItemStack newSeedStack) {
+		if(newSeedStack.getItem() instanceof Seed) {
+			seedStack = newSeedStack;
+			seed = (Seed) seedStack.getItem();
+			seed.setSpecies(this, seedStack);
+			return seed;
+		} else {
+			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
+		}
+		return null;
+	}
+	
+	
+	///////////////////////////////////////////
+	//SAPLINGS
+	///////////////////////////////////////////
+	
+	/** 
+	 * Sets the Dynamic Sapling for this tree type.  Also sets
+	 * the tree type in the dynamic sapling.
+	 * 
+	 * @param sapling
+	 * @return
+	 */
+	public ISpecies setDynamicSapling(IBlockState sapling) {
+		saplingBlock = sapling;//Link the tree to the sapling
+		
+		//Link the sapling to the Tree
+		if(saplingBlock.getBlock() instanceof BlockDynamicSapling) {
+			BlockDynamicSapling dynSap = (BlockDynamicSapling) saplingBlock.getBlock();
+			dynSap.setSpecies(saplingBlock, this);
+		}
+		
+		return this;
+	}
+	
+	public IBlockState getDynamicSapling() {
+		return saplingBlock;
+	}
+	
+	@Override
+	public boolean placeSaplingBlock(World world, BlockPos pos) {
+		world.setBlockState(pos, getDynamicSapling());
+		return true;
+	}
+	
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
@@ -159,6 +249,43 @@ public class Species implements ISpecies {
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
 	}
 
+	/**
+	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 * 
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockState soilBlockState) {
+		Block soilBlock = soilBlockState.getBlock();
+		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
+	}
+	
+	/**
+	 * Position sensitive version of soil acceptability tester
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(soilBlockState);
+	}
+	
+	/**
+	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(blockAccess, pos, soilBlockState);
+	}
+	
 	//////////////////////////////
 	// GROWTH
 	//////////////////////////////
@@ -289,6 +416,31 @@ public class Species implements ISpecies {
 	// WORLDGEN
 	//////////////////////////////
 
+	/**
+	 * Default worldgen spawn mechanism.
+	 * This method uses JoCodes to generate tree models.
+	 * Override to use other methods.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param facing The orientation of the tree(rotates JoCode)
+	 * @param radius The radius of the tree generation boundary
+	 * @return true if tree was generated. false otherwise.
+	 */
+	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
+		EnumFacing facing = CoordUtils.getRandomDir(random);
+		if(getJoCodeStore() != null) {
+			JoCode code = getJoCodeStore().getRandomCode(radius, random);
+			if(code != null) {
+				code.generate(world, this, pos, biome, facing, radius);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public TreeCodeStore getJoCodeStore() {
 		return joCodeStore;
@@ -315,4 +467,29 @@ public class Species implements ISpecies {
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}
+	
+	//////////////////////////////
+	// RECIPES
+	//////////////////////////////
+	
+	//FIXME: Move recipes out of Species
+	
+	/** Used to register the recipes this tree uses. */
+	/*public void registerRecipes(IForgeRegistry<IRecipe> registry) {
+		
+		if(primitiveSapling != null) {
+			//Creates a seed from a vanilla sapling and a wooden bowl
+			ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
+			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
+			
+			//Create a seed from a sapling and dirt bucket
+			GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(ModItems.dirtBucket)});
+			
+			//Creates a vanilla sapling from a seed and dirt bucket
+			if(enableSaplingRecipe) {
+				GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(ModItems.dirtBucket)});
+			}
+		}
+		
+	}*/
 }

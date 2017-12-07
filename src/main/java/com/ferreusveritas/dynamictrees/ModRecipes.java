@@ -20,7 +20,7 @@ public class ModRecipes {
 		ModItems.dirtBucket.registerRecipes(registry);
 		
 		for(DynamicTree tree: ModTrees.baseTrees) {
-			tree.registerRecipes(registry);
+			//tree.registerRecipes(registry); //FIXME:  move recipes from species to here
 		}
 		
 		DynamicTrees.compatProxy.registerRecipes(event);

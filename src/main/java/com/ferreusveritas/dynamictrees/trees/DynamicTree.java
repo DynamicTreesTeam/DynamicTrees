@@ -111,17 +111,7 @@ public abstract class DynamicTree {
 	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
 	private ICellSolver cellSolver = Cells.deciduousSolver;
 	
-	//Seeds
-	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
-	private Seed seed;
-	/** The seed stack for the seed.  Hold damage value for seed items with multiple variants */
-	private ItemStack seedStack;
-	/** Weather or not the seed is Auto-generated */
-	private boolean genSeed = false;	
-	/** Enable the automatic recipe registration to create Vanilla saplings from seeds and dirt(default = true) */
-	protected boolean enableSaplingRecipe = true;
-	/** A blockState that will turn itself into this tree */
-	private IBlockState saplingBlock;
+
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
@@ -191,10 +181,23 @@ public abstract class DynamicTree {
 		}
 		
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		getSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 	}
 	
 	public abstract ISpecies getSpecies();
+	
+	/**
+	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
+	 * For instance Oak may use this to select a Swamp Oak species if the coordinates 
+	 * are in a swamp.
+	 * 
+	 * @param access
+	 * @param pos
+	 * @return
+	 */
+	public ISpecies getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
+		return getSpecies();
+	}
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
@@ -249,7 +252,7 @@ public abstract class DynamicTree {
 	 * 
 	 * @return this tree for chaining
 	 */
-	public DynamicTree register() {
+	/*public DynamicTree register() {
 		
 		//If a seed hasn't been set for this tree go ahead and generate it automatically.
 		if(seed == null) {
@@ -263,7 +266,7 @@ public abstract class DynamicTree {
 		addJoCodes();
 		
 		return this;
-	}
+	}*/
 	
 	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
 	 * We intentionally leave out leaves since they are shared between trees */
@@ -274,31 +277,11 @@ public abstract class DynamicTree {
 	
 	/** Used to register the items this tree uses.  Mainly just the {@link Seed}s */	
 	public List<Item> getRegisterableItems(List<Item> itemList) {
-		if(genSeed) {//If the seed was generated internally then register it too.
+		/*if(genSeed) {//If the seed was generated internally then register it too.
 			itemList.add(seed);
-		}
+		}*/
 		return itemList;
 	}
-	
-	/** Used to register the recipes this tree uses. */
-	public void registerRecipes(IForgeRegistry<IRecipe> registry) {
-		
-		if(primitiveSapling != null) {
-			//Creates a seed from a vanilla sapling and a wooden bowl
-			ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
-			saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
-			
-			//Create a seed from a sapling and dirt bucket
-			GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "seed"), null, new ItemStack(seed), new Ingredient[]{ Ingredient.fromStacks(saplingStack), Ingredient.fromItem(ModItems.dirtBucket)});
-			
-			//Creates a vanilla sapling from a seed and dirt bucket
-			if(enableSaplingRecipe) {
-				GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, getName() + "sapling"), null, saplingStack, new Ingredient[]{ Ingredient.fromItem(seed), Ingredient.fromItem(ModItems.dirtBucket)});
-			}
-		}
-		
-	}
-	
 	
 	//////////////////////////////
 	// TREE PROPERTIES
@@ -372,38 +355,6 @@ public abstract class DynamicTree {
 		return dynamicBranch;
 	}
 	
-	/**
-	 * This is run internally if no seed is set for the tree when it's registered
-	 */
-	private DynamicTree generateSeed() {
-		genSeed = true;
-		seed = new Seed(getName() + "seed");
-		return setSeedStack(new ItemStack(seed));
-	}
-	
-	public DynamicTree setSeedStack(ItemStack newSeedStack) {
-		if(newSeedStack.getItem() instanceof Seed) {
-			seedStack = newSeedStack;
-			seed = (Seed) seedStack.getItem();
-			seed.setTree(this, seedStack);
-		} else {
-			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
-		}
-		return this;
-	}
-	
-	public Seed getSeed() {
-		return seed;
-	}
-	
-	public ItemStack getSeedStack() {
-		return seedStack.copy();
-	}
-	
-	public ItemStack getSeedStack(int qty) {
-		return CompatHelper.setStackCount(seedStack.copy(), qty);
-	}
-	
 	protected DynamicTree setStick(ItemStack itemStack) {
 		stick = itemStack;
 		return this;
@@ -417,29 +368,6 @@ public abstract class DynamicTree {
 	 */
 	public ItemStack getStick(int qty) {
 		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
-	}
-	
-	/** 
-	 * Sets the Dynamic Sapling for this tree type.  Also sets
-	 * the tree type in the dynamic sapling.
-	 * 
-	 * @param sapling
-	 * @return
-	 */
-	public DynamicTree setDynamicSapling(IBlockState sapling) {
-		saplingBlock = sapling;//Link the tree to the sapling
-		
-		//Link the sapling to the Tree
-		if(saplingBlock.getBlock() instanceof BlockDynamicSapling) {
-			BlockDynamicSapling dynSap = (BlockDynamicSapling) saplingBlock.getBlock();
-			dynSap.setTree(saplingBlock, this);
-		}
-		
-		return this;
-	}
-	
-	public IBlockState getDynamicSapling() {
-		return saplingBlock;
 	}
 	
 	protected DynamicTree setPrimitiveLeaves(IBlockState primLeaves, ItemStack primLeavesStack) {
@@ -488,46 +416,6 @@ public abstract class DynamicTree {
 		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
 	}
 	
-	///////////////////////////////////////////
-	//DIRT
-	///////////////////////////////////////////
-	
-	/**
-	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
-	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
-	 * species.
-	 * 
-	 * @param soilBlockState
-	 * @return
-	 */
-	public boolean isAcceptableSoil(IBlockState soilBlockState) {
-		Block soilBlock = soilBlockState.getBlock();
-		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
-	}
-	
-	/**
-	 * Position sensitive version of soil acceptability tester
-	 * 
-	 * @param blockAccess
-	 * @param pos
-	 * @param soilBlockState
-	 * @return
-	 */
-	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
-		return isAcceptableSoil(soilBlockState);
-	}
-	
-	/**
-	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
-	 * 
-	 * @param blockAccess
-	 * @param pos
-	 * @param soilBlockState
-	 * @return
-	 */
-	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
-		return isAcceptableSoil(blockAccess, pos, soilBlockState);
-	}
 	
 	///////////////////////////////////////////
 	//RENDERING
@@ -822,30 +710,6 @@ public abstract class DynamicTree {
 	//////////////////////////////
 	
 
-	/**
-	 * Default worldgen spawn mechanism.
-	 * This method uses JoCodes to generate tree models.
-	 * Override to use other methods.
-	 * 
-	 * @param world The world
-	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
-	 * @param biome The biome this tree is generating in
-	 * @param facing The orientation of the tree(rotates JoCode)
-	 * @param radius The radius of the tree generation boundary
-	 * @return true if tree was generated. false otherwise.
-	 */
-	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
-		EnumFacing facing = CoordUtils.getRandomDir(random);
-		if(getSpecies().getJoCodeStore() != null) {
-			JoCode code = getSpecies().getJoCodeStore().getRandomCode(radius, random);
-			if(code != null) {
-				code.generate(world, this, pos, biome, facing, radius);
-				return true;
-			}
-		}
-		
-		return false;
-	}
 	
 	//////////////////////////////
 	// JAVA OBJECT STUFF

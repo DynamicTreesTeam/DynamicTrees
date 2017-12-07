@@ -35,15 +35,15 @@ public class TreeRegistry {
 	 * Places the tree in a central registry.
 	 * The proper place to use this is during the preInit phase of your mod.
 	 * 
-	 * @param tree The dynamic tree being registered
+	 * @param species The dynamic tree being registered
 	 * @return DynamicTree for chaining
 	 */
-	public static ISpecies registerTree(ISpecies tree) {
-		treesByName.put(tree.getName(), tree);
-		String fullName = tree.getModId() + ":" + tree.getName();
-		treesByFullName.put(fullName, tree);
-		tree.register();//Let the tree setup everything it needs
-		return tree;
+	public static ISpecies registerSpecies(ISpecies species) {
+		treesByName.put(species.getName(), species);
+		String fullName = species.getModId() + ":" + species.getName();
+		treesByFullName.put(fullName, species);
+		species.register();//Let the tree setup everything it needs
+		return species;
 	}
 
 	/**
@@ -51,9 +51,9 @@ public class TreeRegistry {
 	 * 
 	 * @param list
 	 */
-	public static void registerTrees(List<ISpecies> list) {
-		for(ISpecies tree: list) {
-			registerTree(tree);
+	public static void registerSpecies(List<ISpecies> list) {
+		for(ISpecies species: list) {
+			registerSpecies(species);
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static ISpecies findTree(String name) {
+	public static ISpecies findSpecies(String name) {
 		ISpecies tree = treesByFullName.get(name);
 		
 		if(tree == null) {
@@ -83,7 +83,7 @@ public class TreeRegistry {
 	 * @return
 	 */
 	public static ISpecies findTree(String modId, String name) {
-		return findTree(modId + ":" + name);
+		return findSpecies(modId + ":" + name);
 	}
 	
 	//////////////////////////////

@@ -42,6 +42,21 @@ public class TreeOak extends DynamicTree {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
 		}
 		
+		@Override
+		public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+			
+			if(soilBlockState.getBlock() == Blocks.WATER) {
+				Biome biome = blockAccess.getBiome(pos);
+				if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+					BlockPos down = pos.down();
+					if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
+						return true;
+					}
+				}
+			}
+			
+			return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
+		}
 	}
 	
 	Species species;
@@ -80,20 +95,6 @@ public class TreeOak extends DynamicTree {
 		return drops;
 	}
 	
-	@Override
-	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
-		
-		if(soilBlockState.getBlock() == Blocks.WATER) {
-			Biome biome = blockAccess.getBiome(pos);
-			if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
-				BlockPos down = pos.down();
-				if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
-					return true;
-				}
-			}
-		}
-		
-		return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
-	}
+
 	
 }

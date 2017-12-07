@@ -6,7 +6,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.state.IBlockState;
@@ -57,16 +57,16 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	}
 	
 	@Override
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
+	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
 		for(IBiomeSpeciesSelector selector : biomeTreeSelectors) {
-			Decision decision = selector.getTree(world, biome, pos, dirt, random);
+			Decision decision = selector.getSpecies(world, biome, pos, dirt, random);
 			if(decision != null && decision.isHandled()) {
 				return decision;
 			}
 		}
 		
-		return new Decision(null);//No tree at all
+		return new Decision(null);//No species at all
 	}
 	
 	@Override
@@ -83,10 +83,10 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	}
 	
 	@Override
-	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
+	public EnumChance chance(Biome biome, ISpecies species, int radius, Random random) {
 				
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
-			EnumChance c = provider.chance(biome, tree, radius, random);
+			EnumChance c = provider.chance(biome, species, radius, random);
 			if(c != EnumChance.UNHANDLED) {
 				return c;
 			}

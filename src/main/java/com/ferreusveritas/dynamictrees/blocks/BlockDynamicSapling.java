@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicSapling extends Block {
 	
-	public DynamicTree tree;
+	public ISpecies tree;
 	
 	public BlockDynamicSapling(String name) {
 		super(Material.PLANTS);
@@ -45,7 +46,7 @@ public class BlockDynamicSapling extends Block {
 		generateTree(world, pos, state, rand);
 	}
 
-	public static boolean canSaplingStay(IBlockAccess world, DynamicTree tree, BlockPos pos) {
+	public static boolean canSaplingStay(IBlockAccess world, ISpecies species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			IBlockState blockState = world.getBlockState(pos.offset(dir));
@@ -56,24 +57,25 @@ public class BlockDynamicSapling extends Block {
 		}
 
 		//Air above and acceptable soil below
-		return world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
+		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
 	}
 
 	public boolean canBlockStay(IBlockAccess world, BlockPos pos, IBlockState state) {
-		return canSaplingStay(world, getTree(state), pos);
+		return canSaplingStay(world, getSpecies(state), pos);
 	}
 
 	public void generateTree(World world, BlockPos pos, IBlockState state, Random rand) {
-		DynamicTree tree = getTree(state);
+		ISpecies species = getSpecies(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			if(world.isAirBlock(pos.up()) && tree.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+			DynamicTree tree = species.getTree();
+			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch with 1 radius
-				world.setBlockState(pos.up(), tree.getDynamicLeavesState());
-				world.setBlockState(pos.down(), tree.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt
+				world.setBlockState(pos.up(), tree.getDynamicLeavesState());//Place a single leaf block on top
+				world.setBlockState(pos.down(), species.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt underneath
 			}
 		} else {
-			dropBlock(world, tree, state, pos);
+			dropBlock(world, species, state, pos);
 		}
 	}
 
@@ -81,12 +83,12 @@ public class BlockDynamicSapling extends Block {
 	// TREE INFORMATION
 	///////////////////////////////////////////
 
-	public DynamicTree getTree(IBlockState state) {
+	public ISpecies getSpecies(IBlockState state) {
 		return this.tree;
 	}
 
-	public BlockDynamicSapling setTree(IBlockState state, DynamicTree tree) {
-		this.tree = tree;
+	public BlockDynamicSapling setSpecies(IBlockState state, ISpecies species) {
+		this.tree = species;
 		return this;
 	}
 
@@ -97,11 +99,11 @@ public class BlockDynamicSapling extends Block {
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		if (!this.canBlockStay(world, pos, state)) {
-			dropBlock(world, getTree(state), state, pos);
+			dropBlock(world, getSpecies(state), state, pos);
 		}
 	}
 	
-	private void dropBlock(World world, DynamicTree tree, IBlockState state, BlockPos pos) {
+	private void dropBlock(World world, ISpecies tree, IBlockState state, BlockPos pos) {
 		world.setBlockToAir(pos);
 		dropBlockAsItem(world, pos, state, 0);
 	}
@@ -109,7 +111,7 @@ public class BlockDynamicSapling extends Block {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(getTree(state).getSeedStack());
+		dropped.add(getSpecies(state).getSeedStack());
 		return dropped;
 	}
 
@@ -120,7 +122,7 @@ public class BlockDynamicSapling extends Block {
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getTree(state).getSeedStack();
+		return getSpecies(state).getSeedStack();
 	}
 	
 	///////////////////////////////////////////

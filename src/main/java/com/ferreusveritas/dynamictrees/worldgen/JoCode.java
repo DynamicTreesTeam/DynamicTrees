@@ -123,8 +123,8 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, ISpecies tree, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
-		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
+	public void generate(World world, ISpecies species, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
+		world.setBlockState(pos, species.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//This will store the positions of all of the branch endpoints
 		ArrayList<BlockPos> endPoints = new ArrayList<BlockPos>();
@@ -134,7 +134,7 @@ public class JoCode {
 		
 		//Create tree
 		setFacing(facing);
-		generateFork(world, tree, 0, pos, false);
+		generateFork(world, species, 0, pos, false);
 
 		//Fix branch thicknesses and map out leaf locations
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
@@ -165,7 +165,7 @@ public class JoCode {
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 			
 			//Allow for special decorations by the tree itself
-			tree.postGeneration(world, pos, biome, radius, endPoints);
+			species.postGeneration(world, pos, biome, radius, endPoints);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
@@ -177,18 +177,18 @@ public class JoCode {
 	 * Recursive function that "draws" a branch of a tree
 	 * 
 	 * @param world
-	 * @param tree
+	 * @param species
 	 * @param codePos
 	 * @param pos
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, ISpecies tree, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(World world, ISpecies species, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);
 			if(code == forkCode) {
-				codePos = generateFork(world, tree, codePos + 1, pos, disabled);
+				codePos = generateFork(world, species, codePos + 1, pos, disabled);
 			} else if(code == returnCode) {
 				return codePos + 1;
 			} else {
@@ -196,7 +196,7 @@ public class JoCode {
 				pos = pos.offset(dir);
 				if(!disabled) {
 					if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlockState(pos, tree.getDynamicBranch().getDefaultState(), careful ? 3 : 2);
+						world.setBlockState(pos, species.getTree().getDynamicBranch().getDefaultState(), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}

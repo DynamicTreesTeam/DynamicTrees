@@ -20,7 +20,7 @@ public class VanillaSaplingEventHandler {
 		if(blockState.getBlock() == Blocks.SAPLING) {
 			String treeNames[] = {"oak", "spruce", "birch", "jungle", "acacia", "darkoak"};
 			BlockPlanks.EnumType saplingType = blockState.getValue(BlockSapling.TYPE);
-			DynamicTree tree = TreeRegistry.findTree(treeNames[saplingType.getMetadata()]);
+			DynamicTree tree = TreeRegistry.findSpecies(treeNames[saplingType.getMetadata()]);
 			event.getWorld().setBlockToAir(event.getPos());//Set the block to air so the plantTree function won't automatically fail.
 			if(!tree.getSeed().plantSapling(event.getWorld(), event.getPos(), tree.getSeedStack())) { //If it fails then give a seed back to the player
 				double x = event.getPos().getX() + 0.5;

@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
@@ -184,13 +183,13 @@ public class TreeGenerator implements IWorldGenerator {
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		Biome biome = world.getBiome(pos);
-		Decision decision = biomeTreeHandler.getTree(world, biome, pos, blockState, random);
+		Decision decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
 		if(decision.isHandled()) {
-			ISpecies tree = decision.getSpecies();
-			if(tree != null) {
-				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
-					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
-						if(tree.generate(world, pos, biome, random, circle.radius)) {
+			ISpecies species = decision.getSpecies();
+			if(species != null) {
+				if(species.isAcceptableSoilForWorldgen(world, pos, blockState)) {
+					if(biomeTreeHandler.chance(biome, species, circle.radius, random) == EnumChance.OK) {
+						if(species.generate(world, pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;

@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
@@ -76,7 +77,12 @@ public class BlockBonsaiPot extends Block {
 		world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
 		return true;
 	}
-		
+	
+	public boolean setSpecies(World world, ISpecies species, BlockPos pos) {
+		//FIXME: Deny all species except the 6 common ones
+		return false;
+	}
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
@@ -90,7 +96,7 @@ public class BlockBonsaiPot extends Block {
 			DynamicTree tree = getTree(state);
 			
 			if(!world.isRemote) {
-				ItemStack seedStack = tree.getSeedStack();
+				ItemStack seedStack = tree.getSpecies().getSeedStack();
 				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
@@ -120,7 +126,7 @@ public class BlockBonsaiPot extends Block {
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
 		DynamicTree tree = getTree(state);
-		ret.add(tree.getSeedStack());
+		ret.add(tree.getSpecies().getSeedStack());
 		return ret;
 	}
 

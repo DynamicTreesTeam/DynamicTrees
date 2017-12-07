@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
@@ -70,9 +71,9 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
-		ISpecies tree = TreeRegistry.findTree(treeName);
-		if(tree != null) {
-			jo.generate(world, tree, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
+		ISpecies species = TreeRegistry.findSpecies(treeName);
+		if(species != null) {
+			jo.generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
 			Logger.getLogger(ModConstants.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
 		}
@@ -80,8 +81,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void createStaff(World world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
 		ItemStack stack = new ItemStack(ModItems.treeStaff, 1, 0);
-		DynamicTree tree = TreeRegistry.findTree(treeName);
-		ModItems.treeStaff.setTree(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
+		ISpecies tree = TreeRegistry.findSpecies(treeName);
+		ModItems.treeStaff.setSpecies(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
 		EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
@@ -102,9 +103,9 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public void plantTree(World world, BlockPos pos, String treeName) {
-		DynamicTree tree = TreeRegistry.findTree(treeName);
-		if(tree != null) {
-			tree.getSeed().plantSapling(world, pos.up(2), tree.getSeedStack());
+		ISpecies species = TreeRegistry.findSpecies(treeName);
+		if(species != null) {
+			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack());
 		}
 	}
 

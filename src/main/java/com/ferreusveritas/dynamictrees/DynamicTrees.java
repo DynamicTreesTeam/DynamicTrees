@@ -61,7 +61,7 @@ public class DynamicTrees {
         @SideOnly(Side.CLIENT)
 		@Override
 		public ItemStack getTabIconItem() {
-			return TreeRegistry.findTree(BlockPlanks.EnumType.OAK.getName()).getSeedStack();
+			return TreeRegistry.findSpecies(BlockPlanks.EnumType.OAK.getName()).getSeedStack();
 		}
 	};
 

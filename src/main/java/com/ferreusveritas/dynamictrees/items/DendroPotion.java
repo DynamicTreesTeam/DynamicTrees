@@ -131,7 +131,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findTree(targetTree);
+					return TreeRegistry.findSpecies(targetTree);
 				}
 			}
 		}

@@ -30,7 +30,10 @@ public class ModTrees {
 		baseTrees.add(new TreeDarkOak());
 		
 		//Register Trees
-		TreeRegistry.registerTrees(baseTrees);
+		for(DynamicTree tree : baseTrees) {
+			TreeRegistry.registerSpecies(tree.getSpecies());
+		}
+		
 	}
 	
 }

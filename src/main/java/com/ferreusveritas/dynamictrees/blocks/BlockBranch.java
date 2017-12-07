@@ -126,7 +126,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
 		return getTree();
 	}
-
+	
 	@Override
 	public boolean isWood(IBlockAccess world, BlockPos pos) {
 		return true;

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -145,12 +146,12 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	 */
 	public boolean grow(World world, BlockPos rootPos, Random random) {
 		
-		DynamicTree tree = getTree(world, rootPos);
+		ISpecies species = getSpecies(world, rootPos);
 		boolean viable = false;
 		
-		if(tree != null) {
+		if(species != null) {
 			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
-			viable = tree.grow(world, this, rootPos, getSoilLife(world, rootPos), treePos, random);
+			viable = species.getTree().grow(world, species, this, rootPos, getSoilLife(world, rootPos), treePos, random);
 		}
 		
 		if(!viable) {
@@ -320,6 +321,11 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
 	}
 
+	public ISpecies getSpecies(IBlockAccess blockAccess, BlockPos pos) {
+		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
+		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos).getSpeciesForLocation(blockAccess, treePos) : null;
+	}
+	
 	@Override
 	public EnumPushReaction getMobilityFlag(IBlockState state) {
 		return EnumPushReaction.BLOCK;
@@ -389,6 +395,5 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		
 		return true;
 	}
-
 
 }

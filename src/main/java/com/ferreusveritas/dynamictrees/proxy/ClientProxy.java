@@ -84,7 +84,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Meshers for Branches and Seeds
 		for(DynamicTree tree: ModTrees.baseTrees) {
 			ModelHelper.regModel(tree.getDynamicBranch());//Register Branch itemBlock
-			ModelHelper.regModel(tree.getSeed());//Register Seed Item Models
+			ModelHelper.regModel(tree.getSpecies().getSeedStack().getItem());//Register Seed Item Models
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		
@@ -117,7 +117,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return ModBlocks.blockDynamicSapling.getTree(state).foliageColorMultiplier(state, world, pos);
+				return ModBlocks.blockDynamicSapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
 			}
 		});
 		

@@ -6,7 +6,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
@@ -19,12 +19,12 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 
-	private DynamicTree oak;
-	private DynamicTree birch;
-	private DynamicTree spruce;
-	private DynamicTree acacia;
-	private DynamicTree jungle;
-	private DynamicTree darkoak;
+	private ISpecies oak;
+	private ISpecies birch;
+	private ISpecies spruce;
+	private ISpecies acacia;
+	private ISpecies jungle;
+	private ISpecies darkoak;
 	
 	private interface ITreeSelector {
 		Decision getDecision();
@@ -50,12 +50,12 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	@Override
 	public void init() {
-		oak = TreeRegistry.findTree("oak");
-		birch = TreeRegistry.findTree("birch");
-		spruce = TreeRegistry.findTree("spruce");
-		acacia = TreeRegistry.findTree("acacia");
-		jungle = TreeRegistry.findTree("jungle");
-		darkoak = TreeRegistry.findTree("darkoak");
+		oak = TreeRegistry.findSpecies("oak");
+		birch = TreeRegistry.findSpecies("birch");
+		spruce = TreeRegistry.findSpecies("spruce");
+		acacia = TreeRegistry.findSpecies("acacia");
+		jungle = TreeRegistry.findSpecies("jungle");
+		darkoak = TreeRegistry.findSpecies("darkoak");
 	}
 	
 	@Override
@@ -69,7 +69,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	}
 	
 	@Override
-	public Decision getTree(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
+	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
 		int biomeId = Biome.getIdForBiome(biome);
 		ITreeSelector select;

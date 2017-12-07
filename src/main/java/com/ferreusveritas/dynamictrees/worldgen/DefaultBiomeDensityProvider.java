@@ -5,7 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.ISpecies;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.init.Biomes;
@@ -83,7 +83,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	}
 	
 	@Override
-	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random) {
+	public EnumChance chance(Biome biome, ISpecies species, int radius, Random random) {
 
 		int biomeId = Biome.getIdForBiome(biome);
 		IChance chance;
