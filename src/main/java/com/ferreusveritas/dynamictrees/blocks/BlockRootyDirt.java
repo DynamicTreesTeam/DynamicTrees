@@ -44,7 +44,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRootyDirt extends Block implements ITreePart {
-
+	
 	static String name = "rootydirt";
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
@@ -62,28 +62,28 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
-
+	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
-
+	
 	public static enum EnumMimicType implements IStringSerializable {
-
+		
 		DIRT(Blocks.DIRT.getDefaultState(), "dirt"),
 		GRASS(Blocks.GRASS.getDefaultState(), "grass"),
 		PODZOL( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL) , "podzol"),
 		MYCELIUM(Blocks.MYCELIUM.getDefaultState(), "mycelium"),
 		COARSEDIRT( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT) , "coarsedirt"),
 		SNOWY(Blocks.GRASS.getDefaultState().withProperty(BlockGrass.SNOWY, true), "snowy");
-
+		
 		private final IBlockState muse;
 		private final String name;
-
+		
 		private EnumMimicType(IBlockState muse, String name) {
 			this.muse = muse;
 			this.name = name;
 		}
-
+		
 		@Override
 		public String getName() {
 			return name;
@@ -94,12 +94,12 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		}
 		
 	}
-
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[]{LIFE, MIMIC});
 	}
-		
+	
 	/**
 	 * Convert the given metadata into a BlockState for this Block
 	 */
@@ -107,7 +107,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(LIFE, meta);
 	}
-
+	
 	/**
 	 * Convert the BlockState into the correct metadata value
 	 */
@@ -115,21 +115,21 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public int getMetaFromState(IBlockState state) {
 		return state.getValue(LIFE).intValue();
 	}
-
+	
 	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
 		return state.withProperty(MIMIC, getMimicType(worldIn, pos));
 	}
-
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-
+	
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
 		grow(world, pos, random);
 	}
-
+	
 	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos pos) {
 		return EnumFacing.UP; 
 	}
@@ -154,7 +154,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		if(!viable) {
 			world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
 		}
-
+		
 		return viable;
 	}
 	
@@ -173,27 +173,27 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Item.getItemFromBlock(Blocks.DIRT);
 	}
-
+	
 	@Override
 	public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
 		return 20.0f;//Encourage proper tool usage and discourage bypassing tree felling by digging the root from under the tree
 	};
-
+	
 	@Override
 	protected boolean canSilkHarvest() {
 		return false;
 	}
-
+	
 	@Override
 	public boolean hasComparatorInputOverride(IBlockState state) {
 		return true;
 	}
-
+	
 	@Override
 	public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
 		return getSoilLife(world, pos);
 	}
-
+	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
@@ -202,7 +202,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		if(tree != null) {
 			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 		}
-
+		
 		return false;
 	}
 	
@@ -212,26 +212,26 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			branch.destroyEntireTree(world, pos.up());
 		}
 	}
-
+	
 	@Override
 	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
 		destroyTree(world, pos);
 	}
-
+	
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		destroyTree(world, pos);
 	}
-
+	
 	public int getSoilLife(IBlockAccess blockAccess, BlockPos pos) {
 		return blockAccess.getBlockState(pos).getValue(LIFE);
 	}
-
+	
 	public void setSoilLife(World world, BlockPos pos, int life) {
 		world.setBlockState(pos, getDefaultState().withProperty(LIFE, MathHelper.clamp(life, 0, 15)), 3);
 		world.notifyNeighborsOfStateChange(pos, this, false);//Notify all neighbors of NSEWUD neighbors(for comparator)
 	}
-
+	
 	public boolean fertilize(World world, BlockPos pos, int amount) {
 		int soilLife = getSoilLife(world, pos);
 		if((soilLife == 0 && amount < 0) || (soilLife == 15 && amount > 0)) {
@@ -240,52 +240,47 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		setSoilLife(world, pos, soilLife + amount);
 		return true;
 	}
-
+	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		return Cells.nullCell;
 	}
-
+	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		return signal;
 	}
-
+	
 	@Override
 	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		return 8;
 	}
-
+	
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
-
+	
 	@Override
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
-
-	@Override
-	public boolean isRootNode() {
-		return true;
-	}
-
+	
 	@Override
 	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		signal.run(world, this, pos, fromDir);//Run inspector of choice
-
+		
 		signal.root = pos;
 		signal.found = true;
-
+		
 		return signal;
 	}
-
+	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
-
+	
 	/**
 	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
 	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
@@ -295,7 +290,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
 	}
-
+	
 	public ISpecies getSpecies(IBlockAccess blockAccess, BlockPos pos) {
 		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos).getSpeciesForLocation(blockAccess, treePos) : null;
@@ -305,24 +300,24 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public EnumPushReaction getMobilityFlag(IBlockState state) {
 		return EnumPushReaction.BLOCK;
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
-
+	
 	public EnumMimicType getMimicType(IBlockAccess blockAccess, BlockPos pos) {
 		final int dMap[] = {0, -1, 1};
-
+		
 		for(int depth: dMap) {
 			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 				IBlockState mimic = blockAccess.getBlockState(pos.offset(dir).down(depth));
-
+				
 				for(EnumMimicType muse: EnumMimicType.values()) {
 					if(muse != EnumMimicType.DIRT) {
 						if(mimic == muse.getBlockState()) {
@@ -332,10 +327,10 @@ public class BlockRootyDirt extends Block implements ITreePart {
 				}
 			}
 		}
-
+		
 		return EnumMimicType.DIRT;//Default to plain old dirt
 	}
-
+	
 	/**
 	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.
 	 * So dirt bits end up green if we don't.
@@ -343,10 +338,10 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
-
+		
 		BlockPos pos = target.getBlockPos();
 		Random rand = world.rand;
-
+		
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
@@ -354,7 +349,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
 		double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
 		double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
-
+		
 		switch(target.sideHit) {
 			case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
 			case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
@@ -363,38 +358,27 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			case WEST:  d0 = x + axisalignedbb.minX - 0.1D; break;
 			case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
 		}
-
+		
 		//Safe to spawn particles here since this is a client side only member function
 		ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_DUST.getParticleID(), d0, d1, d2, 0, 0, 0, new int[]{Block.getStateId(state)});
 		particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F).setRBGColorF(0.6f, 0.6f, 0.6f);
 		
 		return true;
 	}
-
+	
+	
+	///////////////////////////////////////////
+	// ISSITS
+	///////////////////////////////////////////
+	
+	@Override
+	public boolean isRootNode() {
+		return true;
+	}
+	
 	@Override
 	public boolean isBranch() {
 		return false;
-	}
-	
-	
-	///////////////////////////////////////////
-	// WORLD GETTERS
-	///////////////////////////////////////////
-	
-	public static boolean isRootyDirt(Block block) {
-		return block instanceof BlockRootyDirt;
-	}
-
-	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
-	}
-
-	public static BlockRootyDirt getRootyDirt(Block block) {
-		return isRootyDirt(block) ? (BlockRootyDirt)block : null;
-	}
-	
-	public static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return getRootyDirt(blockAccess.getBlockState(pos).getBlock());
 	}
 	
 }

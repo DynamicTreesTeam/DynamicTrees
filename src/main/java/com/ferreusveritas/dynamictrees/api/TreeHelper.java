@@ -16,11 +16,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TreeHelper {
-
+	
 	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
 	
 	public static final ITreePart nullTreePart = new NullTreePart();
-
+	
 	/**
 	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
 	 * 
@@ -29,7 +29,7 @@ public class TreeHelper {
 	 * @return
 	 */
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
-
+		
 		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
 		int leavesBlockNum = seq / 4;
 		int key = leavesBlockNum;
@@ -61,7 +61,7 @@ public class TreeHelper {
 			leavesMap = new HashMap<Integer, BlockDynamicLeaves>();
 			modLeavesArray.put(modid, leavesMap);
 		}
-
+		
 		return leavesMap;
 	}
 	
@@ -116,75 +116,97 @@ public class TreeHelper {
 		}
 		
 	}
-		
+	
+	
 	//Treeparts
-
+	
 	public static boolean isTreePart(Block block) {
 		return block instanceof ITreePart;
 	}
-
+	
 	public static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
-
+	
 	public static ITreePart getTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : null;
 	}
-
+	
 	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return getTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
-
+	
 	public static ITreePart getTreePart(IBlockState state) {
 		return getTreePart(state.getBlock());
 	}
-
+	
 	public static ITreePart getSafeTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
 	}
-
+	
 	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return getSafeTreePart(blockAccess.getBlockState(pos));
 	}
-
+	
 	public static ITreePart getSafeTreePart(IBlockState blockState) {
 		return getSafeTreePart(blockState.getBlock());
 	}
-
+	
+	
 	//Branches
-
+	
 	public static boolean isBranch(Block block) {
 		return block instanceof BlockBranch;//Oh shuddap you java purists.. this is minecraft!
 	}
-
+	
 	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
 		return isBranch(blockAccess.getBlockState(pos).getBlock());
 	}
-
+	
 	public static BlockBranch getBranch(Block block) {
 		return isBranch(block) ? (BlockBranch)block : null;
 	}
-
+	
 	public static BlockBranch getBranch(ITreePart treepart) {
 		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
 	}
-
+	
 	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
 		return getBranch(blockAccess.getBlockState(pos).getBlock());
 	}
-
+	
+	
 	//Leaves
-
+	
 	public static boolean isLeaves(Block block) {
 		return block instanceof BlockDynamicLeaves;
 	}
-
+	
 	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		return isLeaves(blockAccess.getBlockState(pos).getBlock());
 	}
-
+	
 	public static boolean isLeaves(IBlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
-		
+	
+	
+	//Rooty Dirt
+	
+	public static boolean isRootyDirt(Block block) {
+		return block instanceof BlockRootyDirt;
+	}
+	
+	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
+	}
+	
+	public static BlockRootyDirt getRootyDirt(Block block) {
+		return isRootyDirt(block) ? (BlockRootyDirt)block : null;
+	}
+	
+	public static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+		return getRootyDirt(blockAccess.getBlockState(pos).getBlock());
+	}
+	
 }

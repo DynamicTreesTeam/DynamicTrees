@@ -32,7 +32,7 @@ public class SubstanceGrowth implements ISubstanceEffect{
 			}
 		} else {
 			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks
-				BlockRootyDirt dirt = BlockRootyDirt.getRootyDirt(world, rootPos);
+				BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 				dirt.grow(world, rootPos, world.rand);
 			}
 		}

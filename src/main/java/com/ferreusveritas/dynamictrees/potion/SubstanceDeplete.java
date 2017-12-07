@@ -16,7 +16,7 @@ public class SubstanceDeplete implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRootyDirt dirt = BlockRootyDirt.getRootyDirt(world, rootPos);
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 		if(dirt.fertilize(world, rootPos, -amount)) {
 			if(world.isRemote) {
 				TreeHelper.getSafeTreePart(world, rootPos.up()).analyse(world, rootPos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.VILLAGER_ANGRY, 8)));

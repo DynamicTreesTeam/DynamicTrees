@@ -17,7 +17,7 @@ public class SubstanceFreeze implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRootyDirt dirt = BlockRootyDirt.getRootyDirt(world, rootPos);
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 		BlockPos basePos = rootPos.up();//Position of base of tree
 		if(world.isRemote) {
 			TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.FIREWORKS_SPARK, 8)));
