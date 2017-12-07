@@ -81,7 +81,7 @@ public class TreeRegistry {
 	 * @param name
 	 * @return
 	 */
-	public static ISpecies findTree(String modId, String name) {
+	public static ISpecies findSpecies(String modId, String name) {
 		return findSpecies(modId + ":" + name);
 	}
 	

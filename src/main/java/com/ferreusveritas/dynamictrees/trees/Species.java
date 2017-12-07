@@ -190,7 +190,8 @@ public class Species implements ISpecies {
 	}
 	
 	/**
-	 * This is run internally if no seed is set for the tree when it's registered
+	 * Generate a seed. Developer is still required to register the item
+	 * in the appropriate registries.
 	 */
 	public Seed generateSeed() {
 		seed = new Seed(getName() + "seed");
