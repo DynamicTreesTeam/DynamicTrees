@@ -40,7 +40,7 @@ public class TreeRegistry {
 	 */
 	public static ISpecies registerSpecies(ISpecies species) {
 		treesByName.put(species.getName(), species);
-		String fullName = TreeHelper.getSpeciesFullName(species);
+		String fullName = DynamicTree.getSpeciesFullName(species);
 		treesByFullName.put(fullName, species);
 		return species;
 	}

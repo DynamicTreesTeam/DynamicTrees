@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
@@ -71,7 +72,7 @@ public class Staff extends Item {
 
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			ISpecies species = TreeHelper.getExactSpecies(world, rootPos);
+			ISpecies species = DynamicTree.getExactSpecies(world, rootPos);
 			if(species != null) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
@@ -202,7 +203,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		ISpecies species = getSpecies(stack);
-		tooltip.add("Tree: " + ((species != null) ? TreeHelper.getSpeciesFullName(species) : "none"));
+		tooltip.add("Tree: " + ((species != null) ? DynamicTree.getSpeciesFullName(species) : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 

@@ -32,7 +32,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -611,14 +610,14 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
+	public boolean isBranch() {
+		return false;
+	}
+	
+	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
 		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? 0x01 : 0;
-	}
-
-	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		return false;//Nothing is applied to leaves
 	}
 
 	@Override

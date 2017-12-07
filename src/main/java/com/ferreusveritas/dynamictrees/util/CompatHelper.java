@@ -1,7 +1,12 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
 /**
@@ -56,6 +61,22 @@ public class CompatHelper {
 	
 	public static boolean isStackEmpty(ItemStack stack) {
 		return getStackCount(stack) == 0;
+	}
+	
+	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
+		if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
+			if(!player.capabilities.isCreativeMode) {
+				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
+				player.setHeldItem(hand, emptiable.getEmptyContainer());
+			}
+		}
+		else if(heldItem.getItem() == Items.POTIONITEM) {//An actual potion
+			if(!player.capabilities.isCreativeMode) {
+				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
+			}
+		} else {
+			CompatHelper.shrinkStack(heldItem, 1); //Just a regular item like bonemeal
+		}
 	}
 	
 }

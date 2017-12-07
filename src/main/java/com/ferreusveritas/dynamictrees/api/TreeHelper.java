@@ -2,8 +2,6 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
 
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -118,52 +116,7 @@ public class TreeHelper {
 		}
 		
 	}
-	
-
-	/**
-	 * This is resource intensive.  Use only for interaction code.
-	 * Only the root node can determine the exact species and it has
-	 * to be found by mapping the branch network.
-	 * 
-	 * @param world
-	 * @param pos
-	 * @return
-	 */
-	public static ISpecies getExactSpecies(World world, BlockPos pos) {
 		
-		IBlockState blockState = world.getBlockState(pos);
-		Block block = blockState.getBlock();
-		
-		BlockPos rootPos = pos;
-		ISpecies commonSpecies = null;
-		
-		if(isBranch(block)) {
-			BlockBranch branch = (BlockBranch) block;
-			commonSpecies = branch.getTree().getCommonSpecies();
-			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-			
-			if(signal.found) {// Root node was found
-				rootPos = signal.root;
-				block = world.getBlockState(rootPos).getBlock();
-			}
-		}
-		
-		if(isRootyDirt(block)) {
-			return ((BlockRootyDirt) block).getSpecies(world, rootPos);
-		}
-		
-		return commonSpecies;
-	}
-	
-	
-	public static String getSpeciesFullName(ISpecies species) {
-		if(species != null) {
-			return species.getModId() + ":" + species.getName();
-		}
-		
-		return "";
-	}
-	
 	//Treeparts
 
 	public static boolean isTreePart(Block block) {
@@ -233,15 +186,5 @@ public class TreeHelper {
 	public static boolean isLeaves(IBlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
-	
-	//Rooty Dirt
-
-	public static boolean isRootyDirt(Block block) {
-		return block instanceof BlockRootyDirt;
-	}
-
-	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
-	}
-
+		
 }

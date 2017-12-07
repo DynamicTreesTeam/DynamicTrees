@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -60,7 +60,7 @@ public class TreeBirch extends DynamicTree {
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+			if(radius > 4 && BlockRootyDirt.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
 				world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a brown mushroom
 				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 3);//Change rooty dirt to dirt
 			}

@@ -15,12 +15,12 @@ public class SubstanceGrowth implements ISubstanceEffect{
 	int duration = 1600;
 	
 	@Override
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
+	public boolean apply(World world, BlockPos rootPos) {
 		return true;
 	}
 
 	@Override
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 
 		if(deltaTicks > duration) {
 			return false;//Time's up
@@ -28,11 +28,12 @@ public class SubstanceGrowth implements ISubstanceEffect{
 
 		if(world.isRemote) {
 			if(deltaTicks % 8 == 0) {//Run twinkles every 8 ticks.
-				TreeHelper.getSafeTreePart(world, pos.up()).analyse(world, pos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.SPELL, 2)));
+				TreeHelper.getSafeTreePart(world, rootPos.up()).analyse(world, rootPos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.SPELL, 2)));
 			}
 		} else {
 			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks
-				dirt.grow(world, pos, world.rand);
+				BlockRootyDirt dirt = BlockRootyDirt.getRootyDirt(world, rootPos);
+				dirt.grow(world, rootPos, world.rand);
 			}
 		}
 

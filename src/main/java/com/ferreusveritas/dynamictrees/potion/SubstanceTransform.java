@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTransform;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -23,10 +22,10 @@ public class SubstanceTransform implements ISubstanceEffect {
 	}
 	
 	@Override
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
+	public boolean apply(World world, BlockPos rootPos) {
 
 		if(toTree != null) {
-			BlockPos basePos = pos.up();//Position of base of tree
+			BlockPos basePos = rootPos.up();//Position of base of tree
 			if(world.isRemote) {
 				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.CRIT, 8)));
 			} else {
@@ -42,7 +41,7 @@ public class SubstanceTransform implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
 	}
 

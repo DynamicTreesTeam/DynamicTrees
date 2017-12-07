@@ -11,8 +11,10 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -143,9 +145,14 @@ public interface ISpecies {
 	*/
 	public float biomeSuitability(World world, BlockPos pos);
 	
-	
 	//////////////////////////////
-	// WORLDGEN STUFF
+	// INTERACTIVE
+	//////////////////////////////
+	
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ);	
+
+	//////////////////////////////
+	// WORLDGEN
 	//////////////////////////////
 	
 	/**

@@ -223,27 +223,53 @@ public abstract class DynamicTree {
 	// INTERACTION
 	///////////////////////////////////////////
 	
-	public boolean applySubstance(World world, BlockPos pos, BlockRootyDirt dirt, ItemStack itemStack) {
+	/**
+	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
+	* 
+	* @param world The current world
+	* @param hitPos Position
+	* @param player The player applying the substance
+	* @param itemStack The itemstack to be used.
+	* @return true if item was used, false otherwise
+	*/
+	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
 		
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, pos, effect));
+				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
 				return true;
 			} else {
-				return effect.apply(world, dirt, pos);
+				return effect.apply(world, rootPos);
 			}
 		}
 		
 		return false;
 	}
 	
-	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		
+		BlockPos rootPos = findRootNode(world, hitPos);
+		
+		if(rootPos != null) {
+			if (heldItem != null) {//Something in the hand
+				if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
+					CompatHelper.consumePlayerItem(player, hand, heldItem);
+					return true;
+				}
+			}
+
+			//Empty hand or inactive substance
+			ISpecies species = getExactSpecies(world, hitPos);
+			if(species != null) {
+				species.onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+			}
+		}
+
 		return false;
 	}
-	
-	
+
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
@@ -306,6 +332,14 @@ public abstract class DynamicTree {
 	 */
 	public String getFullName() {
 		return getModID() + ":" + getName();
+	}
+
+	public static String getSpeciesFullName(ISpecies species) {
+		if(species != null) {
+			return species.getModId() + ":" + species.getName();
+		}
+		
+		return "";
 	}
 	
 	/**
@@ -415,6 +449,45 @@ public abstract class DynamicTree {
 	//BRANCHES
 	///////////////////////////////////////////
 	
+	
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static ISpecies getExactSpecies(World world, BlockPos pos) {
+		
+		BlockPos rootPos = findRootNode(world, pos);
+		if(rootPos != null) {
+			BlockRootyDirt rootBlock = (BlockRootyDirt) world.getBlockState(rootPos).getBlock();
+			return rootBlock.getSpecies(world, rootPos);
+		}
+		
+		return null;
+	}
+	
+
+	public static BlockPos findRootNode(World world, BlockPos pos) {
+		
+		ITreePart treePart = TreeHelper.getSafeTreePart(world, pos);
+
+		if(treePart.isRootNode()) {
+			return pos;
+		}
+		
+		if(treePart.isBranch()) {
+			MapSignal signal = treePart.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+			if(signal.found) {
+				return signal.root;
+			}
+		}
+		
+		return null;
+	}
 	
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;

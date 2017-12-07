@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
 import net.minecraft.block.BlockDirt;
@@ -124,7 +124,7 @@ public class TreeOak extends DynamicTree {
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+			if(radius > 4 && BlockRootyDirt.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
 				world.setBlockState(pos, random.nextInt(3) == 0 ? Blocks.RED_MUSHROOM.getDefaultState() : Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a mushroom
 				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));//Change rooty dirt to Podzol
 			}

@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
+import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
@@ -61,7 +62,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
-		if(TreeHelper.isRootyDirt(world, pos)) {
+		if(BlockRootyDirt.isRootyDirt(world, pos)) {
 			return new JoCode().buildFromTree(world, pos).toString();
 		}
 		
@@ -92,7 +93,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public String getSpecies(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			return TreeHelper.getSpeciesFullName(TreeHelper.getExactSpecies(world, pos.up()));
+			return DynamicTree.getSpeciesFullName(DynamicTree.getExactSpecies(world, pos.up()));
 		}
 		
 		return "";

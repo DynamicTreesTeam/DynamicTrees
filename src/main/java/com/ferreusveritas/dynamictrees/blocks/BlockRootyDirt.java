@@ -7,11 +7,9 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -29,7 +27,6 @@ import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
@@ -200,37 +197,15 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-
-		if(heldItem != null) {//Something in the hand
-			return applyItemSubstance(world, pos, player, hand, heldItem);
+		DynamicTree tree = getTree(world, pos);
+		
+		if(tree != null) {
+			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 		}
 
 		return false;
 	}
-
-	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
-
-		if(branch != null && branch.getTree().applySubstance(world, pos, this, itemStack)) {
-			if (itemStack.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-				if(!player.capabilities.isCreativeMode) {
-					IEmptiable emptiable = (IEmptiable) itemStack.getItem();
-					player.setHeldItem(hand, emptiable.getEmptyContainer());
-				}
-			}
-			else if(itemStack.getItem() == Items.POTIONITEM) {//An actual potion
-				if(!player.capabilities.isCreativeMode) {
-					player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
-				}
-			} else {
-				CompatHelper.shrinkStack(itemStack, 1); //Just a regular item like bonemeal
-			}
-			return true;
-		}
-		return false;
-	}
-
+	
 	public void destroyTree(World world, BlockPos pos) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {
@@ -396,4 +371,30 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		return true;
 	}
 
+	@Override
+	public boolean isBranch() {
+		return false;
+	}
+	
+	
+	///////////////////////////////////////////
+	// WORLD GETTERS
+	///////////////////////////////////////////
+	
+	public static boolean isRootyDirt(Block block) {
+		return block instanceof BlockRootyDirt;
+	}
+
+	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
+	}
+
+	public static BlockRootyDirt getRootyDirt(Block block) {
+		return isRootyDirt(block) ? (BlockRootyDirt)block : null;
+	}
+	
+	public static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+		return getRootyDirt(blockAccess.getBlockState(pos).getBlock());
+	}
+	
 }

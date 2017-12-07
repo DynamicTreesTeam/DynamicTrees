@@ -201,25 +201,11 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-		if (tree != null && tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ)) {
-			return true;
+
+		if(tree != null) {
+			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 		}
 
-		if (heldItem != null) {
-			return applyItemSubstance(world, pos, player, hand, heldItem);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-
-		BlockPos down = pos.down();
-
-		if (world.getBlockState(down).getBlock() != this) { // Make sure the below block is not another branch block
-			// This is most likely rooty soil.
-			return TreeHelper.getSafeTreePart(world, down).applyItemSubstance(world, down, player, hand, itemStack);
-		}
 		return false;
 	}
 
@@ -612,6 +598,11 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 			//possible supporting branch was destroyed by fire.
 		}
 
+	}
+	
+	@Override
+	public boolean isBranch() {
+		return true;
 	}
 	
 	///////////////////////////////////////////
