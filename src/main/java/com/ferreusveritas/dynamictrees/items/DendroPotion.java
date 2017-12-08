@@ -131,7 +131,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findSpecies(targetTree).getTree();
+					return TreeRegistry.findSpecies(new ResourceLocation(targetTree)).getTree();
 				}
 			}
 		}
@@ -141,7 +141,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public ItemStack setTargetTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
-		nbtTag.setString("target", tree.getFullName());
+		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
 		itemStack.setTagCompound(nbtTag);
 		return itemStack;
 	}
@@ -204,7 +204,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(tree == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add("Transform a tree into a " + tree.getName() + " tree");
+				tooltip.add("Transform a tree into a " + tree.getName().getResourceDomain() + " tree");
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());

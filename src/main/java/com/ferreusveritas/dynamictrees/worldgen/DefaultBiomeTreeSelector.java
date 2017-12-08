@@ -51,13 +51,13 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	@Override
 	public void init() {
-		oak = TreeRegistry.findSpecies("oak");
-		birch = TreeRegistry.findSpecies("birch");
-		spruce = TreeRegistry.findSpecies("spruce");
-		acacia = TreeRegistry.findSpecies("acacia");
-		jungle = TreeRegistry.findSpecies("jungle");
-		darkoak = TreeRegistry.findSpecies("darkoak");
-		oakswamp = TreeRegistry.findSpecies("oakswamp");
+		oak = TreeRegistry.findSpeciesSloppy("oak");
+		birch = TreeRegistry.findSpeciesSloppy("birch");
+		spruce = TreeRegistry.findSpeciesSloppy("spruce");
+		acacia = TreeRegistry.findSpeciesSloppy("acacia");
+		jungle = TreeRegistry.findSpeciesSloppy("jungle");
+		darkoak = TreeRegistry.findSpeciesSloppy("darkoak");
+		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
 	}
 	
 	@Override

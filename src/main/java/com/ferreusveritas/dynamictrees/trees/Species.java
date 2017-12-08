@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -31,6 +29,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -38,13 +37,14 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class Species implements ISpecies {
-
+public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<ISpecies> implements ISpecies {
+	
 	/** Simple name of the tree e.g. "oak" */
-	private final String name;
+	//private final String name;
 	/** ModID of mod registering this tree */
-	private final String modId;
-
+	//private final String modId;
+	
+	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
 	protected  final DynamicTree treeFamily;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
@@ -76,11 +76,6 @@ public class Species implements ISpecies {
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected TreeCodeStore joCodeStore;
 	
-	/** Hands Off! Only {@link DynamicTrees} mod should use this */
-	public Species(String name, DynamicTree treeFamily) {
-		this(ModConstants.MODID, name, treeFamily);
-	}
-	
 	/**
 	 * Constructor suitable for derivative mods
 	 * 
@@ -88,20 +83,9 @@ public class Species implements ISpecies {
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param treeFamily The {@link DynamicTree} that this species belongs to.
 	 */
-	public Species(String modId, String name, DynamicTree treeFamily) {
-		this.modId = modId;
-		this.name = name;
+	public Species(ResourceLocation name, DynamicTree treeFamily) {
+		setRegistryName(name);
 		this.treeFamily = treeFamily;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public String getModId() {
-		return modId;
 	}
 	
 	@Override
@@ -194,7 +178,7 @@ public class Species implements ISpecies {
 	 * in the appropriate registries.
 	 */
 	public Seed generateSeed() {
-		seed = new Seed(getName() + "seed");
+		seed = new Seed(getRegistryName().getResourcePath() + "seed");
 		return setSeedStack(new ItemStack(seed));
 	}
 	
@@ -428,7 +412,7 @@ public class Species implements ISpecies {
 	 */
 	public void addJoCodes() {
 		joCodeStore = new TreeCodeStore(this);
-		joCodeStore.addCodesFromFile("assets/" + getModId() + "/trees/"+ getName() + ".txt");
+		joCodeStore.addCodesFromFile("assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
 	@Override
@@ -438,5 +422,6 @@ public class Species implements ISpecies {
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}
+
 	
 }

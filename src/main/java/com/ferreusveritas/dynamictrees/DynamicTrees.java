@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
@@ -11,6 +12,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +22,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.RegistryBuilder;
 
 /**
 * <p><pre><tt><b>
@@ -65,7 +68,7 @@ public class DynamicTrees {
         @SideOnly(Side.CLIENT)
 		@Override
 		public ItemStack getTabIconItem() {
-			return TreeRegistry.findSpecies(BlockPlanks.EnumType.OAK.getName()).getSeedStack(1);
+			return TreeRegistry.findSpeciesSloppy(BlockPlanks.EnumType.OAK.getName()).getSeedStack(1);
 		}
 	};
 
@@ -97,17 +100,17 @@ public class DynamicTrees {
 	public static class RegistrationHandler {
 		
 		@SubscribeEvent
-		public static void registerBlocks(final RegistryEvent.Register<Block> event) {
+		public static void registerBlocks(RegistryEvent.Register<Block> event) {
 			ModBlocks.registerBlocks(event.getRegistry());
 		}
 		
 		@SubscribeEvent
-		public static void registerItems(final RegistryEvent.Register<Item> event) {
+		public static void registerItems(RegistryEvent.Register<Item> event) {
 			ModItems.registerItems(event.getRegistry());
 		}
 		
 		@SubscribeEvent
-		public static void registerRecipes(final RegistryEvent.Register<IRecipe> event) {
+		public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 			ModRecipes.registerRecipes(event.getRegistry());
 		}
 		
@@ -116,6 +119,16 @@ public class DynamicTrees {
 		public static void registerModels(ModelRegistryEvent event) {
 			ModModels.registerModels(event);
 		}
+
+		@SubscribeEvent
+		public static void newRegistry(RegistryEvent.NewRegistry event) {
+			RegistryBuilder builder = new RegistryBuilder<ISpecies>();
+			TreeRegistry.speciesRegistry = builder
+				.setName(new ResourceLocation(ModConstants.MODID, "species"))
+				.setType(ISpecies.class)
+				.create();
+		}
+		
 	}
 	
 }

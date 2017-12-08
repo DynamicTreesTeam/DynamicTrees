@@ -45,7 +45,7 @@ public class TreeCodeStore {
 	
 	public void addCodesFromFile(String filename) {
 		try {
-			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + species.getName() + "\" from file: " + filename);
+			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
 			if(stream != null) {
 				InputStreamReader streamReader = new InputStreamReader(stream, "UTF-8");
@@ -97,7 +97,7 @@ public class TreeCodeStore {
 		}
 		
 		Collections.sort(arr);
-		System.out.println(species.getName() + ":" + radius + ":" + arr.get(0));
+		System.out.println(species + ":" + radius + ":" + arr.get(0));
 	}
 	
 	public JoCode getRandomCode(int radius, Random rand) {		

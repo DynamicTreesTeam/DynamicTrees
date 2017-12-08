@@ -1,18 +1,18 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
 * A registry for all of the dynamic trees. Use this for this mod or other mods.
@@ -21,8 +21,7 @@ import net.minecraft.world.biome.Biome;
 */
 public class TreeRegistry {
 
-	private static Map<String, ISpecies> treesByName = new HashMap<String, ISpecies>();
-	private static Map<String, ISpecies> treesByFullName = new HashMap<String, ISpecies>();
+	public static IForgeRegistry<ISpecies> speciesRegistry;
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	
 	//////////////////////////////
@@ -39,21 +38,16 @@ public class TreeRegistry {
 	 * @return DynamicTree for chaining
 	 */
 	public static ISpecies registerSpecies(ISpecies species) {
-		treesByName.put(species.getName(), species);
-		String fullName = DynamicTree.getSpeciesFullName(species);
-		treesByFullName.put(fullName, species);
+		speciesRegistry.register(species);
 		return species;
 	}
 
-	/**
-	 * Method for registering a list of trees
-	 * 
-	 * @param list
-	 */
-	public static void registerSpecies(List<ISpecies> list) {
-		for(ISpecies species: list) {
-			registerSpecies(species);
-		}
+	public static void registerSpecies(ISpecies ... values) {
+		speciesRegistry.registerAll(values);
+	}
+	
+	public static ISpecies findSpecies(ResourceLocation name) {
+		return speciesRegistry.getValue(name);
 	}
 	
 	/**
@@ -63,26 +57,28 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static ISpecies findSpecies(String name) {
-		ISpecies tree = treesByFullName.get(name);
+	public static ISpecies findSpeciesSloppy(String name) {
 		
-		if(tree == null) {
-			tree = treesByName.get(name);
+		//Exact find
+		ResourceLocation resloc = new ResourceLocation(name);
+		if(speciesRegistry.containsKey(resloc)) {
+			return speciesRegistry.getValue(resloc);
+		}
+
+		//Search DynamicTrees Domain
+		resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());
+		if(speciesRegistry.containsKey(resloc)) {
+			return speciesRegistry.getValue(resloc);
 		}
 		
-		return tree;
-	}
-	
-	/**
-	 * Convenience function that uses the modId and name for
-	 * the search.
-	 * 
-	 * @param modId
-	 * @param name
-	 * @return
-	 */
-	public static ISpecies findSpecies(String modId, String name) {
-		return findSpecies(modId + ":" + name);
+		//Search all domains
+		for(ISpecies species : speciesRegistry) {
+			if(species.getRegistryName().getResourcePath().equals(resloc.getResourcePath())) {
+				return species;
+			}
+		}
+		
+		return null;
 	}
 	
 	//////////////////////////////

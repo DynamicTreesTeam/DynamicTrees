@@ -21,11 +21,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public interface ISpecies {
-
-	public String getName();
-	
-	public String getModId();
+public interface ISpecies extends net.minecraftforge.registries.IForgeRegistryEntry<ISpecies> {
 	
 	public DynamicTree getTree();
 	

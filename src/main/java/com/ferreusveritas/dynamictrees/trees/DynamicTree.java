@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -45,6 +44,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
@@ -61,9 +61,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class DynamicTree {
 	
 	/** Simple name of the tree e.g. "oak" */
-	private final String name;
-	/** ModID of mod registering this tree */
-	private final String modId;
+	private final ResourceLocation name;
 
 	//Branches
 	/** The dynamic branch used by this tree */
@@ -107,13 +105,8 @@ public abstract class DynamicTree {
 	
 	/** Hands Off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
-		this(treeType.getName().replace("_",""), treeType.getMetadata());
+		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
-	}
-	
-	/** Hands Off! Only {@link DynamicTrees} mod should use this */
-	public DynamicTree(String name, int seq) {
-		this(ModConstants.MODID, name, seq);
 	}
 	
 	/**
@@ -124,12 +117,11 @@ public abstract class DynamicTree {
 	 * @param seq The registration sequence number for this MODID. Used for registering 4 leaves types per {@link BlockDynamicLeaves}.
 	 * Sequence numbers must be unique within each mod.  It's recommended to define the sequence consecutively and avoid later rearrangement. 
 	 */
-	public DynamicTree(String modid, String name, int seq) {
+	public DynamicTree(ResourceLocation name, int seq) {
 		this.name = name;
-		this.modId = modid;
 		
 		if(seq >= 0) {
-			setDynamicLeaves(modid, seq);
+			setDynamicLeaves(name.getResourceDomain(), seq);
 		}
 		setDynamicBranch(new BlockBranch(name + "branch"));
 		setStick(new ItemStack(Items.STICK));
@@ -308,29 +300,8 @@ public abstract class DynamicTree {
 	// TREE PROPERTIES
 	//////////////////////////////
 	
-	public String getName() {
+	public ResourceLocation getName() {
 		return name;
-	}
-	
-	public String getModID() {
-		return modId;
-	}
-	
-	/**
-	 * The qualified name of the tree complete with modId to avoid name collisions.
-	 * 
-	 * @return The full name of the tree
-	 */
-	public String getFullName() {
-		return getModID() + ":" + getName();
-	}
-
-	public static String getSpeciesFullName(ISpecies species) {
-		if(species != null) {
-			return species.getModId() + ":" + species.getName();
-		}
-		
-		return "";
 	}
 	
 	/**
@@ -784,7 +755,7 @@ public abstract class DynamicTree {
 	
 	@Override
 	public String toString() {
-		return getName();
+		return getName().toString();
 	}
 	
 }

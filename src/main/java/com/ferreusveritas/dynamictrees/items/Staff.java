@@ -29,6 +29,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -118,7 +119,7 @@ public class Staff extends Item {
 
 	public Staff setSpecies(ItemStack itemStack, ISpecies species) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", species.getName());
+		nbt.setString("tree", species.toString());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -134,9 +135,9 @@ public class Staff extends Item {
 		NBTTagCompound nbt = getNBT(itemStack);
 
 		if(nbt.hasKey("tree")) {
-			return TreeRegistry.findSpecies(nbt.getString("tree"));
+			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
 		} else {
-			ISpecies species = TreeRegistry.findSpecies("oak");
+			ISpecies species = TreeRegistry.findSpeciesSloppy("oak");
 			setSpecies(itemStack, species);
 			return species;
 		}
@@ -203,7 +204,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		ISpecies species = getSpecies(stack);
-		tooltip.add("Tree: " + ((species != null) ? DynamicTree.getSpeciesFullName(species) : "none"));
+		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 

@@ -71,7 +71,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
-		ISpecies species = TreeRegistry.findSpecies(treeName);
+		ISpecies species = TreeRegistry.findSpeciesSloppy(treeName);
 		if(species != null) {
 			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
@@ -81,7 +81,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void createStaff(World world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
 		ItemStack stack = new ItemStack(ModItems.treeStaff, 1, 0);
-		ISpecies tree = TreeRegistry.findSpecies(treeName);
+		ISpecies tree = TreeRegistry.findSpeciesSloppy(treeName);
 		ModItems.treeStaff.setSpecies(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
 		EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
 		entityItem.motionX = 0;
@@ -93,14 +93,14 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public String getSpecies(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getSafeTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			return DynamicTree.getSpeciesFullName(DynamicTree.getExactSpecies(world, pos.up()));
+			return DynamicTree.getExactSpecies(world, pos.up()).toString();
 		}
 		
 		return "";
 	}
 
 	public void plantTree(World world, BlockPos pos, String treeName) {
-		ISpecies species = TreeRegistry.findSpecies(treeName);
+		ISpecies species = TreeRegistry.findSpeciesSloppy(treeName);
 		if(species != null) {
 			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack(1));
 		}

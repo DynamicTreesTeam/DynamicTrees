@@ -16,6 +16,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -50,7 +51,7 @@ public class TreeOak extends DynamicTree {
 	public class SpeciesSwampOak extends Species {
 		
 		SpeciesSwampOak(DynamicTree treeFamily) {
-			super(treeFamily.getName() + "swamp", treeFamily);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily);
 			
 			//Oak trees are about as average as you can get
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
