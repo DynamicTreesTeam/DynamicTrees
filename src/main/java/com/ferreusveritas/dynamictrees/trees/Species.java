@@ -423,5 +423,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return 1.5f;
 	}
 
-	
+	@Override
+	public String toString() {
+		return getRegistryName().toString();
+	}
 }

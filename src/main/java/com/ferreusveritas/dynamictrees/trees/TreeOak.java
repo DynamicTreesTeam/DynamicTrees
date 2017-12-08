@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
@@ -24,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeOak extends DynamicTree {
 	
@@ -100,8 +100,14 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = TreeRegistry.registerSpecies(new SpeciesOak(this));
-		swampSpecies = TreeRegistry.registerSpecies(new SpeciesSwampOak(this));
+		species = new SpeciesOak(this);
+		swampSpecies = new SpeciesSwampOak(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+		speciesRegistry.register(species);
+		speciesRegistry.register(swampSpecies);
 	}
 	
 	@Override

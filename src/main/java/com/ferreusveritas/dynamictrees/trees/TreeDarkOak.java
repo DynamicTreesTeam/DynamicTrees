@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -26,6 +25,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeDarkOak extends DynamicTree {
 	
@@ -100,7 +100,12 @@ public class TreeDarkOak extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = TreeRegistry.registerSpecies(new SpeciesDarkOak(this));
+		species = new SpeciesDarkOak(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+		speciesRegistry.register(species);
 	}
 	
 	@Override

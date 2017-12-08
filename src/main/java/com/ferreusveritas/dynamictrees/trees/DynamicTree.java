@@ -52,6 +52,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
 * All data related to a tree family.
@@ -178,6 +179,8 @@ public abstract class DynamicTree {
 	}
 	
 	public abstract void createSpecies();
+	
+	public abstract void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry);
 	
 	public abstract ISpecies getCommonSpecies();
 

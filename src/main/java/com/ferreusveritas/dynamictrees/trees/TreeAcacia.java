@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
@@ -16,6 +15,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeAcacia extends DynamicTree {
 		
@@ -52,7 +52,12 @@ public class TreeAcacia extends DynamicTree {
 
 	@Override
 	public void createSpecies() {
-		species = TreeRegistry.registerSpecies(new SpeciesAcacia(this));
+		species = new SpeciesAcacia(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+		speciesRegistry.register(species);
 	}
 	
 	@Override

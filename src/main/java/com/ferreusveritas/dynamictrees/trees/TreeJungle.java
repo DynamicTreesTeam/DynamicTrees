@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
@@ -30,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeJungle extends DynamicTree {
 	
@@ -143,7 +143,12 @@ public class TreeJungle extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = TreeRegistry.registerSpecies(new SpeciesJungle(this));
+		species = new SpeciesJungle(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+		speciesRegistry.register(species);
 	}
 	
 	@Override

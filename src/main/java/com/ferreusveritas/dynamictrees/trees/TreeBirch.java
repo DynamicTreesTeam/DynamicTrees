@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.block.BlockPlanks;
@@ -19,6 +18,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeBirch extends DynamicTree {
 		
@@ -53,7 +53,12 @@ public class TreeBirch extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = TreeRegistry.registerSpecies(new SpeciesBirch(this));
+		species = new SpeciesBirch(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+		speciesRegistry.register(species);
 	}
 	
 	@Override

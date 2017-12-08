@@ -34,7 +34,7 @@ public class ModRecipes {
 				
 				//Create a seed from a sapling and dirt bucket
 				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(ModConstants.MODID, tree.getName() + "seed"),
+					new ResourceLocation(ModConstants.MODID, tree.getName().getResourcePath() + "seed"),
 					null,
 					seedStack,
 					new Ingredient[]{
@@ -45,7 +45,7 @@ public class ModRecipes {
 
 				//Creates a vanilla sapling from a seed and dirt bucket
 				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(ModConstants.MODID, tree.getName() + "sapling"),
+					new ResourceLocation(ModConstants.MODID, tree.getName().getResourcePath() + "sapling"),
 					null,
 					saplingStack,
 					new Ingredient[]{
