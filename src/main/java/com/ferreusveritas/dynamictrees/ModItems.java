@@ -12,12 +12,8 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModItems {
 	
 	public static DendroPotion dendroPotion;
@@ -36,9 +32,7 @@ public class ModItems {
 		treeStaff = new Staff();
 	}
 	
-	@SubscribeEvent
-	public static void registerItems(final RegistryEvent.Register<Item> event) {
-		final IForgeRegistry<Item> registry = event.getRegistry();
+	public static void registerItems(IForgeRegistry<Item> registry) {
 		
 		//Item Blocks
 		registerItemBlock(registry, ModBlocks.blockRootyDirt);
@@ -68,7 +62,7 @@ public class ModItems {
 			registerItemBlock(registry, leavesBlock);
 		}
 		
-		DynamicTrees.compatProxy.registerItems(event);
+		DynamicTrees.compatProxy.registerItems(registry);
 	}
 
 	public static void registerItemBlock(final IForgeRegistry<Item> registry, Block block) {

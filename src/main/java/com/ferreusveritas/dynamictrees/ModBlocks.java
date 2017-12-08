@@ -12,12 +12,8 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModBlocks {
 	
 	public static BlockRootyDirt blockRootyDirt;
@@ -41,9 +37,7 @@ public class ModBlocks {
 	
 	}
 	
-	@SubscribeEvent
-	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
-		final IForgeRegistry<Block> registry = event.getRegistry();
+	public static void registerBlocks(IForgeRegistry<Block> registry) {
 
 		registry.register(ModBlocks.blockRootyDirt);
 		registry.register(ModBlocks.blockDynamicSapling);
@@ -64,7 +58,7 @@ public class ModBlocks {
 			registry.register(leavesBlock);
 		}
 
-		DynamicTrees.compatProxy.registerBlocks(event);
+		DynamicTrees.compatProxy.registerBlocks(registry);
 	}
 	
 }

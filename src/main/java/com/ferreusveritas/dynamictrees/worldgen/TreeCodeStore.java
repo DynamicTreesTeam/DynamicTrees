@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -45,14 +46,21 @@ public class TreeCodeStore {
 	public void addCodesFromFile(String filename) {
 		try {
 			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + species.getName() + "\" from file: " + filename);
-			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
-			String line;
-			while((line = readIn.readLine()) != null) {
-				if((line.length() >= 3) && (line.charAt(0) != '#')) {
-					String[] split = line.split(":");
-					addCode(Integer.valueOf(split[0]), split[1]);
+			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
+			if(stream != null) {
+				InputStreamReader streamReader = new InputStreamReader(stream, "UTF-8");
+				BufferedReader readIn = new BufferedReader(streamReader);
+				String line;
+				while((line = readIn.readLine()) != null) {
+					if((line.length() >= 3) && (line.charAt(0) != '#')) {
+						String[] split = line.split(":");
+						addCode(Integer.valueOf(split[0]), split[1]);
+					}
 				}
+			} else {
+				throw(new FileNotFoundException(filename));
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {

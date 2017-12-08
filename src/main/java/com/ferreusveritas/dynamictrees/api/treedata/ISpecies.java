@@ -56,7 +56,7 @@ public interface ISpecies {
 	public float getTapering();
 	
 	///////////////////////////////////////////
-	//DIRT
+	//SEED
 	///////////////////////////////////////////
 	
 	public Seed getSeed();
@@ -71,8 +71,12 @@ public interface ISpecies {
 	 */
 	public ItemStack getSeedStack(int qty);
 
-	public boolean placeSaplingBlock(World world, BlockPos pos);
+	///////////////////////////////////////////
+	//SAPLING
+	///////////////////////////////////////////
 	
+	public boolean placeSaplingBlock(World world, BlockPos pos);
+		
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////

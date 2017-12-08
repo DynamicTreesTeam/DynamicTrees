@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
@@ -127,17 +128,10 @@ public class TreeJungle extends DynamicTree {
 		
 	}
 
-	Species species;
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
+	ISpecies species;
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
-		species = new SpeciesJungle(this);
-		TreeRegistry.registerSpecies(species);
 		
 		canSupportCocoa = true;
 		
@@ -145,6 +139,16 @@ public class TreeJungle extends DynamicTree {
 			registerBottomListener(new BottomListenerPodzol(), new BottomListenerVine());
 		}
 		
+	}
+	
+	@Override
+	public void createSpecies() {
+		species = TreeRegistry.registerSpecies(new SpeciesJungle(this));
+	}
+	
+	@Override
+	public ISpecies getCommonSpecies() {
+		return species;
 	}
 	
 	@Override

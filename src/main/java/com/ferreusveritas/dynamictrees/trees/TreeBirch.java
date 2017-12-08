@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -44,17 +45,20 @@ public class TreeBirch extends DynamicTree {
 		
 	}
 	
-	Species species;
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
+	ISpecies species;
 	
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
-		species = new SpeciesBirch(this);
-		TreeRegistry.registerSpecies(species);
+	}
+	
+	@Override
+	public void createSpecies() {
+		species = TreeRegistry.registerSpecies(new SpeciesBirch(this));
+	}
+	
+	@Override
+	public ISpecies getCommonSpecies() {
+		return species;
 	}
 	
 	@Override

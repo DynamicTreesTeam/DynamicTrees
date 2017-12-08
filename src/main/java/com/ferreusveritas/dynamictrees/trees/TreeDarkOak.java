@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
 import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -86,22 +87,25 @@ public class TreeDarkOak extends DynamicTree {
 		}
 	}
 	
-	Species species;
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
+	ISpecies species;
 	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
-		species = new SpeciesDarkOak(this);
-		TreeRegistry.registerSpecies(species);
 		
 		setCellSolver(Cells.darkOakSolver);
 		setSmotherLeavesMax(3);//thin canopy
 		
 		registerBottomListener(new BottomListenerPodzol());
+	}
+	
+	@Override
+	public void createSpecies() {
+		species = TreeRegistry.registerSpecies(new SpeciesDarkOak(this));
+	}
+	
+	@Override
+	public ISpecies getCommonSpecies() {
+		return species;
 	}
 	
 	protected static final ICell darkOakLeafCells[] = {

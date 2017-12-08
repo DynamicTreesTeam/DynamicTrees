@@ -64,7 +64,7 @@ public abstract class DynamicTree {
 	private final String name;
 	/** ModID of mod registering this tree */
 	private final String modId;
-	
+
 	//Branches
 	/** The dynamic branch used by this tree */
 	private BlockBranch dynamicBranch;
@@ -135,6 +135,7 @@ public abstract class DynamicTree {
 		setStick(new ItemStack(Items.STICK));
 		
 		createLeafCluster();
+		createSpecies();
 	}
 	
 	/**
@@ -167,17 +168,16 @@ public abstract class DynamicTree {
 		}
 		
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		
-		configureCommonSpecies(wood);
+
+		simpleVanillaCommonSpecies(wood);
 	}
 	
-	private void configureCommonSpecies(BlockPlanks.EnumType wood) {
+	protected void simpleVanillaCommonSpecies(BlockPlanks.EnumType wood) {
 
 		Species commonSpecies = (Species) getCommonSpecies();
-		
-		//Link up the Dynamic Sapling with the appropriate species
+					
 		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		
+	
 		//Generate a seed
 		commonSpecies.generateSeed();
 		
@@ -185,8 +185,10 @@ public abstract class DynamicTree {
 		commonSpecies.addJoCodes();
 	}
 	
-	public abstract ISpecies getCommonSpecies();
+	public abstract void createSpecies();
 	
+	public abstract ISpecies getCommonSpecies();
+
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
 	 * For instance Oak may use this to select a Swamp Oak species if the coordinates 

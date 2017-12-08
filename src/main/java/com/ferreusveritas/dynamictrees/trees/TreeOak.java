@@ -87,24 +87,25 @@ public class TreeOak extends DynamicTree {
 			// TODO Add Vines.
 		}
 	}
-	
-	
-	Species species;
-	Species swampSpecies;
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
+
+	ISpecies species;
+	ISpecies swampSpecies;
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
-		species = new SpeciesOak(this);
-		swampSpecies = new SpeciesSwampOak(this);
-		TreeRegistry.registerSpecies(species);
-		TreeRegistry.registerSpecies(swampSpecies);
 		
 		registerBottomListener(new BottomListenerPodzol());
+	}
+	
+	@Override
+	public void createSpecies() {
+		species = TreeRegistry.registerSpecies(new SpeciesOak(this));
+		swampSpecies = TreeRegistry.registerSpecies(new SpeciesSwampOak(this));
+	}
+	
+	@Override
+	public ISpecies getCommonSpecies() {
+		return species;
 	}
 	
 	/**
@@ -118,7 +119,7 @@ public class TreeOak extends DynamicTree {
 			return swampSpecies;
 		}
 		
-		return species;
+		return getCommonSpecies();
 	}
 	
 	@Override

@@ -210,9 +210,8 @@ public class Species implements ISpecies {
 		return null;
 	}
 	
-	
 	///////////////////////////////////////////
-	//SAPLINGS
+	//SAPLING
 	///////////////////////////////////////////
 	
 	/** 
@@ -243,7 +242,7 @@ public class Species implements ISpecies {
 		world.setBlockState(pos, getDynamicSapling());
 		return true;
 	}
-	
+
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////

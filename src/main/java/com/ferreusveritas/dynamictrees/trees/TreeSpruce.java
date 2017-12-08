@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
 import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
@@ -86,22 +87,25 @@ public class TreeSpruce extends DynamicTree {
 
 	}
 	
-	Species species;
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
+	ISpecies species;
 	
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
-		species = new SpeciesSpruce(this);
-		TreeRegistry.registerSpecies(species);
 		
 		setCellSolver(Cells.coniferSolver);
 		setSmotherLeavesMax(3);
 		
 		registerBottomListener(new BottomListenerPodzol());
+	}
+	
+	@Override
+	public void createSpecies() {
+		species = TreeRegistry.registerSpecies(new SpeciesSpruce(this));
+	}
+	
+	@Override
+	public ISpecies getCommonSpecies() {
+		return species;
 	}
 	
 	protected static final ICell spruceBranch = new CellConiferBranch();
