@@ -69,14 +69,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected int upProbability = 2;
 	/** Number of blocks high we have to be before a branch is allowed to form [default = 3](Just high enough to walk under)*/
 	protected int lowestBranchHeight = 3;
-	/** Number of times a grow signal retries before failing. Affects growing speed [default = 0] */
-	protected int retries = 0;
 	/** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
 	protected float signalEnergy = 16.0f;
 	/** Ideal growth rate [default = 1.0]*/
 	protected float growthRate = 1.0f;
 	/** Ideal soil longevity [default = 8]*/
-	protected int soilLongevity = 8;//TODO: Make a 0.0 to 1.0 float and recode
+	protected int soilLongevity = 8;
 	
 	//Seeds
 	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
@@ -152,14 +150,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return getLowestBranchHeight();
 	}
 	
-	public void setRetries(int retries) {
-		this.retries = retries;
-	}
-	
-	public int getRetries() {
-		return retries;
-	}
-	
 	public float getTapering() {
 		return tapering;
 	}
@@ -180,6 +170,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public ItemStack getSeedStack(int qty) {
 		return CompatHelper.setStackCount(seedStack.copy(), qty);
 	}
+	
 	
 	public Seed getSeed() {
 		return seed;
@@ -216,22 +207,24 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if seed was dropped
 	 */
 	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
-				
-		if(endPoints.size() > 0) {
-			BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-			branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-			BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
+		
+		if(ModConfigs.seedDropRate > world.rand.nextFloat()) {
+			if(endPoints.size() > 0) {
+				BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+				BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
 
-			if(seedPos != BlockPos.ORIGIN) {
-				EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
-				Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
-				float distAngle = 15;//The spread angle(center to edge)
-				float launchSpeed = 4;//Blocks(meters) per second
-				motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-				seedEntity.motionX = motion.x;
-				seedEntity.motionY = motion.y;
-				seedEntity.motionZ = motion.z;
-				CompatHelper.spawnEntity(world, seedEntity);
+				if(seedPos != BlockPos.ORIGIN) {
+					EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
+					Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
+					float distAngle = 15;//The spread angle(center to edge)
+					float launchSpeed = 4;//Blocks(meters) per second
+					motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+					seedEntity.motionX = motion.x;
+					seedEntity.motionY = motion.y;
+					seedEntity.motionZ = motion.z;
+					CompatHelper.spawnEntity(world, seedEntity);
+				}
 			}
 		}
 
@@ -469,7 +462,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		handleRot(world, ends, rootPos, treePos, soilLife, rapid);
 		
 		if(!rapid) {
-			//This will handle seed drop
+			//This will handle seed drops
 			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
 			
 			//This will handle fruit spawning
@@ -490,9 +483,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * A little internal convenience function for getting branch endpoints
 	 * 
-	 * @param world
-	 * @param treePos
-	 * @param treeBase
+	 * @param world The world
+	 * @param treePos The {@link BlockPos} of the base of the {@link DynamicTree} trunk
+	 * @param treeBase The tree part that is the base of the {@link DynamicTree} trunk.  Provided for easy analysis.
 	 * @return A list of all branch endpoints for the {@link DynamicTree}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
@@ -501,6 +494,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return endFinder.getEnds();
 	}
 	
+	/**
+	 * A rot handler.
+	 * 
+	 * @param world The world
+	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} for this {@link DynamicTree}
+	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
+	 * @param soilLife The soillife of the {@link BlockRootyDirt}
+	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly. 
+	 */
 	private void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
@@ -518,11 +521,21 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 	}
 
+	/**
+	 * Provides the chance that a log will rot.
+	 * 
+	 * @param world The world
+	 * @param pos The {@link BlockPos} of the {@link BlockBranch}
+	 * @param rand A random number generator
+	 * @param radius The radius of the {@link BlockBranch}
+	 * @return The chance this will rot. 0.0(never) -> 1.0(always)
+	 */
 	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
 		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
 	}
 
 	/**
+	 * The grow handler.
 	 * 
 	 * @param world The world
 	 * @param rootyDirt The {@link BlockRootyDirt} that is supporting this tree
@@ -537,16 +550,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 		do {
-			if(random.nextFloat() < growthRate) {
+			if(growthRate > random.nextFloat()) {
 				if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
-					boolean success = false;
+					boolean success = treeBase.growSignal(world, treePos, new GrowSignal(this, rootPos, getEnergy(world, rootPos))).success;
 
-					float energy = getEnergy(world, rootPos);
-					for(int i = 0; !success && i < 1 + getRetries(); i++) {//Some species have multiple growth retry attempts
-						success = treeBase.growSignal(world, treePos, new GrowSignal(this, rootPos, energy)).success;
-					}
-
-					//TODO: Make this a float
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
 					if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
@@ -635,7 +642,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if the tree became diseased
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
-		if(soilLife == 0 && random.nextFloat() < ModConfigs.diseaseChance) {
+		if(soilLife == 0 && ModConfigs.diseaseChance > random.nextFloat() ) {
 			baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
 			return true;
 		}

@@ -51,7 +51,7 @@ public class Seed extends Item {
 					ItemStack seedStack = entityItem.getItem();
 					int count = seedStack.getCount();
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ModConfigs.seedPlantRate) <= getSpecies(seedStack).biomeSuitability(entityItem.world, pos) ){//1 in 16 chance if ideal
+						if( getSpecies(seedStack).biomeSuitability(entityItem.world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
 							if(plantSapling(entityItem.world, pos, seedStack)) {
 								break;
 							}

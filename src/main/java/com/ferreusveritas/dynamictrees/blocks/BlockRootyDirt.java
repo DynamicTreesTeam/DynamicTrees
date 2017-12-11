@@ -128,7 +128,6 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
-		System.out.println(world.isRemote ? "Remote" : "Client");
 		updateTree(world, pos, random, false);
 	}
 	
