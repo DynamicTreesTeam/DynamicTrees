@@ -28,7 +28,7 @@ public class TreeBirch extends DynamicTree {
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
-						
+			
 			envFactor(Type.COLD, 0.75f);
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.50f);

@@ -95,7 +95,7 @@ public abstract class DynamicTree {
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 	
-	/** Hands Off! Only dynamictrees mod should use this and only for vanilla trees */
+	/** Get your Cheeto fingers off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")), treeType.getMetadata());
 		simpleVanillaSetup(treeType);

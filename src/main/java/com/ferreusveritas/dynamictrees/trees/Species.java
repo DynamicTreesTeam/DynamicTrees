@@ -327,7 +327,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		float deltaYaw = (world.rand.nextFloat() * 90) - 45;
 		float deltaPitch = (world.rand.nextFloat() * -60);// must be greater than -90 degrees(and less than 90) for the tangent function.
-		vOut = vOut.normalize(). //Create a unit vector
+		vOut = vOut.normalize(). //Normalize to unit vector
 				addVector(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to 60 degrees
 				normalize(). //Re-normalize to unit vector
 				rotateYaw((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- 45 degrees
@@ -659,7 +659,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		envFactors.put(type, factor);
 		return this;
 	}
-
+	
 	/**
 	*
 	* @param world The World

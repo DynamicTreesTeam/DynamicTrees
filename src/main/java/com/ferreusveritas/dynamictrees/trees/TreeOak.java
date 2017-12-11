@@ -51,7 +51,6 @@ public class TreeOak extends DynamicTree {
 		SpeciesSwampOak(DynamicTree treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily);
 			
-			//Oak trees are about as average as you can get
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
 			envFactor(Type.COLD, 0.50f);
@@ -87,8 +86,36 @@ public class TreeOak extends DynamicTree {
 		}
 	}
 
-	Species species;
+	public class SpeciesAppleOak extends Species {
+
+		public SpeciesAppleOak(DynamicTree treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), "apple"), treeFamily);
+			
+			//A bit stockier, smaller and slower than your basic oak
+			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
+			
+			envFactor(Type.COLD, 0.75f);
+			envFactor(Type.HOT, 0.75f);
+			envFactor(Type.DRY, 0.25f);
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return biome == Biomes.PLAINS;
+		}
+		
+		@Override
+		public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			super.postGeneration(world, pos, biome, radius, endPoints, worldGen);
+			
+			// TODO Add Apples
+		}
+		
+	}
+	
+	Species commonSpecies;
 	Species swampSpecies;
+	Species appleSpecies;
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
@@ -96,25 +123,26 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesOak(this);
+		commonSpecies = new SpeciesOak(this);
 		swampSpecies = new SpeciesSwampOak(this);
+		swampSpecies = new SpeciesAppleOak(this);
 	}
 	
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
+		speciesRegistry.register(commonSpecies);
 		speciesRegistry.register(swampSpecies);
+		speciesRegistry.register(appleSpecies);
 	}
 	
 	@Override
 	public Species getCommonSpecies() {
-		return species;
+		return commonSpecies;
 	}
 	
 	/**
-	 * This will cause worldgen to select the swamp variation of the oak
-	 * when the biome is appropriate for it.
-	 * 
+	 * This will cause the swamp variation of the oak to grow when the player plants
+	 * a common oak acorn.
 	 */
 	@Override
 	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
