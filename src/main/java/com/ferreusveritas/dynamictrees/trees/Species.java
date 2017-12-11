@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -364,10 +365,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return BlockPos.ORIGIN;
 	}
 	
+	
 	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
-	
 	
 	/** 
 	 * Sets the Dynamic Sapling for this tree type.  Also sets
@@ -501,15 +502,20 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	private void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
-		for(BlockPos endPos: ends) {
+
+		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
+		
+		while (iter.hasNext()) {
+			BlockPos endPos = iter.next();
 			IBlockState branchState = world.getBlockState(endPos);
 			BlockBranch branch = TreeHelper.getBranch(branchState);
 			int radius = branch.getRadius(branchState);
 			float rotChance = rotChance(world, endPos, world.rand, radius);
 			if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
-				ends.remove(endPos);//Prune out the rotted end points so we don't spawn fruit from them.
+				iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 			}
 		}
+		
 	}
 
 	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
