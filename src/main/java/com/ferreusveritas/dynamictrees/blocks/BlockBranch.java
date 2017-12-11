@@ -3,22 +3,23 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.List;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFire;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
@@ -30,6 +31,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -45,7 +47,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
-public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningListener {
+public class BlockBranch extends Block implements ITreePart, IBurningListener {
 
 	private DynamicTree tree; //The tree this branch type creates
 	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
@@ -64,7 +66,6 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
 		setHarvestLevel("axe", 0);
 		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
-		setTickRandomly(true); //We need this to facilitate decay when supporting neighbors are lacking
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
@@ -149,23 +150,21 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	// WORLD UPDATE
 	///////////////////////////////////////////
 
-	//TODO: Should we eliminate ticking for branch blocks and rely on the growth signal for rotting?
-	@Override
-	public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-		age(world, pos, state, random, false);
-	}
-
-	@Override
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
-		int radius = getRadius(world, pos);
-		if (fast || rand.nextInt(radius * 2) == 0) {// Thicker branches take longer to rot
-			return checkForRot(world, pos, radius, rand, fast);
+	/**
+	 * 
+	 * @param world
+	 * @param pos
+	 * @param radius
+	 * @param rand 
+	 * @param rapid if true then unsupported branch rot will occur regardless of chance value.  will also rot the entire unsupported branch at once
+	 * @return true if the branch was destroyed because of rot
+	 */
+	public boolean checkForRot(World world, BlockPos pos, int radius, Random rand, float chance, boolean rapid) {
+		
+		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
+			return false;//Bail out if not in rapid mode and the rot chance fails
 		}
 		
-		return false;
-	}
-
-	public boolean checkForRot(World world, BlockPos pos, int radius, Random rand, boolean fast) {
 		// Rooty dirt below the block counts as a branch in this instance
 		// Rooty dirt below for saplings counts as 2 neighbors if the soil is not infertile
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
@@ -180,12 +179,12 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 		
 		boolean didRot = getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
 
-		if(fast && didRot) {// Speedily rot back dead branches if this block rotted
+		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
 			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
 				IBlockState state = world.getBlockState(neighPos);
 				if(state.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, getRadius(state), rand, true);
+					checkForRot(world, neighPos, getRadius(state), rand, 1.0f, true);
 				}
 			}
 		}
@@ -224,7 +223,8 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		// return 4096;
-		return getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos, face);
+		int radius = getRadius(world, pos);
+		return (getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos, face) * radius) / 8 ;
 	}
 
 	///////////////////////////////////////////
@@ -307,7 +307,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
-			ISpecies species = signal.getSpecies();
+			Species species = signal.getSpecies();
 			//DynamicTree tree = signal.getTree();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
@@ -447,8 +447,8 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 		return signal;
 	}
 
-	public ISpecies getSpeciesFromSignal(World world, MapSignal signal) {
-		ISpecies species;
+	public Species getSpeciesFromSignal(World world, MapSignal signal) {
+		Species species;
 		if(signal.found) {
 			BlockRootyDirt rootyDirt = (BlockRootyDirt) world.getBlockState(signal.root).getBlock();
 			species = rootyDirt.getSpecies(world, signal.root);
@@ -462,7 +462,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	// Destroys all branches recursively not facing the branching direction with the root node
 	public int destroyTreeFromNode(World world, BlockPos pos) {//, float fortuneFactor) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-		ISpecies species = getSpeciesFromSignal(world, signal);//Get the species from the root node
+		Species species = getSpeciesFromSignal(world, signal);//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze only part of the tree beyond the break point and calculate it's volume
 		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
@@ -471,7 +471,7 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 
 	public int destroyEntireTree(World world, BlockPos pos) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-		ISpecies species = getSpeciesFromSignal(world, signal);//Get the species from the root node
+		Species species = getSpeciesFromSignal(world, signal);//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze the entire tree and calculate it's volume
 		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
@@ -592,14 +592,34 @@ public class BlockBranch extends Block implements ITreePart, IAgeable, IBurningL
 	}
 	
 	@Override
-	public void neighborWasBurned(World world, IBlockState oldState, BlockPos thisPos, BlockPos burnedPos) {
-		
+	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos) {		
+		//possible supporting branch was destroyed by fire.
 		if(oldState.getBlock() == this) {
-			//possible supporting branch was destroyed by fire.
+			for(EnumFacing dir: EnumFacing.VALUES) {
+				BlockPos neighPos = burnedPos.offset(dir);
+				if(TreeHelper.isBranch(world, neighPos)) {
+					BlockPos rootPos = DynamicTree.findRootNode(world, neighPos);
+					if(rootPos == null) {
+						analyse(world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
+					}
+				}
+			}
 		}
 
 	}
 	
+	@Override
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {		
+		IBlockState neighBlockState = world.getBlockState(neighbor);
+
+		if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {
+			int age = neighBlockState.getBlock() == Blocks.FIRE ? ((Integer)neighBlockState.getValue(BlockFire.AGE)).intValue() : 0;
+			world.setBlockState(neighbor, ModBlocks.blockVerboseFire.getDefaultState().withProperty(BlockFire.AGE, age));
+		}
+		
+	}
+
+
 	@Override
 	public boolean isBranch() {
 		return true;

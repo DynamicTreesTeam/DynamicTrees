@@ -4,9 +4,9 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 
 public class Seed extends Item {
 
-	private ISpecies species;//The tree this seed creates
+	private Species species;//The tree this seed creates
 
 	public Seed(String name) {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
@@ -32,11 +32,11 @@ public class Seed extends Item {
 		setRegistryName(name);
 	}
 	
-	public void setSpecies(ISpecies species, ItemStack seedStack) {
+	public void setSpecies(Species species, ItemStack seedStack) {
 		this.species = species;
 	}
 	
-	public ISpecies getSpecies(ItemStack seedStack) {
+	public Species getSpecies(ItemStack seedStack) {
 		return species;
 	}
 	
@@ -73,7 +73,7 @@ public class Seed extends Item {
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
-			ISpecies species = getSpecies(heldItem);
+			Species species = getSpecies(heldItem);
 			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();//FIXME: Species need their own bonsai pots.. or find another solution
 			if(bonzaiPot.setSpecies(world, species, pos)) {
 				CompatHelper.shrinkStack(heldItem, 1);
@@ -102,7 +102,7 @@ public class Seed extends Item {
 	 * @return
 	 */
 	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
-		ISpecies species = getSpecies(seedStack);
+		Species species = getSpecies(seedStack);
 		
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, species, pos)) {
 			return species.placeSaplingBlock(world, pos);

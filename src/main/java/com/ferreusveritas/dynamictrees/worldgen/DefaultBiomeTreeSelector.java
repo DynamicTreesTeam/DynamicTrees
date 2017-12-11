@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -19,13 +18,13 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 
-	private ISpecies oak;
-	private ISpecies birch;
-	private ISpecies spruce;
-	private ISpecies acacia;
-	private ISpecies jungle;
-	private ISpecies darkoak;
-	private ISpecies oakswamp;
+	private Species oak;
+	private Species birch;
+	private Species spruce;
+	private Species acacia;
+	private Species jungle;
+	private Species darkoak;
+	private Species oakswamp;
 	
 	private interface ITreeSelector {
 		Decision getDecision();

@@ -9,6 +9,12 @@
 [ ]Cacti
 [ ]Seasons
 [ ]Thick trees
+[X]Branches no longer tick randomly
+[X]Re-do Rot
+[X]Re-do Cellular automata
+[X]Species
+[X]Thicker worldgen trees
+[X]Spawn swamp oaks
 [ ]Redo drops from smashed Dynamic Leaves block
 	Look for nearest matching branch and fetch species
-[ ]Redo seed dropping by using a signal
+[X]Redo seed dropping by using a signal

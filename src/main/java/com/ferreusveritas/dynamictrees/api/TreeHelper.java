@@ -70,14 +70,13 @@ public class TreeHelper {
 	 * Used by the growth potion and the dendrocoil.
 	 * 
 	 * @param world
-	 * @param pos
+	 * @param rootPos
 	 */
-	public static void growPulse(World world, BlockPos pos) {
-		Block dirtCandidate = world.getBlockState(pos).getBlock();
-		if(dirtCandidate instanceof BlockRootyDirt) {
-			BlockRootyDirt dirt = (BlockRootyDirt) dirtCandidate;	
-			dirt.grow(world, pos, world.rand);
-			ageVolume(world, pos, 1);
+	public static void growPulse(World world, BlockPos rootPos) {
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		if(dirt != null) {
+			dirt.updateTree(world, rootPos, world.rand, true);
+			ageVolume(world, rootPos, 1);
 		}
 	}
 	
@@ -172,9 +171,12 @@ public class TreeHelper {
 	}
 	
 	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(blockAccess.getBlockState(pos).getBlock());
+		return getBranch(blockAccess.getBlockState(pos));
 	}
 	
+	public static BlockBranch getBranch(IBlockState state) {
+		return getBranch(state.getBlock());
+	}
 	
 	//Leaves
 	

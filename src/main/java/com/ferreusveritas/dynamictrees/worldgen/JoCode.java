@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -123,11 +124,8 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, ISpecies species, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
+	public void generate(World world, Species species, BlockPos pos, Biome biome, EnumFacing facing, int radius) {
 		world.setBlockState(pos, species.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
-
-		//This will store the positions of all of the branch endpoints
-		ArrayList<BlockPos> endPoints = new ArrayList<BlockPos>();
 
 		//A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);
@@ -140,8 +138,9 @@ public class JoCode {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {//If a branch exists then the growth was successful
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
-			NodeInflator inflator = new NodeInflator(species, leafMap, endPoints);
-			MapSignal signal = new MapSignal(inflator);
+			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
+			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gather a list of branch end points
+			MapSignal signal = new MapSignal(inflator, endFinder);
 			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
 			
 			smother(leafMap, branch.getTree());
@@ -165,7 +164,7 @@ public class JoCode {
 			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
 			
 			//Allow for special decorations by the tree itself
-			species.postGeneration(world, pos, biome, radius, endPoints, !careful);
+			species.postGeneration(world, pos, biome, radius, endFinder.getEnds(), !careful);
 		
 		} else { //The growth failed.. turn the soil to plain dirt
 			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
@@ -183,7 +182,7 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, ISpecies species, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);

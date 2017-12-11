@@ -6,6 +6,6 @@ import net.minecraft.world.World;
 
 public interface IBurningListener {
 
-	public void neighborWasBurned(World world, IBlockState oldState, BlockPos thisPos, BlockPos burnedPos);
+	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos);
 	
 }

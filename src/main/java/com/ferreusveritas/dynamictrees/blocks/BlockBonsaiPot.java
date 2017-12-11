@@ -8,8 +8,8 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModTrees;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
@@ -82,7 +82,7 @@ public class BlockBonsaiPot extends Block {
 		return false;
 	}
 	
-	public boolean setSpecies(World world, ISpecies species, BlockPos pos) {
+	public boolean setSpecies(World world, Species species, BlockPos pos) {
 		if(species == species.getTree().getCommonSpecies()) {//Make sure the seed is a common species
 			return setTree(world, species.getTree(), pos);
 		}

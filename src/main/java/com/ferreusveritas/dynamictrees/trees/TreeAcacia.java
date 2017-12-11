@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -40,7 +39,7 @@ public class TreeAcacia extends DynamicTree {
 		
 	}
 	
-	ISpecies species;
+	Species species;
 	
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
@@ -56,12 +55,12 @@ public class TreeAcacia extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		speciesRegistry.register(species);
 	}
 	
 	@Override
-	public ISpecies getCommonSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	

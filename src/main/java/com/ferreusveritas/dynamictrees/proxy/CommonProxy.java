@@ -23,7 +23,7 @@ public class CommonProxy {
 	public void registerTileEntities() {}
 
 	public void preInit() {
-		registerEventHandlers();
+		registerCommonEventHandlers();
 	}
 
 	public void init() {}
@@ -32,7 +32,7 @@ public class CommonProxy {
 	
 	public void registerColorHandlers() {}
 
-	public void registerEventHandlers() {
+	public void registerCommonEventHandlers() {
 		//Common Events.. unused at the moment
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
 

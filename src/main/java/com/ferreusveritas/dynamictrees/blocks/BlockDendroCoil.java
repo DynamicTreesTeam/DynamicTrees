@@ -9,10 +9,10 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
@@ -71,7 +71,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
-		ISpecies species = TreeRegistry.findSpeciesSloppy(treeName);
+		Species species = TreeRegistry.findSpeciesSloppy(treeName);
 		if(species != null) {
 			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
@@ -81,7 +81,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void createStaff(World world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
 		ItemStack stack = new ItemStack(ModItems.treeStaff, 1, 0);
-		ISpecies tree = TreeRegistry.findSpeciesSloppy(treeName);
+		Species tree = TreeRegistry.findSpeciesSloppy(treeName);
 		ModItems.treeStaff.setSpecies(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
 		EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
 		entityItem.motionX = 0;
@@ -100,7 +100,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public void plantTree(World world, BlockPos pos, String treeName) {
-		ISpecies species = TreeRegistry.findSpeciesSloppy(treeName);
+		Species species = TreeRegistry.findSpeciesSloppy(treeName);
 		if(species != null) {
 			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack(1));
 		}

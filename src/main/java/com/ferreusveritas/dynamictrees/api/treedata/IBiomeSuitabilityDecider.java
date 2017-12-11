@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +16,7 @@ import net.minecraft.world.biome.Biome;
  */
 public interface IBiomeSuitabilityDecider {
 
-	public Decision getBiomeSuitability(World world, Biome biome, ISpecies tree, BlockPos pos);
+	public Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
 	
 	/** Decision interface for handling the event */
 	public class Decision {

@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
 import com.ferreusveritas.dynamictrees.trees.TreeBirch;
 import com.ferreusveritas.dynamictrees.trees.TreeDarkOak;
@@ -30,7 +30,7 @@ public class ModTrees {
 		baseTrees.add(new TreeDarkOak());
 	
 		for(DynamicTree tree: baseTrees) {
-			tree.registerSpecies(TreeRegistry.speciesRegistry);
+			tree.registerSpecies(Species.REGISTRY);
 		}
 	}
 	

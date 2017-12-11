@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockPlanks;
@@ -22,7 +22,7 @@ public class VanillaSaplingEventHandler {
 		if(blockState.getBlock() == Blocks.SAPLING) {
 			BlockPlanks.EnumType saplingType = blockState.getValue(BlockSapling.TYPE);
 			String treeName = saplingType.getName().replace("_","");//DynamicTrees Mod doesn't respect underscores
-			ISpecies species = TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, treeName));
+			Species species = TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, treeName));
 			event.getWorld().setBlockToAir(event.getPos());//Set the block to air so the plantTree function won't automatically fail.
 			if(!species.getSeed().plantSapling(event.getWorld(), event.getPos(), species.getSeedStack(1))) { //If it fails then give a seed back to the player
 				double x = event.getPos().getX() + 0.5;

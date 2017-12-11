@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -26,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicSapling extends Block {
 	
-	public ISpecies tree;
+	public Species tree;
 	
 	public BlockDynamicSapling(String name) {
 		super(Material.PLANTS);
@@ -46,7 +46,7 @@ public class BlockDynamicSapling extends Block {
 		generateTree(world, pos, state, rand);
 	}
 
-	public static boolean canSaplingStay(IBlockAccess world, ISpecies species, BlockPos pos) {
+	public static boolean canSaplingStay(IBlockAccess world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			IBlockState blockState = world.getBlockState(pos.offset(dir));
@@ -65,7 +65,7 @@ public class BlockDynamicSapling extends Block {
 	}
 
 	public void generateTree(World world, BlockPos pos, IBlockState state, Random rand) {
-		ISpecies species = getSpecies(state);
+		Species species = getSpecies(state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
 			DynamicTree tree = species.getTree();
@@ -83,11 +83,11 @@ public class BlockDynamicSapling extends Block {
 	// TREE INFORMATION
 	///////////////////////////////////////////
 
-	public ISpecies getSpecies(IBlockState state) {
+	public Species getSpecies(IBlockState state) {
 		return this.tree;
 	}
 
-	public BlockDynamicSapling setSpecies(IBlockState state, ISpecies species) {
+	public BlockDynamicSapling setSpecies(IBlockState state, Species species) {
 		this.tree = species;
 		return this;
 	}
@@ -103,7 +103,7 @@ public class BlockDynamicSapling extends Block {
 		}
 	}
 	
-	private void dropBlock(World world, ISpecies tree, IBlockState state, BlockPos pos) {
+	private void dropBlock(World world, Species tree, IBlockState state, BlockPos pos) {
 		world.setBlockToAir(pos);
 		dropBlockAsItem(world, pos, state, 0);
 	}

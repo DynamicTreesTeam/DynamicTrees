@@ -1,12 +1,10 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -19,15 +17,13 @@ public class NodeInflator implements INodeInspector {
 	private float radius;
 	private BlockPos last;
 
-	ISpecies species;
+	Species species;
 	SimpleVoxmap leafMap;
-	List<BlockPos> endPoints;
 	
-	public NodeInflator(ISpecies species, SimpleVoxmap leafMap, List<BlockPos> endPoints) {
+	public NodeInflator(Species species, SimpleVoxmap leafMap) {
 		this.species = species;
 		this.leafMap = leafMap;
-		this.endPoints = endPoints;
-		last = new BlockPos(0, -1, 0);
+		last = BlockPos.ORIGIN;
 	}
 	
 	@Override
@@ -70,7 +66,6 @@ public class NodeInflator implements INodeInspector {
 			}
 			
 			if(isTwig) {
-				endPoints.add(pos);
 				//Handle leaves here
 				leafMap.setVoxel(pos, (byte) 16);//16(bit 5) is code for a twig
 				SimpleVoxmap leafCluster = branch.getTree().getLeafCluster();

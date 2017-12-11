@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
@@ -20,6 +21,7 @@ public class ModBlocks {
 	public static BlockDynamicSapling blockDynamicSapling;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
+	public static BlockVerboseFire blockVerboseFire;
 	
 	public static void preInit() {
 	
@@ -35,6 +37,8 @@ public class ModBlocks {
 		//Fruit
 		blockFruitCocoa = new BlockFruitCocoa();
 	
+		//Verbose Fire
+		blockVerboseFire = new BlockVerboseFire();
 	}
 	
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
@@ -43,6 +47,7 @@ public class ModBlocks {
 		registry.register(ModBlocks.blockDynamicSapling);
 		registry.register(ModBlocks.blockBonsaiPot);
 		registry.register(ModBlocks.blockFruitCocoa);
+		registry.register(ModBlocks.blockVerboseFire);
 
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 

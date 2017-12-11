@@ -7,9 +7,10 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -127,7 +128,8 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
-		grow(world, pos, random);
+		System.out.println(world.isRemote ? "Remote" : "Client");
+		updateTree(world, pos, random, false);
 	}
 	
 	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos pos) {
@@ -141,14 +143,18 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	 * @param random
 	 * @return false if tree was not found
 	 */
-	public boolean grow(World world, BlockPos rootPos, Random random) {
+	public boolean updateTree(World world, BlockPos rootPos, Random random, boolean rapid) {
 		
-		ISpecies species = getSpecies(world, rootPos);
+		Species species = getSpecies(world, rootPos);
 		boolean viable = false;
 		
 		if(species != null) {
 			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
-			viable = species.getTree().grow(world, species, this, rootPos, getSoilLife(world, rootPos), treePos, random);
+			ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
+			
+			if(treeBase != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+				viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
+			}
 		}
 		
 		if(!viable) {
@@ -291,7 +297,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
 	}
 	
-	public ISpecies getSpecies(IBlockAccess blockAccess, BlockPos pos) {
+	public Species getSpecies(IBlockAccess blockAccess, BlockPos pos) {
 		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos).getSpeciesForLocation(blockAccess, treePos) : null;
 	}

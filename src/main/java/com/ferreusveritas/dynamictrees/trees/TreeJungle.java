@@ -5,15 +5,11 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
-import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
-import com.ferreusveritas.dynamictrees.special.BottomListenerVine;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
@@ -113,32 +109,28 @@ public class TreeJungle extends DynamicTree {
 		}
 		
 		@Override
-		public void postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-			super.postGrow(world, rootPos, treePos, soilLife);
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+			super.postGrow(world, rootPos, treePos, soilLife, rapid);
 			
 			if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
 				addCocoa(world, treePos);
 			}
-
+			
+			return true;
 		}
 
 		private void addCocoa(World world, BlockPos treePos) {
-			TreeHelper.getTreePart(world, treePos).analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa(this)));
+			TreeHelper.getTreePart(world, treePos).analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa()));
 		}
 		
 	}
 
-	ISpecies species;
+	Species species;
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
 		
 		canSupportCocoa = true;
-		
-		if(ModConfigs.vineGen) {
-			registerBottomListener(new BottomListenerPodzol(), new BottomListenerVine());
-		}
-		
 	}
 	
 	@Override
@@ -147,12 +139,12 @@ public class TreeJungle extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		speciesRegistry.register(species);
 	}
 	
 	@Override
-	public ISpecies getCommonSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	

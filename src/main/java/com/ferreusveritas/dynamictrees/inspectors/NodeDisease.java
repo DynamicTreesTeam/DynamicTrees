@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
@@ -16,9 +16,9 @@ import net.minecraft.world.World;
 */
 public class NodeDisease implements INodeInspector {
 
-	ISpecies species;//Destroy any thin branches made of the same kind of wood.
+	Species species;//Destroy any thin branches made of the same kind of wood.
 
-	public NodeDisease(ISpecies tree) {
+	public NodeDisease(Species tree) {
 		this.species = tree;
 	}
 

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import net.minecraft.block.Block;
@@ -11,16 +11,14 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class NodeFruitCocoa extends NodeFruit {
+public class NodeFruitCocoa implements INodeInspector {
 
 	boolean finished;
 
-	public NodeFruitCocoa(ISpecies species) {
-		super(species);
+	public NodeFruitCocoa() {
 		finished = false;
 	}
 
-	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
@@ -46,6 +44,11 @@ public class NodeFruitCocoa extends NodeFruit {
 	public static int coordHashCode(BlockPos pos) {
 		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
 		return hash & 0xFFFF;
+	}
+
+	@Override
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+		return false;
 	}
 
 }

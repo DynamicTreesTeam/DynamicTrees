@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
-import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;
@@ -89,13 +87,11 @@ public class TreeOak extends DynamicTree {
 		}
 	}
 
-	ISpecies species;
-	ISpecies swampSpecies;
+	Species species;
+	Species swampSpecies;
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
-		
-		registerBottomListener(new BottomListenerPodzol());
 	}
 	
 	@Override
@@ -105,13 +101,13 @@ public class TreeOak extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		speciesRegistry.register(species);
 		speciesRegistry.register(swampSpecies);
 	}
 	
 	@Override
-	public ISpecies getCommonSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	
@@ -121,7 +117,7 @@ public class TreeOak extends DynamicTree {
 	 * 
 	 */
 	@Override
-	public ISpecies getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
+	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
 		if(BiomeDictionary.hasType(access.getBiome(pos), Type.SWAMP)) {
 			return swampSpecies;
 		}

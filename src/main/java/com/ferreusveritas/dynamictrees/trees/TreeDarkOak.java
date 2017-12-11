@@ -7,9 +7,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
-import com.ferreusveritas.dynamictrees.special.BottomListenerPodzol;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockDirt;
@@ -87,15 +85,13 @@ public class TreeDarkOak extends DynamicTree {
 		}
 	}
 	
-	ISpecies species;
+	Species species;
 	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		
 		setCellSolver(Cells.darkOakSolver);
 		setSmotherLeavesMax(3);//thin canopy
-		
-		registerBottomListener(new BottomListenerPodzol());
 	}
 	
 	@Override
@@ -104,12 +100,12 @@ public class TreeDarkOak extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry) {
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		speciesRegistry.register(species);
 	}
 	
 	@Override
-	public ISpecies getCommonSpecies() {
+	public Species getCommonSpecies() {
 		return species;
 	}
 	

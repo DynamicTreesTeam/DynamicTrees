@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.network;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +14,7 @@ public class GrowSignal {
 	public EnumFacing dir;
 	public int numTurns;
 	public int numSteps;
-	private ISpecies species;
+	private Species species;
 
 	public BlockPos rootPos;
 	public BlockPos delta;
@@ -27,7 +27,7 @@ public class GrowSignal {
 	//Utility
 	public Random rand;
 
-	public GrowSignal(ISpecies species, BlockPos rootPos, float energy) {
+	public GrowSignal(Species species, BlockPos rootPos, float energy) {
 		this.species = species;
 		this.energy = energy;
 		dir = EnumFacing.UP;
@@ -42,7 +42,7 @@ public class GrowSignal {
 		delta = new BlockPos(0, 0, 0);
 	}
 
-	public ISpecies getSpecies() {
+	public Species getSpecies() {
 		return species;
 	}
 

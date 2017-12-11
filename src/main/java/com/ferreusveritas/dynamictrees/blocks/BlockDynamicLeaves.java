@@ -92,7 +92,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//Borrow flammability from the vanilla minecraft leaves
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		return getTree(world, pos).getPrimitiveLeaves().getBlock().getFlammability(world, pos, face);
+		return (int) (getTree(world, pos).getPrimitiveLeaves().getBlock().getFlammability(world, pos, face) * 0.75f);
 	}
 	
 	//Borrow fire spread rate from the vanilla minecraft leaves
@@ -109,7 +109,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		DynamicTree tree = getTree(state);
 		int preHydro = getHydrationLevel(state);
 
@@ -131,11 +131,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
 				growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
 			}
-		}
-
-		//Do special things if the leaf block is/was on the bottom
-		if(!fast && isBottom(world, pos)) {
-			tree.bottomSpecial(world, pos, rand);
 		}
 		
 		return false;//Leaves were not destroyed

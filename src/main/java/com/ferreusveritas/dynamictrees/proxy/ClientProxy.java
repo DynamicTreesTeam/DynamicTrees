@@ -38,7 +38,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit() {
 		super.preInit();
-		registerEventHandlers();
+		registerClientEventHandlers();
 	}
 	
 	@Override
@@ -185,9 +185,8 @@ public class ClientProxy extends CommonProxy {
 			}
 		}, new Block[] {Blocks.GRASS, Blocks.TALLGRASS, Blocks.DOUBLE_PLANT, Blocks.LEAVES, Blocks.LEAVES2});
 	}
-
-	@Override 
-	public void registerEventHandlers() {
+ 
+	public void registerClientEventHandlers() {
 		//There are currently no Client Side events to handle
 	}
 	

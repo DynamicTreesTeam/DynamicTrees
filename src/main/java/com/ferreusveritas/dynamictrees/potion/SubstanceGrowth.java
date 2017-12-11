@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.potion;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 
 import net.minecraft.util.EnumParticleTypes;
@@ -32,8 +31,7 @@ public class SubstanceGrowth implements ISubstanceEffect{
 			}
 		} else {
 			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks
-				BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
-				dirt.grow(world, rootPos, world.rand);
+				TreeHelper.growPulse(world, rootPos);
 			}
 		}
 

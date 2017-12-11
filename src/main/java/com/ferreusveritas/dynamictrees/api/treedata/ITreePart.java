@@ -69,7 +69,7 @@ public interface ITreePart {
 	* 
 	* @param world The current world
 	* @param pos Position
-	* @param fromDir The direction that should not be analyzed.  Pass ForgeDirection.UNKNOWN to analyse in all directions
+	* @param fromDir The direction that should not be analyzed.  Pass null to analyse in all directions
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/

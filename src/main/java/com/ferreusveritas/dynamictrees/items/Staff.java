@@ -7,10 +7,10 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
@@ -73,7 +73,7 @@ public class Staff extends Item {
 
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			ISpecies species = DynamicTree.getExactSpecies(world, rootPos);
+			Species species = DynamicTree.getExactSpecies(world, rootPos);
 			if(species != null) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
@@ -86,7 +86,7 @@ public class Staff extends Item {
 		}
 
 		//Create a tree from right clicking on soil
-		ISpecies species = getSpecies(heldStack);
+		Species species = getSpecies(heldStack);
 		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
 			new JoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8);
 			CompatHelper.shrinkStack(heldStack, 1);//If the player is in creative this will have no effect.
@@ -117,7 +117,7 @@ public class Staff extends Item {
 		return this;
 	}
 
-	public Staff setSpecies(ItemStack itemStack, ISpecies species) {
+	public Staff setSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		nbt.setString("tree", species.toString());
 		itemStack.setTagCompound(nbt);
@@ -131,13 +131,13 @@ public class Staff extends Item {
 		return this;
 	}
 
-	public ISpecies getSpecies(ItemStack itemStack) {
+	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
 		if(nbt.hasKey("tree")) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
 		} else {
-			ISpecies species = TreeRegistry.findSpeciesSloppy("oak");
+			Species species = TreeRegistry.findSpeciesSloppy("oak");
 			setSpecies(itemStack, species);
 			return species;
 		}
@@ -203,7 +203,7 @@ public class Staff extends Item {
 
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
-		ISpecies species = getSpecies(stack);
+		Species species = getSpecies(stack);
 		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}

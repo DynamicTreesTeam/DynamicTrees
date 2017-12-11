@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.potion;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +25,7 @@ public class SubstanceDisease implements ISubstanceEffect {
 		} else {
 			BlockBranch branch = TreeHelper.getBranch(world, basePos);
 			if(branch != null) {
-				ISpecies species = DynamicTree.getExactSpecies(world, basePos);
+				Species species = DynamicTree.getExactSpecies(world, basePos);
 				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeDisease(species)));
 				dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
 			}

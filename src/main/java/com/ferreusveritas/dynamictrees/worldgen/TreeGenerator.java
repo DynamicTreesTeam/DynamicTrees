@@ -6,9 +6,9 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
 import net.minecraft.block.BlockColored;
@@ -185,7 +185,7 @@ public class TreeGenerator implements IWorldGenerator {
 		Biome biome = world.getBiome(pos);
 		Decision decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
 		if(decision.isHandled()) {
-			ISpecies species = decision.getSpecies();
+			Species species = decision.getSpecies();
 			if(species != null) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeTreeHandler.chance(biome, species, circle.radius, random) == EnumChance.OK) {

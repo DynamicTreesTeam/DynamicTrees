@@ -14,6 +14,7 @@ public class ModConfigs {
 	public static float diseaseChance;
 	public static boolean replaceVanillaSapling;
 	public static boolean vineGen;
+	public static boolean podzolGen;
 	public static boolean worldGen;
 	public static boolean worldGenDebug;
 	
@@ -33,6 +34,7 @@ public class ModConfigs {
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
 		
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
+		podzolGen = config.getBoolean("podzolGen", "world", true, "Randomly generate podzol under select trees.");
 		worldGen = config.getBoolean("worldGen", "world", false, "Experimental world generation.  Generate Dynamic Trees instead of Vanilla trees.");
 
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");

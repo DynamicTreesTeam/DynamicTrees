@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
@@ -12,7 +12,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +21,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.registries.RegistryBuilder;
 
 /**
 * <p><pre><tt><b>
@@ -122,12 +120,7 @@ public class DynamicTrees {
 
 		@SubscribeEvent
 		public static void newRegistry(RegistryEvent.NewRegistry event) {
-						
-			RegistryBuilder builder = new RegistryBuilder<ISpecies>();
-			TreeRegistry.speciesRegistry = builder
-				.setName(new ResourceLocation(ModConstants.MODID, "species"))
-				.setType(ISpecies.class)
-				.create();
+			Species.newRegistry(event);
 		}
 		
 	}

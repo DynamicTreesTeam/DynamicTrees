@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.state.IBlockState;
@@ -83,7 +83,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	}
 	
 	@Override
-	public EnumChance chance(Biome biome, ISpecies species, int radius, Random random) {
+	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
 				
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
 			EnumChance c = provider.chance(biome, species, radius, random);

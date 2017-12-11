@@ -5,28 +5,22 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
-import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -83,8 +77,6 @@ public abstract class DynamicTree {
 	private int smotherLeavesMax = 4;
 	/** Minimum amount of light necessary for a leaves block to be created. **/
 	private int lightRequirement = 13;
-	/** A list of special effects reserved for leaves on the bottom of a stack **/
-	private ArrayList<IBottomListener> bottomSpecials = new ArrayList<IBottomListener>(4);
 	/** The default hydration level of a newly created leaf block [default = 4]**/
 	protected byte defaultHydration = 4;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
@@ -96,7 +88,6 @@ public abstract class DynamicTree {
 	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
 	private ICellSolver cellSolver = Cells.deciduousSolver;
 	
-
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
@@ -180,9 +171,9 @@ public abstract class DynamicTree {
 	
 	public abstract void createSpecies();
 	
-	public abstract void registerSpecies(IForgeRegistry<ISpecies> speciesRegistry);
+	public abstract void registerSpecies(IForgeRegistry<Species> speciesRegistry);
 	
-	public abstract ISpecies getCommonSpecies();
+	public abstract Species getCommonSpecies();
 
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
@@ -193,7 +184,7 @@ public abstract class DynamicTree {
 	 * @param pos
 	 * @return
 	 */
-	public ISpecies getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
+	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
 		return getCommonSpecies();
 	}
 
@@ -256,7 +247,7 @@ public abstract class DynamicTree {
 			}
 
 			//Empty hand or inactive substance
-			ISpecies species = getExactSpecies(world, hitPos);
+			Species species = getExactSpecies(world, hitPos);
 			if(species != null) {
 				species.onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 			}
@@ -268,29 +259,6 @@ public abstract class DynamicTree {
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
-	
-	/**
-	 * This should only be called by the TreeRegistry.
-	 * This registers the tree itself.  This is not used to
-	 * register blocks or items with minecraft.
-	 * 
-	 * @return this tree for chaining
-	 */
-	/*public DynamicTree register() {
-		
-		//If a seed hasn't been set for this tree go ahead and generate it automatically.
-		if(seed == null) {
-			generateSeed();
-		}
-		
-		//Set up the tree to drop seeds of it's kind.
-		registerBottomListener(new BottomListenerDropItems(getSeedStack(), ModConfigs.seedDropRate, true));
-		
-		//Add JoCodes for WorldGen
-		addJoCodes();
-		
-		return this;
-	}*/
 	
 	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
 	 * We intentionally leave out leaves since they are shared between trees */
@@ -424,7 +392,7 @@ public abstract class DynamicTree {
 	 * @param pos
 	 * @return
 	 */
-	public static ISpecies getExactSpecies(World world, BlockPos pos) {
+	public static Species getExactSpecies(World world, BlockPos pos) {
 		
 		BlockPos rootPos = findRootNode(world, pos);
 		if(rootPos != null) {
@@ -619,8 +587,6 @@ public abstract class DynamicTree {
 	// BIOME HANDLING
 	//////////////////////////////
 	
-
-	
 	/**
 	* Handle rotting branches
 	* @param world The world
@@ -645,95 +611,10 @@ public abstract class DynamicTree {
 		return true;
 	}
 	
-	
-	///////////////////////////////////////////
-	// GROWTH
-	///////////////////////////////////////////
-	
-	/**
-	 * 
-	 * @param world
-	 * @param rootyDirt
-	 * @param rootPos
-	 * @param soilLife
-	 * @param treePos
-	 * @param random
-	 * @return false if network is not viable(destroys {@link BlockRootyDirt})
-	 */
-	public boolean grow(World world, ISpecies species, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, BlockPos treePos, Random random) {
-		
-		ITreePart baseTreePart = TreeHelper.getTreePart(world, treePos);
-		
-		if(baseTreePart != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
-			
-			float growthRate = species.getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
-			do {
-				if(random.nextFloat() < growthRate) {
-					if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
-						boolean success = false;
-						
-						float energy = species.getEnergy(world, rootPos);
-						for(int i = 0; !success && i < 1 + species.getRetries(); i++) {//Some species have multiple growth retry attempts
-							success = baseTreePart.growSignal(world, treePos, new GrowSignal(species, rootPos, energy)).success;
-						}
-						
-						//TODO: Make this a float
-						int soilLongevity = species.getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
-						
-						if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
-							rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
-						}
-					}
-				}
-			} while(--growthRate > 0.0f);
 
-			if(random.nextFloat() < ModConfigs.diseaseChance) {
-				baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(species)));
-				return true;
-			}
-			
-			species.postGrow(world, rootPos, treePos, soilLife);
-
-			return true;
-		}
-		
-		return false;//Network is not viable
-	}
-	
 	//////////////////////////////
-	// BOTTOM SPECIAL
+	// BONSAI POT
 	//////////////////////////////
-	
-	/**
-	* Run special effects for bottom blocks
-	* 
-	* @param world The World
-	* @param x X-Axis of block
-	* @param y Y-Axis of block
-	* @param z Z-Axis of block
-	* @param random Random number access
-	*/
-	public void bottomSpecial(World world, BlockPos pos, Random random) {
-		for(IBottomListener special: bottomSpecials) {
-			float chance = special.chance();
-			if(chance != 0.0f && random.nextFloat() <= chance) {
-				special.run(world, this, pos, random);//Make it so!
-			}
-		}
-	}
-	
-	/**
-	* Provides an interface for other mods to add special effects like fruit, spawns or whatever
-	*  
-	* @param listeners
-	* @return DynamicTree for function chaining
-	*/
-	public DynamicTree registerBottomListener(IBottomListener ... listeners) {
-		for(IBottomListener listener: listeners) {
-			bottomSpecials.add(listener);
-		}
-		return this;
-	}
 	
 	/**
 	 * Provides the {@link BlockBonsaiPot} for this tree.  Each mod will
@@ -744,12 +625,6 @@ public abstract class DynamicTree {
 	public BlockBonsaiPot getBonzaiPot() {
 		return ModBlocks.blockBonsaiPot;
 	}
-	
-	
-	//////////////////////////////
-	// WORLDGEN STUFF
-	//////////////////////////////
-	
 
 	
 	//////////////////////////////

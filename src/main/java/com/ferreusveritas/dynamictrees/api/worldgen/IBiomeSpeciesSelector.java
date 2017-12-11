@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -52,13 +52,13 @@ public interface IBiomeSpeciesSelector {
 	
 	public class Decision {
 		private boolean handled;
-		private ISpecies species;
+		private Species species;
 		
 		public Decision() {
 			handled = false;
 		}
 		
-		public Decision(ISpecies species) {
+		public Decision(Species species) {
 			this.species = species;
 			handled = true;
 		}
@@ -67,7 +67,7 @@ public interface IBiomeSpeciesSelector {
 			return handled;
 		}
 		
-		public ISpecies getSpecies() {
+		public Species getSpecies() {
 			return species;
 		}
 	}

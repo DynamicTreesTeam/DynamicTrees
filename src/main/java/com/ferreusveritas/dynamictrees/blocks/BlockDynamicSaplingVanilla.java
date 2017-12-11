@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockSapling;
@@ -13,7 +13,7 @@ import net.minecraft.block.state.IBlockState;
 
 public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 
-	protected Map<Integer, ISpecies> trees = new HashMap<Integer, ISpecies>();
+	protected Map<Integer, Species> trees = new HashMap<Integer, Species>();
 	
 	public BlockDynamicSaplingVanilla(String name) {
 		super(name);
@@ -25,7 +25,7 @@ public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 	///////////////////////////////////////////
 
 	@Override
-	public ISpecies getSpecies(IBlockState state) {
+	public Species getSpecies(IBlockState state) {
 		if(state.getBlock() == this) {
 			return trees.get(state.getValue(BlockSapling.TYPE).ordinal());
 		}
@@ -33,7 +33,7 @@ public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 	}
 
 	@Override
-	public BlockDynamicSaplingVanilla setSpecies(IBlockState state, ISpecies species) {
+	public BlockDynamicSaplingVanilla setSpecies(IBlockState state, Species species) {
 		if(state.getBlock() == this) {
 			trees.put(state.getValue(BlockSapling.TYPE).ordinal(), species);
 		}

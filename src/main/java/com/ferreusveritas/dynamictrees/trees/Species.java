@@ -7,14 +7,18 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -24,6 +28,7 @@ import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -31,18 +36,28 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
-public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<ISpecies> implements ISpecies {
+public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
-	/** Simple name of the tree e.g. "oak" */
-	//private final String name;
-	/** ModID of mod registering this tree */
-	//private final String modId;
+	public static IForgeRegistry<Species> REGISTRY;
+	
+	public static void newRegistry(RegistryEvent.NewRegistry event) {
+		REGISTRY = new RegistryBuilder<Species>()
+				.setName(new ResourceLocation(ModConstants.MODID, "species"))
+				.setType(Species.class)
+				.create();
+	}
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
 	protected  final DynamicTree treeFamily;
@@ -88,7 +103,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		this.treeFamily = treeFamily;
 	}
 	
-	@Override
 	public DynamicTree getTree() {
 		return treeFamily;
 	}
@@ -101,35 +115,29 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		this.growthRate = growthRate;
 	}
 	
-	@Override
 	public float getEnergy(World world, BlockPos rootPos) {
 		return signalEnergy;
 	}
 	
-	@Override
 	public float getGrowthRate(World world, BlockPos rootPos) {
 		return growthRate;
 	}
 	
 	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
-	@Override
 	public int getUpProbability() {
 		return upProbability;
 	}
 	
 	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
-	@Override
 	public float getSecondaryThickness() {
 		return 2.0f;
 	}
 	
 	/** Probability reinforcer for current travel direction */
-	@Override
 	public int getReinfTravel() {
 		return 1;
 	}
 	
-	@Override
 	public int getLowestBranchHeight() {
 		return lowestBranchHeight;
 	}
@@ -139,7 +147,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	* @param pos 
 	* @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
 	*/
-	@Override
 	public int getLowestBranchHeight(World world, BlockPos pos) {
 		return getLowestBranchHeight();
 	}
@@ -148,12 +155,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		this.retries = retries;
 	}
 	
-	@Override
 	public int getRetries() {
 		return retries;
 	}
 	
-	@Override
 	public float getTapering() {
 		return tapering;
 	}
@@ -163,12 +168,18 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//SEEDS
 	///////////////////////////////////////////
 	
-	@Override
+	/**
+	 * Get a copy of the {@link Seed} stack with the supplied quantity.
+	 * This is necessary because the stack may be combined with
+	 * {@link NBT} data.
+	 * 
+	 * @param qty The number of items in the newly copied stack.
+	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
+	 */
 	public ItemStack getSeedStack(int qty) {
 		return CompatHelper.setStackCount(seedStack.copy(), qty);
 	}
 	
-	@Override
 	public Seed getSeed() {
 		return seed;
 	}
@@ -193,10 +204,170 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return null;
 	}
+
+	/**
+	 * 
+	 * @param world
+	 * @param baseTreePart
+	 * @param rootPos
+	 * @param treePos
+	 * @param soilLife
+	 * @return true if seed was dropped
+	 */
+	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
+				
+		if(endPoints.size() > 0) {
+			BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+			branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+			BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
+
+			if(seedPos != BlockPos.ORIGIN) {
+				EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
+				Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
+				float distAngle = 15;//The spread angle(center to edge)
+				float launchSpeed = 4;//Blocks(meters) per second
+				motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+				seedEntity.motionX = motion.x;
+				seedEntity.motionY = motion.y;
+				seedEntity.motionZ = motion.z;
+				CompatHelper.spawnEntity(world, seedEntity);
+			}
+		}
+
+		return true;
+	}
+	
+	
+	///////////////////////////////////////////
+	//FRUIT
+	///////////////////////////////////////////
+	
+	/**
+	 * 
+	 * @param world
+	 * @param baseTreePart
+	 * @param rootPos
+	 * @param treePos
+	 * @param soilLife
+	 * @return true if fruit was created
+	 */
+	public boolean handleFruit(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife, int qty) {
+		
+		int count = 0;
+		int attempts = 0;
+		
+		if(qty > 0) {
+			while(endPoints.size() > 0 && (count < qty) && (attempts < (qty * 2))) {
+				int bSelect = world.rand.nextInt(endPoints.size());
+				BlockPos branchPos = endPoints.get(bSelect);
+				attempts++;
+				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+				BlockPos fruitPos = getRayTraceFruitPos(world, treePos, branchPos);
+				if(fruitPos != BlockPos.ORIGIN && placeFruit(world, fruitPos)) {
+					count++;
+				}
+			}
+		}
+
+		return count > 0;
+	}
+	
+	/**
+	 * Get the number of fruit to produce on an update.  If more control is desired then
+	 * override handleFruit().
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @return
+	 */
+	protected int getFruitQty(World world, BlockPos rootPos) {
+		return 0;
+	}
+	
+	/**
+	 * Get the {@link IBlockState} of the fruitBlock to place during handleFruit().
+	 * If more control is desired then override placeFruit() or handleFruit(). 
+	 * 
+	 * @param world
+	 * @param fruitPos
+	 * @return
+	 */
+	protected IBlockState getFruit(World world, BlockPos fruitPos) {
+		return null;
+	}
+	
+	/**
+	 * Places the fruit.  This can be overridden to create more advanced
+	 * structures.
+	 * 
+	 * @param world
+	 * @param fruitPos
+	 * @return
+	 */
+	protected boolean placeFruit(World world, BlockPos fruitPos) {
+		IBlockState fruit = getFruit(world, fruitPos);
+		if(fruit != null) {
+			world.setBlockState(fruitPos, fruit);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Find a suitable position for seed drops or fruit placement using ray tracing.
+	 * 
+	 * @param world The world
+	 * @param treePos The block position of the {@link DynamicTree} trunk base.
+	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
+	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
+	 */
+	public BlockPos getRayTraceFruitPos(World world, BlockPos treePos, BlockPos branchPos) {
+
+		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
+
+		Vec3d vOut = new Vec3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
+		
+		if(vOut.equals(Vec3d.ZERO)) {
+			vOut = new Vec3d(1, 0, 0);
+		}
+		
+		float deltaYaw = (world.rand.nextFloat() * 90) - 45;
+		float deltaPitch = (world.rand.nextFloat() * -60);// must be greater than -90 degrees(and less than 90) for the tangent function.
+		vOut = vOut.normalize(). //Create a unit vector
+				addVector(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to 60 degrees
+				normalize(). //Re-normalize to unit vector
+				rotateYaw((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- 45 degrees
+				scale(4 + world.rand.nextInt(3)); //Vary the view distance 4 to 6 meters
+
+		Vec3d branchVec = new Vec3d(branchPos).addVector(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
+		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
+		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
+
+		if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
+			RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
+
+			if(result != null) {
+				BlockPos hitPos = result.getBlockPos();
+				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
+					if(getTree().isCompatibleGenericLeaves(world, hitPos)) {//Test if it's the right kind of leaves for the species
+						do { //Run straight down until we hit a block that's non compatible leaves.
+							hitPos = hitPos.down();
+						} while(getTree().isCompatibleGenericLeaves(world, hitPos));
+						if(world.isAirBlock(hitPos)) {//If that block is air then we have a winner.
+							return hitPos;
+						}
+					}
+				}
+			}
+		}
+
+		return BlockPos.ORIGIN;
+	}
 	
 	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
+	
 	
 	/** 
 	 * Sets the Dynamic Sapling for this tree type.  Also sets
@@ -205,7 +376,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param sapling
 	 * @return
 	 */
-	public ISpecies setDynamicSapling(IBlockState sapling) {
+	public Species setDynamicSapling(IBlockState sapling) {
 		saplingBlock = sapling;//Link the tree to the sapling
 		
 		//Link the sapling to the Species
@@ -221,17 +392,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return saplingBlock;
 	}
 	
-	@Override
 	public boolean placeSaplingBlock(World world, BlockPos pos) {
 		world.setBlockState(pos, getDynamicSapling());
 		return true;
 	}
 
+	
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
 	
-	@Override
 	public BlockRootyDirt getRootyDirtBlock() {
 		return ModBlocks.blockRootyDirt;
 	}
@@ -240,18 +410,33 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		soilLongevity = longevity;
 	}
 	
-	@Override
 	public int getSoilLongevity(World world, BlockPos rootPos) {
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
 	}
 	
-	@Override
+	/**
+	 * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
 	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
 		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
 	}
 	
-	@Override
+	/**
+	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
+	 * 
+	 * @param blockAccess
+	 * @param pos
+	 * @param soilBlockState
+	 * @return
+	 */
 	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
 		return isAcceptableSoil(blockAccess, pos, soilBlockState);
 	}
@@ -259,8 +444,126 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//////////////////////////////
 	// GROWTH
 	//////////////////////////////
+
+	/**
+	 * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively.
+	 * If the rapid option is enabled then drops, fruit and disease are skipped.
+	 *  
+	 *  
+	 * @param world The world
+	 * @param rootyDirt The {@link BlockRootyDirt} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} type in the world
+	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
+	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param random A random number generator
+	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRootyDirt} this tree is on)
+	 */
+	public boolean update(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+
+		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
+		List<BlockPos> ends = getEnds(world, treePos, treeBase);
+
+		//This will prune rotted positions from the world and the end point list
+		handleRot(world, ends, rootPos, treePos, soilLife, rapid);
+		
+		if(!rapid) {
+			//This will handle seed drop
+			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
+			
+			//This will handle fruit spawning
+			int fruitQty = getFruitQty(world, rootPos);
+			if(fruitQty > 0) {
+				handleFruit(world, ends, rootPos, treePos, soilLife, fruitQty);
+			}
+			
+			//This will handle disease chance
+			if(handleDisease(world, treeBase, treePos, random, soilLife)) {
+				return true;//Although the tree may be diseased. The tree network is still viable.
+			}
+		}
+		
+		return grow(world, rootyDirt, rootPos, soilLife, treeBase, treePos, random, rapid);
+	}
 	
-	@Override
+	/**
+	 * A little internal convenience function for getting branch endpoints
+	 * 
+	 * @param world
+	 * @param treePos
+	 * @param treeBase
+	 * @return A list of all branch endpoints for the {@link DynamicTree}
+	 */
+	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
+		NodeFindEnds endFinder = new NodeFindEnds();
+		treeBase.analyse(world, treePos, null, new MapSignal(endFinder));
+		return endFinder.getEnds();
+	}
+	
+	private void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+		for(BlockPos endPos: ends) {
+			IBlockState branchState = world.getBlockState(endPos);
+			BlockBranch branch = TreeHelper.getBranch(branchState);
+			int radius = branch.getRadius(branchState);
+			float rotChance = rotChance(world, endPos, world.rand, radius);
+			if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
+				ends.remove(endPos);//Prune out the rotted end points so we don't spawn fruit from them.
+			}
+		}
+	}
+
+	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
+		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
+	}
+
+	/**
+	 * 
+	 * @param world The world
+	 * @param rootyDirt The {@link BlockRootyDirt} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} type in the world
+	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
+	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param random A random number generator
+	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRootyDirt} this tree is on)
+	 */
+	public boolean grow(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+		
+		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
+		do {
+			if(random.nextFloat() < growthRate) {
+				if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
+					boolean success = false;
+
+					float energy = getEnergy(world, rootPos);
+					for(int i = 0; !success && i < 1 + getRetries(); i++) {//Some species have multiple growth retry attempts
+						success = treeBase.growSignal(world, treePos, new GrowSignal(this, rootPos, energy)).success;
+					}
+
+					//TODO: Make this a float
+					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+
+					if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
+					}
+				}
+			}
+		} while(--growthRate > 0.0f);
+
+		return postGrow(world, rootPos, treePos, soilLife, rapid);
+	}
+	
+	/**
+	* Selects a new direction for the branch(grow) signal to turn to.
+	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
+	* Can be overridden for different species but it's preferable to override customDirectionManipulation.
+	* 
+	* @param world The World
+	* @param pos
+	* @param branch The branch block the GrowSignal is traveling in.
+	* @param signal The grow signal.
+	* @return
+	*/
 	public EnumFacing selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
 		EnumFacing originDir = signal.dir.getOpposite();
 		
@@ -303,10 +606,37 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return newDir;
 	}
 	
-	@Override
-	public void postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		
+	/**
+	 * Allows a species to do things after a grow event just occured.  Currently used
+	 * by Jungle trees to create cocoa pods on the trunk
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param treePos
+	 * @param soilLife
+	 */
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+		return true;
 	}
+	
+	/**
+	 * Decide what happens for diseases.
+	 * 
+	 * @param world
+	 * @param baseTreePart
+	 * @param treePos
+	 * @param random
+	 * @return true if the tree became diseased
+	 */
+	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
+		if(soilLife == 0 && random.nextFloat() < ModConfigs.diseaseChance) {
+			baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+			return true;
+		}
+		
+		return false;
+	}
+	
 	
 	//////////////////////////////
 	// BIOME HANDLING
@@ -323,7 +653,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	* @param pos
 	* @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
 	*/
-	@Override
 	public float biomeSuitability(World world, BlockPos pos) {
 		
 		Biome biome = world.getBiome(pos);
@@ -379,16 +708,27 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	// INTERACTIVE
 	//////////////////////////////
 	
-	@Override
 	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
+	
 	
 	//////////////////////////////
 	// WORLDGEN
 	//////////////////////////////
 
-	@Override
+	/**
+	 * Default worldgen spawn mechanism.
+	 * This method uses JoCodes to generate tree models.
+	 * Override to use other methods.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param facing The orientation of the tree(rotates JoCode)
+	 * @param radius The radius of the tree generation boundary
+	 * @return true if tree was generated. false otherwise.
+	 */
 	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
 		EnumFacing facing = CoordUtils.getRandomDir(random);
 		if(getJoCodeStore() != null) {
@@ -402,7 +742,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
-	@Override
 	public TreeCodeStore getJoCodeStore() {
 		return joCodeStore;
 	}
@@ -415,10 +754,24 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		joCodeStore.addCodesFromFile("assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
-	@Override
+	/**
+	 * Allows the tree to decorate itself after it has been generated.  Add vines, fruit, etc.
+	 * 
+	 * @param world The world
+	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param biome The biome this tree is generating in
+	 * @param radius The radius of the tree generation boundary
+	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
+	 * @param worldGen true if this is being generated by the world generator, false if it's the staff, dendrocoil, etc.
+	 */
 	public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {}
 	
-	@Override
+	/**
+	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
+	 * This factor is an attempt to compensate for the problem.
+	 * 
+	 * @return
+	 */
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}

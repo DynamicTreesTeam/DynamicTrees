@@ -21,8 +21,6 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		System.out.println("XXXXXXXXXX TESTING WORLD LOAD EVENT XXXXXXXXXXXX");
-		
 		event.getWorld().addEventListener(new BurningEventListener());
 	}
 	

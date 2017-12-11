@@ -2,12 +2,10 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -15,22 +13,18 @@ import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 
 public class BurningEventListener implements IWorldEventListener {
-
+	
 	@Override
 	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
-		
-		if(newState.getMaterial() == Material.FIRE) {
-			for(EnumFacing dir: EnumFacing.VALUES) {
-				BlockPos neighPos = pos.offset(dir);
-				IBlockState blockState = worldIn.getBlockState(neighPos);
-				Block block = blockState.getBlock();
-				if(block instanceof IBurningListener) {
-					((IBurningListener) block).neighborWasBurned(worldIn, oldState, neighPos, pos);
-				}
+
+		if(flags == 3 && oldState.getBlock() instanceof IBurningListener) { //The old block was a Burning Listener
+			if(newState.getMaterial() == Material.FIRE) { //The new block is made of fire.  It certainly burned.
+				((IBurningListener)oldState.getBlock()).onBurned(worldIn, oldState, pos);//Tell the block what happened
 			}
 		}
+		
 	}
-
+	
 	@Override
 	public void notifyLightSet(BlockPos pos) {}
 

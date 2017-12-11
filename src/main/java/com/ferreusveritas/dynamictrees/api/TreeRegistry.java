@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -12,7 +11,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.IForgeRegistry;
 
 /**
 * A registry for all of the dynamic trees. Use this for this mod or other mods.
@@ -21,7 +19,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 */
 public class TreeRegistry {
 
-	public static IForgeRegistry<ISpecies> speciesRegistry;
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	
 	//////////////////////////////
@@ -37,17 +34,17 @@ public class TreeRegistry {
 	 * @param species The dynamic tree being registered
 	 * @return DynamicTree for chaining
 	 */
-	public static ISpecies registerSpecies(ISpecies species) {
-		speciesRegistry.register(species);
+	public static Species registerSpecies(Species species) {
+		Species.REGISTRY.register(species);
 		return species;
 	}
 
-	public static void registerSpecies(ISpecies ... values) {
-		speciesRegistry.registerAll(values);
+	public static void registerSpecies(Species ... values) {
+		Species.REGISTRY.registerAll(values);
 	}
 	
-	public static ISpecies findSpecies(ResourceLocation name) {
-		return speciesRegistry.getValue(name);
+	public static Species findSpecies(ResourceLocation name) {
+		return Species.REGISTRY.getValue(name);
 	}
 	
 	/**
@@ -57,22 +54,22 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static ISpecies findSpeciesSloppy(String name) {
+	public static Species findSpeciesSloppy(String name) {
 		
 		//Exact find
 		ResourceLocation resloc = new ResourceLocation(name);
-		if(speciesRegistry.containsKey(resloc)) {
-			return speciesRegistry.getValue(resloc);
+		if(Species.REGISTRY.containsKey(resloc)) {
+			return Species.REGISTRY.getValue(resloc);
 		}
 
 		//Search DynamicTrees Domain
 		resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());
-		if(speciesRegistry.containsKey(resloc)) {
-			return speciesRegistry.getValue(resloc);
+		if(Species.REGISTRY.containsKey(resloc)) {
+			return Species.REGISTRY.getValue(resloc);
 		}
 		
 		//Search all domains
-		for(ISpecies species : speciesRegistry) {
+		for(Species species : Species.REGISTRY) {
 			if(species.getRegistryName().getResourcePath().equals(resloc.getResourcePath())) {
 				return species;
 			}

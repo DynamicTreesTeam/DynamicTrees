@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.api.treedata.ISpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
@@ -20,9 +20,9 @@ import net.minecraft.world.World;
 */
 public class NodeDestroyer implements INodeInspector {
 
-	ISpecies species;//Destroy any node that's made of the same kind of wood
+	Species species;//Destroy any node that's made of the same kind of wood
 
-	public NodeDestroyer(ISpecies species) {
+	public NodeDestroyer(Species species) {
 		this.species = species;
 	}
 
