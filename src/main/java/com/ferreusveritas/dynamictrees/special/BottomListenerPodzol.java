@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.special;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.api.IBottomListener;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
@@ -20,11 +19,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
-public class BottomListenerPodzol implements IBottomListener {
+public class BottomListenerPodzol {
 
 	private static final IBlockState podzolState = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 	
-	@Override
 	public void run(World world, DynamicTree tree, BlockPos pos, Random random) {
 
 		int x = pos.getX() + random.nextInt(3) - 1;
@@ -63,12 +61,10 @@ public class BottomListenerPodzol implements IBottomListener {
 
 	}
 
-	@Override
 	public float chance() {
 		return 1f/256f;
 	}
 
-	@Override
 	public String getName() {
 		return "podzol";
 	}
