@@ -580,28 +580,23 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	protected boolean canSilkHarvest() {
 		return false;
 	}
-
-	//1 in 64 chance to drop a seed on destruction.. This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
-	public int quantitySeedDropped(Random random) {
-		return random.nextInt(64) == 0 ? 1 : 0;
-	}
-
+	
 	//Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
 	}
-
+	
 	@Override
 	public int quantityDropped(Random random) {
 		return 0;
 	}
-
+	
 	@Override
 	public int damageDropped(IBlockState state) {
 		return 0;
 	}
-
+	
 	//When the leaves are sheared just return vanilla leaves for usability
 	@Override
 	public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess blockAccess, BlockPos pos, int fortune) {

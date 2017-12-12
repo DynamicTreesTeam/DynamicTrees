@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;
@@ -57,6 +58,8 @@ public class TreeOak extends DynamicTree {
 	
 	public class SpeciesSwampOak extends Species {
 		
+		GenFeatureVine vineGen;
+		
 		SpeciesSwampOak(DynamicTree treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily);
 			
@@ -64,6 +67,8 @@ public class TreeOak extends DynamicTree {
 			
 			envFactor(Type.COLD, 0.50f);
 			envFactor(Type.DRY, 0.50f);
+			
+			vineGen = new GenFeatureVine(this).setMaxLength(4);
 		}
 		
 		@Override
@@ -93,10 +98,10 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
-			super.postGeneration(world, pos, biome, radius, endPoints, worldGen);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
 			
-			// TODO Add Vines.
+			vineGen.setQuantity(4).gen(world, rootPos.up(), endPoints);
 		}
 	}
 

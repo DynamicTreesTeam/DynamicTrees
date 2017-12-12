@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
+import java.util.ArrayList;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -47,19 +49,18 @@ public class NodeDestroyer implements INodeInspector {
 
 	public void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+			ArrayList<ItemStack> dropList = new ArrayList<>();
 			DynamicTree tree = species.getTree();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-				//if(tree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
-					if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
-						world.setBlockToAir(leavesPos);
-						int qty = tree.getDynamicLeaves().quantitySeedDropped(world.rand);
-						if(qty > 0) {
-							ItemStack seeds = CompatHelper.setStackCount(species.getSeedStack(1).copy(), qty);
-							EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, seeds);
-							CompatHelper.spawnEntity(world, itemEntity);
-						}
+				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
+					world.setBlockToAir(leavesPos);
+					dropList.clear();
+					species.getTreeHarvestDrops(world, leavesPos, dropList, world.rand);
+					for(ItemStack stack : dropList) {
+						EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, stack);
+						CompatHelper.spawnEntity(world, itemEntity);
 					}
-				//}
+				}
 			}
 		}
 	}

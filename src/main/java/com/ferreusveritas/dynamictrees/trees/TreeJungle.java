@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
@@ -31,6 +32,8 @@ public class TreeJungle extends DynamicTree {
 	
 	public class SpeciesJungle extends Species {
 
+		GenFeatureVine vineGen;
+		
 		SpeciesJungle(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
 
@@ -41,6 +44,8 @@ public class TreeJungle extends DynamicTree {
 			envFactor(Type.DRY,  0.20f);
 			envFactor(Type.HOT, 1.1f);
 			envFactor(Type.WET, 1.1f);
+			
+			vineGen = new GenFeatureVine(species);
 		}
 
 		@Override
@@ -103,7 +108,9 @@ public class TreeJungle extends DynamicTree {
 				addCocoa(world, rootPos.up());
 			}
 			
-			// TODO Add Vines
+			BlockPos treePos = rootPos.up();
+			
+			vineGen.setQuantity(endPoints.size() / 2).gen(world, treePos, endPoints);
 			
 			// TODO Add underbrush
 		}
