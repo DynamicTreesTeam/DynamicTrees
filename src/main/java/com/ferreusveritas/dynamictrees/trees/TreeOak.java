@@ -125,7 +125,7 @@ public class TreeOak extends DynamicTree {
 	public void createSpecies() {
 		commonSpecies = new SpeciesOak(this);
 		swampSpecies = new SpeciesSwampOak(this);
-		swampSpecies = new SpeciesAppleOak(this);
+		appleSpecies = new SpeciesAppleOak(this);
 	}
 	
 	@Override
