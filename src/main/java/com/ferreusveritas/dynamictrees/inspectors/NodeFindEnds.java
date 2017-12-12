@@ -39,13 +39,13 @@ public class NodeFindEnds implements INodeInspector {
 	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		//Okay.. so.. a little explanation. If we are only one block away from the last block we returned from then we can't be on an end
-		pos = pos.subtract(last);
-		if(pos.getX() * pos.getX() + pos.getY() * pos.getY() + pos.getZ() * pos.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
+		BlockPos dPos = pos.subtract(last);
+		if(dPos.getX() * dPos.getX() + dPos.getY() * dPos.getY() + dPos.getZ() * dPos.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
 			endPoints.add(pos);
 		}
 			
 		last = pos;//We can only be in a branch on the return run 
-		
+
 		return false;
 	}
 	
