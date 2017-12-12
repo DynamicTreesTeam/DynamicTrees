@@ -56,6 +56,10 @@ public class TreeOak extends DynamicTree {
 		
 	}
 	
+	/**
+	 * Swamp Oaks are just Oaks with slight growth differences that can generate in water
+	 * and with vines hanging from their leaves.
+	 */
 	public class SpeciesSwampOak extends Species {
 		
 		GenFeatureVine vineGen;
@@ -101,6 +105,7 @@ public class TreeOak extends DynamicTree {
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
 			
+			//Generate Vines
 			vineGen.setQuantity(4).gen(world, rootPos.up(), endPoints);
 		}
 	}

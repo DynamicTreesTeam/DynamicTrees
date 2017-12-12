@@ -203,8 +203,12 @@ public class TreeHelper {
 		return block instanceof BlockRootyDirt;
 	}
 	
+	public static boolean isRootyDirt(IBlockState soilBlockState) {
+		return isRootyDirt(soilBlockState.getBlock());
+	}
+	
 	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
-		return isRootyDirt(blockAccess.getBlockState(pos).getBlock());
+		return isRootyDirt(blockAccess.getBlockState(pos));
 	}
 	
 	public static BlockRootyDirt getRootyDirt(Block block) {

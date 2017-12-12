@@ -2,19 +2,21 @@
 // TODO (RoadMap)
 ////////////////////////////////////////////////////////////////
 
-[X]Vines need to spawn in jungle and swamp oaks
-[X]Cocoa pods need to spawn on jungle trees during worldgen
+[X]Vines spawn on jungle trees and swamp oaks
+[X]Cocoa pods spawn on jungle trees during worldgen
 [ ]Fix jungle worldgen(forest floor is bare)
 [ ]API
 [ ]Cacti
 [ ]Seasons
-[ ]Thick trees
+[ ]Thick tree trunks
 [X]Branches no longer tick randomly
 [X]Re-do Rot
 [X]Re-do Cellular automata
-[X]Species
+[X]Divide Trees into Trees and Species
 [X]Thicker worldgen trees
 [X]Spawn swamp oaks
 [X]Redo drops from smashed Dynamic Leaves block
-[X]	Look for nearest matching branch and fetch species
+[X]Look for nearest matching branch and fetch species
 [X]Redo seed dropping by using a signal
+[X]Quark greener grass compatibility added
+[X]Rework block flow so BlockEvent.HarvestDropsEvent works as expected

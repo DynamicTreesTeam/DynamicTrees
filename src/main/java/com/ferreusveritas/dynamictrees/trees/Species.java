@@ -625,7 +625,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 		do {
 			if(growthRate > random.nextFloat()) {
-				if(soilLife > 0 && CoordUtils.isSurroundedByExistingChunks(world, rootPos)){
+				if(soilLife > 0){
 					boolean success = treeBase.growSignal(world, treePos, new GrowSignal(this, rootPos, getEnergy(world, rootPos))).success;
 
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.special.GenFeatureUndergrowth;
 import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -33,6 +34,7 @@ public class TreeJungle extends DynamicTree {
 	public class SpeciesJungle extends Species {
 
 		GenFeatureVine vineGen;
+		GenFeatureUndergrowth underGen;
 		
 		SpeciesJungle(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -46,6 +48,7 @@ public class TreeJungle extends DynamicTree {
 			envFactor(Type.WET, 1.1f);
 			
 			vineGen = new GenFeatureVine(species);
+			underGen = new GenFeatureUndergrowth(species);
 		}
 
 		@Override
@@ -110,9 +113,11 @@ public class TreeJungle extends DynamicTree {
 			
 			BlockPos treePos = rootPos.up();
 			
+			//Generate Vines
 			vineGen.setQuantity(endPoints.size() / 2).gen(world, treePos, endPoints);
-			
-			// TODO Add underbrush
+
+			//Generate undergrowth
+			underGen.setRadius(radius).gen(world, treePos, endPoints);
 		}
 		
 		@Override
