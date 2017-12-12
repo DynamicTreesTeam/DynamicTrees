@@ -244,10 +244,12 @@ public class SimpleVoxmap {
 					protected Cell computeNext() {
 						
 						while(true) {
-							if (x < lenX) {
+							int pos = calcPos(x, y, z);
+							
+							if (x < lenX - 1) {
 								++x;
 							}
-							else if (z < lenZ) {
+							else if (z < lenZ - 1) {
 								x = 0;
 								++z;
 							}
@@ -262,7 +264,7 @@ public class SimpleVoxmap {
 							}
 
 							if(touched[y]) {
-								byte value = data[calcPos(x, y, z)];
+								byte value = data[pos];
 								if(value > 0) {
 									return new Cell(value, new BlockPos(x, y, z).subtract(center));
 								}
@@ -292,10 +294,12 @@ public class SimpleVoxmap {
 					protected BlockPos computeNext() {
 
 						while(true) {
-							if (x < lenX) {
+							int pos = calcPos(x, y, z);
+
+							if (x < lenX - 1) {
 								++x;
 							}
-							else if (z < lenZ) {
+							else if (z < lenZ - 1) {
 								x = 0;
 								++z;
 							}
@@ -310,7 +314,7 @@ public class SimpleVoxmap {
 							}
 							
 							if(touched[y]) {
-								if(data[calcPos(x, y, z)] > 0) {
+								if(data[pos] > 0) {
 									return new BlockPos(x, y, z).subtract(center);
 								}
 							} else {

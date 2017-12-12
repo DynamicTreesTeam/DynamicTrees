@@ -15,6 +15,7 @@
 [X]Species
 [X]Thicker worldgen trees
 [X]Spawn swamp oaks
-[ ]Redo drops from smashed Dynamic Leaves block
+[X]Redo drops from smashed Dynamic Leaves block
 	Look for nearest matching branch and fetch species
 [X]Redo seed dropping by using a signal
+[ ]Blacklist Scala

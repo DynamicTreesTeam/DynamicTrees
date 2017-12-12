@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -562,24 +561,6 @@ public abstract class DynamicTree {
 	
 	public ICell getCellForLeaves(int hydro) {
 		return Cells.normalCells[hydro];
-	}
-	
-	//////////////////////////////
-	// DROPS HANDLING
-	//////////////////////////////
-	
-	/** 
-	* Override to add items to the included list argument. For apples and whatnot.
-	* Pay Attention!  Add items to drops parameter.
-	* 
-	* @param world
-	* @param pos
-	* @param chance
-	* @param drops
-	* @return
-	*/
-	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-		return drops;
 	}
 	
 	

@@ -95,14 +95,14 @@ public class TreeHelper {
 	 * Warning: CPU intensive and should be used sparingly
 	 * 
 	 * @param world The world
-	 * @param pos The position of the bottom most block of a trees trunk
+	 * @param treePos The position of the bottom most block of a trees trunk
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
 	 */
-	public static void ageVolume(World world, BlockPos pos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
+	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
 		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
-			BlockPos.getAllInBox(pos.add(new BlockPos(-halfWidth, 0, -halfWidth)), pos.add(new BlockPos(halfWidth, height, halfWidth)));
+			BlockPos.getAllInBox(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
 		for(int i = 0; i < iterations; i++) {
 			for(BlockPos iPos: iterable) {
@@ -160,6 +160,10 @@ public class TreeHelper {
 	
 	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
 		return isBranch(blockAccess.getBlockState(pos).getBlock());
+	}
+	
+	public static boolean isBranch(IBlockState state) {
+		return isBranch(state.getBlock());
 	}
 	
 	public static BlockBranch getBranch(Block block) {

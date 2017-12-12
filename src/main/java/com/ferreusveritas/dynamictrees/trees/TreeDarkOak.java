@@ -50,6 +50,15 @@ public class TreeDarkOak extends DynamicTree {
 		};
 		
 		@Override
+		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+			Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
+			if ((rand.nextInt(chance) == 0)) {
+				drops.add(new ItemStack(Items.APPLE, 1, 0));
+			}
+			return drops;
+		}
+		
+		@Override
 		public int getLowestBranchHeight(World world, BlockPos pos) {
 			return (int)(super.getLowestBranchHeight(world, pos) * biomeSuitability(world, pos));
 		}
@@ -133,15 +142,6 @@ public class TreeDarkOak extends DynamicTree {
 		}
 		
 		return false;
-	}
-	
-	@Override
-	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-		Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
-		if ((rand.nextInt(chance) == 0)) {
-			drops.add(new ItemStack(Items.APPLE, 1, 0));
-		}
-		return drops;
 	}
 	
 	@Override

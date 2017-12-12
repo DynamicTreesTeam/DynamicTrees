@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -490,45 +491,91 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		DynamicTree tree = getTree(state);
+		
+		Species species = getExactSpecies(world, pos, getTree(state));
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 
-		if(tree == null) {
-			return ret;
-		}
+		if(species != null) {
 
-		int chance = getSaplingDropChance(state);
+			int chance = getSaplingDropChance(state);
 
-		//Hokey fortune stuff here.
-		if (fortune > 0) {
-			chance -= 2 << fortune;
-			if (chance < 10) { 
-				chance = 10;
+			//Hokey fortune stuff here.
+			if (fortune > 0) {
+				chance -= 2 << fortune;
+				if (chance < 10) { 
+					chance = 10;
+				}
 			}
-		}
 
-		//It's mostly for seeds.. mostly.
-		//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
-		Random rand = world instanceof World ? ((World)world).rand : new Random();
-		if (rand.nextInt(chance) == 0) {
-			ret.add(tree.getCommonSpecies().getSeedStack(1));//FIXME: This is broken.  Should drop the species specific seed.
-		}
-
-		//More fortune contrivances here.  Vanilla compatible returns.
-		chance = 200; //1 in 200 chance of returning an "apple"
-		if (fortune > 0) {
-			chance -= 10 << fortune;
-			if (chance < 40) {
-				chance = 40;
+			//It's mostly for seeds.. mostly.
+			//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
+			Random rand = world instanceof World ? ((World)world).rand : new Random();
+			if (rand.nextInt(chance) == 0) {
+				ret.add(species.getSeedStack(1));
 			}
-		}
 
-		//Get species specific drops.. apples or cocoa for instance
-		tree.getDrops(world, pos, chance, ret);
+			//More fortune contrivances here.  Vanilla compatible returns.
+			chance = 200; //1 in 200 chance of returning an "apple"
+			if (fortune > 0) {
+				chance -= 10 << fortune;
+				if (chance < 40) {
+					chance = 40;
+				}
+			}
+
+			//Get species specific drops.. apples or cocoa for instance
+			ret = species.getDrops(world, pos, chance, ret);
+		}
 
 		return ret;
 	}
-
+	
+	/**
+	 * Warning! Resource intensive algorithm.  Use only for interaction such as breaking blocks.
+	 * 
+	 * @param access
+	 * @param pos
+	 * @param tree
+	 * @return
+	 */
+	Species getExactSpecies(IBlockAccess access, BlockPos pos, DynamicTree tree) {
+		
+		if(access instanceof World) {
+			World world = (World) access;
+			ArrayList<BlockPos> branchList = new ArrayList<>();
+						
+			//Find all of the branches that are nearby
+			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {
+				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));
+				IBlockState state = access.getBlockState(dPos);
+				if(TreeHelper.isBranch(state)) {
+					BlockBranch branch = TreeHelper.getBranch(state);
+					if(branch.getTree() == tree && branch.getRadius(state) == 1) {
+						branchList.add(dPos);
+					}
+				}
+			}
+			
+			if(!branchList.isEmpty()) {
+				//Find the closest one
+				BlockPos closest = branchList.get(0);
+				double minDist = 999;
+				
+				for(BlockPos dPos : branchList) {
+					double d = pos.distanceSq(dPos);
+					if(d < minDist) {
+						minDist = d;
+						closest = dPos;
+					}
+				}
+				
+				return DynamicTree.getExactSpecies(world, closest);
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	protected boolean canSilkHarvest() {
 		return false;

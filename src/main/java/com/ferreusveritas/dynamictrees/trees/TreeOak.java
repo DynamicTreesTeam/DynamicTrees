@@ -43,6 +43,15 @@ public class TreeOak extends DynamicTree {
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
 		}
+
+		@Override
+		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+			Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
+			if ((rand.nextInt(chance) == 0)) {
+				drops.add(new ItemStack(Items.APPLE, 1, 0));
+			}
+			return drops;
+		}
 		
 	}
 	
@@ -77,6 +86,11 @@ public class TreeOak extends DynamicTree {
 			
 			return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
 		}
+
+		@Override
+		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+			return commonSpecies.getDrops(blockAccess, pos, chance, drops);
+		}
 		
 		@Override
 		public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
@@ -102,6 +116,11 @@ public class TreeOak extends DynamicTree {
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
+		}
+
+		@Override
+		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+			return commonSpecies.getDrops(blockAccess, pos, chance, drops);
 		}
 		
 		@Override
@@ -164,15 +183,6 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		return false;
-	}
-	
-	@Override
-	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-		Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
-		if ((rand.nextInt(chance) == 0)) {
-			drops.add(new ItemStack(Items.APPLE, 1, 0));
-		}
-		return drops;
 	}
 	
 }

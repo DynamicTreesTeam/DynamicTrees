@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
@@ -28,6 +30,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -197,6 +200,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return null;
 	}
 
+	public float getSeedDropRate() {
+		return 1.0f;
+	}
+	
 	/**
 	 * 
 	 * @param world
@@ -208,25 +215,29 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
 		
-		if(ModConfigs.seedDropRate > world.rand.nextFloat()) {
-			if(endPoints.size() > 0) {
-				BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-				BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
+		float dropRate = getSeedDropRate() * ModConfigs.seedDropRate;
+		
+		do {
+			if(dropRate > world.rand.nextFloat()) {
+				if(endPoints.size() > 0) {
+					BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+					branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+					BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
 
-				if(seedPos != BlockPos.ORIGIN) {
-					EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
-					Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
-					float distAngle = 15;//The spread angle(center to edge)
-					float launchSpeed = 4;//Blocks(meters) per second
-					motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-					seedEntity.motionX = motion.x;
-					seedEntity.motionY = motion.y;
-					seedEntity.motionZ = motion.z;
-					CompatHelper.spawnEntity(world, seedEntity);
+					if(seedPos != BlockPos.ORIGIN) {
+						EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
+						Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
+						float distAngle = 15;//The spread angle(center to edge)
+						float launchSpeed = 4;//Blocks(meters) per second
+						motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+						seedEntity.motionX = motion.x;
+						seedEntity.motionY = motion.y;
+						seedEntity.motionZ = motion.z;
+						CompatHelper.spawnEntity(world, seedEntity);
+					}
 				}
 			}
-		}
+		} while(--dropRate > 0.0f);
 
 		return true;
 	}
@@ -360,6 +371,26 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	
 	///////////////////////////////////////////
+	//DROPS
+	///////////////////////////////////////////
+	
+	/** 
+	* Override to add items to the included list argument. For apples and whatnot.
+	* Pay Attention!  Add items to drops parameter and then return it. The list
+	* may already contain seeds.  Remove them if desired.
+	* 
+	* @param world The world
+	* @param pos The {@link BlockPos} of the {@link BlockDynamicLeaves} that was harvested
+	* @param chance The sapling drop chance from {@link BlockLeaves}
+	* @param drops A {@link ArrayList} of things to be manipulated
+	* @return the drop list
+	*/
+	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
+		return drops;
+	}
+	
+	
+	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
 	
@@ -457,7 +488,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
-
+		
 		//This will prune rotted positions from the world and the end point list
 		handleRot(world, ends, rootPos, treePos, soilLife, rapid);
 		
@@ -504,7 +535,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param soilLife The soillife of the {@link BlockRootyDirt}
 	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly. 
 	 */
-	private void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+	public void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		
