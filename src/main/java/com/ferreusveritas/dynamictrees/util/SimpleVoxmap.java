@@ -245,6 +245,7 @@ public class SimpleVoxmap {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
+							BlockPos dPos = new BlockPos(x, y, z);
 							
 							if (x < lenX - 1) {
 								++x;
@@ -266,7 +267,7 @@ public class SimpleVoxmap {
 							if(touched[y]) {
 								byte value = data[pos];
 								if(value > 0) {
-									return new Cell(value, new BlockPos(x, y, z).subtract(center));
+									return new Cell(value, dPos.subtract(center));
 								}
 							} else {
 								++y;
@@ -295,6 +296,7 @@ public class SimpleVoxmap {
 
 						while(true) {
 							int pos = calcPos(x, y, z);
+							BlockPos dPos = new BlockPos(x, y, z);
 
 							if (x < lenX - 1) {
 								++x;
@@ -315,7 +317,7 @@ public class SimpleVoxmap {
 							
 							if(touched[y]) {
 								if(data[pos] > 0) {
-									return new BlockPos(x, y, z).subtract(center);
+									return dPos.subtract(center);
 								}
 							} else {
 								++y;

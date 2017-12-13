@@ -86,8 +86,8 @@ public class TreeHelper {
 	 * @param world
 	 * @param pos The position of the bottom most block of a trees trunk
 	 */
-	public static void ageVolume(World world, BlockPos pos, int interations) {
-		ageVolume(world, pos, 8, 32, null, interations);
+	public static void ageVolume(World world, BlockPos pos, int iterations) {
+		ageVolume(world, pos, 8, 32, null, iterations);
 	}
 	
 	/**

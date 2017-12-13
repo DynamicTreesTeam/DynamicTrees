@@ -26,6 +26,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
@@ -533,7 +534,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
 		//This will prune rotted positions from the world and the end point list
-		handleRot(world, ends, rootPos, treePos, soilLife, rapid);
+		if(handleRot(world, ends, rootPos, treePos, soilLife, rapid)) {
+			return false;//Last piece of tree rotted away.
+		}
 		
 		if(!rapid) {
 			//This will handle seed drops
@@ -576,11 +579,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} for this {@link DynamicTree}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
 	 * @param soilLife The soillife of the {@link BlockRootyDirt}
-	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly. 
+	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly.
+	 * @return true if last piece of tree rotted away.
 	 */
-	public void handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
+		SimpleVoxmap leafMap = getTree().getLeafCluster();
 		
 		while (iter.hasNext()) {
 			BlockPos endPos = iter.next();
@@ -589,10 +594,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			int radius = branch.getRadius(branchState);
 			float rotChance = rotChance(world, endPos, world.rand, radius);
 			if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
+				if(rapid) {
+					TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), null, 2);
+				}
 				iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 			}
 		}
 		
+		return ends.isEmpty() && !TreeHelper.isBranch(world, treePos);//There are no endpoints and the trunk is missing
 	}
 
 	/**

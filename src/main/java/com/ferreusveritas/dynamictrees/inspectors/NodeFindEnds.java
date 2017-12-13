@@ -50,6 +50,9 @@ public class NodeFindEnds implements INodeInspector {
 	}
 	
 	public List<BlockPos> getEnds() {
+		if(endPoints.isEmpty()) {//It's impossible for nothing to have been found.
+			endPoints.add(last);//So just add the last node that was found.
+		}
 		return endPoints;
 	}
 	

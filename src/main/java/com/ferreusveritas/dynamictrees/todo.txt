@@ -20,3 +20,4 @@
 [X]Redo seed dropping by using a signal
 [X]Quark greener grass compatibility added
 [X]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
+[ ]Make Cocoa Pod placeable again

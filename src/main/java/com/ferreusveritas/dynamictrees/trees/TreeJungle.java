@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.GenFeatureUndergrowth;
@@ -47,8 +48,8 @@ public class TreeJungle extends DynamicTree {
 			envFactor(Type.HOT, 1.1f);
 			envFactor(Type.WET, 1.1f);
 			
-			vineGen = new GenFeatureVine(species);
-			underGen = new GenFeatureUndergrowth(species);
+			vineGen = new GenFeatureVine(this);
+			underGen = new GenFeatureUndergrowth(this);
 		}
 
 		@Override
@@ -114,7 +115,7 @@ public class TreeJungle extends DynamicTree {
 			BlockPos treePos = rootPos.up();
 			
 			//Generate Vines
-			vineGen.setQuantity(endPoints.size() / 2).gen(world, treePos, endPoints);
+			vineGen.setQuantity(endPoints.size() / 2).setMaxLength(20).gen(world, treePos, endPoints);
 
 			//Generate undergrowth
 			underGen.setRadius(radius).gen(world, treePos, endPoints);
@@ -132,7 +133,10 @@ public class TreeJungle extends DynamicTree {
 		}
 
 		private void addCocoa(World world, BlockPos treePos) {
-			TreeHelper.getTreePart(world, treePos).analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa()));
+			ITreePart treePart = TreeHelper.getTreePart(world, treePos);
+			if(treePart != null) {
+				treePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa()));
+			}
 		}
 		
 	}
@@ -143,6 +147,11 @@ public class TreeJungle extends DynamicTree {
 		super(BlockPlanks.EnumType.JUNGLE);
 		
 		canSupportCocoa = true;
+	}
+
+	@Override
+	public int getLightRequirement() {
+		return 12;
 	}
 	
 	@Override
@@ -160,6 +169,7 @@ public class TreeJungle extends DynamicTree {
 		return species;
 	}
 	
+	/*
 	@Override
 	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
@@ -182,6 +192,6 @@ public class TreeJungle extends DynamicTree {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 }
