@@ -4,7 +4,7 @@
 
 [X]Vines spawn on jungle trees and swamp oaks
 [X]Cocoa pods spawn on jungle trees during worldgen
-[ ]Fix jungle worldgen(forest floor is bare)
+[X]Fix jungle worldgen(forest floor is bare)
 [ ]API
 [ ]Cacti
 [ ]Seasons
@@ -20,5 +20,5 @@
 [X]Redo seed dropping by using a signal
 [X]Quark greener grass compatibility added
 [X]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
-[ ]Make Cocoa Pod placeable again
+[X]Make Cocoa Pod placeable again
 [ ]Find out why jungle tree generation looks like leaves are missing

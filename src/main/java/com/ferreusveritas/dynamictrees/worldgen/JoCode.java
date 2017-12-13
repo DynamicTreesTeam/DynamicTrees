@@ -142,28 +142,26 @@ public class JoCode {
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
 			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
-			MapSignal signal = new MapSignal(inflator, endFinder);
+			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
 			branch.analyse(world, treePos, EnumFacing.DOWN, signal);
 			List<BlockPos> endPoints = endFinder.getEnds();
 			
-			smother(leafMap, branch.getTree());
+			smother(leafMap, branch.getTree());//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
 			
-			BlockDynamicLeaves leavesBlock = branch.getTree().getDynamicLeaves();
-			int treeSub = branch.getTree().getDynamicLeavesSub();
-			
-			//Place Growing Leaves Blocks
-			for(Cell cell: leafMap.getAllNonZeroCells()) {
-				if((cell.getValue() & 7) != 0) {
+			//Place Growing Leaves Blocks from voxmap
+			IBlockState leavesState = branch.getTree().getDynamicLeavesState();
+			for(Cell cell: leafMap.getAllNonZeroCells()) {//Iterate through all of the cells that are not zero value(air)
+				if((cell.getValue() & 0x0F) != 0) {//If this is true then we are dealing with a leaf block.  Masked off value is the hydro value
 					BlockPos cellPos = cell.getPos();
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesBlock.getDefaultState().withProperty(BlockDynamicLeaves.TREE, treeSub).withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
 					}
 				}
 			}
 			
-			//Age volume
+			//Age volume for 3 cycles using a leafmap
 			TreeHelper.ageVolume(world, treePos, radius, 32, leafMap, 3);
 			
 			//Rot the unsupported branches
@@ -238,16 +236,16 @@ public class JoCode {
 				int count = 0;
 				for(int iy = startY; iy >= 0; iy--) {
 					int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-					if(v == 0) {
+					if(v == 0) {//Air
 						count = 0;//Reset the count
 					} else
-					if(v <= 4) {
+					if((v & 0x0F) != 0) {//Leaves
 						count++;
 						if(count > tree.getSmotherLeavesMax()){//Smother value
 							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
 						}
 					} else
-					if(v == 16) {//Twig
+					if((v & 0x10) != 0) {//Twig
 						count++;
 						leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
 					}

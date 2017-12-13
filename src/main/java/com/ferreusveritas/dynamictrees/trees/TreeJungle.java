@@ -2,16 +2,25 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.GenFeatureUndergrowth;
 import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -96,18 +105,20 @@ public class TreeJungle extends DynamicTree {
 		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
-			
+
 			if(world.rand.nextInt() % 16 == 0) {
 				addCocoa(world, rootPos.up());
 			}
-			
-			BlockPos treePos = rootPos.up();
-			
-			//Generate Vines
-			vineGen.setQuantity(endPoints.size() / 2).setMaxLength(20).gen(world, treePos, endPoints);
 
-			//Generate undergrowth
-			underGen.setRadius(radius).gen(world, treePos, endPoints);
+			if(worldGen) {
+				BlockPos treePos = rootPos.up();
+				
+				//Generate Vines
+				vineGen.setQuantity(endPoints.size() / 2).setMaxLength(20).gen(world, treePos, endPoints);
+
+				//Generate undergrowth
+				underGen.setRadius(radius).gen(world, treePos, endPoints);
+			}
 		}
 		
 		@Override
@@ -140,7 +151,7 @@ public class TreeJungle extends DynamicTree {
 
 	@Override
 	public int getLightRequirement() {
-		return 12;
+		return 12;//The jungle can be a dark place.  Give these trees a little advantage.
 	}
 	
 	@Override
@@ -158,10 +169,10 @@ public class TreeJungle extends DynamicTree {
 		return species;
 	}
 	
-	/*
 	@Override
-	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		
+	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	
+		//Place Cocoa Pod if we are holding Cocoa Beans
 		if(heldItem != null) {
 			if(heldItem.getItem() == Items.DYE && heldItem.getItemDamage() == 3) {
 				BlockBranch branch = TreeHelper.getBranch(world, pos);
@@ -176,11 +187,14 @@ public class TreeJungle extends DynamicTree {
 						if (!player.capabilities.isCreativeMode) {
 							CompatHelper.shrinkStack(heldItem, 1);
 						}
+						return true;
 					}
 				}
 			}
 		}
-		return false;
-	}*/
+		
+		//Need this here to apply potions or bone meal.
+		return super.onTreeActivated(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+	}
 	
 }

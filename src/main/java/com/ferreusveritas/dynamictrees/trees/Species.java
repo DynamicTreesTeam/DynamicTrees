@@ -583,7 +583,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if last piece of tree rotted away.
 	 */
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
-
+		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		SimpleVoxmap leafMap = getTree().getLeafCluster();
 		
@@ -603,7 +603,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		return ends.isEmpty() && !TreeHelper.isBranch(world, treePos);//There are no endpoints and the trunk is missing
 	}
-
+	
 	/**
 	 * Provides the chance that a log will rot.
 	 * 
@@ -616,7 +616,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
 		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
 	}
-
+	
 	/**
 	 * The grow handler.
 	 * 
@@ -636,16 +636,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			if(growthRate > random.nextFloat()) {
 				if(soilLife > 0){
 					boolean success = treeBase.growSignal(world, treePos, new GrowSignal(this, rootPos, getEnergy(world, rootPos))).success;
-
+					
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
-
+					
 					if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 					}
 				}
 			}
 		} while(--growthRate > 0.0f);
-
+		
 		return postGrow(world, rootPos, treePos, soilLife, rapid);
 	}
 	

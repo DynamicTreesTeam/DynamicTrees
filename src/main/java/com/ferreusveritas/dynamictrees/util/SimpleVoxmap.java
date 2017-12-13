@@ -229,8 +229,13 @@ public class SimpleVoxmap {
 		}
 	}
 
-	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	
 	public Iterable<Cell> getAllNonZeroCells() {
+		return getAllNonZeroCells((byte) 0xFF);
+	}
+	
+	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	public Iterable<Cell> getAllNonZeroCells(byte mask) {
 		
 		return new Iterable<Cell>() {
 			@Override
@@ -265,7 +270,7 @@ public class SimpleVoxmap {
 							}
 
 							if(touched[y]) {
-								byte value = data[pos];
+								byte value = (byte) (data[pos] & mask);
 								if(value > 0) {
 									return new Cell(value, dPos.subtract(center));
 								}
@@ -280,9 +285,13 @@ public class SimpleVoxmap {
 		};
 	}
 
+
+	public Iterable<BlockPos> getAllNonZero() {
+		return getAllNonZero((byte) 0xFF);
+	}
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<BlockPos> getAllNonZero() {
+	public Iterable<BlockPos> getAllNonZero(byte mask) {
 		
 		return new Iterable<BlockPos>() {
 			@Override
@@ -316,7 +325,7 @@ public class SimpleVoxmap {
 							}
 							
 							if(touched[y]) {
-								if(data[pos] > 0) {
+								if((data[pos] & mask) > 0) {
 									return dPos.subtract(center);
 								}
 							} else {

@@ -101,7 +101,7 @@ public class TreeHelper {
 	 */
 	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
-		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero() : 
+		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero((byte) 0x0F) : 
 			BlockPos.getAllInBox(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
 		for(int i = 0; i < iterations; i++) {
@@ -109,7 +109,9 @@ public class TreeHelper {
 				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
-					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+					if(((IAgeable)block).age(world, iPos, blockState, world.rand, true)) {
+						leafMap.setVoxel(iPos, (byte) 0);
+					}
 				}
 			}
 		}
