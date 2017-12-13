@@ -10,8 +10,12 @@ import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -110,7 +114,9 @@ public class TreeHelper {
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
 					if(((IAgeable)block).age(world, iPos, blockState, world.rand, true)) {
-						leafMap.setVoxel(iPos, (byte) 0);
+						if(leafMap != null) {
+							leafMap.setVoxel(iPos, (byte) 0);
+						}
 					}
 				}
 			}

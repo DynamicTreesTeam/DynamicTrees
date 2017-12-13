@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockDoublePlant.EnumBlockHalf;
 import net.minecraft.block.BlockDoublePlant.EnumPlantType;
@@ -34,6 +35,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -45,6 +47,7 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable {
 	
@@ -116,7 +119,27 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
+		world.checkLight(pos);
 		if(hydro == 0 || !hasAdequateLight(world, tree, pos)) {
+			
+			//Diagnostic code FIXME
+			/*if(TreeHelper.isLeaves(world, pos)) {
+				if(!hasAdequateLight(world, tree, pos)) {
+					Chunk chunk = world.getChunkFromBlockCoords(pos);
+					chunk.generateSkylightMap();
+					int light = world.getLightFor(EnumSkyBlock.SKY, pos);
+					light = world.getLight(pos);
+					world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));
+					return true;
+				}
+				
+				if(hydro == 0) {
+					world.setBlockState(pos, Blocks.GLASS.getDefaultState());
+					return true;
+				}
+			}*/
+			//End diagnostic code
+			
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 

@@ -156,7 +156,7 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 2);// 2: 0
 					}
 				}
 			}
