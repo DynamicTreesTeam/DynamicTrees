@@ -116,7 +116,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
-		if(hydro == 0 || !hasAdequateLight(world, tree, pos)){
+		if(hydro == 0 || (!rapid && !hasAdequateLight(world, tree, pos))){
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 
