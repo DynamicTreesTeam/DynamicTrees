@@ -21,3 +21,4 @@
 [X]Quark greener grass compatibility added
 [X]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
 [ ]Make Cocoa Pod placeable again
+[ ]Find out why jungle tree generation looks like leaves are missing

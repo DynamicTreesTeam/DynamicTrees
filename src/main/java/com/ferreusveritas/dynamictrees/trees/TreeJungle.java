@@ -2,27 +2,16 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.GenFeatureUndergrowth;
 import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
