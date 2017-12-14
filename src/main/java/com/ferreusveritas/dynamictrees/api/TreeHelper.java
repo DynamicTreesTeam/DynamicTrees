@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -133,7 +132,7 @@ public class TreeHelper {
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
 		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 		if(dirt != null) {
-			dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFruitCocoa()));
+			dirt.startAnalysis(world, rootPos, signal);
 			return true;
 		}
 		return false;
