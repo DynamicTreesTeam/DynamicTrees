@@ -18,16 +18,12 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -164,8 +160,6 @@ public class JoCode {
 						//FIXME: Diagnostic code
 						//Can't seem to get the light processing to work under Worldgen. This might be by design in Minecraft but it's killing the way this works.
 						/*int light = world.getLightFor(EnumSkyBlock.SKY, cellPos);
-						Chunk chunk = world.getChunkFromBlockCoords(cellPos);
-						chunk.enqueueRelightChecks();
 						world.setBlockState(cellPos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));*/
 						//FIXME: End diagnostic code
 					}

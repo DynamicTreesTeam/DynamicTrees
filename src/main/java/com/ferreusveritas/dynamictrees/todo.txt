@@ -1,25 +1,88 @@
-////////////////////////////////////////////////////////////////
-// TODO (RoadMap)
-////////////////////////////////////////////////////////////////
+	╭─────────────────╮
+	│                 │
+	│       ▓▓        │
+	│      ▓▓▓▓▓      │
+	│     ▓▓▓┼▓▓▓     │
+	│    ▓▓▓▓│▓▓▓     │
+	│    ▓▓└─┧ ▓▓▓    │
+	│     ▓  ┠─┘▓     │
+	│        ┃        │
+	│  █████████████  │
+	│  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+	│  ░░░░░░░░░░░░░  │
+	╞═════════════════╡
+	│  DYNAMIC TREES  │
+	├─────────────────┤
+	│    ROAD MAP     │
+	╰─────────────────╯
 
-[X]Vines spawn on jungle trees and swamp oaks
-[X]Cocoa pods spawn on jungle trees during worldgen
-[X]Fix jungle worldgen(forest floor is bare)
-[ ]API
-[ ]Cacti
-[ ]Seasons
-[ ]Thick tree trunks
-[X]Improved Fire Behavior
-[X]Branches no longer tick randomly
-[X]Re-do Rot
-[X]Re-do Cellular automata
-[X]Divide Trees into Trees and Species
-[X]Thicker worldgen trees
-[X]Spawn swamp oaks
-[X]Redo drops from smashed Dynamic Leaves block
-[X]Look for nearest matching branch and fetch species
-[X]Redo seed dropping by using a signal
-[X]Quark greener grass compatibility added
-[X]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
-[X]Make Cocoa Pod placeable again
-[X]Find out why jungle tree generation looks like leaves are missing
+
+┍━━━━━━━━━━━━━┑
+│ PERFORMANCE │
+┕━━━┯━━━━━━━━━┙
+	│
+	├[✔]┬Redo Tree Signals
+	│	│
+	│	├[✔]Branches no longer tick randomly(better performance)
+	│	├[✔]Re-do Rot
+	│	├[✔]Redo seed dropping by using a signal
+	│	├[✔]DynamicLeaves looks for nearest matching branch and fetch species when harvesting
+	│	├[✔]Redo drops from smashed Dynamic Leaves block
+	│	╰[✔]Make Cocoa Pod placeable again
+	│
+	╰[✔]Re-do Cellular automata
+
+
+┍━━━━━━━━━━━━━┑
+│  FEATURES   │
+┕━━━┯━━━━━━━━━┙
+	│
+	├[✔]┬Divide Trees into Trees and Species
+	│	│
+	│	├[✔]Spawn swamp oaks	
+	│	│
+	│	├[ ]┬BlockRootyDirtFake for supporting branches but not doing anything
+	│	│	│
+	│	│	╰[ ]Jungle buttress roots
+	│	│
+	│	╰[ ]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
+	│		│
+	│		╰[ ]┬Apple Trees
+	│			│
+	│			├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
+	│			├[ ]Apple fruit block
+	│			├[ ]Apple seed crafted from apple and dirt bucket
+	│			╰[ ]Spawn randomly in plains biome
+	│
+	├[✔]Improved Fire Behavior
+	│
+	├[ ]┬Bone Meal behaves more consistently with Minecraft lore 
+	│	│
+	│	├[ ]Bone meal should grow saplings to first stage.
+	│	╰[ ]Bone meal should attempt a single growth cycle in a developing tree.
+	│
+	├[ ]API
+	├[ ]Cacti
+	├[ ]Seasons
+	├[ ]Trees fall over when harvested
+	╰[ ]Thick tree trunks
+
+
+┍━━━━━━━━━━━━━┑
+│  WORLDGEN   │
+┕━━━┯━━━━━━━━━┙
+	│
+	├[✔]Thicker worldgen trees
+	├[✔]Find out why jungle tree generation looks like leaves are missing
+	├[✔]Vines spawn on jungle trees and swamp oaks
+	├[✔]Cocoa pods spawn on jungle trees during worldgen
+	╰[✔]Fix jungle worldgen(forest floor is bare)
+
+
+┍━━━━━━━━━━━━━┑
+│COMPATABILITY│
+┕━━━┯━━━━━━━━━┙
+	│
+	├[✔]Quark greener grass compatibility added
+	╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
+
