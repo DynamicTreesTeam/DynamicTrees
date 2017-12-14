@@ -18,12 +18,16 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -156,10 +160,31 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 2);// 2: 0
+						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						//FIXME: Diagnostic code
+						//Can't seem to get the light processing to work under Worldgen. This might be by design in Minecraft but it's killing the way this works.
+						/*int light = world.getLightFor(EnumSkyBlock.SKY, cellPos);
+						Chunk chunk = world.getChunkFromBlockCoords(cellPos);
+						chunk.enqueueRelightChecks();
+						world.setBlockState(cellPos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));*/
+						//FIXME: End diagnostic code
 					}
 				}
 			}
+			
+			//FIXME: Diagnostic code
+			/*for(Cell cell: leafMap.getAllNonZeroCells()) {//Iterate through all of the cells that are not zero value(air)
+				BlockPos pos = cell.getPos();
+				if(TreeHelper.isLeaves(world, pos)) {
+					BlockDynamicLeaves leavesBlock = (BlockDynamicLeaves) world.getBlockState(pos).getBlock();
+					//if(!leavesBlock.hasAdequateLight(world, species.getTree(), pos)) {
+						int light = world.getLightFor(EnumSkyBlock.SKY, pos);
+						light = world.getLight(pos);
+						world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));
+					//}
+				}
+			}*/
+			//FIXME: End diagnostic code
 			
 			//Age volume for 3 cycles using a leafmap
 			TreeHelper.ageVolume(world, treePos, radius, 32, leafMap, 3);

@@ -114,7 +114,7 @@ public class TreeJungle extends DynamicTree {
 				BlockPos treePos = rootPos.up();
 				
 				//Generate Vines
-				vineGen.setQuantity(endPoints.size() / 2).setMaxLength(20).gen(world, treePos, endPoints);
+				vineGen.setQuantity(endPoints.size()).setMaxLength(20).gen(world, treePos, endPoints);
 
 				//Generate undergrowth
 				underGen.setRadius(radius).gen(world, treePos, endPoints);

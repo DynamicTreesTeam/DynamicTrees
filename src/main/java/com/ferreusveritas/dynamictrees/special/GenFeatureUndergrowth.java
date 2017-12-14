@@ -48,11 +48,15 @@ public class GenFeatureUndergrowth implements IGenFeature {
 					world.setBlockState(pos, Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE));
 					pos = pos.up(world.rand.nextInt(3));
 					
+					IBlockState leavesState = Blocks.LEAVES.getDefaultState()
+							.withProperty(BlockOldLeaf.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE)
+							.withProperty(BlockOldLeaf.CHECK_DECAY, Boolean.valueOf(false));
+					
 					SimpleVoxmap leafMap = species.getTree().getLeafCluster();
 					for(BlockPos dPos : leafMap.getAllNonZero()) {
 						BlockPos leafPos = pos.add(dPos);
-						if(world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
-							world.setBlockState(leafPos, Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE));
+						if((coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+							world.setBlockState(leafPos, leavesState);
 						}
 					}
 			}
@@ -74,5 +78,9 @@ public class GenFeatureUndergrowth implements IGenFeature {
 		return pos;
 	}
 	
+	public static int coordHashCode(BlockPos pos) {
+		int hash = (pos.getX() * 4111 ^ pos.getY() * 271 ^ pos.getZ() * 3067) >> 1;
+		return hash & 0xFFFF;
+	}
 	
 }

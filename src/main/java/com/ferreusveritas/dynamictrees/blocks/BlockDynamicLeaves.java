@@ -120,13 +120,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
 		world.checkLight(pos);
-		if(hydro == 0 || !hasAdequateLight(world, tree, pos)) {
+		if(hydro == 0 || (!rapid && !hasAdequateLight(world, tree, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			
-			//Diagnostic code FIXME
+			//FIXME: Diagnostic code 
 			/*if(TreeHelper.isLeaves(world, pos)) {
 				if(!hasAdequateLight(world, tree, pos)) {
-					Chunk chunk = world.getChunkFromBlockCoords(pos);
-					chunk.generateSkylightMap();
 					int light = world.getLightFor(EnumSkyBlock.SKY, pos);
 					light = world.getLight(pos);
 					world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));
@@ -138,7 +136,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 					return true;
 				}
 			}*/
-			//End diagnostic code
+			//FIXME: End diagnostic code
 			
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
