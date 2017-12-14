@@ -3,12 +3,11 @@ package com.ferreusveritas.dynamictrees.potion;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeTransform;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,14 +23,15 @@ public class SubstanceTransform implements ISubstanceEffect {
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
 
-		if(toTree != null) {
-			BlockPos basePos = rootPos.up();//Position of base of tree
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+
+		if(dirt != null && toTree != null) {
 			if(world.isRemote) {
-				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.CRIT, 8)));
+				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 			} else {
-				BlockBranch branch = TreeHelper.getBranch(world, basePos);
-				if(branch != null) {
-					branch.analyse(world, basePos, EnumFacing.DOWN, new MapSignal(new NodeTransform(branch.getTree(), toTree), new NodeTwinkle(EnumParticleTypes.FIREWORKS_SPARK, 8)));
+				Species species = dirt.getSpecies(world, rootPos);
+				if(species != null) {
+					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(species.getTree(), toTree)));
 				}
 			}
 			return true;

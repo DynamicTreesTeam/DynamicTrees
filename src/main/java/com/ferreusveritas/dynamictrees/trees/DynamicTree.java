@@ -189,9 +189,9 @@ public abstract class DynamicTree {
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
-		//Bonemeal fertilizes the soil
+		//Bonemeal fertilizes the soil and causes a single growth pulse
 		if( itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
-			return new SubstanceFertilize().setAmount(1);
+			return new SubstanceFertilize().setAmount(1).setGrow(true);
 		}
 		
 		//Use substance provider interface if it's available

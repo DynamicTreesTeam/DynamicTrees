@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.special.GenFeatureUndergrowth;
@@ -107,7 +106,7 @@ public class TreeJungle extends DynamicTree {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
 
 			if(world.rand.nextInt() % 16 == 0) {
-				addCocoa(world, rootPos.up());
+				addCocoa(world, rootPos);
 			}
 
 			if(worldGen) {
@@ -126,17 +125,14 @@ public class TreeJungle extends DynamicTree {
 			super.postGrow(world, rootPos, treePos, soilLife, rapid);
 			
 			if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-				addCocoa(world, treePos);
+				addCocoa(world, rootPos);
 			}
 			
 			return true;
 		}
 
-		private void addCocoa(World world, BlockPos treePos) {
-			ITreePart treePart = TreeHelper.getTreePart(world, treePos);
-			if(treePart != null) {
-				treePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeFruitCocoa()));
-			}
+		private void addCocoa(World world, BlockPos rootPos) {
+			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa()));
 		}
 		
 	}

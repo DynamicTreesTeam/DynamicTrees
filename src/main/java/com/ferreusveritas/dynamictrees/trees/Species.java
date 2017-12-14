@@ -466,6 +466,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return true;
 	}
 
+	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {
+		return true;
+	}
+	
+	public boolean canUseBoneMealNow(World world, Random rand, BlockPos pos) {
+		return true;
+	}
 	
 	///////////////////////////////////////////
 	//DIRT

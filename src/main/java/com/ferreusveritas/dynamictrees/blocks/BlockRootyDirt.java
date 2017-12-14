@@ -131,7 +131,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		updateTree(world, pos, random, false);
 	}
 	
-	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos pos) {
+	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos rootPos) {
 		return EnumFacing.UP; 
 	}
 	
@@ -269,6 +269,15 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	@Override
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
+	}
+	
+	public MapSignal startAnalysis(World world, BlockPos rootPos, MapSignal signal) {
+		EnumFacing dir = getTrunkDirection(world, rootPos);
+		BlockPos treePos = rootPos.offset(dir);
+		
+		TreeHelper.getSafeTreePart(world, treePos).analyse(world, treePos, null, signal);
+		
+		return signal;
 	}
 	
 	@Override

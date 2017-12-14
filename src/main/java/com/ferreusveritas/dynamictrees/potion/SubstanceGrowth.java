@@ -1,9 +1,7 @@
 package com.ferreusveritas.dynamictrees.potion;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +25,7 @@ public class SubstanceGrowth implements ISubstanceEffect{
 
 		if(world.isRemote) {
 			if(deltaTicks % 8 == 0) {//Run twinkles every 8 ticks.
-				TreeHelper.getSafeTreePart(world, rootPos.up()).analyse(world, rootPos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.SPELL, 2)));
+				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.SPELL, 2);
 			}
 		} else {
 			if((deltaTicks % 40) == 0) {//Grow pulse every 40 ticks

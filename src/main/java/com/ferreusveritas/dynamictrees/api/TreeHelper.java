@@ -2,15 +2,19 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
 
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -120,6 +124,20 @@ public class TreeHelper {
 		
 	}
 	
+	public static void treeParticles(World world, BlockPos rootPos, EnumParticleTypes type, int num) {
+		if(world.isRemote) {
+			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
+		}
+	}
+
+	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		if(dirt != null) {
+			dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFruitCocoa()));
+			return true;
+		}
+		return false;
+	}
 	
 	//Treeparts
 	
