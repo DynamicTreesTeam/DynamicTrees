@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
 
 import net.minecraft.block.BlockDirt;
@@ -71,8 +72,8 @@ public class TreeOak extends DynamicTree {
 			
 			envFactor(Type.COLD, 0.50f);
 			envFactor(Type.DRY, 0.50f);
-			
-			vineGen = new GenFeatureVine(this).setMaxLength(4);
+						
+			vineGen = new GenFeatureVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6);
 		}
 		
 		@Override
@@ -102,11 +103,21 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		@Override
+		public ItemStack getSeedStack(int qty) {
+			return commonSpecies.getSeedStack(qty);
+		}
+		
+		@Override
+		public Seed getSeed() {
+			return commonSpecies.getSeed();
+		}
+		
+		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
 			
 			//Generate Vines
-			vineGen.setQuantity(4).gen(world, rootPos.up(), endPoints);
+			vineGen.setQuantity(5).gen(world, rootPos.up(), endPoints);
 		}
 	}
 

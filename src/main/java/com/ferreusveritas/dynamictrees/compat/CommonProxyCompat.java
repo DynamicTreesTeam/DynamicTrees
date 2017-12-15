@@ -17,7 +17,7 @@ public class CommonProxyCompat {
 
 	public void init() {}
 	
-	public void registerBlocks(IForgeRegistry<Block> registry) {		
+	public void registerBlocks(IForgeRegistry<Block> registry) {
 		ccproxy.registerBlocks(registry);
 	}
 	

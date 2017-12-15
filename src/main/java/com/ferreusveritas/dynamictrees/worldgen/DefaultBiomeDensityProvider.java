@@ -110,7 +110,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 				chance = new ChanceStatic(EnumChance.OK);
 			}
 			else if(BiomeDictionary.hasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-				chance = new ChanceRandom(0.5f);
+				chance = new ChanceRandom(0.75f);
 			} 
 			else if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 				chance = new ChanceStatic(EnumChance.CANCEL);

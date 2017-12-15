@@ -44,7 +44,7 @@
 	│	│	│
 	│	│	├[✔]Swamp oak species created
 	│	│	├[✔]Swamp oak generate with vines
-	│	│	╰[ ]JoCode tree models for WorldGen 
+	│	│	╰[✔]JoCode tree models for WorldGen 
 	│	│
 	│	├[ ]┬BlockRootyDirtFake for supporting branches but not doing anything
 	│	│	│
@@ -62,10 +62,9 @@
 	│
 	├[✔]Improved Fire Behavior
 	│
-	├[ ]┬Bone Meal behaves more consistently with Minecraft lore
+	├[✔]┬Bone Meal behaves more consistently with Minecraft lore
 	│	│
 	│	├[✔]┬Bone meal should grow saplings to first stage.
-	│	│	│
 	│	│	╰[✔]Spawn grow particles like a vanilla sapling
 	│	│
 	│	╰[✔]Bone meal should attempt a single growth cycle in a developing tree.

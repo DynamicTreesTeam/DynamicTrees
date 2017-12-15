@@ -104,6 +104,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public Species(ResourceLocation name, DynamicTree treeFamily) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
+		
+		//Add JoCode models for worldgen
+		addJoCodes();
 	}
 	
 	public DynamicTree getTree() {
@@ -174,7 +177,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public ItemStack getSeedStack(int qty) {
 		return CompatHelper.setStackCount(seedStack.copy(), qty);
 	}
-	
 	
 	public Seed getSeed() {
 		return seed;

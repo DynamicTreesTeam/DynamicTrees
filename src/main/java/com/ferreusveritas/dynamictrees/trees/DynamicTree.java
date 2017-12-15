@@ -163,9 +163,6 @@ public abstract class DynamicTree {
 	
 		//Generate a seed
 		commonSpecies.generateSeed();
-		
-		//A JoCode models for worldgen
-		commonSpecies.addJoCodes();
 	}
 	
 	public abstract void createSpecies();

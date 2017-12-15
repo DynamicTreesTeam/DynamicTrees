@@ -19,6 +19,8 @@ public class GenFeatureVine implements IGenFeature {
 	protected final PropertyBool vineMap[] = new PropertyBool[] {null, null, BlockVine.NORTH, BlockVine.SOUTH, BlockVine.WEST, BlockVine.EAST};
 	protected int qty = 4;
 	protected int maxLength = 8;
+	protected float verSpread = 60;
+	protected float rayDistance = 5;
 	protected Species species;
 	
 	public GenFeatureVine(Species species) {
@@ -35,6 +37,16 @@ public class GenFeatureVine implements IGenFeature {
 		return this;
 	}
 	
+	public GenFeatureVine setVerSpread(float verSpread) {
+		this.verSpread = verSpread;
+		return this;
+	}
+	
+	public GenFeatureVine setRayDistance(float rayDistance) {
+		this.rayDistance = rayDistance;
+		return this;
+	}
+	
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints) {
 		if(!endPoints.isEmpty()) {
@@ -47,7 +59,7 @@ public class GenFeatureVine implements IGenFeature {
 	
 	protected void addVine(World world, Species species, BlockPos treePos, BlockPos branchPos) {
 		
-		RayTraceResult result = species.branchRayTrace(world, treePos, branchPos, 90, 80, 5);
+		RayTraceResult result = species.branchRayTrace(world, treePos, branchPos, 90, verSpread, rayDistance);
 		
 		if(result != null) {
 			BlockPos vinePos = result.getBlockPos().offset(result.sideHit);
