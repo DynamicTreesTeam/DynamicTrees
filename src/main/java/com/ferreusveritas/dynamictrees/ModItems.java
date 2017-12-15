@@ -47,7 +47,7 @@ public class ModItems {
 
 		for(DynamicTree tree: ModTrees.baseTrees) {
 			tree.getRegisterableBlocks(treeBlocks);
-			registry.register(tree.getCommonSpecies().getSeed());
+			tree.getRegisterableItems(treeItems);
 		}
 
 		for(Item item: treeItems) {

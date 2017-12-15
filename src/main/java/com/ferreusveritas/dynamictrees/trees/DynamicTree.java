@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -34,6 +35,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -261,6 +263,21 @@ public abstract class DynamicTree {
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(dynamicBranch);
 		return blockList;
+	}
+	
+	/** 
+	 * Used to register items the tree creates. Mostly for the {@link Seed}
+	 * If the developer provides the seed externally instead of having it 
+	 * generated internally then the seed should be allowed to register here.
+	 * If this can't be the case then override this member function with a 
+	 * dummy one. 
+	 */
+	public List<Item> getRegisterableItems(List<Item> itemList) {
+		Seed seed = getCommonSpecies().getSeed();
+		if(seed != null) {
+			itemList.add(seed);
+		}
+		return itemList;
 	}
 	
 	//////////////////////////////

@@ -31,7 +31,7 @@
 	│	├[✔]Redo drops from smashed Dynamic Leaves block
 	│	╰[✔]Make Cocoa Pod placeable again
 	│
-	╰[✔]Re-do Cellular automata
+	╰[✔]Re-do Cellular Leaves automata
 
 
 ┍━━━━━━━━━━━━━┑

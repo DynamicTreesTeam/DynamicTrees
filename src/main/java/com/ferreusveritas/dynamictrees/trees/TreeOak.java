@@ -39,6 +39,7 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.50f);
 			envFactor(Type.FOREST, 1.05f);
+			
 		}
 		
 		@Override
@@ -97,16 +98,19 @@ public class TreeOak extends DynamicTree {
 			return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
 		}
 
+		//Swamp Oaks are just oaks in a swamp..  So they have the same drops
 		@Override
 		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 			return commonSpecies.getDrops(blockAccess, pos, chance, drops);
 		}
 		
+		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
 		public ItemStack getSeedStack(int qty) {
 			return commonSpecies.getSeedStack(qty);
 		}
 		
+		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
 		public Seed getSeed() {
 			return commonSpecies.getSeed();
@@ -121,6 +125,9 @@ public class TreeOak extends DynamicTree {
 		}
 	}
 
+	/**
+	 * This species drops no seeds at all.  One must craft the seed from an apple.
+	 */
 	public class SpeciesAppleOak extends Species {
 
 		public SpeciesAppleOak(DynamicTree treeFamily) {
@@ -132,6 +139,7 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.COLD, 0.75f);
 			envFactor(Type.HOT, 0.75f);
 			envFactor(Type.DRY, 0.25f);
+			
 		}
 		
 		@Override
