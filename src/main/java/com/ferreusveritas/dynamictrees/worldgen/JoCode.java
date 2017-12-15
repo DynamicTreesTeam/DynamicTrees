@@ -14,12 +14,12 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -126,6 +126,7 @@ public class JoCode {
 	* @param radius Constraint radius
 	*/
 	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
+			IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
 		world.setBlockState(rootPos, species.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//A Tree generation boundary radius is at least 2 and at most 8
@@ -148,37 +149,32 @@ public class JoCode {
 			
 			smother(leafMap, branch.getTree());//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
 			
+			//Establish a zone where we can place leaves without hitting ungenerated chunks.
+			SafeChunkBounds safeBounds = new SafeChunkBounds(world, rootPos);//Area that is safe to place leaves during worldgen
+			
 			//Place Growing Leaves Blocks from voxmap
 			IBlockState leavesState = branch.getTree().getDynamicLeavesState();
-			for(Cell cell: leafMap.getAllNonZeroCells()) {//Iterate through all of the cells that are not zero value(air)
-				if((cell.getValue() & 0x0F) != 0) {//If this is true then we are dealing with a leaf block.  Masked off value is the hydro value
-					BlockPos cellPos = cell.getPos();
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
+				BlockPos cellPos = cell.getPos();
+				if(safeBounds.inBounds(cellPos)) {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
 						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
-						//FIXME: Diagnostic code
-						//Can't seem to get the light processing to work under Worldgen. This might be by design in Minecraft but it's killing the way this works.
-						/*int light = world.getLightFor(EnumSkyBlock.SKY, cellPos);
-						world.setBlockState(cellPos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));*/
-						//FIXME: End diagnostic code
 					}
+				} else {
+					leafMap.setVoxel(cellPos, (byte) 0);
 				}
 			}
-			
-			//FIXME: Diagnostic code
-			/*for(Cell cell: leafMap.getAllNonZeroCells()) {//Iterate through all of the cells that are not zero value(air)
-				BlockPos pos = cell.getPos();
-				if(TreeHelper.isLeaves(world, pos)) {
-					BlockDynamicLeaves leavesBlock = (BlockDynamicLeaves) world.getBlockState(pos).getBlock();
-					//if(!leavesBlock.hasAdequateLight(world, species.getTree(), pos)) {
-						int light = world.getLightFor(EnumSkyBlock.SKY, pos);
-						light = world.getLight(pos);
-						world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(light)));
-					//}
+
+			//Shrink the safeBounds down by 1 so that the aging process won't look for neighbors outside of the bounds.
+			safeBounds.setShrink(1);
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
+				BlockPos cellPos = cell.getPos();
+				if(!safeBounds.inBounds(cellPos)) {
+					leafMap.setVoxel(cellPos, (byte) 0);
 				}
-			}*/
-			//FIXME: End diagnostic code
+			}
 			
 			//Age volume for 3 cycles using a leafmap
 			TreeHelper.ageVolume(world, treePos, radius, 32, leafMap, 3);
@@ -189,12 +185,12 @@ public class JoCode {
 			//Allow for special decorations by the tree itself
 			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
 		
-		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlockState(rootPos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
+		} else { //The growth failed.. turn the soil back to what it was
+			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
 
 	}
-
+	
 	/**
 	 * Recursive function that "draws" a branch of a tree
 	 * 

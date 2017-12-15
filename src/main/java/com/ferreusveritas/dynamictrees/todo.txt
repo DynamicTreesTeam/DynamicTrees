@@ -31,6 +31,8 @@
 	│	├[✔]Redo drops from smashed Dynamic Leaves block
 	│	╰[✔]Make Cocoa Pod placeable again
 	│
+	├[✔]Light smothering disabled during worldgen(doesn't work anyway)
+	│
 	╰[✔]Re-do Cellular Leaves automata
 
 
@@ -85,6 +87,7 @@
 	├[✔]Vines spawn on jungle trees and swamp oaks
 	├[✔]Cocoa pods spawn on jungle trees during worldgen
 	├[✔]Fix jungle worldgen(forest floor is bare)
+	├[⌛]Fix spawning leaves in ungenerated chunks
 	╰[ ]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.) 
 
 

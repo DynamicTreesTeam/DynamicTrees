@@ -151,7 +151,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 			ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
 			
-			if(treeBase != null && CoordUtils.isSurroundedByExistingChunks(world, rootPos)) {
+			if(treeBase != null && CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 				viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
 			}
 		}
