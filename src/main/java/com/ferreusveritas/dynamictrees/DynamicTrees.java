@@ -46,7 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * </p>
 * 
 * @author ferreusveritas
-* @version 0.7.1b
+* @version 0.7.1c
 *
 */
 @Mod(modid = ModConstants.MODID, version=ModConstants.VERSION, dependencies="after:computercraft;after:quark")
@@ -73,20 +73,20 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		
-		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
-		TreeGenerator.preInit();//Create the generator
-		
-		try {
+		try { //This is need because something silently absorbs exceptions outside of this event.
+			ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
+			TreeGenerator.preInit();//Create the generator
+			
 			ModBlocks.preInit();
 			ModItems.preInit();
 			ModTrees.preInit();
+			
+			proxy.preInit();
+			compatProxy.preInit();
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 		
-		proxy.preInit();
-		
-		compatProxy.preInit();
 	}
 
 	@Mod.EventHandler
