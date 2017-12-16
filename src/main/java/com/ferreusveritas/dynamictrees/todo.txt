@@ -31,6 +31,8 @@
     │   ├[✔]Redo drops from smashed Dynamic Leaves block
     │   ╰[✔]Make Cocoa Pod placeable again
     │
+    ├[✔]Dynamic leaves work as expected in fast or fancy graphics mode
+    │
     ├[✔]Light smothering disabled during worldgen(doesn't work anyway)
     │
     ╰[✔]Re-do Cellular Leaves automata
@@ -58,7 +60,7 @@
     │           │
     │           ├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
     │           ├[ ]Apple fruit block
-    │           ├[ ]Apple seed crafted from apple and dirt bucket
+    │           ├[ ]Apple pip crafted from apple and dirt bucket
     │           ├[ ]JoCode tree models for WorldGen 
     │           ╰[ ]Spawn randomly in plains biome
     │
@@ -102,4 +104,12 @@
     │
     ├[✔]Quark greener grass compatibility added
     ╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
+
+
+┍━━━━━━━━━━━━━┑
+│     API     │
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]Forge Compatible Species Registry(IForgeRegistry<Species>)
+    ╰[ ]Make Tree Builder for easily making custom Trees.
 

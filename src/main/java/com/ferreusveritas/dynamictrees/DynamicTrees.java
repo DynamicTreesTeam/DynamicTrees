@@ -76,10 +76,14 @@ public class DynamicTrees {
 		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
 		TreeGenerator.preInit();//Create the generator
 		
-		ModBlocks.preInit();
-		ModItems.preInit();
-		ModTrees.preInit();
-				
+		try {
+			ModBlocks.preInit();
+			ModItems.preInit();
+			ModTrees.preInit();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
 		proxy.preInit();
 		
 		compatProxy.preInit();

@@ -31,11 +31,13 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
@@ -45,6 +47,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable {
 	
@@ -55,7 +59,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public BlockDynamicLeaves() {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
-		leavesFancy = true;//True for alpha transparent leaves
+		//leavesFancy = true;//True for alpha transparent leaves
 	}
 	
 	@Override
@@ -668,4 +672,21 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return BlockPlanks.EnumType.OAK;//Shouldn't matter since it's only used to name things in ItemLeaves
 	}
 
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+		return super.isOpaqueCube(state);
+	}
+	
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+    	return super.getBlockLayer();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+		return super.shouldSideBeRendered(blockState, blockAccess, pos, side); 
+	}
 }
