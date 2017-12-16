@@ -23,13 +23,13 @@
 ┕━━━┯━━━━━━━━━┙
     │
     ├[✔]┬Redo Tree Signals
-    │    │
-    │    ├[✔]Branches no longer tick randomly(better performance)
-    │    ├[✔]Re-do Rot
-    │    ├[✔]Redo seed dropping by using a signal
-    │    ├[✔]DynamicLeaves looks for nearest matching branch and fetch species when harvesting
-    │    ├[✔]Redo drops from smashed Dynamic Leaves block
-    │    ╰[✔]Make Cocoa Pod placeable again
+    │   │
+    │   ├[✔]Branches no longer tick randomly(better performance)
+    │   ├[✔]Re-do Rot
+    │   ├[✔]Redo seed dropping by using a signal
+    │   ├[✔]DynamicLeaves looks for nearest matching branch and fetch species when harvesting
+    │   ├[✔]Redo drops from smashed Dynamic Leaves block
+    │   ╰[✔]Make Cocoa Pod placeable again
     │
     ├[✔]Light smothering disabled during worldgen(doesn't work anyway)
     │
@@ -41,26 +41,26 @@
 ┕━━━┯━━━━━━━━━┙
     │
     ├[✔]┬Divide Trees into Trees and Species
-    │    │
-    │    ├[✔]┬Spawn swamp oaks in swamps
-    │    │   │
-    │    │   ├[✔]Swamp oak species created
-    │    │   ├[✔]Swamp oak generate with vines
-    │    │   ╰[✔]JoCode tree models for WorldGen 
-    │    │
-    │    ├[ ]┬BlockRootyDirtFake for supporting branches but not doing anything
-    │    │   │
-    │    │   ╰[ ]Jungle buttress roots
-    │    │
-    │    ╰[ ]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
-    │        │
-    │        ╰[ ]┬Apple Trees
-    │            │
-    │            ├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
-    │            ├[ ]Apple fruit block
-    │            ├[ ]Apple seed crafted from apple and dirt bucket
-    │            ├[ ]JoCode tree models for WorldGen 
-    │            ╰[ ]Spawn randomly in plains biome
+    │   │
+    │   ├[✔]┬Spawn swamp oaks in swamps
+    │   │   │
+    │   │   ├[✔]Swamp oak species created
+    │   │   ├[✔]Swamp oak generate with vines
+    │   │   ╰[✔]JoCode tree models for WorldGen 
+    │   │
+    │   ├[ ]┬BlockRootyDirtFake for supporting branches but not doing anything
+    │   │   │
+    │   │   ╰[ ]Jungle buttress roots
+    │   │
+    │   ╰[ ]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
+    │       │
+    │       ╰[ ]┬Apple Trees
+    │           │
+    │           ├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
+    │           ├[ ]Apple fruit block
+    │           ├[ ]Apple seed crafted from apple and dirt bucket
+    │           ├[ ]JoCode tree models for WorldGen 
+    │           ╰[ ]Spawn randomly in plains biome
     │
     ├[✔]Improved Fire Behavior
     │
