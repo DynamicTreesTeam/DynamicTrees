@@ -587,7 +587,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} for this {@link DynamicTree}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
-	 * @param soilLife The soillife of the {@link BlockRootyDirt}
+	 * @param soilLife The soil life of the {@link BlockRootyDirt}
 	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly.
 	 * @return true if last piece of tree rotted away.
 	 */
@@ -600,13 +600,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			BlockPos endPos = iter.next();
 			IBlockState branchState = world.getBlockState(endPos);
 			BlockBranch branch = TreeHelper.getBranch(branchState);
-			int radius = branch.getRadius(branchState);
-			float rotChance = rotChance(world, endPos, world.rand, radius);
-			if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
-				if(rapid) {
-					TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), null, 2);
+			if(branch != null) {
+				int radius = branch.getRadius(branchState);
+				float rotChance = rotChance(world, endPos, world.rand, radius);
+				if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
+					if(rapid) {
+						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), null, 2);
+					}
+					iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 				}
-				iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 			}
 		}
 		
