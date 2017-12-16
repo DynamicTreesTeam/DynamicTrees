@@ -87,9 +87,13 @@
     ├[✔]Vines spawn on jungle trees and swamp oaks
     ├[✔]Cocoa pods spawn on jungle trees during worldgen
     ├[✔]Fix jungle worldgen(forest floor is bare)
-    ├[✔]Fixed broken poisson disc algorithm
-    ├[⌛]Fix spawning leaves in ungenerated chunks
-    ╰[ ]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.) 
+    │
+    ├[⌛]┬Poisson disc rework
+    │   ├[✔]Fixed broken poisson disc algorithm
+    │   ├[✔]Poisson discs fit more tightly together(better, more continuous forest canopies)
+    │   ╰[ ]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.)
+    │
+    ╰[⌛]Fix spawning leaves in ungenerated chunks(cascading worldgen lag problem)
 
 
 ┍━━━━━━━━━━━━━┑
