@@ -105,8 +105,8 @@ public class TreeJungle extends DynamicTree {
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
 
-			if(world.rand.nextInt() % 16 == 0) {
-				addCocoa(world, rootPos);
+			if(world.rand.nextInt() % 8 == 0) {
+				addCocoa(world, rootPos, true);
 			}
 
 			if(worldGen) {
@@ -125,14 +125,14 @@ public class TreeJungle extends DynamicTree {
 			super.postGrow(world, rootPos, treePos, soilLife, rapid);
 			
 			if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-				addCocoa(world, rootPos);
+				addCocoa(world, rootPos, false);
 			}
 			
 			return true;
 		}
 
-		private void addCocoa(World world, BlockPos rootPos) {
-			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa()));
+		private void addCocoa(World world, BlockPos rootPos, boolean worldGen) {
+			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa().setWorldGen(worldGen)));
 		}
 		
 	}

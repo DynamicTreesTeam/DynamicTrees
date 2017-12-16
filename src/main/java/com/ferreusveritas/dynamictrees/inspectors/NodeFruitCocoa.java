@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -13,12 +14,17 @@ import net.minecraft.world.World;
 
 public class NodeFruitCocoa implements INodeInspector {
 
-	boolean finished;
-
+	boolean finished = false;
+	boolean worldGen = false;
+	
 	public NodeFruitCocoa() {
-		finished = false;
 	}
 
+	public NodeFruitCocoa setWorldGen(boolean worldGen) {
+		this.worldGen = worldGen;
+		return this;
+	}
+	
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
@@ -31,6 +37,9 @@ public class NodeFruitCocoa implements INodeInspector {
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
 						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
+						if(worldGen) {
+							cocoaState = cocoaState.withProperty(BlockCocoa.AGE, 2);
+						}
 						world.setBlockState(pos, cocoaState, 2);
 					}
 				} else {
