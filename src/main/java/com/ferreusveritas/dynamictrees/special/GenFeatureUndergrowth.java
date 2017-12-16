@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.special;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -40,7 +41,7 @@ public class GenFeatureUndergrowth implements IGenFeature {
 			int rad = MathHelper.clamp(radius, 2, world.rand.nextInt(radius - 1) + 2);
 			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
 
-			BlockPos pos = findGround(world, new BlockPos(v));
+			BlockPos pos = TreeHelper.findGround(world, new BlockPos(v));
 			IBlockState soilBlockState = world.getBlockState(pos);
 
 			if(species.isAcceptableSoil(world, pos, soilBlockState)) {
@@ -62,22 +63,7 @@ public class GenFeatureUndergrowth implements IGenFeature {
 			}
 		}
 	}
-	
-	BlockPos findGround(World world, BlockPos pos) {
-				
-		//Rise up until we are no longer in a solid block
-		while(world.getBlockState(pos).isFullCube()) {
-			pos = pos.up();
-		}
-		
-		//Dive down until we are again
-		while(!world.getBlockState(pos).isFullCube() && pos.getY() > 50) {
-			pos = pos.down();
-		}
 
-		return pos;
-	}
-	
 	public static int coordHashCode(BlockPos pos) {
 		int hash = (pos.getX() * 4111 ^ pos.getY() * 271 ^ pos.getZ() * 3067) >> 1;
 		return hash & 0xFFFF;

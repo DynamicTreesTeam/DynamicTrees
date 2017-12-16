@@ -75,7 +75,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	public double getDensity(Biome biome, double noiseDensity, Random random) {
 		
 		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Roofed Forest
-			return 0.5f + (noiseDensity / 2.0f);
+			return 0.4f + (noiseDensity / 3.0f);
 		}
 		
 		double naturalDensity = MathHelper.clamp((biome.decorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0

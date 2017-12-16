@@ -138,8 +138,9 @@ public class TreeGenerator implements IWorldGenerator {
 				int posX = xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = zi * 4 + 1 + 8 + random.nextInt(3);
 				BlockPos blockpos = world.getHeight(pos.add(posX, 0, posZ));
-
-				if (random.nextInt(16) == 0) {
+				blockpos = TreeHelper.findGround(world, blockpos).up();
+				
+				if (random.nextInt(6) == 0) {
 					new WorldGenBigMushroom().generate(world, random, blockpos);
 				}
 			}
