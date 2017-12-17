@@ -88,6 +88,8 @@
     ├[✔]Find out why jungle tree generation looks like leaves are missing
     ├[✔]Vines spawn on jungle trees and swamp oaks
     ├[✔]Cocoa pods spawn on jungle trees during worldgen
+    ├[✔]Mesa Forests now properly spawn oaks instead of nothing
+    ├[✔]MUTATED_REDWOOD_TAIGA and MUTATED_REDWOOD_TAIGA_HILLS now properly spawn spruce instead of Oak.
     ├[✔]Fix jungle worldgen(forest floor is bare)
     │
     ├[⌛]┬Poisson disc rework
