@@ -581,6 +581,8 @@ public abstract class DynamicTree {
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////
+
+	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 	
 	/**
 	* Handle rotting branches
@@ -592,8 +594,6 @@ public abstract class DynamicTree {
 	* @return true if the branch should rot
 	*/
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-		
-		final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 		
 		if(radius <= 1) {
 			for(EnumFacing dir: upFirst) {

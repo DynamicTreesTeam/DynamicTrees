@@ -1,12 +1,17 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
 import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
 import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
+import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
@@ -27,6 +32,8 @@ public class TreeSpruce extends DynamicTree {
 	
 	public class SpeciesSpruce extends Species {
 
+		GenFeaturePodzol podzolGen;
+		
 		SpeciesSpruce(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
 			
@@ -36,6 +43,8 @@ public class TreeSpruce extends DynamicTree {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.WET, 0.75f);
+			
+			podzolGen = new GenFeaturePodzol();
 		}
 		
 		@Override
@@ -83,6 +92,16 @@ public class TreeSpruce extends DynamicTree {
 			return hash & 0xFFFF;
 		}
 
+		@Override
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+			if(ModConfigs.podzolGen) {
+				NodeFindEnds endFinder = new NodeFindEnds();
+				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
+				podzolGen.gen(world, treePos, endFinder.getEnds());
+			}
+			return true;
+		}
+		
 	}
 	
 	Species species;

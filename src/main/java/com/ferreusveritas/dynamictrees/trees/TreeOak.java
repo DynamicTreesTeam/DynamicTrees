@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.special.GenFeatureVine;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;

@@ -48,10 +48,10 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
 public class BlockBranch extends Block implements ITreePart, IBurningListener {
-
+	
 	private DynamicTree tree; //The tree this branch type creates
 	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
-
+	
 	// This is a nightmare
 	public static final IUnlistedProperty<Integer> RADIUSD = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8));
 	public static final IUnlistedProperty<Integer> RADIUSU = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8));
@@ -60,7 +60,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public static final IUnlistedProperty<Integer> RADIUSW = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8));
 	public static final IUnlistedProperty<Integer> RADIUSE = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8));
 	public static final IUnlistedProperty CONNECTIONS[] = { RADIUSD, RADIUSU, RADIUSN, RADIUSS, RADIUSW, RADIUSE };
-
+	
 	public BlockBranch(String name) {
 		super(Material.WOOD); //Trees are made of wood. Brilliant.
 		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
@@ -69,17 +69,17 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
-
+	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
-
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		IProperty[] listedProperties = { RADIUS };
 		return new ExtendedBlockState(this, listedProperties, CONNECTIONS);
 	}
-
+	
 	/**
 	 * Convert the given metadata into a BlockState for this Block
 	 */
@@ -87,7 +87,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(RADIUS, (meta & 7) + 1);
 	}
-
+	
 	/**
 	 * Convert the BlockState into the correct metadata value
 	 */
@@ -95,34 +95,34 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public int getMetaFromState(IBlockState state) {
 		return state.getValue(RADIUS) - 1;
 	}
-
+	
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;
 			int thisRadius = getRadius(state);
-
+			
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
 			}
 			return retval;
 		}
-
+		
 		return state;
 	}
-
+	
 	///////////////////////////////////////////
 	// TREE INFORMATION
 	///////////////////////////////////////////
-
+	
 	public void setTree(DynamicTree tree) {
 		this.tree = tree;
 	}
-
+	
 	public DynamicTree getTree() {
 		return tree;
 	}
-
+	
 	@Override
 	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
 		return getTree();
@@ -136,20 +136,20 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public boolean isSameWood(ITreePart treepart) {
 		return isSameWood(TreeHelper.getBranch(treepart));
 	}
-
+	
 	public boolean isSameWood(BlockBranch branch) {
 		return branch != null && getTree() == branch.getTree();
 	}
-
+	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return isSameWood(branch) ? 0x11 : 0;// Other branches of the same type are always valid support.
 	}
-
+	
 	///////////////////////////////////////////
 	// WORLD UPDATE
 	///////////////////////////////////////////
-
+	
 	/**
 	 * 
 	 * @param world
@@ -168,7 +168,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		// Rooty dirt below the block counts as a branch in this instance
 		// Rooty dirt below for saplings counts as 2 neighbors if the soil is not infertile
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
-
+		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
 			neigh += TreeHelper.getSafeTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
@@ -178,7 +178,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		}
 		
 		boolean didRot = getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
-
+		
 		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
 			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
@@ -191,46 +191,46 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 		return didRot;
 	}
-
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-
+	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-
+		
 		if(tree != null) {
 			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		int radius = getRadius(world, pos);
 		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
-
+	
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		// return 300;
 		return getTree().getPrimitiveLog().getBlock().getFlammability(world, pos, face);
 	}
-
+	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		// return 4096;
 		int radius = getRadius(world, pos);
 		return (getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos, face) * radius) / 8 ;
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 	@Override
 	public boolean isFullCube(IBlockState state) {
 		return false;
@@ -240,7 +240,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public boolean isOpaqueCube(IBlockState state) {
 		return getRadius(state) == 8;
 	}
-
+	
 	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
 		if (getRadius(blockState) == 8) {
@@ -254,11 +254,11 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
-
+	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		DynamicTree thisTree = getTree();
-
+		
 		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
 		} else {
@@ -270,7 +270,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return getRadius(blockAccess.getBlockState(pos));
 	}
-
+	
 	public int getRadius(IBlockState blockState) {
 		if (blockState.getBlock() == this) {
 			return blockState.getValue(RADIUS);
@@ -278,17 +278,17 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			return 0;
 		}
 	}
-
+	
 	public void setRadius(World world, BlockPos pos, int radius) {
 		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp(radius, 1, 8)), 2);
 	}
-
+	
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return isSameWood(from) ? getRadius(blockAccess, pos) + 2 : 0;
 	}
-
+	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		DynamicTree tree = signal.getSpecies().getTree();
 		
@@ -302,10 +302,10 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		}
 		return signal;
 	}
-
+	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
-
+		
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
 			Species species = signal.getSpecies();
 			//DynamicTree tree = signal.getTree();
@@ -313,10 +313,10 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
 			EnumFacing targetDir = tree.getCommonSpecies().selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
-
+			
 			{
 				BlockPos deltaPos = pos.offset(targetDir);
-
+				
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
 				if (treepart != null) {
@@ -325,14 +325,14 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(world, pos));
 				}
 			}
-
+			
 			// Calculate Branch Thickness based on neighboring branches
 			float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
-
+			
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
 					BlockPos deltaPos = pos.offset(dir);
-
+					
 					// If it is decided to implement a special block(like a squirrel hole, tree
 					// swing, rotting, burned or infested branch, etc) then this new block could be
 					// derived from BlockBranch and this works perfectly. Should even work with
@@ -344,36 +344,36 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 					}
 				}
 			}
-
+			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
 			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
-
+		
 		return signal;
 	}
-
+	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
-
+	
 	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
 	// The result is that only thin branches and trunks can be climbed
 	@Override
 	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
 		return true;
 	}
-
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
-
+		
 		if (state.getBlock() != this) {
 			return NULL_AABB;
 		}
-
+		
 		int thisRadius = getRadius(state);
-
+		
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
@@ -389,11 +389,11 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		}
 		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 	}
-
+	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
 		int thisRadius = getRadius(state);
-
+		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
 			if (connRadius > 0) {
@@ -405,21 +405,21 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			}
 		}
 	}
-
+	
 	@Override
 	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
 		return getRadius(world, pos);
 	}
-
+	
 	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
 		return TreeHelper.getSafeTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, radius);
 	}
-
+	
 	///////////////////////////////////////////
 	// NODE ANALYSIS
 	///////////////////////////////////////////
-
+	
 	@Override
 	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
@@ -428,9 +428,9 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
-
+					
 					signal = TreeHelper.getSafeTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
-
+					
 					// This should only be true for the originating block when the root node is found
 					if (signal.found && signal.localRootDir == null && fromDir == null) {
 						signal.localRootDir = dir;
@@ -443,10 +443,10 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			signal.overflow = true;
 		}
 		signal.depth--;
-
+		
 		return signal;
 	}
-
+	
 	public Species getSpeciesFromSignal(World world, MapSignal signal) {
 		Species species;
 		if(signal.found) {
@@ -468,7 +468,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
-
+	
 	public int destroyEntireTree(World world, BlockPos pos) {
 		MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 		Species species = getSpeciesFromSignal(world, signal);//Get the species from the root node
@@ -477,14 +477,14 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
-
+	
 	///////////////////////////////////////////
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
-
+	
 	public List<ItemStack> getWoodDrops(World world, BlockPos pos, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
-
+		
 		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
 		DynamicTree tree = getTree();
 		ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
@@ -496,7 +496,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	/*
 	1.10.2 Simplified Block Harvesting Logic Flow(for no silk touch)
-
+	
 	tryHarvestBlock {
 		canHarvest = canHarvestBlock() <- (ForgeHooks.canHarvestBlock occurs in here)
 		removed = removeBlock(canHarvest) {
@@ -545,7 +545,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 		return true;// Function returns true if Block was destroyed
 	}
-
+	
 	// Super member also does nothing
 	@Override
 	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
@@ -562,13 +562,13 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
 	}
-
+	
 	// Similar to above.. We already created drops in removedByPlayer() so no quantity should be expressed
 	@Override
 	public int quantityDropped(Random random) {
 		return 0;
 	}
-
+	
 	// We do not allow silk harvest for all the reasons listed in getItemDropped
 	@Override
 	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
@@ -605,21 +605,20 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 				}
 			}
 		}
-
+		
 	}
 	
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {		
 		IBlockState neighBlockState = world.getBlockState(neighbor);
-
+		
 		if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {
 			int age = neighBlockState.getBlock() == Blocks.FIRE ? ((Integer)neighBlockState.getValue(BlockFire.AGE)).intValue() : 0;
 			world.setBlockState(neighbor, ModBlocks.blockVerboseFire.getDefaultState().withProperty(BlockFire.AGE, age));
 		}
 		
 	}
-
-
+	
 	@Override
 	public boolean isBranch() {
 		return true;
@@ -628,10 +627,10 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	///////////////////////////////////////////
 	// IRRELEVANT
 	///////////////////////////////////////////
-
+	
 	@Override
 	public boolean isRootNode() {
 		return false;
 	}
-
+	
 }

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.special;
+package com.ferreusveritas.dynamictrees.genfeatures;
 
 import java.util.List;
 
