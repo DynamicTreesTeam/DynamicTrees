@@ -10,7 +10,7 @@ public class CommonProxyCompat {
 	public CCProxyBase ccproxy;
 	
 	public void preInit() {
-		//Computercraft Creative Mode Stuff		
+		//Computercraft Creative Mode Stuff
 		ccproxy = CCProxyBase.hasComputerCraft() ? new CCProxyActive() : new CCProxyBase();
 		ccproxy.createBlocks();
 	}

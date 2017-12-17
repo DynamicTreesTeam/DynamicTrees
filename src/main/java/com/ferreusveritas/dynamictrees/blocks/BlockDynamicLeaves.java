@@ -674,8 +674,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
-		return super.isOpaqueCube(state);
+		return Blocks.LEAVES.isOpaqueCube(state);
 	}
 	
     @SideOnly(Side.CLIENT)
