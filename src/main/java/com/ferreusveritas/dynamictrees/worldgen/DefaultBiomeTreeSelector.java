@@ -26,6 +26,10 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	private Species darkoak;
 	private Species oakswamp;
 	
+	private StaticDecision staticOakDecision;
+	private StaticDecision staticSpruceDecision;
+	private StaticDecision staticDarkOakDecision;
+	
 	private interface ITreeSelector {
 		Decision getDecision();
 	}
@@ -57,6 +61,10 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		jungle = TreeRegistry.findSpeciesSloppy("jungle");
 		darkoak = TreeRegistry.findSpeciesSloppy("darkoak");
 		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
+		
+		staticOakDecision = new StaticDecision(new Decision(oak));
+		staticSpruceDecision = new StaticDecision(new Decision(spruce));
+		staticDarkOakDecision = new  StaticDecision(new Decision(darkoak));
 	}
 	
 	@Override
@@ -80,17 +88,22 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		}
 		else {
 			if(BiomeDictionary.hasType(biome, Type.FOREST)) {
-				if (BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
-					select = new StaticDecision(new Decision(spruce));
+				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
+					select = staticSpruceDecision;
+				} else if (BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
+					select = staticSpruceDecision;
 				} else if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
-					select = new StaticDecision(new Decision(darkoak));
+					select = staticDarkOakDecision;
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = new StaticDecision(new Decision(birch));
 				} else {
-					select = new StaticDecision(new Decision(oak));
+					select = staticOakDecision;
 				}
 			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
-				select = new StaticDecision(new Decision(darkoak));
+				select = staticDarkOakDecision;
+			}
+			else if(biome == Biomes.MESA_ROCK) {
+				select = staticOakDecision;
 			}
 			else if(BiomeDictionary.hasType(biome, Type.JUNGLE)) {
 				select = new StaticDecision(new Decision(jungle));
@@ -106,8 +119,9 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			}
 			else if(BiomeDictionary.hasType(biome, Type.WASTELAND)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree
-			} else {
-				select = new StaticDecision(new Decision(oak));//Just default to oak for everything else
+			}
+			else {
+				select = staticOakDecision;//Just default to oak for everything else
 			}
 
 			fastTreeLookup.put(biomeId, select);//Cache decision for future use

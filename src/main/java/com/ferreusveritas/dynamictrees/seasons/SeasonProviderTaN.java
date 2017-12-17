@@ -12,14 +12,11 @@ public class SeasonProviderTaN implements ISeasonProvider {
 
 	@Override
 	public float getSeasonValue() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public void updateTick(World world, long worldTicks) {
-		// TODO Auto-generated method stub
-		
+	public void updateTick(World world, long worldTicks) {		
 	}
 
 }
