@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -13,6 +14,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeHills;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -45,6 +47,34 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		public Decision getDecision() {
 			return decision;
 		}
+	}
+	
+	private class RandomDecision implements ITreeSelector {
+
+		ArrayList<Decision> table = new ArrayList<>();
+		Random rand;
+		
+		public RandomDecision(Random rand) {
+			this.rand = rand;
+		}
+		
+		public RandomDecision addSpecies(Species species, int weight) {
+			while(weight-- > 0) {
+				table.add(new Decision(species));
+			}
+			return this;
+		}
+		
+		public RandomDecision end() {
+			table.trimToSize();
+			return this;
+		}
+		
+		@Override
+		public Decision getDecision() {
+			return table.get(rand.nextInt(table.size()));
+		}
+		
 	}
 	
 	HashMap<Integer, ITreeSelector> fastTreeLookup = new HashMap<Integer, ITreeSelector>();
@@ -84,10 +114,13 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		ITreeSelector select;
 				
 		if(fastTreeLookup.containsKey(biomeId)) {
-			select = fastTreeLookup.get(biomeId);//Speedily look up the type of tree
+			select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 		}
 		else {
-			if(BiomeDictionary.hasType(biome, Type.FOREST)) {
+			if(biome instanceof BiomeHills) {
+				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
+			}
+			else if(BiomeDictionary.hasType(biome, Type.FOREST)) {
 				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
 					select = staticSpruceDecision;
 				} else if (BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
