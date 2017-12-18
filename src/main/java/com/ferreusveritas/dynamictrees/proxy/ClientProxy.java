@@ -1,10 +1,15 @@
 package com.ferreusveritas.dynamictrees.proxy;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import java.util.Random;
+
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.ModItems;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.client.TreeModelHelper;
+import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.event.ClientEventHandler;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -13,10 +18,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,128 +28,155 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
-import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void preInit() {
 		super.preInit();
+		registerClientEventHandlers();
 	}
 	
 	@Override
 	public void init() {
 		super.init();
-		
-		//Register Rootydirt Mesher and Colorizer
-		TreeModelHelper.regMesher(Item.getItemFromBlock(DynamicTrees.blockRootyDirt));
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-				return worldIn != null && pos != null ? BiomeColorHelper.getGrassColorAtPos(worldIn, pos) : ColorizerGrass.getGrassColor(0.5D, 1.0D);
-			}
-		}, new Block[] {DynamicTrees.blockRootyDirt});
-				
-		//Register Potion Mesher and Colorizer
-		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
-			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(DynamicTrees.dendroPotion, type.getIndex(), new ModelResourceLocation(DynamicTrees.dendroPotion.getRegistryName(), "inventory"));
-		}
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
-			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-				return tintIndex == 0 ? DynamicTrees.dendroPotion.getColor(stack) : 0x00FFFFFF;
-			}
-		}, new Item[] {DynamicTrees.dendroPotion});
-		
-		//Register DirtBucket Mesher
-		TreeModelHelper.regMesher(DynamicTrees.dirtBucket);
-		
-		//Register Woodland Staff Mesher and Colorizer
-		TreeModelHelper.regMesher(DynamicTrees.treeStaff);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
-			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-				return tintIndex == 1 ? DynamicTrees.treeStaff.getColor(stack) : 0x00FFFFFF;
-			}
-		}, new Item[] {DynamicTrees.treeStaff});
-		
-		//Register Sapling Colorizer
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return DynamicTrees.blockDynamicSapling.getTree(state).foliageColorMultiplier(state, world, pos);
-			}
-		}, new Block[] {DynamicTrees.blockDynamicSapling});
-		
-		//Register Bonsai Pot Colorizer
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return DynamicTrees.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
-			}
-		}, new Block[] {DynamicTrees.blockBonsaiPot});
-		TreeModelHelper.regMesher(Item.getItemFromBlock(DynamicTrees.blockBonsaiPot));//Register this just in case something weird happens
-		
-		//Register DendroCoil Mesher if it exists
-		Block dendroCoil = Block.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, "dendrocoil"));
-		if(dendroCoil != Blocks.AIR) {
-			TreeModelHelper.regMesher(Item.getItemFromBlock(dendroCoil));
-		}
-		
-		//Register Meshers for Branches and Seeds
-		for(DynamicTree tree: DynamicTrees.baseTrees) {
-			TreeModelHelper.regMesher(Item.getItemFromBlock(tree.getDynamicBranch()));
-			TreeModelHelper.regMesher(tree.getSeed());//Register Seed Item Models
-		}
-		
-		//Register GrowingLeavesBlocks Meshers and Colorizers
-		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(DynamicTrees.MODID).values()) {
-			Item item = Item.getItemFromBlock(leaves);
-			if(item != null) {
-				TreeModelHelper.regMesher(item);
-				
-				Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
-					@Override
-					public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-						Block block = state.getBlock();
-						if(TreeHelper.isLeaves(block)) {
-							BlockDynamicLeaves leaves = (BlockDynamicLeaves) block;
-							DynamicTree tree = leaves.getTree(state);
-							return tree.foliageColorMultiplier(state, worldIn, pos);
-						}
-						return 0x00ff00ff;//Magenta shading to indicate error
-					}
-				}, new Block[] {leaves});
-				
-				Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
-					@Override
-					public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-						return ColorizerFoliage.getFoliageColorBasic();
-					}
-				}, new Item[] {Item.getItemFromBlock(leaves)});
-			}
-		}
-				
-		//makePlantsBlue();
+		registerColorHandlers();
 	}
 	
 	@Override
 	public void registerModels() {
 		
-		for(DynamicTree tree: DynamicTrees.baseTrees) {
-			TreeModelHelper.registerTreeModels(tree);
-			//ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranch.RADIUS).build());
+		//BLOCKS
+		
+		//Register Rootydirt Mesher
+		ModelHelper.regModel(ModBlocks.blockRootyDirt);
+
+		//Register Bonsai Pot Mesher
+		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
+		
+		//Register DendroCoil Mesher
+		Block dendroCoil = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil"));
+		if(dendroCoil != Blocks.AIR) {
+			ModelHelper.regModel(dendroCoil);
+		}
+
+		
+		//ITEMS
+		
+		//Register Potion Mesher
+		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
+			ModelHelper.regModel(ModItems.dendroPotion, type.getIndex());
 		}
 		
+		//Register DirtBucket Mesher
+		ModelHelper.regModel(ModItems.dirtBucket);
+		
+		//Register Woodland Staff Mesher
+		ModelHelper.regModel(ModItems.treeStaff);
+
+		
+		//TREE PARTS
+		
+		//Register Meshers for Branches and Seeds
+		for(DynamicTree tree: ModTrees.baseTrees) {
+			ModelHelper.regModel(tree.getDynamicBranch());//Register Branch itemBlock
+			ModelHelper.regModel(tree.getCommonSpecies().getSeed());//Register Seed Item Models
+			ModelHelper.regModel(tree);//Register custom state mapper for branch
+		}
+		
+		//Register GrowingLeavesBlocks Meshers and Colorizers
+		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
+			Item item = Item.getItemFromBlock(leaves);
+			ModelHelper.regModel(item);
+		}
+
+		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
 	}
 	
-	void makePlantsBlue() {
+	public void registerColorHandlers() {
+		
+		final int white = 0x00FFFFFF;
+		final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
+		
+		//BLOCKS
+		
+		//Register Rootydirt Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+				return BiomeColorHelper.getGrassColorAtPos(world, pos);
+			}
+		});
+		
+		//Register Sapling Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+				return ModBlocks.blockDynamicSapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
+			}
+		});
+		
+		//Register Bonsai Pot Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+				return ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
+			}
+		});
+		
+		
+		//ITEMS
+		
+		//Register Potion Colorizer
+		ModelHelper.regColorHandler(ModItems.dendroPotion, new IItemColor() {
+			@Override
+			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				return tintIndex == 0 ? ModItems.dendroPotion.getColor(stack) : white;
+			}
+		});
+		
+		//Register Woodland Staff Mesher and Colorizer
+		ModelHelper.regColorHandler(ModItems.treeStaff, new IItemColor() {
+			@Override
+			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				return tintIndex == 1 ? ModItems.treeStaff.getColor(stack) : white;
+			}
+		});
+		
+		
+		//TREE PARTS
+		
+		//Register GrowingLeavesBlocks Colorizers
+		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
+			
+			ModelHelper.regColorHandler(leaves, new IBlockColor() {
+				@Override
+				public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+					Block block = state.getBlock();
+					if(TreeHelper.isLeaves(block)) {
+						return ((BlockDynamicLeaves) block).getTree(state).foliageColorMultiplier(state, worldIn, pos);
+					}
+					return magenta;
+				}
+			});
+				
+			ModelHelper.regColorHandler(Item.getItemFromBlock(leaves), new IItemColor() {
+				@Override
+				public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+					return ColorizerFoliage.getFoliageColorBasic();
+				}
+			});
+		}
+
+		//makePlantsBlue();
+	}
+	
+	public void makePlantsBlue() {
 		//Because blue is fukin' tight!    Toying with the idea of how to create seasonal color changes
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
 			@Override
@@ -154,21 +185,9 @@ public class ClientProxy extends CommonProxy {
 			}
 		}, new Block[] {Blocks.GRASS, Blocks.TALLGRASS, Blocks.DOUBLE_PLANT, Blocks.LEAVES, Blocks.LEAVES2});
 	}
-	
-	@Override
-	public EntityPlayer getClientPlayer() {
-		return Minecraft.getMinecraft().player;
-	}
-	
-	@Override
-	public World getClientWorld() {
-		return Minecraft.getMinecraft().world;
-	}
-	
-	@Override 
-	public void registerEventHandlers() {
-		super.registerEventHandlers();//Registers Common Handlers
-		MinecraftForge.EVENT_BUS.register(new ClientEventHandler());//Registers Client Handler
+ 
+	public void registerClientEventHandlers() {
+		//There are currently no Client Side events to handle
 	}
 	
 	@Override
@@ -186,12 +205,37 @@ public class ClientProxy extends CommonProxy {
 		particle.setRBGColorF(r, g, b);
 	}
 	
-	/**
-	 * Not strictly necessary. But adds a little more isolation to the server for particle effects
-	 */
+	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
 	@Override
 	public void spawnParticle(World world, EnumParticleTypes particleType, double x, double y, double z, double mx, double my, double mz) {
 		world.spawnParticle(particleType, x, y, z, mx, my, mz);
+	}
+
+	public void crushLeavesBlock(World world, BlockPos pos, IBlockState blockState, Entity entity) {
+		Random random = world.rand;
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
+		if(treePart instanceof BlockDynamicLeaves) {
+			BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
+			DynamicTree tree = leaves.getTree(blockState);
+			if(tree != null) {
+				int color = getTreeFoliageColor(tree, world, blockState, pos);
+				float r = (color >> 16 & 255) / 255.0F;
+				float g = (color >> 8 & 255) / 255.0F;
+				float b = (color & 255) / 255.0F;
+				for(int dz = 0; dz < 8; dz++) {
+					for(int dy = 0; dy < 8; dy++) {
+						for(int dx = 0; dx < 8; dx++) {
+							if(random.nextInt(8) == 0) {
+								double fx = pos.getX() + dx / 8.0;
+								double fy = pos.getY() + dy / 8.0;
+								double fz = pos.getZ() + dz / 8.0;
+								addDustParticle(fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	
 }

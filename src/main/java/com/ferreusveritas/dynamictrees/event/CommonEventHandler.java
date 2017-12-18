@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.seasons.SeasonManager;
 
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Type;
@@ -16,6 +17,11 @@ public class CommonEventHandler {
 		if(event.type == Type.WORLD && event.phase == Phase.START && event.world.provider.getDimension() == 0) {
 			seasonManager.updateTick(event.world, event.world.getWorldTime());
 		}
+	}
+	
+	@SubscribeEvent
+	public void onWorldLoad(WorldEvent.Load event) {
+		event.getWorld().addEventListener(new BurningEventListener());
 	}
 	
 }

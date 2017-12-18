@@ -1,13 +1,13 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -19,8 +19,6 @@ import net.minecraft.world.biome.Biome;
 */
 public class TreeRegistry {
 
-	private static Map<String, DynamicTree> treesByName = new HashMap<String, DynamicTree>();
-	private static Map<String, DynamicTree> treesByFullName = new HashMap<String, DynamicTree>();
 	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	
 	//////////////////////////////
@@ -33,25 +31,20 @@ public class TreeRegistry {
 	 * Places the tree in a central registry.
 	 * The proper place to use this is during the preInit phase of your mod.
 	 * 
-	 * @param tree The dynamic tree being registered
+	 * @param species The dynamic tree being registered
 	 * @return DynamicTree for chaining
 	 */
-	public static DynamicTree registerTree(DynamicTree tree) {
-		treesByName.put(tree.getName(), tree);
-		treesByFullName.put(tree.getFullName(), tree);
-		tree.register();//Let the tree setup everything it needs
-		return tree;
+	public static Species registerSpecies(Species species) {
+		Species.REGISTRY.register(species);
+		return species;
 	}
 
-	/**
-	 * Method for registering a list of trees
-	 * 
-	 * @param list
-	 */
-	public static void registerTrees(List<DynamicTree> list) {
-		for(DynamicTree tree: list) {
-			registerTree(tree);
-		}
+	public static void registerSpecies(Species ... values) {
+		Species.REGISTRY.registerAll(values);
+	}
+	
+	public static Species findSpecies(ResourceLocation name) {
+		return Species.REGISTRY.getValue(name);
 	}
 	
 	/**
@@ -61,26 +54,28 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static DynamicTree findTree(String name) {
-		DynamicTree tree = treesByFullName.get(name);
+	public static Species findSpeciesSloppy(String name) {
 		
-		if(tree == null) {
-			tree = treesByName.get(name);
+		//Exact find
+		ResourceLocation resloc = new ResourceLocation(name);
+		if(Species.REGISTRY.containsKey(resloc)) {
+			return Species.REGISTRY.getValue(resloc);
+		}
+
+		//Search DynamicTrees Domain
+		resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());
+		if(Species.REGISTRY.containsKey(resloc)) {
+			return Species.REGISTRY.getValue(resloc);
 		}
 		
-		return tree;
-	}
-	
-	/**
-	 * Convenience function that uses the modId and name for
-	 * the search.
-	 * 
-	 * @param modId
-	 * @param name
-	 * @return
-	 */
-	public static DynamicTree findTree(String modId, String name) {
-		return findTree(modId + ":" + name);
+		//Search all domains
+		for(Species species : Species.REGISTRY) {
+			if(species.getRegistryName().getResourcePath().equals(resloc.getResourcePath())) {
+				return species;
+			}
+		}
+		
+		return null;
 	}
 	
 	//////////////////////////////
@@ -98,9 +93,9 @@ public class TreeRegistry {
 	
 	private static final IBiomeSuitabilityDecider.Decision undecided = new IBiomeSuitabilityDecider.Decision();
 	
-	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, DynamicTree tree, BlockPos pos) {
+	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, Species species, BlockPos pos) {
 		for(IBiomeSuitabilityDecider decider: biomeSuitabilityDeciders) {
-			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, tree, pos);
+			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, species, pos);
 			if(decision.isHandled()) {
 				return decision;
 			}

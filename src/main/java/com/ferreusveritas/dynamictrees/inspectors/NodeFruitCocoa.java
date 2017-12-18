@@ -1,26 +1,30 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class NodeFruitCocoa extends NodeFruit {
+public class NodeFruitCocoa implements INodeInspector {
 
-	boolean finished;
-
-	public NodeFruitCocoa(DynamicTree tree) {
-		super(tree);
-		finished = false;
+	boolean finished = false;
+	boolean worldGen = false;
+	
+	public NodeFruitCocoa() {
 	}
 
-	@Override
+	public NodeFruitCocoa setWorldGen(boolean worldGen) {
+		this.worldGen = worldGen;
+		return this;
+	}
+	
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
@@ -32,7 +36,10 @@ public class NodeFruitCocoa extends NodeFruit {
 					EnumFacing dir = EnumFacing.getFront(side);
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = DynamicTrees.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
+						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
+						if(worldGen) {
+							cocoaState = cocoaState.withProperty(BlockCocoa.AGE, 2);
+						}
 						world.setBlockState(pos, cocoaState, 2);
 					}
 				} else {
@@ -46,6 +53,11 @@ public class NodeFruitCocoa extends NodeFruit {
 	public static int coordHashCode(BlockPos pos) {
 		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
 		return hash & 0xFFFF;
+	}
+
+	@Override
+	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+		return false;
 	}
 
 }

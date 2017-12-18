@@ -1,9 +1,117 @@
-////////////////////////////////////////////////////////////////
-// TODO (RoadMap)
-////////////////////////////////////////////////////////////////
 
-[ ]Vines need to spawn in jungle and swamp
-[ ]Fix jungle worldgen(forest floor is bare)
-[ ]API
-[ ]Seasons
-[ ]Thick trees
+    ╭─────────────────╮
+    │                 │
+    │       ▓▓        │
+    │      ▓▓▓▓▓      │
+    │     ▓▓▓┼▓▓▓     │
+    │    ▓▓▓▓│▓▓▓     │
+    │    ▓▓└─┧ ▓▓▓    │
+    │     ▓  ┠─┘▓     │
+    │        ┃        │
+    │  █████████████  │
+    │  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+    │  ░░░░░░░░░░░░░  │
+    ╞═════════════════╡
+    │  DYNAMIC TREES  │
+    ├─────────────────┤
+    │    ROAD MAP     │
+    ╰─────────────────╯
+
+
+┍━━━━━━━━━━━━━┑
+│ PERFORMANCE │
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]┬Redo Tree Signals
+    │   │
+    │   ├[✔]Branches no longer tick randomly(better performance)
+    │   ├[✔]Re-do Rot
+    │   ├[✔]Redo seed dropping by using a signal
+    │   ├[✔]DynamicLeaves looks for nearest matching branch and fetch species when harvesting
+    │   ├[✔]Redo drops from smashed Dynamic Leaves block
+    │   ╰[✔]Make Cocoa Pod placeable again
+    │
+    ├[✔]Dynamic leaves work as expected in fast or fancy graphics mode
+    │
+    ├[✔]Light smothering disabled during worldgen(doesn't work anyway)
+    │
+    ╰[✔]Re-do Cellular Leaves automata
+
+
+┍━━━━━━━━━━━━━┑
+│  FEATURES   │
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]┬Divide Trees into Trees and Species
+    │   │
+    │   ├[✔]┬Spawn swamp oaks in swamps
+    │   │   │
+    │   │   ├[✔]Swamp oak species created
+    │   │   ├[✔]Swamp oak generate with vines
+    │   │   ╰[✔]JoCode tree models for WorldGen 
+    │   │
+    │   ├[ ]┬BlockRootyDirtFake for supporting branches but not doing anything
+    │   │   │
+    │   │   ╰[ ]Jungle buttress roots
+    │   │
+    │   ╰[ ]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
+    │       │
+    │       ╰[ ]┬Apple Trees
+    │           │
+    │           ├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
+    │           ├[ ]Apple fruit block
+    │           ├[ ]Apple pip crafted from apple and dirt bucket
+    │           ├[ ]JoCode tree models for WorldGen 
+    │           ╰[ ]Spawn randomly in plains biome
+    │
+    ├[✔]Improved Fire Behavior
+    │
+    ├[✔]┬Bone Meal behaves more consistently with Minecraft lore
+    │   │
+    │   ├[✔]┬Bone meal should grow saplings to first stage.
+    │   │   ╰[✔]Spawn grow particles like a vanilla sapling
+    │   │
+    │   ╰[✔]Bone meal should attempt a single growth cycle in a developing tree.
+    │
+    ├[ ]API
+    ├[ ]Cacti
+    ├[ ]Seasons
+    ├[ ]Trees fall over when harvested
+    ╰[ ]Thick tree trunks
+
+
+┍━━━━━━━━━━━━━┑
+│  WORLDGEN   │
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]Thicker worldgen trees
+    ├[✔]Find out why jungle tree generation looks like leaves are missing
+    ├[✔]Vines spawn on jungle trees and swamp oaks
+    ├[✔]Cocoa pods spawn on jungle trees during worldgen
+    ├[✔]Mesa Forests now properly spawn oaks instead of nothing
+    ├[✔]MUTATED_REDWOOD_TAIGA and MUTATED_REDWOOD_TAIGA_HILLS now properly spawn spruce instead of Oak.
+    ├[✔]Fix jungle worldgen(forest floor is bare)
+    │
+    ├[⌛]┬Poisson disc rework
+    │   ├[✔]Fixed broken poisson disc algorithm
+    │   ├[✔]Poisson discs fit more tightly together(better, more continuous forest canopies)
+    │   ╰[ ]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.)
+    │
+    ╰[⌛]Fix spawning leaves in ungenerated chunks(cascading worldgen lag problem)
+
+
+┍━━━━━━━━━━━━━┑
+│COMPATABILITY│
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]Quark greener grass compatibility added
+    ╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
+
+
+┍━━━━━━━━━━━━━┑
+│     API     │
+┕━━━┯━━━━━━━━━┙
+    │
+    ├[✔]Forge Compatible Species Registry(IForgeRegistry<Species>)
+    ╰[ ]Make Tree Builder for easily making custom Trees.
+

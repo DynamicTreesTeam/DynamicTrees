@@ -9,8 +9,10 @@ import net.minecraft.world.World;
 
 public class BlockFruitCocoa extends BlockCocoa {
 	
+	public static final String name = "fruitcocoa";
+
 	public BlockFruitCocoa() {
-		this("fruitcocoa");
+		this(name);
 	}
 	
 	public BlockFruitCocoa(String name) {

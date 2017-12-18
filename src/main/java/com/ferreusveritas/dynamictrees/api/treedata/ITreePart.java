@@ -7,10 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -72,7 +69,7 @@ public interface ITreePart {
 	* 
 	* @param world The current world
 	* @param pos Position
-	* @param fromDir The direction that should not be analyzed.  Pass ForgeDirection.UNKNOWN to analyse in all directions
+	* @param fromDir The direction that should not be analyzed.  Pass null to analyse in all directions
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
@@ -86,7 +83,7 @@ public interface ITreePart {
 	* @return DynamicTree
 	*/
 	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
-
+	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
 	* Valid supports are other branches(always), leaves(for twigs), and rooty dirt(under special circumstances)
@@ -102,21 +99,13 @@ public interface ITreePart {
 	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 
 	/**
-	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
-	* 
-	* @param world The current world
-	* @param pos Position
-	* @param player The player applying the substance
-	* @param itemStack The itemstack to be used.
-	* @return true if item was used, false otherwise
-	*/
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
-
-	/**
 	* The single root node of a tree.
 	* 
 	* @return true if treepart is root node. false otherwise.
 	*/
 	boolean isRootNode();
+	
+	
+	boolean isBranch();
 
 }

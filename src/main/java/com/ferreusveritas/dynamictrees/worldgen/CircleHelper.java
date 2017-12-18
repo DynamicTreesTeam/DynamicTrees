@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
@@ -246,9 +246,9 @@ public class CircleHelper {
 				}
 			}
 		}
-
 		
-		if(!solution && ConfigHandler.worldGenDebug) {
+		
+		if(!solution && ModConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
 			Circle cAtemp = new Circle(cA);
 			Circle cBtemp = new Circle(cB);

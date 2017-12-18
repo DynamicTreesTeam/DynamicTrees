@@ -1,5 +1,10 @@
 package com.ferreusveritas.dynamictrees.compat;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.registries.IForgeRegistry;
+
 public class CommonProxyCompat {
 
 	public CCProxyBase ccproxy;
@@ -12,16 +17,16 @@ public class CommonProxyCompat {
 
 	public void init() {}
 	
-	public void registerBlocks() {
-		ccproxy.registerBlocks();
+	public void registerBlocks(IForgeRegistry<Block> registry) {
+		ccproxy.registerBlocks(registry);
 	}
 	
-	public void registerItems() {
-		ccproxy.registerItems();		
+	public void registerItems(IForgeRegistry<Item> registry) {
+		ccproxy.registerItems(registry);		
 	}
 
-	public void registerRecipes() {
-		ccproxy.registerRecipes();
+	public void registerRecipes(IForgeRegistry<IRecipe> registry) {
+		ccproxy.registerRecipes(registry);
 	}
 	
 }

@@ -2,28 +2,29 @@ package com.ferreusveritas.dynamictrees.items;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 
 public class Seed extends Item {
 
-	private DynamicTree tree;//The tree this seed creates
+	private Species species;//The tree this seed creates
 
 	public Seed(String name) {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
@@ -31,32 +32,34 @@ public class Seed extends Item {
 		setRegistryName(name);
 	}
 	
-	public void setTree(DynamicTree tree, ItemStack seedStack) {
-		this.tree = tree;
+	public void setSpecies(Species species, ItemStack seedStack) {
+		this.species = species;
 	}
 	
-	public DynamicTree getTree(ItemStack seedStack) {
-		return tree;
+	public Species getSpecies(ItemStack seedStack) {
+		return species;
 	}
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
-		if(entityItem.ticksExisted >= ConfigHandler.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!entityItem.world.isRemote) {//Server side only
+		World world = CompatHelper.getEntityWorld(entityItem);
+		
+		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
+			if(!world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
-				if(entityItem.world.canBlockSeeSky(pos)) {
+				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
-					ItemStack seedStack = entityItem.getEntityItem();
-					int count = seedStack.getCount();
+					ItemStack seedStack = CompatHelper.getEntityItem(entityItem);
+					int count = CompatHelper.getStackCount(seedStack);
 					while(count-- > 0) {
-						if( rand.nextFloat() * (1f/ConfigHandler.seedPlantRate) <= getTree(seedStack).biomeSuitability(entityItem.world, pos) ){//1 in 16 chance if ideal
-							if(plantSapling(entityItem.world, pos, seedStack)) {
+						if( getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
+							if(plantSapling(world, pos, seedStack)) {
 								break;
 							}
 						}
 					}
-					entityItem.getEntityItem().setCount(0);
+					CompatHelper.setStackCount(CompatHelper.getEntityItem(entityItem), 0);
 				}
 			}
 			entityItem.setDead();
@@ -72,17 +75,18 @@ public class Seed extends Item {
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
-			DynamicTree tree = getTree(heldItem);
-			BlockBonsaiPot bonzaiPot = tree.getBonzaiPot();
-			bonzaiPot.setTree(world, tree, pos);
-			heldItem.shrink(1);
-			return EnumActionResult.SUCCESS;
+			Species species = getSpecies(heldItem);
+			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();//FIXME: Species need their own bonsai pots.. or find another solution
+			if(bonzaiPot.setSpecies(world, species, pos)) {
+				CompatHelper.shrinkStack(heldItem, 1);
+				return EnumActionResult.SUCCESS;
+			}
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, heldItem) && player.canPlayerEdit(pos.up(), facing, heldItem)) {//Ensure permissions to edit block
 				if(plantSapling(world, pos.up(), heldItem)) {//Do the planting
-					heldItem.shrink(1);
+					CompatHelper.shrinkStack(heldItem, 1);
 					return EnumActionResult.SUCCESS;
 				}
 			}
@@ -100,11 +104,10 @@ public class Seed extends Item {
 	 * @return
 	 */
 	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
-		DynamicTree tree = getTree(seedStack);
+		Species species = getSpecies(seedStack);
 		
-		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, tree, pos)) {
-			world.setBlockState(pos, tree.getDynamicSapling());
-			return true;
+		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, species, pos)) {
+			return species.placeSaplingBlock(world, pos);
 		}
 
 		return false;

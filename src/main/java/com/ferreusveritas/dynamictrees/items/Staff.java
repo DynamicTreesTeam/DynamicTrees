@@ -10,11 +10,14 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +29,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -69,23 +73,23 @@ public class Staff extends Item {
 
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			DynamicTree tree = treePart.getTree(world, rootPos);
-			if(tree != null) {
+			Species species = DynamicTree.getExactSpecies(world, rootPos);
+			if(species != null) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
 					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
-				setTree(heldStack, tree);
+				setSpecies(heldStack, species);
 				return EnumActionResult.SUCCESS;
 			}
 		}
 
 		//Create a tree from right clicking on soil
-		DynamicTree tree = getTree(heldStack);
-		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
-			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
-			heldStack.shrink(1);//If the player is in creative this will have no effect.
+		Species species = getSpecies(heldStack);
+		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
+			new JoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8);
+			CompatHelper.shrinkStack(heldStack, 1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
 
@@ -113,9 +117,9 @@ public class Staff extends Item {
 		return this;
 	}
 
-	public Staff setTree(ItemStack itemStack, DynamicTree tree) {
+	public Staff setSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", tree.getName());
+		nbt.setString("tree", species.toString());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -127,15 +131,15 @@ public class Staff extends Item {
 		return this;
 	}
 
-	public DynamicTree getTree(ItemStack itemStack) {
+	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
 		if(nbt.hasKey("tree")) {
-			return TreeRegistry.findTree(nbt.getString("tree"));
+			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
 		} else {
-			DynamicTree tree = TreeRegistry.findTree("oak");
-			setTree(itemStack, tree);
-			return tree;
+			Species species = TreeRegistry.findSpeciesSloppy("oak");
+			setSpecies(itemStack, species);
+			return species;
 		}
 	}
 
@@ -198,9 +202,9 @@ public class Staff extends Item {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advancedTooltips) {
-		DynamicTree tree = getTree(stack);
-		tooltip.add("Tree: " + ((tree != null) ? tree.getFullName() : "none"));
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
+		Species species = getSpecies(stack);
+		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 

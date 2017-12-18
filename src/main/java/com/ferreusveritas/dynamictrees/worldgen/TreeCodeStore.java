@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.EnumFacing;
@@ -28,10 +29,10 @@ import net.minecraft.util.EnumFacing;
 public class TreeCodeStore {
 
 	ArrayList<ArrayList<JoCode>> store = new ArrayList<ArrayList<JoCode>>(7);//Radius values 2,3,4,5,6,7,8
-	DynamicTree tree;
+	Species species;
 	
-	public TreeCodeStore(DynamicTree tree) {
-		this.tree = tree;
+	public TreeCodeStore(Species tree) {
+		this.species = tree;
 		for(int i = 0; i < 7; i++) {
 			store.add(new ArrayList<JoCode>());
 		}
@@ -44,15 +45,22 @@ public class TreeCodeStore {
 	
 	public void addCodesFromFile(String filename) {
 		try {
-			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for tree \"" + tree.getName() + "\" from file: " + filename);
-			BufferedReader readIn = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(filename), "UTF-8"));
-			String line;
-			while((line = readIn.readLine()) != null) {
-				if((line.length() >= 3) && (line.charAt(0) != '#')) {
-					String[] split = line.split(":");
-					addCode(Integer.valueOf(split[0]), split[1]);
+			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
+			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
+			if(stream != null) {
+				InputStreamReader streamReader = new InputStreamReader(stream, "UTF-8");
+				BufferedReader readIn = new BufferedReader(streamReader);
+				String line;
+				while((line = readIn.readLine()) != null) {
+					if((line.length() >= 3) && (line.charAt(0) != '#')) {
+						String[] split = line.split(":");
+						addCode(Integer.valueOf(split[0]), split[1]);
+					}
 				}
+			} else {
+				throw(new FileNotFoundException(filename));
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
@@ -89,7 +97,7 @@ public class TreeCodeStore {
 		}
 		
 		Collections.sort(arr);
-		System.out.println(tree.getName() + ":" + radius + ":" + arr.get(0));
+		System.out.println(species + ":" + radius + ":" + arr.get(0));
 	}
 	
 	public JoCode getRandomCode(int radius, Random rand) {		
