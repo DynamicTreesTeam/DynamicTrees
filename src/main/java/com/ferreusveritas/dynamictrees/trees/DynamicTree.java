@@ -153,6 +153,7 @@ public abstract class DynamicTree {
 		}
 		
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		ModBlocks.blockBonsaiPot.setupVanillaTree(this);//Setup the bonsai pot to receive this type of tree
 
 		simpleVanillaCommonSpecies(wood);
 	}

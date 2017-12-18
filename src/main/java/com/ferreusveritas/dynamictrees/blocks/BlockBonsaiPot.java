@@ -7,7 +7,6 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
@@ -52,13 +51,10 @@ public class BlockBonsaiPot extends Block {
 		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		mapTrees();
 	}
 
-	private void mapTrees() {
-		for(DynamicTree tree: ModTrees.baseTrees) {
-			trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
-		}
+	public void setupVanillaTree(DynamicTree tree) {
+		trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
 	}
 
 	//////////////////////////////
