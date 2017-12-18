@@ -46,7 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * </p>
 * 
 * @author ferreusveritas
-* @version 0.7.1d
+* @version 0.7.1e
 *
 */
 @Mod(modid = ModConstants.MODID, version=ModConstants.VERSION,dependencies="after:computercraft;after:quark")
