@@ -80,7 +80,7 @@ public class DynamicTrees {
 			proxy.preInit();
 			compatProxy.preInit();
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 		RegistrationHandler.registerBlocks();
@@ -103,7 +103,7 @@ public class DynamicTrees {
 	public static class RegistrationHandler {
 		
 		public static void registerBlocks() {
-			ModBlocks.registerBlocks();	
+			ModBlocks.registerBlocks();
 		}
 		
 		public static void registerItems() {
