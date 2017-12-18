@@ -96,7 +96,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		staticOakDecision = new StaticDecision(new Decision(oak));
 		staticSpruceDecision = new StaticDecision(new Decision(spruce));
 		staticBirchDecision = new StaticDecision(new Decision(birch));
-		staticDarkOakDecision = new  StaticDecision(new Decision(darkoak));
+		staticDarkOakDecision = new StaticDecision(new Decision(darkoak));
 	}
 	
 	@Override
@@ -131,8 +131,8 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 					select = staticDarkOakDecision;
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = staticBirchDecision;
-				} else {
-					select = staticOakDecision;
+				} else {//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
+					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1).end();
 				}
 			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
 				select = staticDarkOakDecision;
