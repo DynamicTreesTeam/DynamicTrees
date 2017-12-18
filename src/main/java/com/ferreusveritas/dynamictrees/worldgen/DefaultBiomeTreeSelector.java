@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -15,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHills;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
@@ -96,7 +96,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		staticOakDecision = new StaticDecision(new Decision(oak));
 		staticSpruceDecision = new StaticDecision(new Decision(spruce));
 		staticBirchDecision = new StaticDecision(new Decision(birch));
-		staticDarkOakDecision = new  StaticDecision(new Decision(darkoak));
+		staticDarkOakDecision = new StaticDecision(new Decision(darkoak));
 	}
 	
 	@Override
@@ -122,12 +122,12 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
 				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
 			}
-			else if(BiomeDictionary.hasType(biome, Type.FOREST)) {
+			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
 				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
 					select = staticSpruceDecision;
-				} else if (BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
+				} else if (CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
 					select = staticSpruceDecision;
-				} else if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
+				} else if (CompatHelper.biomeHasType(biome, Type.SPOOKY)) {
 					select = staticDarkOakDecision;
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = staticBirchDecision;
@@ -140,19 +140,19 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			else if(biome == Biomes.MESA_ROCK) {
 				select = staticOakDecision;
 			}
-			else if(BiomeDictionary.hasType(biome, Type.JUNGLE)) {
+			else if(CompatHelper.biomeHasType(biome, Type.JUNGLE)) {
 				select = new StaticDecision(new Decision(jungle));
 			}
-			else if(BiomeDictionary.hasType(biome, Type.SAVANNA)) {
+			else if(CompatHelper.biomeHasType(biome, Type.SAVANNA)) {
 				select = new StaticDecision(new Decision(acacia));
 			}
-			else if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
 				select = new StaticDecision(new Decision(oakswamp));
 			}
-			else if(BiomeDictionary.hasType(biome, Type.SANDY)) {
+			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree
 			}
-			else if(BiomeDictionary.hasType(biome, Type.WASTELAND)) {
+			else if(CompatHelper.biomeHasType(biome, Type.WASTELAND)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree
 			}
 			else {
