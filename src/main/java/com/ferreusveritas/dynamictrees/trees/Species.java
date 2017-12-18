@@ -61,6 +61,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		REGISTRY = new RegistryBuilder<Species>()
 				.setName(new ResourceLocation(ModConstants.MODID, "species"))
 				.setType(Species.class)
+				.setIDRange(0, Integer.MAX_VALUE - 1)
 				.create();
 	}
 	
