@@ -6,11 +6,9 @@ import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -88,14 +86,14 @@ public class DynamicTrees {
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
 		proxy.registerModels();
-		
-		proxy.registerEventHandlers();
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		
 		TreeGenerator.init();//This is run during the init phase to cache tree data that was created during the preInit phase
+		
+		RegistrationHandler.registerRecipes();
 		
 		proxy.init();
 		compatProxy.init();
@@ -104,25 +102,20 @@ public class DynamicTrees {
 	@Mod.EventBusSubscriber
 	public static class RegistrationHandler {
 		
-		@SubscribeEvent
-		public static void registerBlocks(RegistryEvent.Register<Block> event) {
-			ModBlocks.registerBlocks(event.getRegistry());
+		public static void registerBlocks() {
+			ModBlocks.registerBlocks();	
 		}
 		
-		@SubscribeEvent
-		public static void registerItems(RegistryEvent.Register<Item> event) {
-			ModItems.registerItems(event.getRegistry());
+		public static void registerItems() {
+			ModItems.registerItems();
 		}
 		
-		@SubscribeEvent
-		public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-			ModRecipes.registerRecipes(event.getRegistry());
+		public static void registerRecipes() {
+			ModRecipes.registerRecipes();
 		}
 		
-		@SubscribeEvent
-		@SideOnly(Side.CLIENT)
-		public static void registerModels(ModelRegistryEvent event) {
-			ModModels.registerModels(event);
+		public static void registerModels() {
+			ModModels.registerModels();
 		}
 
 		@SubscribeEvent

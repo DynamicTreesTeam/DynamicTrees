@@ -16,22 +16,19 @@ import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
 
@@ -144,7 +141,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		return itemStack;
 	}
 	
-	public DendroPotion registerRecipes(IForgeRegistry<IRecipe> registry) {
+	public DendroPotion registerRecipes() {
 		
 		PotionType awkward = PotionType.REGISTRY.getObject(new ResourceLocation("awkward"));
 		

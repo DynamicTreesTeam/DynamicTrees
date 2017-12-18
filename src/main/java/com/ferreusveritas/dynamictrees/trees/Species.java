@@ -50,10 +50,11 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.fml.common.registry.IForgeRegistry;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.fml.common.registry.RegistryBuilder;
 
-public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
+public class Species extends IForgeRegistryEntry.Impl<Species> {
 	
 	public static IForgeRegistry<Species> REGISTRY;
 	
@@ -263,10 +264,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 						Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
 						float distAngle = 15;//The spread angle(center to edge)
 						float launchSpeed = 4;//Blocks(meters) per second
-						motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-						seedEntity.motionX = motion.x;
-						seedEntity.motionY = motion.y;
-						seedEntity.motionZ = motion.z;
+						motion = new Vec3d(motion.xCoord, 0, motion.yCoord).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+						seedEntity.motionX = motion.xCoord;
+						seedEntity.motionY = motion.yCoord;
+						seedEntity.motionZ = motion.zCoord;
 						CompatHelper.spawnEntity(world, seedEntity);
 					}
 				}

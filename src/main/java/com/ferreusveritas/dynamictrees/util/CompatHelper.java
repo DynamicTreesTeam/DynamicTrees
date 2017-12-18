@@ -7,7 +7,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -35,17 +34,17 @@ public class CompatHelper {
 	}
 	
 	public static ItemStack getEntityItem(EntityItem entityItem) {
-		return entityItem.getItem();
+		return entityItem.getEntityItem();
 	}
 
 	//Biomes
 	
 	public static boolean biomeHasType(Biome biome, Type type) {
-		return BiomeDictionary.isBiomeOfType(biome, type);
+		return BiomeDictionary.hasType(biome, type);
 	}
 	
 	public static int getBiomeTreesPerChunk(Biome biome) {
-		return biome.decorator.treesPerChunk;
+		return biome.theBiomeDecorator.treesPerChunk;
 	}
 	
 	//ItemStacks

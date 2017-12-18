@@ -28,7 +28,7 @@ public class CircleEventHandler {
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
 		if(event.getWorld().provider.getDimension() == 0){//Overworld
 			byte circleData[] = event.getData().getByteArray("GTCD");
-			TreeGenerator.getTreeGenerator().getChunkCircleManager().setChunkCircleData(event.getChunk().x, event.getChunk().z, circleData);
+			TreeGenerator.getTreeGenerator().getChunkCircleManager().setChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition, circleData);
 		}
 	}
 
@@ -40,13 +40,13 @@ public class CircleEventHandler {
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
 		if(event.getWorld().provider.getDimension() == 0) {//Overworld
 			ChunkCircleManager cm = TreeGenerator.getTreeGenerator().getChunkCircleManager();
-			byte circleData[] = cm.getChunkCircleData(event.getChunk().x, event.getChunk().z);
+			byte circleData[] = cm.getChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition);
 			NBTTagByteArray circleByteArray = new NBTTagByteArray(circleData);
 			event.getData().setTag("GTCD", circleByteArray);//Growing Trees Circle Data
 
 			// Unload circles here if the chunk is no longer loaded.
 			if(!event.getChunk().isLoaded()) {
-				cm.unloadChunkCircleData(event.getChunk().x, event.getChunk().z);
+				cm.unloadChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition);
 			}
 		}
 	}

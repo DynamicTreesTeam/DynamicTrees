@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.compat;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -66,7 +65,7 @@ public class QuarkProxyActiveClient extends QuarkProxyBase {
 		if(registrationMethod != null) {
 			try {
 				registrationMethod.invoke(greenerGrass, new Object[] { new Block[] {block} } );
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

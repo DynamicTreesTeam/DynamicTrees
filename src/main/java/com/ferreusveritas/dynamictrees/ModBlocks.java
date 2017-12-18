@@ -13,7 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModBlocks {
 	
@@ -24,7 +24,7 @@ public class ModBlocks {
 	public static BlockVerboseFire blockVerboseFire;
 	
 	public static void preInit() {
-	
+		
 		//Dirt
 		blockRootyDirt = new BlockRootyDirt();
 		
@@ -41,13 +41,13 @@ public class ModBlocks {
 		blockVerboseFire = new BlockVerboseFire();
 	}
 	
-	public static void registerBlocks(IForgeRegistry<Block> registry) {
+	public static void registerBlocks() {
 
-		registry.register(ModBlocks.blockRootyDirt);
-		registry.register(ModBlocks.blockDynamicSapling);
-		registry.register(ModBlocks.blockBonsaiPot);
-		registry.register(ModBlocks.blockFruitCocoa);
-		registry.register(ModBlocks.blockVerboseFire);
+		GameRegistry.register(ModBlocks.blockRootyDirt);
+		GameRegistry.register(ModBlocks.blockDynamicSapling);
+		GameRegistry.register(ModBlocks.blockBonsaiPot);
+		GameRegistry.register(ModBlocks.blockFruitCocoa);
+		GameRegistry.register(ModBlocks.blockVerboseFire);
 
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 
@@ -56,14 +56,14 @@ public class ModBlocks {
 		}
 
 		for(Block block: treeBlocks) {
-			registry.register(block);
+			GameRegistry.register(block);
 		}
 		
 		for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			registry.register(leavesBlock);
+			GameRegistry.register(leavesBlock);
 		}
 
-		DynamicTrees.compatProxy.registerBlocks(registry);
+		DynamicTrees.compatProxy.registerBlocks();
 	}
 	
 }

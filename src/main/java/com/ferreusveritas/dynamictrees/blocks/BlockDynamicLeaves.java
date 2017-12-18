@@ -545,7 +545,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(access instanceof World) {
 			World world = (World) access;
-			ArrayList<BlockPos> branchList = new ArrayList<>();
+			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
 						
 			//Find all of the branches that are nearby
 			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {

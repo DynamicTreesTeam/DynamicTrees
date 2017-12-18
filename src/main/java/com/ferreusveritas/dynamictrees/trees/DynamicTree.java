@@ -47,7 +47,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 /**
 * All data related to a tree family.

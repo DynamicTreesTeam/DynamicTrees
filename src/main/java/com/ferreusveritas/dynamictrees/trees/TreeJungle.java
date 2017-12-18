@@ -24,7 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 public class TreeJungle extends DynamicTree {
 	

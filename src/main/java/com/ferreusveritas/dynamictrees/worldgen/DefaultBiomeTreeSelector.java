@@ -52,7 +52,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	private class RandomDecision implements ITreeSelector {
 
-		ArrayList<Decision> table = new ArrayList<>();
+		ArrayList<Decision> table = new ArrayList<Decision>();
 		Random rand;
 		
 		public RandomDecision(Random rand) {

@@ -17,7 +17,6 @@ import com.google.common.collect.Multimap;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,7 +201,7 @@ public class Staff extends Item {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		Species species = getSpecies(stack);
 		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));

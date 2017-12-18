@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
 	
@@ -32,15 +32,15 @@ public class ModItems {
 		treeStaff = new Staff();
 	}
 	
-	public static void registerItems(IForgeRegistry<Item> registry) {
+	public static void registerItems() {
 		
 		//Item Blocks
-		registerItemBlock(registry, ModBlocks.blockRootyDirt);
-		registerItemBlock(registry, ModBlocks.blockBonsaiPot);
+		registerItemBlock(ModBlocks.blockRootyDirt);
+		registerItemBlock(ModBlocks.blockBonsaiPot);
 		
-		registry.register(ModItems.dendroPotion);
-		registry.register(ModItems.dirtBucket);
-		registry.register(ModItems.treeStaff);
+		GameRegistry.register(ModItems.dendroPotion);
+		GameRegistry.register(ModItems.dirtBucket);
+		GameRegistry.register(ModItems.treeStaff);
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ArrayList<Item> treeItems = new ArrayList<Item>();
@@ -51,22 +51,22 @@ public class ModItems {
 		}
 
 		for(Item item: treeItems) {
-			registry.register(item);
+			GameRegistry.register(item);
 		}
 		
 		for(Block block: treeBlocks) {
-			registerItemBlock(registry, block);
+			registerItemBlock(block);
 		}
 		
 		for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			registerItemBlock(registry, leavesBlock);
+			registerItemBlock(leavesBlock);
 		}
 		
-		DynamicTrees.compatProxy.registerItems(registry);
+		DynamicTrees.compatProxy.registerItems();
 	}
 
-	public static void registerItemBlock(final IForgeRegistry<Item> registry, Block block) {
-		registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
+	public static void registerItemBlock(Block block) {
+		GameRegistry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
 	}
 	
 }

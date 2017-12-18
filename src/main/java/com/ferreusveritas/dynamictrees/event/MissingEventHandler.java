@@ -9,9 +9,10 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent.MissingMappings;
-import net.minecraftforge.event.RegistryEvent.MissingMappings.Mapping;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class MissingEventHandler {
 
@@ -26,16 +27,18 @@ public class MissingEventHandler {
 	 */
 	//Missing Blocks Resolved Here
 	@EventHandler
-	public void missingBlockMappings(MissingMappings<Block> event) {
-		for(Mapping<Block> missing: event.getMappings()) {
-			ResourceLocation resLoc = missing.key;
-			String domain = resLoc.getResourceDomain();
-			String path = resLoc.getResourcePath();
-			if(domain.equals("growingtrees")) {
-				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
-				Block mappedBlock = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
-				if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
-					missing.remap(mappedBlock);
+	public void missingBlockMappings(FMLMissingMappingsEvent event) {
+		for(MissingMapping missing: event.getAll()) {
+			if(missing.type == GameRegistry.Type.BLOCK) {
+				ResourceLocation resLoc = missing.resourceLocation;
+				String domain = resLoc.getResourceDomain();
+				String path = resLoc.getResourcePath();
+				if(domain.equals("growingtrees")) {
+					Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
+					Block mappedBlock = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
+					if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
+						missing.remap(mappedBlock);
+					}
 				}
 			}
 		}
@@ -43,16 +46,18 @@ public class MissingEventHandler {
 
 	//Missing Items Resolved Here
 	@EventHandler
-	public void missingItemMappings(MissingMappings<Item> event) {		
-		for(Mapping<Item> missing: event.getMappings()) {
-			ResourceLocation resLoc = missing.key;
-			String domain = resLoc.getResourceDomain();
-			String path = resLoc.getResourcePath();
-			if(domain.equals("growingtrees")) {
-				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
-				Item mappedItem = Item.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
-				if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
-					missing.remap(mappedItem);
+	public void missingItemMappings(FMLMissingMappingsEvent event) {		
+		for(MissingMapping missing: event.getAll()) {
+			if(missing.type == GameRegistry.Type.ITEM) {
+				ResourceLocation resLoc = missing.resourceLocation;
+				String domain = resLoc.getResourceDomain();
+				String path = resLoc.getResourcePath();
+				if(domain.equals("growingtrees")) {
+					Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
+					Item mappedItem = Item.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
+					if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
+						missing.remap(mappedItem);
+					}
 				}
 			}
 		}

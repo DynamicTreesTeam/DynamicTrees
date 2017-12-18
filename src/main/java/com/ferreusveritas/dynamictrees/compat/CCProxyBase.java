@@ -1,10 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class CCProxyBase {
 
@@ -20,10 +16,10 @@ public class CCProxyBase {
 	
 	public void createItems() {}
 	
-	public void registerBlocks(IForgeRegistry<Block> registry) {}
+	public void registerBlocks() {}
 	
-	public void registerItems(IForgeRegistry<Item> registry) {}
+	public void registerItems() {}
 	
-	public void registerRecipes(IForgeRegistry<IRecipe> registry) {}
+	public void registerRecipes() {}
 
 }

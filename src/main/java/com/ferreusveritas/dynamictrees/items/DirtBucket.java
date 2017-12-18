@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModItems;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -95,7 +96,7 @@ public class DirtBucket extends Item {
 
 	public DirtBucket registerRecipes() {
 		//Create a dirt bucket from dirt and a bucket
-		GameRegistry.addShapelessRecipe(new ItemStack(DynamicTrees.dirtBucket), new Object[]{ Blocks.DIRT, Items.BUCKET});
+		GameRegistry.addShapelessRecipe(new ItemStack(ModItems.dirtBucket), new Object[]{ Blocks.DIRT, Items.BUCKET});
 		return this;
 	}
 	
