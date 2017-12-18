@@ -84,7 +84,7 @@ public class DynamicTrees {
 			proxy.preInit();
 			compatProxy.preInit();
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 	}
