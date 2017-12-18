@@ -235,7 +235,7 @@ public class SimpleVoxmap {
 	}
 	
 	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
-	public Iterable<Cell> getAllNonZeroCells(byte mask) {
+	public Iterable<Cell> getAllNonZeroCells(final byte mask) {
 		
 		return new Iterable<Cell>() {
 			@Override
@@ -291,7 +291,7 @@ public class SimpleVoxmap {
 	}
 	
 	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
-	public Iterable<Cell> getAllNonZeroCellsFromTop(byte mask) {
+	public Iterable<Cell> getAllNonZeroCellsFromTop(final byte mask) {
 		
 		return new Iterable<Cell>() {
 			@Override
@@ -346,7 +346,7 @@ public class SimpleVoxmap {
 	}
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<BlockPos> getAllNonZero(byte mask) {
+	public Iterable<BlockPos> getAllNonZero(final byte mask) {
 		
 		return new Iterable<BlockPos>() {
 			@Override

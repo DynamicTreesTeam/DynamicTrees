@@ -16,7 +16,7 @@ public class SeasonProviderTaN implements ISeasonProvider {
 	}
 
 	@Override
-	public void updateTick(World world, long worldTicks) {		
+	public void updateTick(World world, long worldTicks) {
 	}
 
 }

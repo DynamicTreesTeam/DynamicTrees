@@ -43,21 +43,23 @@ public class Seed extends Item {
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
+		World world = CompatHelper.getEntityWorld(entityItem);
+		
 		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!entityItem.world.isRemote) {//Server side only
+			if(!world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
-				if(entityItem.world.canBlockSeeSky(pos)) {
+				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
-					ItemStack seedStack = entityItem.getItem();
-					int count = seedStack.getCount();
+					ItemStack seedStack = CompatHelper.getEntityItem(entityItem);
+					int count = CompatHelper.getStackCount(seedStack);
 					while(count-- > 0) {
-						if( getSpecies(seedStack).biomeSuitability(entityItem.world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
-							if(plantSapling(entityItem.world, pos, seedStack)) {
+						if( getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
+							if(plantSapling(world, pos, seedStack)) {
 								break;
 							}
 						}
 					}
-					CompatHelper.setStackCount(entityItem.getItem(), 0);
+					CompatHelper.setStackCount(CompatHelper.getEntityItem(entityItem), 0);
 				}
 			}
 			entityItem.setDead();

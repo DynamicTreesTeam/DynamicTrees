@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
@@ -12,7 +13,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -34,7 +34,7 @@ public class TreeAcacia extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return BiomeDictionary.hasType(biome, Type.SAVANNA);
+			return CompatHelper.biomeHasType(biome, Type.SAVANNA);
 		}
 		
 	}

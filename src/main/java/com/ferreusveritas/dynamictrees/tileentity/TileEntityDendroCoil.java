@@ -11,6 +11,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITickable {
 
@@ -64,6 +65,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 	public void update() {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
+		World world = getWorld();
 		
 		synchronized(this) {
 			treeName = new String(dendroCoil.getSpecies(world, getPos()));
@@ -113,7 +115,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		}
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
-
+		World world = getWorld();
+		
 		if(!world.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:

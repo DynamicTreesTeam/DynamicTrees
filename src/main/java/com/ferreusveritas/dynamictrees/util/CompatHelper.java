@@ -3,11 +3,15 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 
 /**
  * Maintaining code between Minecraft versions can be a pain.
@@ -19,10 +23,32 @@ import net.minecraft.world.World;
  */
 public class CompatHelper {
 	
+	//Entities
+	
 	public static boolean spawnEntity(World world, Entity entity) {
 		return world.spawnEntity(entity);
 	}
 
+	public static World getEntityWorld(Entity entity) {
+		return entity.world;
+	}
+	
+	public static ItemStack getEntityItem(EntityItem entityItem) {
+		return entityItem.getItem();
+	}
+
+	//Biomes
+	
+	public static boolean biomeHasType(Biome biome, Type type) {
+		return BiomeDictionary.hasType(biome, type);
+	}
+	
+	public static int getBiomeTreesPerChunk(Biome biome) {
+		return biome.decorator.treesPerChunk;
+	}
+	
+	//ItemStacks
+	
 	public static int getStackCount(ItemStack stack) {
 		return isValid(stack) ? stack.getCount() : 0;
 	}

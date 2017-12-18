@@ -49,7 +49,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * @version 0.7.1d
 *
 */
-@Mod(modid = ModConstants.MODID, version=ModConstants.VERSION, dependencies="after:computercraft;after:quark")
+@Mod(modid = ModConstants.MODID, version=ModConstants.VERSION,dependencies="after:computercraft;after:quark")
 public class DynamicTrees {
 
 	@Mod.Instance(ModConstants.MODID)

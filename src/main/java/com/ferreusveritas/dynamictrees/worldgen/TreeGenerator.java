@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumCh
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
@@ -21,7 +22,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -120,7 +120,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-		if(BiomeDictionary.hasType(world.getBiome(pos), Type.SPOOKY)) {
+		if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {
 			roofedForestCompensation(world, random, pos);
 		}
 	}

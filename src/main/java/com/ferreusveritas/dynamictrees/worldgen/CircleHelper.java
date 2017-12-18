@@ -246,7 +246,7 @@ public class CircleHelper {
 				}
 			}
 		}
-
+		
 		
 		if(!solution && ModConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();

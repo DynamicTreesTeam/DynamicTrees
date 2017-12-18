@@ -23,7 +23,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -51,7 +50,7 @@ public class TreeJungle extends DynamicTree {
 
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return BiomeDictionary.hasType(biome, Type.JUNGLE);
+			return CompatHelper.biomeHasType(biome, Type.JUNGLE);
 		};
 		
 		@Override

@@ -59,7 +59,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public BlockDynamicLeaves() {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
-		//leavesFancy = true;//True for alpha transparent leaves
 	}
 	
 	@Override
@@ -120,7 +119,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
-		world.checkLight(pos);
 		if(hydro == 0 || (!rapid && !hasAdequateLight(world, tree, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed

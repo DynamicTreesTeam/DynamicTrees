@@ -7,6 +7,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockPlanks;
@@ -21,7 +22,6 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -87,7 +87,7 @@ public class TreeOak extends DynamicTree {
 			
 			if(soilBlockState.getBlock() == Blocks.WATER) {
 				Biome biome = blockAccess.getBiome(pos);
-				if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+				if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
 					BlockPos down = pos.down();
 					if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
 						return true;
@@ -194,7 +194,7 @@ public class TreeOak extends DynamicTree {
 	 */
 	@Override
 	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
-		if(BiomeDictionary.hasType(access.getBiome(pos), Type.SWAMP)) {
+		if(CompatHelper.biomeHasType(access.getBiome(pos), Type.SWAMP)) {
 			return swampSpecies;
 		}
 		

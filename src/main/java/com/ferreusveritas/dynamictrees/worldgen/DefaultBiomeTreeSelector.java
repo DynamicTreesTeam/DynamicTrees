@@ -30,6 +30,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	private StaticDecision staticOakDecision;
 	private StaticDecision staticSpruceDecision;
+	private StaticDecision staticBirchDecision;
 	private StaticDecision staticDarkOakDecision;
 	
 	private interface ITreeSelector {
@@ -94,6 +95,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		
 		staticOakDecision = new StaticDecision(new Decision(oak));
 		staticSpruceDecision = new StaticDecision(new Decision(spruce));
+		staticBirchDecision = new StaticDecision(new Decision(birch));
 		staticDarkOakDecision = new  StaticDecision(new Decision(darkoak));
 	}
 	
@@ -117,7 +119,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 		}
 		else {
-			if(biome instanceof BiomeHills) {
+			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
 				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
 			}
 			else if(BiomeDictionary.hasType(biome, Type.FOREST)) {
@@ -128,7 +130,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 				} else if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
 					select = staticDarkOakDecision;
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
-					select = new StaticDecision(new Decision(birch));
+					select = staticBirchDecision;
 				} else {
 					select = staticOakDecision;
 				}
