@@ -1,25 +1,29 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
+import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -116,69 +120,93 @@ public class JoCode {
 	* 
 	* @param world The world
 	* @param seed The seed used to create the tree
-	* @param pos The position of what will become the rootydirt block
+	* @param rootPos The position of what will become the rootydirt block
+	* @param biome The biome of the coordinates.
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, DynamicTree tree, BlockPos pos, EnumFacing facing, int radius) {
-		world.setBlockState(pos, tree.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
+	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
+			IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
+		world.setBlockState(rootPos, species.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
+		//A Tree generation boundary radius is at least 2 and at most 8
+		radius = MathHelper.clamp(radius, 2, 8);
+		BlockPos treePos = rootPos.up();
+		
 		//Create tree
 		setFacing(facing);
-		generateFork(world, tree, 0, pos, false);
-
-		radius = MathHelper.clamp(radius, 2, 8);
+		generateFork(world, species, 0, rootPos, false);
 
 		//Fix branch thicknesses and map out leaf locations
-		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
+		BlockBranch branch = TreeHelper.getBranch(world, treePos);
 		if(branch != null) {//If a branch exists then the growth was successful
-			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(pos.up(), new BlockPos(radius, 0, radius));
-			NodeInflator integrator = new NodeInflator(leafMap);
-			MapSignal signal = new MapSignal(integrator);
-			branch.analyse(world, pos.up(), EnumFacing.DOWN, signal);
+			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
+			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
+			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
+			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
+			branch.analyse(world, treePos, EnumFacing.DOWN, signal);
+			List<BlockPos> endPoints = endFinder.getEnds();
 			
-			smother(leafMap, branch.getTree());
+			smother(leafMap, branch.getTree());//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
 			
-			BlockDynamicLeaves leavesBlock = branch.getTree().getDynamicLeaves();
-			int treeSub = branch.getTree().getDynamicLeavesSub();
+			//Establish a zone where we can place leaves without hitting ungenerated chunks.
+			SafeChunkBounds safeBounds = new SafeChunkBounds(world, rootPos);//Area that is safe to place leaves during worldgen
 			
-			//Place Growing Leaves Blocks
-			for(Cell cell: leafMap.getAllNonZeroCells()) {
-				if((cell.getValue() & 7) != 0) {
-					BlockPos cellPos = cell.getPos();
+			//Place Growing Leaves Blocks from voxmap
+			IBlockState leavesState = branch.getTree().getDynamicLeavesState();
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
+				BlockPos cellPos = cell.getPos();
+				if(safeBounds.inBounds(cellPos)) {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesBlock.getDefaultState().withProperty(BlockDynamicLeaves.TREE, treeSub).withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
 					}
+				} else {
+					leafMap.setVoxel(cellPos, (byte) 0);
+				}
+			}
+
+			//Shrink the safeBounds down by 1 so that the aging process won't look for neighbors outside of the bounds.
+			safeBounds.setShrink(1);
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
+				BlockPos cellPos = cell.getPos();
+				if(!safeBounds.inBounds(cellPos)) {
+					leafMap.setVoxel(cellPos, (byte) 0);
 				}
 			}
 			
-			//Age volume
-			TreeHelper.ageVolume(world, pos.up(), radius, 32, leafMap, 3);
+			//Age volume for 3 cycles using a leafmap
+			TreeHelper.ageVolume(world, treePos, radius, 32, leafMap, 3);
+			
+			//Rot the unsupported branches
+			species.handleRot(world, endPoints, rootPos, treePos, 0, true);
+			
+			//Allow for special decorations by the tree itself
+			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
 		
-		} else { //The growth failed.. turn the soil to plain dirt
-			world.setBlockState(pos, Blocks.DIRT.getDefaultState(), careful ? 3 : 2);
+		} else { //The growth failed.. turn the soil back to what it was
+			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
 
 	}
-
+	
 	/**
 	 * Recursive function that "draws" a branch of a tree
 	 * 
 	 * @param world
-	 * @param tree
+	 * @param species
 	 * @param codePos
 	 * @param pos
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, DynamicTree tree, int codePos, BlockPos pos, boolean disabled) {
+	private int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);
 			if(code == forkCode) {
-				codePos = generateFork(world, tree, codePos + 1, pos, disabled);
+				codePos = generateFork(world, species, codePos + 1, pos, disabled);
 			} else if(code == returnCode) {
 				return codePos + 1;
 			} else {
@@ -186,7 +214,7 @@ public class JoCode {
 				pos = pos.offset(dir);
 				if(!disabled) {
 					if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlockState(pos, tree.getDynamicBranch().getDefaultState(), careful ? 3 : 2);
+						world.setBlockState(pos, species.getTree().getDynamicBranch().getDefaultState(), careful ? 3 : 2);
 					} else {
 						disabled = true;
 					}
@@ -223,16 +251,16 @@ public class JoCode {
 				int count = 0;
 				for(int iy = startY; iy >= 0; iy--) {
 					int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-					if(v == 0) {
+					if(v == 0) {//Air
 						count = 0;//Reset the count
 					} else
-					if(v <= 4) {
+					if((v & 0x0F) != 0) {//Leaves
 						count++;
 						if(count > tree.getSmotherLeavesMax()){//Smother value
 							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
 						}
 					} else
-					if(v == 16) {//Twig
+					if((v & 0x10) != 0) {//Twig
 						count++;
 						leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
 					}

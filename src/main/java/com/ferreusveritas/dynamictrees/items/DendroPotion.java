@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
@@ -124,7 +125,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findTree(targetTree);
+					return TreeRegistry.findSpecies(new ResourceLocation(targetTree)).getTree();
 				}
 			}
 		}
@@ -134,7 +135,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public ItemStack setTargetTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
-		nbtTag.setString("target", tree.getFullName());
+		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
 		itemStack.setTagCompound(nbtTag);
 		return itemStack;
 	}
@@ -178,9 +179,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 
-		for(DynamicTree tree : DynamicTrees.baseTrees) {
+		for(DynamicTree tree : ModTrees.baseTrees) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
+			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
 		}
 
 		return this;
@@ -197,7 +198,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(tree == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add("Transform a tree into a " + tree.getName() + " tree");
+				tooltip.add("Transform a tree into a " + tree.getName().getResourceDomain() + " tree");
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());

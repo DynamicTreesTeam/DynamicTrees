@@ -15,29 +15,53 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.common.registry.IForgeRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeBirch extends DynamicTree {
+		
+	public class SpeciesBirch extends Species {
+
+		SpeciesBirch(DynamicTree treeFamily) {
+			super(treeFamily.getName(), treeFamily);
+			
+			//Birch are tall, skinny, fast growing trees
+			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
+			
+			envFactor(Type.COLD, 0.75f);
+			envFactor(Type.HOT, 0.50f);
+			envFactor(Type.DRY, 0.50f);
+			envFactor(Type.FOREST, 1.05f);
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
+		};
+		
+	}
+	
+	Species species;
 	
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
-		
-		//Birch are tall, skinny, fast growing trees
-		setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
-		
-		setRetries(1);//Special fast growing
-		
-		envFactor(Type.COLD, 0.75f);
-		envFactor(Type.HOT, 0.50f);
-		envFactor(Type.DRY, 0.50f);
-		envFactor(Type.FOREST, 1.05f);
 	}
 	
 	@Override
-	public boolean isBiomePerfect(Biome biome) {
-		return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
-	};
+	public void createSpecies() {
+		species = new SpeciesBirch(this);
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		speciesRegistry.register(species);
+	}
+	
+	@Override
+	public Species getCommonSpecies() {
+		return species;
+	}
 	
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {

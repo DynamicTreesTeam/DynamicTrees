@@ -3,7 +3,8 @@ package com.ferreusveritas.dynamictrees.compat;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 
@@ -35,11 +36,11 @@ public class QuarkProxyActiveClient extends QuarkProxyBase {
 		
 		if(greenerGrass != null && greenerGrass.enabled) {// Does there Quark?
 			// Register the RootyDirtBlock(Put meat in Quark)
-			registerGreenerColor(DynamicTrees.blockRootyDirt);
+			registerGreenerColor(ModBlocks.blockRootyDirt);
 			
 			// Conditionally register all of the base mod leaves(Fill Quark with more meats)
 			if(affectFolliage) {
-				HashMap<Integer, BlockDynamicLeaves> map = TreeHelper.getLeavesMapForModId(DynamicTrees.MODID);
+				HashMap<Integer, BlockDynamicLeaves> map = TreeHelper.getLeavesMapForModId(ModConstants.MODID);
 				for(BlockDynamicLeaves leaves : map.values()) {
 					registerGreenerColor(leaves);
 				}

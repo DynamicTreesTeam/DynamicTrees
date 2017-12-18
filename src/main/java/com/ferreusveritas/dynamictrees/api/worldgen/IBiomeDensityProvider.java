@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.world.biome.Biome;
 
@@ -48,7 +48,7 @@ public interface IBiomeDensityProvider {
 	 * @param random
 	 * @return true to produce a tree false otherwise
 	 */
-	public EnumChance chance(Biome biome, DynamicTree tree, int radius, Random random);
+	public EnumChance chance(Biome biome, Species species, int radius, Random random);
 	
 	enum EnumChance {
 		OK,

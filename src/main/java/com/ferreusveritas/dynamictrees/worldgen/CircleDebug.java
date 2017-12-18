@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.util.Circle;
 
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
@@ -64,7 +64,7 @@ public class CircleDebug {
 			name = "unresolved-" + chunkX + ":" + chunkZ;
 		}
 		
-		Logger.getLogger(DynamicTrees.MODID).log(Level.INFO, "Writing:" + name + ".png");
+		Logger.getLogger(ModConstants.MODID).log(Level.INFO, "Writing:" + name + ".png");
 		
 		try {
 			ImageIO.write(img, "png", new File("./unsolved/" + name + ".png"));
@@ -202,122 +202,6 @@ public class CircleDebug {
 			
 		}
 		
-	}
-	
-	////////////////////////////////////////////////////////////
-	
-	public static void initCircleTests() {
-		/*
-		ArrayList<Circle> circles = new ArrayList<Circle>();
-		
-		Circle c1 = new Circle(8, 8, 8);//Right in the middle
-		c1.real = true;
-		circles.add(c1);
-		
-		Circle c2 = CircleHelper.findSecondCircle(c1, 7);
-		c1.real = true;
-		circles.add(c2);
-		
-		Circle c3 = CircleHelper.findThirdCircle(c1, c2, 4);
-		
-		if(c3 != null) {
-			circles.add(c3);
-			
-			Circle c4 = CircleHelper.findThirdCircle(c1, c3, 6);
-			if(c4 != null) {
-				circles.add(c4);
-			}
-			
-			c4 = CircleHelper.findThirdCircle(c3, c2, 2);
-			if(c4 != null) {
-				circles.add(c4);
-			}
-			
-		}
-		
-		for(Circle cOut: circles){
-			for(Circle cIn: circles){
-				CircleHelper.maskCircles(cOut, cIn);
-			}
-		}
-		
-		outputCirclesToPng(circles, 0, 0, "masking");
-		
-		int xOffset = -48 * 16;
-		int zOffset = 44 * 16;
-		
-		for(int r = 2; r <= 8; r++) {
-		
-		//Test 1 (nonarant test)
-		circles.clear();
-		circles.add(new Circle(-8 + xOffset, -8 + zOffset, r));
-		circles.add(new Circle( 8 + xOffset, -8 + zOffset, r));
-		circles.add(new Circle(24 + xOffset, -8 + zOffset, r));
-		circles.add(new Circle(-8 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle( 8 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle(24 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle(-8 + xOffset, 24 + zOffset, r));
-		circles.add(new Circle( 8 + xOffset, 24 + zOffset, r));
-		circles.add(new Circle(24 + xOffset, 24 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 1r" + r);
-		
-		//Test 2 (Outside Edge Test)
-		circles.clear();
-		circles.add(new Circle(-3 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle( 18 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle(8 + xOffset, -3 + zOffset, r));
-		circles.add(new Circle(8 + xOffset, 18 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 2r" + r);
-		
-		//Test 3 (Inside Edge Test)
-		circles.clear();
-		circles.add(new Circle(4 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle(11 + xOffset, 8 + zOffset, r));
-		circles.add(new Circle(8 + xOffset, 4 + zOffset, r));
-		circles.add(new Circle(8 + xOffset, 11 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 3r" + r);
-		
-		//Test 4 (Inside Corner Test)
-		circles.clear();
-		circles.add(new Circle(4 + xOffset, 4 + zOffset, r));
-		circles.add(new Circle(11 + xOffset, 4 + zOffset, r));
-		circles.add(new Circle(4 + xOffset, 11 + zOffset, r));
-		circles.add(new Circle(11 + xOffset, 11 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 4r" + r);
-		
-		//Test 5 (Outside Corner Test)
-		circles.clear();
-		circles.add(new Circle(-3 + xOffset, -3 + zOffset, r));
-		circles.add(new Circle(-3 + xOffset, 18 + zOffset, r));
-		circles.add(new Circle(18 + xOffset, -3 + zOffset, r));
-		circles.add(new Circle(18 + xOffset, 18 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 5r" + r);
-		
-		//Test 6
-		circles.clear();
-		circles.add(new Circle(16 + xOffset, 16 + zOffset, r));
-		circles.add(new Circle(-1 + xOffset, 16 + zOffset, r));
-		circles.add(new Circle(16 + xOffset, -1 + zOffset, r));
-		circles.add(new Circle(-1 + xOffset, -1 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 6r" + r);
-		
-		//Test 7
-		circles.clear();
-		circles.add(new Circle(15 + xOffset, 15 + zOffset, r));
-		circles.add(new Circle(0 + xOffset, 15 + zOffset, r));
-		circles.add(new Circle(15 + xOffset, 0 + zOffset, r));
-		circles.add(new Circle(0 + xOffset, 0 + zOffset, r));
-		for(Circle c: circles){c.edgeMask(xOffset, zOffset);}
-		outputCirclesToPng(circles, xOffset >> 4, zOffset >> 4, "test 7r" + r);
-		
-		}
-*/		
 	}
 	
 ////////////////////////////////////////////////////////////

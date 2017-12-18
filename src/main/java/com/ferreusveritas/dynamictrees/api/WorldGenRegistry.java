@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 public class WorldGenRegistry {
 
@@ -12,14 +12,14 @@ public class WorldGenRegistry {
 	//////////////////////////////
 	
 	/**
-	 * Mods should call this to register an {@link IBiomeTreeSelector}.
+	 * Mods should call this to register an {@link IBiomeSpeciesSelector}.
 	 * 
 	 * @param treeSelector The tree selector being registered
 	 * @return
 	 */
-	public static boolean registerBiomeTreeSelector(IBiomeTreeSelector treeSelector) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addTreeSelector(treeSelector);
+	public static boolean registerBiomeTreeSelector(IBiomeSpeciesSelector treeSelector) {
+		if(TreeGenerator.getTreeGenerator() != null) {
+			TreeGenerator.getTreeGenerator().biomeTreeHandler.addTreeSelector(treeSelector);
 			return true;
 		}
 		return false;
@@ -32,8 +32,8 @@ public class WorldGenRegistry {
 	 * @return
 	 */
 	public static boolean registerBiomeDensityProvider(IBiomeDensityProvider densityProvider) {
-		if(DynamicTrees.treeGenerator != null) {
-			DynamicTrees.treeGenerator.biomeTreeHandler.addDensityProvider(densityProvider);
+		if(TreeGenerator.getTreeGenerator() != null) {
+			TreeGenerator.getTreeGenerator().biomeTreeHandler.addDensityProvider(densityProvider);
 			return true;
 		}
 		return false;
@@ -45,7 +45,7 @@ public class WorldGenRegistry {
 	 * @return
 	 */
 	public static boolean isWorldGenEnabled() {
-		return ConfigHandler.worldGen;
+		return ModConfigs.worldGen;
 	}
 	
 }

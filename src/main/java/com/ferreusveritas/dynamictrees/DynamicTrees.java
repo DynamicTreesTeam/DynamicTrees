@@ -1,47 +1,23 @@
 package com.ferreusveritas.dynamictrees;
 
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
-import com.ferreusveritas.dynamictrees.items.DendroPotion;
-import com.ferreusveritas.dynamictrees.items.DirtBucket;
-import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
-import com.ferreusveritas.dynamictrees.trees.TreeBirch;
-import com.ferreusveritas.dynamictrees.trees.TreeDarkOak;
-import com.ferreusveritas.dynamictrees.trees.TreeJungle;
-import com.ferreusveritas.dynamictrees.trees.TreeOak;
-import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
 * <p><pre><tt><b>
@@ -67,207 +43,87 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 * </p>
 * 
 * @author ferreusveritas
-* @version 0.6.6
+* @version 0.7.1d
 *
 */
-@Mod(modid = DynamicTrees.MODID, version=DynamicTrees.VERSION,dependencies="after:ComputerCraft;after:Quark")
+@Mod(modid = ModConstants.MODID, version=ModConstants.VERSION,dependencies="after:ComputerCraft;after:Quark")
 public class DynamicTrees {
 
-	public static final String MODID = "dynamictrees";
-	public static final String VERSION = "0.6.6";
-
-	public static final DynamicTreesTab dynamicTreesTab = new DynamicTreesTab(MODID);
-	
-	public static BlockRootyDirt blockRootyDirt;
-	public static BlockDynamicSapling blockDynamicSapling;
-	public static BlockFruitCocoa blockFruitCocoa;
-	public static Staff treeStaff;
-	public static DendroPotion dendroPotion;
-	public static DirtBucket dirtBucket;
-	public static BlockBonsaiPot blockBonsaiPot;
-	public static TreeGenerator treeGenerator;
-
-	@Instance(MODID)
+	@Mod.Instance(ModConstants.MODID)
 	public static DynamicTrees instance;
-
+	
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
+	//This will provide us with a proxy for dealing with compatibility with other mods
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.compat.ClientProxyCompat", serverSide = "com.ferreusveritas.dynamictrees.compat.CommonProxyCompat")
 	public static CommonProxyCompat compatProxy;
-
-	public static ArrayList<DynamicTree> baseTrees = new ArrayList<DynamicTree>();
 	
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		//Run before anything else. Read your config, create blocks, items, etc, and register them with the GameRegistry.
-
-		//CircleDebug.initCircleTests(); //This is for circle generation testing purposes only
-
-		ConfigHandler.preInit(event);
-
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			treeGenerator = new TreeGenerator();
+	public static final CreativeTabs dynamicTreesTab = new CreativeTabs(ModConstants.MODID) {
+        @SideOnly(Side.CLIENT)
+		@Override
+		public Item getTabIconItem() {
+			return TreeRegistry.findSpeciesSloppy(BlockPlanks.EnumType.OAK.getName()).getSeedStack(1).getItem();
 		}
+	};
+
+	@Mod.EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
 		
-		//Dirt
-		blockRootyDirt = new BlockRootyDirt();
-		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");
-		
-		//Trees
-		baseTrees.add(new TreeOak());
-		baseTrees.add(new TreeSpruce());
-		baseTrees.add(new TreeBirch());
-		baseTrees.add(new TreeJungle());
-		baseTrees.add(new TreeAcacia());
-		baseTrees.add(new TreeDarkOak());
-		
-		//Register Trees
-		TreeRegistry.registerTrees(baseTrees);
-		
-		//Potions
-		dendroPotion = new DendroPotion();
-		
-		//Dirt Bucket
-		dirtBucket = new DirtBucket();
-		
-		//Bonsai Pot
-		blockBonsaiPot = new BlockBonsaiPot();
-		
-		//Fruit
-		blockFruitCocoa = new BlockFruitCocoa();
-		
-		//Creative Mode Stuff
-		treeStaff = new Staff();
-		
-		//Set the creative tabs icon
-		dynamicTreesTab.setTabIconItemStack(TreeRegistry.findTree("oak").getSeedStack());
-		
-		proxy.preInit();
-		compatProxy.preInit();
+		try { //This is need because something silently absorbs exceptions outside of this event.
+			ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
+			TreeGenerator.preInit();//Create the generator
+			
+			ModBlocks.preInit();
+			ModItems.preInit();
+			ModTrees.preInit();
+			
+			proxy.preInit();
+			compatProxy.preInit();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
 		proxy.registerModels();
-		
-		proxy.registerEventHandlers();
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		//Do your mod setup. Build whatever data structures you care about. Register recipes.
 		
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			treeGenerator.biomeTreeHandler.init();
-		}
+		TreeGenerator.init();//This is run during the init phase to cache tree data that was created during the preInit phase
 		
 		RegistrationHandler.registerRecipes();
 		
 		proxy.init();
 		compatProxy.init();
 	}
-
-	@EventHandler
-	public void PostInit(FMLPostInitializationEvent e){
-		//Handle interaction with other mods, complete your setup based on this.
-	}
-
-	///////////////////////////////////////////
-	// MISSING REMAPPING
-	///////////////////////////////////////////
-
-	/**
-	 * Here we'll simply remap the old "growingtrees" modid to the new modid for old blocks and items.
-	 * 
-	 * @param event
-	 */
-	//Missing Blocks Resolved Here
-	@EventHandler
-	public void missingMappings(FMLMissingMappingsEvent event) {
-		for(MissingMapping missing: event.getAll()) {
-			ResourceLocation resLoc = missing.resourceLocation;
-			String domain = resLoc.getResourceDomain();
-			String path = resLoc.getResourcePath();
-			if(domain.equals("growingtrees")) {
-				Logger.getLogger(MODID).log(Level.CONFIG, "Remapping Missing Object: " + missing.name);
-				if(missing.type == GameRegistry.Type.BLOCK) {
-					Block mappedBlock = Block.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, path));
-					if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
-						missing.remap(mappedBlock);
-					}
-				}
-				else if(missing.type == GameRegistry.Type.ITEM) {
-					Item mappedItem = Item.REGISTRY.getObject(new ResourceLocation(DynamicTrees.MODID, path));
-					if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
-						missing.remap(mappedItem);
-					}
-				}
-			}
-		}
-	}
-
-	//Missing Items Resolved Here
-
-	///////////////////////////////////////////
-	// REGISTRATION
-	///////////////////////////////////////////
 	
+	@Mod.EventBusSubscriber
 	public static class RegistrationHandler {
 		
 		public static void registerBlocks() {
-
-			GameRegistry.register(blockRootyDirt);
-			GameRegistry.register(blockDynamicSapling);
-			GameRegistry.register(blockBonsaiPot);
-			GameRegistry.register(blockFruitCocoa);
-
-			for(DynamicTree tree: baseTrees) {
-				tree.registerBlocks();
-			}
-
-			for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(MODID).values()) {
-				GameRegistry.register(leavesBlock);
-			}
-
-			compatProxy.registerBlocks();
+			ModBlocks.registerBlocks();	
 		}
-
+		
 		public static void registerItems() {
-			GameRegistry.register(treeStaff);
-
-			for(DynamicTree tree: baseTrees) {
-				tree.registerItems();
-			}
-
-			GameRegistry.register(dendroPotion);
-			GameRegistry.register(dirtBucket);
-			
-			for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(MODID).values()) {
-				GameRegistry.register(new ItemBlock(leavesBlock).setRegistryName(leavesBlock.getRegistryName()));
-			}
-
-			ItemBlock itemBlock = new ItemBlock(blockRootyDirt);
-			itemBlock.setRegistryName(blockRootyDirt.getRegistryName());
-			GameRegistry.register(itemBlock);
-
-			ItemBlock itemBonsaiBlock = new ItemBlock(blockBonsaiPot);
-			itemBonsaiBlock.setRegistryName(blockBonsaiPot.getRegistryName());
-			GameRegistry.register(itemBonsaiBlock);
-			
-			compatProxy.registerItems();
+			ModItems.registerItems();
+		}
+		
+		public static void registerRecipes() {
+			ModRecipes.registerRecipes();
+		}
+		
+		public static void registerModels() {
+			ModModels.registerModels();
 		}
 
-		public static void registerRecipes() {
-			for(DynamicTree tree: baseTrees) {
-				tree.registerRecipes();
-			}
-
-			dirtBucket.registerRecipes();			
-			dendroPotion.registerRecipes();
-			
-			compatProxy.registerRecipes();
+		@SubscribeEvent
+		public static void newRegistry(RegistryEvent.NewRegistry event) {
+			Species.newRegistry(event);
 		}
 		
 	}
-
+	
 }

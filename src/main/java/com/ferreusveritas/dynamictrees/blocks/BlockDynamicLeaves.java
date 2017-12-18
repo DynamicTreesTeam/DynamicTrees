@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -30,14 +31,14 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -45,6 +46,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable {
 	
@@ -55,7 +58,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public BlockDynamicLeaves() {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
-		leavesFancy = true;//True for alpha transparent leaves
 	}
 	
 	@Override
@@ -93,7 +95,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//Borrow flammability from the vanilla minecraft leaves
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		return getTree(world, pos).getPrimitiveLeaves().getBlock().getFlammability(world, pos, face);
+		return (int) (getTree(world, pos).getPrimitiveLeaves().getBlock().getFlammability(world, pos, face) * 0.75f);
 	}
 	
 	//Borrow fire spread rate from the vanilla minecraft leaves
@@ -110,13 +112,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		DynamicTree tree = getTree(state);
 		int preHydro = getHydrationLevel(state);
 
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
-		if(hydro == 0 || !hasAdequateLight(world, tree, pos)){
+		if(hydro == 0 || (!rapid && !hasAdequateLight(world, tree, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 
@@ -132,11 +134,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
 				growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
 			}
-		}
-
-		//Do special things if the leaf block is/was on the bottom
-		if(!fast && isBottom(world, pos)) {
-			tree.bottomSpecial(world, pos, rand);
 		}
 		
 		return false;//Leaves were not destroyed
@@ -208,9 +205,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				for(int ix = minX; ix <= maxX; ix++) {
 					for(int iz = minZ; iz <= maxZ; iz++) {
 						BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
-						if(TreeHelper.isLeaves(world, iPos)) {
+						IBlockState state = world.getBlockState(iPos);
+						if(TreeHelper.isLeaves(state)) {
 							hasLeaves = true;//This layer has leaves
-							crushBlock(world, iPos, entity);
+							DynamicTrees.proxy.crushLeavesBlock(world, iPos, state, entity);
+							world.setBlockToAir(iPos);
 						} else
 						if (!world.isAirBlock(iPos)) {
 							crushing = false;//We hit something solid thus no longer crushing leaves layers
@@ -221,37 +220,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	public void crushBlock(World world, BlockPos pos, Entity entity) {
-
-		if(world.isRemote) {
-			Random random = world.rand;
-			IBlockState blockState = world.getBlockState(pos);
-			ITreePart treePart = TreeHelper.getTreePart(blockState);
-			if(treePart instanceof BlockDynamicLeaves) {
-				DynamicTree tree = treePart.getTree(world, pos);
-				if(tree != null) {
-					int color = DynamicTrees.proxy.getTreeFoliageColor(tree, world, blockState, pos);
-			        float r = (color >> 16 & 255) / 255.0F;
-			        float g = (color >> 8 & 255) / 255.0F;
-			        float b = (color & 255) / 255.0F;
-					for(int dz = 0; dz < 8; dz++) {
-						for(int dy = 0; dy < 8; dy++) {
-							for(int dx = 0; dx < 8; dx++) {
-								if(random.nextInt(8) == 0) {
-									double fx = pos.getX() + dx / 8.0;
-									double fy = pos.getY() + dy / 8.0;
-									double fz = pos.getZ() + dz / 8.0;
-									DynamicTrees.proxy.addDustParticle(fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		world.setBlockToAir(pos);
-	}
 
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
@@ -453,7 +421,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/**
-	* Will place a leaves block if the position is air.
+	* Will place a leaves block if the position is air and it's possible to create one there.
 	* Otherwise it will check to see if the block is already there.
 	* 
 	* @param world
@@ -475,7 +443,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	public GrowSignal branchOut(World world, BlockPos pos, GrowSignal signal) {
 
-		DynamicTree tree = signal.getTree();
+		DynamicTree tree = signal.getSpecies().getTree();
 
 		//Check to be sure the placement for a branch is valid by testing to see if it would first support a leaves block
 		if(tree == null || !needLeaves(world, pos, tree)){
@@ -505,8 +473,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			world.setBlockState(pos, signal.branchBlock.getDefaultState(), 2);
-			signal.radius = signal.getTree().getSecondaryThickness();//For the benefit of the parent branch
+			world.setBlockState(pos, tree.getDynamicBranch().getDefaultState(), 2);
+			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
 		}
 
 		signal.success = hasLeaves;
@@ -525,71 +493,112 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		DynamicTree tree = getTree(state);
+		
+		Species species = getExactSpecies(world, pos, getTree(state));
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 
-		if(tree == null) {
-			return ret;
-		}
+		if(species != null) {
 
-		int chance = getSaplingDropChance(state);
+			int chance = getSaplingDropChance(state);
 
-		//Hokey fortune stuff here.
-		if (fortune > 0) {
-			chance -= 2 << fortune;
-			if (chance < 10) { 
-				chance = 10;
+			//Hokey fortune stuff here.
+			if (fortune > 0) {
+				chance -= 2 << fortune;
+				if (chance < 10) { 
+					chance = 10;
+				}
 			}
-		}
 
-		//It's mostly for seeds.. mostly.
-		//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
-		Random rand = world instanceof World ? ((World)world).rand : new Random();
-		if (rand.nextInt(chance) == 0) {
-			ret.add(tree.getSeedStack());
-		}
-
-		//More fortune contrivances here.  Vanilla compatible returns.
-		chance = 200; //1 in 200 chance of returning an "apple"
-		if (fortune > 0) {
-			chance -= 10 << fortune;
-			if (chance < 40) {
-				chance = 40;
+			//It's mostly for seeds.. mostly.
+			//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
+			Random rand = world instanceof World ? ((World)world).rand : new Random();
+			if (rand.nextInt(chance) == 0) {
+				ret.add(species.getSeedStack(1));
 			}
-		}
 
-		//Get species specific drops.. apples or cocoa for instance
-		tree.getDrops(world, pos, chance, ret);
+			//More fortune contrivances here.  Vanilla compatible returns.
+			chance = 200; //1 in 200 chance of returning an "apple"
+			if (fortune > 0) {
+				chance -= 10 << fortune;
+				if (chance < 40) {
+					chance = 40;
+				}
+			}
+
+			//Get species specific drops.. apples or cocoa for instance
+			ret = species.getDrops(world, pos, chance, ret);
+		}
 
 		return ret;
 	}
-
+	
+	/**
+	 * Warning! Resource intensive algorithm.  Use only for interaction such as breaking blocks.
+	 * 
+	 * @param access
+	 * @param pos
+	 * @param tree
+	 * @return
+	 */
+	Species getExactSpecies(IBlockAccess access, BlockPos pos, DynamicTree tree) {
+		
+		if(access instanceof World) {
+			World world = (World) access;
+			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
+						
+			//Find all of the branches that are nearby
+			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {
+				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));
+				IBlockState state = access.getBlockState(dPos);
+				if(TreeHelper.isBranch(state)) {
+					BlockBranch branch = TreeHelper.getBranch(state);
+					if(branch.getTree() == tree && branch.getRadius(state) == 1) {
+						branchList.add(dPos);
+					}
+				}
+			}
+			
+			if(!branchList.isEmpty()) {
+				//Find the closest one
+				BlockPos closest = branchList.get(0);
+				double minDist = 999;
+				
+				for(BlockPos dPos : branchList) {
+					double d = pos.distanceSq(dPos);
+					if(d < minDist) {
+						minDist = d;
+						closest = dPos;
+					}
+				}
+				
+				return DynamicTree.getExactSpecies(world, closest);
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	protected boolean canSilkHarvest() {
 		return false;
 	}
-
-	//1 in 64 chance to drop a seed on destruction.. This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
-	public int quantitySeedDropped(Random random) {
-		return random.nextInt(64) == 0 ? 1 : 0;
-	}
-
+	
 	//Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return null;
 	}
-
+	
 	@Override
 	public int quantityDropped(Random random) {
 		return 0;
 	}
-
+	
 	@Override
 	public int damageDropped(IBlockState state) {
 		return 0;
 	}
-
+	
 	//When the leaves are sheared just return vanilla leaves for usability
 	@Override
 	public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess blockAccess, BlockPos pos, int fortune) {
@@ -640,14 +649,14 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
+	public boolean isBranch() {
+		return false;
+	}
+	
+	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
 		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? 0x01 : 0;
-	}
-
-	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		return false;//Nothing is applied to leaves
 	}
 
 	@Override
@@ -660,4 +669,20 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return BlockPlanks.EnumType.OAK;//Shouldn't matter since it's only used to name things in ItemLeaves
 	}
 
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return Blocks.LEAVES.isOpaqueCube(state);
+	}
+	
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+    	return super.getBlockLayer();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+		return super.shouldSideBeRendered(blockState, blockAccess, pos, side); 
+	}
 }

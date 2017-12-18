@@ -7,8 +7,9 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
@@ -54,7 +55,7 @@ public class BlockBonsaiPot extends Block {
 	}
 
 	private void mapTrees() {
-		for(DynamicTree tree: DynamicTrees.baseTrees) {
+		for(DynamicTree tree: ModTrees.baseTrees) {
 			trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
 		}
 	}
@@ -71,24 +72,35 @@ public class BlockBonsaiPot extends Block {
 	}
 	
 	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
-		BlockPlanks.EnumType woodType = tree.getPrimitiveSapling().getValue(BlockSapling.TYPE);
-		world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
-		return true;
+		IBlockState primitiveSapling = tree.getPrimitiveSapling();
+		if(primitiveSapling.getBlock() == Blocks.SAPLING) {
+			BlockPlanks.EnumType woodType = primitiveSapling.getValue(BlockSapling.TYPE);
+			world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
+			return true;
+		}
+		return false;
 	}
-		
+	
+	public boolean setSpecies(World world, Species species, BlockPos pos) {
+		if(species == species.getTree().getCommonSpecies()) {//Make sure the seed is a common species
+			return setTree(world, species.getTree(), pos);
+		}
+		return false;
+	}
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
 	
 	//Unlike a regular flower pot this is only used to eject the contents
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
 			
 			if(!world.isRemote) {
-				ItemStack seedStack = tree.getSeedStack();
+				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
 				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
@@ -118,13 +130,13 @@ public class BlockBonsaiPot extends Block {
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
 		DynamicTree tree = getTree(state);
-		ret.add(tree.getSeedStack());
+		ret.add(tree.getCommonSpecies().getSeedStack(1));
 		return ret;
 	}
 
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
-		if (!world.getBlockState(pos.down()).isFullyOpaque()) {
+		if (!world.getBlockState(pos.down()).isSideSolid(world, pos, EnumFacing.UP)) {
 			this.dropBlockAsItem(world, pos, state, 0);
 			world.setBlockToAir(pos);
 		}

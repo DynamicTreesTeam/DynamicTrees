@@ -1,10 +1,8 @@
 package com.ferreusveritas.dynamictrees.potion;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -13,12 +11,18 @@ import net.minecraft.world.World;
 public class SubstanceFertilize implements ISubstanceEffect {
 
 	int amount = 1;
+	boolean grow;
 	
 	@Override
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
-		if(dirt.fertilize(world, pos, amount)) {
+	public boolean apply(World world, BlockPos rootPos) {
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		if(dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
 			if(world.isRemote) {
-				TreeHelper.getSafeTreePart(world, pos.up()).analyse(world, pos.up(), null, new MapSignal(new NodeTwinkle(EnumParticleTypes.VILLAGER_HAPPY, 8)));
+				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_HAPPY, 8);
+			} else {
+				if(grow) {
+					TreeHelper.growPulse(world, rootPos);
+				}
 			}
 			return true;
 		}
@@ -26,7 +30,7 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
 	}
 	
@@ -40,6 +44,19 @@ public class SubstanceFertilize implements ISubstanceEffect {
 		return this;
 	}
 
+	/**
+	 * If growth is enabled then the tree will take an
+	 * update and the item will be consumed.  Regardless
+	 * of if the soil life is full.
+	 * 
+	 * @param grow
+	 * @return
+	 */
+	public SubstanceFertilize setGrow(boolean grow) {
+		this.grow = grow;
+		return this;
+	}
+	
 	@Override
 	public boolean isLingering() {
 		return false;

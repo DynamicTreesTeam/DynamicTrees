@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.worldgen.ChunkCircleManager;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.world.World;
@@ -20,7 +20,7 @@ public class CircleEventHandler {
 	public void onWorldUnload(WorldEvent.Unload event) {
 		World world = event.getWorld();
 		if(world.provider.getDimension() == 0 && !world.isRemote) {
-			DynamicTrees.treeGenerator.onWorldUnload();//clears the circles
+			TreeGenerator.getTreeGenerator().onWorldUnload();//clears the circles
 		}
 	}
 
@@ -28,7 +28,7 @@ public class CircleEventHandler {
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
 		if(event.getWorld().provider.getDimension() == 0){//Overworld
 			byte circleData[] = event.getData().getByteArray("GTCD");
-			DynamicTrees.treeGenerator.getChunkCircleManager().setChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition, circleData);
+			TreeGenerator.getTreeGenerator().getChunkCircleManager().setChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition, circleData);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class CircleEventHandler {
 	@SubscribeEvent 
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
 		if(event.getWorld().provider.getDimension() == 0) {//Overworld
-			ChunkCircleManager cm = DynamicTrees.treeGenerator.getChunkCircleManager();
+			ChunkCircleManager cm = TreeGenerator.getTreeGenerator().getChunkCircleManager();
 			byte circleData[] = cm.getChunkCircleData(event.getChunk().xPosition, event.getChunk().zPosition);
 			NBTTagByteArray circleByteArray = new NBTTagByteArray(circleData);
 			event.getData().setTag("GTCD", circleByteArray);//Growing Trees Circle Data
