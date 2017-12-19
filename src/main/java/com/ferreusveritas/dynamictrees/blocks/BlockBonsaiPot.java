@@ -7,7 +7,6 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
