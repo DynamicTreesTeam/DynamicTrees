@@ -6,13 +6,13 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockLeaves;
@@ -23,7 +23,7 @@ import net.minecraft.world.EnumSkyBlock;
 
 public class GenFeaturePodzol implements IGenFeature {
 
-	private static final IBlockState podzolState = Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
+	private static final IBlockState podzolState = new BlockState(Blocks.dirt, 2);
 	
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints) {
@@ -76,7 +76,7 @@ public class GenFeaturePodzol implements IGenFeature {
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			BlockPos deltaPos = pos.offset(dir);
 			Block testBlock = world.getBlockState(deltaPos).getBlock();
-			Podzolish += (testBlock == Blocks.dirt) && (world.getBlockState(deltaPos).getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL) ? 1 : 0;
+			Podzolish += (testBlock == Blocks.dirt) && (world.getBlockState(deltaPos).getMeta() == 2) ? 1 : 0;
 			Podzolish += testBlock == ModBlocks.blockRootyDirt ? 1 : 0;
 			if(Podzolish >= 3) {
 				world.setBlockState(pos, podzolState);

@@ -17,11 +17,10 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.block.BlockDirt;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeDarkOak extends DynamicTree {
@@ -45,7 +44,7 @@ public class TreeDarkOak extends DynamicTree {
 
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
+			return isOneOfBiomes(biome, BiomeGenBase.roofedForest);
 		};
 		
 		@Override
@@ -134,8 +133,8 @@ public class TreeDarkOak extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 6) {
-				world.setBlockState(pos, Blocks.red_mushroom);//Change branch to a red mushroom
-				world.setBlockState(pos.down(), Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));//Change rooty dirt to Podzol
+				world.setBlockState(pos, TreeOak.redMushroom);//Change branch to a red mushroom
+				world.setBlockState(pos.down(), TreeOak.podzol);//Change rooty dirt to Podzol
 			}
 			return true;
 		}

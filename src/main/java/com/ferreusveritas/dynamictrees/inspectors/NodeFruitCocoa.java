@@ -2,15 +2,15 @@ package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCocoa;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class NodeFruitCocoa implements INodeInspector {
 
@@ -38,7 +38,7 @@ public class NodeFruitCocoa implements INodeInspector {
 					if (world.isAirBlock(pos)) {
 						IBlockState cocoaState = ModBlocks.blockFruitCocoa.onBlockPlaced(world, pos, dir, 0, 0, 0, 0, null);
 						if(worldGen) {
-							cocoaState = cocoaState.withProperty(BlockCocoa.AGE, 2);
+							cocoaState = cocoaState.withMeta(2 << 2);
 						}
 						world.setBlockState(pos, cocoaState, 2);
 					}

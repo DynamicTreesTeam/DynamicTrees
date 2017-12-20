@@ -7,13 +7,17 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
+import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+
 import net.minecraft.world.IBlockAccess;
 
 public class TreeHelper {
@@ -122,7 +126,7 @@ public class TreeHelper {
 	}
 	
 	public static void treeParticles(World world, BlockPos rootPos, EnumParticleTypes type, int num) {
-		if(world.isRemote) {
+		if(world.isRemote()) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
 		}
 	}

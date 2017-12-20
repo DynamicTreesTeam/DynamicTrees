@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -49,13 +50,13 @@ public class ModBlocks {
 		GameRegistry.register(ModBlocks.blockFruitCocoa);
 		GameRegistry.register(ModBlocks.blockVerboseFire);
 
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
+		ArrayList<BlockBackport> treeBlocks = new ArrayList<BlockBackport>();
 
 		for(DynamicTree tree: ModTrees.baseTrees) {
 			tree.getRegisterableBlocks(treeBlocks);
 		}
 
-		for(Block block: treeBlocks) {
+		for(BlockBackport block: treeBlocks) {
 			GameRegistry.register(block);
 		}
 		

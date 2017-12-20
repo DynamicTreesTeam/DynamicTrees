@@ -1,7 +1,15 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.SpeciesRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
@@ -15,18 +23,10 @@ import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.world.ColorizerFoliage;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeSpruce extends DynamicTree {
 	
@@ -107,7 +107,7 @@ public class TreeSpruce extends DynamicTree {
 	Species species;
 	
 	public TreeSpruce() {
-		super(BlockPlanks.EnumType.SPRUCE);
+		super(VanillaTreeData.EnumType.SPRUCE);
 		
 		setCellSolver(Cells.coniferSolver);
 		setSmotherLeavesMax(3);
@@ -119,7 +119,7 @@ public class TreeSpruce extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+	public void registerSpecies(SpeciesRegistry speciesRegistry) {
 		speciesRegistry.register(species);
 	}
 	

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
@@ -137,7 +138,7 @@ public class TreeJungle extends DynamicTree {
 	Species species;
 	
 	public TreeJungle() {
-		super(BlockPlanks.EnumType.JUNGLE);
+		super(VanillaTreeData.EnumType.JUNGLE);
 		
 		canSupportCocoa = true;
 	}
@@ -167,7 +168,7 @@ public class TreeJungle extends DynamicTree {
 	
 		//Place Cocoa Pod if we are holding Cocoa Beans
 		if(heldItem != null) {
-			if(heldItem.getItem() == Items.DYE && heldItem.getItemDamage() == 3) {
+			if(heldItem.getItem() == Items.dye && heldItem.getItemDamage() == 3) {
 				BlockBranch branch = TreeHelper.getBranch(world, pos);
 				if(branch != null && branch.getRadius(world, pos) == 8) {
 					if(side != EnumFacing.UP && side != EnumFacing.DOWN) {

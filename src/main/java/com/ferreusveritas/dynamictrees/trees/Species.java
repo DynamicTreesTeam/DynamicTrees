@@ -46,6 +46,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -796,9 +797,9 @@ public class Species extends Registerable {
 	* @param biomes Multiple biomes to match against
 	* @return True if a match is found. False if not.
 	*/
-	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome ... biomes) {
-		for(Biome biome: biomes) {
-			if(biomeToCheck == biome) {
+	public static boolean isOneOfBiomes(Biome biomeToCheck, BiomeGenBase ... biomes) {
+		for(BiomeGenBase biome: biomes) {
+			if(biomeToCheck.getBiomeGenBase() == biome) {
 				return true;
 			}
 		}

@@ -4,28 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.SpeciesRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 public class TreeOak extends DynamicTree {
+	
+	public static IBlockState dirt = new BlockState(Blocks.dirt, 0);
+	public static IBlockState podzol = new BlockState(Blocks.dirt, 2);
+	public static IBlockState redMushroom = new BlockState(Blocks.red_mushroom);
+	public static IBlockState brownMushroom = new BlockState(Blocks.brown_mushroom);
+	
 	
 	public class SpeciesOak extends Species {
 		
@@ -44,14 +50,14 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
+			return isOneOfBiomes(biome, BiomeGenBase.forest, BiomeGenBase.forestHills);
 		}
 
 		@Override
 		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
 			Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
 			if ((rand.nextInt(chance) == 0)) {
-				drops.add(new ItemStack(Items.APPLE, 1, 0));
+				drops.add(new ItemStack(Items.apple, 1, 0));
 			}
 			return drops;
 		}
@@ -79,13 +85,13 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return isOneOfBiomes(biome, Biomes.SWAMPLAND);
+			return isOneOfBiomes(biome, BiomeGenBase.swampland);
 		}
 		
 		@Override
 		public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
 			
-			if(soilBlockState.getBlock() == Blocks.WATER) {
+			if(soilBlockState.getBlock() == Blocks.water) {
 				Biome biome = blockAccess.getBiome(pos);
 				if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
 					BlockPos down = pos.down();
@@ -144,7 +150,7 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return biome == Biomes.PLAINS;
+			return biome.getBiomeGenBase() == BiomeGenBase.plains;
 		}
 
 		@Override
@@ -166,7 +172,7 @@ public class TreeOak extends DynamicTree {
 	Species appleSpecies;
 	
 	public TreeOak() {
-		super(BlockPlanks.EnumType.OAK);
+		super(VanillaTreeData.EnumType.OAK);
 	}
 	
 	@Override
@@ -177,7 +183,7 @@ public class TreeOak extends DynamicTree {
 	}
 	
 	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+	public void registerSpecies(SpeciesRegistry speciesRegistry) {
 		speciesRegistry.register(commonSpecies);
 		speciesRegistry.register(swampSpecies);
 		speciesRegistry.register(appleSpecies);
@@ -204,9 +210,9 @@ public class TreeOak extends DynamicTree {
 	@Override
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
-				world.setBlockState(pos, random.nextInt(3) == 0 ? Blocks.RED_MUSHROOM.getDefaultState() : Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a mushroom
-				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL));//Change rooty dirt to Podzol
+			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 4) {
+				world.setBlockState(pos, random.nextInt(3) == 0 ? redMushroom : brownMushroom);//Change branch to a mushroom
+				world.setBlockState(pos.down(), podzol);//Change rooty dirt to Podzol
 			}
 			return true;
 		}

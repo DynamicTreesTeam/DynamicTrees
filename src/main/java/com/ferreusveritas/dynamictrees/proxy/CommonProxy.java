@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.proxy;
 import com.ferreusveritas.dynamictrees.ConfigHandler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
@@ -12,7 +13,6 @@ import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.registry.GameRegistry;
 

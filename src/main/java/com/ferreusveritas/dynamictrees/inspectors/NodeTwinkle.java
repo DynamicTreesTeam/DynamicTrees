@@ -4,13 +4,13 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class NodeTwinkle implements INodeInspector {
 
@@ -24,7 +24,7 @@ public class NodeTwinkle implements INodeInspector {
 
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		if(world.isRemote && TreeHelper.isBranch(block)) {
+		if(world.isRemote() && TreeHelper.isBranch(block)) {
 			spawnParticles(world, particleType, pos.getX(), pos.getY() + 1, pos.getZ(), numParticles, world.rand);
 		}
 		return false;

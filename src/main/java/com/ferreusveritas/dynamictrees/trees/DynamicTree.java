@@ -133,7 +133,7 @@ public abstract class DynamicTree {
 		setPrimitiveLeaves(wood.getLeavesBlockAndMeta(), wood.getLeavesBlockAndMeta().toItemStack());
 		setPrimitiveLog(wood.getLogBlockAndMeta(), wood.getLogBlockAndMeta().toItemStack());
 		setPrimitiveSapling(new BlockState(Blocks.sapling, wood.getMetadata()));
-		setDynamicSapling(new BlockState(DynamicTrees.blockDynamicSapling, wood.getMetadata()));
+		setDynamicSapling(new BlockState(ModBlocks.blockDynamicSapling, wood.getMetadata()));
 
 		simpleVanillaCommonSpecies(wood);
 	}

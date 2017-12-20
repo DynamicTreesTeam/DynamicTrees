@@ -3,6 +3,9 @@ package com.ferreusveritas.dynamictrees.inspectors;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -12,9 +15,6 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 /**
 * Destroys all branches on a tree and the surrounding leaves.
@@ -48,7 +48,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	public void killSurroundingLeaves(World world, BlockPos twigPos) {
-		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+		if (!world.isRemote() && !world.restoringBlockSnapshots()) { // do not drop items while restoring blockstates, prevents item dupe
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
 			DynamicTree tree = species.getTree();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
@@ -57,7 +57,7 @@ public class NodeDestroyer implements INodeInspector {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, leavesPos, dropList, world.rand);
 					for(ItemStack stack : dropList) {
-						EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, stack);
+						EntityItem itemEntity = new EntityItem(world.real(), leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, stack);
 						CompatHelper.spawnEntity(world, itemEntity);
 					}
 				}

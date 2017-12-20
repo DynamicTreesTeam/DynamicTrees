@@ -95,5 +95,9 @@ public class World extends BlockAccess {
 	public static boolean doesBlockHaveSolidTopSurface(World world, BlockPos pos) {
 		return net.minecraft.world.World.doesBlockHaveSolidTopSurface(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	}
+
+	public long getTotalWorldTime() {
+		return world.getTotalWorldTime();
+	}
 	
 }

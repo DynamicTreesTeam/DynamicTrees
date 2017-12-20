@@ -16,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeBirch extends DynamicTree {
@@ -36,7 +37,7 @@ public class TreeBirch extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
+			return isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills);
 		};
 		
 	}

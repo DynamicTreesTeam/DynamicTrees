@@ -1,16 +1,16 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class NodeTransform implements INodeInspector {
 	
@@ -29,7 +29,7 @@ public class NodeTransform implements INodeInspector {
 		if(branch != null && fromTree == branch.getTree()) {
 			int radius = branch.getRadius(world, pos);
 			if(radius > 0) {
-				world.setBlockState(pos, toTree.getDynamicBranch().getDefaultState().withProperty(BlockBranch.RADIUS, radius));
+				world.setBlockState(pos, toTree.getDynamicBranch().getDefaultState().withMeta(radius - 1));
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}
@@ -45,7 +45,7 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	public void transformSurroundingLeaves(World world, BlockPos twigPos) {
-		if (!world.isRemote) {
+		if (!world.isRemote()) {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(fromTree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(fromTree.isCompatibleGenericLeaves(world, leavesPos)) {
