@@ -99,5 +99,17 @@ public class World extends BlockAccess {
 	public long getTotalWorldTime() {
 		return world.getTotalWorldTime();
 	}
+
+	public void scheduleUpdate(BlockPos pos, Block block, int i) {
+		world.scheduleBlockUpdate(pos.getX(), pos.getY(), pos.getZ(), block, i);		
+	}
+
+	public boolean isBlockinHighHumidity(BlockPos pos) {
+		return world.isBlockHighHumidity(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public boolean isRaining() {
+		return world.isRaining();
+	}
 	
 }

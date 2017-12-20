@@ -3,27 +3,33 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockTNT;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
+import net.minecraft.util.ResourceLocation;
 
-public class BlockVerboseFire extends BlockFire {
+public class BlockVerboseFire extends BlockFire implements IRegisterable {
 
 	public BlockVerboseFire() {
 		setRegistryName("fire");
 		setHardness(0.0F);
 		setLightLevel(1.0F);
-		setSoundType(SoundType.CLOTH);
-		setUnlocalizedName("fire");
+		setStepSound(soundTypeCloth);
+		setUnlocalizedNameReg("fire");
 		disableStats();
 	}
+	
+	
 	
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
         if (worldIn.getGameRules().getBoolean("doFireTick")) {
@@ -32,7 +38,7 @@ public class BlockVerboseFire extends BlockFire {
             }
 
             Block block = worldIn.getBlockState(pos.down()).getBlock();
-            boolean onFireSource = block.isFireSource(worldIn, pos.down(), EnumFacing.UP);
+            boolean onFireSource = block.isFireSource(worldIn.real(), pos.getX(), pos.down().getY(), pos.getZ(), EnumFacing.UP.toForgeDirection());
 
             int age = ((Integer)state.getValue(AGE)).intValue();
 
@@ -45,7 +51,7 @@ public class BlockVerboseFire extends BlockFire {
                     worldIn.setBlockState(pos, state, 4);
                 }
 
-                worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn) + rand.nextInt(10));
+                worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn.real()) + rand.nextInt(10));
 
                 if (!onFireSource) {
                     if (!this.canNeighborCatchFire(worldIn, pos)) {
@@ -56,7 +62,7 @@ public class BlockVerboseFire extends BlockFire {
                         return;
                     }
 
-                    if (!this.canCatchFire(worldIn, pos.down(), EnumFacing.UP) && age == 15 && rand.nextInt(4) == 0) {
+                    if (!this.canCatchFire(worldIn, pos.getX(), pos.down().getY(), pos.getZ(), EnumFacing.UP.toForgeDirection()) && age == 15 && rand.nextInt(4) == 0) {
                         worldIn.setBlockToAir(pos);
                         return;
                     }
@@ -90,7 +96,7 @@ public class BlockVerboseFire extends BlockFire {
                 		//Chance to age
                 		if (heat > 0 && rand.nextInt(distance) <= heat && (!worldIn.isRaining() || !this.canDie(worldIn, dPos))) {
                 			int newAge = MathHelper.clamp(age + rand.nextInt(5) / 4, 0, 15);
-                			worldIn.setBlockState(dPos, Blocks.FIRE.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
+                			worldIn.setBlockState(dPos, Blocks.fire.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
                 		}
                 	}
                 }
@@ -98,8 +104,10 @@ public class BlockVerboseFire extends BlockFire {
         }
         
     }
-    
-    public void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age, EnumFacing face) {
+
+
+
+	public void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age, EnumFacing face) {
         int flammability = worldIn.getBlockState(pos).getBlock().getFlammability(worldIn, pos, face);
         
         if (random.nextInt(chance) < flammability) {
@@ -107,7 +115,7 @@ public class BlockVerboseFire extends BlockFire {
             
             if (random.nextInt(age + 10) < 5 && !worldIn.isRainingAt(pos)) {
     			int newAge = MathHelper.clamp(age + random.nextInt(5) / 4, 0, 15);
-                worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
+                worldIn.setBlockState(pos, Blocks.fire.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
             }
             else {
                 worldIn.setBlockToAir(pos);
@@ -117,8 +125,8 @@ public class BlockVerboseFire extends BlockFire {
             	}
             }
             
-            if (iblockstate.getBlock() == Blocks.TNT) {
-                Blocks.TNT.onBlockDestroyedByPlayer(worldIn, pos, iblockstate.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)));
+            if (iblockstate.getBlock() == Blocks.tnt) {
+                Blocks.tnt.onBlockDestroyedByPlayer(worldIn, pos, iblockstate.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)));
             }
         }
     }
@@ -146,5 +154,32 @@ public class BlockVerboseFire extends BlockFire {
         
         return 0;
     }
+
     
+	//////////////////////////////
+	// REGISTRATION
+	//////////////////////////////
+
+	ResourceLocation name;
+	
+	public void setRegistryName(String name) {
+		ModContainer mc = Loader.instance().activeModContainer();
+		String domain = mc.getModId().toLowerCase();
+		setRegistryName(new ResourceLocation(domain, name));
+	}
+	
+	@Override
+	public void setRegistryName(ResourceLocation name) {
+		this.name = name;
+	}
+
+	@Override
+	public ResourceLocation getRegistryName() {
+		return name;
+	}
+
+	@Override
+	public void setUnlocalizedNameReg(String unlocalName) {
+		setBlockName(unlocalName);
+	}
 }
