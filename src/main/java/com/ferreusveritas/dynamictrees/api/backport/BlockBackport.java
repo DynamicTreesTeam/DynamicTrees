@@ -3,12 +3,15 @@ package com.ferreusveritas.dynamictrees.api.backport;
 import java.util.ArrayList;
 import java.util.Random;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -218,16 +221,22 @@ public class BlockBackport extends Block implements IBlockBackport {
 	// REGISTRATION
 	//////////////////////////////
 
-	String registryName;
+	ResourceLocation name;
+	
+	public void setRegistryName(String name) {
+		ModContainer mc = Loader.instance().activeModContainer();
+		String domain = mc.getModId().toLowerCase();
+		setRegistryName(new ResourceLocation(domain, name));
+	}
 	
 	@Override
-	public void setRegistryName(String regName) {
-		registryName = regName;
+	public void setRegistryName(ResourceLocation name) {
+		this.name = name;
 	}
 
 	@Override
-	public String getRegistryName() {
-		return registryName;
+	public ResourceLocation getRegistryName() {
+		return name;
 	}
 
 	@Override

@@ -2,8 +2,6 @@ package com.ferreusveritas.dynamictrees.api.backport;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.biome.BiomeGenBase;
 
 /**
  * IBlockAccess object expansion for backport using a simple decorator pattern
@@ -11,7 +9,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * @author ferreusveritas
  *
  */
-public interface IBlockAccessBackport extends IBlockAccess {
+public interface IBlockAccess extends net.minecraft.world.IBlockAccess {
 	
 	public IBlockState getBlockState(BlockPos pos);
 	
@@ -31,7 +29,7 @@ public interface IBlockAccessBackport extends IBlockAccess {
 	public int isBlockProvidingPowerTo(BlockPos pos, EnumFacing side);
 
 	//public BiomeGenBase getBiomeGenForCoords(int x, int z);
-	public BiomeGenBase getBiome(BlockPos pos);
+	public Biome getBiome(BlockPos pos);
 
 	//public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default);
 	boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default);

@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockPos implements Comparable<BlockPos> {
 
+	public static final BlockPos ORIGIN = new BlockPos(0, 0, 0);
 	/** X coordinate */
 	private final int x;
 	/** Y coordinate */

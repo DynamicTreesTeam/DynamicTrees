@@ -1,13 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-import com.ferreusveritas.dynamictrees.util.MathHelper;
-
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-
-import net.minecraft.world.biome.BiomeGenBase;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 /**
  * Provides the suitability factor for a tree at a given biome or position.
@@ -17,7 +15,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  */
 public interface IBiomeSuitabilityDecider {
 
-	public Decision getBiomeSuitability(World world, BiomeGenBase biome, DynamicTree tree, BlockPos pos);
+	public Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
 	
 	/** Decision interface for handling the event */
 	public class Decision {

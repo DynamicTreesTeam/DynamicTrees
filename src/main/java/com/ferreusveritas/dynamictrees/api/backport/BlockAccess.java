@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api.backport;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -12,15 +11,15 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author ferreusveritas
  *
  */
-public class BlockAccess implements IBlockAccessBackport {
+public class BlockAccess implements IBlockAccess {
 
-	private final IBlockAccess access;
+	private final net.minecraft.world.IBlockAccess access;
 	
-	public BlockAccess(IBlockAccess world) {
+	public BlockAccess(net.minecraft.world.IBlockAccess world) {
 		this.access = world;
 	}
 
-	public IBlockAccess getRealBlockAccess() {
+	public net.minecraft.world.IBlockAccess getRealBlockAccess() {
 		return access;
 	}
 	
@@ -60,8 +59,8 @@ public class BlockAccess implements IBlockAccessBackport {
 	}
 
 	@Override
-	public BiomeGenBase getBiome(BlockPos pos) {
-		return getBiomeGenForCoords(pos.getX(), pos.getZ());
+	public Biome getBiome(BlockPos pos) {
+		return new Biome(getBiomeGenForCoords(pos.getX(), pos.getZ()));
 	}
 	
 	@Override

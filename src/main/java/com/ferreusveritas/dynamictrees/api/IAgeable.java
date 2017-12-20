@@ -14,9 +14,9 @@ public interface IAgeable {
 	 * @param pos
 	 * @param state
 	 * @param rand
-	 * @param fast
+	 * @param rapid
 	 * @return true if block was destroyed after the ageing, false otherwise
 	 */
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast);
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid);
 	
 }

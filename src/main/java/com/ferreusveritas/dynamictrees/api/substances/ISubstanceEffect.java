@@ -18,21 +18,21 @@ public interface ISubstanceEffect {
 	 * 
 	 * @param world
 	 * @param dirt
-	 * @param pos
+	 * @param rootPos 
 	 * @return true for success.  false otherwise
 	 */
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos);
+	public boolean apply(World world, BlockPos rootPos);
 	
 	/**
 	 * For a continuously updating effect.
 	 * 
 	 * @param world
 	 * @param dirt
-	 * @param pos
+	 * @param rootPos
 	 * @param deltaTicks
 	 * @return true to stay alive. false to kill effector
 	 */
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks);
+	public boolean update(World world, BlockPos rootPos, int deltaTicks);
 	
 	/**
 	 * Get the name of the effect.  Used to compare existing effects in the environment.

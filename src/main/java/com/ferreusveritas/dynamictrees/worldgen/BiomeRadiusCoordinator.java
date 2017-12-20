@@ -2,11 +2,11 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
@@ -22,7 +22,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	@Override
 	public int getRadiusAtCoords(World world, double x, double z) {
 		double scale = 128;//Effectively scales up the noisemap
-		BiomeGenBase biome = world.getBiomeGenForCoords((int)x, (int)z);
+		Biome biome = new Biome(world.getBiomeGenForCoords((int)x, (int)z));
 		double noiseDensity = (noiseGenerator.func_151601_a(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
 		double density = densityProvider.getDensity(biome, noiseDensity, world.rand);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)

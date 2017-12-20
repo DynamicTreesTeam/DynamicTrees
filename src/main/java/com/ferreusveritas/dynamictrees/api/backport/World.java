@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.api.backport;
 
 import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.biome.BiomeGenBase;
 
 /**
  * World object expansion for backport using a simple decorator pattern
@@ -43,6 +43,10 @@ public class World extends BlockAccess {
 		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), blockState.getBlock(), blockState.getMeta(), 3);
 	}
 	
+	public void setBlockState(BlockPos pos, Block block) {
+		world.setBlock(pos.getX(), pos.getY(), pos.getZ(), block, 0, 3);
+	}
+	
 	public int getLightFor(EnumSkyBlock type, BlockPos pos) {
 		return world.getSavedLightValue(type, pos.getX(), pos.getY(), pos.getZ());
 	}
@@ -56,9 +60,9 @@ public class World extends BlockAccess {
 	}
 
 	@Override
-	public BiomeGenBase getBiome(BlockPos pos) {
-		return world.getBiomeGenForCoords(pos.getX(), pos.getZ());
-	}
+    public Biome getBiome(BlockPos pos) {
+    	return new Biome(world.getBiomeGenForCoords(pos.getX(), pos.getZ()));
+    }
 	
 	public boolean canBlockSeeSky(BlockPos pos) {
 		return world.canBlockSeeTheSky(pos.getX(), pos.getY(), pos.getZ());

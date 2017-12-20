@@ -1,28 +1,40 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector;
+import com.ferreusveritas.dynamictrees.api.backport.World;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.BiomeGenHills;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
+public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 
-	private DynamicTree oak;
-	private DynamicTree birch;
-	private DynamicTree spruce;
-	private DynamicTree acacia;
-	private DynamicTree jungle;
-	private DynamicTree darkoak;
+	private Species oak;
+	private Species birch;
+	private Species spruce;
+	private Species acacia;
+	private Species jungle;
+	private Species darkoak;
+	private Species oakswamp;
+	
+	private StaticDecision staticOakDecision;
+	private StaticDecision staticSpruceDecision;
+	private StaticDecision staticBirchDecision;
+	private StaticDecision staticDarkOakDecision;
 	
 	private interface ITreeSelector {
 		Decision getDecision();
@@ -41,6 +53,34 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 		}
 	}
 	
+	private class RandomDecision implements ITreeSelector {
+
+		ArrayList<Decision> table = new ArrayList<Decision>();
+		Random rand;
+		
+		public RandomDecision(Random rand) {
+			this.rand = rand;
+		}
+		
+		public RandomDecision addSpecies(Species species, int weight) {
+			while(weight-- > 0) {
+				table.add(new Decision(species));
+			}
+			return this;
+		}
+		
+		public RandomDecision end() {
+			table.trimToSize();
+			return this;
+		}
+		
+		@Override
+		public Decision getDecision() {
+			return table.get(rand.nextInt(table.size()));
+		}
+		
+	}
+	
 	HashMap<Integer, ITreeSelector> fastTreeLookup = new HashMap<Integer, ITreeSelector>();
 	
 	public DefaultBiomeTreeSelector() {		
@@ -48,17 +88,23 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	
 	@Override
 	public void init() {
-		oak = TreeRegistry.findTree("oak");
-		birch = TreeRegistry.findTree("birch");
-		spruce = TreeRegistry.findTree("spruce");
-		acacia = TreeRegistry.findTree("acacia");
-		jungle = TreeRegistry.findTree("jungle");
-		darkoak = TreeRegistry.findTree("darkoak");
+		oak = TreeRegistry.findSpeciesSloppy("oak");
+		birch = TreeRegistry.findSpeciesSloppy("birch");
+		spruce = TreeRegistry.findSpeciesSloppy("spruce");
+		acacia = TreeRegistry.findSpeciesSloppy("acacia");
+		jungle = TreeRegistry.findSpeciesSloppy("jungle");
+		darkoak = TreeRegistry.findSpeciesSloppy("darkoak");
+		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
+		
+		staticOakDecision = new StaticDecision(new Decision(oak));
+		staticSpruceDecision = new StaticDecision(new Decision(spruce));
+		staticBirchDecision = new StaticDecision(new Decision(birch));
+		staticDarkOakDecision = new StaticDecision(new Decision(darkoak));
 	}
 	
 	@Override
 	public String getName() {
-		return DynamicTrees.MODID + ":default";
+		return ModConstants.MODID + ":default";
 	}
 	
 	@Override
@@ -67,41 +113,53 @@ public class DefaultBiomeTreeSelector implements IBiomeTreeSelector {
 	}
 	
 	@Override
-	public Decision getTree(World world, BiomeGenBase biome, BlockPos pos, IBlockState dirt, Random random) {
+	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
-		int biomeId = biome.biomeID;
+		int biomeId = Biome.getIdForBiome(biome);
 		ITreeSelector select;
 				
 		if(fastTreeLookup.containsKey(biomeId)) {
-			select = fastTreeLookup.get(biomeId);//Speedily look up the type of tree
+			select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 		}
 		else {
-			if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {
-				if (BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS)) {
-					select = new StaticDecision(new Decision(spruce));
-				} else if (BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) {
-					select = new StaticDecision(new Decision(darkoak));
-				} else if (DynamicTree.isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills)) {
-					select = new StaticDecision(new Decision(birch));
-				} else {
-					select = new StaticDecision(new Decision(oak));
+			if(biome.getBiomeGenBase() instanceof BiomeGenHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
+				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
+			}
+			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
+				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
+					select = staticSpruceDecision;
+				} else if (CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
+					select = staticSpruceDecision;
+				} else if (CompatHelper.biomeHasType(biome, Type.SPOOKY)) {
+					select = staticDarkOakDecision;
+				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
+					select = staticBirchDecision;
+				} else {//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
+					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1).end();
 				}
-			} /*else if(biome == BiomeGenBase.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
-				select = new StaticDecision(new Decision(darkoak));
-			}*/
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.JUNGLE)) {
+			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
+				select = staticDarkOakDecision;
+			}
+			else if(biome == Biomes.MESA_ROCK) {
+				select = staticOakDecision;
+			}
+			else if(CompatHelper.biomeHasType(biome, Type.JUNGLE)) {
 				select = new StaticDecision(new Decision(jungle));
 			}
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA)) {
+			else if(CompatHelper.biomeHasType(biome, Type.SAVANNA)) {
 				select = new StaticDecision(new Decision(acacia));
 			}
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.SANDY)) {
+			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
+				select = new StaticDecision(new Decision(oakswamp));
+			}
+			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree
 			}
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.WASTELAND)) {
+			else if(CompatHelper.biomeHasType(biome, Type.WASTELAND)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree
-			} else {
-				select = new StaticDecision(new Decision(oak));//Just default to oak for everything else
+			}
+			else {
+				select = staticOakDecision;//Just default to oak for everything else
 			}
 
 			fastTreeLookup.put(biomeId, select);//Cache decision for future use

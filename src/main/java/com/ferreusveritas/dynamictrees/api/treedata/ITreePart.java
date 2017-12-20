@@ -1,20 +1,15 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.World;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 
 public interface ITreePart {
 
@@ -87,7 +82,7 @@ public interface ITreePart {
 	* @return DynamicTree
 	*/
 	DynamicTree getTree(BlockAccess blockAccess, BlockPos pos);
-
+	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
 	* Valid supports are other branches(always), leaves(for twigs), and rooty dirt(under special circumstances)
@@ -103,21 +98,13 @@ public interface ITreePart {
 	int branchSupport(BlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 
 	/**
-	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
-	* 
-	* @param world The current world
-	* @param pos Position
-	* @param player The player applying the substance
-	* @param itemStack The itemstack to be used.
-	* @return true if item was used, false otherwise
-	*/
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack);
-
-	/**
 	* The single root node of a tree.
 	* 
 	* @return true if treepart is root node. false otherwise.
 	*/
 	boolean isRootNode();
+	
+	
+	boolean isBranch();
 
 }

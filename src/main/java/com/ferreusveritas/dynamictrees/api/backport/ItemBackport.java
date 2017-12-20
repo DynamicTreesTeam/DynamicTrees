@@ -1,21 +1,30 @@
 package com.ferreusveritas.dynamictrees.api.backport;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public class ItemBackport extends Item implements IRegisterable {
 
-	protected String registryName;
+	protected ResourceLocation name;
+	
+	public void setRegistryName(String name) {
+		ModContainer mc = Loader.instance().activeModContainer();
+		String domain = mc.getModId().toLowerCase();
+		setRegistryName(new ResourceLocation(domain, name));
+	}
 	
 	@Override
-	public void setRegistryName(String regName) {
-		registryName = regName;
+	public void setRegistryName(ResourceLocation name) {
+		this.name = name;
 	}
 
 	@Override
-	public String getRegistryName() {
-		return registryName;
+	public ResourceLocation getRegistryName() {
+		return name;
 	}
 
 	@Override

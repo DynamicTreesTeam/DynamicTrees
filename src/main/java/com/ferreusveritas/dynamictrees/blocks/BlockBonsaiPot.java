@@ -5,17 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
-import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.renderers.RendererBonsai;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
@@ -43,14 +42,11 @@ public class BlockBonsaiPot extends BlockBackport {
 		setDefaultState(new BlockState(this, 0));
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
-		mapTrees();
 		setBlockBoundsForItemRender();
 	}
 
-	private void mapTrees() {
-		for(DynamicTree tree: DynamicTrees.baseTrees) {
-			trees.put(tree.getPrimitiveSapling().getMeta(), tree);
-		}
+	public void setupVanillaTree(DynamicTree tree) {
+		trees.put(tree.getPrimitiveSapling().getMeta(), tree);
 	}
 
 	//////////////////////////////
@@ -69,7 +65,14 @@ public class BlockBonsaiPot extends BlockBackport {
 		world.setBlockState(pos, getDefaultState().withMeta(woodType));
 		return true;
 	}
-		
+	
+	public boolean setSpecies(World world, Species species, BlockPos pos) {
+		if(species == species.getTree().getCommonSpecies()) {//Make sure the seed is a common species
+			return setTree(world, species.getTree(), pos);
+		}
+		return false;
+	}
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
@@ -82,7 +85,7 @@ public class BlockBonsaiPot extends BlockBackport {
 			DynamicTree tree = getTree(state);
 			
 			if(!world.isRemote()) {
-				ItemStack seedStack = tree.getSeedStack();
+				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
 				ItemStack saplingStack = tree.getPrimitiveSapling().toItemStack();
 				CompatHelper.spawnEntity(world, new EntityItem(world.real(), pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
@@ -112,7 +115,7 @@ public class BlockBonsaiPot extends BlockBackport {
 		IBlockState state = world.getBlockState(pos);
 		ArrayList<ItemStack> ret = super.getDrops(world, pos, metadata, fortune);
 		DynamicTree tree = getTree(state);
-		ret.add(tree.getSeedStack());
+		ret.add(tree.getCommonSpecies().getSeedStack(1));
 		return ret;
 	}
 	

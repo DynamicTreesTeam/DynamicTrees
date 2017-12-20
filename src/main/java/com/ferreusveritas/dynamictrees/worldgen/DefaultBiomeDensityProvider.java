@@ -3,13 +3,13 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
@@ -62,7 +62,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
 	@Override
 	public String getName() {
-		return DynamicTrees.MODID + ":default";
+		return ModConstants.MODID + ":default";
 	}
 	
 	@Override
@@ -71,26 +71,26 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	}
 
 	@Override
-	public double getDensity(BiomeGenBase biome, double noiseDensity, Random random) {
+	public double getDensity(Biome biome, double noiseDensity, Random random) {
 		
-		if(BiomeDictionary.isBiomeOfType(biome, Type.SPOOKY)) { //Roofed Forest
-			return 0.5f + (noiseDensity / 2.0f);
+		if(CompatHelper.biomeHasType(biome, Type.SPOOKY)) { //Roofed Forest
+			return 0.4f + (noiseDensity / 3.0f);
 		}
 		
-		double naturalDensity = MathHelper.clamp((biome.theBiomeDecorator.treesPerChunk) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
+		double naturalDensity = MathHelper.clamp((CompatHelper.getBiomeTreesPerChunk(biome)) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return noiseDensity * naturalDensity;
 	}
 	
 	@Override
-	public EnumChance chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random) {
+	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
 
-		int biomeId = biome.biomeID;
+		int biomeId = Biome.getIdForBiome(biome);
 		IChance chance;
 				
 		if(fastChanceLookup.containsKey(biomeId)) {
 			chance = fastChanceLookup.get(biomeId);
 		} else {
-			if(BiomeDictionary.isBiomeOfType(biome, Type.CONIFEROUS)) {
+			if(CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
 				chance = new IChance() {
 					@Override
 					public EnumChance getChance(Random random, int radius) {
@@ -102,16 +102,16 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 					}
 				};
 			}
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
+			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
 				chance = new ChanceStatic(EnumChance.OK);
 			}
-			/*else if(biome == BiomeGenBase.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
+			/*else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
 				chance = new ChanceStatic(EnumChance.OK);
 			}*/
-			else if(BiomeDictionary.isBiomeOfType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-				chance = new ChanceRandom(0.5f);
+			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
+				chance = new ChanceRandom(0.75f);
 			} 
-			else if(biome.theBiomeDecorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
+			else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 				chance = new ChanceStatic(EnumChance.CANCEL);
 			}
 			else {

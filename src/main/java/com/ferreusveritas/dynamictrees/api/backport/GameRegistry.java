@@ -9,10 +9,10 @@ public class GameRegistry extends cpw.mods.fml.common.registry.GameRegistry {
 
 	public static void register(IRegisterable object) {
 		if(object instanceof Block) {
-			registerBlock((Block) object, object instanceof ILorable ? ItemBlockLore.class : ItemBlock.class, object.getRegistryName());
+			registerBlock((Block) object, object instanceof ILorable ? ItemBlockLore.class : ItemBlock.class, object.getRegistryName().getResourcePath());
 		} else
 		if(object instanceof Item) {
-			registerItem((Item) object, object.getRegistryName());
+			registerItem((Item) object, object.getRegistryName().getResourcePath());
 		}
 	}
 

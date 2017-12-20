@@ -3,27 +3,30 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.backport.BlockState;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
+import com.ferreusveritas.dynamictrees.api.backport.EnumDyeColor;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeTreeSelector.Decision;
-import com.ferreusveritas.dynamictrees.api.backport.EnumDyeColor;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
+import cpw.mods.fml.common.IWorldGenerator;
 import net.minecraft.init.Blocks;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import cpw.mods.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
+	
+	private static TreeGenerator INSTANCE;
 	
 	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
@@ -31,6 +34,31 @@ public class TreeGenerator implements IWorldGenerator {
 	protected ChunkCircleManager circleMan;
 	protected RandomXOR random;
 	
+	public static TreeGenerator getTreeGenerator() {
+		return INSTANCE;
+	}
+	
+	public static void preInit() {
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			INSTANCE = new TreeGenerator();
+		}
+	}
+	
+	/**
+	 * This is run during the init phase to cache 
+	 * tree data that was created during the preInit phase
+	 */
+	public static void init() {
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			INSTANCE.biomeTreeHandler.init();
+		}
+	}
+	
+	/**
+	 * This is for world debugging.
+	 * The colors signify the different tree spawn failure modes.
+	 *
+	 */
 	public enum EnumGeneratorResult {
 		GENERATED(EnumDyeColor.WHITE),
 		NOTREE(EnumDyeColor.BLACK),
@@ -92,7 +120,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-		if(BiomeDictionary.isBiomeOfType(world.getBiomeGenForCoords(pos.getX(), pos.getZ()), Type.SPOOKY)) {
+		if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {
 			roofedForestCompensation(world, random, pos);
 		}
 	}
@@ -109,10 +137,11 @@ public class TreeGenerator implements IWorldGenerator {
 			for (int zi = 0; zi < 4; ++zi) {
 				int posX = pos.getX() + xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = pos.getZ() + zi * 4 + 1 + 8 + random.nextInt(3);
-				int posY = world.real().getHeightValue(posX, posZ);
-
-				if (random.nextInt(16) == 0) {
-					new WorldGenBigMushroom().generate(world.real(), random, posX, posY, posZ);
+				BlockPos blockpos = world.getHeight(pos.add(posX, 0, posZ));
+				blockpos = TreeHelper.findGround(world, blockpos).up();
+				
+				if (random.nextInt(6) == 0) {
+					new WorldGenBigMushroom().generate(world.real(), random, blockpos.getX(), blockpos.getY(), blockpos.getZ());
 				}
 			}
 		}
@@ -136,13 +165,13 @@ public class TreeGenerator implements IWorldGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			EnumDyeColor color = resultType.getColor();
-			world.setBlockState(pos, new BlockState(Blocks.stained_hardened_clay, color.getMetadata()));
-			world.setBlockState(pos.up(), new BlockState(Blocks.stained_hardened_clay, color.getMetadata()));
+			world.setBlockState(pos, new BlockState(Blocks.wool, color.getMetadata()));
+			world.setBlockState(pos.up(), new BlockState(Blocks.carpet, color.getMetadata()));
 		}
 	}
 	
 	private EnumGeneratorResult makeTree(World world, Circle circle) {
-
+		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
@@ -154,14 +183,14 @@ public class TreeGenerator implements IWorldGenerator {
 		
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
-		BiomeGenBase biome = world.getBiome(pos);
-		Decision decision = biomeTreeHandler.getTree(world.real(), biome, pos, blockState, random);
+		Biome biome = world.getBiome(pos);
+		Decision decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
 		if(decision.isHandled()) {
-			DynamicTree tree = decision.getTree();
-			if(tree != null) {
-				if(tree.isAcceptableSoilForWorldgen(world, pos, blockState)) {
-					if(biomeTreeHandler.chance(biome, tree, circle.radius, random) == EnumChance.OK) {
-						if(tree.generate(world, pos, biome, random, circle.radius)) {
+			Species species = decision.getSpecies();
+			if(species != null) {
+				if(species.isAcceptableSoilForWorldgen(world, pos, blockState)) {
+					if(biomeTreeHandler.chance(biome, species, circle.radius, random) == EnumChance.OK) {
+						if(species.generate(world, pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;
@@ -180,7 +209,7 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 		
 		//Display wool circles for testing the circle growing algorithm
-		if(ConfigHandler.worldGenDebug) {
+		if(ModConfigs.worldGenDebug) {
 			makeWoolCircle(world, circle, pos.getY(), result);
 		}
 		

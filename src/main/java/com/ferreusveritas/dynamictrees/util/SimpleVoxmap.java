@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.google.common.collect.AbstractIterator;
 
+
 /**
 * A simple implementation of a voxel map
 * 
@@ -228,8 +229,13 @@ public class SimpleVoxmap {
 		}
 	}
 
-	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	
 	public Iterable<Cell> getAllNonZeroCells() {
+		return getAllNonZeroCells((byte) 0xFF);
+	}
+	
+	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	public Iterable<Cell> getAllNonZeroCells(final byte mask) {
 		
 		return new Iterable<Cell>() {
 			@Override
@@ -243,10 +249,13 @@ public class SimpleVoxmap {
 					protected Cell computeNext() {
 						
 						while(true) {
-							if (x < lenX) {
+							int pos = calcPos(x, y, z);
+							BlockPos dPos = new BlockPos(x, y, z);
+							
+							if (x < lenX - 1) {
 								++x;
 							}
-							else if (z < lenZ) {
+							else if (z < lenZ - 1) {
 								x = 0;
 								++z;
 							}
@@ -261,9 +270,9 @@ public class SimpleVoxmap {
 							}
 
 							if(touched[y]) {
-								byte value = data[calcPos(x, y, z)];
+								byte value = (byte) (data[pos] & mask);
 								if(value > 0) {
-									return new Cell(value, new BlockPos(x, y, z).subtract(center));
+									return new Cell(value, dPos.subtract(center));
 								}
 							} else {
 								++y;
@@ -276,9 +285,68 @@ public class SimpleVoxmap {
 		};
 	}
 
+
+	public Iterable<Cell> getAllNonZeroCellsFromTop() {
+		return getAllNonZeroCellsFromTop((byte) 0xFF);
+	}
+	
+	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
+	public Iterable<Cell> getAllNonZeroCellsFromTop(final byte mask) {
+		
+		return new Iterable<Cell>() {
+			@Override
+			public Iterator<Cell> iterator() {
+				return new AbstractIterator<Cell>() {
+					private int x = 0;
+					private int y = lenY - 1;
+					private int z = 0;
+
+					@Override
+					protected Cell computeNext() {
+						
+						while(true) {
+							int pos = calcPos(x, y, z);
+							BlockPos dPos = new BlockPos(x, y, z);
+							
+							if (x < lenX - 1) {
+								++x;
+							}
+							else if (z < lenZ - 1) {
+								x = 0;
+								++z;
+							}
+							else {
+								x = 0;
+								z = 0;
+								--y;
+							} 
+							
+							if (y < 0) {
+								return this.endOfData();
+							}
+
+							if(touched[y]) {
+								byte value = (byte) (data[pos] & mask);
+								if(value > 0) {
+									return new Cell(value, dPos.subtract(center));
+								}
+							} else {
+								--y;
+							}
+						}
+						
+					}
+				};
+			}
+		};
+	}
+	
+	public Iterable<BlockPos> getAllNonZero() {
+		return getAllNonZero((byte) 0xFF);
+	}
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<BlockPos> getAllNonZero() {
+	public Iterable<BlockPos> getAllNonZero(final byte mask) {
 		
 		return new Iterable<BlockPos>() {
 			@Override
@@ -291,10 +359,13 @@ public class SimpleVoxmap {
 					protected BlockPos computeNext() {
 
 						while(true) {
-							if (x < lenX) {
+							int pos = calcPos(x, y, z);
+							BlockPos dPos = new BlockPos(x, y, z);
+
+							if (x < lenX - 1) {
 								++x;
 							}
-							else if (z < lenZ) {
+							else if (z < lenZ - 1) {
 								x = 0;
 								++z;
 							}
@@ -309,8 +380,8 @@ public class SimpleVoxmap {
 							}
 							
 							if(touched[y]) {
-								if(data[calcPos(x, y, z)] > 0) {
-									return new BlockPos(x, y, z).subtract(center);
+								if((data[pos] & mask) > 0) {
+									return dPos.subtract(center);
 								}
 							} else {
 								++y;
@@ -329,7 +400,15 @@ public class SimpleVoxmap {
 			for(int z = 0; z < lenZ; z++) {
 				buffer = "";
 				for(int x = 0; x < lenX; x++) {
-					buffer += Integer.toHexString(getVoxel(x - center.getX(), y - center.getY(), z - center.getZ()) & 0xF);
+					byte b = getVoxel(x - center.getX(), y - center.getY(), z - center.getZ());
+					if((b & 32) != 0) {
+						buffer += "B";
+					}
+					else if((b & 16) != 0) {
+						buffer += "T";
+					} else {
+						buffer += Integer.toHexString(b & 0xF);
+					}
 				}
 				System.out.println(buffer);
 			}

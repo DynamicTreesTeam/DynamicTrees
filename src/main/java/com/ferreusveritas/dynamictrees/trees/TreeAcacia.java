@@ -1,35 +1,67 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.VanillaTreeData;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.SpeciesRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import com.ferreusveritas.dynamictrees.VanillaTreeData;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeAcacia extends DynamicTree {
+		
+	public class SpeciesAcacia extends Species {
+
+		SpeciesAcacia(DynamicTree treeFamily) {
+			super(treeFamily.getName(), treeFamily);
+			
+			//Acacia Trees are short, very slowly growing trees
+			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
+		
+			envFactor(Type.COLD, 0.25f);
+			envFactor(Type.NETHER, 0.75f);
+			envFactor(Type.WET, 0.75f);
+			
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return CompatHelper.biomeHasType(biome, Type.SAVANNA);
+		}
+		
+	}
+	
+	Species species;
 	
 	public TreeAcacia() {
 		super(VanillaTreeData.EnumType.ACACIA);
-		
-		//Acacia Trees are short, very slowly growing trees
-		setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
-		
-		envFactor(Type.COLD, 0.25f);
-		envFactor(Type.NETHER, 0.75f);
-		envFactor(Type.WET, 0.75f);
-		
+
 		setCellSolver(Cells.acaciaSolver);
 		
 		setSmotherLeavesMax(2);//very thin canopy
+	}
+
+	@Override
+	public void createSpecies() {
+		species = new SpeciesAcacia(this);
+	}
+	
+	@Override
+	public void registerSpecies(SpeciesRegistry speciesRegistry) {
+		speciesRegistry.register(species);
+	}
+	
+	@Override
+	public Species getCommonSpecies() {
+		return species;
 	}
 	
 	protected static final ICell acaciaBranch = new ICell() {
@@ -63,11 +95,6 @@ public class TreeAcacia extends DynamicTree {
 	@Override
 	public ICell getCellForLeaves(int hydro) {
 		return acaciaLeafCells[hydro];
-	}
-	
-	@Override
-	public boolean isBiomePerfect(BiomeGenBase biome) {
-		return BiomeDictionary.isBiomeOfType(biome, Type.SAVANNA);
 	}
 	
 	@Override

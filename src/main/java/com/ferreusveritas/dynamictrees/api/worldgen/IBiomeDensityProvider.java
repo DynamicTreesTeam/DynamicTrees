@@ -3,9 +3,8 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-
-import net.minecraft.world.biome.BiomeGenBase;
+import com.ferreusveritas.dynamictrees.api.backport.Biome;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 /**
  * Provides the forest density for a given biome.
@@ -37,7 +36,7 @@ public interface IBiomeDensityProvider {
 	 * @param noiseDensity The density that the noise function returned(0.0 - 1.0)
 	 * @return density 0.0(lowest) - 1.0(highest)  anything less than 0 will signal unhandled 
 	 */
-	double getDensity(BiomeGenBase biome, double noiseDensity, Random random);
+	double getDensity(Biome biome, double noiseDensity, Random random);
 	
 	/**
 	 * Given the set of parameters determine if the tree should really be created
@@ -48,7 +47,7 @@ public interface IBiomeDensityProvider {
 	 * @param random
 	 * @return true to produce a tree false otherwise
 	 */
-	public EnumChance chance(BiomeGenBase biome, DynamicTree tree, int radius, Random random);
+	public EnumChance chance(Biome biome, Species species, int radius, Random random);
 	
 	enum EnumChance {
 		OK,
