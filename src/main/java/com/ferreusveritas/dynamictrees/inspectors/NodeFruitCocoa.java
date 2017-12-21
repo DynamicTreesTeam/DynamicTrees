@@ -37,10 +37,7 @@ public class NodeFruitCocoa implements INodeInspector {
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
 						IBlockState cocoaState = ModBlocks.blockFruitCocoa.onBlockPlaced(world, pos, dir, 0, 0, 0, 0, null);
-						if(worldGen) {
-							cocoaState = cocoaState.withProperty(BlockCocoa.AGE, 2);
-						}
-						world.setBlockState(pos, cocoaState, 2);
+						world.setBlockState(pos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;

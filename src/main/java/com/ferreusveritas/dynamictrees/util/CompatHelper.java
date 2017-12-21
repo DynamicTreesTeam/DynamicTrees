@@ -90,18 +90,16 @@ public class CompatHelper {
 	}
 	
 	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
-		if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-			if(!player.capabilities.isCreativeMode) {
+		if(!player.capabilities.isCreativeMode) {
+			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
 				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
 				player.setHeldItem(hand, emptiable.getEmptyContainer());
 			}
-		}
-		else if(heldItem.getItem() == Items.POTIONITEM) {//An actual potion
-			if(!player.capabilities.isCreativeMode) {
+			else if(heldItem.getItem() == Items.POTIONITEM) {//An actual potion
 				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
+			} else {
+				CompatHelper.shrinkStack(heldItem, 1); //Just a regular item like bonemeal
 			}
-		} else {
-			CompatHelper.shrinkStack(heldItem, 1); //Just a regular item like bonemeal
 		}
 	}
 	
