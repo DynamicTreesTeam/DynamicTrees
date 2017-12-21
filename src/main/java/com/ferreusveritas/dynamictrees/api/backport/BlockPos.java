@@ -6,6 +6,7 @@ import com.google.common.collect.AbstractIterator;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockPos implements Comparable<BlockPos> {
@@ -24,6 +25,14 @@ public class BlockPos implements Comparable<BlockPos> {
 		z = zIn;
 	}
 
+    public BlockPos(Vec3d vec) {
+        this(vec.xCoord, vec.yCoord, vec.zCoord);
+    }
+	
+    public BlockPos(double xIn, double yIn, double zIn) {
+        this(MathHelper.floor_double(xIn), MathHelper.floor_double(yIn), MathHelper.floor_double(zIn));
+    }
+    
 	public AxisAlignedBB getAxisAlignedBB() {
 		return AxisAlignedBB.getBoundingBox(getX(), getY(), getZ(), getX() + 1, getY() + 1, getZ() + 1);
 	}

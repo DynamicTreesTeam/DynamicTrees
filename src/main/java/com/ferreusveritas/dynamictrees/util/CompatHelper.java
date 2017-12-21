@@ -11,7 +11,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 
 /**
@@ -57,11 +56,11 @@ public class CompatHelper {
 	//Biomes
 	
 	public static boolean biomeHasType(Biome biome, BiomeDictionary.Type type) {
-		return BiomeDictionary.isBiomeOfType(biome.getBiomeGenBase(), type);
+		return BiomeDictionary.isBiomeOfType(biome.base(), type);
 	}
 	
 	public static int getBiomeTreesPerChunk(Biome biome) {
-		return biome.getBiomeGenBase().theBiomeDecorator.treesPerChunk;
+		return biome.base().theBiomeDecorator.treesPerChunk;
 	}
 	
 	//ItemStacks
@@ -107,18 +106,16 @@ public class CompatHelper {
 	}
 	
 	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
-		if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-			if(!player.capabilities.isCreativeMode) {
+		if(!player.capabilities.isCreativeMode) {
+			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
 				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
-				player.setHeldItem(hand, emptiable.getEmptyContainer());
+				player.inventory.mainInventory[player.inventory.currentItem] = emptiable.getEmptyContainer();
 			}
-		}
-		else if(heldItem.getItem() == Items.potionitem) {//An actual potion
-			if(!player.capabilities.isCreativeMode) {
-				player.setHeldItem(hand, new ItemStack(Items.glass_bottle));
+			else if(heldItem.getItem() == Items.potionitem) {//An actual potion
+				player.inventory.mainInventory[player.inventory.currentItem] = new ItemStack(Items.glass_bottle);
+			} else {
+				shrinkStack(heldItem, 1); //Just a regular item like bonemeal
 			}
-		} else {
-			CompatHelper.shrinkStack(heldItem, 1); //Just a regular item like bonemeal
 		}
 	}
 	

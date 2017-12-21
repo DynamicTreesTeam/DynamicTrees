@@ -3,17 +3,20 @@ package com.ferreusveritas.dynamictrees.inspectors;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCocoa;
 
 public class NodeFruitCocoa implements INodeInspector {
 
+	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 2, PropertyInteger.Bits.BXX00); 
+	
 	boolean finished = false;
 	boolean worldGen = false;
 	
@@ -36,11 +39,11 @@ public class NodeFruitCocoa implements INodeInspector {
 					EnumFacing dir = EnumFacing.getFront(side);
 					pos = pos.offset(dir);
 					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = ModBlocks.blockFruitCocoa.onBlockPlaced(world, pos, dir, 0, 0, 0, 0, null);
-						if(worldGen) {
-							cocoaState = cocoaState.withMeta(2 << 2);
-						}
-						world.setBlockState(pos, cocoaState, 2);
+						IBlockState cocoaState = new BlockState(
+								ModBlocks.blockFruitCocoa,
+								ModBlocks.blockFruitCocoa.onBlockPlaced(world.real(), pos.getX(), pos.getY(), pos.getZ(), side, 0, 0, 0, 0)
+							);						
+						world.setBlockState(pos, cocoaState.withProperty(AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;

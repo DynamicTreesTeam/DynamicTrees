@@ -50,7 +50,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 public class BlockBranch extends BlockBackport implements ITreePart, IBurningListener {
 	
 	private DynamicTree tree;//The tree this branch type creates
-	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8, PropertyInteger.Bits.BXXXX);
+	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8, PropertyInteger.Bits.B0XXX);
 	
 	public BlockBranch(String name) {
 		super(Material.wood); //Trees are made of wood. Brilliant.

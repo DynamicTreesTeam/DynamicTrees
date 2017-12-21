@@ -3,20 +3,25 @@ package com.ferreusveritas.dynamictrees.genfeatures;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
+import com.ferreusveritas.dynamictrees.api.backport.RayTraceResult;
+import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
-import net.minecraft.block.BlockVine;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
 
 public class GenFeatureVine implements IGenFeature {
 
-	protected final PropertyBool vineMap[] = new PropertyBool[] {null, null, BlockVine.NORTH, BlockVine.SOUTH, BlockVine.WEST, BlockVine.EAST};
+	PropertyInteger SOUTH = PropertyInteger.create("south", 0, 1, PropertyInteger.Bits.B000X);
+	PropertyInteger WEST  = PropertyInteger.create("west",  0, 1, PropertyInteger.Bits.B00X0);
+	PropertyInteger NORTH = PropertyInteger.create("north", 0, 1, PropertyInteger.Bits.B0X00);
+	PropertyInteger EAST  = PropertyInteger.create("east",  0, 1, PropertyInteger.Bits.BX000);
+	
+	protected final PropertyInteger vineMap[] = new PropertyInteger[] {null, null, NORTH, SOUTH, WEST, EAST};
 	protected int qty = 4;
 	protected int maxLength = 8;
 	protected float verSpread = 60;
@@ -63,9 +68,9 @@ public class GenFeatureVine implements IGenFeature {
 		
 		if(result != null) {
 			BlockPos vinePos = result.getBlockPos().offset(result.sideHit);
-			PropertyBool vineSide = vineMap[result.sideHit.getOpposite().getIndex()];
+			PropertyInteger vineSide = vineMap[result.sideHit.getOpposite().getIndex()];
 			if(vineSide != null) {
-				IBlockState vineState = Blocks.VINE.getDefaultState().withProperty(vineSide, Boolean.valueOf(true));
+				IBlockState vineState = new BlockState(Blocks.vine).withProperty(vineSide, 1);
 				int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
 				for(int i = 0; i < len; i++) {
 					if(world.isAirBlock(vinePos)) {

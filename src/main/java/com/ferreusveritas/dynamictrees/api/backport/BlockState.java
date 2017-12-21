@@ -117,4 +117,10 @@ public class BlockState implements IBlockState {
 	public boolean isOpaqueCube() {
 		return block.isOpaqueCube();
 	}
+	
+	@Override
+	public boolean isSideSolid(World world, BlockPos pos, EnumFacing dir) {
+        IBlockState state = world.getBlockState(pos);
+        return state.getBlock().isSideSolid(world.real(), pos.getX(), pos.getY(), pos.getZ(), dir.toForgeDirection());
+	}
 }

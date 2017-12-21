@@ -8,17 +8,21 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
+import com.ferreusveritas.dynamictrees.api.backport.Vec3d;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.block.BlockOldLeaf;
-import net.minecraft.block.BlockOldLog;
 import net.minecraft.init.Blocks;
 
 public class GenFeatureUndergrowth implements IGenFeature {
 
+	public static final PropertyInteger VARIANT = PropertyInteger.create("variant", 0, 3, PropertyInteger.Bits.B00XX);
+	public static final PropertyInteger NO_DECAY = PropertyInteger.create("nodecay", 0, 1, PropertyInteger.Bits.B0X00);
+	public static final PropertyInteger CHECK_DECAY = PropertyInteger.create("checkdecay", 0, 1, PropertyInteger.Bits.BX000); 
+	
 	private Species species;
 	private int radius = 2;
 	
@@ -45,13 +49,11 @@ public class GenFeatureUndergrowth implements IGenFeature {
 			IBlockState soilBlockState = world.getBlockState(pos);
 
 			if(species.isAcceptableSoil(world, pos, soilBlockState)) {
-					int type = world.rand.nextInt(2);
-					world.setBlockState(pos, Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE));
+					int variant = world.rand.nextInt(2) == 0 ? VanillaTreeData.EnumType.OAK.getMetadata() : VanillaTreeData.EnumType.JUNGLE.getMetadata();
+					world.setBlockState(pos, new BlockState(Blocks.log).withProperty(VARIANT, variant));
 					pos = pos.up(world.rand.nextInt(3));
 					
-					IBlockState leavesState = new BlockState(Blocks.leaves)
-							.withMeta(type == 0 ? VanillaTreeData.EnumType.OAK.getMetadata() : VanillaTreeData.EnumType.JUNGLE.getMetadata())
-							.withProperty(BlockOldLeaf.CHECK_DECAY, Boolean.valueOf(false));
+					IBlockState leavesState = new BlockState(Blocks.leaves).withProperty(VARIANT, variant).withProperty(CHECK_DECAY, 0);
 					
 					SimpleVoxmap leafMap = species.getTree().getLeafCluster();
 					for(BlockPos dPos : leafMap.getAllNonZero()) {

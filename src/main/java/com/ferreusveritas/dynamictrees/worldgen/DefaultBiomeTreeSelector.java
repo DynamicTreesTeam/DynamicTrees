@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.Biome;
@@ -12,17 +11,17 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.BiomeGenHills;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 
+	public static final int MUTATED = 128;
+	
 	private Species oak;
 	private Species birch;
 	private Species spruce;
@@ -122,25 +121,26 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 			select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 		}
 		else {
-			if(biome.getBiomeGenBase() instanceof BiomeGenHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
+			if(biome.base() instanceof BiomeGenHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
 				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
-				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
+				if(	biome.biomeID == BiomeGenBase.megaTaiga.biomeID + MUTATED || 
+					biome.biomeID == BiomeGenBase.megaTaigaHills.biomeID + MUTATED) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
 					select = staticSpruceDecision;
 				} else if (CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
 					select = staticSpruceDecision;
 				} else if (CompatHelper.biomeHasType(biome, Type.SPOOKY)) {
 					select = staticDarkOakDecision;
-				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
+				} else if (Species.isOneOfBiomes(biome, BiomeGenBase.birchForest, BiomeGenBase.birchForestHills)) {
 					select = staticBirchDecision;
 				} else {//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
 					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1).end();
 				}
-			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
+			} else if(biome.biomeID == BiomeGenBase.roofedForest.biomeID + MUTATED) {//For some reason this isn't registered as either FOREST or SPOOKY
 				select = staticDarkOakDecision;
 			}
-			else if(biome == Biomes.MESA_ROCK) {
+			else if(biome.base() == BiomeGenBase.mesaPlateau_F) {//MESA_ROCK
 				select = staticOakDecision;
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.JUNGLE)) {

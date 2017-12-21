@@ -3,9 +3,11 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -14,12 +16,13 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
-import net.minecraft.block.BlockTNT;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockVerboseFire extends BlockFire implements IRegisterable {
 
+	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 15, PropertyInteger.Bits.BXXXX);
+	
 	public BlockVerboseFire() {
 		setRegistryName("fire");
 		setHardness(0.0F);
@@ -30,15 +33,21 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
 	}
 	
 	
-	
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        if (worldIn.getGameRules().getBoolean("doFireTick")) {
-            if (!this.canPlaceBlockAt(worldIn, pos)) {
+	@Override
+	public void updateTick(net.minecraft.world.World world, int x, int y, int z, Random rand) {
+		
+        if (world.getGameRules().getGameRuleBooleanValue("doFireTick")) {
+        	
+    		World worldIn = new World(world);
+    		BlockPos pos = new BlockPos(x, y, z);
+    		IBlockState state = worldIn.getBlockState(pos);
+        	
+            if (!this.canPlaceBlockAt(world, x, y, z)) {
                 worldIn.setBlockToAir(pos);
             }
 
             Block block = worldIn.getBlockState(pos.down()).getBlock();
-            boolean onFireSource = block.isFireSource(worldIn.real(), pos.getX(), pos.down().getY(), pos.getZ(), EnumFacing.UP.toForgeDirection());
+            boolean onFireSource = block.isFireSource(world, x, y - 1, z, EnumFacing.UP.toForgeDirection());
 
             int age = ((Integer)state.getValue(AGE)).intValue();
 
@@ -72,7 +81,7 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
                 int chanceDelta = humidityFactor * -50;
 
                 for(EnumFacing dir: EnumFacing.VALUES) {
-                	int baseChance = ((dir.getAxis() == EnumFacing.Axis.Y) ? 250 : 300);
+                	int baseChance = ((dir.getFrontOffsetY() != 0) ? 250 : 300);//Axis is Y
                     this.tryCatchFire(worldIn, pos.offset(dir), baseChance + chanceDelta, rand, age, dir.getOpposite());
                 }
 
@@ -83,9 +92,9 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
                 	
                 	int distance = 100;
                 	
-                	int y = dPos.getY() - pos.getY();
-                	if(y > 1) {
-                		distance += (y - 1) * 100;
+                	int dy = dPos.getY() - pos.getY();
+                	if(dy > 1) {
+                		distance += (dy - 1) * 100;
                 	}
                 	
                 	int neighEncrg = this.getNeighborEncouragement(worldIn, dPos);
@@ -96,7 +105,7 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
                 		//Chance to age
                 		if (heat > 0 && rand.nextInt(distance) <= heat && (!worldIn.isRaining() || !this.canDie(worldIn, dPos))) {
                 			int newAge = MathHelper.clamp(age + rand.nextInt(5) / 4, 0, 15);
-                			worldIn.setBlockState(dPos, Blocks.fire.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
+                			worldIn.setBlockState(dPos, new BlockState(Blocks.fire).withProperty(AGE, Integer.valueOf(newAge)), 3);
                 		}
                 	}
                 }
@@ -105,17 +114,29 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
         
     }
 
-
-
+    protected boolean canDie(World worldIn, BlockPos pos) {
+    	if(worldIn.isRainingAt(pos)) {
+    		return true;
+    	}
+    	
+    	for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+    		if(worldIn.isRainingAt(pos.offset(dir))) {
+    			return true;
+    		}
+    	}
+    	
+        return false;
+    }
+	
 	public void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age, EnumFacing face) {
-        int flammability = worldIn.getBlockState(pos).getBlock().getFlammability(worldIn, pos, face);
+        int flammability = worldIn.getBlockState(pos).getBlock().getFlammability(worldIn.real(), pos.getX(), pos.getY(), pos.getZ(), face.toForgeDirection());
         
         if (random.nextInt(chance) < flammability) {
             IBlockState iblockstate = worldIn.getBlockState(pos);
             
             if (random.nextInt(age + 10) < 5 && !worldIn.isRainingAt(pos)) {
     			int newAge = MathHelper.clamp(age + random.nextInt(5) / 4, 0, 15);
-                worldIn.setBlockState(pos, Blocks.fire.getDefaultState().withProperty(AGE, Integer.valueOf(newAge)), 3);
+                worldIn.setBlockState(pos, new BlockState(Blocks.fire).withProperty(AGE, Integer.valueOf(newAge)), 3);
             }
             else {
                 worldIn.setBlockToAir(pos);
@@ -126,14 +147,15 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
             }
             
             if (iblockstate.getBlock() == Blocks.tnt) {
-                Blocks.tnt.onBlockDestroyedByPlayer(worldIn, pos, iblockstate.withProperty(BlockTNT.EXPLODE, Boolean.valueOf(true)));
+                Blocks.tnt.onBlockDestroyedByPlayer(worldIn.real(), pos.getX(), pos.getY(), pos.getZ(), 1);
             }
         }
     }
 
     public boolean canNeighborCatchFire(World worldIn, BlockPos pos) {
         for (EnumFacing enumfacing : EnumFacing.values()) {
-            if (this.canCatchFire(worldIn, pos.offset(enumfacing), enumfacing.getOpposite())) {
+        	BlockPos dPos = pos.offset(enumfacing);
+            if (this.canCatchFire(worldIn, dPos.getX(), dPos.getY(), dPos.getZ(), enumfacing.getOpposite().toForgeDirection())) {
                 return true;
             }
         }
@@ -146,7 +168,8 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
     		int encouragementAccumulator = 0;
 
     		for (EnumFacing enumfacing : EnumFacing.values()) {
-    			encouragementAccumulator = Math.max(worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getFireSpreadSpeed(worldIn, pos.offset(enumfacing), enumfacing.getOpposite()), encouragementAccumulator);
+            	BlockPos dPos = pos.offset(enumfacing);
+    			encouragementAccumulator = Math.max(worldIn.getBlockState(dPos).getBlock().getFireSpreadSpeed(worldIn.real(), dPos.getX(), dPos.getY(), dPos.getZ(), enumfacing.getOpposite().toForgeDirection()), encouragementAccumulator);
     		}
 
     		return encouragementAccumulator;

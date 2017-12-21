@@ -49,7 +49,7 @@ public class SafeChunkBounds {
 		for(Tile t : Tile.values()) {
 			int chunkX = centerX + t.pos.getX();
 			int chunkZ = centerZ + t.pos.getZ();
-			chunkBounds[t.index] = world.real().getChunkProvider().getLoadedChunk(chunkX, chunkZ) != null ? new BlockBounds(new ChunkPos(chunkX, chunkZ)) : BlockBounds.INVALID;
+			chunkBounds[t.index] = world.real().getChunkProvider().chunkExists(chunkX, chunkZ) ? new BlockBounds(new ChunkPos(chunkX, chunkZ)) : BlockBounds.INVALID;
 		}
 		
 		rebuildChunkBorders();

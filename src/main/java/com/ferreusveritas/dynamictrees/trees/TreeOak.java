@@ -144,7 +144,7 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return biome.getBiomeGenBase() == BiomeGenBase.plains;
+			return biome.base() == BiomeGenBase.plains;
 		}
 
 		@Override

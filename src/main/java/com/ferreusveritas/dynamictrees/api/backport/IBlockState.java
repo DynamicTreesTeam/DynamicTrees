@@ -42,4 +42,5 @@ public interface IBlockState {
 	public Material getMaterial();
 	public boolean isFullCube();
 	public boolean isOpaqueCube();
+	public boolean isSideSolid(World world, BlockPos pos, EnumFacing dir);
 }

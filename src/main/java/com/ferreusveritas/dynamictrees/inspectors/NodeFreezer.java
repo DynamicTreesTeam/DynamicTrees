@@ -34,7 +34,7 @@ public class NodeFreezer implements INodeInspector {
 
 	//Clumsy hack to freeze leaves
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, BlockPos twigPos) {		
-		if (!world.isRemote() && !world.restoringBlockSnapshots()) { // do not drop items while restoring blockstates, prevents item dupe
+		if (!world.isRemote && !world.restoringBlockSnapshots()) { // do not drop items while restoring blockstates, prevents item dupe
 			DynamicTree tree = branch.getTree();
 			IBlockState primLeaves = tree.getPrimitiveLeaves();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {

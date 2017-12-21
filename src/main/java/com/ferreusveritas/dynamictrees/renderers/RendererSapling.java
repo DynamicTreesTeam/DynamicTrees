@@ -29,22 +29,26 @@ public class RendererSapling implements ISimpleBlockRenderingHandler {
 
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockDynamicSapling sapling = (BlockDynamicSapling) block;
-		DynamicTree tree = sapling.getTree(new BlockAccess(blockAccess).getBlockState(pos));
+		DynamicTree tree = sapling.getSpecies(new BlockAccess(blockAccess).getBlockState(pos)).getTree();
 		
 		renderSapling(blockAccess, x, y, z, tree, renderer, 0);
 
 		return true;
 	}
 
-	public static void renderSapling(IBlockAccess blockAccess, int x, int y, int z, DynamicTree tree, RenderBlocks renderer, double yOffset) {
+	public static void renderSapling(IBlockAccess vblockAccess, int x, int y, int z, DynamicTree tree, RenderBlocks renderer, double yOffset) {
+		
+		BlockPos pos = new BlockPos(x, y, z);
+		BlockAccess blockAccess = new BlockAccess(vblockAccess);
+		
 		//Draw trunk
 		renderer.setRenderBounds(0.4375, 0.0 + yOffset, 0.4375, 0.5625, 0.3125 + yOffset, 0.5625);
-		renderer.renderStandardBlock(tree.getDynamicSapling().getBlock(), x, y, z);
+		renderer.renderStandardBlock(tree.getCommonSpecies().getDynamicSapling().getBlock(), x, y, z);
 		
 		//Draw leaves
 		renderer.setRenderBounds(0.25, 0.25 + yOffset, 0.25, 0.75, 0.75 + yOffset, 0.75);
 		renderer.setOverrideBlockTexture(tree.getPrimitiveLeaves().getIcon(0));
-		int multiplier = tree.foliageColorMultiplier(blockAccess, x, y, z);
+		int multiplier = tree.foliageColorMultiplier(blockAccess.getBlockState(pos), blockAccess, pos);
 		
 		float r = (multiplier >> 16 & 255) / 255.0F;
 		float g = (multiplier >> 8 & 255) / 255.0F;

@@ -88,7 +88,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		World world = new World(worldObj);
 		
 		synchronized(this) {
-			treeName = new String(dendroCoil.getTree(world, getPos()));
+			treeName = new String(dendroCoil.getSpecies(world, getPos()));
 			soilLife = dendroCoil.getSoilLife(world, getPos());
 		}
 
@@ -136,8 +136,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 
 		BlockDendroCoil dendroCoil = (BlockDendroCoil)getBlockType();
 		World world = new World(worldObj);
-
-		if(!world.isRemote() && dendroCoil != null) {
+		
+		if(!world.isRemote && dendroCoil != null) {
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
 					return new Object[]{ dendroCoil.getCode(world, getPos()) };

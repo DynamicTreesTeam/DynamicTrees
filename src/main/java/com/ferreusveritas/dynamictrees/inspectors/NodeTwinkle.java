@@ -24,7 +24,7 @@ public class NodeTwinkle implements INodeInspector {
 
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		if(world.isRemote() && TreeHelper.isBranch(block)) {
+		if(world.isRemote && TreeHelper.isBranch(block)) {
 			spawnParticles(world, particleType, pos.getX(), pos.getY() + 1, pos.getZ(), numParticles, world.rand);
 		}
 		return false;

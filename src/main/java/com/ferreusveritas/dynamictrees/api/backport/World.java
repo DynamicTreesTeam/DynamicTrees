@@ -4,7 +4,10 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.GameRules;
 
 /**
  * World object expansion for backport using a simple decorator pattern
@@ -108,6 +111,23 @@ public class World extends BlockAccess {
 
 	public boolean isRaining() {
 		return world.isRaining();
+	}
+
+	public GameRules getGameRules() {
+		return world.getGameRules();
+	}
+	
+	public EnumDifficulty getDifficulty() {
+		return world.difficultySetting;
+	}
+
+	public boolean isRainingAt(BlockPos pos) {
+		return world.canLightningStrikeAt(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public RayTraceResult rayTraceBlocks(Vec3d start, Vec3d end, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock) {
+		MovingObjectPosition mop = world.func_147447_a(start.toVec3(), end.toVec3(), stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
+		return mop == null ? null : new RayTraceResult(mop);
 	}
 	
 }

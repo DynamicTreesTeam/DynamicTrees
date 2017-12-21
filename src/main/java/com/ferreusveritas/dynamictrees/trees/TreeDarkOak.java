@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.Biome;
@@ -133,8 +134,8 @@ public class TreeDarkOak extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 6) {
-				world.setBlockState(pos, TreeOak.redMushroom);//Change branch to a red mushroom
-				world.setBlockState(pos.down(), TreeOak.podzol);//Change rooty dirt to Podzol
+				world.setBlockState(pos, ModBlocks.blockStates.redMushroom);//Change branch to a red mushroom
+				world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
 			}
 			return true;
 		}

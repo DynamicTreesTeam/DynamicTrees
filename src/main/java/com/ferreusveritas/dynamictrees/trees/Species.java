@@ -17,9 +17,10 @@ import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
-import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
+import com.ferreusveritas.dynamictrees.api.backport.RayTraceResult;
 import com.ferreusveritas.dynamictrees.api.backport.Registerable;
 import com.ferreusveritas.dynamictrees.api.backport.SpeciesRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.Vec3d;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -774,7 +775,7 @@ public class Species extends Registerable {
 		
 		float s = defaultSuitability();
 		
-		for(Type t : BiomeDictionary.getTypesForBiome(biome.getBiomeGenBase())) {
+		for(Type t : BiomeDictionary.getTypesForBiome(biome.base())) {
 			s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
 		}
 		
@@ -799,7 +800,7 @@ public class Species extends Registerable {
 	*/
 	public static boolean isOneOfBiomes(Biome biomeToCheck, BiomeGenBase ... biomes) {
 		for(BiomeGenBase biome: biomes) {
-			if(biomeToCheck.getBiomeGenBase() == biome) {
+			if(biomeToCheck.base() == biome) {
 				return true;
 			}
 		}
