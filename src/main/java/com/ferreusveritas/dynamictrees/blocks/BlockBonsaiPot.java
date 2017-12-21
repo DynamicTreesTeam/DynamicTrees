@@ -84,7 +84,7 @@ public class BlockBonsaiPot extends BlockBackport {
 		if(hand == EnumHand.MAIN_HAND && heldItem == null) { //Empty hand
 			DynamicTree tree = getTree(state);
 			
-			if(!world.isRemote()) {
+			if(!world.isRemote) {
 				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
 				ItemStack saplingStack = tree.getPrimitiveSapling().toItemStack();
 				CompatHelper.spawnEntity(world, new EntityItem(world.real(), pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
@@ -111,9 +111,8 @@ public class BlockBonsaiPot extends BlockBackport {
 
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
-		IBlockState state = world.getBlockState(pos);
-		ArrayList<ItemStack> ret = super.getDrops(world, pos, metadata, fortune);
+	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, IBlockState state, int fortune) {
+		ArrayList<ItemStack> ret = super.getDrops(world, pos, state, fortune);
 		DynamicTree tree = getTree(state);
 		ret.add(tree.getCommonSpecies().getSeedStack(1));
 		return ret;

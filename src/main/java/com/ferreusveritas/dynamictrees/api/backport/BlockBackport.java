@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
@@ -29,6 +28,7 @@ public class BlockBackport extends Block implements IBlockBackport {
 	
 	protected BlockBackport(Material material) {
 		super(material);
+		defBlockState = new BlockState(this, 0);
 	}
 
 	@Override
@@ -66,18 +66,20 @@ public class BlockBackport extends Block implements IBlockBackport {
 	}
 	
 	@Override
-	public float getBlockHardness(net.minecraft.world.World world, int x, int y, int z) {
-		return this.getBlockHardness(new World(world), new BlockPos(x, y, z));
+	public float getBlockHardness(net.minecraft.world.World vworld, int x, int y, int z) {
+		World world = new World(vworld);
+		BlockPos pos = new BlockPos(x, y, z);
+		return this.getBlockHardness(world.getBlockState(pos), world, pos);
 	}
 	
 	@Override
-	public float getBlockHardness(World world, BlockPos pos) {
+	public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
 		return super.getBlockHardness(world.real(), pos.getX(), pos.getY(), pos.getZ());
 	};
 
 	@Override
-	public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
-		return this.getFlammability(world, new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
+	public int getFlammability(net.minecraft.world.IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+		return this.getFlammability(new BlockAccess(world), new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
 	}
 	
 	@Override
@@ -86,8 +88,8 @@ public class BlockBackport extends Block implements IBlockBackport {
 	}
 
 	@Override
-	public int getFireSpreadSpeed(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
-		return this.getFireSpreadSpeed(world, new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
+	public int getFireSpreadSpeed(net.minecraft.world.IBlockAccess access, int x, int y, int z, ForgeDirection face) {
+		return this.getFireSpreadSpeed(new BlockAccess(access), new BlockPos(x, y, z), EnumFacing.fromForgeDirection(face));
 	}
 	
 	@Override
@@ -96,8 +98,8 @@ public class BlockBackport extends Block implements IBlockBackport {
 	}
 	
 	@Override
-	public boolean isLadder(IBlockAccess world, int x, int y, int z, EntityLivingBase entity) {
-		return this.isLadder(world, new BlockPos(x, y, z), entity);
+	public boolean isLadder(net.minecraft.world.IBlockAccess access, int x, int y, int z, EntityLivingBase entity) {
+		return this.isLadder(new BlockAccess(access), new BlockPos(x, y, z), entity);
 	}
 	
 	@Override
@@ -126,8 +128,8 @@ public class BlockBackport extends Block implements IBlockBackport {
 	}
 	
 	@Override
-	public boolean isWood(IBlockAccess world, int x, int y, int z) {
-		return this.isWood(world, new BlockPos(x, y, z));
+	public boolean isWood(net.minecraft.world.IBlockAccess access, int x, int y, int z) {
+		return this.isWood(new BlockAccess(access), new BlockPos(x, y, z));
 	}
 	
 	@Override
@@ -192,13 +194,16 @@ public class BlockBackport extends Block implements IBlockBackport {
 	}
 	
 	@Override
-	public ArrayList<ItemStack> getDrops(net.minecraft.world.World world, int x, int y, int z, int metadata, int fortune) {
-		return this.getDrops(new World(world), new BlockPos(x, y, z), metadata, fortune);
+	public ArrayList<ItemStack> getDrops(net.minecraft.world.World vworld, int x, int y, int z, int metadata, int fortune) {
+		World world = new World(vworld);
+		BlockPos pos = new BlockPos(x, y, z);
+		IBlockState state = world.getBlockState(pos);
+		return this.getDrops(world, pos, state, fortune);
 	}
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune) {
-		return super.getDrops(world.real(), pos.getX(), pos.getY(), pos.getZ(), metadata, fortune);
+	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, IBlockState state, int fortune) {
+		return super.getDrops(world.real(), pos.getX(), pos.getY(), pos.getZ(), state.getMeta(), fortune);
 	}
 	
 	@Override

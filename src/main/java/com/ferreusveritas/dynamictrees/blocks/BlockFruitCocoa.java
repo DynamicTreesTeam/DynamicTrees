@@ -1,10 +1,13 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockCocoa;
@@ -12,10 +15,9 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 
 public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
-
-	protected String registryName;
 	
 	public BlockFruitCocoa() {
 		this("fruitcocoa");
@@ -26,14 +28,22 @@ public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
 		setRegistryName(name);
 	}
 
+	ResourceLocation name;
+	
+	public void setRegistryName(String name) {
+		ModContainer mc = Loader.instance().activeModContainer();
+		String domain = mc.getModId().toLowerCase();
+		setRegistryName(new ResourceLocation(domain, name));
+	}
+	
 	@Override
-	public void setRegistryName(String regName) {
-		registryName = regName;
+	public void setRegistryName(ResourceLocation name) {
+		this.name = name;
 	}
 
 	@Override
-	public String getRegistryName() {
-		return registryName;
+	public ResourceLocation getRegistryName() {
+		return name;
 	}
 
 	@Override
@@ -50,7 +60,7 @@ public class BlockFruitCocoa extends BlockCocoa implements IRegisterable {
 		x += Direction.offsetX[dir];
 		z += Direction.offsetZ[dir];
 		BlockPos pos = new BlockPos(x, y, z);
-		BlockBranch branch = TreeHelper.getBranch(world, pos);
+		BlockBranch branch = TreeHelper.getBranch(new BlockAccess(world), pos);
 		return branch != null && branch.getRadius(new World(world), pos) == 8 && branch.getTree().canSupportCocoa;
 	}
 

@@ -133,7 +133,6 @@ public abstract class DynamicTree {
 		setPrimitiveLeaves(wood.getLeavesBlockAndMeta(), wood.getLeavesBlockAndMeta().toItemStack());
 		setPrimitiveLog(wood.getLogBlockAndMeta(), wood.getLogBlockAndMeta().toItemStack());
 		setPrimitiveSapling(new BlockState(Blocks.sapling, wood.getMetadata()));
-		setDynamicSapling(new BlockState(ModBlocks.blockDynamicSapling, wood.getMetadata()));
 
 		simpleVanillaCommonSpecies(wood);
 	}
@@ -142,7 +141,7 @@ public abstract class DynamicTree {
 
 		Species commonSpecies = (Species) getCommonSpecies();
 					
-		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withMeta(wood.getMetadata()));
 	
 		//Generate a seed
 		commonSpecies.generateSeed();
@@ -303,7 +302,7 @@ public abstract class DynamicTree {
 	}
 	
 	public IBlockState getDynamicLeavesState() {
-		return getDynamicLeaves().getDefaultState().withProperty(BlockDynamicLeaves.TREE, this.getDynamicLeavesSub());
+		return new BlockState(getDynamicLeaves(), getDynamicLeavesSub());
 	}
 	
 	public IBlockState getDynamicLeavesState(int hydro) {
@@ -519,7 +518,7 @@ public abstract class DynamicTree {
 	// LEAVES HANDLING
 	//////////////////////////////
 	
-	public boolean isCompatibleDynamicLeaves(BlockAccess blockAccess, BlockPos pos) {
+	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		
 		IBlockState state = blockAccess.getBlockState(pos);
 		ITreePart treePart = TreeHelper.getTreePart(state);

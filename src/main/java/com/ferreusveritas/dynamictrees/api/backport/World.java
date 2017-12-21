@@ -15,20 +15,18 @@ import net.minecraft.world.EnumSkyBlock;
 public class World extends BlockAccess {
 
 	private final net.minecraft.world.World world;
+	public final boolean isRemote;
 	public Random rand;
 	
 	public World(net.minecraft.world.World world) {
 		super(world);
+		this.isRemote = world.isRemote;
 		this.world = world;
 		this.rand = world.rand;
 	}
 
 	public net.minecraft.world.World real() {
 		return world;
-	}
-	
-	public boolean isRemote() {
-		return world.isRemote;
 	}
 	
 	public boolean restoringBlockSnapshots() {

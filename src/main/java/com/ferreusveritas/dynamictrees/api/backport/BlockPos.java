@@ -163,4 +163,21 @@ public class BlockPos implements Comparable<BlockPos> {
         return this.getY() == compareTo.getY() ? (this.getZ() == compareTo.getZ() ? this.getX() - compareTo.getX() : this.getZ() - compareTo.getZ()) : this.getY() - compareTo.getY();
     }
 
+    /**
+     * Calculate squared distance to the given Vector
+     */
+    public double distanceSq(BlockPos to) {
+        return this.distanceSq((double)to.getX(), (double)to.getY(), (double)to.getZ());
+    }
+
+    /**
+     * Calculate squared distance to the given coordinates
+     */
+    public double distanceSq(double toX, double toY, double toZ) {
+        double d0 = (double)this.getX() - toX;
+        double d1 = (double)this.getY() - toY;
+        double d2 = (double)this.getZ() - toZ;
+        return d0 * d0 + d1 * d1 + d2 * d2;
+    }
+    
 }

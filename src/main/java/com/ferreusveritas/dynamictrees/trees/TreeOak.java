@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.VanillaTreeData;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.Biome;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
-import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.SpeciesRegistry;
@@ -26,12 +26,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeOak extends DynamicTree {
-	
-	public static IBlockState dirt = new BlockState(Blocks.dirt, 0);
-	public static IBlockState podzol = new BlockState(Blocks.dirt, 2);
-	public static IBlockState redMushroom = new BlockState(Blocks.red_mushroom);
-	public static IBlockState brownMushroom = new BlockState(Blocks.brown_mushroom);
-	
 	
 	public class SpeciesOak extends Species {
 		
@@ -211,8 +205,8 @@ public class TreeOak extends DynamicTree {
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		if(super.rot(world, pos, neighborCount, radius, random)) {
 			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.Sky, pos) < 4) {
-				world.setBlockState(pos, random.nextInt(3) == 0 ? redMushroom : brownMushroom);//Change branch to a mushroom
-				world.setBlockState(pos.down(), podzol);//Change rooty dirt to Podzol
+				world.setBlockState(pos, random.nextInt(3) == 0 ? ModBlocks.blockStates.redMushroom : ModBlocks.blockStates.brownMushroom);//Change branch to a mushroom
+				world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
 			}
 			return true;
 		}

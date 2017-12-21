@@ -7,12 +7,13 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
-import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.IRegisterable;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -20,8 +21,11 @@ import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -30,34 +34,47 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable, IRegisterable {
 	
+	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4, PropertyInteger.Bits.B00XX);
+	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3, PropertyInteger.Bits.BXX00);
+	
 	private String[] species = {"X", "X", "X", "X"};
 	private DynamicTree trees[] = new DynamicTree[4];
-	protected String registryName;
+	protected ResourceLocation name;
 	
 	public BlockDynamicLeaves() {
 		field_150121_P = true;//True for alpha transparent leaves
 	}
 	
 	@Override
-	public void setRegistryName(String regName) {
-		registryName = regName;
+	public ResourceLocation getRegistryName() {
+		return name;
 	}
 	
 	@Override
-	public String getRegistryName() {
-		return registryName;
+	public void setRegistryName(ResourceLocation regName) {
+		name = regName;
+	}
+	
+	public ResourceLocation setRegistryName(String ModID, String regName) {
+		name = new ResourceLocation(ModID, regName);
+		return name;
+	}
+	
+	public void setRegistryName(String name) {
+		ModContainer mc = Loader.instance().activeModContainer();
+		String domain = mc.getModId().toLowerCase();
+		setRegistryName(new ResourceLocation(domain, name));
 	}
 	
 	@Override
@@ -65,47 +82,38 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		setBlockName(unlocalName);
 	}
 	
-	public void setTree(int sub, DynamicTree tree) {
-		trees[sub & 3] = tree;
-		species[sub & 3] = tree.getName();
+	public void setTree(int treeNum, DynamicTree tree) {
+		trees[treeNum & 3] = tree;
+		species[treeNum & 3] = tree.getName().getResourcePath();
 	}
 	
 	@Override
-	public DynamicTree getTree(BlockAccess blockAccess, BlockPos pos) {
-		return getTree(getSubBlockNum(blockAccess, pos));
+	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
+		return getTree(blockAccess.getBlockState(pos));
 	}
 	
 	public DynamicTree getTree(IBlockState blockState) {
-		return getTreeFromMetadata(blockState.getMeta());
+		return getTree(blockState.getValue(TREE));
 	}
 	
-	protected DynamicTree getTreeFromMetadata(int metadata) {
-		return getTree(getSubBlockNumFromMetadata(metadata));
-	}
-	
-	protected DynamicTree getTree(int treeNum) {
+	public DynamicTree getTree(int treeNum) {
 		return trees[treeNum & 3];
-	}
-
-	//Pull the subblock number portion from the metadata 
-	protected static final int getSubBlockNumFromMetadata(int meta){
-		return (meta >> 2) & 3;
 	}
 
 	//Pull the subblock from the world
 	protected static int getSubBlockNum(IBlockAccess blockAccess, BlockPos pos) {
-		return getSubBlockNumFromMetadata(new BlockAccess(blockAccess).getBlockMetadata(pos));
+		return new BlockAccess(blockAccess).getBlockState(pos).getValue(TREE);
 	}
 	
 	//Borrow flammability from the vanilla minecraft leaves
 	@Override
-	public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
-		return getTree(new BlockAccess(world), new BlockPos(x, y, z)).getPrimitiveLeaves().getBlock().getFlammability(world, x, y, z, face);
+	public int getFlammability(net.minecraft.world.IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+		return (int) (getTree(new BlockAccess(world), new BlockPos(x, y, z)).getPrimitiveLeaves().getBlock().getFlammability(world, x, y, z, face) * 0.75f);
 	}
 	
 	//Borrow fire spread rate from the vanilla minecraft leaves
 	@Override
-	public int getFireSpreadSpeed(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+	public int getFireSpreadSpeed(net.minecraft.world.IBlockAccess world, int x, int y, int z, ForgeDirection face) {
 		return getTree(new BlockAccess(world), new BlockPos(x, y, z)).getPrimitiveLeaves().getBlock().getFireSpreadSpeed(world, x, y, z, face);
 	}
 
@@ -118,13 +126,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean fast) {
+	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		DynamicTree tree = getTree(state);
 		int preHydro = getHydrationLevel(state);
 
 		//Check hydration level.  Dry leaves are dead leaves.
 		int hydro = getHydrationLevelFromNeighbors(world, pos, tree);
-		if(hydro == 0 || !hasAdequateLight(world, tree, pos)){
+		if(hydro == 0 || (!rapid && !hasAdequateLight(world, tree, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			removeLeaves(world, pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 
@@ -141,11 +149,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
 			}
 		}
-
-		//Do special things if the leaf block is/was on the bottom
-		if(!fast && isBottom(world, pos)) {
-			tree.bottomSpecial(world, pos, rand);
-		}
 		
 		return false;//Leaves were not destroyed
 	}
@@ -157,7 +160,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		BlockPos deltaPos = new BlockPos(x, y, z).offset(dir);
 
-		DynamicTree tree = TreeHelper.getSafeTreePart(world, deltaPos).getTree(new World(world), deltaPos);
+		DynamicTree tree = TreeHelper.getSafeTreePart(new BlockAccess(world), deltaPos).getTree(new World(world), deltaPos);
 
 		if(tree != null && tree.getDynamicLeaves() == this) {//Attempt to match the proper growing leaves for the tree being clicked on
 			return tree.getDynamicLeavesSub() << 2;//Return matched metadata
@@ -205,9 +208,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				for(int ix = minX; ix <= maxX; ix++) {
 					for(int iz = minZ; iz <= maxZ; iz++) {
 						BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
-						if(TreeHelper.isLeaves(world, iPos)) {
+						IBlockState state = world.getBlockState(iPos);
+						if(TreeHelper.isLeaves(state)) {
 							hasLeaves = true;//This layer has leaves
-							crushBlock(world, iPos, entity);
+							DynamicTrees.proxy.crushLeavesBlock(world, iPos, state, entity);
+							world.setBlockToAir(iPos);
 						} else
 						if (!world.isAirBlock(iPos)) {
 							crushing = false;//We hit something solid thus no longer crushing leaves layers
@@ -218,33 +223,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	protected void crushBlock(World world, BlockPos pos, Entity entity) {
-
-		if(world.isRemote()) {
-			Random random = world.rand;
-			ITreePart treePart = TreeHelper.getTreePart(world, pos);
-			if(treePart instanceof BlockDynamicLeaves) {
-				DynamicTree tree = treePart.getTree(world, pos);
-				if(tree != null) {
-					int metadata = world.getBlockMetadata(pos);
-					for(int dz = 0; dz < 8; dz++) {
-						for(int dy = 0; dy < 8; dy++) {
-							for(int dx = 0; dx < 8; dx++) {
-								if(random.nextInt(8) == 0) {
-									double fx = pos.getX() + dx / 8.0;
-									double fy = pos.getY() + dy / 8.0;
-									double fz = pos.getZ() + dz / 8.0;
-									DynamicTrees.proxy.addDustParticle(world.real(), fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, dx, dy, dz, this, metadata);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		world.setBlockToAir(pos);
-	}
 
 	@Override
 	public void onEntityCollidedWithBlock(net.minecraft.world.World world, int x, int y, int z, Entity entity) {
@@ -282,18 +260,17 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	//Test if the block at this location is capable of being grown into
-	protected boolean isLocationSuitableForNewLeaves(World world, DynamicTree tree, BlockPos pos) {
+	public boolean isLocationSuitableForNewLeaves(World world, DynamicTree tree, BlockPos pos) {
 		Block block = world.getBlock(pos);
 		
 		if(block instanceof BlockDynamicLeaves) {
 			return false;
 		}
 
-		BlockPos belowPos = pos.down();
-		Block belowBlock = world.getBlock(belowPos);
+		IBlockState belowBlockState = world.getBlockState(pos.down());
 
 		//Prevent leaves from growing on the ground or above liquids
-		if(belowBlock.isOpaqueCube() || belowBlock instanceof BlockLiquid) {
+		if(belowBlockState.isOpaqueCube() || belowBlockState.getBlock() instanceof BlockLiquid) {
 			return false;
 		}
 
@@ -301,10 +278,10 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		if(block == Blocks.double_plant){
 			int meta = world.getBlockMetadata(pos);
 			if((meta & 8) != 0) {//Top block of double plant 
-				meta = world.getBlockMetadata(belowPos);
+				meta = world.getBlockMetadata(pos.down());
 				if(meta == 2 || meta == 3) {//tall grass or fern
 					world.setBlockToAir(pos);
-					world.setBlockState(belowPos, new BlockState(Blocks.tallgrass, meta - 1));
+					world.setBlockState(pos.down(), new BlockState(Blocks.tallgrass, meta - 1));
 				}
 			}
 		}
@@ -328,7 +305,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/** Check to make sure the leaves have enough light to exist */
-	protected boolean hasAdequateLight(World world, DynamicTree tree, BlockPos pos) {
+	public boolean hasAdequateLight(World world, DynamicTree tree, BlockPos pos) {
 
 		//If clear sky is above the block then we needn't go any further
 		if(world.canBlockSeeSky(pos)) {
@@ -363,13 +340,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	/** Used to find if the leaf block is at the bottom of the stack */
-	protected static boolean isBottom(World world, BlockPos pos) {
+	public static boolean isBottom(World world, BlockPos pos) {
 		Block belowBlock = world.getBlock(pos.down());
 		return isBottom(world, pos, belowBlock);
 	}
 
 	/** Used to find if the leaf block is at the bottom of the stack */
-	protected static boolean isBottom(World world, BlockPos pos, Block belowBlock) {
+	public static boolean isBottom(World world, BlockPos pos, Block belowBlock) {
 		if(TreeHelper.isTreePart(belowBlock)) {
 			ITreePart belowTreepart = (ITreePart) belowBlock;
 			return belowTreepart.getRadius(world, pos.down()) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
@@ -378,7 +355,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	/** Gathers hydration levels from neighbors before pushing the values into the solver */
-	protected int getHydrationLevelFromNeighbors(BlockAccess world, BlockPos pos, DynamicTree tree) {
+	public int getHydrationLevelFromNeighbors(BlockAccess world, BlockPos pos, DynamicTree tree) {
 
 		ICell cells[] = new ICell[6];
 		
@@ -393,21 +370,17 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public int getHydrationLevel(IBlockState blockState) {
 		if(blockState.getBlock() instanceof BlockDynamicLeaves) {
-			return getHydrationLevelFromMetadata(blockState.getMeta());
+			return blockState.getValue(HYDRO);
 		}
 		return 0;
 	}
 
-	protected int getHydrationLevelFromMetadata(int meta) {
-		return (meta & 3) + 1;
-	}
-
 	public int getHydrationLevel(BlockAccess blockAccess, BlockPos pos) {
-		return getHydrationLevelFromMetadata(blockAccess.getBlockMetadata(pos));
+		return getHydrationLevel(blockAccess.getBlockState(pos));
 	}
 
 	@Override
-	public ICell getHydrationCell(BlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
 		int hydro = getHydrationLevel(blockState);
 		DynamicTree tree = getTree(blockState);
 		
@@ -418,13 +391,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-	protected static void removeLeaves(World world, BlockPos pos) {
+	public static void removeLeaves(World world, BlockPos pos) {
 		world.setBlockToAir(pos);
 		world.real().notifyBlocksOfNeighborChange(pos.getX(), pos.getY(), pos.getZ(), Blocks.air);
 	}
 	
 	//Variable hydration levels are only appropriate for leaf blocks
-	protected static boolean setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
+	public static boolean setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
 		hydro = MathHelper.clamp(hydro, 0, 4);
 		
 		if(hydro == 0) {
@@ -433,7 +406,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		} else {
 			//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
 			//does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-			world.real().setBlockMetadataWithNotify(pos.getX(), pos.getY(), pos.getZ(), (currentBlockState.getMeta() & 12) | ((hydro - 1) & 3), 4);
+			world.setBlockState(pos, currentBlockState.withProperty(HYDRO, hydro), 4);
 			return false;
 		}
 	}
@@ -457,7 +430,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	* @param tree
 	* @return True if the leaves are now at the coordinates.
 	*/
-	protected boolean needLeaves(World world, BlockPos pos, DynamicTree tree) {
+	public boolean needLeaves(World world, BlockPos pos, DynamicTree tree) {
 		if(world.isAirBlock(pos)){//Place Leaves if Air
 			return this.growLeaves(world, tree, pos, tree.getDefaultHydration());
 		} else {//Otherwise check if there's already this type of leaves there.
@@ -468,7 +441,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	public GrowSignal branchOut(World world, BlockPos pos, GrowSignal signal) {
 
-		DynamicTree tree = signal.getTree();
+		DynamicTree tree = signal.getSpecies().getTree();
 
 		//Check to be sure the placement for a branch is valid by testing to see if it would first support a leaves block
 		if(tree == null || !needLeaves(world, pos, tree)){
@@ -498,8 +471,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			world.setBlockState(pos, new BlockState(signal.branchBlock, 0), 2);
-			signal.radius = signal.getTree().getSecondaryThickness();//For the benefit of the parent branch
+			world.setBlockState(pos, tree.getDynamicBranch().getDefaultState(), 2);
+			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
 		}
 
 		signal.success = hasLeaves;
@@ -508,7 +481,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public int probabilityForBlock(BlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return from.getTree().isCompatibleDynamicLeaves(blockAccess, pos) ? 2: 0;
 	}
 
@@ -519,76 +492,120 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public ArrayList<ItemStack> getDrops(net.minecraft.world.World _world, int x, int y, int z, int metadata, int fortune) {
 		World world = new World(_world);
-		DynamicTree tree = getTreeFromMetadata(metadata);
+		BlockPos pos = new BlockPos(x, y, z);
+		BlockState state = new BlockState(this, metadata);
+		
+		Species species = getExactSpecies(world, pos, getTree(state));
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 
-		if(tree == null) {
-			return ret;
-		}
+		if(species != null) {
 
-		int chance = this.func_150123_b(metadata);
+			int chance = this.func_150123_b(metadata);
 
-		//Hokey fortune stuff here.
-		if (fortune > 0) {
-			chance -= 2 << fortune;
-			if (chance < 10) { 
-				chance = 10;
+			//Hokey fortune stuff here.
+			if (fortune > 0) {
+				chance -= 2 << fortune;
+				if (chance < 10) { 
+					chance = 10;
+				}
 			}
-		}
 
-		//It's mostly for seeds.. mostly.
-		//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
-		Random rand = world instanceof World ? ((World)world).rand : new Random();
-		if (rand.nextInt(chance) == 0) {
-			ret.add(tree.getSeedStack());
-		}
-
-		//More fortune contrivances here.  Vanilla compatible returns.
-		chance = 200; //1 in 200 chance of returning an "apple"
-		if (fortune > 0) {
-			chance -= 10 << fortune;
-			if (chance < 40) {
-				chance = 40;
+			//It's mostly for seeds.. mostly.
+			//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
+			Random rand = world instanceof World ? ((World)world).rand : new Random();
+			if (rand.nextInt(chance) == 0) {
+				ret.add(species.getSeedStack(1));
 			}
-		}
 
-		//Get species specific drops.. apples or cocoa for instance
-		tree.getDrops(world, new BlockPos(x, y, z), chance, ret);
+			//More fortune contrivances here.  Vanilla compatible returns.
+			chance = 200; //1 in 200 chance of returning an "apple"
+			if (fortune > 0) {
+				chance -= 10 << fortune;
+				if (chance < 40) {
+					chance = 40;
+				}
+			}
+
+			//Get species specific drops.. apples or cocoa for instance
+			ret = species.getDrops(world, pos, chance, ret);
+		}
 
 		return ret;
 	}
-
+	
+	/**
+	 * Warning! Resource intensive algorithm.  Use only for interaction such as breaking blocks.
+	 * 
+	 * @param access
+	 * @param pos
+	 * @param tree
+	 * @return
+	 */
+	Species getExactSpecies(IBlockAccess access, BlockPos pos, DynamicTree tree) {
+		
+		if(access instanceof World) {
+			World world = (World) access;
+			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
+						
+			//Find all of the branches that are nearby
+			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {
+				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));
+				IBlockState state = access.getBlockState(dPos);
+				if(TreeHelper.isBranch(state)) {
+					BlockBranch branch = TreeHelper.getBranch(state);
+					if(branch.getTree() == tree && branch.getRadius(state) == 1) {
+						branchList.add(dPos);
+					}
+				}
+			}
+			
+			if(!branchList.isEmpty()) {
+				//Find the closest one
+				BlockPos closest = branchList.get(0);
+				double minDist = 999;
+				
+				for(BlockPos dPos : branchList) {
+					double d = pos.distanceSq(dPos);
+					if(d < minDist) {
+						minDist = d;
+						closest = dPos;
+					}
+				}
+				
+				return DynamicTree.getExactSpecies(world, closest);
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	protected boolean canSilkHarvest() {
 		return false;
 	}
-
-	//1 in 64 chance to drop a seed on destruction.. This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
-	public int quantitySeedDropped(Random random) {
-		return random.nextInt(64) == 0 ? 1 : 0;
-	}
-
+	
 	//Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
 	@Override
 	public Item getItemDropped(int meta, Random random, int fortune) {
 		return null;
 	}
-
+	
 	@Override
 	public int quantityDropped(Random random) {
 		return 0;
 	}
-
+	
 	@Override
 	public int damageDropped(int metadata) {
 		return 0;
 	}
-
+	
 	//When the leaves are sheared just return vanilla leaves for usability
 	@Override
-	public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess access, int x, int y, int z, int fortune) {
+	public ArrayList<ItemStack> onSheared(ItemStack item, net.minecraft.world.IBlockAccess _blockAccess, int x, int y, int z, int fortune) {
+		DynamicTree tree = getTree(new BlockAccess(_blockAccess), new BlockPos(x, y, z));
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-		ret.add(getTree(new BlockAccess(access), new BlockPos(x, y, z)).getPrimitiveLeaves().toItemStack());
+		ret.add(tree.getPrimitiveLeaves().toItemStack());
 		return ret;
 	}
 
@@ -597,7 +614,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//////////////////////////////
 
 	@Override
-	public int getRadiusForConnection(BlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		return fromRadius == 1 && from.getTree().isCompatibleDynamicLeaves(blockAccess, pos) ? 1 : 0;
 	}
 
@@ -616,7 +633,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int metadata) {
-		return getTreeFromMetadata(metadata).getPrimitiveLeaves().getIcon(side);
+		return getTree(new BlockState(this, metadata)).getPrimitiveLeaves().getIcon(side);
 	}
 	
 	@Override
@@ -627,24 +644,26 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//Returns the color this block should be rendered. Used by leaves.
 	@Override
 	@SideOnly(Side.CLIENT)
-	public int getRenderColor(int metadata) {
-		return getTreeFromMetadata(metadata).foliageColorMultiplier(null, 0, 0, 0);
+	public int getRenderColor(int metadata) { //Item Version
+		IBlockState state = new BlockState(this, metadata);
+		return getTree(state).foliageColorMultiplier(null, null, null);
 	}
 
 	//A hack to retain vanilla minecraft leaves block colors in their biomes
 	@Override
-	@SideOnly(Side.CLIENT)
-	public int colorMultiplier(IBlockAccess access, int x, int y, int z) {
-		return getTree(new BlockAccess(access), new BlockPos(x, y, z)).foliageColorMultiplier(access, x, y, z);
+	@SideOnly(Side.CLIENT) //World Block Version
+	public int colorMultiplier(net.minecraft.world.IBlockAccess access, int x, int y, int z) {
+		BlockPos pos = new BlockPos(x, y, z);
+		return getTree(new BlockAccess(access), pos).foliageColorMultiplier(null, new BlockAccess(access), pos);
 	}
 
 	@Override
-	public boolean isFoliage(IBlockAccess world, int x, int y, int z) {
+	public boolean isFoliage(net.minecraft.world.IBlockAccess world, int x, int y, int z) {
 		return true;
 	}
 
 	@Override
-	public int getRadius(BlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
 
@@ -659,14 +678,14 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	@Override
-	public int branchSupport(BlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public boolean isBranch() {
+		return false;
+	}
+	
+	@Override
+	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
 		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? 0x01 : 0;
-	}
-
-	@Override
-	public boolean applyItemSubstance(World world, BlockPos pos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		return false;//Nothing is applied to leaves
 	}
 
 	@Override

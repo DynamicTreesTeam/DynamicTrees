@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
 
 /**
  * Adapter to make a block work more like 1.10.2+
@@ -30,7 +29,7 @@ public interface IBlockBackport extends IRegisterable {
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ);
 	
 	//public float getBlockHardness(net.minecraft.world.World world, int x, int y, int z);
-	public float getBlockHardness(World world, BlockPos pos);
+	public float getBlockHardness(IBlockState state, World world, BlockPos pos);
 
 	//public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face);
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face);
@@ -66,7 +65,7 @@ public interface IBlockBackport extends IRegisterable {
 	public boolean removedByPlayer(World world, EntityPlayer player, BlockPos pos, boolean canHarvest);
 	
 	//public ArrayList<ItemStack> getDrops(net.minecraft.world.World world, int x, int y, int z, int metadata, int fortune);
-	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, int metadata, int fortune);
+	public ArrayList<ItemStack> getDrops(World world, BlockPos pos, IBlockState state, int fortune);
 	
 	//protected void dropBlockAsItem(net.minecraft.world.World world, int x, int y, int z, ItemStack stack);
 	public void dropBlockAsItem(World world, BlockPos pos, ItemStack stack);

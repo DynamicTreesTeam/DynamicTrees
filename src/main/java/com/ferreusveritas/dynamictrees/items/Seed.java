@@ -49,7 +49,7 @@ public class Seed extends ItemBackport {
 		World world = CompatHelper.getEntityWorld(entityItem);
 		
 		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
-			if(!world.isRemote()) {//Server side only
+			if(!world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
 				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();

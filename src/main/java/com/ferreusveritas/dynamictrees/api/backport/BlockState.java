@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.api.backport;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
@@ -37,6 +38,16 @@ public class BlockState implements IBlockState {
 	@Override
 	public IBlockState withMeta(int meta) {
 		return new BlockState(block, meta & 0x0f);
+	}
+	
+	@Override
+	public IBlockState withProperty(IProperty property, int value) {
+		return new BlockState(block, property.apply(value, meta));
+	}
+	
+	@Override
+	public int getValue(IProperty property) {
+		return property.read(meta);
 	}
 	
 	///////////////////////////////////////////
@@ -90,5 +101,20 @@ public class BlockState implements IBlockState {
 	@Override
 	public ItemStack toItemStack(){
 		return toItemStack(1);
+	}
+	
+	@Override
+	public Material getMaterial() {
+		return block.getMaterial();
+	}
+	
+	@Override
+	public boolean isFullCube() {
+		return block.renderAsNormalBlock();
+	}
+	
+	@Override
+	public boolean isOpaqueCube() {
+		return block.isOpaqueCube();
 	}
 }

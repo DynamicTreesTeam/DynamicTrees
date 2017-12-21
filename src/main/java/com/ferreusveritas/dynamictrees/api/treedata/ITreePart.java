@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import com.ferreusveritas.dynamictrees.api.backport.BlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -23,7 +23,7 @@ public interface ITreePart {
 	* @param leavesTree The tree data of the leaves the request came from
 	* @return Cell for getting hydration level
 	*/
-	ICell getHydrationCell(BlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree);
+	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree);
 
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.
@@ -43,7 +43,7 @@ public interface ITreePart {
 	* @param from The branch making the request
 	* @return Probability weight used to determine if the growth path will take this block as a path next. 
 	*/
-	int probabilityForBlock(BlockAccess blockAccess, BlockPos pos, BlockBranch from);
+	int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
 
 	/**
 	* The radius of the part that a neighbor is expected to connect with 
@@ -53,7 +53,7 @@ public interface ITreePart {
 	* @param fromRadius The radius of the branch requesting connection data
 	* @return Radius of the connection point to this block from the branch
 	*/
-	int getRadiusForConnection(BlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius);
+	int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius);
 
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
@@ -61,14 +61,14 @@ public interface ITreePart {
 	* @param pos Position
 	* @return Radius of the treepart(branch)
 	*/
-	int getRadius(BlockAccess blockAccess, BlockPos pos);
+	int getRadius(IBlockAccess blockAccess, BlockPos pos);
 
 	/**
 	* Configurable general purpose branch network scanner to gather data and/or perform operations
 	* 
 	* @param world The current world
 	* @param pos Position
-	* @param fromDir The direction that should not be analyzed.  Pass ForgeDirection.UNKNOWN to analyse in all directions
+	* @param fromDir The direction that should not be analyzed.  Pass null to analyse in all directions
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
@@ -81,7 +81,7 @@ public interface ITreePart {
 	* @param pos Position
 	* @return DynamicTree
 	*/
-	DynamicTree getTree(BlockAccess blockAccess, BlockPos pos);
+	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
 	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
@@ -95,7 +95,7 @@ public interface ITreePart {
 	* @param radius The radius of the branch requesting support
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
-	int branchSupport(BlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
+	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 
 	/**
 	* The single root node of a tree.

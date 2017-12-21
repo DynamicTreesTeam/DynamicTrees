@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.ItemBackport;
@@ -28,6 +29,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 
 public class DendroPotion extends ItemBackport implements ISubstanceEffectProvider, IEmptiable {
 
@@ -125,7 +127,7 @@ public class DendroPotion extends ItemBackport implements ISubstanceEffectProvid
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findTree(targetTree);
+					return TreeRegistry.findSpecies(new ResourceLocation(targetTree)).getTree();
 				}
 			}
 		}
@@ -135,7 +137,7 @@ public class DendroPotion extends ItemBackport implements ISubstanceEffectProvid
 	
 	public ItemStack setTargetTree(ItemStack itemStack, DynamicTree tree) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
-		nbtTag.setString("target", tree.getName());
+		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
 		itemStack.setTagCompound(nbtTag);
 		return itemStack;
 	}
@@ -179,14 +181,14 @@ public class DendroPotion extends ItemBackport implements ISubstanceEffectProvid
 				new ItemStack(Items.diamond), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 
-		for(DynamicTree tree : DynamicTrees.baseTrees) {
+		for(DynamicTree tree : ModTrees.baseTrees) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-			GameRegistry.addBrewingRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getSeedStack(), outputStack);
+			GameRegistry.addBrewingRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
 		}
 
 		return this;
 	}
-	
+
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
 		super.addInformation(stack, playerIn, tooltip, advanced);
@@ -198,7 +200,7 @@ public class DendroPotion extends ItemBackport implements ISubstanceEffectProvid
 			if(tree == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add("Transform a tree into a " + tree.getName() + " tree");
+				tooltip.add("Transform a tree into a " + tree.getName().getResourceDomain() + " tree");
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());

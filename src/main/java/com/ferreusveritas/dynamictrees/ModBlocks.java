@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
+import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.GameRegistry;
+import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -14,7 +16,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
-import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 
 public class ModBlocks {
 	
@@ -24,7 +26,11 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockVerboseFire blockVerboseFire;
 	
+	public static CommonBlockStates blockStates;
+	
 	public static void preInit() {
+		
+		blockStates = new CommonBlockStates();
 		
 		//Dirt
 		blockRootyDirt = new BlockRootyDirt();
@@ -66,5 +72,20 @@ public class ModBlocks {
 
 		DynamicTrees.compatProxy.registerBlocks();
 	}
+
+	public static class CommonBlockStates {
+		public final IBlockState dirt;
+		public final IBlockState podzol;
+		public final IBlockState redMushroom;
+		public final IBlockState brownMushroom;
+		
+		public CommonBlockStates() {
+			dirt = new BlockState(Blocks.dirt, 0);
+			podzol = new BlockState(Blocks.dirt, 2);
+			redMushroom = new BlockState(Blocks.red_mushroom);
+			brownMushroom = new BlockState(Blocks.brown_mushroom);
+		}
+	}
+
 	
 }

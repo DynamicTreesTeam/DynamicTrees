@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.substances;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 

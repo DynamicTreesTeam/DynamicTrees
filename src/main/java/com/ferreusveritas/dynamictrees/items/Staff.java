@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
@@ -18,6 +19,8 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
 
@@ -35,15 +38,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 
 /**
 * Try the following in a command block to demonstrate the extra tag functionality.
 * /give @p dynamictrees:staff 1 0 tag:{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"birch",display:{Name:"Frog"}}
 */
 public class Staff extends ItemBackport {
-
-	IIcon overlayIcon;
-	IIcon glimmerIcon;
 
 	public Staff() {
 		this("staff");
@@ -52,7 +53,7 @@ public class Staff extends ItemBackport {
 	public Staff(String name) {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setMaxStackSize(1);
-		setTextureName(DynamicTrees.MODID + ":" + name);
+		setTextureName(ModConstants.MODID + ":" + name);
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
 	}
@@ -61,16 +62,9 @@ public class Staff extends ItemBackport {
 	public EnumActionResult onItemUse(ItemStack heldStack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		
 		IBlockState clickedBlock = world.getBlockState(pos);
-		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock.getBlock());
+		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock);
 		BlockPos rootPos = pos;
 		
-		/*if(clickedBlock instanceof BlockGrowingLeaves ){
-			if(world.isRemote){
-				int metadata = world.getBlockMetadata(x, y, z);
-				Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Leaves Metadata: " + Integer.toBinaryString(metadata)));
-			}
-		}*/
-
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
@@ -79,7 +73,7 @@ public class Staff extends ItemBackport {
 				rootPos = signal.root;
 				treePart = TreeHelper.getSafeTreePart(world, rootPos);
 				
-				if(world.isRemote() && treePart.isRootNode()) {
+				if(world.isRemote && treePart.isRootNode()) {
 					BlockRootyDirt rootyDirt = (BlockRootyDirt) treePart;
 					int soilLife = rootyDirt.getSoilLife(world, rootPos);
 					Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Rooty Soil Life: " + soilLife));
@@ -89,23 +83,23 @@ public class Staff extends ItemBackport {
 
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			DynamicTree tree = treePart.getTree(world, rootPos);
-			if(tree != null) {
+			Species species = DynamicTree.getExactSpecies(world, rootPos);
+			if(species != null) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
 					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
-				setTree(heldStack, tree);
+				setSpecies(heldStack, species);
 				return EnumActionResult.SUCCESS;
 			}
 		}
 
 		//Create a tree from right clicking on soil
-		DynamicTree tree = getTree(heldStack);
-		if(tree != null && tree.isAcceptableSoil(world, pos, clickedBlock)) {
-			new JoCode(getCode(heldStack)).setCareful(true).generate(world, tree, pos, getPlayerDirection(player), 8);
-			heldStack.stackSize--;//If the player is in creative this will have no effect.
+		Species species = getSpecies(heldStack);
+		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
+			new JoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8);
+			CompatHelper.shrinkStack(heldStack, 1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
 
@@ -133,9 +127,9 @@ public class Staff extends ItemBackport {
 		return this;
 	}
 
-	public Staff setTree(ItemStack itemStack, DynamicTree tree) {
+	public Staff setSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", tree.getName());
+		nbt.setString("tree", species.toString());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -147,15 +141,15 @@ public class Staff extends ItemBackport {
 		return this;
 	}
 
-	public DynamicTree getTree(ItemStack itemStack) {
+	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
 		if(nbt.hasKey("tree")) {
-			return TreeRegistry.findTree(nbt.getString("tree"));
+			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
 		} else {
-			DynamicTree tree = TreeRegistry.findTree("oak");
-			setTree(itemStack, tree);
-			return tree;
+			Species species = TreeRegistry.findSpeciesSloppy("oak");
+			setSpecies(itemStack, species);
+			return species;
 		}
 	}
 
@@ -225,8 +219,8 @@ public class Staff extends ItemBackport {
 
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean advancedTooltips) {
-		DynamicTree tree = getTree(stack);
-		tooltip.add("Tree: " + ((tree != null) ? tree.getFullName() : "none"));
+		Species species = getSpecies(stack);
+		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
 
@@ -243,6 +237,9 @@ public class Staff extends ItemBackport {
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
+
+	IIcon overlayIcon;
+	IIcon glimmerIcon;
 
 	@Override
 	@SideOnly(Side.CLIENT)

@@ -1,18 +1,15 @@
 package com.ferreusveritas.dynamictrees.potion;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTransform;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
-
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
+import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumParticleTypes;
 import com.ferreusveritas.dynamictrees.api.backport.World;
-import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.inspectors.NodeTransform;
+import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 public class SubstanceTransform implements ISubstanceEffect {
 
@@ -23,16 +20,17 @@ public class SubstanceTransform implements ISubstanceEffect {
 	}
 	
 	@Override
-	public boolean apply(World world, BlockRootyDirt dirt, BlockPos pos) {
+	public boolean apply(World world, BlockPos rootPos) {
 
-		if(toTree != null) {
-			BlockPos basePos = pos.up();//Position of base of tree
-			if(world.isRemote()) {
-				TreeHelper.getSafeTreePart(world, basePos).analyse(world, basePos, null, new MapSignal(new NodeTwinkle(EnumParticleTypes.CRIT, 8)));
+		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+
+		if(dirt != null && toTree != null) {
+			if(world.isRemote) {
+				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 			} else {
-				BlockBranch branch = TreeHelper.getBranch(world, basePos);
-				if(branch != null) {
-					branch.analyse(world, basePos, EnumFacing.DOWN, new MapSignal(new NodeTransform(branch.getTree(), toTree), new NodeTwinkle(EnumParticleTypes.FIREWORKS_SPARK, 8)));
+				Species species = dirt.getSpecies(world, rootPos);
+				if(species != null) {
+					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(species.getTree(), toTree)));
 				}
 			}
 			return true;
@@ -42,7 +40,7 @@ public class SubstanceTransform implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean update(World world, BlockRootyDirt dirt, BlockPos pos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
 	}
 

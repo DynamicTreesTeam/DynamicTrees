@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.items;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
@@ -27,7 +29,7 @@ public class DirtBucket extends ItemBackport {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setTextureName(DynamicTrees.MODID + ":" + name);
+		setTextureName(ModConstants.MODID + ":" + name);
 		setMaxStackSize(1);
 		setContainerItem(this);
 	}
@@ -69,7 +71,7 @@ public class DirtBucket extends ItemBackport {
 		boolean replaceable = blockState.getBlock().isReplaceable(world, pos.getX(), pos.getY(), pos.getZ());
 		
 		if(replaceable) {
-			if (!world.isRemote()) {
+			if (!world.isRemote) {
 				world.real().func_147480_a(pos.getX(), pos.getY(), pos.getZ(), true);
 			}
 			
@@ -83,7 +85,7 @@ public class DirtBucket extends ItemBackport {
 	
 	public DirtBucket registerRecipes() {
 		//Create a dirt bucket from dirt and a bucket
-		GameRegistry.addShapelessRecipe(new ItemStack(DynamicTrees.dirtBucket), new Object[]{ Blocks.dirt, Items.bucket});
+		GameRegistry.addShapelessRecipe(new ItemStack(ModItems.dirtBucket), new Object[]{ Blocks.dirt, Items.bucket});
 		return this;
 	}
 	

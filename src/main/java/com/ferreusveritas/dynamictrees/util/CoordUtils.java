@@ -19,7 +19,7 @@ public class CoordUtils {
 			new Vec3i( 1, 0, 1) //SE
 		};
 	
-	public static boolean isSurroundedByExistingChunks(World world, BlockPos pos) {
+	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
 		for(Vec3i dir: CoordUtils.surround) {
 			if(!world.real().getChunkProvider().chunkExists((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ())){
 				return false;
