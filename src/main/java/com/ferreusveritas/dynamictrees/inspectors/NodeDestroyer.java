@@ -49,7 +49,7 @@ public class NodeDestroyer implements INodeInspector {
 
 	public void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
-			ArrayList<ItemStack> dropList = new ArrayList<>();
+			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
 			DynamicTree tree = species.getTree();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {

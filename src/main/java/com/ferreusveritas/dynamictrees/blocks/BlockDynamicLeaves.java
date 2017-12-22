@@ -298,7 +298,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public boolean setBlockToLeaves(World world, DynamicTree tree, BlockPos pos, int hydro) {
 		hydro = MathHelper.clamp(hydro, 0, 4);
 		if(hydro != 0) {
-			world.setBlockState(pos, getDefaultState().withProperty(HYDRO, hydro).withProperty(TREE, tree.getDynamicLeavesSub()), 2);//Removed Notify Neighbors Flag for performance
+			world.setBlockState(pos, tree.getDynamicLeavesState().withProperty(HYDRO, hydro), 2);//Removed Notify Neighbors Flag for performance
 			return true;
 		} else {
 			removeLeaves(world, pos);
@@ -545,7 +545,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(access instanceof World) {
 			World world = (World) access;
-			ArrayList<BlockPos> branchList = new ArrayList<>();
+			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
 						
 			//Find all of the branches that are nearby
 			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {
