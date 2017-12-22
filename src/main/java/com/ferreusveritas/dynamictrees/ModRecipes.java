@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ModRecipes {
 
@@ -30,6 +31,8 @@ public class ModRecipes {
 				//Creates a vanilla sapling from a seed and dirt bucket
 				GameRegistry.addShapelessRecipe(saplingStack, new Object[]{ seedStack, ModItems.dirtBucket });
 
+				//Register the seed in the ore dictionary as a sapling since we can convert for free anyway.
+				OreDictionary.registerOre("treeSapling", seedStack);
 			}
 
 		}

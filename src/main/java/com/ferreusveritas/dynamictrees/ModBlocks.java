@@ -86,6 +86,5 @@ public class ModBlocks {
 			brownMushroom = new BlockState(Blocks.brown_mushroom);
 		}
 	}
-
 	
 }
