@@ -47,11 +47,5 @@ public class BranchModel implements IModel {
 			return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
 		}
 	}
-
-	// Our custom loaded model doesn't need a default state, just return null
-	@Override
-	public IModelState getDefaultState() {
-		return null;
-	}
-
+	
 }	
