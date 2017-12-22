@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ModRecipes {
 
@@ -22,7 +23,6 @@ public class ModRecipes {
 			IBlockState primitiveSapling = tree.getPrimitiveSapling();
 
 			if(primitiveSapling != null) {
-				//Creates a seed from a vanilla sapling and a wooden bowl
 				ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
 				saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
 
@@ -34,6 +34,8 @@ public class ModRecipes {
 				//Creates a vanilla sapling from a seed and dirt bucket
 				GameRegistry.addShapelessRecipe(saplingStack, new Object[]{ seedStack, ModItems.dirtBucket });
 
+				//Register the seed in the ore dictionary as a sapling since we can convert for free anyway.
+				OreDictionary.registerOre("treeSapling", seedStack);
 			}
 
 		}

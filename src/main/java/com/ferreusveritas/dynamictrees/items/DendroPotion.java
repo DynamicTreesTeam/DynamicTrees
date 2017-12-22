@@ -199,7 +199,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(tree == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add("Transform a tree into a " + tree.getName().getResourceDomain() + " tree");
+				tooltip.add("Transform a tree into a " + tree.getName().getResourcePath() + " tree");
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());

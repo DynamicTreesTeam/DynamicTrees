@@ -14,7 +14,6 @@ import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -22,8 +21,6 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
 public class GenFeaturePodzol implements IGenFeature {
-
-	private static final IBlockState podzolState = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 	
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints) {
@@ -58,7 +55,7 @@ public class GenFeaturePodzol implements IGenFeature {
 						else
 							if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
 								if(world.getLightFor(EnumSkyBlock.SKY, offPos.up()) <= darkThreshold) {
-									world.setBlockState(offPos, podzolState);
+									world.setBlockState(offPos, ModBlocks.blockStates.podzol);
 								} else {
 									spreadPodzol(world, pos);
 								}
@@ -79,7 +76,7 @@ public class GenFeaturePodzol implements IGenFeature {
 			Podzolish += (testBlock == Blocks.DIRT) && (world.getBlockState(deltaPos).getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL) ? 1 : 0;
 			Podzolish += testBlock == ModBlocks.blockRootyDirt ? 1 : 0;
 			if(Podzolish >= 3) {
-				world.setBlockState(pos, podzolState);
+				world.setBlockState(pos, ModBlocks.blockStates.podzol);
 				break;
 			}
 		}
