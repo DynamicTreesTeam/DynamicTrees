@@ -612,12 +612,13 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
 		for(EnumFacing dir : EnumFacing.VALUES) {
 			BlockPos neighbor = pos.offset(dir);
-			IBlockState neighBlockState = world.getBlockState(neighbor);			
+			IBlockState neighBlockState = world.getBlockState(neighbor);
 			if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {
 				int age = neighBlockState.getBlock() == Blocks.FIRE ? ((Integer)neighBlockState.getValue(BlockFire.AGE)).intValue() : 0;
 				world.setBlockState(neighbor, ModBlocks.blockVerboseFire.getDefaultState().withProperty(BlockFire.AGE, age));
 			}
 		}
+		
 	}
 	
 	@Override

@@ -103,7 +103,7 @@
 ┍━━━━━━━━━━━━━┑
 │COMPATABILITY│
 ┕━━━┯━━━━━━━━━┙
-    │
+    ├[✔]Added OreDictionary for Seeds and treeSapling
     ├[✔]Quark greener grass compatibility added
     ╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
 

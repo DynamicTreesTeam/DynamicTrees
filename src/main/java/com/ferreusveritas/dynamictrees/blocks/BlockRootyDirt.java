@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -70,11 +71,11 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	
 	public static enum EnumMimicType implements IStringSerializable {
 		
-		DIRT(Blocks.DIRT.getDefaultState(), "dirt"),
+		DIRT(ModBlocks.blockStates.dirt, "dirt"),
 		GRASS(Blocks.GRASS.getDefaultState(), "grass"),
-		PODZOL( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL) , "podzol"),
+		PODZOL(ModBlocks.blockStates.podzol, "podzol"),
 		MYCELIUM(Blocks.MYCELIUM.getDefaultState(), "mycelium"),
-		COARSEDIRT( Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT) , "coarsedirt"),
+		COARSEDIRT(Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT) , "coarsedirt"),
 		SNOWY(Blocks.GRASS.getDefaultState().withProperty(BlockGrass.SNOWY, true), "snowy");
 		
 		private final IBlockState muse;
