@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumActionResult;
@@ -31,6 +32,7 @@ public class Seed extends ItemBackport {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
+		setTextureName(ModConstants.MODID + ":" + name);
 	}
 	
 	public void setSpecies(Species species, ItemStack seedStack) {

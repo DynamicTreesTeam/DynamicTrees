@@ -54,11 +54,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class Species extends Registerable {
 	
-	public static SpeciesRegistry REGISTRY;
-	
-	public static void newRegistry() {
-		REGISTRY = new SpeciesRegistry();
-	}
+	public static SpeciesRegistry REGISTRY = new SpeciesRegistry();
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
 	protected  final DynamicTree treeFamily;

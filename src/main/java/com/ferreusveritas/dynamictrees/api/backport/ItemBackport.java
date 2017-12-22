@@ -12,9 +12,10 @@ public class ItemBackport extends Item implements IRegisterable {
 	protected ResourceLocation name;
 	
 	public void setRegistryName(String name) {
+		ResourceLocation resloc = new ResourceLocation(name);
 		ModContainer mc = Loader.instance().activeModContainer();
 		String domain = mc.getModId().toLowerCase();
-		setRegistryName(new ResourceLocation(domain, name));
+		setRegistryName(new ResourceLocation(domain, resloc.getResourcePath()));
 	}
 	
 	@Override

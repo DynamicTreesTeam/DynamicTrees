@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
+
 public class RandomXOR extends Random {
 
 	private static final long serialVersionUID = -3477272122511092632L;

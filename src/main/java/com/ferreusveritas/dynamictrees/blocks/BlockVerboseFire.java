@@ -14,9 +14,12 @@ import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockVerboseFire extends BlockFire implements IRegisterable {
@@ -105,7 +108,7 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
                 		//Chance to age
                 		if (heat > 0 && rand.nextInt(distance) <= heat && (!worldIn.isRaining() || !this.canDie(worldIn, dPos))) {
                 			int newAge = MathHelper.clamp(age + rand.nextInt(5) / 4, 0, 15);
-                			worldIn.setBlockState(dPos, new BlockState(Blocks.fire).withProperty(AGE, Integer.valueOf(newAge)), 3);
+                			worldIn.setBlockState(dPos, new BlockState(this).withProperty(AGE, Integer.valueOf(newAge)), 3);
                 		}
                 	}
                 }
@@ -136,7 +139,7 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
             
             if (random.nextInt(age + 10) < 5 && !worldIn.isRainingAt(pos)) {
     			int newAge = MathHelper.clamp(age + random.nextInt(5) / 4, 0, 15);
-                worldIn.setBlockState(pos, new BlockState(Blocks.fire).withProperty(AGE, Integer.valueOf(newAge)), 3);
+    			worldIn.setBlockState(pos, new BlockState(this).withProperty(AGE, Integer.valueOf(newAge)), 3);
             }
             else {
                 worldIn.setBlockToAir(pos);
@@ -205,4 +208,19 @@ public class BlockVerboseFire extends BlockFire implements IRegisterable {
 	public void setUnlocalizedNameReg(String unlocalName) {
 		setBlockName(unlocalName);
 	}
+	
+	//////////////////////////////
+	// RENDERING
+	//////////////////////////////
+	
+    @SideOnly(Side.CLIENT)
+    public IIcon getFireIcon(int arg) {
+        return Blocks.fire.getFireIcon(arg);
+    }
+
+    /**  Gets the block's texture. Args: side, meta */
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+    	return Blocks.fire.getIcon(side, meta);
+    }
 }

@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeCoder;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.inspectors.NodeInflator;
@@ -126,7 +127,7 @@ public class JoCode {
 	*/
 	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
 			IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
-		world.setBlockState(rootPos, species.getRootyDirtBlock().getDefaultState().withMeta(0));//Set to unfertilized rooty dirt
+		world.setBlockState(rootPos, species.getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, 0));//Set to unfertilized rooty dirt
 
 		//A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);

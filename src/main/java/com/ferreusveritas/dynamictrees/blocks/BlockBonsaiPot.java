@@ -39,7 +39,7 @@ public class BlockBonsaiPot extends BlockBackport {
 	
 	public BlockBonsaiPot(String name) {
 		super(Blocks.flower_pot.getMaterial());
-		setDefaultState(new BlockState(this, 0));
+		setDefaultState(new BlockState(this));
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
 		setBlockBoundsForItemRender();

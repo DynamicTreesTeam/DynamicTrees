@@ -299,7 +299,7 @@ public abstract class DynamicTree {
 	}
 	
 	public IBlockState getDynamicLeavesState() {
-		return new BlockState(getDynamicLeaves(), getDynamicLeavesSub());
+		return new BlockState(getDynamicLeaves()).withProperty(BlockDynamicLeaves.TREE, getDynamicLeavesSub());
 	}
 	
 	public IBlockState getDynamicLeavesState(int hydro) {

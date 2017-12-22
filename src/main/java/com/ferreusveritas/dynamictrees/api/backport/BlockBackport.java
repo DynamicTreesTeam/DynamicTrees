@@ -28,7 +28,7 @@ public class BlockBackport extends Block implements IBlockBackport {
 	
 	protected BlockBackport(Material material) {
 		super(material);
-		defBlockState = new BlockState(this, 0);
+		defBlockState = new BlockState(this);
 	}
 
 	@Override
@@ -229,9 +229,10 @@ public class BlockBackport extends Block implements IBlockBackport {
 	ResourceLocation name;
 	
 	public void setRegistryName(String name) {
+		ResourceLocation resloc = new ResourceLocation(name);
 		ModContainer mc = Loader.instance().activeModContainer();
 		String domain = mc.getModId().toLowerCase();
-		setRegistryName(new ResourceLocation(domain, name));
+		setRegistryName(new ResourceLocation(domain, resloc.getResourcePath()));
 	}
 	
 	@Override

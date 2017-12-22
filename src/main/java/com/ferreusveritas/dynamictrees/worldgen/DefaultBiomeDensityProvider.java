@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
@@ -105,9 +106,9 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
 				chance = new ChanceStatic(EnumChance.OK);
 			}
-			/*else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
+			else if(biome.biomeID == BiomeGenBase.roofedForest.biomeID + DefaultBiomeTreeSelector.MUTATED) {//Although this is a forest it's not registered as one for some reason
 				chance = new ChanceStatic(EnumChance.OK);
-			}*/
+			}
 			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
 				chance = new ChanceRandom(0.75f);
 			} 

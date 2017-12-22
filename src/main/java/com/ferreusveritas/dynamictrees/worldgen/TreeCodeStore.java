@@ -13,10 +13,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
+import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 
 /**
  * A storage class for {@link JoCode} objects.

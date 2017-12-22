@@ -56,7 +56,7 @@ public class BlockBranch extends BlockBackport implements ITreePart, IBurningLis
 		super(Material.wood); //Trees are made of wood. Brilliant.
 		setStepSound(soundTypeWood); //aaaaand they also sound like wood.
 		setHarvestLevel("axe", 0);
-		setDefaultState(this.defBlockState.withProperty(RADIUS, 1));
+		setDefaultState(getDefaultState().withProperty(RADIUS, 1));
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
 	}

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.ConfigHandler;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
@@ -35,7 +35,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral {
 		}
 		
 		public boolean include() {
-			return !debug || ConfigHandler.worldGenDebug;
+			return !debug || ModConfigs.worldGenDebug;
 		}
 		
 		public static int countMethods() {

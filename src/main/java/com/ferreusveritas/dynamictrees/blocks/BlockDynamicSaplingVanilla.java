@@ -29,7 +29,7 @@ public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 	@Override
 	public BlockDynamicSaplingVanilla setSpecies(IBlockState state, Species species) {
 		if(state.getBlock() == this) {
-			trees.put(state.getMeta(), tree);
+			trees.put(state.getMeta(), species);
 		}
 		return this;
 	}

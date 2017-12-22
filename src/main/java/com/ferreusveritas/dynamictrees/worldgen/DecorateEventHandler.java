@@ -41,6 +41,7 @@ public class DecorateEventHandler {
 		
 	//Seeds:
 	//Forest, Roofed Forest, Desert, Village: 3036345388435907851
+	//Swamp, Roofed Forest, Desert, Forest, Birch Forest, Village 1212426086214323691
 	//Roofed Forest Seed:  1488218954
 
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)

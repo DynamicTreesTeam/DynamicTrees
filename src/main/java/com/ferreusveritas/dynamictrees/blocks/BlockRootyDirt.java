@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
 import com.ferreusveritas.dynamictrees.api.backport.EnumHand;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
+import com.ferreusveritas.dynamictrees.api.backport.PropertyInteger;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -41,6 +42,8 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	
 	static String name = "rootydirt";
 	
+	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15, PropertyInteger.Bits.BXXXX);
+	
 	public BlockRootyDirt() {
 		this(name);
 	}
@@ -48,6 +51,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	public BlockRootyDirt(String name) {
 		super(Material.ground);
 		setStepSound(soundTypeGrass);
+		setDefaultState(getDefaultState().withProperty(LIFE, 15));
 		setTickRandomly(true);
 		setUnlocalizedNameReg(name);
 		setRegistryName(name);
