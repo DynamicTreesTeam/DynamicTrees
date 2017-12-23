@@ -6,10 +6,10 @@
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
-  "updateUrl": "",
+  "updateUrl": "http://minecraft.curseforge.com/projects/dynamictrees",
   "authorList": [ "FerreusVeritas" ],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "assets/dynamictrees/logo.png",
   "screenshots": [],
   "dependencies": []
 }
