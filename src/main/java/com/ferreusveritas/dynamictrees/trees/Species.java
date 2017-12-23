@@ -544,7 +544,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
 		//This will prune rotted positions from the world and the end point list
-		if(handleRot(world, ends, rootPos, treePos, soilLife, rapid)) {
+		if(handleRot(world, ends, rootPos, treePos, soilLife, false)) {
 			return false;//Last piece of tree rotted away.
 		}
 		
