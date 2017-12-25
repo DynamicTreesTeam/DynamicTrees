@@ -57,7 +57,7 @@ public class CommonProxy {
 	// PARTICLES
 	///////////////////////////////////////////
 
-	public void addDustParticle(double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {}
+	public void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {}
 	
 	/**
 	 * Not strictly necessary. But adds a little more isolation to the server for particle effects
