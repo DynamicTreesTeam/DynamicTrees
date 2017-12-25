@@ -200,36 +200,43 @@ public class ClientProxy extends CommonProxy {
 	///////////////////////////////////////////
 	
 	@Override
-	public void addDustParticle(double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {
-		Particle particle = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.BLOCK_DUST.getParticleID(), fx, fy, fz, mx, my, mz, new int[]{Block.getStateId(blockState)});
-		particle.setRBGColorF(r, g, b);
+	public void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {
+		if(world.isRemote) {
+			Particle particle = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.BLOCK_DUST.getParticleID(), fx, fy, fz, mx, my, mz, new int[]{Block.getStateId(blockState)});
+			particle.setRBGColorF(r, g, b);
+		}
 	}
 	
 	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
 	@Override
 	public void spawnParticle(World world, EnumParticleTypes particleType, double x, double y, double z, double mx, double my, double mz) {
-		world.spawnParticle(particleType, x, y, z, mx, my, mz);
+		if(world.isRemote) {
+			world.spawnParticle(particleType, x, y, z, mx, my, mz);
+		}
 	}
 
+	@Override
 	public void crushLeavesBlock(World world, BlockPos pos, IBlockState blockState, Entity entity) {
-		Random random = world.rand;
-		ITreePart treePart = TreeHelper.getTreePart(blockState);
-		if(treePart instanceof BlockDynamicLeaves) {
-			BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
-			DynamicTree tree = leaves.getTree(blockState);
-			if(tree != null) {
-				int color = getTreeFoliageColor(tree, world, blockState, pos);
-				float r = (color >> 16 & 255) / 255.0F;
-				float g = (color >> 8 & 255) / 255.0F;
-				float b = (color & 255) / 255.0F;
-				for(int dz = 0; dz < 8; dz++) {
-					for(int dy = 0; dy < 8; dy++) {
-						for(int dx = 0; dx < 8; dx++) {
-							if(random.nextInt(8) == 0) {
-								double fx = pos.getX() + dx / 8.0;
-								double fy = pos.getY() + dy / 8.0;
-								double fz = pos.getZ() + dz / 8.0;
-								addDustParticle(fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
+		if(world.isRemote) {
+			Random random = world.rand;
+			ITreePart treePart = TreeHelper.getTreePart(blockState);
+			if(treePart instanceof BlockDynamicLeaves) {
+				BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
+				DynamicTree tree = leaves.getTree(blockState);
+				if(tree != null) {
+					int color = getTreeFoliageColor(tree, world, blockState, pos);
+					float r = (color >> 16 & 255) / 255.0F;
+					float g = (color >> 8 & 255) / 255.0F;
+					float b = (color & 255) / 255.0F;
+					for(int dz = 0; dz < 8; dz++) {
+						for(int dy = 0; dy < 8; dy++) {
+							for(int dx = 0; dx < 8; dx++) {
+								if(random.nextInt(8) == 0) {
+									double fx = pos.getX() + dx / 8.0;
+									double fy = pos.getY() + dy / 8.0;
+									double fz = pos.getZ() + dz / 8.0;
+									addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
+								}
 							}
 						}
 					}
