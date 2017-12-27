@@ -47,7 +47,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		grow(world, rand, pos, state);
 	}
 	
-	public static boolean canSaplingStay(IBlockAccess world, Species species, BlockPos pos) {
+	public static boolean canSaplingStay(World world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			IBlockState blockState = world.getBlockState(pos.offset(dir));
@@ -61,7 +61,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
 	}
 	
-	public boolean canBlockStay(IBlockAccess world, BlockPos pos, IBlockState state) {
+	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
 		return canSaplingStay(world, getSpecies(state), pos);
 	}
 
