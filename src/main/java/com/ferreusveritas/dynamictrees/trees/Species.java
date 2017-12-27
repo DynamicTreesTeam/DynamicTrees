@@ -498,12 +498,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
 	 * species.
 	 * 
-	 * @param blockAccess
+	 * @param world
 	 * @param pos
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
 		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
 	}
@@ -511,13 +511,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
 	 * 
-	 * @param blockAccess
+	 * @param world
 	 * @param pos
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
-		return isAcceptableSoil(blockAccess, pos, soilBlockState);
+	public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(world, pos, soilBlockState);
 	}
 	
 	//////////////////////////////
