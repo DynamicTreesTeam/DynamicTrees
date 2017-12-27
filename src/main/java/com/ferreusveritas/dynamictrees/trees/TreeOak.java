@@ -83,19 +83,19 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		@Override
-		public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+		public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
 			
 			if(soilBlockState.getBlock() == Blocks.water) {
-				Biome biome = blockAccess.getBiome(pos);
+				Biome biome = world.getBiome(pos);
 				if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
 					BlockPos down = pos.down();
-					if(isAcceptableSoil(blockAccess, down, blockAccess.getBlockState(down))) {
+					if(isAcceptableSoil(world, down, world.getBlockState(down))) {
 						return true;
 					}
 				}
 			}
 			
-			return super.isAcceptableSoilForWorldgen(blockAccess, pos, soilBlockState);
+			return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
 		}
 
 		//Swamp Oaks are just oaks in a swamp..  So they have the same drops

@@ -489,12 +489,12 @@ public class Species extends Registerable {
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
 	 * species.
 	 * 
-	 * @param blockAccess
+	 * @param world
 	 * @param pos
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoil(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
+	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
 		return soilBlock == Blocks.dirt || soilBlock == Blocks.grass || soilBlock == Blocks.mycelium || soilBlock == ModBlocks.blockRootyDirt;
 	}
@@ -502,13 +502,13 @@ public class Species extends Registerable {
 	/**
 	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
 	 * 
-	 * @param blockAccess
+	 * @param world
 	 * @param pos
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoilForWorldgen(IBlockAccess blockAccess, BlockPos pos, IBlockState soilBlockState) {
-		return isAcceptableSoil(blockAccess, pos, soilBlockState);
+	public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
+		return isAcceptableSoil(world, pos, soilBlockState);
 	}
 	
 	//////////////////////////////

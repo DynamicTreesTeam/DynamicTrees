@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.api.backport.BlockBackport;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
 import com.ferreusveritas.dynamictrees.api.backport.BlockState;
 import com.ferreusveritas.dynamictrees.api.backport.EnumFacing;
-import com.ferreusveritas.dynamictrees.api.backport.IBlockAccess;
 import com.ferreusveritas.dynamictrees.api.backport.IBlockState;
 import com.ferreusveritas.dynamictrees.api.backport.World;
 import com.ferreusveritas.dynamictrees.renderers.RendererSapling;
@@ -46,7 +45,7 @@ public class BlockDynamicSapling extends BlockBackport implements IGrowable {
 		grow(world, rand, pos, state);
 	}
 	
-	public static boolean canSaplingStay(IBlockAccess world, Species species, BlockPos pos) {
+	public static boolean canSaplingStay(World world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 			IBlockState blockState = world.getBlockState(pos.offset(dir));
