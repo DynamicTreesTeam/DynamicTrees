@@ -183,7 +183,7 @@ public abstract class DynamicTree {
 	 * @param pos
 	 * @return
 	 */
-	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
+	public Species getSpeciesForLocation(World access, BlockPos pos) {
 		return getCommonSpecies();
 	}
 
