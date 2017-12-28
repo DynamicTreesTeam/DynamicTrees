@@ -193,8 +193,8 @@ public class TreeOak extends DynamicTree {
 	 * a common oak acorn.
 	 */
 	@Override
-	public Species getSpeciesForLocation(IBlockAccess access, BlockPos pos) {
-		if(CompatHelper.biomeHasType(access.getBiome(pos), Type.SWAMP)) {
+	public Species getSpeciesForLocation(World world, BlockPos pos) {
+		if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SWAMP)) {
 			return swampSpecies;
 		}
 		
