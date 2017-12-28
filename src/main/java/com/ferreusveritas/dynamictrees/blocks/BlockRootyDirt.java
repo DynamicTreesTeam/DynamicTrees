@@ -247,9 +247,9 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
 	}
 	
-	public Species getSpecies(IBlockAccess blockAccess, BlockPos pos) {
-		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
-		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos).getSpeciesForLocation(blockAccess, treePos) : null;
+	public Species getSpecies(World world, BlockPos pos) {
+		BlockPos treePos = pos.offset(getTrunkDirection(world, pos));
+		return TreeHelper.isBranch(world, treePos) ? TreeHelper.getBranch(world, treePos).getTree(world, treePos).getSpeciesForLocation(world, treePos) : null;
 	}
 	
 	@Override
