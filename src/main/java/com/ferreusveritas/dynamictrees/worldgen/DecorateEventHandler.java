@@ -36,7 +36,9 @@ public class DecorateEventHandler {
 	private void disableRoofedForest() {
 		//I didn't want to have to do this but you've given me no choice. This is only necessary in 1.7.10
 		//BiomeGenForest(the secret of the Roofed Forest): BiomeGenForest.field_150632_aF == 3; see: new BiomeGenForest(29(BiomeID), 3) in BiomeGenBase
-		ReflectionHelper.setPrivateValue(BiomeGenForest.class, (BiomeGenForest)BiomeGenBase.roofedForest, 0, 0);//Modify field_150632_aF and revoke roofedForest's privileges.
+		if(BiomeGenBase.roofedForest instanceof BiomeGenForest) {//We need this in case Biomes O'Plenty changed the roofedForest to something else.
+			ReflectionHelper.setPrivateValue(BiomeGenForest.class, (BiomeGenForest)BiomeGenBase.roofedForest, 0, 0);//Modify field_150632_aF and revoke roofedForest's privileges.
+		}
 	}
 		
 	//Seeds:
