@@ -12,6 +12,7 @@ public class ModConfigs {
 	public static float treeHarvestMultiplier;
 	public static boolean ignoreBiomeGrowthRate;
 	public static float diseaseChance;
+	public static boolean isLeavesPassable;
 	public static boolean replaceVanillaSapling;
 	public static boolean vineGen;
 	public static boolean podzolGen;
@@ -30,7 +31,8 @@ public class ModConfigs {
 		treeHarvestMultiplier = config.getFloat("harvestMultiplier", "trees", 1f, 0f, 128f, "Factor that multiplies the wood returned from harvesting a tree.  You cheat.");
 		ignoreBiomeGrowthRate = config.getBoolean("ignoreBiomeGrowthRate", "trees", false, "If enabled all trees grow as if they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
-		
+		isLeavesPassable = config.getBoolean("isLeavesPassable", "trees", false, "If enabled all leaves will be passable");
+
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
 		
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");

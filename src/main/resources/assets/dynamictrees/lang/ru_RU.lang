@@ -8,9 +8,16 @@ tile.leaves1.name=Динамическая листва
 tile.oakbranch.name=Ствол дуба
 tile.sprucebranch.name=Ствол ели
 tile.birchbranch.name=Ствол березы
-tile.junglebranch.name=Ствол тробического дерева
+tile.junglebranch.name=Ствол тропического дерева
 tile.darkoakbranch.name=Ствол темного дуба
 tile.acaciabranch.name=Ствол акации
+
+tile.dynamictrees:oakbranch.name=Ствол дуба
+tile.dynamictrees:sprucebranch.name=Ствол ели
+tile.dynamictrees:birchbranch.name=Ствол березы
+tile.dynamictrees:junglebranch.name=Ствол тропического дерева
+tile.dynamictrees:darkoakbranch.name=Ствол темного дуба
+tile.dynamictrees:acaciabranch.name=Ствол акации
 
 item.oakseed.name=Желудь
 item.spruceseed.name=Еловая шишка
