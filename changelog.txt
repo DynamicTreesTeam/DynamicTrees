@@ -1,0 +1,92 @@
+Changelog:
+
+0.7.2c:
+* Fix dedicated server crash. Closes #26
+* Added Russian translation(thanks AlexRover)
+
+0.7.2b:
+* Fix issue dedicated server crash on worldgen.  Calling client side method. Closes #24
+
+0.7.2 The Worldgen Update(Summary of all added features in Alpha 0.7.1):
+* Mostly internal changes to improve speed.
+* Some of the tree features and signals originate from the root block instead of from the leaves and branches.
+* Corrected many biome generation problems.
+* WorldGen is enabled by default
+* Add dynamic seeds to Ore dictionary as "treeSapling"
+* Don't consume bonemeal in creative mode
+* Add 1/5 chance birch spawn in forest biomes
+* Allow Spruce and Oaks to gen in BiomeHills. Closes #20
+* Mesa Forests now properly spawn oaks instead of nothing
+* MUTATED_REDWOOD_TAIGA and MUTATED_REDWOOD_TAIGA_HILLS now properly spawn Spruce instead of Oak.
+* Fast or Fancy graphics works as expected with Dynamic Leaves
+* Bonemeal can be used on saplings to cause them to grow.
+* Bonemeal causes a single growth update in a tree.
+* WorldGen trees are less scrawny.
+* WorldGen poisson disc generation algorithm fixed.
+* WorldGen poisson discs are tighter together now.(trees fit tighter together to produce a more complete forest canopy)
+* Trees and Species are now separate. (This will mean more in the future)
+* Swamp Oaks(A species) now generate in swamps even in shallow water and with vines.
+* Jungle trees generate with vines and cocoa already on them.
+* Undergrowth added to Jungle floor so it's more Jungly.
+* Fire doesn't burn out of control and it doesn't leave floating tree fragments.
+* Branch Blocks no longer randomly tick(improved efficiency).
+* Chance of seed drops when tree ticks instead of when leaves tick.
+* Now compatible with Quark Greener Grass and Foliage.
+* Huge amounts of API work.
+
+0.7.1f:
+* WorldGen is enabled by default
+* Backport to 1.7.10 completed(needs tested for server and client)
+* Fix lore text bug for transformation potions.
+* Fix crash is forge versions Forge-1.12.2-14.23.1.2576 and higher
+* Add dynamic seeds to Ore dictionary as "treeSapling"
+* Don't consume bonemeal in creative mode
+
+0.7.1e:
+* Fixed bonsai pot render crash
+* Add 1/5 chance birch spawn in forest biomes
+* Allow Spruce and Oaks to gen in BiomeHills. Closes #20
+* Backport all changes to 1.10.2 and 1.11.2
+
+0.7.1d:
+* Mesa Forests now properly spawn oaks instead of nothing
+* MUTATED_REDWOOD_TAIGA and MUTATED_REDWOOD_TAIGA_HILLS now properly spawn Spruce instead of Oak.
+* Fixed crash during server startup (github issue #19)
+
+0.7.1c:
+* Fixed crash during world gen (github issue #18)
+* Fast or Fancy graphics works as expected with Dynamic Leaves
+
+0.7.1b:
+* Bonemeal can be used on saplings to cause them to grow.
+* Bonemeal causes a single growth update in a tree.
+
+0.7.1 Initial Alpha Release:
+* WorldGen trees are less scrawny.
+* WorldGen poisson disc generation algorithm fixed.
+* WorldGen poisson discs are tighter together now.(trees fit tighter together to produce a more complete forest canopy)
+* Trees and Species are now separate.  (This will mean more in the future)
+* Swamp Oaks(A species) now generate in swamps even in shallow water and with vines.
+* Jungle trees generate with vines and cocoa already on them. 
+* Undergrowth added to Jungle floor so it's more Jungly.
+* Fire doesn't burn out of control and it doesn't leave floating tree fragments.
+* Branch Blocks no longer randomly tick(improved efficiency).
+* Chance of seed drops when tree ticks instead of when leaves tick.
+* Now compatible with Quark Greener Grass and Foliage.
+* Huge amounts of API work.
+
+0.6.5 The Potion Update:
+* Added tree specific brew-able potions (Dendro Potions) to replace the current confusing potion method.
+* The potion of burgeoning(fast growth) effect now lingers for 80 seconds on the tree for continuous growth.
+* Added new potion of transformation to change an already grown tree into another tree species.
+* Potions are brewed in a brewing stand in 1.10.2+
+* Potions are crafted from awkward potions in 1.7.10(No realistic way to add real brewing stand recipes in 1.7.10)
+* Seeds can be placed in flower pots to make little "bonsai" trees
+* Branches are now classed as wood(isWood() returns true)  for mods expecting proper tool interaction(like Better Beginnings)
+* Fixed bug where vanilla leaves blocks adjacent to dynamic leaves blocks would cause a crash
+* Added Dirt bucket item for exchanging vanilla saplings to seeds and vice-versa.  No more wasting dirt blocks.  Empty Dirt Bucket out like a water bucket to get your dirt and bucket back.
+* Started API interface for adding modded trees.
+* Created backport functions for 1.7.10 to ease the addition of features universally.
+* Created substance interface for potions and other things.
+* Created IBiomeSuitabilityDecider interface and registry for mods wishing to override what determines the biome suitability of a tree.(TerraFirmaCraft)
+* Fixed DynamicSapling rendering bug in 1.7.10
