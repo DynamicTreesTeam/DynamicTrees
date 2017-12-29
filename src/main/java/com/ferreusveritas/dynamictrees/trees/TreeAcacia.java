@@ -30,6 +30,7 @@ public class TreeAcacia extends DynamicTree {
 			envFactor(Type.NETHER, 0.75f);
 			envFactor(Type.WET, 0.75f);
 			
+			setupStandardSeedDropping();
 		}
 		
 		@Override

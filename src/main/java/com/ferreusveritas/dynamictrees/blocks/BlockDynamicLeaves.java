@@ -496,41 +496,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//////////////////////////////
 	
 	@Override
-	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		
-		Species species = getExactSpecies(world, pos, getTree(state));
+	public List<ItemStack> getDrops(IBlockAccess access, BlockPos pos, IBlockState state, int fortune) {
+				
+		Species species = getExactSpecies(access, pos, getTree(state));
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 
 		if(species != null) {
-
-			int chance = getSaplingDropChance(state);
-
-			//Hokey fortune stuff here.
-			if (fortune > 0) {
-				chance -= 2 << fortune;
-				if (chance < 10) { 
-					chance = 10;
-				}
-			}
-
-			//It's mostly for seeds.. mostly.
-			//Ignores quantityDropped() for Vanilla consistency and fortune compatibility.
-			Random rand = world instanceof World ? ((World)world).rand : new Random();
-			if (rand.nextInt(chance) == 0) {
-				ret.add(species.getSeedStack(1));
-			}
-
-			//More fortune contrivances here.  Vanilla compatible returns.
-			chance = 200; //1 in 200 chance of returning an "apple"
-			if (fortune > 0) {
-				chance -= 10 << fortune;
-				if (chance < 40) {
-					chance = 40;
-				}
-			}
-
-			//Get species specific drops.. apples or cocoa for instance
-			ret = species.getDrops(world, pos, chance, ret);
+			species.getLeavesDrops(access, pos, ret, fortune);
 		}
 
 		return ret;

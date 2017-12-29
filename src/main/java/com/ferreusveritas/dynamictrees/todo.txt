@@ -73,6 +73,10 @@
     │   │
     │   ╰[✔]Bone meal should attempt a single growth cycle in a developing tree.
     │
+    ├[ ]┬Loot table for tree species voluntaries and harvestables.
+    │   │
+    │   ╰[ ]Create a drop provider interface with some sensible default implementations
+    │
     ├[ ]API
     ├[ ]Cacti
     ├[ ]Seasons
@@ -104,6 +108,7 @@
 │COMPATABILITY│
 ┕━━━┯━━━━━━━━━┙
     ├[✔]Added OreDictionary for Seeds and treeSapling
+    ├[✔]Passable Leaves
     ├[✔]Quark greener grass compatibility added
     ╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
 

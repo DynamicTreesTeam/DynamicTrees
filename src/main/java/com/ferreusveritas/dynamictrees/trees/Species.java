@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +13,9 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -23,6 +24,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.misc.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -31,7 +33,6 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -88,6 +89,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
 	protected IBlockState saplingBlock;
+	/** A place to store what drops from the tree. Similar to a loot table */
+	protected DropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
@@ -203,46 +206,66 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return null;
 	}
+	
+	public void addDropCreator(IDropCreator dropCreator) {
+		dropCreatorStorage.addDropCreator(dropCreator);
+	}
 
-	public float getSeedDropRate() {
-		return 1.0f;
+	//It's mostly for seeds.. mostly.
+	public void setupStandardSeedDropping() {
+		dropCreatorStorage.addDropCreator(new SeedDropCreator());
 	}
 	
 	/**
-	 * This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
-	 * 1 in 64 chance to drop a seed on destruction..
-	 * 
-	 * @param random
-	 * @return
-	 */
-	public int getTreeHarvestSeedQuantity(Random random) {
-		return random.nextInt(64) == 0 ? 1 : 0;
-	}
-
-	/**
 	 * Gets a list of drops for a {@link BlockDynamicLeaves} when the entire tree is harvested.
-	 * NOT used for individual {@link BlockDynamicLeaves} being harvested. 
+	 * NOT used for individual {@link BlockDynamicLeaves} being directly harvested by hand or tool. 
 	 * 
 	 * @param world
 	 * @param leafPos
-	 * @param list
+	 * @param dropList
 	 * @param random
 	 * @return
 	 */
-	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> list, Random random) {
-		
-		int seedQty = getTreeHarvestSeedQuantity(random);
-		if(seedQty > 0) {
-			list.add(getSeedStack(seedQty));
-		}
-		
-		return list;
+	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
+		dropList = TreeRegistry.globalDropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
+		return dropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
+	}
+	
+	/**
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link DynamicTree} at
+	 * random with no player interaction.
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param treePos
+	 * @param soilLife
+	 * @return
+	 */
+	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
+		List<ItemStack> dropList = TreeRegistry.globalDropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
+		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, dropList, soilLife);
+	}
+	
+	/**
+	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
+	 * a {@link BlockDynamicLeaves} directly by hand or with a tool.
+	 * 
+	 * @param access
+	 * @param breakPos
+	 * @param dropList
+	 * @param fortune
+	 * @return
+	 */
+	public List<ItemStack> getLeavesDrops(IBlockAccess access, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+		Random random = access instanceof World ? ((World)access).rand : new Random();
+		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
+		return dropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
 	}
 	
 	/**
 	 * 
 	 * @param world
-	 * @param baseTreePart
+	 * @param endPoints
 	 * @param rootPos
 	 * @param treePos
 	 * @param soilLife
@@ -250,33 +273,27 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
 		
-		float dropRate = getSeedDropRate() * ModConfigs.seedDropRate;
+		List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
 		
-		do {
-			if(dropRate > world.rand.nextFloat()) {
-				if(endPoints.size() > 0) {
-					BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-					branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-					BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
+		if(!drops.isEmpty() && !endPoints.isEmpty()) {
+			for(ItemStack drop: drops) {
+				BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+				BlockPos itemPos = getRayTraceFruitPos(world, treePos, branchPos);
 
-					if(seedPos != BlockPos.ORIGIN) {
-						EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
-						Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
-						float distAngle = 15;//The spread angle(center to edge)
-						float launchSpeed = 4;//Blocks(meters) per second
-						motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-						seedEntity.motionX = motion.x;
-						seedEntity.motionY = motion.y;
-						seedEntity.motionZ = motion.z;
-						CompatHelper.spawnEntity(world, seedEntity);
-					}
+				if(itemPos != BlockPos.ORIGIN) {
+					EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+					Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
+					float distAngle = 15;//The spread angle(center to edge)
+					float launchSpeed = 4;//Blocks(meters) per second
+					motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+					CompatHelper.spawnEntity(world, itemEntity, motion);
 				}
 			}
-		} while(--dropRate > 0.0f);
-
+		}
+		
 		return true;
 	}
-	
 	
 	///////////////////////////////////////////
 	//FRUIT
@@ -416,26 +433,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		return null;
 	}
-	
-	///////////////////////////////////////////
-	//DROPS
-	///////////////////////////////////////////
-	
-	/** 
-	* Override to add items to the included list argument. For apples and whatnot.
-	* Pay Attention!  Add items to drops parameter and then return it. The list
-	* may already contain seeds.  Remove them if desired.
-	* 
-	* @param world The world
-	* @param pos The {@link BlockPos} of the {@link BlockDynamicLeaves} that was harvested
-	* @param chance The sapling drop chance from {@link BlockLeaves}
-	* @param drops A {@link ArrayList} of things to be manipulated
-	* @return the drop list
-	*/
-	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-		return drops;
-	}
-	
 	
 	///////////////////////////////////////////
 	//SAPLING

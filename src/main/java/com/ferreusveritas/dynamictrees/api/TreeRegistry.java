@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.api;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.treedata.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -19,7 +21,8 @@ import net.minecraft.world.biome.Biome;
 */
 public class TreeRegistry {
 
-	private static ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
+	private static final ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
+	public static final DropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
 	
 	//////////////////////////////
 	// TREE REGISTRY
@@ -77,6 +80,21 @@ public class TreeRegistry {
 		
 		return null;
 	}
+
+	//////////////////////////////
+	// DROP HANDLING
+	//////////////////////////////
+	
+	/**
+	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
+	 * all trees.
+	 * 
+	 * @param dropCreator
+	 */
+	public static void registerDropCreator(IDropCreator dropCreator) {
+		globalDropCreatorStorage.addDropCreator(dropCreator);
+	}
+	
 	
 	//////////////////////////////
 	// BIOME HANDLING

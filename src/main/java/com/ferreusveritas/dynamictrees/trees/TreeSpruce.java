@@ -44,6 +44,8 @@ public class TreeSpruce extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.WET, 0.75f);
 			
+			setupStandardSeedDropping();
+
 			podzolGen = new GenFeaturePodzol();
 		}
 		

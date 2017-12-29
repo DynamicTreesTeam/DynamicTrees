@@ -33,6 +33,8 @@ public class TreeBirch extends DynamicTree {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.50f);
 			envFactor(Type.FOREST, 1.05f);
+			
+			setupStandardSeedDropping();
 		}
 		
 		@Override

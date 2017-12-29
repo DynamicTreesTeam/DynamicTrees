@@ -44,6 +44,8 @@ public class TreeJungle extends DynamicTree {
 			envFactor(Type.HOT, 1.1f);
 			envFactor(Type.WET, 1.1f);
 			
+			setupStandardSeedDropping();
+			
 			vineGen = new GenFeatureVine(this);
 			underGen = new GenFeatureUndergrowth(this);
 		}

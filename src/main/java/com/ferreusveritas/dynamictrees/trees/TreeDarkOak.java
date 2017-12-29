@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
@@ -9,16 +8,14 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
+import com.ferreusveritas.dynamictrees.misc.AppleDropCreator;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -41,21 +38,14 @@ public class TreeDarkOak extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.MUSHROOM, 1.25f);
 
+			setupStandardSeedDropping();
+			addDropCreator(AppleDropCreator.instance);
 		}
 
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
 		};
-		
-		@Override
-		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-			Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
-			if ((rand.nextInt(chance) == 0)) {
-				drops.add(new ItemStack(Items.APPLE, 1, 0));
-			}
-			return drops;
-		}
 		
 		@Override
 		public int getLowestBranchHeight(World world, BlockPos pos) {
