@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
@@ -174,8 +175,10 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean unknown) {
-		AxisAlignedBB aabb = new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875);
-        addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
+		if (!ModConfigs.isLeavesPassable) {
+			AxisAlignedBB aabb = new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875);
+			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
+		}
 	}
 
 	@Override
@@ -628,6 +631,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 	*/
+
+	@Override
+	public boolean isPassable(IBlockAccess p_isPassable_1_, BlockPos p_isPassable_2_) {
+		return ModConfigs.isLeavesPassable;
+	}
 
 	@Override
 	public boolean isFoliage(IBlockAccess world, BlockPos pos) {
