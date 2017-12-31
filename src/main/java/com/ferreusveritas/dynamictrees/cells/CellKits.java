@@ -1,23 +1,18 @@
-package com.ferreusveritas.dynamictrees.api.cells;
+package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
-import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
-import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
-import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
-import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
-import com.ferreusveritas.dynamictrees.misc.LeafClusters;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 public class CellKits {
-	
-	/** A cell that always returns 0 */
-	public static final ICell nullCell = new CellNull();
-	
+		
 	public static void preInit() {
 		new CellKits();
 	}
@@ -32,7 +27,7 @@ public class CellKits {
 	private final ICellKit deciduous = new ICellKit() {
 
 		private final ICell normalCells[] = {
-				nullCell,
+				CellNull.nullCell,
 				new CellNormal(1),
 				new CellNormal(2),
 				new CellNormal(3),
@@ -54,7 +49,7 @@ public class CellKits {
 
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : nullCell;
+			return radius == 1 ? branchCell : CellNull.nullCell;
 		}
 
 		@Override
@@ -82,7 +77,7 @@ public class CellKits {
 		private final ICell spruceTopBranch = new CellConiferTopBranch();
 
 		private final ICell spruceLeafCells[] = {
-			nullCell,
+			CellNull.nullCell,
 			new CellConiferLeaf(1),
 			new CellConiferLeaf(2),
 			new CellConiferLeaf(3),
@@ -103,7 +98,7 @@ public class CellKits {
 			} else if(radius == 128) {
 				return spruceTopBranch;
 			} else {
-				return nullCell;
+				return CellNull.nullCell;
 			}
 		}
 
@@ -144,7 +139,7 @@ public class CellKits {
 		};
 		
 		private final ICell acaciaLeafCells[] = {
-				nullCell,
+				CellNull.nullCell,
 				new CellAcaciaLeaf(1),
 				new CellAcaciaLeaf(2),
 				new CellAcaciaLeaf(3),
@@ -160,7 +155,7 @@ public class CellKits {
 
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? acaciaBranch : nullCell;
+			return radius == 1 ? acaciaBranch : CellNull.nullCell;
 		}
 
 		@Override
@@ -187,7 +182,7 @@ public class CellKits {
 		private final ICell branchCell = new CellNormal(5);
 		
 		private final ICell darkOakLeafCells[] = {
-				nullCell,
+				CellNull.nullCell,
 				new CellDarkOakLeaf(1),
 				new CellDarkOakLeaf(2),
 				new CellDarkOakLeaf(3),
@@ -203,7 +198,7 @@ public class CellKits {
 
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : nullCell;
+			return radius == 1 ? branchCell : CellNull.nullCell;
 		}
 
 		@Override

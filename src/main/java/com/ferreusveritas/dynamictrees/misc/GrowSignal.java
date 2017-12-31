@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.network;
+package com.ferreusveritas.dynamictrees.misc;
 
 import java.util.Random;
 

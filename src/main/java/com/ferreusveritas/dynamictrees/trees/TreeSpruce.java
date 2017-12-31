@@ -6,11 +6,11 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.misc.GrowSignal;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;

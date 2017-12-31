@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.misc.AppleDropCreator;
+import com.ferreusveritas.dynamictrees.misc.GrowSignal;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;

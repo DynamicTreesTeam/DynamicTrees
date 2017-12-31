@@ -1,4 +1,6 @@
-package com.ferreusveritas.dynamictrees.api.cells;
+package com.ferreusveritas.dynamictrees.cells;
+
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 
 import net.minecraft.util.EnumFacing;
 

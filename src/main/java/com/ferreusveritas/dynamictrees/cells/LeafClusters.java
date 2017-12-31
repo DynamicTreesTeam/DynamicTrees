@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.misc;
+package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 

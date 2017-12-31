@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureUndergrowth;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.misc.GrowSignal;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
