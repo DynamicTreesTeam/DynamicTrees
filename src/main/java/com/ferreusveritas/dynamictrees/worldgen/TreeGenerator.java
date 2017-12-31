@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -113,11 +112,8 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		ArrayList<Circle> circles = circleMan.getCircles(world, random, chunkX, chunkZ);
 		
-		for(Circle c: circles) {
-			makeTree(world, c);
-		}
+		circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
 		
 		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
 		if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {

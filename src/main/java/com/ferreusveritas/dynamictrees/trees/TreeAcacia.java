@@ -4,8 +4,8 @@ import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.cells.CellAcaciaLeaf;
+import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -42,6 +42,7 @@ public class TreeAcacia extends DynamicTree {
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
 
+		setLeafCluster(LeafClusters.acacia);
 		setCellSolver(Cells.acaciaSolver);
 		
 		setSmotherLeavesMax(2);//very thin canopy
@@ -83,33 +84,6 @@ public class TreeAcacia extends DynamicTree {
 	@Override
 	public ICell getCellForLeaves(int hydro) {
 		return acaciaLeafCells[hydro];
-	}
-	
-	@Override
-	public void createLeafCluster(){
-		
-		setLeafCluster(new SimpleVoxmap(7, 2, 7, new byte[] {
-				
-				//Layer 0(Bottom)
-				0, 0, 1, 1, 1, 0, 0,
-				0, 1, 2, 2, 2, 1, 0,
-				1, 2, 3, 4, 3, 2, 1,
-				1, 2, 4, 0, 4, 2, 1,
-				1, 2, 3, 4, 3, 2, 1,
-				0, 1, 2, 2, 2, 1, 0,
-				0, 0, 1, 1, 1, 0, 0,
-				
-				//Layer 1 (Top)
-				0, 0, 0, 0, 0, 0, 0,
-				0, 0, 1, 1, 1, 0, 0,
-				0, 1, 2, 2, 2, 1, 0,
-				0, 1, 2, 2, 2, 1, 0,
-				0, 1, 2, 2, 2, 1, 0,
-				0, 0, 1, 1, 1, 0, 0,
-				0, 0, 0, 0, 0, 0, 0
-				
-		}).setCenter(new BlockPos(3, 0, 3)));
-		
 	}
 	
 }

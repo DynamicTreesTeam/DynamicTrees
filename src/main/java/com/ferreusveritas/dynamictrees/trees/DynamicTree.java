@@ -19,6 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -134,7 +135,7 @@ public abstract class DynamicTree {
 		setDynamicBranch(new BlockBranch(name + "branch"));
 		setStick(new ItemStack(Items.STICK));
 		
-		createLeafCluster();
+		setLeafCluster(LeafClusters.deciduous);
 		createSpecies();
 	}
 	
@@ -519,46 +520,6 @@ public abstract class DynamicTree {
 	
 	public SimpleVoxmap getLeafCluster() {
 		return leafCluster;
-	}
-	
-	/**
-	 * A voxelmap of a leaf cluser for this species.  Values represent hydration value.
-	 * This leaf cluster map is "stamped" on to each branch end during worldgen.  Should be
-	 * representative of what the species actually produces.
-	 */
-	public void createLeafCluster(){
-
-		leafCluster = new SimpleVoxmap(5, 4, 5, new byte[] {
-				//Layer 0 (Bottom)
-				0, 0, 0, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 0, 0, 0,
-
-				//Layer 1
-				0, 1, 1, 1, 0,
-				1, 3, 4, 3, 1,
-				1, 4, 0, 4, 1,
-				1, 3, 4, 3, 1,
-				0, 1, 1, 1, 0,
-				
-				//Layer 2
-				0, 1, 1, 1, 0,
-				1, 2, 3, 2, 1,
-				1, 3, 4, 3, 1,
-				1, 2, 3, 2, 1,
-				0, 1, 1, 1, 0,
-				
-				//Layer 3(Top)
-				0, 0, 0, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 0, 0, 0,
-				
-		}).setCenter(new BlockPos(2, 1, 2));
-
 	}
 	
 	public byte getLeafClusterPoint(BlockPos twigPos, BlockPos leafPos) {

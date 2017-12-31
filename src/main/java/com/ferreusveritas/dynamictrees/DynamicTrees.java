@@ -70,20 +70,15 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		
-		try { //This is need because something silently absorbs exceptions outside of this event.
-			ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
-			TreeGenerator.preInit();//Create the generator
+		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
+		TreeGenerator.preInit();//Create the generator
 			
-			ModBlocks.preInit();
-			ModItems.preInit();
-			ModTrees.preInit();
+		ModBlocks.preInit();
+		ModItems.preInit();
+		ModTrees.preInit();
 			
-			proxy.preInit();
-			compatProxy.preInit();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		proxy.preInit();
+		compatProxy.preInit();
 	}
 
 	@Mod.EventHandler

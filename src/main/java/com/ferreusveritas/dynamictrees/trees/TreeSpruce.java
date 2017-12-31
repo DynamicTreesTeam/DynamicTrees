@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.Cells;
@@ -12,7 +15,7 @@ import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
 import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -103,11 +106,21 @@ public class TreeSpruce extends DynamicTree {
 			return true;
 		}
 		
+		@Override
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
+			BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
+			world.setBlockState(highest.up(1), getDynamicLeavesState(4));
+			world.setBlockState(highest.up(2), getDynamicLeavesState(3));
+			world.setBlockState(highest.up(3), getDynamicLeavesState(1));
+		}
+		
 	}
 		
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		
+		setLeafCluster(LeafClusters.conifer);
 		setCellSolver(Cells.coniferSolver);
 		setSmotherLeavesMax(3);
 	}
@@ -147,25 +160,4 @@ public class TreeSpruce extends DynamicTree {
 		return ColorizerFoliage.getFoliageColorPine();
 	}
 	
-	@Override
-	public void createLeafCluster() {
-		
-		setLeafCluster(new SimpleVoxmap(5, 2, 5, new byte[] {
-				
-				//Layer 0(Bottom)
-				0, 0, 1, 0, 0,
-				0, 1, 2, 1, 0,
-				1, 2, 0, 2, 1,
-				0, 1, 2, 1, 0,
-				0, 0, 1, 0, 0,
-				
-				//Layer 1 (Top)
-				0, 0, 0, 0, 0,
-				0, 0, 1, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 1, 0, 0,
-				0, 0, 0, 0, 0
-				
-		}).setCenter(new BlockPos(2, 0, 2)));
-	}
 }

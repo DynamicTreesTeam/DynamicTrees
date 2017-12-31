@@ -38,7 +38,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	}
 	
 	private class StaticDecision implements ITreeSelector {
-		Decision decision;
+		final Decision decision;
 		
 		public StaticDecision(Decision decision) {
 			this.decision = decision;

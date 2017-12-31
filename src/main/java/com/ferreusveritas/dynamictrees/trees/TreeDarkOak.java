@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
 import com.ferreusveritas.dynamictrees.misc.AppleDropCreator;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;
@@ -85,6 +85,7 @@ public class TreeDarkOak extends DynamicTree {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		
+		setLeafCluster(LeafClusters.darkoak);
 		setCellSolver(Cells.darkOakSolver);
 		setSmotherLeavesMax(3);//thin canopy
 	}
@@ -120,56 +121,4 @@ public class TreeDarkOak extends DynamicTree {
 		return false;
 	}
 	
-	@Override
-	public void createLeafCluster(){
-		
-		setLeafCluster(new SimpleVoxmap(7, 5, 7, new byte[] {
-				
-			//Layer 0(Bottom)
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 2, 2, 2, 0, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 0, 2, 2, 2, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 1
-			0, 0, 1, 1, 1, 0, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			1, 2, 3, 4, 3, 2, 1,
-			1, 2, 4, 0, 4, 2, 1,
-			1, 2, 3, 4, 3, 2, 1,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			
-			//Layer 2
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 1, 2, 4, 2, 1, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 3
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 1, 2, 1, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 4 (Top)
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 1, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0
-			
-		}).setCenter(new BlockPos(3, 1, 3)));
-	}
 }
