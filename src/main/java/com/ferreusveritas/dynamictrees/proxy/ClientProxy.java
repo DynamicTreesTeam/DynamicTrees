@@ -59,11 +59,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
 		
 		//Register DendroCoil Mesher
-		Block dendroCoil = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil"));
-		if(dendroCoil != Blocks.AIR) {
-			ModelHelper.regModel(dendroCoil);
-		}
-
+		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
 		
 		//ITEMS
 		
@@ -89,11 +85,8 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
-		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			Item item = Item.getItemFromBlock(leaves);
-			ModelHelper.regModel(item);
-		}
-
+		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
+		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
 	}

@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -33,7 +34,9 @@ public class ModelHelper {
 	}	
 	
 	public static void regModel(Block block) {
-		regModel(Item.getItemFromBlock(block));
+		if(block != Blocks.AIR) {
+			regModel(Item.getItemFromBlock(block));
+		}
 	}
 	
 	public static void regModel(Item item) {
