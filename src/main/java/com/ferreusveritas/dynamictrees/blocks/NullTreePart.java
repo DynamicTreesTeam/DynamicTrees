@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.CellKits;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -20,7 +20,7 @@ public class NullTreePart implements ITreePart {
 
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
-		return Cells.nullCell;
+		return CellKits.nullCell;
 	}
 
 	@Override

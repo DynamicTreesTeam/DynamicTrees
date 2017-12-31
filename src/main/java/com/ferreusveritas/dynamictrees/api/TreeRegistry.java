@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
@@ -23,6 +25,7 @@ public class TreeRegistry {
 
 	private static final ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	public static final DropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
+	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>(); 
 	
 	//////////////////////////////
 	// TREE REGISTRY
@@ -115,6 +118,22 @@ public class TreeRegistry {
 			return true;
 		}
 		return false;
+	}
+	
+	//////////////////////////////
+	// CELLKIT HANDLING
+	//////////////////////////////
+	
+	public static ICellKit registerCellKit(ResourceLocation name, ICellKit kit) {
+		return cellKitRegistry.computeIfAbsent(name, k -> kit);
+	}
+	
+	public static ICellKit findCellKit(ResourceLocation name) {
+		return cellKitRegistry.get(name);
+	}
+	
+	public static ICellKit findCellKit(String name) {
+		return findCellKit(new ResourceLocation(ModConstants.MODID, name));
 	}
 	
 	//////////////////////////////

@@ -5,17 +5,12 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
-import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
-import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
 import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
 import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -120,8 +115,7 @@ public class TreeSpruce extends DynamicTree {
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		
-		setLeafCluster(LeafClusters.conifer);
-		setCellSolver(Cells.coniferSolver);
+		setCellKit("conifer");
 		setSmotherLeavesMax(3);
 	}
 	
@@ -130,28 +124,14 @@ public class TreeSpruce extends DynamicTree {
 		setCommonSpecies(new SpeciesSpruce(this));
 	}
 	
-	protected static final ICell spruceBranch = new CellConiferBranch();
-	protected static final ICell spruceTopBranch = new CellConiferTopBranch();
-
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		if(branch.getRadius(blockState) == 1) {
-			return blockAccess.getBlockState(pos.down()).getBlock() == branch ? spruceTopBranch : spruceBranch;
-		} else {
-			return Cells.nullCell;
+		int radius = branch.getRadius(blockState);
+		if(radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				radius = 128;
+			}
 		}
-	}
-
-	protected static final ICell spruceLeafCells[] = {
-		Cells.nullCell,
-		new CellConiferLeaf(1),
-		new CellConiferLeaf(2),
-		new CellConiferLeaf(3),
-		new CellConiferLeaf(4)
-	};
-	
-	@Override
-	public ICell getCellForLeaves(int hydro) {
-		return spruceLeafCells[hydro];
+		return getCellKit().getCellForBranch(radius);
 	}
 	
 	@Override

@@ -2,18 +2,19 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
+import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.treedata.IFoliageColorHandler;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -46,9 +47,7 @@ public class TreeBuilder {
 	private int dynamicLeavesSubBlockNum = 0;
 	private int dynamicLeavesSmotherMax = -1;
 	private int dynamicLeavesLightRequirement = -1;
-	private int dynamicLeavesDefaultHydration = -1;
-	private SimpleVoxmap dynamicLeavesClusterVoxmap;
-	private ICellSolver dynamicLeavesCellSolver;
+	private ResourceLocation dynamicLeavesCellKit;
 	private IFoliageColorHandler dynamicLeavesColorHandler;
 
 	//Common Species
@@ -198,42 +197,9 @@ public class TreeBuilder {
 		return this;
 	}
 	
-	/**
-	 * OPTIONAL
-	 * 
-	 * @param leavesHydration The default hydration level of a newly created leaf block [default = 4]
-	 * @return TreeBuilder for chaining
-	 **/
-	public TreeBuilder setDefaultHydration(int leavesHydration) {
-		dynamicLeavesDefaultHydration = leavesHydration;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
-	 * Recommended to leave as default unless you know what you're doing.
-	 * 
-	 * A voxel map of leaves blocks that are "stamped" on to the tree during generation.
-	 * Note that this does not affect the pattern of tree growth and is only used for generation.
-	 * For best results with a custom solutions provide a leaf cluster pattern that best fits the result of what the
-	 * cellSolver for this tree produces.
-	 */
-	public TreeBuilder setLeafCluster(SimpleVoxmap voxmap) {
-		dynamicLeavesClusterVoxmap = voxmap;
-		return this;
-	}
 
-	/** 
-	 * OPTIONAL
-	 * 
- 	 * Recommended to leave as default unless you know what you're doing.
- 	 * 
-	 * The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous]
-	 * If you don't know what this is then leave this alone.
-	 */
-	public TreeBuilder setCellSolver(ICellSolver solver) {
-		dynamicLeavesCellSolver = solver;
+	public TreeBuilder setCellKit(ResourceLocation kit) {
+		dynamicLeavesCellKit = kit; 
 		return this;
 	}
 	
@@ -321,16 +287,8 @@ public class TreeBuilder {
 					this.lightRequirement = dynamicLeavesLightRequirement;
 				}
 				
-				if(dynamicLeavesDefaultHydration != -1) {
-					this.defaultHydration = (byte) dynamicLeavesDefaultHydration;
-				}
-				
-				if(dynamicLeavesClusterVoxmap != null) {
-					setLeafCluster(dynamicLeavesClusterVoxmap);
-				}
-				
-				if(dynamicLeavesCellSolver != null) {
-					setCellSolver(dynamicLeavesCellSolver);
+				if(dynamicLeavesCellKit != null) {
+					this.setCellKit(dynamicLeavesCellKit);
 				}
 			
 			}
@@ -354,6 +312,11 @@ public class TreeBuilder {
 				}
 			}
 
+			@Override
+			public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+				return super.getCellForBranch(blockAccess, pos, blockState, dir, branch);
+			}
+			
 			@Override
 			public Species getCommonSpecies() {
 				return commonSpecies;

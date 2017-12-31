@@ -592,7 +592,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
-		SimpleVoxmap leafMap = getTree().getLeafCluster();
+		SimpleVoxmap leafMap = getTree().getCellKit().getLeafCluster();
 		
 		while (iter.hasNext()) {
 			BlockPos endPos = iter.next();

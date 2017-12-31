@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -71,6 +72,7 @@ public class DynamicTrees {
 	public void preInit(FMLPreInitializationEvent event) {
 		
 		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
+		CellKits.preInit();
 		TreeGenerator.preInit();//Create the generator
 			
 		ModBlocks.preInit();

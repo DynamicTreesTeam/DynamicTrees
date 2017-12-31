@@ -6,9 +6,9 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
+import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -19,11 +19,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
@@ -94,18 +92,14 @@ public abstract class DynamicTree {
 	private int smotherLeavesMax = 4;
 	/** Minimum amount of light necessary for a leaves block to be created. **/
 	protected int lightRequirement = 13;
-	/** The default hydration level of a newly created leaf block [default = 4]**/
-	protected byte defaultHydration = 4;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	private IBlockState primitiveLeaves;
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
 	private ItemStack primitiveLeavesItemStack;
-	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
-	private SimpleVoxmap leafCluster;
-	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
-	private ICellSolver cellSolver = Cells.deciduousSolver;
+	/** A CellKit for leaves automata */
+	private ICellKit cellKit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"));
 	
-
+	
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
 	private ItemStack stick;
@@ -135,7 +129,6 @@ public abstract class DynamicTree {
 		setDynamicBranch(new BlockBranch(name + "branch"));
 		setStick(new ItemStack(Items.STICK));
 		
-		setLeafCluster(LeafClusters.deciduous);
 		createSpecies();
 	}
 	
@@ -469,7 +462,7 @@ public abstract class DynamicTree {
 	}
 	
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
+		return getCellKit().getCellForBranch(branch.getRadius(blockState));
 	}
 	
 	
@@ -502,28 +495,16 @@ public abstract class DynamicTree {
 		return lightRequirement;
 	}
 	
-	public byte getDefaultHydration() {
-		return defaultHydration;
+	public void setCellKit(String name) {
+		cellKit = TreeRegistry.findCellKit(name);
 	}
 	
-	public void setCellSolver(ICellSolver solver) {
-		cellSolver = solver;
+	public void setCellKit(ResourceLocation name) {
+		cellKit = TreeRegistry.findCellKit(name);
 	}
 	
-	public ICellSolver getCellSolver() {
-		return cellSolver;
-	}
-		
-	public void setLeafCluster(SimpleVoxmap leafCluster) {
-		this.leafCluster = leafCluster;
-	}
-	
-	public SimpleVoxmap getLeafCluster() {
-		return leafCluster;
-	}
-	
-	public byte getLeafClusterPoint(BlockPos twigPos, BlockPos leafPos) {
-		return leafCluster.getVoxel(twigPos, leafPos);
+	public ICellKit getCellKit() {
+		return cellKit;
 	}
 	
 	
@@ -567,7 +548,7 @@ public abstract class DynamicTree {
 	}
 	
 	public ICell getCellForLeaves(int hydro) {
-		return Cells.normalCells[hydro];
+		return getCellKit().getCellForLeaves(hydro);
 	}
 	
 	

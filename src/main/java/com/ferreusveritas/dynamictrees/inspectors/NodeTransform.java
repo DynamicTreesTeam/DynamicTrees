@@ -47,7 +47,7 @@ public class NodeTransform implements INodeInspector {
 	public void transformSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote) {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-				if(fromTree.getLeafClusterPoint(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
+				if(fromTree.getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					if(fromTree.isCompatibleGenericLeaves(world, leavesPos)) {
 						int hydro = 2;
 						IBlockState state = world.getBlockState(leavesPos);

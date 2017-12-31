@@ -4,12 +4,8 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
-import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
 import com.ferreusveritas.dynamictrees.misc.AppleDropCreator;
-import com.ferreusveritas.dynamictrees.misc.LeafClusters;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;
@@ -85,27 +81,13 @@ public class TreeDarkOak extends DynamicTree {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		
-		setLeafCluster(LeafClusters.darkoak);
-		setCellSolver(Cells.darkOakSolver);
+		setCellKit("darkoak");
 		setSmotherLeavesMax(3);//thin canopy
 	}
 	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesDarkOak(this));
-	}
-	
-	protected static final ICell darkOakLeafCells[] = {
-			Cells.nullCell,
-			new CellDarkOakLeaf(1),
-			new CellDarkOakLeaf(2),
-			new CellDarkOakLeaf(3),
-			new CellDarkOakLeaf(4)
-		}; 
-	
-	@Override
-	public ICell getCellForLeaves(int hydro) {
-		return darkOakLeafCells[hydro];
 	}
 	
 	@Override

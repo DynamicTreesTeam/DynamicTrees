@@ -53,7 +53,7 @@ public class GenFeatureUndergrowth implements IGenFeature {
 							.withProperty(BlockOldLeaf.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE)
 							.withProperty(BlockOldLeaf.CHECK_DECAY, Boolean.valueOf(false));
 					
-					SimpleVoxmap leafMap = species.getTree().getLeafCluster();
+					SimpleVoxmap leafMap = species.getTree().getCellKit().getLeafCluster();
 					for(BlockPos dPos : leafMap.getAllNonZero()) {
 						BlockPos leafPos = pos.add(dPos);
 						if((coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {

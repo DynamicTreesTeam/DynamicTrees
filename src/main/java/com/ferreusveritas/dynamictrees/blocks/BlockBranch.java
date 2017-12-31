@@ -6,7 +6,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.CellKits;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
@@ -262,7 +262,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
 		} else {
-			return Cells.nullCell;
+			return CellKits.nullCell;
 		}
 	}
 	

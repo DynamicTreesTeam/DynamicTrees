@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.CellKits;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -253,7 +253,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	//Set the block at the provided coords to a leaf block if local light and space requirements are met 
 	public boolean growLeaves(World world, DynamicTree tree, BlockPos pos, int hydro) {
-		hydro = hydro == 0 ? tree.getDefaultHydration() : hydro;
+		hydro = hydro == 0 ? tree.getCellKit().getDefaultHydration() : hydro;
 		if(isLocationSuitableForNewLeaves(world, tree, pos)) {
 			return setBlockToLeaves(world, tree, pos, hydro);
 		}
@@ -370,7 +370,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			cells[dir.ordinal()] = TreeHelper.getSafeTreePart(state).getHydrationCell(world, deltaPos, state, dir, tree);
 		}
 		
-		return tree.getCellSolver().solve(cells);//Find center cell's value from neighbors		
+		return tree.getCellKit().getCellSolver().solve(cells);//Find center cell's value from neighbors		
 	}
 	
 	public int getHydrationLevel(IBlockState blockState) {
@@ -392,7 +392,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		if(dir != null && tree != null) {
 			return tree.getCellForLeaves(hydro);
 		} else {
-			return Cells.normalCells[hydro];
+			return CellKits.nullCell;
 		}
 	}
 
@@ -437,7 +437,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	*/
 	public boolean needLeaves(World world, BlockPos pos, DynamicTree tree) {
 		if(world.isAirBlock(pos)){//Place Leaves if Air
-			return this.growLeaves(world, tree, pos, tree.getDefaultHydration());
+			return this.growLeaves(world, tree, pos, tree.getCellKit().getDefaultHydration());
 		} else {//Otherwise check if there's already this type of leaves there.
 			IBlockState blockState = world.getBlockState(pos);
 			ITreePart treepart = TreeHelper.getSafeTreePart(blockState);
@@ -523,7 +523,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
 						
 			//Find all of the branches that are nearby
-			for(BlockPos dPos: tree.getLeafCluster().getAllNonZero()) {
+			for(BlockPos dPos: tree.getCellKit().getLeafCluster().getAllNonZero()) {
 				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));
 				IBlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
