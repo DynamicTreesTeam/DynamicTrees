@@ -26,7 +26,6 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeSpruce extends DynamicTree {
 	
@@ -105,9 +104,7 @@ public class TreeSpruce extends DynamicTree {
 		}
 		
 	}
-	
-	Species species;
-	
+		
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		
@@ -117,17 +114,7 @@ public class TreeSpruce extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesSpruce(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesSpruce(this));
 	}
 	
 	protected static final ICell spruceBranch = new CellConiferBranch();

@@ -24,7 +24,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeJungle extends DynamicTree {
 	
@@ -137,8 +136,6 @@ public class TreeJungle extends DynamicTree {
 		}
 		
 	}
-
-	Species species;
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
@@ -153,17 +150,7 @@ public class TreeJungle extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesJungle(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesJungle(this));
 	}
 	
 	@Override

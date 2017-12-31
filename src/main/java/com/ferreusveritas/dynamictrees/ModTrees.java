@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -21,17 +22,8 @@ public class ModTrees {
 	 * on the Dynamic Sapling
 	 */
 	public static void preInit() {
-		//Trees
-		baseTrees.add(new TreeOak());
-		baseTrees.add(new TreeSpruce());
-		baseTrees.add(new TreeBirch());
-		baseTrees.add(new TreeJungle());
-		baseTrees.add(new TreeAcacia());
-		baseTrees.add(new TreeDarkOak());
-	
-		for(DynamicTree tree: baseTrees) {
-			tree.registerSpecies(Species.REGISTRY);
-		}
+		Collections.addAll(baseTrees, new TreeOak(), new TreeSpruce(), new TreeBirch(), new TreeJungle(), new TreeAcacia(), new TreeDarkOak());
+		baseTrees.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
 	}
 	
 }

@@ -54,7 +54,7 @@ public class BlockBonsaiPot extends Block {
 	}
 
 	public void setupVanillaTree(DynamicTree tree) {
-		trees.put(tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).ordinal(), tree);
+		trees.put(tree.getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).ordinal(), tree);
 	}
 
 	//////////////////////////////
@@ -69,7 +69,7 @@ public class BlockBonsaiPot extends Block {
 	}
 	
 	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
-		IBlockState primitiveSapling = tree.getPrimitiveSapling();
+		IBlockState primitiveSapling = tree.getPrimitiveSaplingBlockState();
 		if(primitiveSapling.getBlock() == Blocks.SAPLING) {
 			BlockPlanks.EnumType woodType = primitiveSapling.getValue(BlockSapling.TYPE);
 			world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
@@ -99,7 +99,7 @@ public class BlockBonsaiPot extends Block {
 			
 			if(!world.isRemote) {
 				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
-				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSapling().getBlock(), 1, tree.getPrimitiveSapling().getValue(BlockSapling.TYPE).getMetadata());
+				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSaplingBlockState().getBlock(), 1, tree.getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).getMetadata());
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 

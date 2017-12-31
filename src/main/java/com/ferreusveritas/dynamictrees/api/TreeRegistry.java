@@ -94,7 +94,28 @@ public class TreeRegistry {
 	public static void registerDropCreator(IDropCreator dropCreator) {
 		globalDropCreatorStorage.addDropCreator(dropCreator);
 	}
+
+	public static void registerDropCreator(IDropCreator dropCreator, Species species) {
+		species.addDropCreator(dropCreator);
+	}
+
+	public static boolean registerDropCreator(IDropCreator dropCreator, ResourceLocation speciesName) {
+		Species species = findSpecies(speciesName);
+		if(species != null) {
+			species.addDropCreator(dropCreator);
+			return true;
+		}
+		return false;
+	}
 	
+	public static boolean registerDropCreator(IDropCreator dropCreator, String sloppyName) {
+		Species species = findSpeciesSloppy(sloppyName);
+		if(species != null) {
+			species.addDropCreator(dropCreator);
+			return true;
+		}
+		return false;
+	}
 	
 	//////////////////////////////
 	// BIOME HANDLING

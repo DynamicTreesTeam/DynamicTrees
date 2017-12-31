@@ -144,7 +144,6 @@ public class TreeOak extends DynamicTree {
 		
 	}
 	
-	Species commonSpecies;
 	Species swampSpecies;
 	Species appleSpecies;
 	
@@ -154,21 +153,16 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		commonSpecies = new SpeciesOak(this);
+		setCommonSpecies(new SpeciesOak(this));
 		swampSpecies = new SpeciesSwampOak(this);
 		appleSpecies = new SpeciesAppleOak(this);
 	}
 	
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(commonSpecies);
+		super.registerSpecies(speciesRegistry);
 		speciesRegistry.register(swampSpecies);
 		speciesRegistry.register(appleSpecies);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return commonSpecies;
 	}
 	
 	/**

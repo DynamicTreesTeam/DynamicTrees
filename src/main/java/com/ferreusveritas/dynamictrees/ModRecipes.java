@@ -24,7 +24,7 @@ public class ModRecipes {
 		
 		for(DynamicTree tree: ModTrees.baseTrees) {
 
-			IBlockState primitiveSapling = tree.getPrimitiveSapling();
+			IBlockState primitiveSapling = tree.getPrimitiveSaplingBlockState();
 
 			if(primitiveSapling != null) {
 				ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());

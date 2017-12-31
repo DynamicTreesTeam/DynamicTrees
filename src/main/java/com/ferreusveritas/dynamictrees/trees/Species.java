@@ -83,13 +83,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected int soilLongevity = 8;
 	
 	//Seeds
-	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
+	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	protected Seed seed;
 	/** The seed stack for the seed.  Hold damage value for seed items with multiple variants */
 	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
 	protected IBlockState saplingBlock;
-	/** A place to store what drops from the tree. Similar to a loot table */
+	/** A place to store what drops from the species. Similar to a loot table */
 	protected DropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 	
 	//WorldGen

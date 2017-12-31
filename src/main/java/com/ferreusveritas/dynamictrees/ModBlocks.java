@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -29,62 +27,32 @@ public class ModBlocks {
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
-		
 		blockStates = new CommonBlockStates();
 		
-		//Dirt
-		blockRootyDirt = new BlockRootyDirt();
-		
-		//Dynamic version of a Vanilla sapling
-		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");
-		
-		//Bonsai Pot
-		blockBonsaiPot = new BlockBonsaiPot();
-		
-		//Fruit
-		blockFruitCocoa = new BlockFruitCocoa();
-	
-		//Verbose Fire
-		blockVerboseFire = new BlockVerboseFire();
+		blockRootyDirt = new BlockRootyDirt();//Dirt		
+		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");//Dynamic version of a Vanilla sapling		
+		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot		
+		blockFruitCocoa = new BlockFruitCocoa();//Fruit
+		blockVerboseFire = new BlockVerboseFire();//Verbose Fire
 	}
 	
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
-
-		registry.register(ModBlocks.blockRootyDirt);
-		registry.register(ModBlocks.blockDynamicSapling);
-		registry.register(ModBlocks.blockBonsaiPot);
-		registry.register(ModBlocks.blockFruitCocoa);
-		registry.register(ModBlocks.blockVerboseFire);
-
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-
-		for(DynamicTree tree: ModTrees.baseTrees) {
-			tree.getRegisterableBlocks(treeBlocks);
-		}
-
-		for(Block block: treeBlocks) {
-			registry.register(block);
-		}
 		
-		for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			registry.register(leavesBlock);
-		}
+		ArrayList<Block> treeBlocks = new ArrayList<Block>();
+		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
 
+		registry.registerAll(blockRootyDirt, blockDynamicSapling, blockBonsaiPot, blockFruitCocoa, blockVerboseFire);
+		registry.registerAll(treeBlocks.toArray(new Block[0]));
+		
 		DynamicTrees.compatProxy.registerBlocks(registry);
 	}
 
 	public static class CommonBlockStates {
-		public final IBlockState dirt;
-		public final IBlockState podzol;
-		public final IBlockState redMushroom;
-		public final IBlockState brownMushroom;
-		
-		public CommonBlockStates() {
-			dirt = Blocks.DIRT.getDefaultState();
-			podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
-			redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
-			brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
-		}
+		public final IBlockState dirt = Blocks.DIRT.getDefaultState();
+		public final IBlockState podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
+		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
+		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
 	}
 	
 }

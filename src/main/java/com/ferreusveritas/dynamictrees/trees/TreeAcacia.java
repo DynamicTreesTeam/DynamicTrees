@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeAcacia extends DynamicTree {
 		
@@ -39,9 +38,7 @@ public class TreeAcacia extends DynamicTree {
 		}
 		
 	}
-	
-	Species species;
-	
+		
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
 
@@ -52,17 +49,7 @@ public class TreeAcacia extends DynamicTree {
 
 	@Override
 	public void createSpecies() {
-		species = new SpeciesAcacia(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesAcacia(this));
 	}
 	
 	protected static final ICell acaciaBranch = new ICell() {

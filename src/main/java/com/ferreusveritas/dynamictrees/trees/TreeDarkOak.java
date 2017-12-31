@@ -19,7 +19,6 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeDarkOak extends DynamicTree {
 	
@@ -82,9 +81,7 @@ public class TreeDarkOak extends DynamicTree {
 			return probMap;
 		}
 	}
-	
-	Species species;
-	
+		
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		
@@ -94,17 +91,7 @@ public class TreeDarkOak extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesDarkOak(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesDarkOak(this));
 	}
 	
 	protected static final ICell darkOakLeafCells[] = {
