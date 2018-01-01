@@ -51,6 +51,7 @@ public class TreeBuilder {
 	private IFoliageColorHandler dynamicLeavesColorHandler;
 
 	//Common Species
+	private ISpeciesCreator speciesCreator;
 	private IBlockState speciesSaplingBlockState;
 	private Block speciesSaplingBlock;
 	private boolean speciesCreateSeed = true;
@@ -198,6 +199,17 @@ public class TreeBuilder {
 	}
 	
 
+	/**
+	 * OPTIONAL
+	 * 
+	 * Sets the cellular automata kit to use for the {@link BlockDynamicLeaves} for this 
+	 * {@link DynamicTree}
+	 * 
+	 * A CellKit contains all the algorithms and data to make a leaves grow a certain way.
+	 * 
+	 * @param kit The Cell Kit to use.
+	 * @return TreeBuilder for chaining
+	 */
 	public TreeBuilder setCellKit(ResourceLocation kit) {
 		dynamicLeavesCellKit = kit; 
 		return this;
@@ -211,19 +223,32 @@ public class TreeBuilder {
 	 * by the handler is only ever called client side.
 	 * 
 	 * @param handler
-	 * @return
+	 * @return TreeBuilder for chaining
 	 */
 	public TreeBuilder setColorHandler(IFoliageColorHandler handler) {
 		dynamicLeavesColorHandler = handler;
 		return this;
 	}
 	
+	/**
+	 * OPTIONAL
+	 * 
+	 * Provides a way to inject a custom common species.  If this is not used
+	 * a default Species will be created for you.
+	 * 
+	 * @param speciesCreator
+	 * @return TreeBuilder for chaining
+	 */
+	public TreeBuilder setCommonSpecies(ISpeciesCreator speciesCreator) {
+		this.speciesCreator = speciesCreator;
+		return this;
+	}
 
 	/**
 	 * OPTIONAL
 	 * 
 	 * @param state A blockState that will turn into the common species of this tree
-	 * @return
+	 * @return TreeBuilder for chaining
 	 */
 	public TreeBuilder setCommonSpeciesDynamicSapling(IBlockState state) {
 		speciesCreateSapling = false;
@@ -231,11 +256,30 @@ public class TreeBuilder {
 		return this;
 	}
 	
+	/**
+	 * OPTIONAL
+	 * 
+	 * Can be used to turn off automatic seed creation.
+	 * When enabled a seed will automatically be created and
+	 * a standard seed dropper will be added to the common 
+	 * species.
+	 *  
+	 * @param isStandard true to enable automatic seed creation(default), false to disable
+	 * @return TreeBuilder for chaining
+	 */
 	public TreeBuilder setCreateSeed(boolean isStandard) {
 		speciesCreateSeed = isStandard;
 		return this;
 	}
 	
+	/**
+	 * OPTIONAL
+	 * 
+	 * Can be used to turn off automatic dynamic sapling creation.
+	 * 
+	 * @param doCreate true to enable automatic sapling creation(default), false to disable
+	 * @return TreeBuilder for chaining
+	 */
 	public TreeBuilder setCreateSapling(boolean doCreate) {
 		speciesCreateSapling = doCreate && speciesSaplingBlockState == null;
 		return this;
@@ -295,7 +339,8 @@ public class TreeBuilder {
 			
 			@Override
 			public void createSpecies() {
-				setCommonSpecies(new Species(name, this));
+				
+				setCommonSpecies(speciesCreator != null ? speciesCreator.create() : new Species(name, this));
 				
 				if(speciesCreateSeed) {
 					commonSpecies.generateSeed();
@@ -343,6 +388,10 @@ public class TreeBuilder {
 		};
 		
 		return tree;
+	}
+	
+	public interface ISpeciesCreator {
+		Species create();
 	}
 	
 }

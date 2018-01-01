@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.genfeatures;
+package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 
@@ -17,16 +17,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class GenFeatureUndergrowth implements IGenFeature {
+public class FeatureGenUndergrowth implements IGenFeature {
 
 	private Species species;
 	private int radius = 2;
 	
-	public GenFeatureUndergrowth(Species species) {
+	public FeatureGenUndergrowth(Species species) {
 		this.species = species;
 	}
 	
-	public GenFeatureUndergrowth setRadius(int radius) {
+	public FeatureGenUndergrowth setRadius(int radius) {
 		this.radius = radius;
 		return this;
 	}

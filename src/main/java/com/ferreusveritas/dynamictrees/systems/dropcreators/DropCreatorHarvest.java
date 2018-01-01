@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.misc;
+package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import java.util.Random;
 
@@ -12,13 +12,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class VoluntaryDropCreator implements IDropCreator {
+public class DropCreatorHarvest implements IDropCreator {
 
 	ResourceLocation name;
 	ItemStack droppedItem;
 	float rate;
 	
-	public VoluntaryDropCreator(ResourceLocation name, ItemStack droppedItem, float rate) {
+	public DropCreatorHarvest(ResourceLocation name, ItemStack droppedItem, float rate) {
 		this.name = name;
 		this.droppedItem = droppedItem;
 		this.rate = rate;
@@ -31,12 +31,12 @@ public class VoluntaryDropCreator implements IDropCreator {
 
 	@Override
 	public ItemStack getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, int soilLife, int fortune) {
-		return CompatHelper.emptyStack();
+		return rate > random.nextFloat() ? droppedItem : CompatHelper.emptyStack();
 	}
 
 	@Override
 	public ItemStack getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, int soilLife) {
-		return rate > random.nextFloat() ? droppedItem : CompatHelper.emptyStack();
+		return CompatHelper.emptyStack();
 	}
 
 	@Override

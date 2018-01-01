@@ -1,42 +1,34 @@
-package com.ferreusveritas.dynamictrees.potion;
+package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTransform;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SubstanceTransform implements ISubstanceEffect {
+public class SubstanceDisease implements ISubstanceEffect {
 
-	DynamicTree toTree;
-	
-	public SubstanceTransform(DynamicTree toTree) {
-		this.toTree = toTree;
-	}
-	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-
 		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
-
-		if(dirt != null && toTree != null) {
-			if(world.isRemote) {
-				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
-			} else {
-				Species species = dirt.getSpecies(world, rootPos);
-				if(species != null) {
-					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(species.getTree(), toTree)));
+		if(dirt != null) {
+			Species species = dirt.getSpecies(world, rootPos);
+			if(species != null) {
+				if(world.isRemote) {
+					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.CRIT, 8);
+				} else {
+					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeDisease(species)));
+					dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
 				}
+				return true;
 			}
-			return true;
 		}
-
+		
 		return false;
 	}
 
@@ -44,12 +36,12 @@ public class SubstanceTransform implements ISubstanceEffect {
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
 	}
-
+	
 	@Override
 	public String getName() {
-		return "transform";
+		return "disease";
 	}
-
+	
 	@Override
 	public boolean isLingering() {
 		return false;

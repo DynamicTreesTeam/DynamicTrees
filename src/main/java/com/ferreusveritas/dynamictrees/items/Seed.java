@@ -24,6 +24,15 @@ import net.minecraft.world.World;
 
 public class Seed extends Item {
 
+	public final static Seed NULLSEED = new Seed("null") {
+		{ setCreativeTab(null); }
+		@Override public void setSpecies(Species species, ItemStack seedStack) {}
+		@Override public Species getSpecies(ItemStack seedStack) { return Species.NULLSPECIES; }
+		@Override public boolean onEntityItemUpdate(EntityItem entityItem) { entityItem.setDead(); return false; }
+		@Override public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) { return EnumActionResult.FAIL; }
+		@Override public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) { return false; }
+	};
+	
 	private Species species;//The tree this seed creates
 
 	public Seed(String name) {

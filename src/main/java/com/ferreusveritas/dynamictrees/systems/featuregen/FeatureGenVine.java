@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.genfeatures;
+package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
-public class GenFeatureVine implements IGenFeature {
+public class FeatureGenVine implements IGenFeature {
 
 	protected final PropertyBool vineMap[] = new PropertyBool[] {null, null, BlockVine.NORTH, BlockVine.SOUTH, BlockVine.WEST, BlockVine.EAST};
 	protected int qty = 4;
@@ -23,26 +23,26 @@ public class GenFeatureVine implements IGenFeature {
 	protected float rayDistance = 5;
 	protected Species species;
 	
-	public GenFeatureVine(Species species) {
+	public FeatureGenVine(Species species) {
 		this.species = species;
 	}
 	
-	public GenFeatureVine setQuantity(int qty) {
+	public FeatureGenVine setQuantity(int qty) {
 		this.qty = qty;
 		return this;
 	}
 	
-	public GenFeatureVine setMaxLength(int length) {
+	public FeatureGenVine setMaxLength(int length) {
 		this.maxLength = length;
 		return this;
 	}
 	
-	public GenFeatureVine setVerSpread(float verSpread) {
+	public FeatureGenVine setVerSpread(float verSpread) {
 		this.verSpread = verSpread;
 		return this;
 	}
 	
-	public GenFeatureVine setRayDistance(float rayDistance) {
+	public FeatureGenVine setRayDistance(float rayDistance) {
 		this.rayDistance = rayDistance;
 		return this;
 	}

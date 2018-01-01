@@ -2,13 +2,15 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.api.treedata.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.ResourceLocation;
@@ -24,30 +26,12 @@ import net.minecraft.world.biome.Biome;
 public class TreeRegistry {
 
 	private static final ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
-	public static final DropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
+	public static final IDropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
 	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>(); 
 	
 	//////////////////////////////
-	// TREE REGISTRY
+	// SPECIES REGISTRY
 	//////////////////////////////
-	
-	/**
-	 * Mods should use this to register their {@link DynamicTree}
-	 * 
-	 * Places the tree in a central registry.
-	 * The proper place to use this is during the preInit phase of your mod.
-	 * 
-	 * @param species The dynamic tree being registered
-	 * @return DynamicTree for chaining
-	 */
-	public static Species registerSpecies(Species species) {
-		Species.REGISTRY.register(species);
-		return species;
-	}
-
-	public static void registerSpecies(Species ... values) {
-		Species.REGISTRY.registerAll(values);
-	}
 	
 	public static Species findSpecies(ResourceLocation name) {
 		return Species.REGISTRY.getValue(name);
@@ -81,12 +65,18 @@ public class TreeRegistry {
 			}
 		}
 		
-		return null;
+		return Species.NULLSPECIES;
 	}
-
+	
+	public static List<ResourceLocation> getSpeciesDirectory() {
+		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
+	}
+	
 	//////////////////////////////
 	// DROP HANDLING
 	//////////////////////////////
+	
+	public static final ResourceLocation globalName = new ResourceLocation(ModConstants.MODID, "global");
 	
 	/**
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
@@ -94,30 +84,27 @@ public class TreeRegistry {
 	 * 
 	 * @param dropCreator
 	 */
-	public static void registerDropCreator(IDropCreator dropCreator) {
-		globalDropCreatorStorage.addDropCreator(dropCreator);
-	}
-
-	public static void registerDropCreator(IDropCreator dropCreator, Species species) {
-		species.addDropCreator(dropCreator);
-	}
-
-	public static boolean registerDropCreator(IDropCreator dropCreator, ResourceLocation speciesName) {
-		Species species = findSpecies(speciesName);
-		if(species != null) {
-			species.addDropCreator(dropCreator);
-			return true;
+	public static boolean registerDropCreator(ResourceLocation speciesName, IDropCreator dropCreator) {
+		if(speciesName == null || speciesName.equals(globalName)) {
+			return globalDropCreatorStorage.addDropCreator(dropCreator);
+		} else {
+			return findSpecies(speciesName).addDropCreator(dropCreator);
 		}
-		return false;
 	}
 	
-	public static boolean registerDropCreator(IDropCreator dropCreator, String sloppyName) {
-		Species species = findSpeciesSloppy(sloppyName);
-		if(species != null) {
-			species.addDropCreator(dropCreator);
-			return true;
+	public static boolean removeDropCreator(ResourceLocation speciesName, ResourceLocation dropCreatorName) {
+		if(speciesName == null || speciesName.equals(globalName)) {
+			return globalDropCreatorStorage.remDropCreator(dropCreatorName);
+		} else {
+			return findSpecies(speciesName).remDropCreator(dropCreatorName);
 		}
-		return false;
+	}
+	
+	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
+		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<ResourceLocation, Map<ResourceLocation, IDropCreator>>();
+		dir.put(globalName, globalDropCreatorStorage.getDropCreators());
+		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
+		return dir;
 	}
 	
 	//////////////////////////////

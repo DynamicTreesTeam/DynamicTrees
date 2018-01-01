@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.genfeatures;
+package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 import java.util.Random;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
-public class GenFeaturePodzol implements IGenFeature {
+public class FeatureGenPodzol implements IGenFeature {
 	
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints) {

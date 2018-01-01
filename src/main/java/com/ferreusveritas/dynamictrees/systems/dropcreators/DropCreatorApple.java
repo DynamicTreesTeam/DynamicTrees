@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.misc;
+package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import java.util.Random;
 
@@ -14,9 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class AppleDropCreator implements IDropCreator {
+public class DropCreatorApple implements IDropCreator {
 
-	public static final AppleDropCreator instance = new AppleDropCreator();
+	public static final DropCreatorApple instance = new DropCreatorApple();
 	
 	@Override
 	public ResourceLocation getName() {

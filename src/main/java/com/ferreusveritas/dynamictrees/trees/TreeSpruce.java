@@ -8,9 +8,9 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.misc.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -29,7 +29,7 @@ public class TreeSpruce extends DynamicTree {
 	
 	public class SpeciesSpruce extends Species {
 
-		GenFeaturePodzol podzolGen;
+		FeatureGenPodzol podzolGen;
 		
 		SpeciesSpruce(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -43,7 +43,7 @@ public class TreeSpruce extends DynamicTree {
 			
 			setupStandardSeedDropping();
 
-			podzolGen = new GenFeaturePodzol();
+			podzolGen = new FeatureGenPodzol();
 		}
 		
 		@Override

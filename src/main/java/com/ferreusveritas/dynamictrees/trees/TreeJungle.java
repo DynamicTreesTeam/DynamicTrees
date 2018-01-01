@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureUndergrowth;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
-import com.ferreusveritas.dynamictrees.misc.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
@@ -29,8 +29,8 @@ public class TreeJungle extends DynamicTree {
 	
 	public class SpeciesJungle extends Species {
 
-		GenFeatureVine vineGen;
-		GenFeatureUndergrowth underGen;
+		FeatureGenVine vineGen;
+		FeatureGenUndergrowth underGen;
 		
 		SpeciesJungle(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -45,8 +45,8 @@ public class TreeJungle extends DynamicTree {
 			
 			setupStandardSeedDropping();
 			
-			vineGen = new GenFeatureVine(this);
-			underGen = new GenFeatureUndergrowth(this);
+			vineGen = new FeatureGenVine(this);
+			underGen = new FeatureGenUndergrowth(this);
 		}
 
 		@Override

@@ -19,7 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -62,26 +62,34 @@ import net.minecraftforge.registries.IForgeRegistry;
 * 
 * @author ferreusveritas
 */
-public abstract class DynamicTree {
+public class DynamicTree {
+	
+	public final static DynamicTree NULLTREE = new DynamicTree() {
+		@Override public void setCommonSpecies(Species species) {}
+		@Override public void setCellKit(ResourceLocation name) {}
+		@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
+		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
+		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
+	};
 	
 	/** Simple name of the tree e.g. "oak" */
 	private final ResourceLocation name;
-
-	protected Species commonSpecies;
+	
+	protected Species commonSpecies = Species.NULLSPECIES;
 	
 	//Branches
 	/** The dynamic branch used by this tree */
 	private BlockBranch dynamicBranch;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
-	private IBlockState primitiveLog;
+	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
-	private ItemStack primitiveLogItemStack;
+	private ItemStack primitiveLogItemStack = CompatHelper.emptyStack();
 	
 	//Saplings
 	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
-	private IBlockState primitiveSaplingBlockState;
+	private IBlockState primitiveSaplingBlockState = Blocks.AIR.getDefaultState();
 	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
-	private ItemStack primitiveSaplingItemStack;
+	private ItemStack primitiveSaplingItemStack = CompatHelper.emptyStack();
 	
 	//Leaves
 	/** The dynamic leaves used by this tree */
@@ -93,16 +101,16 @@ public abstract class DynamicTree {
 	/** Minimum amount of light necessary for a leaves block to be created. **/
 	protected int lightRequirement = 13;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
-	private IBlockState primitiveLeaves;
+	private IBlockState primitiveLeaves = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
-	private ItemStack primitiveLeavesItemStack;
+	private ItemStack primitiveLeavesItemStack = ItemStack.EMPTY;
 	/** A CellKit for leaves automata */
 	private ICellKit cellKit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"));
 	
 	
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
-	private ItemStack stick;
+	private ItemStack stick = new ItemStack(Items.STICK);
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 	
@@ -110,6 +118,10 @@ public abstract class DynamicTree {
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
+	}
+	
+	public DynamicTree() {
+		this.name = new ResourceLocation(ModConstants.MODID, "null");
 	}
 	
 	/**
@@ -127,7 +139,6 @@ public abstract class DynamicTree {
 			setDynamicLeaves(name.getResourceDomain(), seq);
 		}
 		setDynamicBranch(new BlockBranch(name + "branch"));
-		setStick(new ItemStack(Items.STICK));
 		
 		createSpecies();
 	}
@@ -177,7 +188,7 @@ public abstract class DynamicTree {
 		commonSpecies.generateSeed();
 	}
 	
-	public abstract void createSpecies();
+	public void createSpecies() {}
 	
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		speciesRegistry.register(commonSpecies);
@@ -295,7 +306,7 @@ public abstract class DynamicTree {
 		itemList.add(new ItemBlock(dynamicBranch).setRegistryName(dynamicBranch.getRegistryName()));
 		
 		Seed seed = getCommonSpecies().getSeed();
-		if(seed != null) {
+		if(seed != Seed.NULLSEED) {
 			itemList.add(seed);
 		}
 		return itemList;

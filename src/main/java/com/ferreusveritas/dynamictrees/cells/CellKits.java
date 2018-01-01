@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 public class CellKits {
-		
+	
 	public static void preInit() {
 		new CellKits();
 	}
@@ -25,7 +25,7 @@ public class CellKits {
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {
-
+		
 		private final ICell normalCells[] = {
 				CellNull.nullCell,
 				new CellNormal(1),
@@ -36,47 +36,47 @@ public class CellKits {
 				new CellNormal(6),
 				new CellNormal(7)
 		};
-
+		
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new CellNormal(5);
-
+		
 		private final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211});
 		
 		@Override
 		public ICell getCellForLeaves(int hydro) {
 			return normalCells[hydro];
 		}
-
+		
 		@Override
 		public ICell getCellForBranch(int radius) {
 			return radius == 1 ? branchCell : CellNull.nullCell;
 		}
-
+		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
 			return LeafClusters.deciduous;
 		}
-
+		
 		@Override
 		public ICellSolver getCellSolver() {
 			return deciduousSolver;
 		}
-
+		
 		@Override
 		public int getDefaultHydration() {
 			return 4;
 		}
 		
 	};
-
+	
 	
 	
 	private final ICellKit conifer = new ICellKit() {
 		
-		private final ICell spruceBranch = new CellConiferBranch();
-		private final ICell spruceTopBranch = new CellConiferTopBranch();
-
-		private final ICell spruceLeafCells[] = {
+		private final ICell coniferBranch = new CellConiferBranch();
+		private final ICell coniferTopBranch = new CellConiferTopBranch();
+		
+		private final ICell coniferLeafCells[] = {
 			CellNull.nullCell,
 			new CellConiferLeaf(1),
 			new CellConiferLeaf(2),
@@ -88,30 +88,30 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForLeaves(int hydro) {
-			return spruceLeafCells[hydro];
+			return coniferLeafCells[hydro];
 		}
-
+		
 		@Override
 		public ICell getCellForBranch(int radius) {
 			if(radius == 1) {
-				return spruceBranch;
+				return coniferBranch;
 			} else if(radius == 128) {
-				return spruceTopBranch;
+				return coniferTopBranch;
 			} else {
 				return CellNull.nullCell;
 			}
 		}
-
+		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
 			return LeafClusters.conifer;
 		}
-
+		
 		@Override
 		public ICellSolver getCellSolver() {
 			return coniferSolver;
 		}
-
+		
 		@Override
 		public int getDefaultHydration() {
 			return 4;
@@ -122,13 +122,13 @@ public class CellKits {
 	
 	
 	private final ICellKit acacia = new ICellKit() {
-
+		
 		private final ICell acaciaBranch = new ICell() {
 			@Override
 			public int getValue() {
 				return 5;
 			}
-
+			
 			final int map[] = {0, 3, 5, 5, 5, 5};
 			
 			@Override
@@ -145,29 +145,29 @@ public class CellKits {
 				new CellAcaciaLeaf(3),
 				new CellAcaciaLeaf(4)
 			}; 
-
+		
 		private final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
 		
 		@Override
 		public ICell getCellForLeaves(int hydro) {
 			return acaciaLeafCells[hydro];
 		}
-
+		
 		@Override
 		public ICell getCellForBranch(int radius) {
 			return radius == 1 ? acaciaBranch : CellNull.nullCell;
 		}
-
+		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
 			return LeafClusters.acacia;
 		}
-
+		
 		@Override
 		public ICellSolver getCellSolver() {
 			return acaciaSolver;
 		}
-
+		
 		@Override
 		public int getDefaultHydration() {
 			return 4;
@@ -177,7 +177,7 @@ public class CellKits {
 	
 	
 	private final ICellKit darkoak = new ICellKit() {
-
+		
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new CellNormal(5);
 		
@@ -195,7 +195,7 @@ public class CellKits {
 		public ICell getCellForLeaves(int hydro) {
 			return darkOakLeafCells[hydro];
 		}
-
+		
 		@Override
 		public ICell getCellForBranch(int radius) {
 			return radius == 1 ? branchCell : CellNull.nullCell;
@@ -205,12 +205,12 @@ public class CellKits {
 		public SimpleVoxmap getLeafCluster() {
 			return LeafClusters.darkoak;
 		}
-
+		
 		@Override
 		public ICellSolver getCellSolver() {
 			return darkOakSolver;
 		}
-
+		
 		@Override
 		public int getDefaultHydration() {
 			return 4;
@@ -247,7 +247,7 @@ public class CellKits {
 	}
 	
 	static public class BasicSolver implements ICellSolver {
-
+		
 		private final short codes[];
 		
 		public BasicSolver(short codes[]) {

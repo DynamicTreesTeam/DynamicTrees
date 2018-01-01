@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.inspectors;
+package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import java.util.ArrayList;
 

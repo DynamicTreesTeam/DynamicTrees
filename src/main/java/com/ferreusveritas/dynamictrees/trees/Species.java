@@ -12,19 +12,20 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.misc.GrowSignal;
-import com.ferreusveritas.dynamictrees.misc.SeedDropCreator;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -56,18 +57,38 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
+	public final static Species NULLSPECIES = new Species() {
+		@Override public Seed getSeed() { return Seed.NULLSEED; }
+		@Override public void addJoCodes() {}
+		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
+		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
+		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) { return false; }
+		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
+		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
+		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
+		@Override public void setupStandardSeedDropping() {}
+	};
+	
+	/**
+	 * Mods should use this to register their {@link Species}
+	 * 
+	 * Places the species in a central registry.
+	 * The proper place to use this is during the preInit phase of your mod.
+	 */
 	public static IForgeRegistry<Species> REGISTRY;
 	
-	public static void newRegistry(RegistryEvent.NewRegistry event) {
+	public static void newRegistry(RegistryEvent.NewRegistry event) {		
 		REGISTRY = new RegistryBuilder<Species>()
 				.setName(new ResourceLocation(ModConstants.MODID, "species"))
+				.setDefaultKey(new ResourceLocation(ModConstants.MODID, "null"))
+				.disableSaving()
 				.setType(Species.class)
 				.setIDRange(0, Integer.MAX_VALUE - 1)
 				.create();
 	}
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected  final DynamicTree treeFamily;
+	protected final DynamicTree treeFamily;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -84,19 +105,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
-	protected Seed seed;
-	/** The seed stack for the seed.  Hold damage value for seed items with multiple variants */
-	protected ItemStack seedStack;
+	/** Hold damage value for seed items with multiple variants */
+	protected ItemStack seedStack = new ItemStack(Seed.NULLSEED);
 	/** A blockState that will turn itself into this tree */
-	protected IBlockState saplingBlock;
+	protected IBlockState saplingBlock = Blocks.AIR.getDefaultState();
 	/** A place to store what drops from the species. Similar to a loot table */
-	protected DropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
+	protected IDropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	protected TreeCodeStore joCodeStore;
+	protected TreeCodeStore joCodeStore = new TreeCodeStore(this);
+
+	public Species() {
+		this.treeFamily = DynamicTree.NULLTREE;
+	}
 	
 	/**
 	 * Constructor suitable for derivative mods
@@ -183,37 +207,45 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	public Seed getSeed() {
-		return seed;
+		return (Seed) seedStack.getItem();
 	}
 	
 	/**
 	 * Generate a seed. Developer is still required to register the item
 	 * in the appropriate registries.
 	 */
-	public Seed generateSeed() {
-		seed = new Seed(getRegistryName().getResourcePath() + "seed");
+	public ItemStack generateSeed() {
+		Seed seed = new Seed(getRegistryName().getResourcePath() + "seed");
 		return setSeedStack(new ItemStack(seed));
 	}
 	
-	public Seed setSeedStack(ItemStack newSeedStack) {
+	public ItemStack setSeedStack(ItemStack newSeedStack) {
 		if(newSeedStack.getItem() instanceof Seed) {
 			seedStack = newSeedStack;
-			seed = (Seed) seedStack.getItem();
+			Seed seed = (Seed) seedStack.getItem();
 			seed.setSpecies(this, seedStack);
-			return seed;
+			return seedStack;
 		} else {
 			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
 		}
-		return null;
-	}
-	
-	public void addDropCreator(IDropCreator dropCreator) {
-		dropCreatorStorage.addDropCreator(dropCreator);
+		return CompatHelper.emptyStack();
 	}
 
 	//It's mostly for seeds.. mostly.
 	public void setupStandardSeedDropping() {
-		dropCreatorStorage.addDropCreator(new SeedDropCreator());
+		dropCreatorStorage.addDropCreator(new DropCreatorSeed());
+	}
+	
+	public boolean addDropCreator(IDropCreator dropCreator) {
+		return dropCreatorStorage.addDropCreator(dropCreator);
+	}
+
+	public boolean remDropCreator(ResourceLocation dropCreatorName) {
+		return dropCreatorStorage.remDropCreator(dropCreatorName);
+	}
+	
+	public Map<ResourceLocation, IDropCreator> getDropCreators() {
+		return dropCreatorStorage.getDropCreators();
 	}
 	
 	/**
@@ -855,7 +887,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
 	 */
 	public void addJoCodes() {
-		joCodeStore = new TreeCodeStore(this);
 		joCodeStore.addCodesFromFile("assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	

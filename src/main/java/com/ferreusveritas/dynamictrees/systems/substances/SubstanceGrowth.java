@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.potion;
+package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;

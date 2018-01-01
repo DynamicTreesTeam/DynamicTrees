@@ -5,9 +5,9 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.misc.AppleDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockPlanks;
@@ -39,7 +39,7 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.FOREST, 1.05f);
 			
 			setupStandardSeedDropping();
-			addDropCreator(AppleDropCreator.instance);
+			addDropCreator(DropCreatorApple.instance);
 		}
 		
 		@Override
@@ -55,7 +55,7 @@ public class TreeOak extends DynamicTree {
 	 */
 	public class SpeciesSwampOak extends Species {
 		
-		GenFeatureVine vineGen;
+		FeatureGenVine vineGen;
 		
 		SpeciesSwampOak(DynamicTree treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily);
@@ -67,7 +67,7 @@ public class TreeOak extends DynamicTree {
 			
 			setupStandardSeedDropping();
 						
-			vineGen = new GenFeatureVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6);
+			vineGen = new FeatureGenVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6);
 		}
 		
 		@Override
