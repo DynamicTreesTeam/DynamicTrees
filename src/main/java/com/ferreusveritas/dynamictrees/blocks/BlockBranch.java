@@ -199,13 +199,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-		
-		if(tree != null) {
-			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
-		}
-		
-		return false;
+		return TreeHelper.getSafeTreePart(world, pos).getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	@Override

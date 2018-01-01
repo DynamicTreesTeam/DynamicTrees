@@ -70,6 +70,7 @@ public class DynamicTree {
 		@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
+		@Override public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) { return false; }
 	};
 	
 	/** Simple name of the tree e.g. "oak" */
@@ -274,10 +275,7 @@ public class DynamicTree {
 			}
 
 			//Empty hand or inactive substance
-			Species species = getExactSpecies(world, hitPos);
-			if(species != null) {
-				species.onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
-			}
+			getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 
 		return false;

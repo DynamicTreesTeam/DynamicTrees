@@ -67,6 +67,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
 		@Override public void setupStandardSeedDropping() {}
+		@Override public boolean update(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 	
 	/**

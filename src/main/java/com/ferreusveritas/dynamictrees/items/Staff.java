@@ -74,7 +74,7 @@ public class Staff extends Item {
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
 			Species species = DynamicTree.getExactSpecies(world, rootPos);
-			if(species != null) {
+			if(species != Species.NULLSPECIES) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
 					setCode(heldStack, code);

@@ -30,7 +30,7 @@ public class SubstanceTransform implements ISubstanceEffect {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 			} else {
 				Species species = dirt.getSpecies(world, rootPos);
-				if(species != null) {
+				if(species != Species.NULLSPECIES) {
 					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(species.getTree(), toTree)));
 				}
 			}

@@ -150,7 +150,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 		DynamicTree tree = TreeHelper.getSafeTreePart(world, deltaPos).getTree(world, deltaPos);
 
-		if(tree != null && tree.getDynamicLeaves() == this) {//Attempt to match the proper dynamic leaves for the tree being clicked on
+		if(tree.getDynamicLeaves() == this) {//Attempt to match the proper dynamic leaves for the tree being clicked on
 			return getDefaultState().withProperty(TREE, tree.getDynamicLeavesSub());
 		}
 
@@ -497,13 +497,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess access, BlockPos pos, IBlockState state, int fortune) {
-				
-		Species species = getExactSpecies(access, pos, getTree(state));
+		
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-
-		if(species != null) {
-			species.getLeavesDrops(access, pos, ret, fortune);
-		}
+		getExactSpecies(access, pos, getTree(state)).getLeavesDrops(access, pos, ret, fortune);
 
 		return ret;
 	}

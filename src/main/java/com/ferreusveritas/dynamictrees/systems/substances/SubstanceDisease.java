@@ -18,7 +18,7 @@ public class SubstanceDisease implements ISubstanceEffect {
 		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 		if(dirt != null) {
 			Species species = dirt.getSpecies(world, rootPos);
-			if(species != null) {
+			if(species != Species.NULLSPECIES) {
 				if(world.isRemote) {
 					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.CRIT, 8);
 				} else {
