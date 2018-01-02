@@ -61,6 +61,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
 		@Override public void addJoCodes() {}
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
+		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
@@ -494,9 +495,21 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return saplingBlock;
 	}
 	
-	public boolean placeSaplingBlock(World world, BlockPos pos) {
-		world.setBlockState(pos, getDynamicSapling());
-		return true;
+	/**
+	 * Checks surroundings and places a dynamic sapling block.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return true if the planting was successful
+	 */
+	public boolean plantSapling(World world, BlockPos pos) {
+		
+		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+			world.setBlockState(pos, getDynamicSapling());
+			return true;
+		}
+		
+		return false;
 	}
 
 	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {

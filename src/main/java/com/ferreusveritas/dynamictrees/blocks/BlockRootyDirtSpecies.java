@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntityRootyDirt;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -14,18 +14,30 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockRootyDirtTE extends BlockRootyDirt implements ITileEntityProvider {
+/**
+ * A version of Rooty Dirt block that holds on to a species with a TileEntity.
+ *
+ * When to use this:
+ *  You can't determine a species of a tree family by location alone (e.g. Swamp Oak by biome)
+ * 	The species is rare and you don't want to commit all the resources necessary to make a whole tree family(e.g. Apple Oak)
+ * 
+ * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link DynamicTree} family.
+ * 
+ * @author ferreusveritas
+ *
+ */
+public class BlockRootyDirtSpecies extends BlockRootyDirt implements ITileEntityProvider {
 	
-	static String name = "rootydirt_te";
+	static String name = "rootydirtspecies";
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicType.class);
 	
-	public BlockRootyDirtTE() {
+	public BlockRootyDirtSpecies() {
 		this(name);
 	}
 	
-	public BlockRootyDirtTE(String name) {
+	public BlockRootyDirtSpecies(String name) {
 		super(name);
         this.isBlockContainer = true;
 	}
@@ -58,14 +70,14 @@ public class BlockRootyDirtTE extends BlockRootyDirt implements ITileEntityProvi
 	}
 
 	/**
-	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
-	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
+	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be. In this
+	 * version we'll use a stored value to determine the species.
 	 */
 	public Species getSpecies(World world, BlockPos pos) {
 		DynamicTree tree = getTree(world, pos);
 		TileEntity entity = world.getTileEntity(pos);
-		if(tree!= DynamicTree.NULLTREE && entity instanceof TileEntityRootyDirt) {
-			TileEntityRootyDirt rootyDirtTE = (TileEntityRootyDirt) entity;
+		if(tree!= DynamicTree.NULLTREE && entity instanceof TileEntitySpecies) {
+			TileEntitySpecies rootyDirtTE = (TileEntitySpecies) entity;
 			Species species = rootyDirtTE.getSpecies();
 			if(species.getTree() == tree) {//As a sanity check we should see if the tree and the stored species are a match
 				return rootyDirtTE.getSpecies();

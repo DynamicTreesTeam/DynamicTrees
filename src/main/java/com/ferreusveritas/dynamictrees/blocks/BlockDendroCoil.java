@@ -101,7 +101,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void plantTree(World world, BlockPos pos, String treeName) {
 		Species species = TreeRegistry.findSpeciesSloppy(treeName);
-		species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack(1));
+		species.plantSapling(world, pos.up(2));
 	}
 
 	public void growPulse(World world, BlockPos pos) {

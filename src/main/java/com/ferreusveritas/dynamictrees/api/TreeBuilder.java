@@ -340,7 +340,7 @@ public class TreeBuilder {
 			@Override
 			public void createSpecies() {
 				
-				setCommonSpecies(speciesCreator != null ? speciesCreator.create() : new Species(name, this));
+				setCommonSpecies(speciesCreator != null ? speciesCreator.create(this) : new Species(name, this));
 				
 				if(speciesCreateSeed) {
 					commonSpecies.generateSeed();
@@ -391,7 +391,7 @@ public class TreeBuilder {
 	}
 	
 	public interface ISpeciesCreator {
-		Species create();
+		Species create(DynamicTree tree);
 	}
 	
 }

@@ -89,7 +89,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		@Override
 		public String getName() {
 			return name;
-		} 
+		}
 		
 		public IBlockState getBlockState() {
 			return muse;
