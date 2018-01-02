@@ -22,6 +22,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
@@ -137,6 +138,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
+		addDropCreator(new DropCreatorLogs());
 	}
 	
 	public DynamicTree getTree() {
@@ -295,6 +297,23 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
 		return dropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
 	}
+	
+	
+	/**
+	 * Gets a {@link List} of Logs drops.  Logs drops are {@link ItemStack}s that result from the breaking of
+	 * a {@link BlockBranch} directly by hand or with a tool.
+	 * 
+	 * @param world
+	 * @param breakPos
+	 * @param dropList
+	 * @param volume
+	 * @return
+	 */
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, int volume) {
+		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+	}
+	
 	
 	/**
 	 * 

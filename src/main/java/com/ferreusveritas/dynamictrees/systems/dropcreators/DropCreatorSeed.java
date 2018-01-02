@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -32,17 +32,20 @@ public class DropCreatorSeed implements IDropCreator {
 	}
 	
 	@Override
-	public ItemStack getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, int soilLife, int fortune) {
-		return random.nextInt(64) == 0 ? species.getSeedStack(1) : CompatHelper.emptyStack();//1 in 64 chance to drop a seed on destruction..
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+		return dropList;
 	}
 
 	@Override
-	public ItemStack getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, int soilLife) {
-		return rarity * ModConfigs.seedDropRate > random.nextFloat() ? species.getSeedStack(1) : CompatHelper.emptyStack();
+	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
+		if(rarity * ModConfigs.seedDropRate > random.nextFloat()) {
+			dropList.add(species.getSeedStack(1));
+		}
+		return dropList;
 	}
 
 	@Override
-	public ItemStack getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, int fortune) {		
+	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
 		//Hokey fortune stuff here to match Vanilla logic.
 		if (fortune > 0) {
@@ -51,7 +54,19 @@ public class DropCreatorSeed implements IDropCreator {
 				chance = 10;
 			}
 		}
-		return random.nextInt(chance) == 0 ? species.getSeedStack(1) : CompatHelper.emptyStack();
+		
+		if(random.nextInt(chance) == 0) {
+			dropList.add(species.getSeedStack(1));
+		}
+		
+		return dropList;
 	}
+
+	@Override
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+		return dropList;
+	}
+
+
 		
 }

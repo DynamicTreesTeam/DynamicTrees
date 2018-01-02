@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -14,10 +15,12 @@ public interface IDropCreator {
 	
 	ResourceLocation getName();
 	
-	ItemStack getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, int soilLife, int fortune);
+	List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune);
 	
-	ItemStack getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, int soilLife);
+	List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife);
 	
-	ItemStack getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, int fortune);
+	List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune);
+
+	List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume);
 	
 }

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -26,6 +26,11 @@ import net.minecraft.world.World;
 public class DropCreatorStorage implements IDropCreatorStorage {
 	
 	private HashMap<ResourceLocation, IDropCreator> dropCreators = new HashMap<ResourceLocation, IDropCreator>();
+
+	@Override
+	public ResourceLocation getName() {
+		return new ResourceLocation(ModConstants.MODID, "storage");
+	}
 	
 	@Override
 	public boolean addDropCreator(IDropCreator dropCreator) {
@@ -60,10 +65,7 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {
-			ItemStack stack = dropCreator.getHarvestDrop(world, species, leafPos, random, soilLife, fortune);
-			if(!CompatHelper.isStackEmpty(stack)) {
-				dropList.add(stack);
-			}
+			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, soilLife, fortune);
 		}
 		
 		return dropList;
@@ -74,10 +76,7 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {
-			ItemStack stack = dropCreator.getVoluntaryDrop(world, species, rootPos, random, soilLife);
-			if(!CompatHelper.isStackEmpty(stack)) {
-				dropList.add(stack);
-			}
+			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, soilLife);
 		}
 		
 		return dropList;
@@ -88,13 +87,20 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {
-			ItemStack stack = dropCreator.getLeavesDrop(access, species, breakPos, random, fortune);
-			if(!CompatHelper.isStackEmpty(stack)) {
-				dropList.add(stack);
-			}
+			dropList = dropCreator.getLeavesDrop(access, species, breakPos, random, dropList, fortune);
 		}
 		
 		return dropList;
 	}
 	
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int volume) {
+		dropList = makeDropListIfNull(dropList);
+		
+		for(IDropCreator dropCreator : dropCreators.values()) {
+			dropList = dropCreator.getLogsDrop(world, species, rootPos, random, dropList, volume);
+		}
+		
+		return dropList;
+	}
+
 }

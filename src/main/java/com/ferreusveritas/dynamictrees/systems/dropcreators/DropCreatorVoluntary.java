@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -30,18 +30,26 @@ public class DropCreatorVoluntary implements IDropCreator {
 	}
 
 	@Override
-	public ItemStack getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, int soilLife, int fortune) {
-		return CompatHelper.emptyStack();
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+		return dropList;
 	}
 
 	@Override
-	public ItemStack getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, int soilLife) {
-		return rate > random.nextFloat() ? droppedItem : CompatHelper.emptyStack();
+	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
+		if(rate > random.nextFloat()) {
+			dropList.add(droppedItem);
+		}
+		return dropList;
 	}
 
 	@Override
-	public ItemStack getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, int fortune) {
-		return CompatHelper.emptyStack();
+	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+		return dropList;
 	}
 
+	@Override
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+		return dropList;
+	}
+	
 }
