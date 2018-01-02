@@ -53,6 +53,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable {
 	
+	public static boolean passableLeavesModLoaded = false;
+	
 	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
 	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
 	
@@ -175,7 +177,10 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean unknown) {
-		if (!ModConfigs.isLeavesPassable) {
+		if(passableLeavesModLoaded) {
+			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, unknown);
+		} 
+		else if (!ModConfigs.isLeavesPassable) {
 			AxisAlignedBB aabb = new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 		}
@@ -224,20 +229,24 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 	}
 
-
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity.motionY < 0.0D && entity.fallDistance < 2.0f) {
-			entity.fallDistance = 0.0f;
-			entity.motionY *= 0.5D;//Slowly sink into the block
-		} else
-		if (entity.motionY > 0 && entity.motionY < 0.25D) {
-			entity.motionY += 0.025;//Allow a little climbing
-		}
+		if(passableLeavesModLoaded) {
+			super.onEntityCollidedWithBlock(world, pos, state, entity);
+		} 
+		else {
+			if (entity.motionY < 0.0D && entity.fallDistance < 2.0f) {
+				entity.fallDistance = 0.0f;
+				entity.motionY *= 0.5D;//Slowly sink into the block
+			} else
+				if (entity.motionY > 0 && entity.motionY < 0.25D) {
+					entity.motionY += 0.025;//Allow a little climbing
+				}
 
-		entity.setSprinting(false);//One cannot sprint upon tree tops
-		entity.motionX *= 0.25D;//Make travel slow and laborious
-		entity.motionZ *= 0.25D;
+			entity.setSprinting(false);//One cannot sprint upon tree tops
+			entity.motionX *= 0.25D;//Make travel slow and laborious
+			entity.motionZ *= 0.25D;
+		}
 	}
 
 	@Override
@@ -601,8 +610,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	*/
 
 	@Override
-	public boolean isPassable(IBlockAccess p_isPassable_1_, BlockPos p_isPassable_2_) {
-		return ModConfigs.isLeavesPassable;
+	public boolean isPassable(IBlockAccess access, BlockPos pos) {
+		return passableLeavesModLoaded ? super.isPassable(access, pos) : ModConfigs.isLeavesPassable;
 	}
 
 	@Override
