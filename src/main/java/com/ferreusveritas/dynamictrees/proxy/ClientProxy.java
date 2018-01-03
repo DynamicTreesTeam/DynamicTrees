@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -83,6 +84,9 @@ public class ClientProxy extends CommonProxy {
 			ModelHelper.regModel(tree.getCommonSpecies().getSeed());//Register Seed Item Models
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
+		
+		//Special seed for apple
+		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));

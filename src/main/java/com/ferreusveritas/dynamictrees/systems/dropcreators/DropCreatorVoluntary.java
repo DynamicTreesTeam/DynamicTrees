@@ -37,7 +37,7 @@ public class DropCreatorVoluntary implements IDropCreator {
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
 		if(rate > random.nextFloat()) {
-			dropList.add(droppedItem);
+			dropList.add(droppedItem.copy());
 		}
 		return dropList;
 	}

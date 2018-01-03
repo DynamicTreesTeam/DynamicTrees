@@ -60,7 +60,7 @@ public class BlockRootyDirtSpecies extends BlockRootyDirt implements ITileEntity
     
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return null;
+		return new TileEntitySpecies();
 	}
 
 	@Override
@@ -69,20 +69,31 @@ public class BlockRootyDirtSpecies extends BlockRootyDirt implements ITileEntity
 		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : DynamicTree.NULLTREE;
 	}
 
+	@Override
+	public void setSoilLife(World world, BlockPos pos, int life) {
+		Species species = getSpecies(world, pos);
+		super.setSoilLife(world, pos, life);
+		getTileEntitySpecies(world, pos).setSpecies(species);
+	}
+	
+	private TileEntitySpecies getTileEntitySpecies(World world, BlockPos pos) {
+		return (TileEntitySpecies) world.getTileEntity(pos);
+	}
+	
 	/**
 	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be. In this
 	 * version we'll use a stored value to determine the species.
 	 */
 	public Species getSpecies(World world, BlockPos pos) {
 		DynamicTree tree = getTree(world, pos);
-		TileEntity entity = world.getTileEntity(pos);
-		if(tree!= DynamicTree.NULLTREE && entity instanceof TileEntitySpecies) {
-			TileEntitySpecies rootyDirtTE = (TileEntitySpecies) entity;
+		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, pos);
+		
+		if(tree != DynamicTree.NULLTREE && rootyDirtTE instanceof TileEntitySpecies) {
 			Species species = rootyDirtTE.getSpecies();
 			if(species.getTree() == tree) {//As a sanity check we should see if the tree and the stored species are a match
 				return rootyDirtTE.getSpecies();
 			}
-		}
+		}		
 		return tree.getCommonSpecies();
 	}
 	

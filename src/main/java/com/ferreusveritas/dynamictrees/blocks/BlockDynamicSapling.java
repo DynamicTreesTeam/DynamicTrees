@@ -74,7 +74,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch with 1 radius
 				world.setBlockState(pos.up(), tree.getDynamicLeavesState());//Place a single leaf block on top
-				world.setBlockState(pos.down(), species.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt underneath
+				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			}
 		} else {
 			dropBlock(world, species, state, pos);
@@ -162,6 +162,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	
 	@Override
 	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
+		System.out.println("test");
 		return getSpecies(state).canGrowWithBoneMeal(world, pos);
 	}
 	

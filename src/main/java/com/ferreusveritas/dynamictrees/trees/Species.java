@@ -60,6 +60,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public final static Species NULLSPECIES = new Species() {
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
+		@Override public DynamicTree getTree() { return DynamicTree.NULLTREE; }
 		@Override public void addJoCodes() {}
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
@@ -237,7 +238,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 	//It's mostly for seeds.. mostly.
 	public void setupStandardSeedDropping() {
-		dropCreatorStorage.addDropCreator(new DropCreatorSeed());
+		addDropCreator(new DropCreatorSeed());
 	}
 	
 	public boolean addDropCreator(IDropCreator dropCreator) {
@@ -547,6 +548,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return ModBlocks.blockRootyDirt;
 	}
 	
+	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
+		world.setBlockState(rootPos, getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, life));
+		return true;
+	}
+	
 	public void setSoilLongevity(int longevity) {
 		soilLongevity = longevity;
 	}
@@ -567,7 +573,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
+		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock instanceof BlockRootyDirt;
 	}
 	
 	/**

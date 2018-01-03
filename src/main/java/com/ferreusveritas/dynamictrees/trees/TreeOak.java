@@ -4,17 +4,27 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingSpecies;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorVoluntary;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -94,13 +104,13 @@ public class TreeOak extends DynamicTree {
 		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
 		public ItemStack getSeedStack(int qty) {
-			return commonSpecies.getSeedStack(qty);
+			return getCommonSpecies().getSeedStack(qty);
 		}
 		
 		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
 		public Seed getSeed() {
-			return commonSpecies.getSeed();
+			return getCommonSpecies().getSeed();
 		}
 		
 		@Override
@@ -115,10 +125,15 @@ public class TreeOak extends DynamicTree {
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
+	
+	
 	public class SpeciesAppleOak extends Species {
 
+		BlockDynamicSaplingSpecies sapling;
+		private static final String speciesName = "apple";
+		
 		public SpeciesAppleOak(DynamicTree treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), "apple"), treeFamily);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
@@ -127,12 +142,48 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.HOT, 0.75f);
 			envFactor(Type.DRY, 0.25f);
 			
-			setupStandardSeedDropping();
+			generateSeed();
+
+			addDropCreator(new DropCreatorApple());
+			addDropCreator(new DropCreatorHarvest(new ResourceLocation(ModConstants.MODID, "appleharvest"), new ItemStack(Items.APPLE), 0.05f));
+			addDropCreator(new DropCreatorVoluntary(new ResourceLocation(ModConstants.MODID, "applevoluntary"), new ItemStack(Items.APPLE), 0.05f));
+			
+			sapling = new BlockDynamicSaplingSpecies(speciesName + "sapling");
+			setDynamicSapling(sapling.getDefaultState());
 		}
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
+		}
+		
+		@Override
+		public boolean plantSapling(World world, BlockPos pos) {
+			super.plantSapling(world, pos);
+			TileEntity tileEntity = world.getTileEntity(pos);
+			if(tileEntity instanceof TileEntitySpecies) {
+				TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+				speciesTE.setSpecies(this);
+				return true;
+			}
+			return false;
+		}
+		
+		@Override
+		public BlockRootyDirt getRootyDirtBlock() {
+			return ModBlocks.blockRootyDirtSpecies;
+		}
+		
+		@Override
+		public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
+			super.placeRootyDirtBlock(world, rootPos, life);
+			TileEntity tileEntity = world.getTileEntity(rootPos);
+			if(tileEntity instanceof TileEntitySpecies) {
+				TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+				speciesTE.setSpecies(this);
+				return true;
+			}
+			return true;
 		}
 		
 		@Override
@@ -163,6 +214,18 @@ public class TreeOak extends DynamicTree {
 		super.registerSpecies(speciesRegistry);
 		speciesRegistry.register(swampSpecies);
 		speciesRegistry.register(appleSpecies);
+	}
+	
+	@Override
+	public List<Item> getRegisterableItems(List<Item> itemList) {
+		itemList.add(appleSpecies.getSeed());
+		return super.getRegisterableItems(itemList);
+	}
+	
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList.add(appleSpecies.getDynamicSapling().getBlock());
+		return super.getRegisterableBlocks(blockList);
 	}
 	
 	/**

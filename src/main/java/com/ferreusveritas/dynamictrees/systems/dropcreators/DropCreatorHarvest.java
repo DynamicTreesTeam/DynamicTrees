@@ -32,7 +32,7 @@ public class DropCreatorHarvest implements IDropCreator {
 	@Override
 	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
 		if(rate > random.nextFloat()) {
-			dropList.add(droppedItem);
+			dropList.add(droppedItem.copy());
 		}
 		return dropList;
 	}

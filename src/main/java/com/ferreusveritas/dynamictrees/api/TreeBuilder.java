@@ -343,8 +343,8 @@ public class TreeBuilder {
 				setCommonSpecies(speciesCreator != null ? speciesCreator.create(this) : new Species(name, this));
 				
 				if(speciesCreateSeed) {
-					commonSpecies.generateSeed();
-					commonSpecies.setupStandardSeedDropping();
+					getCommonSpecies().generateSeed();
+					getCommonSpecies().setupStandardSeedDropping();
 				}
 				
 				if(speciesCreateSapling) {
@@ -353,18 +353,13 @@ public class TreeBuilder {
 				}
 				
 				if(speciesSaplingBlockState != null) {
-					commonSpecies.setDynamicSapling(speciesSaplingBlockState);
+					getCommonSpecies().setDynamicSapling(speciesSaplingBlockState);
 				}
 			}
 
 			@Override
 			public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 				return super.getCellForBranch(blockAccess, pos, blockState, dir, branch);
-			}
-			
-			@Override
-			public Species getCommonSpecies() {
-				return commonSpecies;
 			}
 			
 			@Override

@@ -66,6 +66,7 @@ public class DynamicTree {
 	
 	public final static DynamicTree NULLTREE = new DynamicTree() {
 		@Override public void setCommonSpecies(Species species) {}
+		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
 		@Override public void setCellKit(ResourceLocation name) {}
 		@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
@@ -180,19 +181,14 @@ public class DynamicTree {
 	}
 	
 	protected void simpleVanillaCommonSpecies(BlockPlanks.EnumType wood) {
-
-		commonSpecies = (Species) getCommonSpecies();
-					
-		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-	
-		//Generate a seed
-		commonSpecies.generateSeed();
+		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		getCommonSpecies().generateSeed();
 	}
 	
 	public void createSpecies() {}
 	
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(commonSpecies);
+		speciesRegistry.register(getCommonSpecies());
 	}
 	
 	public void setCommonSpecies(Species species) {
@@ -448,7 +444,7 @@ public class DynamicTree {
 			return rootBlock.getSpecies(world, rootPos);
 		}
 		
-		return null;
+		return Species.NULLSPECIES;
 	}
 	
 
