@@ -57,8 +57,8 @@ public class ModelHelper {
 	public static void regDynamicSaplingColorHandler(BlockDynamicSapling sapling) {
 		regColorHandler(sapling, new IBlockColor() {
 			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return sapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
+			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+				return sapling.getSpecies(access, pos, state).getTree().foliageColorMultiplier(state, access, pos);
 			}
 		});
 	}

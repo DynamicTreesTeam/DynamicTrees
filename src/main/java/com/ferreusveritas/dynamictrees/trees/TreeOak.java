@@ -6,17 +6,13 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingSpecies;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorVoluntary;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -24,7 +20,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -125,11 +120,8 @@ public class TreeOak extends DynamicTree {
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
-	
-	
-	public class SpeciesAppleOak extends Species {
+	public class SpeciesAppleOak extends SpeciesRare {
 
-		BlockDynamicSaplingSpecies sapling;
 		private static final String speciesName = "apple";
 		
 		public SpeciesAppleOak(DynamicTree treeFamily) {
@@ -143,47 +135,17 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			
 			generateSeed();
-
+			
 			addDropCreator(new DropCreatorApple());
 			addDropCreator(new DropCreatorHarvest(new ResourceLocation(ModConstants.MODID, "appleharvest"), new ItemStack(Items.APPLE), 0.05f));
 			addDropCreator(new DropCreatorVoluntary(new ResourceLocation(ModConstants.MODID, "applevoluntary"), new ItemStack(Items.APPLE), 0.05f));
 			
-			sapling = new BlockDynamicSaplingSpecies(speciesName + "sapling");
-			setDynamicSapling(sapling.getDefaultState());
+			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
 		}
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
-		}
-		
-		@Override
-		public boolean plantSapling(World world, BlockPos pos) {
-			super.plantSapling(world, pos);
-			TileEntity tileEntity = world.getTileEntity(pos);
-			if(tileEntity instanceof TileEntitySpecies) {
-				TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
-				speciesTE.setSpecies(this);
-				return true;
-			}
-			return false;
-		}
-		
-		@Override
-		public BlockRootyDirt getRootyDirtBlock() {
-			return ModBlocks.blockRootyDirtSpecies;
-		}
-		
-		@Override
-		public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-			super.placeRootyDirtBlock(world, rootPos, life);
-			TileEntity tileEntity = world.getTileEntity(rootPos);
-			if(tileEntity instanceof TileEntitySpecies) {
-				TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
-				speciesTE.setSpecies(this);
-				return true;
-			}
-			return true;
 		}
 		
 		@Override
@@ -218,14 +180,8 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public List<Item> getRegisterableItems(List<Item> itemList) {
-		itemList.add(appleSpecies.getSeed());
+		itemList.add(appleSpecies.getSeed());//Since we generated the apple species internally we need to let the seed out to be registered.
 		return super.getRegisterableItems(itemList);
-	}
-	
-	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList.add(appleSpecies.getDynamicSapling().getBlock());
-		return super.getRegisterableBlocks(blockList);
 	}
 	
 	/**

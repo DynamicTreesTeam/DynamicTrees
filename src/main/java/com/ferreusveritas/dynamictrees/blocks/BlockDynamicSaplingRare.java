@@ -1,19 +1,43 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockDynamicSaplingSpecies extends BlockDynamicSapling implements ITileEntityProvider {
+public class BlockDynamicSaplingRare extends BlockDynamicSapling implements ITileEntityProvider {
 	
-	public BlockDynamicSaplingSpecies(String name) {
+	public BlockDynamicSaplingRare(String name) {
 		super(name);
 		isBlockContainer = true;
 	}
+	
+	@Override
+	public BlockDynamicSapling setSpecies(IBlockState state, Species species) {
+		//A tile entity version of the dynamic sapling does not contain a blockState mapped reference to a species.
+		//The species is determined at runtime by tileEntity data.
+		return this;
+	}
+	
+	@Override
+	public Species getSpecies(IBlockAccess access, BlockPos pos, IBlockState state) {
+		TileEntity tileEntity = access.getTileEntity(pos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies tileEntitySpecies = (TileEntitySpecies) tileEntity;
+			return tileEntitySpecies.getSpecies();
+		}
+		return Species.NULLSPECIES;
+	}
+	
+	
+	///////////////////////////////////////////
+	// TILE ENTITY STUFF
+	///////////////////////////////////////////
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
