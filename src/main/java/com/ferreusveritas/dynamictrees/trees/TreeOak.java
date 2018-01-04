@@ -160,7 +160,7 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
-			if(soilLife < 4) { //TODO: Analyze fruit production based off of tree wood volume to determine fruit producing maturity
+			if(soilLife < 4 && !rapid) { //TODO: Analyze fruit production based off of tree wood volume to determine fruit producing maturity
 				NodeFindEnds endFinder = new NodeFindEnds();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 				appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds());

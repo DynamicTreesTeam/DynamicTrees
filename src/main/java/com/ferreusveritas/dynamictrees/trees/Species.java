@@ -354,77 +354,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	///////////////////////////////////////////
 	
 	/**
-	 * 
-	 * @param world
-	 * @param baseTreePart
-	 * @param rootPos
-	 * @param treePos
-	 * @param soilLife
-	 * @return true if fruit was created
-	 */
-	public boolean handleFruit(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife, int qty) {
-		
-		int count = 0;
-		int attempts = 0;
-		
-		if(qty > 0) {
-			while(endPoints.size() > 0 && (count < qty) && (attempts < (qty * 2))) {
-				int bSelect = world.rand.nextInt(endPoints.size());
-				BlockPos branchPos = endPoints.get(bSelect);
-				attempts++;
-				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-				BlockPos fruitPos = getRayTraceFruitPos(world, treePos, branchPos);
-				if(fruitPos != BlockPos.ORIGIN && placeFruit(world, fruitPos)) {
-					count++;
-				}
-			}
-		}
-
-		return count > 0;
-	}
-	
-	/**
-	 * Get the number of fruit to produce on an update.  If more control is desired then
-	 * override handleFruit().
-	 * 
-	 * @param world
-	 * @param rootPos
-	 * @return
-	 */
-	protected int getFruitQty(World world, BlockPos rootPos) {
-		return 0;
-	}
-	
-	/**
-	 * Get the {@link IBlockState} of the fruitBlock to place during handleFruit().
-	 * If more control is desired then override placeFruit() or handleFruit(). 
-	 * 
-	 * @param world
-	 * @param fruitPos
-	 * @return
-	 */
-	protected IBlockState getFruit(World world, BlockPos fruitPos) {
-		return null;
-	}
-	
-	/**
-	 * Places the fruit.  This can be overridden to create more advanced
-	 * structures.
-	 * 
-	 * @param world
-	 * @param fruitPos
-	 * @return
-	 */
-	protected boolean placeFruit(World world, BlockPos fruitPos) {
-		IBlockState fruit = getFruit(world, fruitPos);
-		if(fruit != null) {
-			world.setBlockState(fruitPos, fruit);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
 	 * Find a suitable position for seed drops or fruit placement using ray tracing.
 	 * 
 	 * @param world The world
@@ -619,12 +548,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		if(!rapid) {
 			//This will handle seed drops
 			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
-			
-			//This will handle fruit spawning
-			int fruitQty = getFruitQty(world, rootPos);
-			if(fruitQty > 0) {
-				handleFruit(world, ends, rootPos, treePos, soilLife, fruitQty);
-			}
 			
 			//This will handle disease chance
 			if(handleDisease(world, treeBase, treePos, random, soilLife)) {
