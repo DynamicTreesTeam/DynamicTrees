@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHills;
+import net.minecraft.world.biome.BiomePlains;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
@@ -27,6 +28,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	private Species jungle;
 	private Species darkoak;
 	private Species oakswamp;
+	private Species apple;
 	
 	private StaticDecision staticOakDecision;
 	private StaticDecision staticSpruceDecision;
@@ -52,7 +54,18 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	private class RandomDecision implements ITreeSelector {
 
-		ArrayList<Decision> table = new ArrayList<Decision>();
+		private class Entry {
+			public Entry(Decision d, int w) {
+				decision = d;
+				weight = w;
+			}
+			
+			public Decision decision;
+			public int weight;
+		}
+		
+		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
+		int totalWeight;
 		Random rand;
 		
 		public RandomDecision(Random rand) {
@@ -60,20 +73,23 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		}
 		
 		public RandomDecision addSpecies(Species species, int weight) {
-			while(weight-- > 0) {
-				table.add(new Decision(species));
-			}
-			return this;
-		}
-		
-		public RandomDecision end() {
-			table.trimToSize();
+			decisionTable.add(new Entry(new Decision(species), weight));
+			totalWeight += weight;
 			return this;
 		}
 		
 		@Override
 		public Decision getDecision() {
-			return table.get(rand.nextInt(table.size()));
+			int chance = rand.nextInt(totalWeight);
+			
+			for(Entry entry: decisionTable) {
+				if(chance < entry.weight) {
+					return entry.decision;
+				}
+				chance -= entry.weight;
+			};
+
+			return decisionTable.get(decisionTable.size() - 1).decision;
 		}
 		
 	}
@@ -92,6 +108,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		jungle = TreeRegistry.findSpeciesSloppy("jungle");
 		darkoak = TreeRegistry.findSpeciesSloppy("darkoak");
 		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
+		apple = TreeRegistry.findSpeciesSloppy("apple");
 		
 		staticOakDecision = new StaticDecision(new Decision(oak));
 		staticSpruceDecision = new StaticDecision(new Decision(spruce));
@@ -111,7 +128,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	@Override
 	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
-		
+
 		int biomeId = Biome.getIdForBiome(biome);
 		ITreeSelector select;
 				
@@ -120,7 +137,10 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		}
 		else {
 			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
-				select = new RandomDecision(world.rand).addSpecies(oak, 1).addSpecies(spruce, 2).end();
+				select = new RandomDecision(world.rand).addSpecies(spruce, 2).addSpecies(oak, 1);
+			}
+			else if(biome instanceof BiomePlains) {
+				select = new RandomDecision(world.rand).addSpecies(oak, 24).addSpecies(apple, 1);
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
 				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
@@ -132,7 +152,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = staticBirchDecision;
 				} else {//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
-					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1).end();
+					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1);
 				}
 			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
 				select = staticDarkOakDecision;
