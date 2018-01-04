@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -59,7 +61,18 @@ public class ModRecipes {
 			}
 
 		}
-
+		
+		//Create an apple seed from an apple and dirt bucket
+		GameRegistry.addShapelessRecipe(
+			new ResourceLocation(ModConstants.MODID, "appleseed"),
+			null,
+			Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeedStack(1),
+			new Ingredient[]{
+				Ingredient.fromStacks(new ItemStack(Items.APPLE)),
+				Ingredient.fromItem(ModItems.dirtBucket)
+			}
+		);
+		
 		DynamicTrees.compatProxy.registerRecipes(registry);
 	}
 	
