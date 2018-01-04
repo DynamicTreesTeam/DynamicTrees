@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -41,7 +41,7 @@ public class FeatureGenUndergrowth implements IGenFeature {
 			int rad = MathHelper.clamp(radius, 2, world.rand.nextInt(radius - 1) + 2);
 			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
 
-			BlockPos pos = TreeHelper.findGround(world, new BlockPos(v));
+			BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
 			IBlockState soilBlockState = world.getBlockState(pos);
 
 			if(species.isAcceptableSoil(world, pos, soilBlockState)) {

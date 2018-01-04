@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.BlockVine;
@@ -59,20 +60,22 @@ public class FeatureGenVine implements IGenFeature {
 	
 	protected void addVine(World world, Species species, BlockPos treePos, BlockPos branchPos) {
 		
-		RayTraceResult result = species.branchRayTrace(world, treePos, branchPos, 90, verSpread, rayDistance);
+		RayTraceResult result = CoordUtils.branchRayTrace(world, species, treePos, branchPos, 90, verSpread, rayDistance);
 		
 		if(result != null) {
 			BlockPos vinePos = result.getBlockPos().offset(result.sideHit);
-			PropertyBool vineSide = vineMap[result.sideHit.getOpposite().getIndex()];
-			if(vineSide != null) {
-				IBlockState vineState = Blocks.VINE.getDefaultState().withProperty(vineSide, Boolean.valueOf(true));
-				int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
-				for(int i = 0; i < len; i++) {
-					if(world.isAirBlock(vinePos)) {
-						world.setBlockState(vinePos, vineState);
-						vinePos = vinePos.down();
-					} else {
-						break;
+			if(vinePos != BlockPos.ORIGIN) {
+				PropertyBool vineSide = vineMap[result.sideHit.getOpposite().getIndex()];
+				if(vineSide != null) {
+					IBlockState vineState = Blocks.VINE.getDefaultState().withProperty(vineSide, Boolean.valueOf(true));
+					int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
+					for(int i = 0; i < len; i++) {
+						if(world.isAirBlock(vinePos)) {
+							world.setBlockState(vinePos, vineState);
+							vinePos = vinePos.down();
+						} else {
+							break;
+						}
 					}
 				}
 			}

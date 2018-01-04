@@ -4,11 +4,10 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 public class FeatureGenFruit implements IGenFeature {
@@ -56,17 +55,10 @@ public class FeatureGenFruit implements IGenFeature {
 	}
 	
 	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos) {
-		RayTraceResult result = species.branchRayTrace(world, treePos, branchPos, 90, verSpread, rayDistance);
-		
-		if(result != null) {
-			BlockPos leafPos = result.getBlockPos();
-			if(world.getBlockState(leafPos).getBlock() instanceof BlockLeaves) {
-				while(world.getBlockState(leafPos).getBlock() instanceof BlockLeaves) {
-					leafPos = leafPos.down();
-				}
-				if(world.isAirBlock(leafPos) && ( !enableHash || ( (coordHashCode(leafPos) & 1) != 0) ) ) {
-					world.setBlockState(leafPos, fruitState);
-				}
+		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos);
+		if(fruitPos != BlockPos.ORIGIN) {
+			if ( !enableHash || ( (coordHashCode(fruitPos) & 1) != 0) ) {
+				world.setBlockState(fruitPos, fruitState);
 			}
 		}
 	}
