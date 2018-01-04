@@ -110,6 +110,14 @@ public class ClientProxy extends CommonProxy {
 			}
 		});
 
+		//Register Rootydirt Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+				return BiomeColorHelper.getGrassColorAtPos(world, pos);
+			}
+		});
+		
 		//Register Sapling Colorizers
 		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);
 		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSaplingSpecies);

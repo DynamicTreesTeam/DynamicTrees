@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingRare;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtSpecies;
@@ -24,6 +25,7 @@ public class ModBlocks {
 	public static BlockRootyDirt blockRootyDirtSpecies;
 	public static BlockDynamicSapling blockDynamicSapling;
 	public static BlockDynamicSaplingRare blockDynamicSaplingSpecies;
+	public static BlockFruit blockFruit;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockVerboseFire blockVerboseFire;
@@ -38,7 +40,8 @@ public class ModBlocks {
 		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");//Dynamic version of a Vanilla sapling
 		blockDynamicSaplingSpecies = new BlockDynamicSaplingRare("saplingrare");//Species extended sapling(Apple)
 		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
-		blockFruitCocoa = new BlockFruitCocoa();//Fruit
+		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
+		blockFruit = new BlockFruit();//Apple
 		blockVerboseFire = new BlockVerboseFire();//Verbose Fire
 	}
 	
@@ -48,7 +51,7 @@ public class ModBlocks {
 		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
 
-		registry.registerAll(blockRootyDirt, blockRootyDirtSpecies, blockDynamicSapling, blockDynamicSaplingSpecies, blockBonsaiPot, blockFruitCocoa, blockVerboseFire);
+		registry.registerAll(blockRootyDirt, blockRootyDirtSpecies, blockDynamicSapling, blockDynamicSaplingSpecies, blockBonsaiPot, blockFruitCocoa, blockFruit, blockVerboseFire);
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 		
 		DynamicTrees.compatProxy.registerBlocks(registry);

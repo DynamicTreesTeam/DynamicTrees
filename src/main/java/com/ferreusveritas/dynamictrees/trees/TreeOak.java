@@ -6,11 +6,14 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorVoluntary;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockPlanks;
@@ -122,6 +125,7 @@ public class TreeOak extends DynamicTree {
 	 */
 	public class SpeciesAppleOak extends SpeciesRare {
 
+		FeatureGenFruit appleGen;
 		private static final String speciesName = "apple";
 		
 		public SpeciesAppleOak(DynamicTree treeFamily) {
@@ -136,10 +140,10 @@ public class TreeOak extends DynamicTree {
 			
 			generateSeed();
 			
-			addDropCreator(new DropCreatorApple());
-			addDropCreator(new DropCreatorHarvest(new ResourceLocation(ModConstants.MODID, "appleharvest"), new ItemStack(Items.APPLE), 0.05f));
-			addDropCreator(new DropCreatorVoluntary(new ResourceLocation(ModConstants.MODID, "applevoluntary"), new ItemStack(Items.APPLE), 0.05f));
+			addDropCreator(new DropCreatorHarvest(new ResourceLocation(ModConstants.MODID, "appleharvest"), new ItemStack(Items.APPLE), 0.025f));
 			
+			appleGen = new FeatureGenFruit(this, ModBlocks.blockFruit.getDefaultState()).setRayDistance(4);
+
 			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
 		}
 		
@@ -149,10 +153,19 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos pos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
-			super.postGeneration(world, pos, biome, radius, endPoints, worldGen);
-			
-			// TODO Add Apples
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
+			appleGen.setQuantity(10).setEnableHash(false).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3)).gen(world, rootPos.up(), endPoints);
+		}
+		
+		@Override
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+			if(soilLife < 4) { //TODO: Analyze fruit production based off of tree wood volume to determine fruit producing maturity
+				NodeFindEnds endFinder = new NodeFindEnds();
+				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
+				appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds());
+			}
+			return true;
 		}
 		
 	}

@@ -38,6 +38,7 @@ public class QuarkProxyActiveClient extends QuarkProxyBase {
 		if(greenerGrass != null && greenerGrass.enabled) {// Does there Quark?
 			// Register the RootyDirtBlock(Put meat in Quark)
 			registerGreenerColor(ModBlocks.blockRootyDirt);
+			registerGreenerColor(ModBlocks.blockRootyDirtSpecies);
 			
 			// Conditionally register all of the base mod leaves(Fill Quark with more meats)
 			if(affectFolliage) {
