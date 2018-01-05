@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
+import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
@@ -35,6 +36,7 @@ public class CommonProxy {
 	public void registerCommonEventHandlers() {
 		//Common Events.. unused at the moment
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
+		MinecraftForge.EVENT_BUS.register(new DropEventHandler());
 
 		//An event for dealing with Vanilla Saplings
 		if(ModConfigs.replaceVanillaSapling) {
