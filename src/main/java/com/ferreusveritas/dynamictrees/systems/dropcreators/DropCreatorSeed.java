@@ -33,6 +33,9 @@ public class DropCreatorSeed implements IDropCreator {
 	
 	@Override
 	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+		if(random.nextInt(64) == 0) {//1 in 64 chance to drop a seed on destruction..	
+			dropList.add(species.getSeedStack(1));
+		}
 		return dropList;
 	}
 
