@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
@@ -47,7 +46,6 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.FOREST, 1.05f);
 			
 			setupStandardSeedDropping();
-			addDropCreator(DropCreatorApple.instance);
 		}
 		
 		@Override

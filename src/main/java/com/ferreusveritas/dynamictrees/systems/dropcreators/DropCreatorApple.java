@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.init.Items;
@@ -12,25 +11,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
-public class DropCreatorApple implements IDropCreator {
+/**
+ * A drop creator that drops apples just like Vanilla trees.
+ * No longer used by any of the trees in the base mod on account of
+ * the addition of the apple species.  Left for demonstration purposes
+ * or in case I change my mind about something.
+ * 
+ * @author ferreusveritas
+ *
+ */
+public class DropCreatorApple extends DropCreator {
 
 	public static final DropCreatorApple instance = new DropCreatorApple();
 	
-	@Override
-	public ResourceLocation getName() {
-		return new ResourceLocation(ModConstants.MODID, "apple");
-	}
-	
-	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		return dropList;
-	}
-
-	@Override
-	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		return dropList;
+	public DropCreatorApple() {
+		super(new ResourceLocation(ModConstants.MODID, "apple"));
 	}
 
 	@Override
@@ -47,11 +43,6 @@ public class DropCreatorApple implements IDropCreator {
 		if(random.nextInt(chance) == 0) {
 			dropList.add(new ItemStack(Items.APPLE));
 		}
-		return dropList;
-	}
-
-	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
 		return dropList;
 	}
 

@@ -5,7 +5,6 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;
@@ -34,7 +33,6 @@ public class TreeDarkOak extends DynamicTree {
 			envFactor(Type.MUSHROOM, 1.25f);
 
 			setupStandardSeedDropping();
-			addDropCreator(DropCreatorApple.instance);
 		}
 
 		@Override
