@@ -36,7 +36,9 @@ public class CommonProxy {
 	public void registerCommonEventHandlers() {
 		//Common Events.. unused at the moment
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
-		MinecraftForge.EVENT_BUS.register(new DropEventHandler());
+		if(ModConfigs.worldGen) {
+			MinecraftForge.EVENT_BUS.register(new DropEventHandler());
+		}
 
 		//An event for dealing with Vanilla Saplings
 		if(ModConfigs.replaceVanillaSapling) {

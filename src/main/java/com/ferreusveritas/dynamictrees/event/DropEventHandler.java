@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class DropEventHandler {
 	
 	@SubscribeEvent
-	public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {		
+	public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {	
 		if(event.getState().getBlock() == Blocks.LEAVES || event.getState().getBlock() == Blocks.LEAVES2) {
 			Iterator<ItemStack> iter = event.getDrops().iterator();
 			while(iter.hasNext()) {
