@@ -325,26 +325,30 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if seed was dropped
 	 */
 	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		
-		List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
-		
-		if(!drops.isEmpty() && !endPoints.isEmpty()) {
-			for(ItemStack drop: drops) {
-				BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-				BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos);
+		int tickSpeed = world.getGameRules().getInt("randomTickSpeed");
+		if(tickSpeed > 0) {
+			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
+			if(world.rand.nextDouble() < slowFactor) {
+				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
 
-				if(itemPos != BlockPos.ORIGIN) {
-					EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
-					Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
-					float distAngle = 15;//The spread angle(center to edge)
-					float launchSpeed = 4;//Blocks(meters) per second
-					motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-					CompatHelper.spawnEntity(world, itemEntity, motion);
+				if(!drops.isEmpty() && !endPoints.isEmpty()) {
+					for(ItemStack drop: drops) {
+						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos);
+
+						if(itemPos != BlockPos.ORIGIN) {
+							EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
+							float distAngle = 15;//The spread angle(center to edge)
+							float launchSpeed = 4;//Blocks(meters) per second
+							motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+							CompatHelper.spawnEntity(world, itemEntity, motion);
+						}
+					}
 				}
 			}
 		}
-		
 		return true;
 	}
 
