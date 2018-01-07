@@ -281,7 +281,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		IBlockState belowBlockState = world.getBlockState(pos.down());
 
 		//Prevent leaves from growing on the ground or above liquids
-		if(belowBlockState.isOpaqueCube() || belowBlockState.getBlock() instanceof BlockLiquid) {
+		if((belowBlockState.isFullCube() && (!(belowBlockState.getBlock() instanceof BlockLeaves)) ) || belowBlockState.getBlock() instanceof BlockLiquid) {
 			return false;
 		}
 
@@ -481,6 +481,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(needLeaves(world, pos.offset(dir), tree)) {
 				hasLeaves = true;
+				break;
 			}
 		}
 
