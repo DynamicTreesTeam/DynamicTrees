@@ -134,10 +134,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 
-		if(hydro > 1) {
-			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
-				growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
-			}
+		//We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
+		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
+			growLeaves(world, tree, pos.offset(dir));//Attempt to grow new leaves
 		}
 		
 		return false;//Leaves were not destroyed
