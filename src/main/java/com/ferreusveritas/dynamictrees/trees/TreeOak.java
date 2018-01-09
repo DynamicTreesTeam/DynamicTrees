@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
@@ -44,6 +46,10 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.50f);
 			envFactor(Type.FOREST, 1.05f);
+			
+			if(ModConfigs.worldGen && !ModConfigs.enableAppleTrees) {
+				addDropCreator(new DropCreatorApple());
+			}
 			
 			setupStandardSeedDropping();
 		}
@@ -158,7 +164,7 @@ public class TreeOak extends DynamicTree {
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
-			if(soilLife < 4 && !rapid) { //TODO: Analyze fruit production based off of tree wood volume to determine fruit producing maturity
+			if(ModConfigs.enableAppleTrees && soilLife < 4 && !rapid) { //TODO: Analyze fruit production based off of tree wood volume to determine fruit producing maturity
 				NodeFindEnds endFinder = new NodeFindEnds();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 				appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds());

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector;
@@ -140,7 +141,11 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 				select = new RandomDecision(world.rand).addSpecies(spruce, 2).addSpecies(oak, 1);
 			}
 			else if(biome instanceof BiomePlains) {
-				select = new RandomDecision(world.rand).addSpecies(oak, 24).addSpecies(apple, 1);
+				if(ModConfigs.enableAppleTrees) {
+					select = new RandomDecision(world.rand).addSpecies(oak, 24).addSpecies(apple, 1);
+				} else {
+					select = staticOakDecision;
+				}
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
 				if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
