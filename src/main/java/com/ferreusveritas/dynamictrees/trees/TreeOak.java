@@ -47,7 +47,7 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.DRY, 0.50f);
 			envFactor(Type.FOREST, 1.05f);
 			
-			if(ModConfigs.worldGen && !ModConfigs.enableAppleTrees) {
+			if(ModConfigs.worldGen && !ModConfigs.enableAppleTrees) {//If we've disabled apple trees we still need some way to get apples.
 				addDropCreator(new DropCreatorApple());
 			}
 			

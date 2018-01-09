@@ -33,7 +33,7 @@ public class ModConfigs {
 		ignoreBiomeGrowthRate = config.getBoolean("ignoreBiomeGrowthRate", "trees", false, "If enabled all trees grow as if they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
 		isLeavesPassable = config.getBoolean("isLeavesPassable", "trees", false, "If enabled all leaves will be passable");
-		enableAppleTrees = config.getBoolean("disableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
+		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
 			
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
 				
