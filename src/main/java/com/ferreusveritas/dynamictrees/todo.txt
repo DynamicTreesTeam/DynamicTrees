@@ -54,15 +54,15 @@
     │   │   │
     │   │   ╰[ ]Jungle buttress roots
     │   │
-    │   ╰[ ]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
+    │   ╰[✔]┬BlockRootyDirtExtended(TileEntity Version) for holding a species identifier
     │       │
-    │       ╰[ ]┬Apple Trees
+    │       ╰[✔]┬Apple Trees
     │           │
-    │           ├[ ]Oaks no longer drop apples(after Apple Tree is implemented)
-    │           ├[ ]Apple fruit block
-    │           ├[ ]Apple pip crafted from apple and dirt bucket
+    │           ├[✔]Oaks no longer drop apples(after Apple Tree is implemented)
+    │           ├[✔]Apple fruit block
+    │           ├[✔]Apple pip crafted from apple and dirt bucket
     │           ├[ ]JoCode tree models for WorldGen 
-    │           ╰[ ]Spawn randomly in plains biome
+    │           ╰[✔]Spawn randomly in plains biome
     │
     ├[✔]Improved Fire Behavior
     │
@@ -77,7 +77,6 @@
     │   │
     │   ╰[ ]Create a drop provider interface with some sensible default implementations
     │
-    ├[ ]API
     ├[ ]Cacti
     ├[ ]Seasons
     ├[ ]Trees fall over when harvested
@@ -118,5 +117,5 @@
 ┕━━━┯━━━━━━━━━┙
     │
     ├[✔]Forge Compatible Species Registry(IForgeRegistry<Species>)
-    ╰[ ]Make Tree Builder for easily making custom Trees.
+    ╰[✔]Make Tree Builder for easily making custom Trees.
 
