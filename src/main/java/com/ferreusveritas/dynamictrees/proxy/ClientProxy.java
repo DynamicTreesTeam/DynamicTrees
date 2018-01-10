@@ -100,7 +100,7 @@ public class ClientProxy extends CommonProxy {
 	
 	public void registerColorHandlers() {
 		
-		final int white = 0x00FFFFFF;
+		final int white = 0xFFFFFFFF;
 		final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 		
 		//BLOCKS
@@ -109,7 +109,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return BiomeColorHelper.getGrassColorAtPos(world, pos);
+				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
 			}
 		});
 		
@@ -117,7 +117,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return ModBlocks.blockDynamicSapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
+				return world == null || pos == null ? white : ModBlocks.blockDynamicSapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
 			}
 		});
 		
@@ -125,7 +125,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
+				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
 			}
 		});
 		
