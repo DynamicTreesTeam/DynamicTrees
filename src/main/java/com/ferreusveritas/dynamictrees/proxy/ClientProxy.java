@@ -97,7 +97,7 @@ public class ClientProxy extends CommonProxy {
 	
 	public void registerColorHandlers() {
 		
-		final int white = 0x00FFFFFF;
+		final int white = 0xFFFFFFFF;
 		final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 		
 		//BLOCKS
