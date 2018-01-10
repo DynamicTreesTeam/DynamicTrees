@@ -106,7 +106,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return BiomeColorHelper.getGrassColorAtPos(world, pos);
+				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
 			}
 		});
 
@@ -114,7 +114,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return BiomeColorHelper.getGrassColorAtPos(world, pos);
+				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
 			}
 		});
 		
@@ -126,7 +126,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
+				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
 			}
 		});
 		
