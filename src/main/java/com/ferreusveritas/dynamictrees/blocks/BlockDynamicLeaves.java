@@ -558,7 +558,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 		
-		return null;
+		return Species.NULLSPECIES;
 	}
 	
 	@Override
