@@ -61,13 +61,17 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public static final IUnlistedProperty<Integer> RADIUSE = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8));
 	public static final IUnlistedProperty CONNECTIONS[] = { RADIUSD, RADIUSU, RADIUSN, RADIUSS, RADIUSW, RADIUSE };
 	
-	public BlockBranch(String name) {
-		super(Material.WOOD); //Trees are made of wood. Brilliant.
+	public BlockBranch(Material material, String name) {
+		super(material);
 		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
 		setHarvestLevel("axe", 0);
 		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setUnlocalizedName(name);
 		setRegistryName(name);
+	}
+	
+	public BlockBranch(String name) {
+		this(Material.WOOD, name); //Trees are made of wood. Brilliant.
 	}
 	
 	///////////////////////////////////////////
