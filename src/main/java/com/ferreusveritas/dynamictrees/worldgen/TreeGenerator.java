@@ -67,7 +67,8 @@ public class TreeGenerator implements IWorldGenerator {
 		UNHANDLEDBIOME(EnumDyeColor.YELLOW),
 		FAILSOIL(EnumDyeColor.BROWN),
 		FAILCHANCE(EnumDyeColor.BLUE),
-		FAILGENERATION(EnumDyeColor.RED);
+		FAILGENERATION(EnumDyeColor.RED),
+		NOGROUND(EnumDyeColor.PURPLE);
 		
 		private final EnumDyeColor color;
 		
@@ -176,6 +177,9 @@ public class TreeGenerator implements IWorldGenerator {
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
 		while(world.isAirBlock(pos) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
 			pos = pos.down();
+			if(pos.getY() < 0) {
+				return EnumGeneratorResult.NOGROUND;
+			}
 		}
 		
 		IBlockState blockState = world.getBlockState(pos);

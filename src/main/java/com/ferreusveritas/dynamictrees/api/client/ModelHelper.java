@@ -58,7 +58,7 @@ public class ModelHelper {
 		regColorHandler(sapling, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return sapling.getSpecies(access, pos, state).getTree().foliageColorMultiplier(state, access, pos);
+				return access == null || pos == null ? -1 : sapling.getSpecies(access, pos, state).getTree().foliageColorMultiplier(state, access, pos);
 			}
 		});
 	}
