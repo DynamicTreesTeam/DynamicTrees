@@ -527,7 +527,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		List<ItemStack> items = getWoodDrops(world, pos, (int)(woodVolume * fortuneFactor));
 		
 		//For An-Sar's PrimalCore mod :)
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, harvesters.get());
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, player);
 		
 		for (ItemStack item : items) {
 			if (world.rand.nextFloat() <= chance) {
