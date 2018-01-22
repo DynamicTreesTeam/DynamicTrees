@@ -166,6 +166,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return upProbability;
 	}
 	
+	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
+	public float getPrimaryThickness() {
+		return 1.0f;
+	}
+	
 	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
 	public float getSecondaryThickness() {
 		return 2.0f;

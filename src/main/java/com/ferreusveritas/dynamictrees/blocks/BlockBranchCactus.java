@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,4 +25,11 @@ public class BlockBranchCactus extends BlockBranch {
         entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
     }
     
+    @Override
+    public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
+    	int radius = (int) signal.getSpecies().getPrimaryThickness();
+    	setRadius(world, pos, radius);
+		signal.radius = radius;//For the benefit of the parent branch
+    	return signal;
+    }
 }
