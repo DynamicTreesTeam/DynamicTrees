@@ -82,7 +82,7 @@ public class DynamicTrees {
 		ModBlocks.preInit();
 		ModItems.preInit();
 		ModTrees.preInit();
-			
+		
 		proxy.preInit();
 		compatProxy.preInit();
 	}
