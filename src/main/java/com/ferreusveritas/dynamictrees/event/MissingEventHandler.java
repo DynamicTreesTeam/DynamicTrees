@@ -32,7 +32,7 @@ public class MissingEventHandler {
 			String domain = resLoc.getResourceDomain();
 			String path = resLoc.getResourcePath();
 			if(domain.equals("growingtrees")) {
-				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
+				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Block: " + path);
 				Block mappedBlock = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
 				if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
 					missing.remap(mappedBlock);
@@ -49,7 +49,7 @@ public class MissingEventHandler {
 			String domain = resLoc.getResourceDomain();
 			String path = resLoc.getResourcePath();
 			if(domain.equals("growingtrees")) {
-				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Object: " + path);
+				Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Remapping Missing Item: " + path);
 				Item mappedItem = Item.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, path));
 				if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
 					missing.remap(mappedItem);
