@@ -1,19 +1,25 @@
 {
-    "multipart": [
-        {   "when": { "tree": "0" },
-            "apply": { "model": "acacia_leaves" }
-        },
-
-        {   "when": { "tree": "1" },
-            "apply": { "model": "dark_oak_leaves" }
-        },
-    
-        {   "when": { "tree": "2" },
-            "apply": { "model": "oak_leaves" }
-        },
-
-        {   "when": { "tree": "3" },
-            "apply": { "model": "oak_leaves" }
-        }
-    ]
+	"forge_marker": 1,
+	"variants": {
+		"tree": {
+			"0": {
+				"model": "acacia_leaves"
+			},
+			"1": {
+				"model": "dark_oak_leaves"
+			},
+			"2": {
+				"model": "oak_leaves"
+			},
+			"3": {
+				"model": "oak_leaves"
+			}
+		},
+		"hydro": {
+			"1": {},
+			"2": {},
+			"3": {},
+			"4": {}
+		}
+	}
 }
