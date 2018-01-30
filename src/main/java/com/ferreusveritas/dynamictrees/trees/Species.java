@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** Ideal soil longevity [default = 8]*/
 	protected int soilLongevity = 8;
 	
+	protected HashSet<Block> soilList = new HashSet<Block>();
+	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	/** Hold damage value for seed items with multiple variants */
@@ -120,7 +124,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected TreeCodeStore joCodeStore = new TreeCodeStore(this);
-
+	
 	public Species() {
 		this.treeFamily = DynamicTree.NULLTREE;
 	}
@@ -135,6 +139,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public Species(ResourceLocation name, DynamicTree treeFamily) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
+		
+		setStandardSoils();
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
@@ -430,6 +436,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
 	}
 	
+	public void addAcceptableSoil(Block ... soilBlocks) {
+		Collections.addAll(soilList, soilBlocks);
+	}
+
+	public void remAcceptableSoil(Block soilBlock) {
+		soilList.remove(soilBlock);
+	}
+	
+	public void clearAcceptableSoils() {
+		soilList.clear();
+	}
+	
+	protected final void setStandardSoils() {
+		addAcceptableSoil(Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM);
+	}
+	
 	/**
 	 * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could 
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
@@ -442,7 +464,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock instanceof BlockRootyDirt;
+		return soilList.contains(soilBlock) || soilBlock instanceof BlockRootyDirt;
 	}
 	
 	/**
