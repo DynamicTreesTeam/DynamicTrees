@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -118,8 +119,8 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	}
 	
 	@Override
-	public String getName() {
-		return ModConstants.MODID + ":default";
+	public ResourceLocation getName() {
+		return new ResourceLocation(ModConstants.MODID, "default");
 	}
 	
 	@Override

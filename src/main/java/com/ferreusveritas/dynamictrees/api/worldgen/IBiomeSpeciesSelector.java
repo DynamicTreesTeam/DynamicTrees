@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -25,7 +26,7 @@ public interface IBiomeSpeciesSelector {
 	 * 
 	 * @return
 	 */
-	public String getName();
+	public ResourceLocation getName();
 	
 	/**
 	 * This is called during the init phase of the DynamicTrees mod.  Use this to get references to trees
