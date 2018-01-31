@@ -24,7 +24,8 @@ public class VanillaSaplingEventHandler {
 			String treeName = saplingType.getName().replace("_","");//DynamicTrees Mod doesn't respect underscores
 			Species species = TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, treeName));
 			event.getWorld().setBlockToAir(event.getPos());//Set the block to air so the plantTree function won't automatically fail.
-			if(!species.getSeed().plantSapling(event.getWorld(), event.getPos(), species.getSeedStack(1))) { //If it fails then give a seed back to the player
+			
+			if(!species.plantSapling(event.getWorld(), event.getPos())) { //If it fails then give a seed back to the player
 				double x = event.getPos().getX() + 0.5;
 				double y = event.getPos().getY() + 0.5;
 				double z = event.getPos().getZ() + 0.5;

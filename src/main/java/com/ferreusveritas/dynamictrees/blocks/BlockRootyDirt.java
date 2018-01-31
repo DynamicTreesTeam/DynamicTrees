@@ -4,11 +4,11 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -89,7 +89,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		@Override
 		public String getName() {
 			return name;
-		} 
+		}
 		
 		public IBlockState getBlockState() {
 			return muse;
@@ -148,7 +148,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		Species species = getSpecies(world, rootPos);
 		boolean viable = false;
 		
-		if(species != null) {
+		if(species != Species.NULLSPECIES) {
 			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 			ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
 			
@@ -203,13 +203,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		DynamicTree tree = getTree(world, pos);
-		
-		if(tree != null) {
-			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
-		}
-		
-		return false;
+		return getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	public void destroyTree(World world, BlockPos pos) {
@@ -249,7 +243,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
-		return Cells.nullCell;
+		return CellNull.nullCell;
 	}
 	
 	@Override
@@ -295,20 +289,20 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? 0x11 : 0;
 	}
-	
+
+	@Override
+	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
+		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
+		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : DynamicTree.NULLTREE;
+	}
+
 	/**
 	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
 	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
 	 */
-	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
-		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : null;
-	}
-	
 	public Species getSpecies(World world, BlockPos pos) {
 		BlockPos treePos = pos.offset(getTrunkDirection(world, pos));
-		return TreeHelper.isBranch(world, treePos) ? TreeHelper.getBranch(world, treePos).getTree(world, treePos).getSpeciesForLocation(world, treePos) : null;
+		return TreeHelper.isBranch(world, treePos) ? TreeHelper.getBranch(world, treePos).getTree(world, treePos).getSpeciesForLocation(world, treePos) : Species.NULLSPECIES;
 	}
 	
 	@Override

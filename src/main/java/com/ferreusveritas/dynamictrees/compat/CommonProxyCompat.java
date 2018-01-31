@@ -1,10 +1,14 @@
 package com.ferreusveritas.dynamictrees.compat;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+
 public class CommonProxyCompat {
 
 	public CCProxyBase ccproxy;
 	
 	public void preInit() {
+		BlockDynamicLeaves.passableLeavesModLoaded = net.minecraftforge.fml.common.Loader.isModLoaded("passableleaves");
+		
 		//Computercraft Creative Mode Stuff
 		ccproxy = CCProxyBase.hasComputerCraft() ? new CCProxyActive() : new CCProxyBase();
 		ccproxy.createBlocks();

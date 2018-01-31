@@ -12,12 +12,20 @@ tile.junglebranch.name=Dynamic Jungle Tree
 tile.darkoakbranch.name=Dynamic Dark Oak Tree
 tile.acaciabranch.name=Dynamic Acacia Tree
 
+tile.dynamictrees:oakbranch.name=Dynamic Oak Tree
+tile.dynamictrees:sprucebranch.name=Dynamic Spruce Tree
+tile.dynamictrees:birchbranch.name=Dynamic Birch Tree
+tile.dynamictrees:junglebranch.name=Dynamic Jungle Tree
+tile.dynamictrees:darkoakbranch.name=Dynamic Dark Oak Tree
+tile.dynamictrees:acaciabranch.name=Dynamic Acacia Tree
+
 item.oakseed.name=Oak Acorn
 item.spruceseed.name=Spruce Cone
 item.birchseed.name=Birch Catkin
 item.jungleseed.name=Jungle Pod
 item.darkoakseed.name=Dark Oak Acorn
 item.acaciaseed.name=Acacia Seed
+item.appleseed.name=Apple Pip
 
 item.dendropotion.biochar.name=Biochar Base Potion
 item.dendropotion.depletion.name=Potion of Depletion

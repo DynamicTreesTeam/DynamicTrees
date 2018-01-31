@@ -6,9 +6,9 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
+import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -19,10 +19,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
@@ -36,6 +35,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -51,23 +51,47 @@ import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 /**
 * All data related to a tree family.
+* A {@link DynamicTree} is more or less just a definition of {@link BlockDynamicLeaves} and {@link BlockBranch} blocks.
+* It also defines the cellular automata function of the {@link BlockDynamicLeaves}.  It defines the type of wood that
+* the tree is made of and consequently what kind of log you get when you cut it down.
+* 
+* A DynamicTree does not contain a reference to a Seed, Sapling, or how it should grow(how fast, how tall, etc).
+* It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
+* All of these capabilities lie in the Species class for which a DynamicTree should always contain one default 
+* species(the common species).
 * 
 * @author ferreusveritas
 */
-public abstract class DynamicTree {
+public class DynamicTree {
+	
+	public final static DynamicTree NULLTREE = new DynamicTree() {
+		@Override public void setCommonSpecies(Species species) {}
+		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
+		@Override public void setCellKit(ResourceLocation name) {}
+		@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
+		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
+		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
+		@Override public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) { return false; }
+	};
 	
 	/** Simple name of the tree e.g. "oak" */
 	private final ResourceLocation name;
-
+	
+	protected Species commonSpecies = Species.NULLSPECIES;
+	
 	//Branches
 	/** The dynamic branch used by this tree */
 	private BlockBranch dynamicBranch;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
-	private IBlockState primitiveLog;
+	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
-	private ItemStack primitiveLogItemStack;
+	private ItemStack primitiveLogItemStack = CompatHelper.emptyStack();
+	
+	//Saplings
 	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
-	private IBlockState primitiveSapling;
+	private IBlockState primitiveSaplingBlockState = Blocks.AIR.getDefaultState();
+	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
+	private ItemStack primitiveSaplingItemStack = CompatHelper.emptyStack();
 	
 	//Leaves
 	/** The dynamic leaves used by this tree */
@@ -77,22 +101,18 @@ public abstract class DynamicTree {
 	/** Maximum amount of leaves in a stack before the bottom-most leaf block dies [default = 4] **/
 	private int smotherLeavesMax = 4;
 	/** Minimum amount of light necessary for a leaves block to be created. **/
-	private int lightRequirement = 13;
-	/** The default hydration level of a newly created leaf block [default = 4]**/
-	protected byte defaultHydration = 4;
+	protected int lightRequirement = 13;
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
-	private IBlockState primitiveLeaves;
+	private IBlockState primitiveLeaves = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
-	private ItemStack primitiveLeavesItemStack;
-	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
-	private SimpleVoxmap leafCluster;
-	/** The solver used to calculate the leaves hydration value from the values pulled from adjacent cells [default = deciduous] */
-	private ICellSolver cellSolver = Cells.deciduousSolver;
+	private ItemStack primitiveLeavesItemStack = CompatHelper.emptyStack();
+	/** A CellKit for leaves automata */
+	private ICellKit cellKit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"));
 	
-
+	
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
-	private ItemStack stick;
+	private ItemStack stick = new ItemStack(Items.STICK);
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 	
@@ -100,6 +120,10 @@ public abstract class DynamicTree {
 	public DynamicTree(BlockPlanks.EnumType treeType) {
 		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")), treeType.getMetadata());
 		simpleVanillaSetup(treeType);
+	}
+	
+	public DynamicTree() {
+		this.name = new ResourceLocation(ModConstants.MODID, "null");
 	}
 	
 	/**
@@ -117,9 +141,7 @@ public abstract class DynamicTree {
 			setDynamicLeaves(name.getResourceDomain(), seq);
 		}
 		setDynamicBranch(new BlockBranch(name + "branch"));
-		setStick(new ItemStack(Items.STICK));
 		
-		createLeafCluster();
 		createSpecies();
 	}
 	
@@ -152,27 +174,30 @@ public abstract class DynamicTree {
 			break;
 		}
 		
-		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood), new ItemStack(Blocks.SAPLING, 1, wood.getMetadata()));
 		ModBlocks.blockBonsaiPot.setupVanillaTree(this);//Setup the bonsai pot to receive this type of tree
 
 		simpleVanillaCommonSpecies(wood);
 	}
 	
 	protected void simpleVanillaCommonSpecies(BlockPlanks.EnumType wood) {
-
-		Species commonSpecies = (Species) getCommonSpecies();
-					
-		commonSpecies.setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-	
-		//Generate a seed
-		commonSpecies.generateSeed();
+		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		getCommonSpecies().generateSeed();
 	}
 	
-	public abstract void createSpecies();
+	public void createSpecies() {}
 	
-	public abstract void registerSpecies(IForgeRegistry<Species> speciesRegistry);
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		speciesRegistry.register(getCommonSpecies());
+	}
 	
-	public abstract Species getCommonSpecies();
+	public void setCommonSpecies(Species species) {
+		commonSpecies = species;
+	}
+	
+	public Species getCommonSpecies() {
+		return commonSpecies;
+	}
 
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
@@ -246,10 +271,7 @@ public abstract class DynamicTree {
 			}
 
 			//Empty hand or inactive substance
-			Species species = getExactSpecies(world, hitPos);
-			if(species != null) {
-				species.onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
-			}
+			getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 
 		return false;
@@ -274,8 +296,11 @@ public abstract class DynamicTree {
 	 * dummy one. 
 	 */
 	public List<Item> getRegisterableItems(List<Item> itemList) {
+		//Register an itemBlock for the branch block
+		itemList.add(new ItemBlock(dynamicBranch).setRegistryName(dynamicBranch.getRegistryName()));
+		
 		Seed seed = getCommonSpecies().getSeed();
-		if(seed != null) {
+		if(seed != Seed.NULLSEED) {
 			itemList.add(seed);
 		}
 		return itemList;
@@ -383,15 +408,20 @@ public abstract class DynamicTree {
 		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
-	protected DynamicTree setPrimitiveSapling(IBlockState primSapling) {
-		primitiveSapling = primSapling;
+	protected DynamicTree setPrimitiveSapling(IBlockState primSapling, ItemStack primSaplingStack) {
+		primitiveSaplingBlockState = primSapling;
+		primitiveSaplingItemStack = primSaplingStack;
 		return this;
 	}
 
-	public IBlockState getPrimitiveSapling() {
-		return primitiveSapling;
+	public IBlockState getPrimitiveSaplingBlockState() {
+		return primitiveSaplingBlockState;
 	}
-		
+	
+	public ItemStack getPrimitiveSaplingItemStack() {
+		return primitiveSaplingItemStack;
+	}
+	
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////
@@ -414,7 +444,7 @@ public abstract class DynamicTree {
 			return rootBlock.getSpecies(world, rootPos);
 		}
 		
-		return null;
+		return Species.NULLSPECIES;
 	}
 	
 
@@ -437,7 +467,7 @@ public abstract class DynamicTree {
 	}
 	
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		return branch.getRadius(blockState) == 1 ? Cells.branchCell : Cells.nullCell;
+		return getCellKit().getCellForBranch(branch.getRadius(blockState));
 	}
 	
 	
@@ -470,68 +500,16 @@ public abstract class DynamicTree {
 		return lightRequirement;
 	}
 	
-	public byte getDefaultHydration() {
-		return defaultHydration;
+	public void setCellKit(String name) {
+		cellKit = TreeRegistry.findCellKit(name);
 	}
 	
-	public void setCellSolver(ICellSolver solver) {
-		cellSolver = solver;
+	public void setCellKit(ResourceLocation name) {
+		cellKit = TreeRegistry.findCellKit(name);
 	}
 	
-	public ICellSolver getCellSolver() {
-		return cellSolver;
-	}
-		
-	public void setLeafCluster(SimpleVoxmap leafCluster) {
-		this.leafCluster = leafCluster;
-	}
-	
-	public SimpleVoxmap getLeafCluster() {
-		return leafCluster;
-	}
-	
-	/**
-	 * A voxelmap of a leaf cluser for this species.  Values represent hydration value.
-	 * This leaf cluster map is "stamped" on to each branch end during worldgen.  Should be
-	 * representative of what the species actually produces.
-	 */
-	public void createLeafCluster(){
-
-		leafCluster = new SimpleVoxmap(5, 4, 5, new byte[] {
-				//Layer 0 (Bottom)
-				0, 0, 0, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 0, 0, 0,
-
-				//Layer 1
-				0, 1, 1, 1, 0,
-				1, 3, 4, 3, 1,
-				1, 4, 0, 4, 1,
-				1, 3, 4, 3, 1,
-				0, 1, 1, 1, 0,
-				
-				//Layer 2
-				0, 1, 1, 1, 0,
-				1, 2, 3, 2, 1,
-				1, 3, 4, 3, 1,
-				1, 2, 3, 2, 1,
-				0, 1, 1, 1, 0,
-				
-				//Layer 3(Top)
-				0, 0, 0, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 0, 0, 0,
-				
-		}).setCenter(new BlockPos(2, 1, 2));
-
-	}
-	
-	public byte getLeafClusterPoint(BlockPos twigPos, BlockPos leafPos) {
-		return leafCluster.getVoxel(twigPos, leafPos);
+	public ICellKit getCellKit() {
+		return cellKit;
 	}
 	
 	
@@ -575,7 +553,7 @@ public abstract class DynamicTree {
 	}
 	
 	public ICell getCellForLeaves(int hydro) {
-		return Cells.normalCells[hydro];
+		return getCellKit().getCellForLeaves(hydro);
 	}
 	
 	

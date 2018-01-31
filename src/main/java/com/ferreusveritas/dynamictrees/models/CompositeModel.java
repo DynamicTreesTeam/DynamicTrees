@@ -37,7 +37,7 @@ public class CompositeModel implements IBakedModel {
 	
 	TextureAtlasSprite barkParticles;
 	
-	//74 Baked models per tree species to achieve this. I guess it's not my problem.  Wasn't my idea anyway. 
+	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway. 
 	private IBakedModel sleeves[][] = new IBakedModel[6][7];
 	private IBakedModel cores[][] = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel rings[] = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides

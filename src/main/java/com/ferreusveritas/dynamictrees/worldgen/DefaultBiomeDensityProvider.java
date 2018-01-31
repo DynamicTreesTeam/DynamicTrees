@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.init.Biomes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -62,8 +63,8 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	HashMap<Integer, IChance> fastChanceLookup = new HashMap<Integer, IChance>();
 	
 	@Override
-	public String getName() {
-		return ModConstants.MODID + ":default";
+	public ResourceLocation getName() {
+		return new ResourceLocation(ModConstants.MODID, "default");
 	}
 	
 	@Override

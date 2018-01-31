@@ -15,7 +15,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,6 +32,8 @@ public class TreeBirch extends DynamicTree {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.50f);
 			envFactor(Type.FOREST, 1.05f);
+			
+			setupStandardSeedDropping();
 		}
 		
 		@Override
@@ -41,26 +42,14 @@ public class TreeBirch extends DynamicTree {
 		};
 		
 	}
-	
-	Species species;
-	
+		
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 	}
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesBirch(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesBirch(this));
 	}
 	
 	@Override

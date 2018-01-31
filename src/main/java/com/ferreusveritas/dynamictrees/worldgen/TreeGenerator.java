@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -11,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decisi
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
@@ -18,6 +18,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
@@ -66,7 +67,8 @@ public class TreeGenerator implements IWorldGenerator {
 		UNHANDLEDBIOME(EnumDyeColor.YELLOW),
 		FAILSOIL(EnumDyeColor.BROWN),
 		FAILCHANCE(EnumDyeColor.BLUE),
-		FAILGENERATION(EnumDyeColor.RED);
+		FAILGENERATION(EnumDyeColor.RED),
+		NOGROUND(EnumDyeColor.PURPLE);
 		
 		private final EnumDyeColor color;
 		
@@ -113,15 +115,13 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		ArrayList<Circle> circles = circleMan.getCircles(world, random, chunkX, chunkZ);
+		if(world.getWorldType() != WorldType.FLAT) {
+			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
 		
-		for(Circle c: circles) {
-			makeTree(world, c);
-		}
-		
-		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-		if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {
-			roofedForestCompensation(world, random, pos);
+			BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
+			if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {
+				roofedForestCompensation(world, random, pos);
+			}
 		}
 	}
 	
@@ -138,7 +138,7 @@ public class TreeGenerator implements IWorldGenerator {
 				int posX = xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = zi * 4 + 1 + 8 + random.nextInt(3);
 				BlockPos blockpos = world.getHeight(pos.add(posX, 0, posZ));
-				blockpos = TreeHelper.findGround(world, blockpos).up();
+				blockpos = CoordUtils.findGround(world, blockpos).up();
 				
 				if (random.nextInt(6) == 0) {
 					new WorldGenBigMushroom().generate(world, random, blockpos);
@@ -177,6 +177,9 @@ public class TreeGenerator implements IWorldGenerator {
 		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
 		while(world.isAirBlock(pos) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
 			pos = pos.down();
+			if(pos.getY() < 0) {
+				return EnumGeneratorResult.NOGROUND;
+			}
 		}
 		
 		IBlockState blockState = world.getBlockState(pos);

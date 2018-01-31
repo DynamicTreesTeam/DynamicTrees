@@ -6,14 +6,14 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.inspectors.NodeDestroyer;
-import com.ferreusveritas.dynamictrees.inspectors.NodeNetVolume;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -61,13 +61,17 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public static final IUnlistedProperty<Integer> RADIUSE = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8));
 	public static final IUnlistedProperty CONNECTIONS[] = { RADIUSD, RADIUSU, RADIUSN, RADIUSS, RADIUSW, RADIUSE };
 	
-	public BlockBranch(String name) {
-		super(Material.WOOD); //Trees are made of wood. Brilliant.
+	public BlockBranch(Material material, String name) {
+		super(material);
 		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
 		setHarvestLevel("axe", 0);
 		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setUnlocalizedName(name);
 		setRegistryName(name);
+	}
+	
+	public BlockBranch(String name) {
+		this(Material.WOOD, name); //Trees are made of wood. Brilliant.
 	}
 	
 	///////////////////////////////////////////
@@ -199,13 +203,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		DynamicTree tree = TreeHelper.getSafeTreePart(world, pos).getTree(world, pos);
-		
-		if(tree != null) {
-			return tree.onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
-		}
-		
-		return false;
+		return TreeHelper.getSafeTreePart(world, pos).getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	@Override
@@ -262,7 +260,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
 		} else {
-			return Cells.nullCell;
+			return CellNull.nullCell;
 		}
 	}
 	
@@ -311,7 +309,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			//DynamicTree tree = signal.getTree();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
-			EnumFacing targetDir = tree.getCommonSpecies().selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+			EnumFacing targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
 			signal.doTurn(targetDir);
 			
 			{
@@ -484,14 +482,8 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	public List<ItemStack> getWoodDrops(World world, BlockPos pos, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
-		
 		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
-		DynamicTree tree = getTree();
-		ItemStack logStack = tree.getPrimitiveLogItemStack(volume / 4096);// A log contains 4096 voxels of wood material(16x16x16 pixels)
-		ItemStack stickStack = tree.getStick((volume % 4096) / 512);// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks)
-		ret.add(logStack);// Drop vanilla logs or whatever
-		ret.add(stickStack);// Give him the stick!
-		return ret;
+		return getTree().getCommonSpecies().getLogsDrops(world, pos, ret, volume);
 	}
 	
 	/*
@@ -535,7 +527,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		List<ItemStack> items = getWoodDrops(world, pos, (int)(woodVolume * fortuneFactor));
 		
 		//For An-Sar's PrimalCore mod :)
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, harvesters.get());
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, player);
 		
 		for (ItemStack item : items) {
 			if (world.rand.nextFloat() <= chance) {

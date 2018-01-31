@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,17 +13,22 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
+import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.inspectors.NodeDisease;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -31,7 +37,6 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,7 +46,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -56,18 +60,45 @@ import net.minecraftforge.fml.common.registry.RegistryBuilder;
 
 public class Species extends IForgeRegistryEntry.Impl<Species> {
 	
+	public static Species NULLSPECIES;
+	
+	public static Species makeNullSpecies() {
+		return new Species() {
+		@Override public Seed getSeed() { return Seed.NULLSEED; }
+		@Override public DynamicTree getTree() { return DynamicTree.NULLTREE; }
+		@Override public void addJoCodes() {}
+		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
+		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
+		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
+		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) { return false; }
+		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
+		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
+		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
+		@Override public void setupStandardSeedDropping() {}
+		@Override public boolean update(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
+	};
+	}
+	
+	/**
+	 * Mods should use this to register their {@link Species}
+	 * 
+	 * Places the species in a central registry.
+	 * The proper place to use this is during the preInit phase of your mod.
+	 */
 	public static IForgeRegistry<Species> REGISTRY;
 	
-	public static void newRegistry(RegistryEvent.NewRegistry event) {
+	public static void newRegistry(RegistryEvent.NewRegistry event) {		
 		REGISTRY = new RegistryBuilder<Species>()
 				.setName(new ResourceLocation(ModConstants.MODID, "species"))
+				.setDefaultKey(new ResourceLocation(ModConstants.MODID, "null"))
+				//.disableSaving()
 				.setType(Species.class)
 				.setIDRange(0, Integer.MAX_VALUE - 1)
 				.create();
 	}
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected  final DynamicTree treeFamily;
+	protected final DynamicTree treeFamily;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -82,19 +113,26 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	/** Ideal soil longevity [default = 8]*/
 	protected int soilLongevity = 8;
 	
+	protected HashSet<Block> soilList = new HashSet<Block>();
+	
 	//Seeds
-	/** The seed used to reproduce this tree.  Drops from the tree and can plant itself */
-	protected Seed seed;
-	/** The seed stack for the seed.  Hold damage value for seed items with multiple variants */
-	protected ItemStack seedStack;
+	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
+	/** Hold damage value for seed items with multiple variants */
+	protected ItemStack seedStack = new ItemStack(Seed.NULLSEED);
 	/** A blockState that will turn itself into this tree */
-	protected IBlockState saplingBlock;
+	protected IBlockState saplingBlock = Blocks.AIR.getDefaultState();
+	/** A place to store what drops from the species. Similar to a loot table */
+	protected IDropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	protected TreeCodeStore joCodeStore;
+	protected TreeCodeStore joCodeStore = new TreeCodeStore(this);
+	
+	public Species() {
+		this.treeFamily = DynamicTree.NULLTREE;
+	}
 	
 	/**
 	 * Constructor suitable for derivative mods
@@ -107,8 +145,11 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
 		
+		setStandardSoils();
+		
 		//Add JoCode models for worldgen
 		addJoCodes();
+		addDropCreator(new DropCreatorLogs());
 	}
 	
 	public DynamicTree getTree() {
@@ -134,6 +175,11 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
 	public int getUpProbability() {
 		return upProbability;
+	}
+	
+	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
+	public float getPrimaryThickness() {
+		return 1.0f;
 	}
 	
 	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
@@ -181,263 +227,147 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	}
 	
 	public Seed getSeed() {
-		return seed;
+		return (Seed) seedStack.getItem();
 	}
 	
 	/**
 	 * Generate a seed. Developer is still required to register the item
 	 * in the appropriate registries.
 	 */
-	public Seed generateSeed() {
-		seed = new Seed(getRegistryName().getResourcePath() + "seed");
+	public ItemStack generateSeed() {
+		Seed seed = new Seed(getRegistryName().getResourcePath() + "seed");
 		return setSeedStack(new ItemStack(seed));
 	}
 	
-	public Seed setSeedStack(ItemStack newSeedStack) {
+	public ItemStack setSeedStack(ItemStack newSeedStack) {
 		if(newSeedStack.getItem() instanceof Seed) {
 			seedStack = newSeedStack;
-			seed = (Seed) seedStack.getItem();
+			Seed seed = (Seed) seedStack.getItem();
 			seed.setSpecies(this, seedStack);
-			return seed;
+			return seedStack;
 		} else {
 			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
 		}
-		return null;
+		return CompatHelper.emptyStack();
 	}
 
-	public float getSeedDropRate() {
-		return 1.0f;
+	//It's mostly for seeds.. mostly.
+	public void setupStandardSeedDropping() {
+		addDropCreator(new DropCreatorSeed());
+	}
+	
+	public boolean addDropCreator(IDropCreator dropCreator) {
+		return dropCreatorStorage.addDropCreator(dropCreator);
+	}
+
+	public boolean remDropCreator(ResourceLocation dropCreatorName) {
+		return dropCreatorStorage.remDropCreator(dropCreatorName);
+	}
+	
+	public Map<ResourceLocation, IDropCreator> getDropCreators() {
+		return dropCreatorStorage.getDropCreators();
 	}
 	
 	/**
-	 * This quantity is used when the tree is cut down and not for when the leaves are directly destroyed.
-	 * 1 in 64 chance to drop a seed on destruction..
-	 * 
-	 * @param random
-	 * @return
-	 */
-	public int getTreeHarvestSeedQuantity(Random random) {
-		return random.nextInt(64) == 0 ? 1 : 0;
-	}
-
-	/**
 	 * Gets a list of drops for a {@link BlockDynamicLeaves} when the entire tree is harvested.
-	 * NOT used for individual {@link BlockDynamicLeaves} being harvested. 
+	 * NOT used for individual {@link BlockDynamicLeaves} being directly harvested by hand or tool. 
 	 * 
 	 * @param world
 	 * @param leafPos
-	 * @param list
+	 * @param dropList
 	 * @param random
 	 * @return
 	 */
-	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> list, Random random) {
-		
-		int seedQty = getTreeHarvestSeedQuantity(random);
-		if(seedQty > 0) {
-			list.add(getSeedStack(seedQty));
-		}
-		
-		return list;
+	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
+		dropList = TreeRegistry.globalDropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
+		return dropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
 	}
+	
+	/**
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link DynamicTree} at
+	 * random with no player interaction.
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param treePos
+	 * @param soilLife
+	 * @return
+	 */
+	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
+		List<ItemStack> dropList = TreeRegistry.globalDropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
+		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, dropList, soilLife);
+	}
+	
+	/**
+	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
+	 * a {@link BlockDynamicLeaves} directly by hand or with a tool.
+	 * 
+	 * @param access
+	 * @param breakPos
+	 * @param dropList
+	 * @param fortune
+	 * @return
+	 */
+	public List<ItemStack> getLeavesDrops(IBlockAccess access, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+		Random random = access instanceof World ? ((World)access).rand : new Random();
+		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
+		return dropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
+	}
+	
+	
+	/**
+	 * Gets a {@link List} of Logs drops.  Logs drops are {@link ItemStack}s that result from the breaking of
+	 * a {@link BlockBranch} directly by hand or with a tool.
+	 * 
+	 * @param world
+	 * @param breakPos
+	 * @param dropList
+	 * @param volume
+	 * @return
+	 */
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, int volume) {
+		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+	}
+	
 	
 	/**
 	 * 
 	 * @param world
-	 * @param baseTreePart
+	 * @param endPoints
 	 * @param rootPos
 	 * @param treePos
 	 * @param soilLife
 	 * @return true if seed was dropped
 	 */
 	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		
-		float dropRate = getSeedDropRate() * ModConfigs.seedDropRate;
-		
-		do {
-			if(dropRate > world.rand.nextFloat()) {
-				if(endPoints.size() > 0) {
-					BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-					branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-					BlockPos seedPos = getRayTraceFruitPos(world, treePos, branchPos);
+		int tickSpeed = world.getGameRules().getInt("randomTickSpeed");
+		if(tickSpeed > 0) {
+			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
+			if(world.rand.nextDouble() < slowFactor) {
+				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
 
-					if(seedPos != BlockPos.ORIGIN) {
-						EntityItem seedEntity = new EntityItem(world, seedPos.getX() + 0.5, seedPos.getY() + 0.5, seedPos.getZ() + 0.5, getSeedStack(1));
-						Vec3d motion = new Vec3d(seedPos).subtract(new Vec3d(treePos));
-						float distAngle = 15;//The spread angle(center to edge)
-						float launchSpeed = 4;//Blocks(meters) per second
-						motion = new Vec3d(motion.xCoord, 0, motion.yCoord).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-						seedEntity.motionX = motion.xCoord;
-						seedEntity.motionY = motion.yCoord;
-						seedEntity.motionZ = motion.zCoord;
-						CompatHelper.spawnEntity(world, seedEntity);
+				if(!drops.isEmpty() && !endPoints.isEmpty()) {
+					for(ItemStack drop: drops) {
+						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
+						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos);
+
+						if(itemPos != BlockPos.ORIGIN) {
+							EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
+							float distAngle = 15;//The spread angle(center to edge)
+							float launchSpeed = 4;//Blocks(meters) per second
+							motion = new Vec3d(motion.xCoord, 0, motion.yCoord).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
+							CompatHelper.spawnEntity(world, itemEntity, motion);
+						}
 					}
 				}
 			}
-		} while(--dropRate > 0.0f);
-
+		}
 		return true;
 	}
-	
-	
-	///////////////////////////////////////////
-	//FRUIT
-	///////////////////////////////////////////
-	
-	/**
-	 * 
-	 * @param world
-	 * @param baseTreePart
-	 * @param rootPos
-	 * @param treePos
-	 * @param soilLife
-	 * @return true if fruit was created
-	 */
-	public boolean handleFruit(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife, int qty) {
-		
-		int count = 0;
-		int attempts = 0;
-		
-		if(qty > 0) {
-			while(endPoints.size() > 0 && (count < qty) && (attempts < (qty * 2))) {
-				int bSelect = world.rand.nextInt(endPoints.size());
-				BlockPos branchPos = endPoints.get(bSelect);
-				attempts++;
-				branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-				BlockPos fruitPos = getRayTraceFruitPos(world, treePos, branchPos);
-				if(fruitPos != BlockPos.ORIGIN && placeFruit(world, fruitPos)) {
-					count++;
-				}
-			}
-		}
 
-		return count > 0;
-	}
-	
-	/**
-	 * Get the number of fruit to produce on an update.  If more control is desired then
-	 * override handleFruit().
-	 * 
-	 * @param world
-	 * @param rootPos
-	 * @return
-	 */
-	protected int getFruitQty(World world, BlockPos rootPos) {
-		return 0;
-	}
-	
-	/**
-	 * Get the {@link IBlockState} of the fruitBlock to place during handleFruit().
-	 * If more control is desired then override placeFruit() or handleFruit(). 
-	 * 
-	 * @param world
-	 * @param fruitPos
-	 * @return
-	 */
-	protected IBlockState getFruit(World world, BlockPos fruitPos) {
-		return null;
-	}
-	
-	/**
-	 * Places the fruit.  This can be overridden to create more advanced
-	 * structures.
-	 * 
-	 * @param world
-	 * @param fruitPos
-	 * @return
-	 */
-	protected boolean placeFruit(World world, BlockPos fruitPos) {
-		IBlockState fruit = getFruit(world, fruitPos);
-		if(fruit != null) {
-			world.setBlockState(fruitPos, fruit);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Find a suitable position for seed drops or fruit placement using ray tracing.
-	 * 
-	 * @param world The world
-	 * @param treePos The block position of the {@link DynamicTree} trunk base.
-	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
-	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
-	 */
-	public BlockPos getRayTraceFruitPos(World world, BlockPos treePos, BlockPos branchPos) {
-
-		RayTraceResult result = branchRayTrace(world, treePos, branchPos, 45, 60, 4 + world.rand.nextInt(3));
-
-		if(result != null) {
-			BlockPos hitPos = result.getBlockPos();
-			do { //Run straight down until we hit a block that's non compatible leaves.
-				hitPos = hitPos.down();
-			} while(getTree().isCompatibleGenericLeaves(world, hitPos));
-			if(world.isAirBlock(hitPos)) {//If that block is air then we have a winner.
-				return hitPos;
-			}
-		}
-
-		return BlockPos.ORIGIN;
-	}
-	
-	
-	public RayTraceResult branchRayTrace(World world, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance) {
-		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
-
-		Vec3d vOut = new Vec3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
-		
-		if(vOut.equals(Vec3d.ZERO)) {
-			vOut = new Vec3d(1, 0, 0);
-			spreadHor = 180;
-		}
-		
-		float deltaYaw = (world.rand.nextFloat() * spreadHor * 2) - spreadHor;
-		float deltaPitch = (world.rand.nextFloat() * -spreadVer);// must be greater than -90 degrees(and less than 90) for the tangent function.
-		vOut = vOut.normalize(). //Normalize to unit vector
-				addVector(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to spreadVer degrees
-				normalize(). //Re-normalize to unit vector
-				rotateYaw((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- spreadHor
-				scale(distance); //Vary the view distance
-		
-		Vec3d branchVec = new Vec3d(branchPos).addVector(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
-		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
-		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
-
-		if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
-			RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
-
-			if(result != null) {
-				BlockPos hitPos = result.getBlockPos();
-				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
-					if(getTree().isCompatibleGenericLeaves(world, hitPos)) {//Test if it's the right kind of leaves for the species
-						return result;
-					}
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	///////////////////////////////////////////
-	//DROPS
-	///////////////////////////////////////////
-	
-	/** 
-	* Override to add items to the included list argument. For apples and whatnot.
-	* Pay Attention!  Add items to drops parameter and then return it. The list
-	* may already contain seeds.  Remove them if desired.
-	* 
-	* @param world The world
-	* @param pos The {@link BlockPos} of the {@link BlockDynamicLeaves} that was harvested
-	* @param chance The sapling drop chance from {@link BlockLeaves}
-	* @param drops A {@link ArrayList} of things to be manipulated
-	* @return the drop list
-	*/
-	public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-		return drops;
-	}
-	
-	
 	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
@@ -465,9 +395,21 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 		return saplingBlock;
 	}
 	
-	public boolean placeSaplingBlock(World world, BlockPos pos) {
-		world.setBlockState(pos, getDynamicSapling());
-		return true;
+	/**
+	 * Checks surroundings and places a dynamic sapling block.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return true if the planting was successful
+	 */
+	public boolean plantSapling(World world, BlockPos pos) {
+		
+		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+			world.setBlockState(pos, getDynamicSapling());
+			return true;
+		}
+		
+		return false;
 	}
 
 	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {
@@ -486,12 +428,33 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 		return ModBlocks.blockRootyDirt;
 	}
 	
+	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
+		world.setBlockState(rootPos, getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, life));
+		return true;
+	}
+	
 	public void setSoilLongevity(int longevity) {
 		soilLongevity = longevity;
 	}
 	
 	public int getSoilLongevity(World world, BlockPos rootPos) {
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
+	}
+	
+	public void addAcceptableSoil(Block ... soilBlocks) {
+		Collections.addAll(soilList, soilBlocks);
+	}
+
+	public void remAcceptableSoil(Block soilBlock) {
+		soilList.remove(soilBlock);
+	}
+	
+	public void clearAcceptableSoils() {
+		soilList.clear();
+	}
+	
+	protected final void setStandardSoils() {
+		addAcceptableSoil(Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM);
 	}
 	
 	/**
@@ -506,7 +469,7 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	 */
 	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM || soilBlock == ModBlocks.blockRootyDirt;
+		return soilList.contains(soilBlock) || soilBlock instanceof BlockRootyDirt;
 	}
 	
 	/**
@@ -545,19 +508,13 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
 		//This will prune rotted positions from the world and the end point list
-		if(handleRot(world, ends, rootPos, treePos, soilLife, rapid)) {
+		if(handleRot(world, ends, rootPos, treePos, soilLife, false)) {
 			return false;//Last piece of tree rotted away.
 		}
 		
 		if(!rapid) {
 			//This will handle seed drops
 			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
-			
-			//This will handle fruit spawning
-			int fruitQty = getFruitQty(world, rootPos);
-			if(fruitQty > 0) {
-				handleFruit(world, ends, rootPos, treePos, soilLife, fruitQty);
-			}
 			
 			//This will handle disease chance
 			if(handleDisease(world, treeBase, treePos, random, soilLife)) {
@@ -596,7 +553,7 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
-		SimpleVoxmap leafMap = getTree().getLeafCluster();
+		SimpleVoxmap leafMap = getTree().getCellKit().getLeafCluster();
 		
 		while (iter.hasNext()) {
 			BlockPos endPos = iter.next();
@@ -859,7 +816,6 @@ public class Species extends IForgeRegistryEntry.Impl<Species> {
 	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
 	 */
 	public void addJoCodes() {
-		joCodeStore = new TreeCodeStore(this);
 		joCodeStore.addCodesFromFile("assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	

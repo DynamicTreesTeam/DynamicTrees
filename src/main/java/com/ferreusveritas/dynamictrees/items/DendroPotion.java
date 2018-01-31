@@ -8,12 +8,12 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.potion.SubstanceDeplete;
-import com.ferreusveritas.dynamictrees.potion.SubstanceDisease;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFreeze;
-import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
-import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDeplete;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDisease;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -41,7 +41,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		BURGEONING( 3, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
 		FERTILITY(  4, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
 		PERSISTANCE(5, "persistance", 0x389aff, "Stops tree from changing"),
-		TRANSFORM(6, "transform", 0x7fb8a4, "Base tree potion for brewing transformations");
+		TRANSFORM(  6, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
 				
 		private final int index;
 		private final String name;

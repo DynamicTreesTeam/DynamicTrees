@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
-import com.ferreusveritas.dynamictrees.inspectors.NodeTwinkle;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -32,20 +32,10 @@ public class TreeHelper {
 	 * @return
 	 */
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
+		int key = seq / 4;
+		String regname = "leaves" + key;
 		
-		HashMap<Integer, BlockDynamicLeaves> leavesMap = getLeavesMapForModId(modid);
-		int leavesBlockNum = seq / 4;
-		int key = leavesBlockNum;
-		
-		if(leavesMap.containsKey(key)) {
-			return leavesMap.get(key);
-		} else {
-			BlockDynamicLeaves leavesBlock = new BlockDynamicLeaves();
-			leavesBlock.setRegistryName(modid, "leaves" + leavesBlockNum);
-			leavesBlock.setUnlocalizedName("leaves" + leavesBlockNum);
-			leavesMap.put(key, leavesBlock);
-			return leavesBlock;
-		}
+		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setRegistryName(modid, regname).setUnlocalizedName(regname));
 	}
 	
 	/**
@@ -56,16 +46,7 @@ public class TreeHelper {
 	 * @return The map of {@link BlockDynamicLeaves}
 	 */
 	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
-		HashMap<Integer, BlockDynamicLeaves> leavesMap;
-		
-		if(modLeavesArray.containsKey(modid)) {
-			leavesMap = modLeavesArray.get(modid);
-		} else {
-			leavesMap = new HashMap<Integer, BlockDynamicLeaves>();
-			modLeavesArray.put(modid, leavesMap);
-		}
-		
-		return leavesMap;
+		return modLeavesArray.computeIfAbsent(modid, k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
 	
 	/**
@@ -136,18 +117,6 @@ public class TreeHelper {
 			return true;
 		}
 		return false;
-	}
-	
-	public static BlockPos findGround(World world, BlockPos pos) {
-		//Rise up until we are no longer in a solid block
-		while(world.getBlockState(pos).isFullCube()) {
-			pos = pos.up();
-		}
-		//Dive down until we are again
-		while(!world.getBlockState(pos).isFullCube() && pos.getY() > 50) {
-			pos = pos.down();
-		}
-		return pos;
 	}
 	
 	//Treeparts
