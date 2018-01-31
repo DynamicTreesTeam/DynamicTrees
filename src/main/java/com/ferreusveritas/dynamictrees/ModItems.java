@@ -35,7 +35,7 @@ public class ModItems {
 		
 		DynamicTrees.compatProxy.registerItems(registry);
 	}
-
+	
 	public static Item makeItemBlock(Block block) {
 		return new ItemBlock(block).setRegistryName(block.getRegistryName());
 	}

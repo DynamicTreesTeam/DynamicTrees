@@ -44,7 +44,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		BURGEONING( 3, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
 		FERTILITY(  4, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
 		PERSISTANCE(5, "persistance", 0x389aff, "Stops tree from changing"),
-		TRANSFORM(6, "transform", 0x7fb8a4, "Base tree potion for brewing transformations");
+		TRANSFORM(  6, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
 				
 		private final int index;
 		private final String name;

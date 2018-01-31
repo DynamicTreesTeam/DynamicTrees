@@ -109,7 +109,7 @@ public class ClientProxy extends CommonProxy {
 				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
 			}
 		});
-
+		
 		//Register Rootydirt Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
 			@Override

@@ -105,7 +105,7 @@ public class DynamicTree {
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	private IBlockState primitiveLeaves = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
-	private ItemStack primitiveLeavesItemStack = ItemStack.EMPTY;
+	private ItemStack primitiveLeavesItemStack = CompatHelper.emptyStack();
 	/** A CellKit for leaves automata */
 	private ICellKit cellKit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"));
 	

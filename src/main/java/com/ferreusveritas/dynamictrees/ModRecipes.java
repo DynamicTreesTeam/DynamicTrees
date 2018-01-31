@@ -5,7 +5,9 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -22,7 +24,10 @@ public class ModRecipes {
 	public static void registerRecipes(IForgeRegistry<IRecipe> registry) {
 
 		ModItems.dendroPotion.registerRecipes(registry);
-		ModItems.dirtBucket.registerRecipes(registry);
+		
+		//Create a dirt bucket from dirt and a bucket
+		GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, "dirtbucket"), null, new ItemStack(ModItems.dirtBucket), 
+				new Ingredient[]{ Ingredient.fromItem(Items.BUCKET), Ingredient.fromItem(ItemBlock.getItemFromBlock(Blocks.DIRT))});
 		
 		for(DynamicTree tree: ModTrees.baseTrees) {
 
