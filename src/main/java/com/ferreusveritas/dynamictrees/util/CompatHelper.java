@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -29,6 +30,13 @@ public class CompatHelper {
 		return world.spawnEntityInWorld(entity);
 	}
 
+	public static boolean spawnEntity(World world, Entity entity, Vec3d motion) {
+		entity.motionX = motion.xCoord;
+		entity.motionY = motion.yCoord;
+		entity.motionZ = motion.zCoord;
+		return world.spawnEntityInWorld(entity);
+	}
+	
 	public static World getEntityWorld(Entity entity) {
 		return entity.worldObj;
 	}

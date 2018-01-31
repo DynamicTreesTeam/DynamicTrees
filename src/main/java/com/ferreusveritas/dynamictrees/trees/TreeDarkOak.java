@@ -1,28 +1,21 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
-import com.ferreusveritas.dynamictrees.cells.CellDarkOakLeaf;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Biomes;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 public class TreeDarkOak extends DynamicTree {
 	
@@ -41,21 +34,17 @@ public class TreeDarkOak extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.MUSHROOM, 1.25f);
 
+			if(ModConfigs.worldGen && !ModConfigs.enableAppleTrees) {
+				addDropCreator(new DropCreatorApple());
+			}
+			
+			setupStandardSeedDropping();
 		}
 
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
 		};
-		
-		@Override
-		public ArrayList<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, int chance, ArrayList<ItemStack> drops) {
-			Random rand = blockAccess instanceof World ? ((World)blockAccess).rand : new Random();
-			if ((rand.nextInt(chance) == 0)) {
-				drops.add(new ItemStack(Items.APPLE, 1, 0));
-			}
-			return drops;
-		}
 		
 		@Override
 		public int getLowestBranchHeight(World world, BlockPos pos) {
@@ -92,42 +81,17 @@ public class TreeDarkOak extends DynamicTree {
 			return probMap;
 		}
 	}
-	
-	Species species;
-	
+		
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		
-		setCellSolver(Cells.darkOakSolver);
+		setCellKit("darkoak");
 		setSmotherLeavesMax(3);//thin canopy
 	}
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesDarkOak(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
-	
-	protected static final ICell darkOakLeafCells[] = {
-			Cells.nullCell,
-			new CellDarkOakLeaf(1),
-			new CellDarkOakLeaf(2),
-			new CellDarkOakLeaf(3),
-			new CellDarkOakLeaf(4)
-		}; 
-	
-	@Override
-	public ICell getCellForLeaves(int hydro) {
-		return darkOakLeafCells[hydro];
+		setCommonSpecies(new SpeciesDarkOak(this));
 	}
 	
 	@Override
@@ -143,56 +107,4 @@ public class TreeDarkOak extends DynamicTree {
 		return false;
 	}
 	
-	@Override
-	public void createLeafCluster(){
-		
-		setLeafCluster(new SimpleVoxmap(7, 5, 7, new byte[] {
-				
-			//Layer 0(Bottom)
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 2, 2, 2, 0, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 2, 0, 0, 0, 2, 0,
-			0, 0, 2, 2, 2, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 1
-			0, 0, 1, 1, 1, 0, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			1, 2, 3, 4, 3, 2, 1,
-			1, 2, 4, 0, 4, 2, 1,
-			1, 2, 3, 4, 3, 2, 1,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			
-			//Layer 2
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 1, 2, 4, 2, 1, 0,
-			0, 1, 2, 2, 2, 1, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 3
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 1, 2, 1, 0, 0,
-			0, 0, 1, 1, 1, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			
-			//Layer 4 (Top)
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 1, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0
-			
-		}).setCenter(new BlockPos(3, 1, 3)));
-	}
 }

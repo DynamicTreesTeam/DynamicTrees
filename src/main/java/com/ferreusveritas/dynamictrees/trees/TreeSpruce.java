@@ -1,19 +1,17 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.Cells;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.cells.CellConiferBranch;
-import com.ferreusveritas.dynamictrees.cells.CellConiferLeaf;
-import com.ferreusveritas.dynamictrees.cells.CellConiferTopBranch;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeaturePodzol;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +22,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,7 +29,7 @@ public class TreeSpruce extends DynamicTree {
 	
 	public class SpeciesSpruce extends Species {
 
-		GenFeaturePodzol podzolGen;
+		FeatureGenPodzol podzolGen;
 		
 		SpeciesSpruce(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -44,7 +41,9 @@ public class TreeSpruce extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.WET, 0.75f);
 			
-			podzolGen = new GenFeaturePodzol();
+			setupStandardSeedDropping();
+
+			podzolGen = new FeatureGenPodzol();
 		}
 		
 		@Override
@@ -102,54 +101,37 @@ public class TreeSpruce extends DynamicTree {
 			return true;
 		}
 		
+		@Override
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
+			//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
+			BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
+			world.setBlockState(highest.up(1), getDynamicLeavesState(4));
+			world.setBlockState(highest.up(2), getDynamicLeavesState(3));
+			world.setBlockState(highest.up(3), getDynamicLeavesState(1));
+		}
+		
 	}
-	
-	Species species;
-	
+		
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		
-		setCellSolver(Cells.coniferSolver);
+		setCellKit("conifer");
 		setSmotherLeavesMax(3);
 	}
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesSpruce(this);
+		setCommonSpecies(new SpeciesSpruce(this));
 	}
 	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
-	}
-	
-	protected static final ICell spruceBranch = new CellConiferBranch();
-	protected static final ICell spruceTopBranch = new CellConiferTopBranch();
-
 	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		if(branch.getRadius(blockState) == 1) {
-			return blockAccess.getBlockState(pos.down()).getBlock() == branch ? spruceTopBranch : spruceBranch;
-		} else {
-			return Cells.nullCell;
+		int radius = branch.getRadius(blockState);
+		if(radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				radius = 128;
+			}
 		}
-	}
-
-	protected static final ICell spruceLeafCells[] = {
-		Cells.nullCell,
-		new CellConiferLeaf(1),
-		new CellConiferLeaf(2),
-		new CellConiferLeaf(3),
-		new CellConiferLeaf(4)
-	};
-	
-	@Override
-	public ICell getCellForLeaves(int hydro) {
-		return spruceLeafCells[hydro];
+		return getCellKit().getCellForBranch(radius);
 	}
 	
 	@Override
@@ -158,25 +140,4 @@ public class TreeSpruce extends DynamicTree {
 		return ColorizerFoliage.getFoliageColorPine();
 	}
 	
-	@Override
-	public void createLeafCluster() {
-		
-		setLeafCluster(new SimpleVoxmap(5, 2, 5, new byte[] {
-				
-				//Layer 0(Bottom)
-				0, 0, 1, 0, 0,
-				0, 1, 2, 1, 0,
-				1, 2, 0, 2, 1,
-				0, 1, 2, 1, 0,
-				0, 0, 1, 0, 0,
-				
-				//Layer 1 (Top)
-				0, 0, 0, 0, 0,
-				0, 0, 1, 0, 0,
-				0, 1, 1, 1, 0,
-				0, 0, 1, 0, 0,
-				0, 0, 0, 0, 0
-				
-		}).setCenter(new BlockPos(2, 0, 2)));
-	}
 }

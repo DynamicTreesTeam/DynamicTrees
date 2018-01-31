@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.cells;
 
-import com.ferreusveritas.dynamictrees.api.cells.CellMatrix;
-
 public class CellDarkOakLeaf extends CellMatrix {
 	
 	public CellDarkOakLeaf(int value) {

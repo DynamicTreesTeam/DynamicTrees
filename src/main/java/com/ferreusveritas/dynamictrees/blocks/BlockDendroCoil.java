@@ -72,7 +72,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
 		JoCode jo = new JoCode(JoCode);
 		Species species = TreeRegistry.findSpeciesSloppy(treeName);
-		if(species != null) {
+		if(species != Species.NULLSPECIES) {
 			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
 			Logger.getLogger(ModConstants.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
@@ -81,8 +81,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void createStaff(World world, BlockPos pos, String treeName, String JoCode, String rgb, boolean readOnly) {
 		ItemStack stack = new ItemStack(ModItems.treeStaff, 1, 0);
-		Species tree = TreeRegistry.findSpeciesSloppy(treeName);
-		ModItems.treeStaff.setSpecies(stack, tree).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
+		Species species = TreeRegistry.findSpeciesSloppy(treeName);
+		ModItems.treeStaff.setSpecies(stack, species).setCode(stack, JoCode).setColor(stack, rgb).setReadOnly(stack, readOnly);
 		EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, stack);
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
@@ -101,9 +101,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public void plantTree(World world, BlockPos pos, String treeName) {
 		Species species = TreeRegistry.findSpeciesSloppy(treeName);
-		if(species != null) {
-			species.getSeed().plantSapling(world, pos.up(2), species.getSeedStack(1));
-		}
+		species.plantSapling(world, pos.up(2));
 	}
 
 	public void growPulse(World world, BlockPos pos) {

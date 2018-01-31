@@ -5,6 +5,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
 /**
@@ -17,11 +18,10 @@ public interface IBiomeDensityProvider {
 	
 	/**
 	 * A unique name to identify this {@link IBiomeDensityProvider}.
-	 * It's recommended to use something like "modid:name"
 	 * 
 	 * @return
 	 */
-	public String getName();
+	public ResourceLocation getName();
 	
 	/**
 	 * Used to determine which selector should run first.  Higher values are executed first.

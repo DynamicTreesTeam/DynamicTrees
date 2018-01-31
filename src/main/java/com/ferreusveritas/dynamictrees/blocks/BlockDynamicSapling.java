@@ -25,9 +25,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * A DynamicSapling block set up to contain a single species.
+ * 
+ * @author ferreusveritas
+ *
+ */
 public class BlockDynamicSapling extends Block implements IGrowable {
 	
-	public Species tree;
+	public Species species = Species.NULLSPECIES;
 	
 	public BlockDynamicSapling(String name) {
 		super(Material.PLANTS);
@@ -62,19 +68,19 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	}
 	
 	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
-		return canSaplingStay(world, getSpecies(state), pos);
+		return canSaplingStay(world, getSpecies(world, pos, state), pos);
 	}
 
 	@Override
 	public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
-		Species species = getSpecies(state);
+		Species species = getSpecies(world, pos, state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
 			DynamicTree tree = species.getTree();
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch with 1 radius
 				world.setBlockState(pos.up(), tree.getDynamicLeavesState());//Place a single leaf block on top
-				world.setBlockState(pos.down(), species.getRootyDirtBlock().getDefaultState());//Set to fully fertilized rooty dirt underneath
+				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			}
 		} else {
 			dropBlock(world, species, state, pos);
@@ -86,12 +92,12 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	// TREE INFORMATION
 	///////////////////////////////////////////
 	
-	public Species getSpecies(IBlockState state) {
-		return this.tree;
+	public Species getSpecies(IBlockAccess access, BlockPos pos, IBlockState state) {
+		return this.species;
 	}
 	
 	public BlockDynamicSapling setSpecies(IBlockState state, Species species) {
-		this.tree = species;
+		this.species = species;
 		return this;
 	}
 	
@@ -103,7 +109,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
 		if (!this.canBlockStay(world, pos, state)) {
-			dropBlock(world, getSpecies(state), state, pos);
+			dropBlock(world, getSpecies(world, pos, state), state, pos);
 		}
 	}
 	
@@ -115,7 +121,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(getSpecies(state).getSeedStack(1));
+		dropped.add(getSpecies(world, pos, state).getSeedStack(1));
 		return dropped;
 	}
 	
@@ -126,7 +132,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getSpecies(state).getSeedStack(1);
+		return getSpecies(world, pos, state).getSeedStack(1);
 	}
 	
 	
@@ -162,12 +168,12 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	
 	@Override
 	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-		return getSpecies(state).canGrowWithBoneMeal(world, pos);
+		return getSpecies(world, pos, state).canGrowWithBoneMeal(world, pos);
 	}
 	
 	@Override
 	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, IBlockState state) {
-		return getSpecies(state).canUseBoneMealNow(world, rand, pos);
+		return getSpecies(world, pos, state).canUseBoneMealNow(world, rand, pos);
 	}
 	
 }

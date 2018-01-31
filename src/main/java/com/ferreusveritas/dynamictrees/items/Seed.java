@@ -5,7 +5,6 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -24,6 +23,14 @@ import net.minecraft.world.World;
 
 public class Seed extends Item {
 
+	public final static Seed NULLSEED = new Seed("null") {
+		{ setCreativeTab(null); }
+		@Override public void setSpecies(Species species, ItemStack seedStack) {}
+		@Override public Species getSpecies(ItemStack seedStack) { return Species.NULLSPECIES; }
+		@Override public boolean onEntityItemUpdate(EntityItem entityItem) { entityItem.setDead(); return false; }
+		@Override public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) { return EnumActionResult.FAIL; }
+	};
+	
 	private Species species;//The tree this seed creates
 
 	public Seed(String name) {
@@ -54,7 +61,7 @@ public class Seed extends Item {
 					int count = CompatHelper.getStackCount(seedStack);
 					while(count-- > 0) {
 						if( getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
-							if(plantSapling(world, pos, seedStack)) {
+							if(getSpecies(seedStack).plantSapling(world, pos)) {
 								break;
 							}
 						}
@@ -69,47 +76,30 @@ public class Seed extends Item {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(ItemStack heldItem, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack seedStack = player.getHeldItem(hand);
+
 		//Handle Flower Pot interaction
 		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
-			Species species = getSpecies(heldItem);
+			Species species = getSpecies(seedStack);
 			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();//FIXME: Species need their own bonsai pots.. or find another solution
 			if(bonzaiPot.setSpecies(world, species, pos)) {
-				CompatHelper.shrinkStack(heldItem, 1);
+				CompatHelper.shrinkStack(seedStack, 1);
 				return EnumActionResult.SUCCESS;
 			}
 		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
-			if (player.canPlayerEdit(pos, facing, heldItem) && player.canPlayerEdit(pos.up(), facing, heldItem)) {//Ensure permissions to edit block
-				if(plantSapling(world, pos.up(), heldItem)) {//Do the planting
-					CompatHelper.shrinkStack(heldItem, 1);
+			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
+				if(getSpecies(seedStack).plantSapling(world, pos.up())) {//Do the planting
+					CompatHelper.shrinkStack(seedStack, 1);
 					return EnumActionResult.SUCCESS;
 				}
 			}
 		}
 
 		return EnumActionResult.FAIL;
-	}
-	
-	/**
-	 * Checks surroundings and places a dynamic sapling block.
-	 * 
-	 * @param world
-	 * @param pos
-	 * @param seedStack
-	 * @return
-	 */
-	public boolean plantSapling(World world, BlockPos pos, ItemStack seedStack) {
-		Species species = getSpecies(seedStack);
-		
-		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, species, pos)) {
-			return species.placeSaplingBlock(world, pos);
-		}
-
-		return false;
 	}
 	
 }

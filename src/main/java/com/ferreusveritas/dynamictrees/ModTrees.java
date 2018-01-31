@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -10,6 +11,8 @@ import com.ferreusveritas.dynamictrees.trees.TreeDarkOak;
 import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
+
+import net.minecraft.util.ResourceLocation;
 
 public class ModTrees {
 
@@ -21,17 +24,10 @@ public class ModTrees {
 	 * on the Dynamic Sapling
 	 */
 	public static void preInit() {
-		//Trees
-		baseTrees.add(new TreeOak());
-		baseTrees.add(new TreeSpruce());
-		baseTrees.add(new TreeBirch());
-		baseTrees.add(new TreeJungle());
-		baseTrees.add(new TreeAcacia());
-		baseTrees.add(new TreeDarkOak());
-	
-		for(DynamicTree tree: baseTrees) {
-			tree.registerSpecies(Species.REGISTRY);
-		}
+		Species.NULLSPECIES = Species.makeNullSpecies();
+		Species.REGISTRY.register(Species.NULLSPECIES.setRegistryName(new ResourceLocation(ModConstants.MODID, "null")));
+		Collections.addAll(baseTrees, new TreeOak(), new TreeSpruce(), new TreeBirch(), new TreeJungle(), new TreeAcacia(), new TreeDarkOak());
+		baseTrees.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
 	}
 	
 }

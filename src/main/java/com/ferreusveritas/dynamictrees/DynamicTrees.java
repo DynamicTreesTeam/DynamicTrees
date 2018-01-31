@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
@@ -15,6 +17,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -66,19 +69,18 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		
-		try { //This is need because something silently absorbs exceptions outside of this event.
-			ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
-			TreeGenerator.preInit();//Create the generator
-			
-			ModBlocks.preInit();
-			ModItems.preInit();
-			ModTrees.preInit();
-			
-			proxy.preInit();
-			compatProxy.preInit();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
+		CellKits.preInit();
+		TreeGenerator.preInit();//Create the generator
+		
+		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
+		
+		ModBlocks.preInit();
+		ModItems.preInit();
+		ModTrees.preInit();
+		
+		proxy.preInit();
+		compatProxy.preInit();
 		
 		RegistrationHandler.registerBlocks();
 		RegistrationHandler.registerItems();
@@ -118,6 +120,7 @@ public class DynamicTrees {
 		@SubscribeEvent
 		public static void newRegistry(RegistryEvent.NewRegistry event) {
 			Species.newRegistry(event);
+			Species.makeNullSpecies();
 		}
 		
 	}

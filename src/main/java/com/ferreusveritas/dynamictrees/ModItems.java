@@ -3,11 +3,9 @@ package com.ferreusveritas.dynamictrees;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -21,52 +19,35 @@ public class ModItems {
 	public static Staff treeStaff;
 	
 	public static void preInit() {
-		
-		//Potions
-		dendroPotion = new DendroPotion();
-		
-		//Dirt Bucket
-		dirtBucket = new DirtBucket();
-		
-		//Creative Mode Staff
-		treeStaff = new Staff();
+		dendroPotion = new DendroPotion();//Potions
+		dirtBucket = new DirtBucket();//Dirt Bucket
+		treeStaff = new Staff();//Creative Mode Staff
 	}
 	
 	public static void registerItems() {
-		
-		//Item Blocks
-		registerItemBlock(ModBlocks.blockRootyDirt);
-		registerItemBlock(ModBlocks.blockBonsaiPot);
-		
-		GameRegistry.register(ModItems.dendroPotion);
-		GameRegistry.register(ModItems.dirtBucket);
-		GameRegistry.register(ModItems.treeStaff);
-		
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ArrayList<Item> treeItems = new ArrayList<Item>();
-
-		for(DynamicTree tree: ModTrees.baseTrees) {
-			tree.getRegisterableBlocks(treeBlocks);
-			tree.getRegisterableItems(treeItems);
-		}
-
-		for(Item item: treeItems) {
-			GameRegistry.register(item);
-		}
+		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableItems(treeItems));
+		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
 		
-		for(Block block: treeBlocks) {
-			registerItemBlock(block);
-		}
-		
-		for(BlockDynamicLeaves leavesBlock: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			registerItemBlock(leavesBlock);
-		}
+		registerAll(makeItemBlock(ModBlocks.blockRootyDirt), makeItemBlock(ModBlocks.blockBonsaiPot));
+		registerAll(dendroPotion, dirtBucket, treeStaff);
+		registerAll(treeItems.toArray(new Item[0]));
 		
 		DynamicTrees.compatProxy.registerItems();
 	}
-
+	
+	public static Item makeItemBlock(Block block) {
+		return new ItemBlock(block).setRegistryName(block.getRegistryName());
+	}
+	
 	public static void registerItemBlock(Block block) {
 		GameRegistry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
+	}
+
+	private static void registerAll(Item ... items) {
+		for(Item item: items) {
+			GameRegistry.register(item);
+		}
 	}
 	
 }

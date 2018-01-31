@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureUndergrowth;
-import com.ferreusveritas.dynamictrees.genfeatures.GenFeatureVine;
-import com.ferreusveritas.dynamictrees.inspectors.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockHorizontal;
@@ -24,14 +24,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
 public class TreeJungle extends DynamicTree {
 	
 	public class SpeciesJungle extends Species {
 
-		GenFeatureVine vineGen;
-		GenFeatureUndergrowth underGen;
+		FeatureGenVine vineGen;
+		FeatureGenUndergrowth underGen;
 		
 		SpeciesJungle(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -44,8 +43,10 @@ public class TreeJungle extends DynamicTree {
 			envFactor(Type.HOT, 1.1f);
 			envFactor(Type.WET, 1.1f);
 			
-			vineGen = new GenFeatureVine(this);
-			underGen = new GenFeatureUndergrowth(this);
+			setupStandardSeedDropping();
+			
+			vineGen = new FeatureGenVine(this);
+			underGen = new FeatureGenUndergrowth(this);
 		}
 
 		@Override
@@ -135,8 +136,6 @@ public class TreeJungle extends DynamicTree {
 		}
 		
 	}
-
-	Species species;
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
@@ -151,17 +150,7 @@ public class TreeJungle extends DynamicTree {
 	
 	@Override
 	public void createSpecies() {
-		species = new SpeciesJungle(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(species);
-	}
-	
-	@Override
-	public Species getCommonSpecies() {
-		return species;
+		setCommonSpecies(new SpeciesJungle(this));
 	}
 	
 	@Override

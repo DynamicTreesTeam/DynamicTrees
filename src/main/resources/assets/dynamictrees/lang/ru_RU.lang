@@ -1,0 +1,40 @@
+itemGroup.dynamictrees=Динамические деревья
+
+tile.rootydirt.name=Корни
+
+tile.leaves0.name=Динамическая листва
+tile.leaves1.name=Динамическая листва
+
+tile.oakbranch.name=Ствол дуба
+tile.sprucebranch.name=Ствол ели
+tile.birchbranch.name=Ствол березы
+tile.junglebranch.name=Ствол тропического дерева
+tile.darkoakbranch.name=Ствол темного дуба
+tile.acaciabranch.name=Ствол акации
+
+tile.dynamictrees:oakbranch.name=Ствол дуба
+tile.dynamictrees:sprucebranch.name=Ствол ели
+tile.dynamictrees:birchbranch.name=Ствол березы
+tile.dynamictrees:junglebranch.name=Ствол тропического дерева
+tile.dynamictrees:darkoakbranch.name=Ствол темного дуба
+tile.dynamictrees:acaciabranch.name=Ствол акации
+
+item.oakseed.name=Желудь
+item.spruceseed.name=Еловая шишка
+item.birchseed.name=Семя березы
+item.jungleseed.name=Семя тропического дерева
+item.darkoakseed.name=Темный желудь
+item.acaciaseed.name=Семя акации
+
+item.dendropotion.biochar.name=Основное зелье
+item.dendropotion.depletion.name=Зелье истощения
+item.dendropotion.defoliance.name=Губительное зелье
+item.dendropotion.burgeoning.name=Зелье роста
+item.dendropotion.fertility.name=Зелье плодородия
+item.dendropotion.persistance.name=Зелье глубокого сна
+item.dendropotion.transform.name=Зелье трансформации
+
+item.dirtbucket.name=Ведро земли
+item.staff.name=Жезл дендролога
+tile.dendrocoil.name=Инструмент дендролога
+tile.bonsaipot.name=Бонсай

@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -59,11 +60,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
 		
 		//Register DendroCoil Mesher
-		Block dendroCoil = Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil"));
-		if(dendroCoil != Blocks.AIR) {
-			ModelHelper.regModel(dendroCoil);
-		}
-
+		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
 		
 		//ITEMS
 		
@@ -88,12 +85,12 @@ public class ClientProxy extends CommonProxy {
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		
+		//Special seed for apple
+		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
+		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
-		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
-			Item item = Item.getItemFromBlock(leaves);
-			ModelHelper.regModel(item);
-		}
-
+		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
+		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
 	}
@@ -113,13 +110,17 @@ public class ClientProxy extends CommonProxy {
 			}
 		});
 		
-		//Register Sapling Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
+		//Register Rootydirt Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : ModBlocks.blockDynamicSapling.getSpecies(state).getTree().foliageColorMultiplier(state, world, pos);
+				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
 			}
 		});
+		
+		//Register Sapling Colorizers
+		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);
+		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSaplingSpecies);
 		
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {

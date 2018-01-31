@@ -8,12 +8,12 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.potion.SubstanceDeplete;
-import com.ferreusveritas.dynamictrees.potion.SubstanceDisease;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.potion.SubstanceFreeze;
-import com.ferreusveritas.dynamictrees.potion.SubstanceGrowth;
-import com.ferreusveritas.dynamictrees.potion.SubstanceTransform;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDeplete;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDisease;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.creativetab.CreativeTabs;

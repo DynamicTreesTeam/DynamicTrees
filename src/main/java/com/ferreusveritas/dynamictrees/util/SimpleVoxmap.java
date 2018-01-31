@@ -244,14 +244,15 @@ public class SimpleVoxmap {
 					private int x = 0;
 					private int y = 0;
 					private int z = 0;
+					private BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
 
 					@Override
 					protected Cell computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
-							BlockPos dPos = new BlockPos(x, y, z);
-							
+							dPos.setPos(x, y, z);
+														
 							if (x < lenX - 1) {
 								++x;
 							}
@@ -300,13 +301,14 @@ public class SimpleVoxmap {
 					private int x = 0;
 					private int y = lenY - 1;
 					private int z = 0;
+					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
 
 					@Override
 					protected Cell computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
-							BlockPos dPos = new BlockPos(x, y, z);
+							dPos.setPos(x, y, z);
 							
 							if (x < lenX - 1) {
 								++x;
@@ -355,12 +357,14 @@ public class SimpleVoxmap {
 					private int x = 0;
 					private int y = 0;
 					private int z = 0;
+					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
+
 					@Override
 					protected BlockPos computeNext() {
 
 						while(true) {
 							int pos = calcPos(x, y, z);
-							BlockPos dPos = new BlockPos(x, y, z);
+							dPos.setPos(x, y, z);
 
 							if (x < lenX - 1) {
 								++x;
