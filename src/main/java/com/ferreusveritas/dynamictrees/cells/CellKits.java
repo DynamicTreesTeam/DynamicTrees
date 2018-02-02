@@ -231,11 +231,11 @@ public class CellKits {
 	*
 	* Example:
 	*	exampleSolver = 0x0514, 0x0413, 0x0312, 0x0211
-	*	0x0514.. (5 X 1 = 4)  If there's 1 or more neighbor blocks with hydration 5 then make this block hydration 4
+	*	0x0514.. (5 @ 1 = 4)  If there's 1 or more neighbor blocks with hydration 5 then make this block hydration 4
 	* 
 	* @param nv Array of counts of neighbor hydration values
 	* @param solution Array of solver elements to solve the cell automata
-	* @return
+	* @return resulting hydration value of the center cell
 	*/
 	public static int solveCell(int[] nv, short[] solution) {
 		for(int d: solution) {
