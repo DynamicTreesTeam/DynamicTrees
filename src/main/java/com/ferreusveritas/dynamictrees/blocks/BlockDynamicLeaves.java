@@ -59,6 +59,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
 	
 	private DynamicTree trees[] = new DynamicTree[4];
+	private int flammabilities[] = new int[] { 60, 60, 60, 60 }; // Mimic vanilla leaves
+	private int fireSpreadSpeeds[] = new int[] { 30, 30, 30, 30 }; // Mimic vanilla leaves
 	
 	public BlockDynamicLeaves() {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
@@ -96,16 +98,26 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return trees[treeNum & 3];
 	}
 	
-	//Borrow flammability from the vanilla minecraft leaves
+	// Get tree-specific flammability
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		return (int) (getTree(world, pos).getPrimitiveLeaves().getBlock().getFlammability(world, pos, face) * 0.75f);
+		return flammabilities[world.getBlockState(pos).getValue(TREE)];
 	}
 	
-	//Borrow fire spread rate from the vanilla minecraft leaves
+	// Get tree-specific fire spread speed
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		return getTree(world, pos).getPrimitiveLeaves().getBlock().getFireSpreadSpeed(world, pos, face);
+		return fireSpreadSpeeds[world.getBlockState(pos).getValue(TREE)];
+	}
+	
+	public BlockDynamicLeaves setFlammability(int flammability, int tree) {
+		flammabilities[tree & 3] = flammability;
+		return this;
+	}
+	
+	public BlockDynamicLeaves setFireSpreadSpeed(int fireSpreadSpeed, int tree) {
+		fireSpreadSpeeds[tree & 3] = fireSpreadSpeed;
+		return this;
 	}
 	
 	@Override
