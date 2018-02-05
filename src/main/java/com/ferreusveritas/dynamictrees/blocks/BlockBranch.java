@@ -50,6 +50,8 @@ import net.minecraftforge.common.property.Properties;
 public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	private DynamicTree tree; //The tree this branch type creates
+	private int flammability = 5; // Mimic vanilla logs
+	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
 	
 	// This is a nightmare
@@ -214,16 +216,26 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		// return 300;
-		return getTree().getPrimitiveLog().getBlock().getFlammability(world, pos, face);
+		// return 5;
+		return flammability;
 	}
 	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		// return 4096;
+		// return 5;
 		int radius = getRadius(world, pos);
-		return (getTree().getPrimitiveLog().getBlock().getFireSpreadSpeed(world, pos, face) * radius) / 8 ;
+		return (fireSpreadSpeed * radius) / 8 ;
 	}
+	
+	public BlockBranch setFlammability(int flammability) {
+		this.flammability = flammability;
+		return this;
+	}
+	
+	public BlockBranch setFireSpreadSpeed(int fireSpreadSpeed) {
+		this.fireSpreadSpeed = fireSpreadSpeed;
+		return this;
+ 	}
 	
 	///////////////////////////////////////////
 	// RENDERING
