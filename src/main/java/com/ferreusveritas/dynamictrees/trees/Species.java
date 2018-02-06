@@ -599,8 +599,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 		
 		if(radius <= 1) {
+			BlockDynamicLeaves leaves = (BlockDynamicLeaves) getLeavesProperties().getDynamicLeavesState().getBlock();
 			for(EnumFacing dir: upFirst) {
-				if(getLeavesProperties().getLeavesBlock().growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
+				if(leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
 					return false;
 				}
 			}

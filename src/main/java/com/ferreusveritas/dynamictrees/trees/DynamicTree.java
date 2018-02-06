@@ -95,9 +95,18 @@ public class DynamicTree {
 	public boolean canSupportCocoa = false;
 	
 	/** Get your Cheeto fingers off! Only dynamictrees mod should use this and only for vanilla trees */
-	public DynamicTree(BlockPlanks.EnumType treeType) {
-		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")));
-		simpleVanillaSetup(treeType);
+	public DynamicTree(BlockPlanks.EnumType wood) {
+		this(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
+		
+		//Setup tree references
+		boolean isOld = wood.getMetadata() < 4;
+		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
+		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		ModBlocks.blockBonsaiPot.setupVanillaTree(this);//Setup the bonsai pot to receive this type of tree
+
+		//Setup common species
+		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
+		getCommonSpecies().generateSeed();
 	}
 	
 	public DynamicTree() {
@@ -118,39 +127,6 @@ public class DynamicTree {
 		setDynamicBranch(new BlockBranch(name + "branch"));
 		
 		createSpecies();
-	}
-	
-	/**
-	 * This is for use with Vanilla Tree types only.  Mods depending on the dynamictrees mod should 
-	 * call the here contained primitive assignment functions in their constructor instead.
-	 * 
-	 * @param wood
-	 */
-	private void simpleVanillaSetup(BlockPlanks.EnumType wood) {
-		
-		switch(wood) {
-			case OAK:
-			case SPRUCE:
-			case BIRCH:
-			case JUNGLE: {
-				IBlockState primLog = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, wood);
-				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockOldLog.VARIANT).getMetadata() & 3));
-			}
-			break;
-			case ACACIA:
-			case DARK_OAK: {
-				IBlockState primLog = Blocks.LOG2.getDefaultState().withProperty(BlockNewLog.VARIANT, wood);
-				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockNewLog.VARIANT).getMetadata() & 3));
-			}
-			break;
-		}
-		
-		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood), new ItemStack(Blocks.SAPLING, 1, wood.getMetadata()));
-		ModBlocks.blockBonsaiPot.setupVanillaTree(this);//Setup the bonsai pot to receive this type of tree
-
-		//Setup common species
-		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		getCommonSpecies().generateSeed();
 	}
 	
 	public void createSpecies() {}
@@ -309,6 +285,10 @@ public class DynamicTree {
 		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
+	protected DynamicTree setPrimitiveLog(IBlockState primLog) {
+		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock()), 1, primLog.getBlock().damageDropped(primLog)));
+	}
+	
 	protected DynamicTree setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
 		primitiveLog = primLog;
 		primitiveLogItemStack = primLogStack;
@@ -321,6 +301,10 @@ public class DynamicTree {
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
 		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
+	}
+	
+	protected DynamicTree setPrimitiveSapling(IBlockState primSapling) {
+		return setPrimitiveSapling(primSapling, new ItemStack(Item.getItemFromBlock(primSapling.getBlock()), 1, primSapling.getBlock().damageDropped(primSapling)));
 	}
 	
 	protected DynamicTree setPrimitiveSapling(IBlockState primSapling, ItemStack primSaplingStack) {
