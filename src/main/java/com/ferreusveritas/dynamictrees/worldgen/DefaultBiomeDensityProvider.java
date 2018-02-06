@@ -85,13 +85,11 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
 	@Override
 	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
-
+		
 		int biomeId = Biome.getIdForBiome(biome);
-		IChance chance;
-				
-		if(fastChanceLookup.containsKey(biomeId)) {
-			chance = fastChanceLookup.get(biomeId);
-		} else {
+		IChance chance = fastChanceLookup.get(biomeId);
+		
+		if(chance == null) {
 			if(CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
 				chance = new IChance() {
 					@Override

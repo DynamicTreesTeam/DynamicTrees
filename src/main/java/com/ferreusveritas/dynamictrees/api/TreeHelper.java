@@ -129,106 +129,106 @@ public class TreeHelper {
 	
 	//Treeparts
 	
-	public static boolean isTreePart(Block block) {
+	public final static boolean isTreePart(Block block) {
 		return block instanceof ITreePart;
 	}
 	
-	public static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
+	public final static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
 	
-	public static ITreePart getTreePart(Block block) {
+	public final static ITreePart getTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
 	}
 	
-	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
+	public final static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return getTreePart(blockAccess.getBlockState(pos));
 	}
 	
-	public static ITreePart getTreePart(IBlockState blockState) {
+	public final static ITreePart getTreePart(IBlockState blockState) {
 		return getTreePart(blockState.getBlock());
 	}
 	
 	
 	//Branches
 	
-	public static boolean isBranch(Block block) {
+	public final static boolean isBranch(Block block) {
 		return block instanceof BlockBranch;//Oh shuddap you java purists.. this is minecraft!
 	}
 	
-	public static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
+	public final static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
 		return isBranch(blockAccess.getBlockState(pos).getBlock());
 	}
 	
-	public static boolean isBranch(IBlockState state) {
+	public final static boolean isBranch(IBlockState state) {
 		return isBranch(state.getBlock());
 	}
 	
-	public static BlockBranch getBranch(Block block) {
+	public final static BlockBranch getBranch(Block block) {
 		return isBranch(block) ? (BlockBranch)block : null;
 	}
 	
-	public static BlockBranch getBranch(ITreePart treepart) {
+	public final static BlockBranch getBranch(ITreePart treepart) {
 		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
 	}
 	
-	public static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
+	public final static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
 		return getBranch(blockAccess.getBlockState(pos));
 	}
 	
-	public static BlockBranch getBranch(IBlockState state) {
+	public final static BlockBranch getBranch(IBlockState state) {
 		return getBranch(state.getBlock());
 	}
 	
 	//Leaves
 	
-	public static boolean isLeaves(Block block) {
+	public final static boolean isLeaves(Block block) {
 		return block instanceof BlockDynamicLeaves;
 	}
 	
-	public static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
+	public final static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		return isLeaves(blockAccess.getBlockState(pos).getBlock());
 	}
 	
-	public static boolean isLeaves(IBlockState blockState) {
+	public final static boolean isLeaves(IBlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
 	
-	public static BlockDynamicLeaves getDynamicLeaves(Block block) {
+	public final static BlockDynamicLeaves getDynamicLeaves(Block block) {
 		return isLeaves(block) ? (BlockDynamicLeaves)block : null;
 	}
 	
-	public static BlockDynamicLeaves getDynamicLeaves(ITreePart treepart) {
+	public final static BlockDynamicLeaves getDynamicLeaves(ITreePart treepart) {
 		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
-	public static BlockDynamicLeaves getDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
+	public final static BlockDynamicLeaves getDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		return getDynamicLeaves(blockAccess.getBlockState(pos));
 	}
 	
-	public static BlockDynamicLeaves getDynamicLeaves(IBlockState state) {
+	public final static BlockDynamicLeaves getDynamicLeaves(IBlockState state) {
 		return getDynamicLeaves(state.getBlock());
 	}
 	
 	//Rooty Dirt
 	
-	public static boolean isRootyDirt(Block block) {
+	public final static boolean isRootyDirt(Block block) {
 		return block instanceof BlockRootyDirt;
 	}
 	
-	public static boolean isRootyDirt(IBlockState soilBlockState) {
+	public final static boolean isRootyDirt(IBlockState soilBlockState) {
 		return isRootyDirt(soilBlockState.getBlock());
 	}
 	
-	public static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+	public final static boolean isRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
 		return isRootyDirt(blockAccess.getBlockState(pos));
 	}
 	
-	public static BlockRootyDirt getRootyDirt(Block block) {
+	public final static BlockRootyDirt getRootyDirt(Block block) {
 		return isRootyDirt(block) ? (BlockRootyDirt)block : null;
 	}
 	
-	public static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+	public final static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
 		return getRootyDirt(blockAccess.getBlockState(pos).getBlock());
 	}
 	

@@ -13,7 +13,6 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
@@ -220,7 +219,8 @@ public class DynamicTree {
 
 		return false;
 	}
-
+	
+	
 	//////////////////////////////
 	// REGISTRATION
 	//////////////////////////////
@@ -251,6 +251,7 @@ public class DynamicTree {
 		}
 		return itemList;
 	}
+	
 	
 	//////////////////////////////
 	// TREE PROPERTIES
@@ -321,11 +322,11 @@ public class DynamicTree {
 		return primitiveSaplingItemStack;
 	}
 	
+	
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////
-	
-	
+		
 	/**
 	 * This is resource intensive.  Use only for interaction code.
 	 * Only the root node can determine the exact species and it has
@@ -336,14 +337,8 @@ public class DynamicTree {
 	 * @return
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
-		
 		BlockPos rootPos = findRootNode(world, pos);
-		if(rootPos != null) {
-			BlockRootyDirt rootBlock = (BlockRootyDirt) world.getBlockState(rootPos).getBlock();
-			return rootBlock.getSpecies(world, rootPos);
-		}
-		
-		return Species.NULLSPECIES;
+		return rootPos != null ? TreeHelper.getRootyDirt(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
 	}
 	
 
@@ -376,26 +371,18 @@ public class DynamicTree {
 	
 	@SideOnly(Side.CLIENT)
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		if(world != null && pos != null) {
-			return BiomeColorHelper.getFoliageColorAtPos(world, pos);
-		}
-		return ColorizerFoliage.getFoliageColorBasic();
+		return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
 	}
+	
 	
 	//////////////////////////////
 	// LEAVES HANDLING
 	//////////////////////////////
 	
 	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		
 		IBlockState state = blockAccess.getBlockState(pos);
-		ITreePart treePart = TreeHelper.getTreePart(state);
-		
-		if (treePart != TreeHelper.nullTreePart && treePart instanceof BlockDynamicLeaves) {
-			return this == ((BlockDynamicLeaves)treePart).getTree(state);			
-		}
-		
-		return false;
+		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(state);
+		return (leaves != null) && this == leaves.getTree(state);
 	}
 
 	public interface IConnectable {
