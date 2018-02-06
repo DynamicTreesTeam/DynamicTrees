@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 
@@ -18,8 +19,8 @@ import net.minecraft.world.World;
  */
 public class SpeciesRare extends Species {
 
-	public SpeciesRare(ResourceLocation name, DynamicTree treeFamily) {
-		super(name, treeFamily);
+	public SpeciesRare(ResourceLocation name, DynamicTree treeFamily, ILeavesProperties leavesProperties) {
+		super(name, treeFamily, leavesProperties);
 	}
 	
 	@Override

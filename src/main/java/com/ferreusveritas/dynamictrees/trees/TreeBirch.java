@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 
 import net.minecraft.block.BlockPlanks;
@@ -23,7 +24,7 @@ public class TreeBirch extends DynamicTree {
 	public class SpeciesBirch extends Species {
 
 		SpeciesBirch(DynamicTree treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getName(), treeFamily, ModBlocks.birchLeavesProperties);
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
@@ -40,29 +41,30 @@ public class TreeBirch extends DynamicTree {
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
 		};
+
+		@Override
+		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+			if(super.rot(world, pos, neighborCount, radius, random)) {
+				if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+					world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a brown mushroom
+					world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 3);//Change rooty dirt to dirt
+				}
+				return true;
+			}
+			
+			return false;
+		}
 		
 	}
 		
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
+		ModBlocks.birchLeavesProperties.setTree(this);
 	}
 	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesBirch(this));
-	}
-	
-	@Override
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
-				world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a brown mushroom
-				world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 3);//Change rooty dirt to dirt
-			}
-			return true;
-		}
-		
-		return false;
 	}
 	
 	@Override

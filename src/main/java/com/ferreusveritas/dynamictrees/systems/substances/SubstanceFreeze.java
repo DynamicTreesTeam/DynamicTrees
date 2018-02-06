@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFreezer;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -15,11 +16,12 @@ public class SubstanceFreeze implements ISubstanceEffect {
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
 		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
-		if(dirt != null) {
+		Species species = dirt.getSpecies(world, rootPos);
+		if(species != Species.NULLSPECIES && dirt != null) {
 			if(world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 			} else {
-				dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFreezer()));
+				dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFreezer(species)));
 				dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
 			}
 			return true;

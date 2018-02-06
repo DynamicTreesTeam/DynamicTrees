@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
@@ -15,6 +16,12 @@ import net.minecraft.world.World;
 
 public class NodeFreezer implements INodeInspector {
 
+	Species species;
+
+	public NodeFreezer(Species species) {
+		this.species = species;
+	}
+	
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
@@ -37,7 +44,7 @@ public class NodeFreezer implements INodeInspector {
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, BlockPos twigPos) {		
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			DynamicTree tree = branch.getTree();
-			IBlockState primLeaves = tree.getPrimitiveLeaves();
+			IBlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
 					world.setBlockState(leavesPos, primLeaves.withProperty(BlockLeaves.DECAYABLE, false).withProperty(BlockLeaves.CHECK_DECAY, false));

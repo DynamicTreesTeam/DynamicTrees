@@ -33,7 +33,7 @@ public class TreeJungle extends DynamicTree {
 		FeatureGenUndergrowth underGen;
 		
 		SpeciesJungle(DynamicTree treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
 
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
@@ -139,15 +139,10 @@ public class TreeJungle extends DynamicTree {
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
-		
+		ModBlocks.jungleLeavesProperties.setTree(this);
 		canSupportCocoa = true;
 	}
 
-	@Override
-	public int getLightRequirement() {
-		return 12;//The jungle can be a dark place.  Give these trees a little advantage.
-	}
-	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesJungle(this));

@@ -5,12 +5,11 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -139,6 +138,7 @@ public class JoCode {
 		//Fix branch thicknesses and map out leaf locations
 		BlockBranch branch = TreeHelper.getBranch(world, treePos);
 		if(branch != null) {//If a branch exists then the growth was successful
+			ILeavesProperties leavesProperties = species.getLeavesProperties();
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
 			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
@@ -146,20 +146,19 @@ public class JoCode {
 			branch.analyse(world, treePos, EnumFacing.DOWN, signal);
 			List<BlockPos> endPoints = endFinder.getEnds();
 			
-			smother(leafMap, branch.getTree());//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
+			smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
 			
 			//Establish a zone where we can place leaves without hitting ungenerated chunks.
 			SafeChunkBounds safeBounds = new SafeChunkBounds(world, rootPos);//Area that is safe to place leaves during worldgen
 			
 			//Place Growing Leaves Blocks from voxmap
-			IBlockState leavesState = branch.getTree().getDynamicLeavesState();
 			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
 				BlockPos cellPos = cell.getPos();
 				if(safeBounds.inBounds(cellPos)) {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesState.withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(cell.getValue(), 1, 4)), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 0);
 					}
 				} else {
 					leafMap.setVoxel(cellPos, (byte) 0);
@@ -229,9 +228,9 @@ public class JoCode {
 	 * Precompute leaf smothering before applying to the world.
 	 * 
 	 * @param leafMap
-	 * @param tree
+	 * @param leavesProperties
 	 */
-	private void smother(SimpleVoxmap leafMap, DynamicTree tree) {
+	private void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
 		BlockPos saveCenter = leafMap.getCenter();
 		leafMap.setCenter(new BlockPos(0, 0, 0));
 
@@ -255,7 +254,7 @@ public class JoCode {
 					} else
 					if((v & 0x0F) != 0) {//Leaves
 						count++;
-						if(count > tree.getSmotherLeavesMax()){//Smother value
+						if(count > leavesProperties.getSmotherLeavesMax()){//Smother value
 							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
 						}
 					} else

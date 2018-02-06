@@ -21,10 +21,10 @@ public interface ITreePart {
 	* @param pos Position of the cell
 	* @param blockState the blockState of the block we are getting the cell from
 	* @param dir The direction of the request(opposite the direction of the requester)
-	* @param leavesTree The tree data of the leaves the request came from
+	* @param leavesProperties The tree data of the leaves the request came from  TODO
 	* @return Cell for getting hydration level
 	*/
-	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree);
+	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties);
 
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.

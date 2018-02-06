@@ -38,7 +38,7 @@ public class TreeOak extends DynamicTree {
 	public class SpeciesOak extends Species {
 		
 		SpeciesOak(DynamicTree treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getName(), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			//Oak trees are about as average as you can get
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
@@ -59,6 +59,19 @@ public class TreeOak extends DynamicTree {
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
 		}
+	
+		@Override
+		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+			if(super.rot(world, pos, neighborCount, radius, random)) {
+				if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+					world.setBlockState(pos, random.nextInt(3) == 0 ? ModBlocks.blockStates.redMushroom : ModBlocks.blockStates.brownMushroom);//Change branch to a mushroom
+					world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
+				}
+				return true;
+			}
+			
+			return false;
+		}
 		
 	}
 	
@@ -71,7 +84,7 @@ public class TreeOak extends DynamicTree {
 		FeatureGenVine vineGen;
 		
 		SpeciesSwampOak(DynamicTree treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
@@ -123,6 +136,19 @@ public class TreeOak extends DynamicTree {
 			//Generate Vines
 			vineGen.setQuantity(5).gen(world, rootPos.up(), endPoints);
 		}
+		
+		@Override
+		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+			if(super.rot(world, pos, neighborCount, radius, random)) {
+				if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
+					world.setBlockState(pos, random.nextInt(3) == 0 ? ModBlocks.blockStates.redMushroom : ModBlocks.blockStates.brownMushroom);//Change branch to a mushroom
+					world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
+				}
+				return true;
+			}
+			
+			return false;
+		}
 	}
 
 	/**
@@ -134,7 +160,7 @@ public class TreeOak extends DynamicTree {
 		private static final String speciesName = "apple";
 		
 		public SpeciesAppleOak(DynamicTree treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
@@ -184,6 +210,7 @@ public class TreeOak extends DynamicTree {
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
+		ModBlocks.oakLeavesProperties.setTree(this);
 	}
 	
 	@Override
@@ -217,19 +244,6 @@ public class TreeOak extends DynamicTree {
 		}
 		
 		return getCommonSpecies();
-	}
-	
-	@Override
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 4 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 4) {
-				world.setBlockState(pos, random.nextInt(3) == 0 ? ModBlocks.blockStates.redMushroom : ModBlocks.blockStates.brownMushroom);//Change branch to a mushroom
-				world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
-			}
-			return true;
-		}
-		
-		return false;
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.api;
 import java.util.HashMap;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -23,6 +24,13 @@ public class TreeHelper {
 	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
 	
 	public static final ITreePart nullTreePart = new NullTreePart();
+	
+	
+	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
+		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq);
+		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().withProperty(BlockDynamicLeaves.TREE, seq & 3));
+		return leaves;
+	}
 	
 	/**
 	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.

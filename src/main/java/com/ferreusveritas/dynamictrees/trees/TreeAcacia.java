@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockPlanks;
@@ -11,7 +12,7 @@ public class TreeAcacia extends DynamicTree {
 	public class SpeciesAcacia extends Species {
 
 		SpeciesAcacia(DynamicTree treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getName(), treeFamily, ModBlocks.acaciaLeavesProperties);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
@@ -32,9 +33,6 @@ public class TreeAcacia extends DynamicTree {
 		
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
-
-		setCellKit("acacia");
-		setSmotherLeavesMax(2);//very thin canopy
 	}
 
 	@Override

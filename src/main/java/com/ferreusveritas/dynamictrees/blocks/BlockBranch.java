@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
@@ -165,7 +166,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	 * @param rapid if true then unsupported branch rot will occur regardless of chance value.  will also rot the entire unsupported branch at once
 	 * @return true if the branch was destroyed because of rot
 	 */
-	public boolean checkForRot(World world, BlockPos pos, int radius, Random rand, float chance, boolean rapid) {
+	public boolean checkForRot(World world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
 			return false;//Bail out if not in rapid mode and the rot chance fails
@@ -183,14 +184,14 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			}
 		}
 		
-		boolean didRot = getTree().rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
 		
 		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
 			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
 				IBlockState state = world.getBlockState(neighPos);
 				if(state.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, getRadius(state), rand, 1.0f, true);
+					checkForRot(world, neighPos, species, getRadius(state), rand, 1.0f, true);
 				}
 			}
 		}
@@ -266,11 +267,11 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	///////////////////////////////////////////
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
 		DynamicTree thisTree = getTree();
 		
-		if(leavesTree == thisTree) {// The requesting leaves must match the tree for hydration to occur
-			return thisTree.getCellForBranch(blockAccess, pos, blockState, dir, this);
+		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+			return leavesProperties.getCellKit().getCellForBranch(thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this));
 		} else {
 			return CellNull.nullCell;
 		}
@@ -300,12 +301,12 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		DynamicTree tree = signal.getSpecies().getTree();
+		Species species = signal.getSpecies();
 		
-		BlockDynamicLeaves leaves = tree.getDynamicLeaves();
+		BlockDynamicLeaves leaves = species.getLeavesProperties().getLeavesBlock();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
-				signal.success = leaves.growLeaves(world, tree, pos, 0);
+				signal.success = leaves.growLeaves(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
 			}

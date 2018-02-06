@@ -1,14 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
-import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -24,9 +20,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockNewLog;
-import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockSapling;
@@ -67,8 +61,8 @@ public class DynamicTree {
 	public final static DynamicTree NULLTREE = new DynamicTree() {
 		@Override public void setCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
-		@Override public void setCellKit(ResourceLocation name) {}
-		@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
+		//@Override public void setCellKit(ResourceLocation name) {}
+		//@Override public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) { return this; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) { return false; }
@@ -94,20 +88,11 @@ public class DynamicTree {
 	private ItemStack primitiveSaplingItemStack = CompatHelper.emptyStack();
 	
 	//Leaves
-	/** The dynamic leaves used by this tree */
-	private BlockDynamicLeaves dynamicLeaves;
-	/** A dynamic leaves block needs a subblock number to specify which subblock we are working with **/
-	private int leavesSubBlock;
-	/** Maximum amount of leaves in a stack before the bottom-most leaf block dies [default = 4] **/
-	private int smotherLeavesMax = 4;
-	/** Minimum amount of light necessary for a leaves block to be created. **/
-	protected int lightRequirement = 13;
-	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
-	private IBlockState primitiveLeaves = Blocks.AIR.getDefaultState();
-	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
-	private ItemStack primitiveLeavesItemStack = CompatHelper.emptyStack();
-	/** A CellKit for leaves automata */
-	private ICellKit cellKit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"));
+	///** The dynamic leaves used by this tree */
+	//private BlockDynamicLeaves dynamicLeaves;
+	///** A dynamic leaves block needs a subblock number to specify which subblock we are working with **/
+	//private int leavesSubBlock;
+
 	
 	
 	//Misc
@@ -118,7 +103,7 @@ public class DynamicTree {
 	
 	/** Get your Cheeto fingers off! Only dynamictrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType treeType) {
-		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")), treeType.getMetadata());
+		this(new ResourceLocation(ModConstants.MODID, treeType.getName().replace("_","")));
 		simpleVanillaSetup(treeType);
 	}
 	
@@ -134,12 +119,9 @@ public class DynamicTree {
 	 * @param seq The registration sequence number for this MODID. Used for registering 4 leaves types per {@link BlockDynamicLeaves}.
 	 * Sequence numbers must be unique within each mod.  It's recommended to define the sequence consecutively and avoid later rearrangement. 
 	 */
-	public DynamicTree(ResourceLocation name, int seq) {
+	public DynamicTree(ResourceLocation name) {
 		this.name = name;
 		
-		if(seq >= 0) {
-			setDynamicLeaves(name.getResourceDomain(), seq);
-		}
 		setDynamicBranch(new BlockBranch(name + "branch"));
 		
 		createSpecies();
@@ -158,17 +140,13 @@ public class DynamicTree {
 			case SPRUCE:
 			case BIRCH:
 			case JUNGLE: {
-				IBlockState primLeaves = Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, wood);
 				IBlockState primLog = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, wood);
-				setPrimitiveLeaves(primLeaves, new ItemStack(primLeaves.getBlock(), 1, primLeaves.getValue(BlockOldLeaf.VARIANT).getMetadata() & 3));
 				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockOldLog.VARIANT).getMetadata() & 3));
 			}
 			break;
 			case ACACIA:
 			case DARK_OAK: {
-				IBlockState primLeaves = Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, wood);
 				IBlockState primLog = Blocks.LOG2.getDefaultState().withProperty(BlockNewLog.VARIANT, wood);
-				setPrimitiveLeaves(primLeaves, new ItemStack(primLeaves.getBlock(), 1, primLeaves.getValue(BlockNewLeaf.VARIANT).getMetadata() & 3));
 				setPrimitiveLog(primLog, new ItemStack(primLog.getBlock(), 1, primLog.getValue(BlockNewLog.VARIANT).getMetadata() & 3));
 			}
 			break;
@@ -321,12 +299,12 @@ public class DynamicTree {
 	 * @param sub The subtype number (0-3) for using 4 leaves type per {@link BlockDynamicLeaves} (e.g. oak=0, spruce=1, etc)
 	 * @return this tree for chaining
 	 */
-	public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) {
+	/*public DynamicTree setDynamicLeaves(BlockDynamicLeaves leaves, int sub) {
 		dynamicLeaves = leaves;
 		leavesSubBlock = sub;
 		dynamicLeaves.setTree(leavesSubBlock, this);
 		return this;
-	}
+	}*/
 	
 	/**
 	 * Set dynamic leaves from an automatically created source.
@@ -335,7 +313,8 @@ public class DynamicTree {
 	 * @param seq The sequencing number(see constructor for details)
 	 * @return this tree for chaining
 	 */
-	protected DynamicTree setDynamicLeaves(String modid, int seq) {
+	//TODO CLEANUP
+	/*protected DynamicTree setDynamicLeaves(String modid, int seq) {
 		return setDynamicLeaves(TreeHelper.getLeavesBlockForSequence(modid, seq), seq & 3);
 	}
 	
@@ -353,7 +332,7 @@ public class DynamicTree {
 	
 	public IBlockState getDynamicLeavesState(int hydro) {
 		return getDynamicLeavesState().withProperty(BlockDynamicLeaves.HYDRO, MathHelper.clamp(hydro, 1, 4));
-	}
+	}*/
 	
 	protected DynamicTree setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
@@ -380,7 +359,7 @@ public class DynamicTree {
 		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
-	protected DynamicTree setPrimitiveLeaves(IBlockState primLeaves, ItemStack primLeavesStack) {
+	/*protected DynamicTree setPrimitiveLeaves(IBlockState primLeaves, ItemStack primLeavesStack) {
 		primitiveLeaves = primLeaves;
 		primitiveLeavesItemStack = primLeavesStack;
 		return this;
@@ -388,11 +367,9 @@ public class DynamicTree {
 	
 	public IBlockState getPrimitiveLeaves() {
 		return primitiveLeaves;
-	}
+	}*/
 	
-	public ItemStack getPrimitiveLeavesItemStack(int qty) {
-		return CompatHelper.setStackCount(primitiveLeavesItemStack.copy(), MathHelper.clamp(qty, 0, 64));
-	}
+
 	
 	protected DynamicTree setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
 		primitiveLog = primLog;
@@ -466,8 +443,8 @@ public class DynamicTree {
 		return null;
 	}
 	
-	public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		return getCellKit().getCellForBranch(branch.getRadius(blockState));
+	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		return branch.getRadius(blockState);
 	}
 	
 	
@@ -482,7 +459,8 @@ public class DynamicTree {
 		}
 		return ColorizerFoliage.getFoliageColorBasic();
 	}
-	
+
+	/*  TODO: Cleanup
 	///////////////////////////////////////////
 	// LEAVES AUTOMATA
 	///////////////////////////////////////////
@@ -495,7 +473,7 @@ public class DynamicTree {
 		return smotherLeavesMax;
 	}
 	
-	/** Minimum amount of light necessary for a leaves block to be created. **/
+	// Minimum amount of light necessary for a leaves block to be created.
 	public int getLightRequirement() {
 		return lightRequirement;
 	}
@@ -511,7 +489,7 @@ public class DynamicTree {
 	public ICellKit getCellKit() {
 		return cellKit;
 	}
-	
+	*/
 	
 	//////////////////////////////
 	// LEAVES HANDLING
@@ -529,17 +507,19 @@ public class DynamicTree {
 		return false;
 	}
 	
-	public boolean isCompatibleDynamicLeaves(Block leaves, int sub) {
+	//TODO: CLEANUP
+	/*public boolean isCompatibleDynamicLeaves(Block leaves, int sub) {
 		return leaves == getDynamicLeaves() && sub == getDynamicLeavesSub();
-	}
+	}*/
 	
 	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		IBlockState primState = getPrimitiveLeaves();
+		IBlockState primState = getCommonSpecies().getLeavesProperties().getPrimitiveLeaves();
 		IBlockState otherState = blockAccess.getBlockState(pos);
 
 		Block primBlock = primState.getBlock();
 		Block otherBlock = otherState.getBlock();
 		
+		//FIXME: This is GARBAGE.  NOT MOD FRIENDLY! This won't permit connections to leaves that are not the vanilla versions of the common species leaves. 
 		if(primBlock == otherBlock) {//Blocks Match
 			//Does it break the BlockState convention? You bet.  Do I not care? You bet!
 			return ((primBlock.getMetaFromState(primState) & 3) == (otherBlock.getMetaFromState(otherState) & 3));
@@ -552,40 +532,11 @@ public class DynamicTree {
 		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
 	}
 	
-	public ICell getCellForLeaves(int hydro) {
+	//TODO Cleanup
+	/*public ICell getCellForLeaves(int hydro) {
 		return getCellKit().getCellForLeaves(hydro);
-	}
+	}*/
 	
-	
-	//////////////////////////////
-	// BIOME HANDLING
-	//////////////////////////////
-
-	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
-	
-	/**
-	* Handle rotting branches
-	* @param world The world
-	* @param pos
-	* @param neighborCount Count of neighbors reinforcing this block
-	* @param radius The radius of the branch
-	* @param random Access to a random number generator
-	* @return true if the branch should rot
-	*/
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-		
-		if(radius <= 1) {
-			for(EnumFacing dir: upFirst) {
-				if(getDynamicLeaves().growLeaves(world, this, pos.offset(dir), 0)) {
-					return false;
-				}
-			}
-		}
-		world.setBlockToAir(pos);
-		return true;
-	}
-	
-
 	//////////////////////////////
 	// BONSAI POT
 	//////////////////////////////

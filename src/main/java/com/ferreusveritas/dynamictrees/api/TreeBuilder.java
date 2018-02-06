@@ -2,11 +2,13 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IFoliageColorHandler;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -14,7 +16,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -43,10 +44,9 @@ public class TreeBuilder {
 	private ItemStack stickItemStack;
 
 	//Leaves
-	private BlockDynamicLeaves dynamicLeavesBlock;
-	private int dynamicLeavesSubBlockNum = 0;
-	private int dynamicLeavesSmotherMax = -1;
-	private int dynamicLeavesLightRequirement = -1;
+	private ILeavesProperties dynamicLeavesProperties;
+	private int dynamicLeavesSmotherMax = 4;
+	private int dynamicLeavesLightRequirement = 13;
 	private ResourceLocation dynamicLeavesCellKit;
 	private IFoliageColorHandler dynamicLeavesColorHandler;
 
@@ -94,7 +94,7 @@ public class TreeBuilder {
 	 * @return TreeBuilder for chaining
 	 */
 	public TreeBuilder setDynamicLeavesSequence(int seqNum) {
-		if(dynamicLeavesBlock == null) {
+		if(dynamicLeavesProperties == null) {
 			this.seqNum = seqNum;
 		}
 		return this;
@@ -109,10 +109,9 @@ public class TreeBuilder {
 	 * @param subBlockNum The number used to select the correct subblock of the {@link BlockDynamicLeaves} (typically 0-3 for a standard {@link BlockDynamicLeaves})
 	 * @return
 	 */
-	public TreeBuilder setDynamicLeaves(BlockDynamicLeaves leaves, int subBlockNum) {
+	public TreeBuilder setDynamicLeavesProperties(ILeavesProperties leavesProperties) {
 		this.seqNum = -1;
-		dynamicLeavesBlock = leaves;
-		dynamicLeavesSubBlockNum = subBlockNum;
+		dynamicLeavesProperties = leavesProperties;
 		return this;
 	}
 
@@ -299,17 +298,34 @@ public class TreeBuilder {
 			return null;
 		}
 		
-		if(seqNum == -1 && dynamicLeavesBlock == null) {
-			System.err.println("Error: Attempted to build an unsequenced tree(or a tree without dynamic leaves)");
+		if(seqNum == -1 && dynamicLeavesProperties == null) {
+			System.err.println("Error: Attempted to build an unsequenced tree(or a tree without dynamic leaves properties)");
 			return null;
 		}
 		
-		DynamicTree tree = new DynamicTree(name, seqNum) {
+		DynamicTree tree = new DynamicTree(name) {
 						
 			{
 				
-				if(dynamicLeavesBlock != null) {
-					setDynamicLeaves(dynamicLeavesBlock, dynamicLeavesSubBlockNum);
+				if(dynamicLeavesProperties == null) {
+
+					dynamicLeavesProperties = new LeavesProperties(primitiveLeavesBlockState, primitiveLeavesItemStack) {
+						@Override
+						public int getLightRequirement() {
+							return dynamicLeavesLightRequirement;
+						}
+
+						public int getSmotherLeavesMax() {
+							return dynamicLeavesSmotherMax;
+						};
+
+						@Override
+						public ICellKit getCellKit() {
+							return TreeRegistry.findCellKit(dynamicLeavesCellKit);
+						}
+					};
+
+					TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seqNum, dynamicLeavesProperties);
 				}
 				
 				setPrimitiveLeaves(primitiveLeavesBlockState, primitiveLeavesItemStack);
@@ -322,25 +338,13 @@ public class TreeBuilder {
 				if(stickItemStack != null) {
 					setStick(stickItemStack);
 				}
-				
-				if(dynamicLeavesSmotherMax != -1) {
-					setSmotherLeavesMax(dynamicLeavesSmotherMax);
-				}
-
-				if(dynamicLeavesLightRequirement != -1) {
-					this.lightRequirement = dynamicLeavesLightRequirement;
-				}
-				
-				if(dynamicLeavesCellKit != null) {
-					this.setCellKit(dynamicLeavesCellKit);
-				}
 			
 			}
 			
 			@Override
 			public void createSpecies() {
-				
-				setCommonSpecies(speciesCreator != null ? speciesCreator.create(this) : new Species(name, this));
+	
+				setCommonSpecies(speciesCreator != null ? speciesCreator.create(this) : new Species(name, this, dynamicLeavesProperties));
 				
 				if(speciesCreateSeed) {
 					getCommonSpecies().generateSeed();
@@ -355,11 +359,6 @@ public class TreeBuilder {
 				if(speciesSaplingBlockState != null) {
 					getCommonSpecies().setDynamicSapling(speciesSaplingBlockState);
 				}
-			}
-
-			@Override
-			public ICell getCellForBranch(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-				return super.getCellForBranch(blockAccess, pos, blockState, dir, branch);
 			}
 			
 			@Override

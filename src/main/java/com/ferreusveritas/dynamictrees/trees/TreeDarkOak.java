@@ -22,7 +22,7 @@ public class TreeDarkOak extends DynamicTree {
 	public class SpeciesDarkOak extends Species {
 
 		SpeciesDarkOak(DynamicTree treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.35f, 18.0f, 6, 8, 0.8f);
@@ -80,31 +80,29 @@ public class TreeDarkOak extends DynamicTree {
 			
 			return probMap;
 		}
+		
+		@Override
+		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+			if(super.rot(world, pos, neighborCount, radius, random)) {
+				if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
+					world.setBlockState(pos, ModBlocks.blockStates.redMushroom);//Change branch to a red mushroom
+					world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
+				}
+				return true;
+			}
+			
+			return false;
+		}
 	}
 		
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
-		
-		setCellKit("darkoak");
-		setSmotherLeavesMax(3);//thin canopy
+		ModBlocks.darkOakLeavesProperties.setTree(this);
 	}
 	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesDarkOak(this));
-	}
-	
-	@Override
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-		if(super.rot(world, pos, neighborCount, radius, random)) {
-			if(radius > 2 && TreeHelper.isRootyDirt(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
-				world.setBlockState(pos, ModBlocks.blockStates.redMushroom);//Change branch to a red mushroom
-				world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
-			}
-			return true;
-		}
-		
-		return false;
 	}
 	
 }

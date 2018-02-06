@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -121,17 +122,17 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			case DEPLETION: return new SubstanceDeplete().setAmount(15);
 			case FERTILITY: return new SubstanceFertilize().setAmount(15);
 			case PERSISTANCE: return new SubstanceFreeze();
-			case TRANSFORM: return new SubstanceTransform(getTargetTree(itemStack));
+			case TRANSFORM: return new SubstanceTransform(getTargetSpecies(itemStack));
 		}
 	}
 	
-	public DynamicTree getTargetTree(ItemStack itemStack) {
+	public Species getTargetSpecies(ItemStack itemStack) {
 		if(itemStack.hasTagCompound()){
 			NBTTagCompound nbtTag = itemStack.getTagCompound();
 			if(nbtTag.hasKey("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
-					return TreeRegistry.findSpecies(new ResourceLocation(targetTree)).getTree();
+					return TreeRegistry.findSpecies(new ResourceLocation(targetTree));
 				}
 			}
 		}
@@ -200,11 +201,11 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		DendroPotionType potionType = getPotionType(stack);
 		
 		if(potionType == DendroPotionType.TRANSFORM) {
-			DynamicTree tree = getTargetTree(stack);
-			if(tree == null) {
+			Species species = getTargetSpecies(stack);
+			if(species == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add("Transform a tree into a " + tree.getName().getResourcePath() + " tree");
+				tooltip.add("Transform a tree into a " + species.getRegistryName().getResourcePath() + " tree");
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());

@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTransform;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumParticleTypes;
@@ -14,10 +13,10 @@ import net.minecraft.world.World;
 
 public class SubstanceTransform implements ISubstanceEffect {
 
-	DynamicTree toTree;
+	Species toSpecies;
 	
-	public SubstanceTransform(DynamicTree toTree) {
-		this.toTree = toTree;
+	public SubstanceTransform(Species toTree) {
+		this.toSpecies = toTree;
 	}
 	
 	@Override
@@ -25,13 +24,13 @@ public class SubstanceTransform implements ISubstanceEffect {
 
 		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
 
-		if(dirt != null && toTree != null) {
+		if(dirt != null && toSpecies != null) {
 			if(world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 			} else {
-				Species species = dirt.getSpecies(world, rootPos);
-				if(species != Species.NULLSPECIES) {
-					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(species.getTree(), toTree)));
+				Species fromSpecies = dirt.getSpecies(world, rootPos);
+				if(fromSpecies != Species.NULLSPECIES) {
+					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
 				}
 			}
 			return true;

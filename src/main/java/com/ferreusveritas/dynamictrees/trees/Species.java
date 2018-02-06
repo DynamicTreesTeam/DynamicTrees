@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -109,6 +110,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected int soilLongevity = 8;
 	
 	protected HashSet<Block> soilList = new HashSet<Block>();
+
+	//Leaves
+	protected ILeavesProperties leavesProperties;
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
@@ -136,9 +140,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param treeFamily The {@link DynamicTree} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, DynamicTree treeFamily) {
+	public Species(ResourceLocation name, DynamicTree treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
+		setLeavesProperties(leavesProperties);
 		
 		setStandardSoils();
 		
@@ -204,6 +209,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return tapering;
 	}
 	
+	///////////////////////////////////////////
+	//LEAVES
+	///////////////////////////////////////////
+	
+	public void setLeavesProperties(ILeavesProperties leavesProperties) {
+		this.leavesProperties = leavesProperties;
+	}
+	
+	public ILeavesProperties getLeavesProperties() {
+		return leavesProperties;
+	}
 	
 	///////////////////////////////////////////
 	//SEEDS
@@ -548,7 +564,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
-		SimpleVoxmap leafMap = getTree().getCellKit().getLeafCluster();
+		SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
 		
 		while (iter.hasNext()) {
 			BlockPos endPos = iter.next();
@@ -557,7 +573,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			if(branch != null) {
 				int radius = branch.getRadius(branchState);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
-				if(branch.checkForRot(world, endPos, radius, world.rand, rotChance, rapid) || radius != 1) {
+				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, rapid) || radius != 1) {
 					if(rapid) {
 						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), null, 2);
 					}
@@ -567,6 +583,30 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		return ends.isEmpty() && !TreeHelper.isBranch(world, treePos);//There are no endpoints and the trunk is missing
+	}
+
+	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+	
+	/**
+	* Handle rotting branches
+	* @param world The world
+	* @param pos
+	* @param neighborCount Count of neighbors reinforcing this block
+	* @param radius The radius of the branch
+	* @param random Access to a random number generator
+	* @return true if the branch should rot
+	*/
+	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+		
+		if(radius <= 1) {
+			for(EnumFacing dir: upFirst) {
+				if(getLeavesProperties().getLeavesBlock().growLeaves(world, getLeavesProperties(), pos.offset(dir), 0)) {
+					return false;
+				}
+			}
+		}
+		world.setBlockToAir(pos);
+		return true;
 	}
 	
 	/**

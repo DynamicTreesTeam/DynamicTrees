@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -242,7 +243,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
 		return CellNull.nullCell;
 	}
 	
@@ -300,8 +301,8 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
 	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
 	 */
-	public Species getSpecies(World world, BlockPos pos) {
-		BlockPos treePos = pos.offset(getTrunkDirection(world, pos));
+	public Species getSpecies(World world, BlockPos rootPos) {
+		BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 		return TreeHelper.isBranch(world, treePos) ? TreeHelper.getBranch(world, treePos).getTree(world, treePos).getSpeciesForLocation(world, treePos) : Species.NULLSPECIES;
 	}
 	

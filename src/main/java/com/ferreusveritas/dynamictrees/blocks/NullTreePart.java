@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -19,7 +20,7 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, DynamicTree leavesTree) {
+	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
 		return CellNull.nullCell;
 	}
 
@@ -32,8 +33,9 @@ public class NullTreePart implements ITreePart {
 	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
+			//FIXME: This needs to have more betterer put in.. could be tricky
 			IBlockState blockState = blockAccess.getBlockState(pos);
-			IBlockState primState = from.getTree().getPrimitiveLeaves();
+			IBlockState primState = from.getTree().getCommonSpecies().getLeavesProperties().getPrimitiveLeaves();
 			if(blockState.getBlock() == primState.getBlock()) {
 				//Ignore "no decay" and "check decay" flags and only compare leaves type.
 				if((blockState.getBlock().getMetaFromState(blockState) & 3) == (primState.getBlock().getMetaFromState(primState) & 3)) {
@@ -72,8 +74,9 @@ public class NullTreePart implements ITreePart {
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		IBlockState blockState = blockAccess.getBlockState(pos);
-		IBlockState primState = branch.getTree().getPrimitiveLeaves();
+		IBlockState primState = branch.getTree().getCommonSpecies().getLeavesProperties().getPrimitiveLeaves();
 		
+		//FIXME: This needs to have more betterer put in.. could be tricky
 		if(blockState.getBlock() == primState.getBlock()) {//Vanilla leaves can be used for support
 			if ( (primState.getBlock().getMetaFromState(primState) & 3) == (blockState.getBlock().getMetaFromState(blockState) & 3) ) {//Compare meta
 				return 0x01;
