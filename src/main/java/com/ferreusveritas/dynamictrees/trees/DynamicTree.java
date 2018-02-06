@@ -148,10 +148,7 @@ public class DynamicTree {
 		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood), new ItemStack(Blocks.SAPLING, 1, wood.getMetadata()));
 		ModBlocks.blockBonsaiPot.setupVanillaTree(this);//Setup the bonsai pot to receive this type of tree
 
-		simpleVanillaCommonSpecies(wood);
-	}
-	
-	protected void simpleVanillaCommonSpecies(BlockPlanks.EnumType wood) {
+		//Setup common species
 		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 		getCommonSpecies().generateSeed();
 	}
@@ -252,8 +249,10 @@ public class DynamicTree {
 	// REGISTRATION
 	//////////////////////////////
 	
-	/** Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
-	 * We intentionally leave out leaves since they are shared between trees */
+	/**
+	 * Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
+	 * We intentionally leave out leaves since they are shared between trees 
+	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(dynamicBranch);
 		return blockList;

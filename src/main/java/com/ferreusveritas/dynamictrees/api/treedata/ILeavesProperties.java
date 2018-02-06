@@ -19,9 +19,7 @@ public interface ILeavesProperties {
 
 	/** cached ItemStack of primitive leaves(what is returned when leaves are sheared) */
 	ItemStack getPrimitiveLeavesItemStack();
-		
-	BlockDynamicLeaves getLeavesBlock();
-	
+			
 	ILeavesProperties setDynamicLeavesState(IBlockState state);
 	
 	IBlockState getDynamicLeavesState();

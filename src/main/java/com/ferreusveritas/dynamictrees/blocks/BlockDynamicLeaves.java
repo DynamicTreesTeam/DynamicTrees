@@ -388,11 +388,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
-		if(dir != null) {
-			return leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO));
-		} else {
-			return CellNull.nullCell;
-		}
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO)) : CellNull.nullCell;
 	}
 	
 	@Override

@@ -41,11 +41,6 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 	
 	@Override
-	public BlockDynamicLeaves getLeavesBlock() {
-		return (BlockDynamicLeaves) getDynamicLeavesState().getBlock();
-	}
-
-	@Override
 	public ILeavesProperties setDynamicLeavesState(IBlockState state) {
 
 		//Cache all the blockStates to speed up worldgen

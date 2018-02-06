@@ -194,10 +194,21 @@ public class TreeHelper {
 		return isLeaves(blockState.getBlock());
 	}
 	
+	public static BlockDynamicLeaves getDynamicLeaves(Block block) {
+		return isLeaves(block) ? (BlockDynamicLeaves)block : null;
+	}
+	
 	public static BlockDynamicLeaves getDynamicLeaves(ITreePart treepart) {
 		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
+	public static BlockDynamicLeaves getDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
+		return getDynamicLeaves(blockAccess.getBlockState(pos));
+	}
+	
+	public static BlockDynamicLeaves getDynamicLeaves(IBlockState state) {
+		return getDynamicLeaves(state.getBlock());
+	}
 	
 	//Rooty Dirt
 	
