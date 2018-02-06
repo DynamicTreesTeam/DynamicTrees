@@ -138,27 +138,15 @@ public class TreeHelper {
 	}
 	
 	public static ITreePart getTreePart(Block block) {
-		return isTreePart(block)? (ITreePart)block : null;
-	}
-	
-	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(blockAccess.getBlockState(pos).getBlock());
-	}
-	
-	public static ITreePart getTreePart(IBlockState state) {
-		return getTreePart(state.getBlock());
-	}
-	
-	public static ITreePart getSafeTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
 	}
 	
-	public static ITreePart getSafeTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getSafeTreePart(blockAccess.getBlockState(pos));
+	public static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
+		return getTreePart(blockAccess.getBlockState(pos));
 	}
 	
-	public static ITreePart getSafeTreePart(IBlockState blockState) {
-		return getSafeTreePart(blockState.getBlock());
+	public static ITreePart getTreePart(IBlockState blockState) {
+		return getTreePart(blockState.getBlock());
 	}
 	
 	
@@ -204,6 +192,10 @@ public class TreeHelper {
 	
 	public static boolean isLeaves(IBlockState blockState) {
 		return isLeaves(blockState.getBlock());
+	}
+	
+	public static BlockDynamicLeaves getDynamicLeaves(ITreePart treepart) {
+		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
 	

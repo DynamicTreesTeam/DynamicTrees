@@ -107,5 +107,4 @@ public interface ITreePart {
 	
 	
 	boolean isBranch();
-
 }

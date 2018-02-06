@@ -116,26 +116,31 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		ILeavesProperties leavesProperties = getProperties(state);
-		int preHydro = getHydrationLevel(state);
+		int oldHydro = state.getValue(BlockDynamicLeaves.HYDRO);
 		
 		//Check hydration level.  Dry leaves are dead leaves.
-		int hydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
-		if(hydro == 0 || (!rapid && !hasAdequateLight(world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
-			removeLeaves(world, pos);//No water, no light .. no leaves
+		int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
+		if(newHydro == 0 || (!rapid && !hasAdequateLight(world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
+			world.setBlockToAir(pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 
-			//Encode new hydration level in metadata for this leaf
-			if(preHydro != hydro) {//A little performance gain
-				if(setHydrationLevel(world, pos, hydro, state)) {
-					return true;//Leaves were destroyed
-				}
+			if(oldHydro != newHydro) {//Only update if the hydro has changed. A little performance gain
+				//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
+				//does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
+				world.setBlockState(pos, leavesProperties.getDynamicLeavesState(newHydro), 4);
 			}
 		}
 		
 		//We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
 		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
-			if(hydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
-				growLeaves(world, leavesProperties, pos.offset(dir));//Attempt to grow new leaves
+			if(newHydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
+				BlockPos offpos = pos.offset(dir);
+				if(isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
+					int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
+					if(hydro > 0) {
+						world.setBlockState(pos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
+					}
+				}
 			}
 		}
 		
@@ -145,17 +150,25 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
 		
-		//TODO: Rework this
-		/* 
 		EnumFacing dir = facing.getOpposite();
 		
 		BlockPos deltaPos = pos.offset(dir);
+		IBlockState blockState = world.getBlockState(deltaPos);
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
 		
-		DynamicTree tree = TreeHelper.getSafeTreePart(world, deltaPos).getTree(world, deltaPos);
+		//If a branch is clicked on
+		BlockBranch branch = TreeHelper.getBranch(treePart);
+		if(branch != null) {
+			MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+			Species species = branch.getSpeciesFromSignal(world, signal);//Get the species from the root node
+			return species.getLeavesProperties().getDynamicLeavesState();
+		}
 		
-		if(tree.getDynamicLeaves() == this) {//Attempt to match the proper dynamic leaves for the tree being clicked on
-			return getDefaultState().withProperty(TREE, tree.getDynamicLeavesSub());
-		}*/
+		//If dynamic leaves are clicked on
+		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(treePart);
+		if(leaves != null) {
+			return leaves.getProperties(blockState).getDynamicLeavesState();
+		}
 		
 		return getDefaultState();
 	}
@@ -253,19 +266,21 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public void beginLeavesDecay(IBlockState state, World world, BlockPos pos) {}
 	
-	//Set the block at the provided coords to a leaf block if local light, space and hydration requirements are met
-	public void growLeaves(World world, ILeavesProperties leavesProp, BlockPos pos){
-		if(isLocationSuitableForNewLeaves(world, leavesProp, pos)){
-			int hydro = getHydrationLevelFromNeighbors(world, pos, leavesProp);
-			setBlockToLeaves(world, leavesProp, pos, hydro);
-		}
-	}
-	
-	//Set the block at the provided coords to a leaf block if local light and space requirements are met 
-	public boolean growLeaves(World world, ILeavesProperties leavesProp, BlockPos pos, int hydro) {
+	/**
+	 * Checks to see if the location at pos is suitable for new leaves
+	 * and if so set new leaves at pos with hydro value
+	 * 
+	 * @param world The world
+	 * @param leavesProp Properties of the leaves we are working with
+	 * @param pos The position of interest
+	 * @param hydro The hydration value for the resulting cell
+	 * @return
+	 */
+	public boolean growLeavesIfLocationIsSuitable(World world, ILeavesProperties leavesProp, BlockPos pos, int hydro) {
 		hydro = hydro == 0 ? leavesProp.getCellKit().getDefaultHydration() : hydro;
 		if(isLocationSuitableForNewLeaves(world, leavesProp, pos)) {
-			return setBlockToLeaves(world, leavesProp, pos, hydro);
+			world.setBlockState(pos, leavesProp.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
+			return true;
 		}
 		return false;
 	}
@@ -305,19 +320,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return world.isAirBlock(pos) && hasAdequateLight(world, leavesProperties, pos);
 	}
 	
-	/** Set the block at the provided coords to a leaf block and also set it's hydration value.
-	* If hydration value is 0 then it sets the block to air
-	*/
-	public boolean setBlockToLeaves(World world, ILeavesProperties leavesProp, BlockPos pos, int hydro) {
-		hydro = MathHelper.clamp(hydro, 0, 4);
-		if(hydro != 0) {
-			world.setBlockState(pos, leavesProp.getDynamicLeavesState().withProperty(HYDRO, hydro), 2);//Removed Notify Neighbors Flag for performance
-			return true;
-		} else {
-			removeLeaves(world, pos);
-			return false;
-		}
-	}
+
 	
 	/** Check to make sure the leaves have enough light to exist */
 	public boolean hasAdequateLight(World world, ILeavesProperties leavesProperties, BlockPos pos) {
@@ -377,49 +380,18 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
 			IBlockState state = world.getBlockState(deltaPos);
-			cells[dir.ordinal()] = TreeHelper.getSafeTreePart(state).getHydrationCell(world, deltaPos, state, dir, leavesProp);
+			cells[dir.ordinal()] = TreeHelper.getTreePart(state).getHydrationCell(world, deltaPos, state, dir, leavesProp);
 		}
 		
 		return leavesProp.getCellKit().getCellSolver().solve(cells);//Find center cell's value from neighbors		
 	}
 	
-	public int getHydrationLevel(IBlockState blockState) {
-		if(blockState.getBlock() instanceof BlockDynamicLeaves) {
-			return blockState.getValue(HYDRO);
-		}
-		return 0;
-	}
-	
-	public int getHydrationLevel(IBlockAccess blockAccess, BlockPos pos) {
-		return getHydrationLevel(blockAccess.getBlockState(pos));
-	}
-	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
 		if(dir != null) {
-			return leavesProperties.getCellKit().getCellForLeaves(getHydrationLevel(blockState));
+			return leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO));
 		} else {
 			return CellNull.nullCell;
-		}
-	}
-	
-	public static void removeLeaves(World world, BlockPos pos) {
-		world.setBlockToAir(pos);
-		world.notifyNeighborsOfStateChange(pos, Blocks.AIR, false); //TODO: Does this affect performance and is it necessary?
-	}
-	
-	//Variable hydration levels are only appropriate for leaf blocks
-	public static boolean setHydrationLevel(World world, BlockPos pos, int hydro, IBlockState currentBlockState) {
-		hydro = MathHelper.clamp(hydro, 0, 4);
-		
-		if(hydro == 0) {
-			removeLeaves(world, pos);
-			return true;
-		} else {
-			//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
-			//does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-			world.setBlockState(pos, currentBlockState.withProperty(HYDRO, hydro), 4);
-			return false;
 		}
 	}
 	
@@ -444,11 +416,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	*/
 	public boolean needLeaves(World world, BlockPos pos, ILeavesProperties leavesProperties) {
 		if(world.isAirBlock(pos)){//Place Leaves if Air
-			return this.growLeaves(world, leavesProperties, pos, leavesProperties.getCellKit().getDefaultHydration());
+			return this.growLeavesIfLocationIsSuitable(world, leavesProperties, pos, leavesProperties.getCellKit().getDefaultHydration());
 		} else {//Otherwise check if there's already this type of leaves there.
 			IBlockState blockState = world.getBlockState(pos);
-			ITreePart treepart = TreeHelper.getSafeTreePart(blockState);
-			return treepart == this && leavesProperties == getTree(blockState);//Check if this is the same type of leaves
+			ITreePart treepart = TreeHelper.getTreePart(blockState);
+			return treepart == this && leavesProperties == getProperties(blockState);//Check if this is the same type of leaves
 		}
 	}
 	
@@ -640,7 +612,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
-		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? 0x01 : 0;
+		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
 	}
 	
 	@Override

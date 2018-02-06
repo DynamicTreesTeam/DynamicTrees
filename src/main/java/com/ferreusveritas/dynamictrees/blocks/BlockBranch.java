@@ -144,18 +144,36 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		return isSameWood(TreeHelper.getBranch(treepart));
 	}
 	
+	/**
+	 * Branches are considered the same wood if they have the same tree
+	 * 
+	 * @param branch
+	 * @return 
+	 */
 	public boolean isSameWood(BlockBranch branch) {
 		return branch != null && getTree() == branch.getTree();
 	}
 	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return isSameWood(branch) ? 0x11 : 0;// Other branches of the same type are always valid support.
+		return isSameWood(branch) ? BlockBranch.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
 	///////////////////////////////////////////
 	// WORLD UPDATE
 	///////////////////////////////////////////
+	
+	static int setSupport(int branches, int leaves) {
+		return ((branches & 0xf) << 4) | (leaves & 0xf);
+	}
+	
+	static int getBranchSupport(int support) {
+		return (support >> 4) & 0xf;
+	}
+	
+	static int getLeavesSupport(int support) {
+		return support & 0xf;
+	}
 	
 	/**
 	 * 
@@ -178,8 +196,8 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
-			neigh += TreeHelper.getSafeTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
-			if (neigh >= 0x10 && (neigh & 0x0F) >= 2) {// Need two neighbors.. one of which must be another branch
+			neigh += TreeHelper.getTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
+			if (getBranchSupport(neigh) >= 1 && getLeavesSupport(neigh) >= 2) {// Need two neighbors.. one of which must be another branch
 				return false;// We've proven that this branch is reinforced so there is no need to continue
 			}
 		}
@@ -206,7 +224,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		return TreeHelper.getSafeTreePart(world, pos).getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
+		return TreeHelper.getTreePart(world, pos).getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	@Override
@@ -217,13 +235,11 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		// return 5;
 		return flammability;
 	}
 	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		// return 5;
 		int radius = getRadius(world, pos);
 		return (fireSpreadSpeed * radius) / 8 ;
 	}
@@ -306,7 +322,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		BlockDynamicLeaves leaves = species.getLeavesProperties().getLeavesBlock();
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
-				signal.success = leaves.growLeaves(world, species.getLeavesProperties(), pos, 0);
+				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
 			}
@@ -330,7 +346,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 				
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
-				if (treepart != null) {
+				if (treepart != TreeHelper.nullTreePart) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
 				} else if (world.isAirBlock(deltaPos)) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(world, pos));
@@ -424,7 +440,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
-		return TreeHelper.getSafeTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, radius);
+		return TreeHelper.getTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, radius);
 	}
 	
 	///////////////////////////////////////////
@@ -440,7 +456,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
 					
-					signal = TreeHelper.getSafeTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
+					signal = TreeHelper.getTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
 					
 					// This should only be true for the originating block when the root node is found
 					if (signal.found && signal.localRootDir == null && fromDir == null) {

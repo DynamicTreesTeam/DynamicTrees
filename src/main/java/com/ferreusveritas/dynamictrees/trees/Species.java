@@ -600,7 +600,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		if(radius <= 1) {
 			for(EnumFacing dir: upFirst) {
-				if(getLeavesProperties().getLeavesBlock().growLeaves(world, getLeavesProperties(), pos.offset(dir), 0)) {
+				if(getLeavesProperties().getLeavesBlock().growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
 					return false;
 				}
 			}
@@ -685,7 +685,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				BlockPos deltaPos = pos.offset(dir);
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[dir.getIndex()] += TreeHelper.getSafeTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
+				probMap[dir.getIndex()] += TreeHelper.getTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
 			}
 		}
 		

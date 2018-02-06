@@ -58,7 +58,7 @@ public class Staff extends Item {
 		ItemStack heldStack = player.getHeldItem(hand);
 		
 		IBlockState clickedBlock = world.getBlockState(pos);
-		ITreePart treePart = TreeHelper.getSafeTreePart(clickedBlock);
+		ITreePart treePart = TreeHelper.getTreePart(clickedBlock);
 		BlockPos rootPos = pos;
 		
 		//Check if the tree part is a branch and look for the root node if so
@@ -67,7 +67,7 @@ public class Staff extends Item {
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
-				treePart = TreeHelper.getSafeTreePart(world, rootPos);
+				treePart = TreeHelper.getTreePart(world, rootPos);
 			}
 		}
 

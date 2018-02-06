@@ -153,7 +153,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 			ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
 			
-			if(treeBase != null && CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
+			if(treeBase != TreeHelper.nullTreePart && CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 				viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
 			}
 		}
@@ -271,7 +271,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 		EnumFacing dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
 		
-		TreeHelper.getSafeTreePart(world, treePos).analyse(world, treePos, null, signal);
+		TreeHelper.getTreePart(world, treePos).analyse(world, treePos, null, signal);
 		
 		return signal;
 	}
@@ -288,7 +288,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return dir == EnumFacing.DOWN ? 0x11 : 0;
+		return dir == EnumFacing.DOWN ? BlockBranch.setSupport(1, 1) : 0;
 	}
 
 	@Override

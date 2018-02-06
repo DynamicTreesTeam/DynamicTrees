@@ -33,15 +33,7 @@ public class NullTreePart implements ITreePart {
 	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
-			//FIXME: This needs to have more betterer put in.. could be tricky
-			IBlockState blockState = blockAccess.getBlockState(pos);
-			IBlockState primState = from.getTree().getCommonSpecies().getLeavesProperties().getPrimitiveLeaves();
-			if(blockState.getBlock() == primState.getBlock()) {
-				//Ignore "no decay" and "check decay" flags and only compare leaves type.
-				if((blockState.getBlock().getMetaFromState(blockState) & 3) == (primState.getBlock().getMetaFromState(primState) & 3)) {
-					return 1;
-				}
-			}
+			return from.getTree().isCompatibleVanillaLeaves(blockAccess, pos) ? 1: 0;
 		}
 		return 0;
 	}
@@ -73,16 +65,7 @@ public class NullTreePart implements ITreePart {
 	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		IBlockState blockState = blockAccess.getBlockState(pos);
-		IBlockState primState = branch.getTree().getCommonSpecies().getLeavesProperties().getPrimitiveLeaves();
-		
-		//FIXME: This needs to have more betterer put in.. could be tricky
-		if(blockState.getBlock() == primState.getBlock()) {//Vanilla leaves can be used for support
-			if ( (primState.getBlock().getMetaFromState(primState) & 3) == (blockState.getBlock().getMetaFromState(blockState) & 3) ) {//Compare meta
-				return 0x01;
-			}
-		}
-		return 0;
+		return BlockBranch.setSupport(0, branch.getTree().isCompatibleVanillaLeaves(blockAccess, pos) ? 1 : 0);
 	}
 
 	@Override

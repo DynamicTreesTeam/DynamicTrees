@@ -132,12 +132,9 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 
 		int biomeId = Biome.getIdForBiome(biome);
-		ITreeSelector select;
+		ITreeSelector select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 				
-		if(fastTreeLookup.containsKey(biomeId)) {
-			select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
-		}
-		else {
+		if(select == null) {
 			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
 				select = new RandomDecision(world.rand).addSpecies(spruce, 2).addSpecies(oak, 1);
 			}
