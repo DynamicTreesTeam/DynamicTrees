@@ -21,7 +21,7 @@ public class NullTreePart implements ITreePart {
 
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
-		return CellNull.nullCell;
+		return CellNull.NULLCELL;
 	}
 
 	@Override

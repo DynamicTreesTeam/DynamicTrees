@@ -13,6 +13,18 @@ import net.minecraft.util.ResourceLocation;
 
 public class CellKits {
 	
+	private static final ICellSolver NULLCELLSOLVER = new ICellSolver() {
+		@Override public int solve(ICell[] cells) { return 0; }
+	};
+	
+	public static final ICellKit NULLCELLKIT = new ICellKit() {
+		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULLCELL; }
+		@Override public ICell getCellForBranch(int radius) { return CellNull.NULLCELL; }
+		@Override public ICellSolver getCellSolver() { return NULLCELLSOLVER; }
+		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULLMAP; }
+		@Override public int getDefaultHydration() { return 0; }
+	};
+	
 	public static void preInit() {
 		new CellKits();
 	}
@@ -27,7 +39,7 @@ public class CellKits {
 	private final ICellKit deciduous = new ICellKit() {
 		
 		private final ICell normalCells[] = {
-				CellNull.nullCell,
+				CellNull.NULLCELL,
 				new CellNormal(1),
 				new CellNormal(2),
 				new CellNormal(3),
@@ -49,7 +61,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : CellNull.nullCell;
+			return radius == 1 ? branchCell : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -77,7 +89,7 @@ public class CellKits {
 		private final ICell coniferTopBranch = new CellConiferTopBranch();
 		
 		private final ICell coniferLeafCells[] = {
-			CellNull.nullCell,
+			CellNull.NULLCELL,
 			new CellConiferLeaf(1),
 			new CellConiferLeaf(2),
 			new CellConiferLeaf(3),
@@ -98,7 +110,7 @@ public class CellKits {
 			} else if(radius == 128) {
 				return coniferTopBranch;
 			} else {
-				return CellNull.nullCell;
+				return CellNull.NULLCELL;
 			}
 		}
 		
@@ -139,7 +151,7 @@ public class CellKits {
 		};
 		
 		private final ICell acaciaLeafCells[] = {
-				CellNull.nullCell,
+				CellNull.NULLCELL,
 				new CellAcaciaLeaf(1),
 				new CellAcaciaLeaf(2),
 				new CellAcaciaLeaf(3),
@@ -155,7 +167,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? acaciaBranch : CellNull.nullCell;
+			return radius == 1 ? acaciaBranch : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -182,7 +194,7 @@ public class CellKits {
 		private final ICell branchCell = new CellNormal(5);
 		
 		private final ICell darkOakLeafCells[] = {
-				CellNull.nullCell,
+				CellNull.NULLCELL,
 				new CellDarkOakLeaf(1),
 				new CellDarkOakLeaf(2),
 				new CellDarkOakLeaf(3),
@@ -198,7 +210,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : CellNull.nullCell;
+			return radius == 1 ? branchCell : CellNull.NULLCELL;
 		}
 
 		@Override

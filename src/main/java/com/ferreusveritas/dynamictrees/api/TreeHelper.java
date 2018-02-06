@@ -28,7 +28,9 @@ public class TreeHelper {
 	
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
 		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq);
-		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().withProperty(BlockDynamicLeaves.TREE, seq & 3));
+		int tree = seq & 3;
+		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().withProperty(BlockDynamicLeaves.TREE, tree));
+		leaves.setProperties(tree, leavesProperties);
 		return leaves;
 	}
 	

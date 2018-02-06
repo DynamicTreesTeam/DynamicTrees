@@ -289,7 +289,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			return leavesProperties.getCellKit().getCellForBranch(thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this));
 		} else {
-			return CellNull.nullCell;
+			return CellNull.NULLCELL;
 		}
 	}
 	

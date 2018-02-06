@@ -60,7 +60,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
 	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
 	
-	public ILeavesProperties properties[] = new ILeavesProperties[4];
+	public ILeavesProperties properties[] = new ILeavesProperties[] { LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES };
 	
 	public BlockDynamicLeaves() {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
@@ -79,6 +79,10 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public int getMetaFromState(IBlockState state) {
 		return (state.getValue(HYDRO) - 1) | (state.getValue(TREE) << 2); 
+	}
+	
+	public void setProperties(int tree, ILeavesProperties properties) {
+		this.properties[tree & 3] = properties;
 	}
 	
 	public ILeavesProperties getProperties(IBlockState blockState) {
@@ -138,7 +142,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				if(isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
 					int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
 					if(hydro > 0) {
-						world.setBlockState(pos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
+						world.setBlockState(offpos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
 					}
 				}
 			}
@@ -388,7 +392,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
-		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO)) : CellNull.nullCell;
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO)) : CellNull.NULLCELL;
 	}
 	
 	@Override

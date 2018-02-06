@@ -10,7 +10,7 @@ import net.minecraft.util.EnumFacing;
  */
 public class CellNull implements ICell {
 
-	public static final CellNull nullCell = new CellNull();
+	public static final CellNull NULLCELL = new CellNull();
 	
 	@Override
 	public int getValue() {

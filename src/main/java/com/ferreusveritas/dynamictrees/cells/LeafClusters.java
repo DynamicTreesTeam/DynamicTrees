@@ -11,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
  */
 public class LeafClusters {
 
+	public static final SimpleVoxmap NULLMAP = new SimpleVoxmap(1, 1, 1, new byte[] { 0 });
+	
 	public static final SimpleVoxmap deciduous = new SimpleVoxmap(5, 4, 5, new byte[] {
 			//Layer 0 (Bottom)
 			0, 0, 0, 0, 0,
