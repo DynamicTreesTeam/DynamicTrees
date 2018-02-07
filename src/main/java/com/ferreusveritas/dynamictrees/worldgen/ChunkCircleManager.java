@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
@@ -177,7 +178,9 @@ public class ChunkCircleManager {
 				for(Circle c: circles) {
 					System.err.println((c.hasFreeAngles() ? "->" : "  ") +  c);
 				}
-				CircleDebug.outputCirclesToPng(circles, chunkX, chunkZ, "");
+				if(ModConfigs.poissonDiscImageWrite) {
+					CircleDebug.outputCirclesToPng(circles, chunkX, chunkZ, "");
+				}
 				break;//Something went terribly wrong and we shouldn't hang the system for it.
 			}
 			
