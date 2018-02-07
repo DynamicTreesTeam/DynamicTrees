@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
@@ -56,71 +57,7 @@ public class TreeCactus extends DynamicTree {
 		
 		@Override
 		public JoCode getJoCode(String joCodeString) {
-			return new JoCode(joCodeString) {
-				@Override
-				public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
-					IBlockState initialState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
-					species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
-
-					// A Tree generation boundary radius is at least 2 and at most 8
-					radius = MathHelper.clamp(radius, 2, 8);
-					BlockPos treePos = rootPos.up();
-					
-					// Create tree
-					setFacing(facing);
-					generateFork(world, species, 0, rootPos, false);
-
-					// Fix branch thicknesses and map out leaf locations
-					BlockBranch branch = TreeHelper.getBranch(world, treePos);
-					if(branch != null) {//If a branch exists then the growth was successful
-						NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
-						MapSignal signal = new MapSignal(endFinder);
-						branch.analyse(world, treePos, EnumFacing.DOWN, signal);
-						List<BlockPos> endPoints = endFinder.getEnds();
-						
-						// Allow for special decorations by the tree itself
-						species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
-					} else { // The growth failed.. turn the soil back to what it was
-						world.setBlockState(rootPos, initialState, careful ? 3 : 2);
-					}
-				}
-				
-				@Override
-				protected int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
-					IBlockState defaultBranchState = species.getTree().getDynamicBranch().getDefaultState();
-					if (!(defaultBranchState.getBlock() instanceof BlockBranchCactus)) {
-						return codePos;
-					}
-					while (codePos < instructions.size()) {
-						int code = getCode(codePos);
-						if (code == forkCode) {
-							codePos = generateFork(world, species, codePos + 1, pos, disabled);
-						} else if(code == returnCode) {
-							return codePos + 1;
-						} else {
-							EnumFacing dir = EnumFacing.getFront(code);
-							pos = pos.offset(dir);
-							if (!disabled) {
-								if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
-									boolean trunk = false;
-									if (dir == EnumFacing.UP) {
-										IBlockState downState = world.getBlockState(pos.down());
-										if (TreeHelper.isRooty(downState) || (downState.getBlock() == defaultBranchState.getBlock() && downState.getValue(BlockBranchCactus.TRUNK) && downState.getValue(BlockBranchCactus.ORIGIN) == EnumFacing.DOWN)) {
-											trunk = true;
-										}
-									}
-									world.setBlockState(pos, defaultBranchState.withProperty(BlockBranchCactus.TRUNK, trunk).withProperty(BlockBranchCactus.ORIGIN, dir.getOpposite()), careful ? 3 : 2);
-								} else {
-									disabled = true;
-								}
-							}
-							codePos++;
-						}
-					}
-
-					return codePos;
-				}
-			};
+			return new JoCodeCactus(joCodeString);
 		}
 		
 		@Override
@@ -136,7 +73,6 @@ public class TreeCactus extends DynamicTree {
 			return hash & 0xFFFF;
 		}
 		
-	
 		@Override
 		public float getPrimaryThickness() {
 			return 5.0f;
@@ -167,10 +103,6 @@ public class TreeCactus extends DynamicTree {
 			probMap[2] = probMap[3] = probMap[4] = probMap[5] = signal.isInTrunk() && (signal.energy > 1) ? 1 : 0;
 			if (signal.dir != EnumFacing.UP) probMap[signal.dir.ordinal()] = 0;//Disable the current direction, unless that direction is up
 			probMap[originDir.ordinal()] = 0;//Disable the direction we came from
-			
-			//System.out.println(signal.energy);
-			//System.out.println(probMap);
-			
 			return probMap;
 		}
 		
@@ -183,6 +115,82 @@ public class TreeCactus extends DynamicTree {
 		}
 		
 	}
+	
+	public class SpeciesCactusSmall extends Species {
+
+		public SpeciesCactusSmall(DynamicTree treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "small"), treeFamily, ModBlocks.cactusLeavesProperties);
+			
+			setBasicGrowingParameters(0.875f, 3.0f, 3, 2, 1.5f);
+			
+			this.setSoilLongevity(1); // Doesn't live very long
+			
+			envFactor(Type.SNOWY, 0.25f);
+			envFactor(Type.COLD, 0.5f);
+			envFactor(Type.SANDY, 1.05f);
+			
+			addAcceptableSoil(Blocks.SAND, Blocks.HARDENED_CLAY); //TODO: remove dirt and grass and add rooty sand or something
+		}
+		
+		@Override
+		public JoCode getJoCode(String joCodeString) {
+			return new JoCodeCactus(joCodeString);
+		}
+		
+		@Override
+		public float getPrimaryThickness() {
+			return 5.0f;
+		}
+
+		@Override
+		public float getSecondaryThickness() {
+			return 4.0f;
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.MUTATED_DESERT);
+		}
+		
+		@Override
+		public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+			return false;
+		}
+		
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+			EnumFacing originDir = signal.dir.getOpposite();
+			
+			//Alter probability map for direction change
+			probMap[0] = 0;//Down is always disallowed for cactus
+			probMap[1] = signal.delta.getX() % 2 == 0 || signal.delta.getZ() % 2 == 0 ? getUpProbability() : 0;
+			probMap[2] = probMap[3] = probMap[4] = probMap[5] = signal.isInTrunk() && (signal.energy > 1) ? 1 : 0;
+			if (signal.dir != EnumFacing.UP) probMap[signal.dir.ordinal()] = 0;//Disable the current direction, unless that direction is up
+			probMap[originDir.ordinal()] = 0;//Disable the direction we came from
+			return probMap;
+		}
+		
+		@Override
+		protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
+			if(signal.isInTrunk() && newDir != EnumFacing.UP){ //Turned out of trunk
+				signal.energy += 0.5f;
+			}
+			return newDir;
+		}
+		
+		@Override
+		public ItemStack getSeedStack(int qty) {
+			return getCommonSpecies().getSeedStack(qty);
+		}
+		
+		@Override
+		public Seed getSeed() {
+			return getCommonSpecies().getSeed();
+		}
+		
+	}
+	
+	public Species speciesSmall;
 	
 	public TreeCactus() {
 		super(new ResourceLocation(ModConstants.MODID, "cactus"));
@@ -200,12 +208,15 @@ public class TreeCactus extends DynamicTree {
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesCactus(this));
-		getCommonSpecies().generateSeed();
+		speciesSmall = new SpeciesCactusSmall(this);
 	}
 	
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
+		speciesRegistry.register(speciesSmall);
+		
+		getCommonSpecies().generateSeed();
 	}
 	
 	@Override
@@ -235,6 +246,58 @@ public class TreeCactus extends DynamicTree {
 		}
 		
 		return false;
+	}
+	
+	protected class JoCodeCactus extends JoCode {
+		
+		public JoCodeCactus(String code) {
+			super(code);
+		}
+		
+		@Override
+		public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
+			IBlockState initialState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
+			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
+
+			// A Tree generation boundary radius is at least 2 and at most 8
+			radius = MathHelper.clamp(radius, 2, 8);
+			BlockPos treePos = rootPos.up();
+			
+			// Create tree
+			setFacing(facing);
+			generateFork(world, species, 0, rootPos, false);
+
+			// Fix branch thicknesses and map out leaf locations
+			BlockBranch branch = TreeHelper.getBranch(world, treePos);
+			if(branch != null) {//If a branch exists then the growth was successful
+				NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
+				MapSignal signal = new MapSignal(endFinder);
+				branch.analyse(world, treePos, EnumFacing.DOWN, signal);
+				List<BlockPos> endPoints = endFinder.getEnds();
+				
+				// Allow for special decorations by the tree itself
+				species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
+			} else { // The growth failed.. turn the soil back to what it was
+				world.setBlockState(rootPos, initialState, careful ? 3 : 2);
+			}
+		}
+		
+		@Override
+		public boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
+			IBlockState defaultBranchState = species.getTree().getDynamicBranch().getDefaultState();
+			if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
+				boolean trunk = false;
+				if (dir == EnumFacing.UP) {
+					IBlockState downState = world.getBlockState(pos.down());
+					if (TreeHelper.isRooty(downState) || (downState.getBlock() == defaultBranchState.getBlock() && downState.getValue(BlockBranchCactus.TRUNK) && downState.getValue(BlockBranchCactus.ORIGIN) == EnumFacing.DOWN)) {
+						trunk = true;
+					}
+				}
+				return !world.setBlockState(pos, defaultBranchState.withProperty(BlockBranchCactus.TRUNK, trunk).withProperty(BlockBranchCactus.ORIGIN, dir.getOpposite()), careful ? 3 : 2);
+			}
+			return true;
+		}
+		
 	}
 	
 }
