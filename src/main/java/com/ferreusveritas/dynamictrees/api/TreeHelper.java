@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -67,7 +67,7 @@ public class TreeHelper {
 	 * @param rootPos
 	 */
 	public static void growPulse(World world, BlockPos rootPos) {
-		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRootyDirt(world, rootPos);
 		if(dirt != null) {
 			dirt.updateTree(world, rootPos, world.rand, true);
 			ageVolume(world, rootPos, 1);
@@ -121,7 +121,7 @@ public class TreeHelper {
 	}
 
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
-		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRootyDirt(world, rootPos);
 		if(dirt != null) {
 			dirt.startAnalysis(world, rootPos, signal);
 			return true;
@@ -215,7 +215,7 @@ public class TreeHelper {
 	//Rooty Dirt
 	
 	public final static boolean isRootyDirt(Block block) {
-		return block instanceof BlockRootyDirt;
+		return block instanceof BlockRooty;
 	}
 	
 	public final static boolean isRootyDirt(IBlockState soilBlockState) {
@@ -226,11 +226,11 @@ public class TreeHelper {
 		return isRootyDirt(blockAccess.getBlockState(pos));
 	}
 	
-	public final static BlockRootyDirt getRootyDirt(Block block) {
-		return isRootyDirt(block) ? (BlockRootyDirt)block : null;
+	public final static BlockRooty getRootyDirt(Block block) {
+		return isRootyDirt(block) ? (BlockRooty)block : null;
 	}
 	
-	public final static BlockRootyDirt getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
+	public final static BlockRooty getRootyDirt(IBlockAccess blockAccess, BlockPos pos) {
 		return getRootyDirt(blockAccess.getBlockState(pos).getBlock());
 	}
 	

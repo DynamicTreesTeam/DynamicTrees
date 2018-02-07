@@ -477,7 +477,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public Species getSpeciesFromSignal(World world, MapSignal signal) {
 		Species species;
 		if(signal.found) {
-			BlockRootyDirt rootyDirt = (BlockRootyDirt) world.getBlockState(signal.root).getBlock();
+			BlockRooty rootyDirt = (BlockRooty) world.getBlockState(signal.root).getBlock();
 			species = rootyDirt.getSpecies(world, signal.root);
 		} else {
 			species = getTree().getCommonSpecies();

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
@@ -69,7 +69,7 @@ public class EntityLingeringEffector extends Entity {
 		if(effect != null) {
 			IBlockState blockState = world.getBlockState(blockPos);
 
-			if(blockState.getBlock() instanceof BlockRootyDirt) {
+			if(blockState.getBlock() instanceof BlockRooty) {
 				if(!effect.update(world, blockPos, ticksExisted)) {
 					setDead();
 				}

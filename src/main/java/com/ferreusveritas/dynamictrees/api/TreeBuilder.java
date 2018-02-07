@@ -36,9 +36,7 @@ public class TreeBuilder {
 	
 	//Drops
 	private IBlockState primitiveLeavesBlockState = Blocks.LEAVES.getDefaultState();
-	private ItemStack primitiveLeavesItemStack = new ItemStack(Blocks.LEAVES);
 	private IBlockState primitiveLogBlockState = Blocks.LOG.getDefaultState();
-	private ItemStack primitiveLogItemStack = new ItemStack(Blocks.LOG);
 	private IBlockState primitiveSaplingBlockState;
 	private ItemStack primitiveSaplingItemStack;
 	private ItemStack stickItemStack;
@@ -122,12 +120,10 @@ public class TreeBuilder {
   	 * If not defined the default leaves will be plain Vanilla oak leaves and that's what will drop when sheared.
 	 * 
 	 * @param primLeaves The primitive leaves which are used for many purposes including drops, branch reinforcing and some other basic behavior.
-	 * @param primLeavesStack cached {@link ItemStack} of primitive leaves(what is returned when leaves are sheared)
 	 * @return TreeBuilder for chaining
 	 */
-	public TreeBuilder setPrimitiveLeaves(IBlockState primLeaves, ItemStack primLeavesStack) {
+	public TreeBuilder setPrimitiveLeaves(IBlockState primLeaves) {
 		primitiveLeavesBlockState = primLeaves;
-		primitiveLeavesItemStack = primLeavesStack;
 		return this;
 	}
 
@@ -140,9 +136,8 @@ public class TreeBuilder {
 	 * @param primLogStack The cached ItemStack of primitive logs(what is returned when wood is harvested)
 	 * @return TreeBuilder for chaining
 	 */
-	public TreeBuilder setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
+	public TreeBuilder setPrimitiveLog(IBlockState primLog) {
 		primitiveLogBlockState = primLog;
-		primitiveLogItemStack = primLogStack;
 		return this;
 	}
 	
@@ -309,7 +304,7 @@ public class TreeBuilder {
 				
 				if(dynamicLeavesProperties == null) {
 
-					dynamicLeavesProperties = new LeavesProperties(primitiveLeavesBlockState, primitiveLeavesItemStack) {
+					dynamicLeavesProperties = new LeavesProperties(primitiveLeavesBlockState) {
 						@Override
 						public int getLightRequirement() {
 							return dynamicLeavesLightRequirement;
@@ -328,8 +323,7 @@ public class TreeBuilder {
 					TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seqNum, dynamicLeavesProperties);
 				}
 				
-				setPrimitiveLeaves(primitiveLeavesBlockState, primitiveLeavesItemStack);
-				setPrimitiveLog(primitiveLogBlockState, primitiveLogItemStack);
+				this.setPrimitiveLog(primitiveLogBlockState);
 				
 				if(primitiveSaplingBlockState != null && primitiveSaplingItemStack != null) {
 					setPrimitiveSapling(primitiveSaplingBlockState, primitiveSaplingItemStack);

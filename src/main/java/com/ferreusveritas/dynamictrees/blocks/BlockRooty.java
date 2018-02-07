@@ -46,18 +46,18 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockRootyDirt extends Block implements ITreePart {
+public class BlockRooty extends Block implements ITreePart {
 	
 	static String name = "rootydirt";
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicType.class);
 	
-	public BlockRootyDirt() {
+	public BlockRooty() {
 		this(name);
 	}
 	
-	public BlockRootyDirt(String name) {
+	public BlockRooty(String name) {
 		super(Material.GROUND);
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15).withProperty(MIMIC, EnumMimicType.DIRT));
@@ -169,7 +169,7 @@ public class BlockRootyDirt extends Block implements ITreePart {
 	 * This is the state the rooty dirt returns to once it no longer supports a tree structure.
 	 * 
 	 * @param access
-	 * @param pos The position of the {@link BlockRootyDirt}
+	 * @param pos The position of the {@link BlockRooty}
 	 * @return
 	 */
 	public IBlockState getDecayBlockState(IBlockAccess access, BlockPos pos) {

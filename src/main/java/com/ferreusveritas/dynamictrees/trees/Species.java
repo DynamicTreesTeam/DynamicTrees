@@ -22,7 +22,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -72,7 +72,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
 		@Override public void setupStandardSeedDropping() {}
-		@Override public boolean update(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
+		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 	
 	/**
@@ -435,12 +435,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//DIRT
 	///////////////////////////////////////////
 	
-	public BlockRootyDirt getRootyDirtBlock() {
+	public BlockRooty getRootyDirtBlock() {
 		return ModBlocks.blockRootyDirt;
 	}
 	
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		world.setBlockState(rootPos, getRootyDirtBlock().getDefaultState().withProperty(BlockRootyDirt.LIFE, life));
+		world.setBlockState(rootPos, getRootyDirtBlock().getDefaultState().withProperty(BlockRooty.LIFE, life));
 		return true;
 	}
 	
@@ -480,7 +480,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilList.contains(soilBlock) || soilBlock instanceof BlockRootyDirt;
+		return soilList.contains(soilBlock) || soilBlock instanceof BlockRooty;
 	}
 	
 	/**
@@ -505,15 +505,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 *  
 	 *  
 	 * @param world The world
-	 * @param rootyDirt The {@link BlockRootyDirt} that is supporting this tree
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} type in the world
+	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
-	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRootyDirt} this tree is on)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
-	public boolean update(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
 
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -555,9 +555,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} for this {@link DynamicTree}
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link DynamicTree}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
-	 * @param soilLife The soil life of the {@link BlockRootyDirt}
+	 * @param soilLife The soil life of the {@link BlockRooty}
 	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly.
 	 * @return true if last piece of tree rotted away.
 	 */
@@ -627,15 +627,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * The grow handler.
 	 * 
 	 * @param world The world
-	 * @param rootyDirt The {@link BlockRootyDirt} that is supporting this tree
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRootyDirt} type in the world
+	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
-	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRootyDirt} this tree is on)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
-	public boolean grow(World world, BlockRootyDirt rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
 		
 		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 		do {
@@ -825,7 +825,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * Override to use other methods.
 	 * 
 	 * @param world The world
-	 * @param pos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param pos The position of {@link BlockRooty} this tree is planted in
 	 * @param biome The biome this tree is generating in
 	 * @param facing The orientation of the tree(rotates JoCode)
 	 * @param radius The radius of the tree generation boundary
@@ -859,7 +859,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * Allows the tree to decorate itself after it has been generated.  Add vines, fruit, etc.
 	 * 
 	 * @param world The world
-	 * @param rootPos The position of {@link BlockRootyDirt} this tree is planted in
+	 * @param rootPos The position of {@link BlockRooty} this tree is planted in
 	 * @param biome The biome this tree is generating in
 	 * @param radius The radius of the tree generation boundary
 	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints

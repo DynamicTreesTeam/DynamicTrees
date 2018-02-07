@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 
 import net.minecraft.tileentity.TileEntity;
@@ -36,7 +36,7 @@ public class SpeciesRare extends Species {
 	}
 	
 	@Override
-	public BlockRootyDirt getRootyDirtBlock() {
+	public BlockRooty getRootyDirtBlock() {
 		return ModBlocks.blockRootyDirtSpecies;
 	}
 	

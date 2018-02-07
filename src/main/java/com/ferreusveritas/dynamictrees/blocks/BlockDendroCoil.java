@@ -114,14 +114,14 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public void killTree(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			((BlockRootyDirt)part).destroyTree(world, pos.up());
+			((BlockRooty)part).destroyTree(world, pos.up());
 		}
 	}
 
 	public int getSoilLife(World world, BlockPos pos) {
 		ITreePart part = TreeHelper.getTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			return ((BlockRootyDirt)part).getSoilLife(world, pos.up());
+			return ((BlockRooty)part).getSoilLife(world, pos.up());
 		}
 		return 0;
 	}
@@ -129,7 +129,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	public void setSoilLife(World world, BlockPos pos, int life) {
 		ITreePart part = TreeHelper.getTreePart(world, pos.up());
 		if(part.isRootNode()) {
-			((BlockRootyDirt)part).setSoilLife(world, pos.up(), life);
+			((BlockRooty)part).setSoilLife(world, pos.up(), life);
 		}
 	}
 	

@@ -107,4 +107,11 @@ public interface ITreePart {
 	
 	
 	boolean isBranch();
+	
+	public enum TreePartType {
+		ROOT,
+		BRANCH,
+		LEAVES
+	}
+	
 }
