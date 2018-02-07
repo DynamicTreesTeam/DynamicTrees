@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFreezer;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -15,7 +15,7 @@ public class SubstanceFreeze implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRootyDirt dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
 		Species species = dirt.getSpecies(world, rootPos);
 		if(species != Species.NULLSPECIES && dirt != null) {
 			if(world.isRemote) {

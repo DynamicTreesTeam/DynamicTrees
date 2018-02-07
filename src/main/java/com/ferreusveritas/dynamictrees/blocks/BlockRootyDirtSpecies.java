@@ -26,7 +26,7 @@ import net.minecraft.world.World;
  * @author ferreusveritas
  *
  */
-public class BlockRootyDirtSpecies extends BlockRootyDirt implements ITileEntityProvider {
+public class BlockRootyDirtSpecies extends BlockRooty implements ITileEntityProvider {
 	
 	static String name = "rootydirtspecies";
 	

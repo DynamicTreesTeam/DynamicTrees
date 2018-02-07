@@ -320,7 +320,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		Species species = signal.getSpecies();
 		
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(species.getLeavesProperties().getDynamicLeavesState());
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(species.getLeavesProperties().getDynamicLeavesState());
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
@@ -478,7 +478,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public Species getSpeciesFromSignal(World world, MapSignal signal) {
 		Species species;
 		if(signal.found) {
-			BlockRootyDirt rootyDirt = (BlockRootyDirt) world.getBlockState(signal.root).getBlock();
+			BlockRooty rootyDirt = (BlockRooty) world.getBlockState(signal.root).getBlock();
 			species = rootyDirt.getSpecies(world, signal.root);
 		} else {
 			species = getTree().getCommonSpecies();
@@ -621,7 +621,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 				BlockPos neighPos = burnedPos.offset(dir);
 				if(TreeHelper.isBranch(world, neighPos)) {
 					BlockPos rootPos = DynamicTree.findRootNode(world, neighPos);
-					if(rootPos == null) {
+					if(rootPos == BlockPos.ORIGIN) {
 						analyse(world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
 					}
 				}
@@ -641,18 +641,8 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 	}
 	
-	@Override
-	public boolean isBranch() {
-		return true;
-	}
-	
-	///////////////////////////////////////////
-	// IRRELEVANT
-	///////////////////////////////////////////
-	
-	@Override
-	public boolean isRootNode() {
-		return false;
+	public final TreePartType getTreePartType() {
+		return TreePartType.BRANCH;
 	}
 	
 }

@@ -272,7 +272,9 @@ public class CircleHelper {
 			circles.add(cAtemp);
 			circles.add(cBtemp);
 			circles.add(new Circle(24, 24, cCrad));
-			CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
+			if(ModConfigs.poissonDiscImageWrite) {
+				CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
+			}
 			System.err.println("3rd circle condition: No solution found");
 			System.err.println("CircleA:" + cA);
 			System.err.println("CircleB:" + cB);

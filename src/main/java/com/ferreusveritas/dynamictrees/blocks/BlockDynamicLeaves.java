@@ -169,7 +169,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 		
 		//If dynamic leaves are clicked on
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(treePart);
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(treePart);
 		if(leaves != null) {
 			return leaves.getProperties(blockState).getDynamicLeavesState();
 		}
@@ -600,16 +600,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public boolean isRootNode() {
-		return false;
-	}
-	
-	@Override
-	public boolean isBranch() {
-		return false;
-	}
-	
-	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
 		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
@@ -642,4 +632,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return super.shouldSideBeRendered(blockState, blockAccess, pos, side); 
 	}
     
+	public final TreePartType getTreePartType() {
+		return TreePartType.LEAVES;
+	}
+	
 }

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -38,6 +39,14 @@ public class LeavesProperties implements ILeavesProperties {
 	private IBlockState dynamicLeavesBlockHydroStates[] = new IBlockState[5];
 
 	private LeavesProperties() {}
+	
+	public LeavesProperties(IBlockState primitiveLeaves) {
+		this(primitiveLeaves, new ItemStack(Item.getItemFromBlock(primitiveLeaves.getBlock()), 1, primitiveLeaves.getBlock().damageDropped(primitiveLeaves)));
+	}
+	
+	public LeavesProperties(IBlockState primitiveLeaves, ICellKit cellKit) {
+		this(primitiveLeaves, new ItemStack(Item.getItemFromBlock(primitiveLeaves.getBlock()), 1, primitiveLeaves.getBlock().damageDropped(primitiveLeaves)), cellKit);
+	}
 	
 	public LeavesProperties(IBlockState primitiveLeaves, ItemStack primitiveLeavesItemStack) {
 		this(primitiveLeaves, primitiveLeavesItemStack, TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, "deciduous")));

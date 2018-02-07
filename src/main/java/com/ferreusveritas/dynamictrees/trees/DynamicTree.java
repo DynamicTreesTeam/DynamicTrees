@@ -205,7 +205,7 @@ public class DynamicTree {
 		
 		BlockPos rootPos = findRootNode(world, hitPos);
 		
-		if(rootPos != null) {
+		if(rootPos != BlockPos.ORIGIN) {
 			if (heldItem != null) {//Something in the hand
 				if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
 					CompatHelper.consumePlayerItem(player, hand, heldItem);
@@ -338,7 +338,7 @@ public class DynamicTree {
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
 		BlockPos rootPos = findRootNode(world, pos);
-		return rootPos != null ? TreeHelper.getRootyDirt(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
+		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
 	}
 	
 
@@ -346,18 +346,20 @@ public class DynamicTree {
 		
 		ITreePart treePart = TreeHelper.getTreePart(world, pos);
 
-		if(treePart.isRootNode()) {
-			return pos;
+		switch(treePart.getTreePartType()) {
+			case BRANCH:
+				MapSignal signal = treePart.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				if(signal.found) {
+					return signal.root;
+				}
+				break;
+			case ROOT:
+				return pos;
+			default:
+				return BlockPos.ORIGIN;
 		}
 		
-		if(treePart.isBranch()) {
-			MapSignal signal = treePart.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-			if(signal.found) {
-				return signal.root;
-			}
-		}
-		
-		return null;
+		return BlockPos.ORIGIN;
 	}
 	
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
@@ -381,7 +383,7 @@ public class DynamicTree {
 	
 	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		IBlockState state = blockAccess.getBlockState(pos);
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(state);
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(state);
 		return (leaves != null) && this == leaves.getTree(state);
 	}
 

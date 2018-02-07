@@ -97,14 +97,18 @@ public interface ITreePart {
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
 	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
-
-	/**
-	* The single root node of a tree.
-	* 
-	* @return true if treepart is root node. false otherwise.
-	*/
-	boolean isRootNode();
 	
+	public enum TreePartType {
+		NULL,
+		ROOT,
+		BRANCH,
+		LEAVES
+	}
 	
-	boolean isBranch();
+	TreePartType getTreePartType();
+	
+	default boolean isRootNode() {
+		return false;
+	}
+	
 }

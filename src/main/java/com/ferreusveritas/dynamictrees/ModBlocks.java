@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingRare;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtSpecies;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
@@ -27,8 +27,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
 	
-	public static BlockRootyDirt blockRootyDirt;
-	public static BlockRootyDirt blockRootyDirtSpecies;
+	public static BlockRooty blockRootyDirt;
+	public static BlockRooty blockRootyDirtSpecies;
 	public static BlockDynamicSapling blockDynamicSapling;
 	public static BlockDynamicSaplingRare blockDynamicSaplingSpecies;
 	public static BlockFruit blockFruit;
@@ -51,7 +51,7 @@ public class ModBlocks {
 	public static void preInit() {
 		blockStates = new CommonBlockStates();
 		
-		blockRootyDirt = new BlockRootyDirt();//Dirt
+		blockRootyDirt = new BlockRooty();//Dirt
 		blockRootyDirtSpecies = new BlockRootyDirtSpecies();//Special dirt for rarer species
 		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");//Dynamic version of a Vanilla sapling
 		blockDynamicSaplingSpecies = new BlockDynamicSaplingRare("saplingrare");//Species extended sapling(Apple)
