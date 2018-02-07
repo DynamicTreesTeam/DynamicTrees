@@ -14,7 +14,7 @@ public class SubstanceDeplete implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
 		if(dirt.fertilize(world, rootPos, -amount)) {
 			TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_ANGRY, 8);
 			return true;

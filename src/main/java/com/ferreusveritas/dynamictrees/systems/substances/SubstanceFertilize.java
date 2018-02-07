@@ -15,7 +15,7 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
 		if(dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
 			if(world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_HAPPY, 8);

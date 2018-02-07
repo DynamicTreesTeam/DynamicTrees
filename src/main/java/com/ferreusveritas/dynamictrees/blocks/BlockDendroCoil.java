@@ -62,7 +62,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
-		if(TreeHelper.isRootyDirt(world, pos)) {
+		if(TreeHelper.isRooty(world, pos)) {
 			return new JoCode().buildFromTree(world, pos).toString();
 		}
 		

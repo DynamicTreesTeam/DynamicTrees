@@ -15,7 +15,7 @@ public class SubstanceFreeze implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRootyDirt(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
 		Species species = dirt.getSpecies(world, rootPos);
 		if(species != Species.NULLSPECIES && dirt != null) {
 			if(world.isRemote) {

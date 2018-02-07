@@ -169,7 +169,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 		
 		//If dynamic leaves are clicked on
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(treePart);
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(treePart);
 		if(leaves != null) {
 			return leaves.getProperties(blockState).getDynamicLeavesState();
 		}

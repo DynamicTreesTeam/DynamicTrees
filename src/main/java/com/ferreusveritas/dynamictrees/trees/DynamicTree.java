@@ -338,7 +338,7 @@ public class DynamicTree {
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
 		BlockPos rootPos = findRootNode(world, pos);
-		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRootyDirt(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
+		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
 	}
 	
 
@@ -383,7 +383,7 @@ public class DynamicTree {
 	
 	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
 		IBlockState state = blockAccess.getBlockState(pos);
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(state);
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(state);
 		return (leaves != null) && this == leaves.getTree(state);
 	}
 

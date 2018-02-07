@@ -319,7 +319,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		Species species = signal.getSpecies();
 		
-		BlockDynamicLeaves leaves = TreeHelper.getDynamicLeaves(species.getLeavesProperties().getDynamicLeavesState());
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(species.getLeavesProperties().getDynamicLeavesState());
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
