@@ -106,7 +106,7 @@ public class TreeCactus extends DynamicTree {
 											boolean trunk = false;
 											if (dir == EnumFacing.UP) {
 												IBlockState downState = world.getBlockState(pos.down());
-												if (TreeHelper.isRootyDirt(downState) || (downState.getBlock() == defaultBranchState.getBlock() && downState.getValue(BlockBranchCactus.TRUNK) && downState.getValue(BlockBranchCactus.ORIGIN) == EnumFacing.DOWN)) {
+												if (TreeHelper.isRooty(downState) || (downState.getBlock() == defaultBranchState.getBlock() && downState.getValue(BlockBranchCactus.TRUNK) && downState.getValue(BlockBranchCactus.ORIGIN) == EnumFacing.DOWN)) {
 													trunk = true;
 												}
 											}
