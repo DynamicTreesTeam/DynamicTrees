@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 
 import java.util.ArrayList;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
 
 import dan200.computercraft.api.lua.ILuaContext;
@@ -24,6 +25,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		killTree,
 		getSoilLife,
 		setSoilLife,
+		getSpeciesList,
 		createStaff,
 		testPoisson,
 		testPoisson2
@@ -121,10 +123,6 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 			switch(ComputerMethod.values()[method]) {
 				case getCode:
 					return new Object[]{ dendroCoil.getCode(world, getPos()) };
-				case getSoilLife:
-					synchronized(this) {
-						return new Object[]{soilLife};
-					}
 				case getTree:
 					synchronized(this) {
 						return new Object[]{treeName};
@@ -137,6 +135,10 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						throw new LuaException("Expected: " + methodNames[method] + " treeName<String>");
 					}
 					break;
+				case getSoilLife:
+					synchronized(this) {
+						return new Object[]{soilLife};
+					}
 				case setSoilLife:
 					if(arguments.length >= 1 &&
 						arguments[0] instanceof Double) {
@@ -145,6 +147,10 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						throw new LuaException("Expected: " + methodNames[method] + " life<Number>");
 					}
 					break;
+				case getSpeciesList:
+					ArrayList<String> species = new ArrayList<String>();
+					TreeRegistry.getSpeciesDirectory().forEach(r -> species.add(r.toString()));
+					return species.toArray();
 				case createStaff:
 					if(arguments.length >= 4 &&
 						arguments[0] instanceof String &&
@@ -166,6 +172,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 					}
 					break;
 				case growPulse:
+					cacheCommand(method, arguments);
+					break;
 				case killTree:
 					cacheCommand(method, arguments);
 					break;

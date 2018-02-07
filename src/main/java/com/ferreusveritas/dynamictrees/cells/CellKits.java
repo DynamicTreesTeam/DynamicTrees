@@ -34,6 +34,7 @@ public class CellKits {
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "conifer"), conifer);
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "acacia"), acacia);
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "darkoak"), darkoak);
+		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "bare"), bare);
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {
