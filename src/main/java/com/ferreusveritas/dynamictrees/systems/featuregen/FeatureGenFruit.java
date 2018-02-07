@@ -57,7 +57,7 @@ public class FeatureGenFruit implements IGenFeature {
 	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos);
 		if(fruitPos != BlockPos.ORIGIN) {
-			if ( !enableHash || ( (coordHashCode(fruitPos) & 1) != 0) ) {
+			if ( !enableHash || ( (coordHashCode(fruitPos) & 3) == 0) ) {
 				world.setBlockState(fruitPos, fruitState);
 			}
 		}

@@ -5,14 +5,12 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorHarvest;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
@@ -22,7 +20,6 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -170,9 +167,7 @@ public class TreeOak extends DynamicTree {
 			envFactor(Type.DRY, 0.25f);
 			
 			generateSeed();
-			
-			addDropCreator(new DropCreatorHarvest(new ResourceLocation(ModConstants.MODID, "appleharvest"), new ItemStack(Items.APPLE), 0.025f));
-			
+						
 			appleGen = new FeatureGenFruit(this, ModBlocks.blockFruit.getDefaultState()).setRayDistance(4);
 
 			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
