@@ -27,6 +27,7 @@ public class ModItems {
 	public static void registerItems(IForgeRegistry<Item> registry) {
 		ArrayList<Item> treeItems = new ArrayList<Item>();
 		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableItems(treeItems));
+		ModTrees.dynamicCactus.getRegisterableItems(treeItems);
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
 		
 		registry.registerAll(makeItemBlock(ModBlocks.blockRootyDirt), makeItemBlock(ModBlocks.blockBonsaiPot));

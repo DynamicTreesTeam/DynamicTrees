@@ -113,7 +113,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		}
 	}
 	
-	private void dropBlock(World world, Species tree, IBlockState state, BlockPos pos) {
+	protected void dropBlock(World world, Species tree, IBlockState state, BlockPos pos) {
 		world.setBlockToAir(pos);
 		dropBlockAsItem(world, pos, state, 0);
 	}

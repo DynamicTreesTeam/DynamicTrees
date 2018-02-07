@@ -79,6 +79,10 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 			return 0.4f + (noiseDensity / 3.0f);
 		}
 		
+		if(CompatHelper.biomeHasType(biome, Type.SANDY)) { //Desert
+			return noiseDensity;
+		}
+		
 		double naturalDensity = MathHelper.clamp((CompatHelper.getBiomeTreesPerChunk(biome)) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return noiseDensity * naturalDensity;
 	}
@@ -111,6 +115,9 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
 				chance = new ChanceRandom(0.75f);
 			} 
+			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {//Deserts (for cacti)
+				chance = new ChanceRandom(0.075f); // TODO: tweak cactus scarcity
+			}
 			else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 				chance = new ChanceStatic(EnumChance.CANCEL);
 			}

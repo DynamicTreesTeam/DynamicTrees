@@ -68,7 +68,7 @@ public class CircleDebug {
 		
 		try {
 			ImageIO.write(img, "png", new File("./unsolved/" + name + ".png"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

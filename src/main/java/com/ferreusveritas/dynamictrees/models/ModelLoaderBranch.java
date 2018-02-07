@@ -17,6 +17,7 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 
 public class ModelLoaderBranch implements ICustomModelLoader {
+	
 	public final String BRANCH_MODEL_RESOURCE_NAME = "dynamictrees:block/smartmodel/branch";
 	public final String code = "#dynamictree";
 	
@@ -86,4 +87,5 @@ public class ModelLoaderBranch implements ICustomModelLoader {
 	}
 
 	private IResourceManager resourceManager;
-	}
+	
+}

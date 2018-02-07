@@ -31,6 +31,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	private Species darkoak;
 	private Species oakswamp;
 	private Species apple;
+	private Species cactus;
 	
 	private StaticDecision staticOakDecision;
 	private StaticDecision staticSpruceDecision;
@@ -112,6 +113,8 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
 		apple = TreeRegistry.findSpeciesSloppy("apple");
 		
+		cactus = TreeRegistry.findSpeciesSloppy("cactus");
+		
 		staticOakDecision = new StaticDecision(new Decision(oak));
 		staticSpruceDecision = new StaticDecision(new Decision(spruce));
 		staticBirchDecision = new StaticDecision(new Decision(birch));
@@ -173,7 +176,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 				select = new StaticDecision(new Decision(oakswamp));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {
-				select = new StaticDecision(new Decision());//Not handled, no tree
+				select = new StaticDecision(new Decision(cactus));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.WASTELAND)) {
 				select = new StaticDecision(new Decision());//Not handled, no tree

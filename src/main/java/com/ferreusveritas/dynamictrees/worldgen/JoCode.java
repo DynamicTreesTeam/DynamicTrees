@@ -33,11 +33,11 @@ import net.minecraft.world.biome.Biome;
 public class JoCode {
 
 	static private final String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	static private final byte forkCode = 6;
-	static private final byte returnCode = 7;
+	static protected final byte forkCode = 6;
+	static protected final byte returnCode = 7;
 
 	public ArrayList<Byte> instructions;
-	private boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
+	protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
 
 	public JoCode() {
 		instructions = new ArrayList<Byte>();
@@ -81,7 +81,7 @@ public class JoCode {
 	 * @param pos
 	 * @return
 	 */
-	private int getCode(int pos) {
+	protected int getCode(int pos) {
 		return unfacingMap[instructions.get(pos)];
 	}
 
@@ -199,7 +199,7 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	private int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
+	protected int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
 
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);

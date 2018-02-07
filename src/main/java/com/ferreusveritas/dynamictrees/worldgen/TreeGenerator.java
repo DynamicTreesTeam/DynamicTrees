@@ -119,7 +119,7 @@ public class TreeGenerator implements IWorldGenerator {
 			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
 		
 			BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-			if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {
+			if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {//FIXME: Shouldn't this check directly for roofed forest, since some modded biomes could also have the SPOOKY type?
 				roofedForestCompensation(world, random, pos);
 			}
 		}

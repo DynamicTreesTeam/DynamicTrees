@@ -38,7 +38,7 @@ public class TreeCodeStore {
 		}
 	}
 	
-	private ArrayList<JoCode> getListForRadius(int radius) {
+	protected ArrayList<JoCode> getListForRadius(int radius) {
 		radius = MathHelper.clamp(radius, 2, 8);
 		return store.get(radius - 2);
 	}

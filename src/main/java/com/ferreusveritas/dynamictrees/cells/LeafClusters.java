@@ -136,4 +136,7 @@ public class LeafClusters {
 			
 		}).setCenter(new BlockPos(3, 1, 3));
 	
+	
+	public static final SimpleVoxmap bare = new SimpleVoxmap(1, 1, 1, new byte[] { 0x20 });
+	
 }

@@ -11,6 +11,7 @@ tile.birchbranch.name=Dynamic Birch Tree
 tile.junglebranch.name=Dynamic Jungle Tree
 tile.darkoakbranch.name=Dynamic Dark Oak Tree
 tile.acaciabranch.name=Dynamic Acacia Tree
+tile.cactusbranch.name=Dynamic Cactus
 
 tile.dynamictrees:oakbranch.name=Dynamic Oak Tree
 tile.dynamictrees:sprucebranch.name=Dynamic Spruce Tree
@@ -18,6 +19,7 @@ tile.dynamictrees:birchbranch.name=Dynamic Birch Tree
 tile.dynamictrees:junglebranch.name=Dynamic Jungle Tree
 tile.dynamictrees:darkoakbranch.name=Dynamic Dark Oak Tree
 tile.dynamictrees:acaciabranch.name=Dynamic Acacia Tree
+tile.dynamictrees:cactusbranch.name=Dynamic Cactus
 
 item.oakseed.name=Oak Acorn
 item.spruceseed.name=Spruce Cone

@@ -266,7 +266,9 @@ public class CompositeModel implements IBakedModel {
 	}
 	
 	protected int getRadius(IBlockState blockState) {
-		return blockState.getValue(BlockBranch.RADIUS);
+		// This way works with branches that don't have the RADIUS property, like cactus
+		return ((BlockBranch) blockState.getBlock()).getRadius(blockState);
+		//return blockState.getValue(BlockBranch.RADIUS);
 	}
 	
 	/**

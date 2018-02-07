@@ -44,6 +44,8 @@ public class ModBlocks {
 	public static LeavesProperties darkOakLeavesProperties;
 	public static LeavesProperties[] vanillaLeavesProperties;
 	
+	public static LeavesProperties cactusLeavesProperties;
+	
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
@@ -124,12 +126,15 @@ public class ModBlocks {
 			TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seq++, lp);
 		}
 		
+		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));
+		
 	}
 	
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
 
 		registry.registerAll(blockRootyDirt, blockRootyDirtSpecies, blockDynamicSapling, blockDynamicSaplingSpecies, blockBonsaiPot, blockFruitCocoa, blockFruit, blockVerboseFire);

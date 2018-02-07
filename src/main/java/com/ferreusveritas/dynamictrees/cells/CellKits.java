@@ -231,6 +231,38 @@ public class CellKits {
 	};
 	
 	
+	private final ICellKit bare = new ICellKit() {
+		
+		private final ICellSolver solver = new BasicSolver(new short[]{});
+		
+		@Override
+		public ICell getCellForLeaves(int hydro) {
+			return CellNull.NULLCELL;
+		}
+		
+		@Override
+		public ICell getCellForBranch(int radius) {
+			return CellNull.NULLCELL;
+		}
+		
+		@Override
+		public SimpleVoxmap getLeafCluster() {
+			return LeafClusters.bare;
+		}
+		
+		@Override
+		public ICellSolver getCellSolver() {
+			return solver;
+		}
+		
+		@Override
+		public int getDefaultHydration() {
+			return 0;
+		}
+		
+	};
+	
+	
 	/**
 	* Cellular automata function that determines the behavior of the center cell from it's neighbors.
 	* Values here are the number of neighbors for each hydration level.  Must be 16 elements.
