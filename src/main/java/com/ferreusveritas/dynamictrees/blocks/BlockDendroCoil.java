@@ -70,8 +70,8 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public void setCode(World world, BlockPos pos, String treeName, String JoCode) {
-		JoCode jo = new JoCode(JoCode);
 		Species species = TreeRegistry.findSpeciesSloppy(treeName);
+		JoCode jo = species.getJoCode(JoCode);
 		if(species != Species.NULLSPECIES) {
 			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
 		} else {
