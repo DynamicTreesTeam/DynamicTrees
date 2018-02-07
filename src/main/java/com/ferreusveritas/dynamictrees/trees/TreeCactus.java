@@ -50,7 +50,7 @@ public class TreeCactus extends DynamicTree {
 			// TODO: Clean up this mess (maybe make JoCode use an interface like ITreeGenerator for easier custom tree generation)
 			joCodeStore = new TreeCodeStore(this) {
 				@Override
-				public void addCode(int radius, String code) {
+				public void addCode(Species species, int radius, String code) {
 					JoCode joCode = new JoCode(code) {
 						@Override
 						public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {

@@ -848,11 +848,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return joCodeStore;
 	}
 	
+	public JoCode getJoCode(String joCodeString) {
+		return new JoCode(joCodeString);
+	}
+	
 	/**
 	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
 	 */
 	public void addJoCodes() {
-		joCodeStore.addCodesFromFile("assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
+		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
 	/**

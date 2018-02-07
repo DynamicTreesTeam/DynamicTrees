@@ -88,7 +88,7 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
-			new JoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8);
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8);
 			CompatHelper.shrinkStack(heldStack, 1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}

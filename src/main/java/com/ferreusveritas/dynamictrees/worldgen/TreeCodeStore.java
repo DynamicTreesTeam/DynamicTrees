@@ -43,7 +43,7 @@ public class TreeCodeStore {
 		return store.get(radius - 2);
 	}
 	
-	public void addCodesFromFile(String filename) {
+	public void addCodesFromFile(Species species, String filename) {
 		try {
 			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
@@ -54,7 +54,7 @@ public class TreeCodeStore {
 				while((line = readIn.readLine()) != null) {
 					if((line.length() >= 3) && (line.charAt(0) != '#')) {
 						String[] split = line.split(":");
-						addCode(Integer.valueOf(split[0]), split[1]);
+						addCode(species, Integer.valueOf(split[0]), split[1]);
 					}
 				}
 			} else {
@@ -70,8 +70,8 @@ public class TreeCodeStore {
 		}
 	}
 
-	public void addCode(int radius, String code) {
-		JoCode joCode = new JoCode(code).setCareful(false);
+	public void addCode(Species species, int radius, String code) {
+		JoCode joCode = species.getJoCode(code).setCareful(false);
 		
 		//Code reserved for collecting WorldGen JoCodes
 		//collectWorldGenCodes(tree, radius, joCode);
