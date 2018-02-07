@@ -211,11 +211,7 @@ public class JoCode {
 				EnumFacing dir = EnumFacing.getFront(code);
 				pos = pos.offset(dir);
 				if(!disabled) {
-					if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-						world.setBlockState(pos, species.getTree().getDynamicBranch().getDefaultState(), careful ? 3 : 2);
-					} else {
-						disabled = true;
-					}
+					disabled = setBlockForGeneration(world, species, pos, dir, careful);
 				}
 				codePos++;
 			}
@@ -224,6 +220,14 @@ public class JoCode {
 		return codePos;
 	}
 
+	protected boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
+		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+			world.setBlockState(pos, species.getTree().getDynamicBranch().getDefaultState(), careful ? 3 : 2);
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Precompute leaf smothering before applying to the world.
 	 * 
