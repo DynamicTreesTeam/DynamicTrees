@@ -376,19 +376,12 @@ public class BlockRooty extends Block implements ITreePart {
 		return true;
 	}
 	
-	
-	///////////////////////////////////////////
-	// ISSITS
-	///////////////////////////////////////////
+	public final TreePartType getTreePartType() {
+		return TreePartType.ROOT;
+	}
 	
 	@Override
-	public boolean isRootNode() {
+	public final boolean isRootNode() {
 		return true;
 	}
-	
-	@Override
-	public boolean isBranch() {
-		return false;
-	}
-	
 }

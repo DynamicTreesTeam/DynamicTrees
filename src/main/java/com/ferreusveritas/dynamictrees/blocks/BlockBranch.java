@@ -620,7 +620,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 				BlockPos neighPos = burnedPos.offset(dir);
 				if(TreeHelper.isBranch(world, neighPos)) {
 					BlockPos rootPos = DynamicTree.findRootNode(world, neighPos);
-					if(rootPos == null) {
+					if(rootPos == BlockPos.ORIGIN) {
 						analyse(world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
 					}
 				}
@@ -640,18 +640,8 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 	}
 	
-	@Override
-	public boolean isBranch() {
-		return true;
-	}
-	
-	///////////////////////////////////////////
-	// IRRELEVANT
-	///////////////////////////////////////////
-	
-	@Override
-	public boolean isRootNode() {
-		return false;
+	public final TreePartType getTreePartType() {
+		return TreePartType.BRANCH;
 	}
 	
 }

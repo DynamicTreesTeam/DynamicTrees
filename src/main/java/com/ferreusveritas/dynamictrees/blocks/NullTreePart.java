@@ -52,16 +52,6 @@ public class NullTreePart implements ITreePart {
 	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
-
-	@Override
-	public boolean isRootNode() {
-		return false;
-	}
-
-	@Override
-	public boolean isBranch() {
-		return false;
-	}
 	
 	@Override
 	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
@@ -73,4 +63,8 @@ public class NullTreePart implements ITreePart {
 		return null;
 	}
 
+	public final TreePartType getTreePartType() {
+		return TreePartType.NULL;
+	}
+	
 }
