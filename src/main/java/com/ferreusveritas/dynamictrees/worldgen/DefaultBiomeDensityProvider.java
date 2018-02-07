@@ -80,7 +80,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 		}
 		
 		if(CompatHelper.biomeHasType(biome, Type.SANDY)) { //Desert
-			return noiseDensity;
+			return (noiseDensity * 0.6) + 0.4;
 		}
 		
 		double naturalDensity = MathHelper.clamp((CompatHelper.getBiomeTreesPerChunk(biome)) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0

@@ -116,82 +116,6 @@ public class TreeCactus extends DynamicTree {
 		
 	}
 	
-	public class SpeciesCactusSmall extends Species {
-
-		public SpeciesCactusSmall(DynamicTree treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "small"), treeFamily, ModBlocks.cactusLeavesProperties);
-			
-			setBasicGrowingParameters(0.875f, 3.0f, 3, 2, 1.5f);
-			
-			this.setSoilLongevity(1); // Doesn't live very long
-			
-			envFactor(Type.SNOWY, 0.25f);
-			envFactor(Type.COLD, 0.5f);
-			envFactor(Type.SANDY, 1.05f);
-			
-			addAcceptableSoil(Blocks.SAND, Blocks.HARDENED_CLAY); //TODO: remove dirt and grass and add rooty sand or something
-		}
-		
-		@Override
-		public JoCode getJoCode(String joCodeString) {
-			return new JoCodeCactus(joCodeString);
-		}
-		
-		@Override
-		public float getPrimaryThickness() {
-			return 5.0f;
-		}
-
-		@Override
-		public float getSecondaryThickness() {
-			return 4.0f;
-		}
-		
-		@Override
-		public boolean isBiomePerfect(Biome biome) {
-			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.MUTATED_DESERT);
-		}
-		
-		@Override
-		public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
-			return false;
-		}
-		
-		@Override
-		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
-			EnumFacing originDir = signal.dir.getOpposite();
-			
-			//Alter probability map for direction change
-			probMap[0] = 0;//Down is always disallowed for cactus
-			probMap[1] = signal.delta.getX() % 2 == 0 || signal.delta.getZ() % 2 == 0 ? getUpProbability() : 0;
-			probMap[2] = probMap[3] = probMap[4] = probMap[5] = signal.isInTrunk() && (signal.energy > 1) ? 1 : 0;
-			if (signal.dir != EnumFacing.UP) probMap[signal.dir.ordinal()] = 0;//Disable the current direction, unless that direction is up
-			probMap[originDir.ordinal()] = 0;//Disable the direction we came from
-			return probMap;
-		}
-		
-		@Override
-		protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
-			if(signal.isInTrunk() && newDir != EnumFacing.UP){ //Turned out of trunk
-				signal.energy += 0.5f;
-			}
-			return newDir;
-		}
-		
-		@Override
-		public ItemStack getSeedStack(int qty) {
-			return getCommonSpecies().getSeedStack(qty);
-		}
-		
-		@Override
-		public Seed getSeed() {
-			return getCommonSpecies().getSeed();
-		}
-		
-	}
-	
-	public Species speciesSmall;
-	
 	public TreeCactus() {
 		super(new ResourceLocation(ModConstants.MODID, "cactus"));
 		
@@ -208,14 +132,11 @@ public class TreeCactus extends DynamicTree {
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesCactus(this));
-		speciesSmall = new SpeciesCactusSmall(this);
 	}
 	
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(speciesSmall);
-		
 		getCommonSpecies().generateSeed();
 	}
 	
