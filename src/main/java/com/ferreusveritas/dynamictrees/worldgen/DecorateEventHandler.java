@@ -14,13 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 /**
 * <pre><tt>
 * [   01   ] [   02   ] [   03   ] [   04   ]
-* ┌──┬──┬──┐ ┌──┬──┬──┐ ┌──┬──┬──┐ ┌──┬──┬──┐
-* │  │  │  │ │  │  │  │ │  │Un│Ex│ │Un│Ex│  │
-* ├──┼──┼──┤ ├──┼──┼──┤ ├──┼──┼──┤ ├──┼──┼──┤
-* │  │Un│Ex│ │Un│  │  │ │  │  │Ex│ │Ex│Un│  │
-* ├──┼──┼──┤ ├──┼──┼──┤ ├──┼──┼──┤ ├──┼──┼──┤
-* │  │Ex│Ex│ │Ex│Ex│  │ │  │  │  │ │  │  │  │
-* └──┴──┴──┘ └──┴──┴──┘ └──┴──┴──┘ └──┴──┴──┘
+* â”Œâ”€â”€â”¬â”€â”€â”¬â”€â”€â”� â”Œâ”€â”€â”¬â”€â”€â”¬â”€â”€â”� â”Œâ”€â”€â”¬â”€â”€â”¬â”€â”€â”� â”Œâ”€â”€â”¬â”€â”€â”¬â”€â”€â”�
+* â”‚  â”‚  â”‚  â”‚ â”‚  â”‚  â”‚  â”‚ â”‚  â”‚Unâ”‚Exâ”‚ â”‚Unâ”‚Exâ”‚  â”‚
+* â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤
+* â”‚  â”‚Unâ”‚Exâ”‚ â”‚Unâ”‚  â”‚  â”‚ â”‚  â”‚  â”‚Exâ”‚ â”‚Exâ”‚Unâ”‚  â”‚
+* â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤ â”œâ”€â”€â”¼â”€â”€â”¼â”€â”€â”¤
+* â”‚  â”‚Exâ”‚Exâ”‚ â”‚Exâ”‚Exâ”‚  â”‚ â”‚  â”‚  â”‚  â”‚ â”‚  â”‚  â”‚  â”‚
+* â””â”€â”€â”´â”€â”€â”´â”€â”€â”˜ â””â”€â”€â”´â”€â”€â”´â”€â”€â”˜ â””â”€â”€â”´â”€â”€â”´â”€â”€â”˜ â””â”€â”€â”´â”€â”€â”´â”€â”€â”˜
 * </tt></pre>
 *
 * Ex: Chunk that will be tested for existence
@@ -48,7 +48,7 @@ public class DecorateEventHandler {
 
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
-		if(event.getType() == EventType.TREE) {//Affects roofed forests in 1.10.2(Not 1.7.10)
+		if(event.getType() == EventType.TREE || event.getType() == EventType.CACTUS) {//Affects roofed forests in 1.10.2(Not 1.7.10)
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			ResourceLocation resloc = biome.getRegistryName();
 			//Only deny tree decoration for Vanilla Minecraft Biomes

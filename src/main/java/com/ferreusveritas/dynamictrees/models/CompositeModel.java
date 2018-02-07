@@ -33,7 +33,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class CompositeModel implements IBakedModel {
 
-	private ModelBlock modelBlock;
+	protected ModelBlock modelBlock;
 	
 	TextureAtlasSprite barkParticles;
 	
