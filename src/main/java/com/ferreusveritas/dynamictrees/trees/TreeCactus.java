@@ -18,7 +18,6 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
