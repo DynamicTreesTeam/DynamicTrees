@@ -239,6 +239,9 @@ public class BlockBranchCactus extends BlockBranch {
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
 		}
+		
+		double min = 0.5 - (thisRadius / 16.0), max = 0.5 + (thisRadius / 16.0);
+		addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(min, min, min, max, max, max));
 	}
 	
 	@Override
