@@ -33,6 +33,7 @@ public class TreeAcacia extends DynamicTree {
 		
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
+		ModBlocks.acaciaLeavesProperties.setTree(this);
 	}
 
 	@Override
