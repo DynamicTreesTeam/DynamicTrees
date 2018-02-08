@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -38,66 +37,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	private StaticDecision staticBirchDecision;
 	private StaticDecision staticDarkOakDecision;
 	
-	private interface ITreeSelector {
-		Decision getDecision();
-	}
-	
-	private class StaticDecision implements ITreeSelector {
-		final Decision decision;
-		
-		public StaticDecision(Decision decision) {
-			this.decision = decision;
-		}
-
-		@Override
-		public Decision getDecision() {
-			return decision;
-		}
-	}
-	
-	private class RandomDecision implements ITreeSelector {
-
-		private class Entry {
-			public Entry(Decision d, int w) {
-				decision = d;
-				weight = w;
-			}
-			
-			public Decision decision;
-			public int weight;
-		}
-		
-		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
-		int totalWeight;
-		Random rand;
-		
-		public RandomDecision(Random rand) {
-			this.rand = rand;
-		}
-		
-		public RandomDecision addSpecies(Species species, int weight) {
-			decisionTable.add(new Entry(new Decision(species), weight));
-			totalWeight += weight;
-			return this;
-		}
-		
-		@Override
-		public Decision getDecision() {
-			int chance = rand.nextInt(totalWeight);
-			
-			for(Entry entry: decisionTable) {
-				if(chance < entry.weight) {
-					return entry.decision;
-				}
-				chance -= entry.weight;
-			};
-
-			return decisionTable.get(decisionTable.size() - 1).decision;
-		}
-		
-	}
-	
-	HashMap<Integer, ITreeSelector> fastTreeLookup = new HashMap<Integer, ITreeSelector>();
+	HashMap<Integer, DecisionProvider> fastTreeLookup = new HashMap<Integer, DecisionProvider>();
 	
 	public DefaultBiomeTreeSelector() {		
 	}
@@ -135,7 +75,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 
 		int biomeId = Biome.getIdForBiome(biome);
-		ITreeSelector select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
+		DecisionProvider select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 				
 		if(select == null) {
 			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.

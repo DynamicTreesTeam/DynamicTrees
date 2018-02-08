@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.worldgen;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -73,4 +74,70 @@ public interface IBiomeSpeciesSelector {
 		}
 	}
 
+	public interface DecisionProvider {
+		Decision getDecision();
+	}
+	
+	public class StaticDecision implements DecisionProvider {
+		final Decision decision;
+		
+		public StaticDecision(Decision decision) {
+			this.decision = decision;
+		}
+
+		@Override
+		public Decision getDecision() {
+			return decision;
+		}
+	}
+	
+	public class RandomDecision implements DecisionProvider {
+
+		private class Entry {
+			public Entry(Decision d, int w) {
+				decision = d;
+				weight = w;
+			}
+			
+			public Decision decision;
+			public int weight;
+		}
+		
+		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
+		int totalWeight;
+		Random rand;
+		
+		public RandomDecision(Random rand) {
+			this.rand = rand;
+		}
+		
+		public RandomDecision addSpecies(Species species, int weight) {
+			decisionTable.add(new Entry(new Decision(species), weight));
+			totalWeight += weight;
+			return this;
+		}
+		
+		public RandomDecision addUnhandled(int weight) {
+			decisionTable.add(new Entry(new Decision(), weight));
+			totalWeight += weight;
+			return this;
+			
+		}
+		
+		@Override
+		public Decision getDecision() {
+			int chance = rand.nextInt(totalWeight);
+			
+			for(Entry entry: decisionTable) {
+				if(chance < entry.weight) {
+					return entry.decision;
+				}
+				chance -= entry.weight;
+			};
+
+			return decisionTable.get(decisionTable.size() - 1).decision;
+		}
+		
+	}
+	
 }
