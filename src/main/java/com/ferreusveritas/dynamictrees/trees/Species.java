@@ -435,12 +435,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//DIRT
 	///////////////////////////////////////////
 	
-	public BlockRooty getRootyDirtBlock() {
+	public BlockRooty getRootyBlock() {
 		return ModBlocks.blockRootyDirt;
 	}
 	
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		world.setBlockState(rootPos, getRootyDirtBlock().getDefaultState().withProperty(BlockRooty.LIFE, life));
+		world.setBlockState(rootPos, getRootyBlock().getDefaultState().withProperty(BlockRooty.LIFE, life));
 		return true;
 	}
 	

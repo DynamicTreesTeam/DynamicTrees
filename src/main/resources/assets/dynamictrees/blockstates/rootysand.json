@@ -1,0 +1,10 @@
+{
+    "multipart": [
+        {   "when": { "mimic": "sand" },
+            "apply": { "model": "sand" }
+        },
+        {   "when": { "mimic": "red_sand" },
+            "apply": { "model": "red_sand" }
+        }
+    ]
+}

@@ -6,8 +6,6 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -26,13 +24,10 @@ import net.minecraft.world.World;
  * @author ferreusveritas
  *
  */
-public class BlockRootyDirtSpecies extends BlockRooty implements ITileEntityProvider {
+public class BlockRootyDirtSpecies extends BlockRootyDirt implements ITileEntityProvider {
 	
 	static String name = "rootydirtspecies";
-	
-	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
-	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicType.class);
-	
+		
 	public BlockRootyDirtSpecies() {
 		this(name);
 	}

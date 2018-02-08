@@ -10,8 +10,8 @@ import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
-import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
@@ -65,6 +65,11 @@ public class TreeCactus extends DynamicTree {
 			int month = (int)day / 30; //Change the hashs every in-game month
 			
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (coordHashCode(pos.up(month)) % 3);//Vary the height energy by a psuedorandom hash function
+		}
+		
+		@Override
+		public BlockRooty getRootyBlock() {
+			return ModBlocks.blockRootySand;
 		}
 		
 		public int coordHashCode(BlockPos pos) {

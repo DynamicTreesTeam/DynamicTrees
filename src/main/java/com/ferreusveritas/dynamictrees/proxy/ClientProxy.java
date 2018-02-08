@@ -56,9 +56,12 @@ public class ClientProxy extends CommonProxy {
 		
 		//BLOCKS
 		
-		//Register Rootydirt Mesher
+		//Register Rooty Dirt Mesher
 		ModelHelper.regModel(ModBlocks.blockRootyDirt);
 
+		//Register Rooty Sand Mesher
+		ModelHelper.regModel(ModBlocks.blockRootySand);
+		
 		//Register Bonsai Pot Mesher
 		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
 		

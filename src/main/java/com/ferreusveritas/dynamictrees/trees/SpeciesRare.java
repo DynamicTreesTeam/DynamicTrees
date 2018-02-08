@@ -36,7 +36,7 @@ public class SpeciesRare extends Species {
 	}
 	
 	@Override
-	public BlockRooty getRootyDirtBlock() {
+	public BlockRooty getRootyBlock() {
 		return ModBlocks.blockRootyDirtSpecies;
 	}
 	
