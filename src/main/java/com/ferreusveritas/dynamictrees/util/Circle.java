@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
-
 import net.minecraft.util.math.BlockPos;
 
 public class Circle extends Vec2i {
@@ -198,8 +196,8 @@ public class Circle extends Vec2i {
 	* @param endAngle starting angle in radians
 	*/
 	public void maskArc(double startAngle, double endAngle) {
-		int start = Math.round(CircleHelper.radiansToTurns(startAngle) * 32.0f) & 31;
-		int end =   Math.round(CircleHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
+		int start = Math.round(MathHelper.radiansToTurns(startAngle) * 32.0f) & 31;
+		int end =   Math.round(MathHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
 		arc |= bitRun(start, end);
 	}
 	
@@ -297,7 +295,7 @@ public class Circle extends Vec2i {
 	}
 	
 	/**
-	* Gets the next free angle for placing a new neighboring circle.
+	* Gets the next free angle(in radians) for placing a new neighboring circle.
 	* 
 	* @return free angle in radians
 	*/

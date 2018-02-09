@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class PairData {
@@ -86,7 +87,7 @@ public class PairData {
 		//Avoid branching by using a bit twiddle hack to determine the sign of the data.
 		tc.x = (-( ((vAngle / codesize) + 1) & 2) + 1) * vsdata[codesize - modulus];
 		tc.z = (-(  (vAngle / codesize)      & 2) + 1) * vsdata[modulus];
-		tc.setLoose(((looseMask >> Math.min(modulus - 1, 32)) & 1) != 0);
+		tc.setTight(((looseMask >> Math.min(modulus - 1, 32)) & 1) == 0);
 		
 		return tc;
 	}
@@ -106,13 +107,13 @@ public class PairData {
 	
 	public int getSector(double actualAngle) {
 		
-		int sector = (int)(CircleHelper.radiansToTurns(actualAngle) * sectors);
-		double smallestDelta = CircleHelper.deltaAngle(actualAngle, getCoords(sector).angle());
+		int sector = (int)(MathHelper.radiansToTurns(actualAngle) * sectors);
+		double smallestDelta = MathHelper.deltaAngle(actualAngle, getCoords(sector).angle());
 		
 		for(int dir = -1; dir <= 1; dir += 2) {
 			while(true) {
 				double ang = getCoords(sector + dir).angle();
-				double del = CircleHelper.deltaAngle(actualAngle, ang);
+				double del = MathHelper.deltaAngle(actualAngle, ang);
 				if(del < smallestDelta) {
 					smallestDelta = del;
 					sector += dir;

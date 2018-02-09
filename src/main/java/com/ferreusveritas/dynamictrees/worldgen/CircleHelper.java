@@ -2,111 +2,60 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class CircleHelper {
 
-	public static double wrapAngle(double angle) {
-		final double TwoPi = Math.PI * 2;
-		angle %= TwoPi;//Wrap angle
-		return angle + (angle < 0 ? TwoPi : 0);//Convert negative angle to positive
-	}
-
-	/**
-	* Convert Range [0, PI * 2] to [0, 1]
-	* @param angle The angle to convert [0, PI * 2] (angle will be wrapped to this range)
-	* @return range [0, 1]
-	*/
-	public static float radiansToTurns(double angle) {
-		return (float) (wrapAngle(angle) / (Math.PI * 2));
-	}
-
-	/**
-	* Length (angular) of a shortest way between two angles.
-	* 
-	* @param alpha First angle in range [0, PI * 2] (input will be wrapped to range)
-	* @param beta Second angle in range [0, PI * 2] (input will be wrapped to range)
-	* @return Shorted Delta angle in range [0, PI]
-	*/
-	public static double deltaAngle(double alpha, double beta) {
-		double phi = Math.abs(beta - alpha) % (Math.PI * 2);// This is either the distance or 360 - distance
-		double distance = phi > Math.PI ? (Math.PI * 2) - phi : phi;
-		return distance;
-	}
-
 	/**
 	* Creates a tangential circle to cA at a random angle with radius cBrad.
-	* Only returns tightly fitting circles and rejects loose fits with no overlapping
-	* edges.
 	* 
 	* @param cA The base circle
 	* @param cBrad The radius of the created second circle
+	* @param onlyTight Only returns tightly fitting circles and reject loose fits.
 	* @return
 	*/
-	public static Circle findSecondCircle(Circle cA, int cBrad) {
-
-		double angle = cA.getFreeAngle();		
-
-		PairData pd = new PairData(cA.radius, cBrad);
-		int sector = pd.getSector(angle);
-		Vec2i[] coordList = pd.getCoordsForSectors(sector - 2, sector + 2);
-		Vec2i closestCoord = coordList[0];
-		double closestAngle = Math.PI;
-
-		for(Vec2i c: coordList) {
-			if(!c.isLoose()) {//Reject loose circles when finding 2nd
-				double deltaAngle = deltaAngle(c.angle(), angle);
-				if(deltaAngle < closestAngle) {
-					closestCoord = c;
-					closestAngle = deltaAngle;
-				}
-			}
-		}
-
-		return (Circle) new Circle(closestCoord, cBrad).add(cA.x, cA.z);
+	public static Circle findSecondCircle(Circle cA, int cBrad, boolean onlyTight) {
+		return findSecondCircle(cA, cBrad, cA.getFreeAngle(), onlyTight);
 	}
 
+	private static int singleSearchOrder[] = new int[] {0, 1, -1};
+	
 	/**
 	* Creates a tangential circle to cA at a specific angle with radius cBrad
 	* 
 	* @param cA The base circle
 	* @param cBrad The radius of the created second circle
+	* @param angle The angle(in radians) to create the new circle 
+ 	* @param onlyTight Only returns tightly fitting circles and reject loose fits.
 	* @return
 	*/
-	public static Circle findSecondCircle(Circle cA, int cBrad, double angle) {
-
-		angle = Math.toRadians(angle);
+	public static Circle findSecondCircle(Circle cA, int cBrad, double angle, boolean onlyTight) {
 
 		PairData pd = new PairData(cA.radius, cBrad);
 		int sector = pd.getSector(angle);
 
-		Vec2i[] coordList = pd.getCoordsForSectors(sector - 2, sector + 2);
-		Vec2i closestCoord = coordList[0];
-		double closestAngle = Math.PI;
-		boolean isLoose = false;
+		if(!onlyTight) {
+			return (Circle) new Circle(pd.getCoords(sector), cBrad).add(cA.x, cA.z);
+		}
 		
-		for(Vec2i c: coordList) {
-			double deltaAngle = deltaAngle(c.angle(), angle);
-			if(deltaAngle < closestAngle) {
-				closestCoord = c;
-				closestAngle = deltaAngle;
-				isLoose = c.isLoose();
+		for(int i : singleSearchOrder) {
+			Vec2i c = pd.getCoords(sector + i);
+			if(c.isTight()) {//Reject loose circles when finding 2nd circle
+				return (Circle) new Circle(c, cBrad).add(cA.x, cA.z);
 			}
 		}
 
-		Circle result = (Circle) new Circle(closestCoord, cBrad).add(cA.x, cA.z);
-		result.loose = isLoose;
-		
-		return result;
+		return null;//Something went terribly wrong since there's always a tight circle next to a loose one
 	}
 
+	private static int pairSearchOrder[] = new int[] {34, 33, 35, 18, 50, 17, 17, 19, 49, 51, 32, 36, 2, 66, 1, 3, 65, 67, 16, 20, 48, 52};
 	
 	/**
 	* Finds a circle that is tangential to both circle cA and circle cB of radius cCrad.
 	* Prefers a tight fit for both circles if possible.  Otherwise fits tightly with
-	* circle cA.  If the fit is loose for both circles the result is rejected.
+	* either circle cA.  If all else fails return a fit loose to both circles.
 	* 
 	* @param cA
 	* @param cB
@@ -119,13 +68,12 @@ public class CircleHelper {
 			return null;
 		}
 
-		Circle cC = new Circle(0, 0, cCrad);//This is where the solution will be stored
 		Vec2i delta = new Vec2i(cB.x - cA.x, cB.z - cA.z);
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
 		double lenAB = delta.len();
-		int lenAC = cA.radius + cC.radius;
-		int lenBC = cB.radius + cC.radius;
+		int lenAC = cA.radius + cCrad;
+		int lenBC = cB.radius + cCrad;
 
 		//Use law of cosines to determine missing angles of triangle ABC
 		double angA = Math.acos((lenAC * lenAC + lenAB * lenAB - lenBC * lenBC) / (2 * lenAC * lenAB));
@@ -133,38 +81,56 @@ public class CircleHelper {
 
 		double angAB = delta.angle();
 
-		double angBAC = wrapAngle(angAB - angA);
-		double angABC = wrapAngle(-Math.PI + angAB + angB);
+		double angBAC = MathHelper.wrapAngle(angAB - angA);
+		double angABC = MathHelper.wrapAngle(-Math.PI + angAB + angB);
 
-		PairData pdAC = new PairData(cA.radius, cC.radius);
-		PairData pdBC = new PairData(cB.radius, cC.radius);
+		PairData pdAC = new PairData(cA.radius, cCrad);
+		PairData pdBC = new PairData(cB.radius, cCrad);
 		
-		int posAC = pdAC.getSector(angBAC);
-		int posBC = pdBC.getSector(angABC);
+		int sectorAC = pdAC.getSector(angBAC);
+		int sectorBC = pdBC.getSector(angABC);
 		
-		Vec2i[] coordListAC = pdAC.getCoordsForSectors(posAC - 2, posAC + 2);
-		Vec2i[] coordListBC = pdBC.getCoordsForSectors(posBC - 2, posBC + 2);
+		Vec2i[] coordListAC = pdAC.getCoordsForSectors(sectorAC - 2, sectorAC + 2);
+		Vec2i[] coordListBC = pdBC.getCoordsForSectors(sectorBC - 2, sectorBC + 2);
 
 		Vec2i a = new Vec2i();
 		Vec2i b = new Vec2i();
-		boolean solution = false;
+		Vec2i halftight = null;
+		Vec2i loose = null;
 		
-		for(int ac = 0; ac < coordListAC.length; ac++) {//We'll be using these loops to scan a 5x5 block area for solutions
-			for(int bc = 0; bc < coordListBC.length; bc++) {
-				a.set(coordListAC[ac]).add(cA.x, cA.z);//Add the relative A->C coordinates to the circle A's absolute coordinates
-				b.set(coordListBC[bc]).add(cB.x, cB.z);//Add the relative B->C coordinates to the circle A's absolute coordinates
-				if( (a.x == b.x) && (a.z == b.z) ) {//We've found a location where the new circle C is touching both circle A and circle B
-					cC.set(a);//Set this as the current solution although there may be others
-					solution = !(a.loose && b.loose);//The solution is not viable if both are loose
-					if(!(a.loose || b.loose)) {//Neither are loose.. perfect fit
-						return cC;//A perfect fit is ideally what we are looking for so we can leave with it now 
+		for(int i : pairSearchOrder) {
+			a.set(coordListAC[i >> 4]).add(cA.x, cA.z);//Add the relative A->C coordinates to the circle A's absolute coordinates
+			b.set(coordListBC[i & 15]).add(cB.x, cB.z);//Add the relative B->C coordinates to the circle B's absolute coordinates
+			if( (a.x == b.x) && (a.z == b.z) ) {//We've found a location where the new circle C is touching both circle A and circle B
+				if(a.tight && b.tight) {//both are tight(AND).. perfect fit
+					return new Circle(a, cCrad);//A perfect fit is ideally what we are looking for so we can leave with it now
+				}
+				else
+				if(halftight == null) {
+					if(a.tight || b.tight) {//one is tight(OR)
+						halftight = new Vec2i(a);
+					}
+					else
+					if(loose == null) {//neither are tight(NOR)
+						loose = new Vec2i(a);
 					}
 				}
 			}
 		}
+
+		if(halftight != null) {
+			return new Circle(halftight, cCrad);
+		}
+		if(loose != null) {
+			return new Circle(loose, cCrad);
+		}
 		
+		//If we've gotten this far the only possibility is that the circles are too far apart to make a new circle
+		//that is tangential to both. So we will simply create a tangent circle pointing at the circle that is too far away.
+		return findSecondCircle(cA, cCrad, angAB, true);
 		
-		if(!solution && ModConfigs.worldGenDebug) {
+		/*
+		if(ModConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
 			Circle cAtemp = new Circle(cA);
 			Circle cBtemp = new Circle(cB);
@@ -196,8 +162,8 @@ public class CircleHelper {
 			System.err.println("angAB: " + Math.toDegrees(angAB));
 			System.err.println("angBAC: " + Math.toDegrees(angBAC));
 			System.err.println("angABC: " + Math.toDegrees(angABC));
-			System.err.println("posAC: " + posAC + "/" + pdAC.getSectors());
-			System.err.println("posBC: " + posBC + "/" + pdBC.getSectors());
+			System.err.println("posAC: " + sectorAC + "/" + pdAC.getSectors());
+			System.err.println("posBC: " + sectorBC + "/" + pdBC.getSectors());
 			
 			for(int i = 0; i < 5; i++) {
 				System.err.println("coordListAC[" + i + "]: " + coordListAC[i]);
@@ -213,8 +179,7 @@ public class CircleHelper {
 			System.err.println("RadiusC:" + cCrad);
 		}
 		
-		
-		return solution ? cC : null;
+		return null;*/
 	}
 	
 	public static void maskCircles(Circle c1, Circle c2) {

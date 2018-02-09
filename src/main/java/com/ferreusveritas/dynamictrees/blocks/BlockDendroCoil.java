@@ -133,7 +133,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 	
-	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle) {
+	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle, boolean onlyTight) {
 		pos = pos.up();
 		
 		for(int y = 0; y < 2; y++) {
@@ -148,13 +148,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 			Circle circleA = new Circle(pos, rad1);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 
-			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle, onlyTight);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
-			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isLoose() ? Blocks.COBBLESTONE.getDefaultState() : Blocks.DIAMOND_BLOCK.getDefaultState());
+			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isTight() ? Blocks.DIAMOND_BLOCK.getDefaultState() : Blocks.COBBLESTONE.getDefaultState());
 		}
 	}
 	
-	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3) {
+	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3, boolean onlyTight) {
 		pos = pos.up();
 				
 		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
@@ -171,7 +171,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 			Circle circleA = new Circle(pos, rad1);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 			
-			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle, onlyTight);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 			
 			CircleHelper.maskCircles(circleA, circleB);
