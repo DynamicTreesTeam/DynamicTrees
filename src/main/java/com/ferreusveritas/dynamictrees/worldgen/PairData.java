@@ -2,16 +2,14 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
+import com.ferreusveritas.dynamictrees.util.Vec2iPCA;
 
 public class PairData {
-	private byte vsdata[];
-	private int looseMask;
-	private int codesize;
+	private Vec2i coordData[];
 	private int sectors;
 	
-	private static int looseMasks[][] = new int[7][7];
-	private static byte pairdata[][][] = new byte[7][7][];
-
+	private static Vec2i coordTable[][][] = new Vec2i[7][7][];
+	
 	static { //Yuh.. magic.
 		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
 		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
@@ -46,17 +44,31 @@ public class PairData {
 	private static void createPairData(int rad1, int rad2, int codeSize, int curveCode, int looseMask) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
-		pairdata[idx1][idx2] = pairdata[idx2][idx1] = uncompressCurve(codeSize, curveCode);
-		looseMasks[idx1][idx2] = looseMasks[idx2][idx1] = looseMask;
+		int sectors = codeSize * 4;
+		Vec2i[] coord = coordTable[idx1][idx2] = coordTable[idx2][idx1] = new Vec2i[sectors];
+
+		byte curveData[] = uncompressCurve(codeSize, curveCode);
+		
+		for(int sector = 0; sector < sectors; sector++) {
+			int modulus = Math.abs(((sector + codeSize) % (codeSize * 2) ) - codeSize);
+			
+			//Avoid branching by using a bit twiddle to determine the sign of the data.
+			coord[sector] = new Vec2iPCA(//Use the Precomputed angle variant of Vec2i
+					(-( ((sector / codeSize) + 1) & 2) + 1) * curveData[codeSize - modulus],
+					(-(  (sector / codeSize)      & 2) + 1) * curveData[modulus],
+					((looseMask >> Math.min(modulus - 1, 32)) & 1) == 0
+				);
+		}
+		
 	}
-
+	
 	private static byte[] uncompressCurve(int codeSize, long curveCode) {
-		byte[] wave = new byte[codeSize + 2];
-
+		byte[] wave = new byte[codeSize + 2];//TODO: Determine if we need the extra 2 bytes
+		
 		for(int i = 0; i <= codeSize; i++) {
 			wave[i + 1] = (byte) (wave[i] + ((curveCode >> i) & 1));
 		}
-
+		
 		return wave;
 	}
 	
@@ -67,58 +79,37 @@ public class PairData {
 	public PairData(int rad1, int rad2) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
-		this.vsdata = pairdata[idx1][idx2];
-		this.looseMask = looseMasks[idx1][idx2];
-		this.codesize = vsdata.length - 2;
-		this.sectors = (vsdata.length - 2) * 4;
+		this.coordData = coordTable[idx1][idx2];
+		this.sectors = coordData.length;
 	}
 	
 	public Vec2i getCoords(int sector) {
-		//Wrap angle
-		int vAngle = sector % (codesize * 4);
-		if(vAngle < 0) {
-			vAngle += (codesize * 4);
+		
+		//Wrap sector
+		sector %= sectors;
+		if(sector < 0) {
+			sector += sectors;
 		}
-			
-		int modulus = Math.abs(((vAngle + codesize) % (codesize * 2) ) - codesize);
-
-		Vec2i tc = new Vec2i();
 		
-		//Avoid branching by using a bit twiddle hack to determine the sign of the data.
-		tc.x = (-( ((vAngle / codesize) + 1) & 2) + 1) * vsdata[codesize - modulus];
-		tc.z = (-(  (vAngle / codesize)      & 2) + 1) * vsdata[modulus];
-		tc.setTight(((looseMask >> Math.min(modulus - 1, 32)) & 1) == 0);
-		
-		return tc;
-	}
-	
-	public Vec2i[] getCoordsForSectors(int startSector, int stopSector) {
-		
-		int numSectors = stopSector - startSector + 1;
-		Vec2i c[] = new Vec2i[numSectors];
-		int coordIter = 0;
-		
-		for(int sectorIter = startSector; sectorIter <= stopSector; sectorIter++) {
-			c[coordIter++] = getCoords(sectorIter);
-		}
-
-		return c;
+		return coordData[sector];
 	}
 	
 	public int getSector(double actualAngle) {
 		
 		int sector = (int)(MathHelper.radiansToTurns(actualAngle) * sectors);
 		double smallestDelta = MathHelper.deltaAngle(actualAngle, getCoords(sector).angle());
+		boolean runNextDir = true;
 		
-		for(int dir = -1; dir <= 1; dir += 2) {
+		for(int dir = -1; runNextDir && dir <= 1; dir += 2) {//Search one direction and then the other
 			while(true) {
 				double ang = getCoords(sector + dir).angle();
 				double del = MathHelper.deltaAngle(actualAngle, ang);
 				if(del < smallestDelta) {
 					smallestDelta = del;
 					sector += dir;
+					runNextDir = false;//If this direction lead to a decrease in the delta angle then the other direction can only make it larger.  
 				} else {
-					break;
+					break;//Try the other direction
 				}
 			}
 		}

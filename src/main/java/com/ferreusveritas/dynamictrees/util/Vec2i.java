@@ -9,10 +9,14 @@ public class Vec2i {
 	public Vec2i() {}
 
 	public Vec2i(int x, int z) {
-		this();
-		set(x, z);
+		this(x, z, false);
 	}
 
+	public Vec2i(int x, int z, boolean tight) {
+		set(x, z);
+		this.tight = tight;
+	}
+	
 	public Vec2i(Vec2i aCoord) {
 		this(aCoord.x, aCoord.z);
 		setTight(aCoord.tight);
@@ -25,8 +29,7 @@ public class Vec2i {
 	}
 
 	public Vec2i set(Vec2i other) {
-		this.x = other.x;
-		this.z = other.z;
+		set(other.x, other.z);
 		this.tight = other.tight;
 		return this;
 	}
