@@ -120,8 +120,8 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 							case setCode: dendroCoil.setCode(world, getPos(), cmd.s(), cmd.s()); break;
 							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), cmd.i()); break;
 							case createStaff: dendroCoil.createStaff(world, getPos(), cmd.s(), cmd.s(), cmd.s(), cmd.b()); break;
-							case testPoisson: dendroCoil.testPoisson(world, getPos(), cmd.i(), cmd.i(), cmd.d()); break;
-							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.i()); break;
+							case testPoisson: dendroCoil.testPoisson(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.b()); break;
+							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.i(), cmd.b()); break;
 							case testPoisson3: dendroCoil.testPoisson3(world, getPos(), cmd.i(), getPos().add(cmd.i(), 0, cmd.i()), cmd.i(), cmd.i()); break;
 							default: break;
 						}
@@ -230,7 +230,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						arguments[3] instanceof Double) {
 						cacheCommand(method, arguments);
 					} else {
-						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>, radius3<Number>");
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>, radius3<Number>, onlyTight<Boolean>");
 					}
 				case testPoisson3:
 					if(arguments.length >= 4 &&
@@ -241,7 +241,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						arguments[4] instanceof Double) {
 						cacheCommand(method, arguments);
 					} else {
-						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, delX<Number>, delZ<Number>, radius2<Number>, radius3<Number>");
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, delX<Number>, delZ<Number>, radius2<Number>, radius3<Number>, onlyTight<Boolean>");
 					}
 					break;
 				default:
