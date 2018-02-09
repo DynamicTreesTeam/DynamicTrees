@@ -27,7 +27,7 @@ public class BlockCactusSapling extends BlockDynamicSapling {
 			DynamicTree tree = species.getTree();
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch
-				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath //TODO: replace with rooty sand or something
+				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath
 			}
 		} else {
 			dropBlock(world, species, state, pos);

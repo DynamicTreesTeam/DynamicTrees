@@ -36,8 +36,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeCactus extends DynamicTree {
 	
-	// TODO: Seeds, sapling, add more JoCodes to the file, tweak growth pattern if necessary
-	// This is still WIP, just committing it now to sync up with other changes.
 	public class SpeciesCactus extends Species {
 		
 		public SpeciesCactus(DynamicTree treeFamily) {
@@ -51,7 +49,8 @@ public class TreeCactus extends DynamicTree {
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
 			
-			addAcceptableSoil(Blocks.SAND, Blocks.HARDENED_CLAY); //TODO: remove dirt and grass and add rooty sand or something
+			clearAcceptableSoils();
+			addAcceptableSoil(Blocks.SAND);
 		}
 		
 		@Override

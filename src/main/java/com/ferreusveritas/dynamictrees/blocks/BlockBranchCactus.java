@@ -147,8 +147,7 @@ public class BlockBranchCactus extends BlockBranch {
 	
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius) {
-		// TODO: replace this
-		//world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp(radius, 1, 8)), 2);
+		// Do nothing
 	}
 	
 	// Directionless probability grabber
