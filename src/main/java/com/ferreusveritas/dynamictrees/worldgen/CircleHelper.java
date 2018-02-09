@@ -33,7 +33,7 @@ public class CircleHelper {
 	*/
 	public static Circle findSecondCircle(Circle cA, int cBrad, double angle, boolean onlyTight) {
 
-		PairData pd = new PairData(cA.radius, cBrad);
+		CirclePairData pd = new CirclePairData(cA.radius, cBrad);
 		int sector = pd.getSector(angle);
 
 		if(onlyTight) {
@@ -82,8 +82,8 @@ public class CircleHelper {
 		double angBAC = MathHelper.wrapAngle(angAB - angA);
 		double angABC = MathHelper.wrapAngle(-Math.PI + angAB + angB);
 
-		PairData pdAC = new PairData(cA.radius, cCrad);
-		PairData pdBC = new PairData(cB.radius, cCrad);
+		CirclePairData pdAC = new CirclePairData(cA.radius, cCrad);
+		CirclePairData pdBC = new CirclePairData(cB.radius, cCrad);
 		
 		//The closest sectors for the given angles
 		int sectorAC = pdAC.getSector(angBAC);

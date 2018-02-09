@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 import com.ferreusveritas.dynamictrees.util.Vec2iPCA;
 
-public class PairData {
+public class CirclePairData {
 	private Vec2i coordData[];
 	private int sectors;
 	
@@ -76,7 +76,7 @@ public class PairData {
 		return sectors;
 	}
 	
-	public PairData(int rad1, int rad2) {
+	public CirclePairData(int rad1, int rad2) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 		this.coordData = coordTable[idx1][idx2];
