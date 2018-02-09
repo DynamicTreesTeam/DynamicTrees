@@ -27,7 +27,7 @@ public class MathHelper {
     public static int floor(double value) {
     	return net.minecraft.util.math.MathHelper.floor(value);
     }
-	
+    
 	/** Select a random direction weighted from the probability map **/ 
 	public static int selectRandomFromDistribution(Random random, int distMap[]) {
 		
@@ -54,6 +54,20 @@ public class MathHelper {
 		
 		return 0;
 	}
+
+    /**
+     * Wrap between 0(inclusive) and max(exclusive)
+     * 
+     * @param i The parameter to wrap
+     * @param max The value(must be positive) that if met or exceeded will wrap around 
+     * @return The wrapped value
+     */
+    public static int wrap(int i, int max) {
+		while(i < 0) {
+			i += max;
+		}
+    	return i % max;
+    }
 	
 	public static double wrapAngle(double angle) {
 		final double TwoPi = Math.PI * 2;

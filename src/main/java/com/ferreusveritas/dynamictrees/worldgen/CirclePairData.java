@@ -72,10 +72,6 @@ public class CirclePairData {
 		return wave;
 	}
 	
-	public int getSectors() {
-		return sectors;
-	}
-	
 	public CirclePairData(int rad1, int rad2) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
@@ -84,14 +80,7 @@ public class CirclePairData {
 	}
 	
 	public Vec2i getCoords(int sector) {
-		
-		//Wrap sector
-		sector %= sectors;
-		if(sector < 0) {
-			sector += sectors;
-		}
-		
-		return coordData[sector];
+		return coordData[MathHelper.wrap(sector, sectors)];
 	}
 	
 	public int getSector(double actualAngle) {
