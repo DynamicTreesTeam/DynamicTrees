@@ -122,6 +122,7 @@ public class TreeSpruce extends DynamicTree {
 		setCommonSpecies(new SpeciesSpruce(this));
 	}
 	
+	@Override
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		int radius = branch.getRadius(blockState);
 		if(radius == 1) {

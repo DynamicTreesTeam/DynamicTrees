@@ -62,7 +62,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : CellNull.NULLCELL;
+			return radius == 1 || radius == 128 ? branchCell : CellNull.NULLCELL;
 		}
 		
 		@Override
