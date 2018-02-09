@@ -186,6 +186,38 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 	
+	public void testPoisson3(World world, BlockPos posA, int radA, BlockPos posB, int radB, int radC) {
+		posA = posA.up();
+		posB = posB.up();
+				
+		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
+		
+		for(int y = 0; y < 2; y++) {
+			for(int z = -28; z <= 28; z++) {
+				for(int x = -28; x <= 28; x++) {
+					world.setBlockToAir(posA.add(x, y, z));
+				}
+			}
+		}
+		
+		if(radA >= 2 && radB >= 2 && radA <= 8 && radB <= 8 && radC >= 2 && radC <= 8) {
+			Circle circleA = new Circle(posA, radA);
+			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, posA.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			Circle circleB = new Circle(posB, radB);
+			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, posB.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			CircleHelper.maskCircles(circleA, circleB);
+			
+			Circle circleC = CircleHelper.findThirdCircle(circleA, circleB, radC);
+			if(circleC != null) {
+				TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleC, posA.getY(), EnumGeneratorResult.NOTREE, 3);
+			} else {
+				world.setBlockState(new BlockPos(circleA.x, posA.up().getY(), circleA.z), Blocks.REDSTONE_BLOCK.getDefaultState());
+			}
+		}
+	}
+	
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
 		return new TileEntityDendroCoil();

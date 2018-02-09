@@ -8,94 +8,6 @@ import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class CircleHelper {
 
-	private static int looseMasks[][] = new int[7][7];
-	private static byte pairdata[][][] = new byte[7][7][];
-
-	static { //Yuh.. magic.
-		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
-		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
-		createPairData(8, 6, 28, 0x004956DF, 0x00495490);
-		createPairData(8, 5, 26, 0x0012AADF, 0x0012AA90);
-		createPairData(8, 4, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(8, 3, 22, 0x0002556F, 0x00025548);
-		createPairData(8, 2, 20, 0x0000956F, 0x00009548);
-		createPairData(7, 7, 28, 0x004956DF, 0x00495490);
-		createPairData(7, 6, 26, 0x001256DF, 0x00125490);
-		createPairData(7, 5, 24, 0x0004AADF, 0x0004AA90);
-		createPairData(7, 4, 22, 0x00012ADF, 0x00012A90);
-		createPairData(7, 3, 20, 0x0000956F, 0x00009548);
-		createPairData(7, 2, 18, 0x0000256F, 0x00002548);
-		createPairData(6, 6, 24, 0x000496DF, 0x00049490);
-		createPairData(6, 5, 22, 0x00012ADF, 0x00012A90);
-		createPairData(6, 4, 20, 0x00004ADF, 0x00004A90);
-		createPairData(6, 3, 18, 0x0000256F, 0x00002548);
-		createPairData(6, 2, 16, 0x0000096F, 0x00000948);
-		createPairData(5, 5, 20, 0x0000555F, 0x00005550);
-		createPairData(5, 4, 18, 0x0000155F, 0x00001550);
-		createPairData(5, 3, 16, 0x00000AAF, 0x00000AA8);
-		createPairData(5, 2, 14, 0x000002AF, 0x000002A8);
-		createPairData(4, 4, 16, 0x0000055F, 0x00000550);
-		createPairData(4, 3, 14, 0x000002AF, 0x000002A8);
-		createPairData(4, 2, 12, 0x000000AF, 0x000000A8);
-		createPairData(3, 3, 12, 0x00000157, 0x00000154);
-		createPairData(3, 2, 10, 0x00000057, 0x00000054);
-		createPairData(2, 2,  8, 0x00000017, 0x00000014);
-	}
-	
-	private static void createPairData(int rad1, int rad2, int codeSize, int curveCode, int looseMask) {
-		int idx1 = rad1 - 2;
-		int idx2 = rad2 - 2;
-		pairdata[idx1][idx2] = pairdata[idx2][idx1] = uncompressCurve(codeSize, curveCode);
-		looseMasks[idx1][idx2] = looseMasks[idx2][idx1] = looseMask;
-	}
-
-	private static byte[] uncompressCurve(int codeSize, long curveCode) {
-		byte[] wave = new byte[codeSize + 2];
-
-		for(int i = 0; i <= codeSize; i++) {
-			wave[i + 1] = (byte) (wave[i] + ((curveCode >> i) & 1));
-		}
-
-		return wave;
-	}
-
-	private static Vec2i[] getCoordsForPair(int rad1, int rad2, int startAngle, int stopAngle) {
-		int idx1 = rad1 - 2;
-		int idx2 = rad2 - 2;
-
-		byte vsdata[] = pairdata[idx1][idx2];
-		int looseMask = looseMasks[idx1][idx2];
-		int codesize = vsdata.length - 2;
-		
-		int numAngles = stopAngle - startAngle + 1;
-		Vec2i c[] = new Vec2i[numAngles];
-		int coordIter = 0;
-		
-		for(int angleIter = startAngle; angleIter <= stopAngle; angleIter++) {
-			
-			//Wrap angle
-			int vAngle = angleIter % (codesize * 4);
-			if(vAngle < 0) {
-				vAngle += (codesize * 4);
-			}
-				
-			int modulus = Math.abs(((vAngle + codesize) % (codesize * 2) ) - codesize);
-
-			Vec2i tc = c[coordIter++ % c.length] = new Vec2i();
-			
-			//Avoid branching by using a bit twiddle hack to determine the sign of the data.
-			tc.x = (-( ((vAngle / codesize) + 1) & 2) + 1) * vsdata[codesize - modulus];
-			tc.z = (-(  (vAngle / codesize)      & 2) + 1) * vsdata[modulus];
-			tc.setLoose(((looseMask >> Math.min(modulus - 1, 32)) & 1) != 0);
-		}
-
-		return c;
-	}
-
-	private static int getNumAnglesInPair(int rad1, int rad2) {
-		return (pairdata[rad1 - 2][rad2 - 2].length - 2) * 4;
-	}
-
 	public static double wrapAngle(double angle) {
 		final double TwoPi = Math.PI * 2;
 		angle %= TwoPi;//Wrap angle
@@ -118,7 +30,7 @@ public class CircleHelper {
 	* @param beta Second angle in range [0, PI * 2] (input will be wrapped to range)
 	* @return Shorted Delta angle in range [0, PI]
 	*/
-	private static double deltaAngle(double alpha, double beta) {
+	public static double deltaAngle(double alpha, double beta) {
 		double phi = Math.abs(beta - alpha) % (Math.PI * 2);// This is either the distance or 360 - distance
 		double distance = phi > Math.PI ? (Math.PI * 2) - phi : phi;
 		return distance;
@@ -137,9 +49,9 @@ public class CircleHelper {
 
 		double angle = cA.getFreeAngle();		
 
-		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
-
-		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		PairData pd = new PairData(cA.radius, cBrad);
+		int sector = pd.getSector(angle);
+		Vec2i[] coordList = pd.getCoordsForSectors(sector - 2, sector + 2);
 		Vec2i closestCoord = coordList[0];
 		double closestAngle = Math.PI;
 
@@ -166,10 +78,11 @@ public class CircleHelper {
 	public static Circle findSecondCircle(Circle cA, int cBrad, double angle) {
 
 		angle = Math.toRadians(angle);
-		
-		int pos = (int)(radiansToTurns(angle) * getNumAnglesInPair(cA.radius, cBrad));
 
-		Vec2i[] coordList = getCoordsForPair(cA.radius, cBrad, pos - 2, pos + 2);
+		PairData pd = new PairData(cA.radius, cBrad);
+		int sector = pd.getSector(angle);
+
+		Vec2i[] coordList = pd.getCoordsForSectors(sector - 2, sector + 2);
 		Vec2i closestCoord = coordList[0];
 		double closestAngle = Math.PI;
 		boolean isLoose = false;
@@ -206,7 +119,7 @@ public class CircleHelper {
 			return null;
 		}
 
-		Circle cC = new Circle(0, 0, cCrad);
+		Circle cC = new Circle(0, 0, cCrad);//This is where the solution will be stored
 		Vec2i delta = new Vec2i(cB.x - cA.x, cB.z - cA.z);
 
 		//Calculate lengths of the sides of triangle ABC whose corners are the centers of the 3 circles
@@ -223,25 +136,28 @@ public class CircleHelper {
 		double angBAC = wrapAngle(angAB - angA);
 		double angABC = wrapAngle(-Math.PI + angAB + angB);
 
-		int posAC = (int)(radiansToTurns(angBAC) * getNumAnglesInPair(cA.radius, cC.radius));
-		int posBC = (int)(radiansToTurns(angABC) * getNumAnglesInPair(cB.radius, cC.radius));
-
-		Vec2i[] coordListAC = getCoordsForPair(cA.radius, cC.radius, posAC - 2, posAC + 2);
-		Vec2i[] coordListBC = getCoordsForPair(cB.radius, cC.radius, posBC - 2, posBC + 2);
+		PairData pdAC = new PairData(cA.radius, cC.radius);
+		PairData pdBC = new PairData(cB.radius, cC.radius);
+		
+		int posAC = pdAC.getSector(angBAC);
+		int posBC = pdBC.getSector(angABC);
+		
+		Vec2i[] coordListAC = pdAC.getCoordsForSectors(posAC - 2, posAC + 2);
+		Vec2i[] coordListBC = pdBC.getCoordsForSectors(posBC - 2, posBC + 2);
 
 		Vec2i a = new Vec2i();
 		Vec2i b = new Vec2i();
 		boolean solution = false;
 		
-		for(int ac = 0; ac < coordListAC.length; ac++) {
+		for(int ac = 0; ac < coordListAC.length; ac++) {//We'll be using these loops to scan a 5x5 block area for solutions
 			for(int bc = 0; bc < coordListBC.length; bc++) {
-				a.set(coordListAC[ac]).add(cA.x, cA.z);
-				b.set(coordListBC[bc]).add(cB.x, cB.z);
-				if( (a.x == b.x) && (a.z == b.z) ) {
-					cC.set(a);
-					solution = !(a.loose && b.loose);
+				a.set(coordListAC[ac]).add(cA.x, cA.z);//Add the relative A->C coordinates to the circle A's absolute coordinates
+				b.set(coordListBC[bc]).add(cB.x, cB.z);//Add the relative B->C coordinates to the circle A's absolute coordinates
+				if( (a.x == b.x) && (a.z == b.z) ) {//We've found a location where the new circle C is touching both circle A and circle B
+					cC.set(a);//Set this as the current solution although there may be others
+					solution = !(a.loose && b.loose);//The solution is not viable if both are loose
 					if(!(a.loose || b.loose)) {//Neither are loose.. perfect fit
-						return cC;
+						return cC;//A perfect fit is ideally what we are looking for so we can leave with it now 
 					}
 				}
 			}
@@ -275,6 +191,22 @@ public class CircleHelper {
 			if(ModConfigs.poissonDiscImageWrite) {
 				CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
 			}
+			System.err.println("------------------------------------");
+			System.err.println("lenAB: " + lenAB);
+			System.err.println("angAB: " + Math.toDegrees(angAB));
+			System.err.println("angBAC: " + Math.toDegrees(angBAC));
+			System.err.println("angABC: " + Math.toDegrees(angABC));
+			System.err.println("posAC: " + posAC + "/" + pdAC.getSectors());
+			System.err.println("posBC: " + posBC + "/" + pdBC.getSectors());
+			
+			for(int i = 0; i < 5; i++) {
+				System.err.println("coordListAC[" + i + "]: " + coordListAC[i]);
+			}
+
+			for(int i = 0; i < 5; i++) {
+				System.err.println("coordListBC[" + i + "]: " + coordListBC[i]);
+			}
+			
 			System.err.println("3rd circle condition: No solution found");
 			System.err.println("CircleA:" + cA);
 			System.err.println("CircleB:" + cB);

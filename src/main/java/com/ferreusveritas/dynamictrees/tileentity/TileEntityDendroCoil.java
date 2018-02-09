@@ -28,16 +28,50 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		getSpeciesList,
 		createStaff,
 		testPoisson,
-		testPoisson2
+		testPoisson2,
+		testPoisson3
 	}
 	
 	private class CachedCommand {
 		ComputerMethod method;
 		Object[] arguments;
+		int argRead = 0;
 
 		public CachedCommand(int method, Object[] args) {
 			this.method = ComputerMethod.values()[method];
 			this.arguments = args;
+		}
+		
+		public double d() {
+			return d(argRead++);
+		}
+
+		public int i() {
+			return i(argRead++);
+		}
+
+		public String s() {
+			return s(argRead++);
+		}
+
+		public boolean b() {
+			return b(argRead++);
+		}
+		
+		public double d(int arg) {
+			return ((Double)arguments[arg]).doubleValue();
+		}
+		
+		public int i(int arg) {
+			return ((Double)arguments[arg]).intValue();
+		}
+		
+		public String s(int arg) {
+			return ((String)arguments[arg]);
+		}
+		
+		public boolean b(int arg) {
+			return ((Boolean)arguments[arg]).booleanValue();
 		}
 	}
 
@@ -78,16 +112,17 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		synchronized(cachedCommands) {
 			if(cachedCommands.size() > 0) { 
 				if(dendroCoil != null) {
-					for(CachedCommand command:  cachedCommands) {
-						switch(command.method) {
+					for(CachedCommand cmd:  cachedCommands) {
+						switch(cmd.method) {
 							case growPulse: dendroCoil.growPulse(world, getPos()); break;
 							case killTree: dendroCoil.killTree(world, getPos()); break;
-							case plantTree: dendroCoil.plantTree(world, getPos(), (String)command.arguments[0]); break;
-							case setCode: dendroCoil.setCode(world, getPos(), (String)command.arguments[0], (String)command.arguments[1]); break;
-							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), ((Double)command.arguments[0]).intValue()); break;
-							case createStaff: dendroCoil.createStaff(world, getPos(), (String)command.arguments[0], (String)command.arguments[1], (String)command.arguments[2],(Boolean)command.arguments[3]); break;
-							case testPoisson: dendroCoil.testPoisson(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2]); break;
-							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), ((Double)command.arguments[0]).intValue(), ((Double)command.arguments[1]).intValue(), (Double)command.arguments[2], ((Double)command.arguments[3]).intValue()); break;
+							case plantTree: dendroCoil.plantTree(world, getPos(), cmd.s()); break;
+							case setCode: dendroCoil.setCode(world, getPos(), cmd.s(), cmd.s()); break;
+							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), cmd.i()); break;
+							case createStaff: dendroCoil.createStaff(world, getPos(), cmd.s(), cmd.s(), cmd.s(), cmd.b()); break;
+							case testPoisson: dendroCoil.testPoisson(world, getPos(), cmd.i(), cmd.i(), cmd.d()); break;
+							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.i()); break;
+							case testPoisson3: dendroCoil.testPoisson3(world, getPos(), cmd.i(), getPos().add(cmd.i(), 0, cmd.i()), cmd.i(), cmd.i()); break;
 							default: break;
 						}
 					}
@@ -96,7 +131,7 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 			}
 		}
 	}
-
+	
 	@Override
 	public String getType() {
 		return "dendrocoil";
@@ -196,6 +231,17 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						cacheCommand(method, arguments);
 					} else {
 						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, radius2<Number>, angle<Number>, radius3<Number>");
+					}
+				case testPoisson3:
+					if(arguments.length >= 4 &&
+						arguments[0] instanceof Double &&
+						arguments[1] instanceof Double &&
+						arguments[2] instanceof Double &&
+						arguments[3] instanceof Double &&
+						arguments[4] instanceof Double) {
+						cacheCommand(method, arguments);
+					} else {
+						throw new LuaException("Expected: " + methodNames[method] + " radius1<Number>, delX<Number>, delZ<Number>, radius2<Number>, radius3<Number>");
 					}
 					break;
 				default:
