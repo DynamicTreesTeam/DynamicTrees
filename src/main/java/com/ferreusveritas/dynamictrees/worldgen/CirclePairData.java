@@ -80,7 +80,7 @@ public class CirclePairData {
 	}
 	
 	public Vec2i getCoords(int sector) {
-		return coordData[MathHelper.wrap(sector, sectors)];
+		return new Vec2i(coordData[MathHelper.wrap(sector, sectors)]);
 	}
 	
 	public int getSector(double actualAngle) {

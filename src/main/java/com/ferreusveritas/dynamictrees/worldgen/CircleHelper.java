@@ -100,7 +100,7 @@ public class CircleHelper {
 		for(int i : pairSearchOrder) {
 			int aDeltaSector = i >> 4;
 			int bDeltaSector = i & 15;
-			
+						
 			if(aCoords[aDeltaSector] == null) {
 				//Add the relative A->C coordinates to the circle A's absolute coordinates
 				aCoords[aDeltaSector] = pdAC.getCoords(sectorAC + aDeltaSector - 2).add(cA.x, cA.z);
@@ -142,8 +142,7 @@ public class CircleHelper {
 		//that is tangential to both. So we will simply create a tangent circle pointing at the circle that is too far away.
 		return findSecondCircle(cA, cCrad, angAB, true);
 		
-		/*
-		if(ModConfigs.worldGenDebug) {
+		/*if(ModConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
 			Circle cAtemp = new Circle(cA);
 			Circle cBtemp = new Circle(cB);
@@ -175,17 +174,8 @@ public class CircleHelper {
 			System.err.println("angAB: " + Math.toDegrees(angAB));
 			System.err.println("angBAC: " + Math.toDegrees(angBAC));
 			System.err.println("angABC: " + Math.toDegrees(angABC));
-			System.err.println("posAC: " + sectorAC + "/" + pdAC.getSectors());
-			System.err.println("posBC: " + sectorBC + "/" + pdBC.getSectors());
-			
-			for(int i = 0; i < 5; i++) {
-				System.err.println("coordListAC[" + i + "]: " + coordListAC[i]);
-			}
-
-			for(int i = 0; i < 5; i++) {
-				System.err.println("coordListBC[" + i + "]: " + coordListBC[i]);
-			}
-			
+			System.err.println("posAC: " + sectorAC);
+			System.err.println("posBC: " + sectorBC);
 			System.err.println("3rd circle condition: No solution found");
 			System.err.println("CircleA:" + cA);
 			System.err.println("CircleB:" + cB);
