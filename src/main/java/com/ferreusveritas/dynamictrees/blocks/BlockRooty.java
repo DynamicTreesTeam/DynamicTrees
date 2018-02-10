@@ -95,23 +95,28 @@ public class BlockRooty extends Block implements ITreePart {
 	 */
 	public boolean updateTree(World world, BlockPos rootPos, Random random, boolean rapid) {
 		
-		Species species = getSpecies(world, rootPos);
-		boolean viable = false;
-		
-		if(species != Species.NULLSPECIES) {
-			BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
-			ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
+		if(CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
+
+			boolean viable = false;
 			
-			if(treeBase != TreeHelper.nullTreePart && CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
-				viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
+			Species species = getSpecies(world, rootPos);
+
+			if(species != Species.NULLSPECIES) {
+				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
+				ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
+
+				if(treeBase != TreeHelper.nullTreePart) {
+					viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
+				}
 			}
+			
+			if(!viable) {
+				world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
+			}
+
 		}
-		
-		if(!viable) {
-			world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
-		}
-		
-		return viable;
+
+		return true;
 	}
 	
 	/**
