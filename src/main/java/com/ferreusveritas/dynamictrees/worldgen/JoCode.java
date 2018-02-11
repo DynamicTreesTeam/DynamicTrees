@@ -234,7 +234,7 @@ public class JoCode {
 	 * @param leafMap
 	 * @param leavesProperties
 	 */
-	private void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
+	protected void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
 		BlockPos saveCenter = leafMap.getCenter();
 		leafMap.setCenter(new BlockPos(0, 0, 0));
 
@@ -273,7 +273,7 @@ public class JoCode {
 		leafMap.setCenter(saveCenter);
 	}
 
-	private boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
+	protected boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
 
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(dir != except && TreeHelper.getBranch(world, pos.offset(dir)) != null) {
