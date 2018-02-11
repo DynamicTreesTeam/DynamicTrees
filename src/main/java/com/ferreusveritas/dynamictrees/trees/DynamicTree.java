@@ -148,10 +148,10 @@ public class DynamicTree {
 	 * are in a swamp.
 	 * 
 	 * @param access
-	 * @param pos
+	 * @param trunkPos
 	 * @return
 	 */
-	public Species getSpeciesForLocation(World access, BlockPos pos) {
+	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
 		return getCommonSpecies();
 	}
 

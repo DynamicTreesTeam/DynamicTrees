@@ -25,12 +25,12 @@ public class BlockRootySand extends BlockRooty {
 	
 	static String name = "rootysand";
 	
-	public BlockRootySand() {
-		this(name);
+	public BlockRootySand(boolean isTileEntity) {
+		this(name + (isTileEntity ? "species" : ""), isTileEntity);
 	}
 	
-	public BlockRootySand(String name) {
-		super(name, Material.SAND);
+	public BlockRootySand(String name, boolean isTileEntity) {
+		super(name, Material.SAND, isTileEntity);
 		setSoundType(SoundType.SAND);
 	}
 	

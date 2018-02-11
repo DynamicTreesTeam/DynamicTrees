@@ -336,7 +336,6 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
 			Species species = signal.getSpecies();
-			//DynamicTree tree = signal.getTree();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
 			EnumFacing targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion

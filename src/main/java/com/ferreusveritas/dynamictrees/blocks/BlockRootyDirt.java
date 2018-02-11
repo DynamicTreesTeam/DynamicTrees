@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -15,6 +16,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -32,15 +34,14 @@ public class BlockRootyDirt extends BlockRooty {
 	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicDirtType.class);
 	
 	static String name = "rootydirt";
-	
-	public BlockRootyDirt() {
-		this(name);
+		
+	public BlockRootyDirt(boolean isTileEntity) {
+		this(name + (isTileEntity ? "species" : ""), isTileEntity);
 	}
 	
-	public BlockRootyDirt(String name) {
-		super(name, Material.GROUND);
+	public BlockRootyDirt(String name, boolean isTileEntity) {
+		super(name, Material.GROUND, isTileEntity);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15).withProperty(MIMIC, EnumMimicDirtType.DIRT));
-		
 	}
 	
 	///////////////////////////////////////////
@@ -57,6 +58,22 @@ public class BlockRootyDirt extends BlockRooty {
 		return state.withProperty(MIMIC, getMimicType(worldIn, pos));
 	}
 
+    /**
+     * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
+     * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
+     * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
+     */
+    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+        TileEntity tileentity = worldIn.getTileEntity(pos);
+        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+    }
+    
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileEntitySpecies();
+	}
+
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
