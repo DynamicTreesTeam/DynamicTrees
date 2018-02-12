@@ -13,7 +13,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.biome.BiomeColorHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LeavesProperties implements ILeavesProperties {
 
@@ -124,6 +130,11 @@ public class LeavesProperties implements ILeavesProperties {
 	@Override
 	public ICellKit getCellKit() {
 		return cellKit;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
 	}
 	
 }

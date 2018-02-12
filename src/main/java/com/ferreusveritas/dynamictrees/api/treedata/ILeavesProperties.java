@@ -6,6 +6,10 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ILeavesProperties {
 
@@ -38,5 +42,8 @@ public interface ILeavesProperties {
 	
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
+	
+	@SideOnly(Side.CLIENT)
+	int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos);
 	
 }

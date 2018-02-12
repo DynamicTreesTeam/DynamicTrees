@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
@@ -146,7 +147,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
+				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).getCommonSpecies().getLeavesProperties().foliageColorMultiplier(state, world, pos);
 			}
 		});
 		
@@ -180,7 +181,7 @@ public class ClientProxy extends CommonProxy {
 				public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
 					Block block = state.getBlock();
 					if(TreeHelper.isLeaves(block)) {
-						return ((BlockDynamicLeaves) block).getTree(state).foliageColorMultiplier(state, worldIn, pos);
+						return ((BlockDynamicLeaves) block).getProperties(state).foliageColorMultiplier(state, worldIn, pos);
 					}
 					return magenta;
 				}
@@ -213,8 +214,8 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public int getTreeFoliageColor(DynamicTree tree, World world, IBlockState blockState, BlockPos pos) {
-		return tree.foliageColorMultiplier(blockState, world, pos);
+	public int getFoliageColor(ILeavesProperties leavesProperties, World world, IBlockState blockState, BlockPos pos) {
+		return leavesProperties.foliageColorMultiplier(blockState, world, pos);
 	}
 	
 	///////////////////////////////////////////
@@ -244,21 +245,19 @@ public class ClientProxy extends CommonProxy {
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
 			if(treePart instanceof BlockDynamicLeaves) {
 				BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
-				DynamicTree tree = leaves.getTree(blockState);
-				if(tree != null) {
-					int color = getTreeFoliageColor(tree, world, blockState, pos);
-					float r = (color >> 16 & 255) / 255.0F;
-					float g = (color >> 8 & 255) / 255.0F;
-					float b = (color & 255) / 255.0F;
-					for(int dz = 0; dz < 8; dz++) {
-						for(int dy = 0; dy < 8; dy++) {
-							for(int dx = 0; dx < 8; dx++) {
-								if(random.nextInt(8) == 0) {
-									double fx = pos.getX() + dx / 8.0;
-									double fy = pos.getY() + dy / 8.0;
-									double fz = pos.getZ() + dz / 8.0;
-									addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
-								}
+				ILeavesProperties leavesProperties = leaves.getProperties(blockState);
+				int color = getFoliageColor(leavesProperties, world, blockState, pos);
+				float r = (color >> 16 & 255) / 255.0F;
+				float g = (color >> 8 & 255) / 255.0F;
+				float b = (color & 255) / 255.0F;
+				for(int dz = 0; dz < 8; dz++) {
+					for(int dy = 0; dy < 8; dy++) {
+						for(int dx = 0; dx < 8; dx++) {
+							if(random.nextInt(8) == 0) {
+								double fx = pos.getX() + dx / 8.0;
+								double fy = pos.getY() + dy / 8.0;
+								double fz = pos.getZ() + dz / 8.0;
+								addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
 							}
 						}
 					}
@@ -266,5 +265,5 @@ public class ClientProxy extends CommonProxy {
 			}
 		}
 	}
-	
+
 }

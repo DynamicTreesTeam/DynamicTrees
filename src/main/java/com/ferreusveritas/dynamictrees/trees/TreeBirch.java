@@ -12,14 +12,11 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TreeBirch extends DynamicTree {
 		
@@ -78,12 +75,6 @@ public class TreeBirch extends DynamicTree {
 			}
 		}
 		return radius;
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return ColorizerFoliage.getFoliageColorBirch();
 	}
 	
 }

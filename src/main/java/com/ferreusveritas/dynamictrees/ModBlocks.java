@@ -24,6 +24,11 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -76,12 +81,24 @@ public class ModBlocks {
 					public int getSmotherLeavesMax() {
 						return 3;
 					}
+					
+					@Override
+					@SideOnly(Side.CLIENT)
+					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+						return ColorizerFoliage.getFoliageColorPine();
+					}
 				};
-		
+				
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
 				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata()),
-				TreeRegistry.findCellKit("deciduous"));
+				TreeRegistry.findCellKit("deciduous") ) {
+			@Override
+			@SideOnly(Side.CLIENT)
+			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+				return ColorizerFoliage.getFoliageColorBirch();
+			}
+		};
 		
 		jungleLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),

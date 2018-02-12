@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.api.treedata.IFoliageColorHandler;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -17,10 +16,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * A {@link DynamicTree} builder class to ease in the creation of new trees for other mods.
@@ -46,7 +41,6 @@ public class TreeBuilder {
 	private int dynamicLeavesSmotherMax = 4;
 	private int dynamicLeavesLightRequirement = 13;
 	private ResourceLocation dynamicLeavesCellKit;
-	private IFoliageColorHandler dynamicLeavesColorHandler;
 
 	//Common Species
 	private ISpeciesCreator speciesCreator;
@@ -212,21 +206,6 @@ public class TreeBuilder {
 	/**
 	 * OPTIONAL
 	 * 
-	 * It's up to the mod author to provide an interface that respects Client {@link SideOnly} function 
-	 * calls.  For simple colors and mapping it's typically not a problem.  The interface provided 
-	 * by the handler is only ever called client side.
-	 * 
-	 * @param handler
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setColorHandler(IFoliageColorHandler handler) {
-		dynamicLeavesColorHandler = handler;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
 	 * Provides a way to inject a custom common species.  If this is not used
 	 * a default Species will be created for you.
 	 * 
@@ -325,6 +304,8 @@ public class TreeBuilder {
 				
 				this.setPrimitiveLog(primitiveLogBlockState);
 				
+				dynamicLeavesProperties.setTree(this);
+				
 				if(primitiveSaplingBlockState != null && primitiveSaplingItemStack != null) {
 					setPrimitiveSapling(primitiveSaplingBlockState, primitiveSaplingItemStack);
 				}
@@ -361,16 +342,6 @@ public class TreeBuilder {
 					blockList.add(speciesSaplingBlock);
 				}
 				return super.getRegisterableBlocks(blockList);
-			}
-			
-			@SideOnly(Side.CLIENT)
-			@Override
-			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-				if(dynamicLeavesColorHandler != null) {
-					return dynamicLeavesColorHandler.foliageColorMultiplier(state, world, pos);
-				} else {
-					return super.foliageColorMultiplier(state, world, pos);
-				}
 			}
 			
 		};

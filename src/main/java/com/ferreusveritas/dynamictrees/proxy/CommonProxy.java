@@ -3,11 +3,11 @@ package com.ferreusveritas.dynamictrees.proxy;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
@@ -53,7 +53,7 @@ public class CommonProxy {
 		}
 	}
 	
-	public int getTreeFoliageColor(DynamicTree tree, World world, IBlockState blockState, BlockPos pos) {
+	public int getFoliageColor(ILeavesProperties leavesProperties, World world, IBlockState blockState, BlockPos pos) {
 		return 0x00FF00FF;//Magenta shading as error indicator
 	}
 
