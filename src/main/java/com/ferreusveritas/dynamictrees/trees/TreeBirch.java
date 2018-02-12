@@ -21,7 +21,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeBirch extends DynamicTree {
 		
 	public class SpeciesBirch extends Species {
-
+		
 		SpeciesBirch(DynamicTree treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.birchLeavesProperties);
 			
@@ -40,7 +40,7 @@ public class TreeBirch extends DynamicTree {
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS);
 		};
-
+		
 		@Override
 		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 			if(super.rot(world, pos, neighborCount, radius, random)) {
@@ -55,7 +55,7 @@ public class TreeBirch extends DynamicTree {
 		}
 		
 	}
-		
+	
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 		ModBlocks.birchLeavesProperties.setTree(this);
