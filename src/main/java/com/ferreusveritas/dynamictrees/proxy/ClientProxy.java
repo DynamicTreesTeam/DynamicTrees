@@ -9,10 +9,14 @@ import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
+import com.ferreusveritas.dynamictrees.models.RootyStateMapper;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -36,6 +40,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -57,9 +62,13 @@ public class ClientProxy extends CommonProxy {
 		//BLOCKS
 		
 		//Register Rooty Dirt Mesher
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new RootyStateMapper());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new RootyStateMapper());
+		
 		ModelHelper.regModel(ModBlocks.blockRootyDirt);
 
 		//Register Rooty Sand Mesher
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new RootyStateMapper());
 		ModelHelper.regModel(ModBlocks.blockRootySand);
 		
 		//Register Bonsai Pot Mesher
@@ -200,6 +209,7 @@ public class ClientProxy extends CommonProxy {
  
 	public void registerClientEventHandlers() {
 		//There are currently no Client Side events to handle
+		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
 	}
 	
 	@Override

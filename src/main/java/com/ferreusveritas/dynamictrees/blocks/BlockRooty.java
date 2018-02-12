@@ -36,6 +36,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
@@ -49,13 +52,14 @@ import net.minecraft.world.World;
  * @author ferreusveritas
  *
  */
-public class BlockRooty extends Block implements ITreePart, ITileEntityProvider {
+public abstract class BlockRooty extends Block implements ITreePart, ITileEntityProvider {
 	
+	public static final MimicProperty MIMIC = new MimicProperty("mimic");
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	
-	public BlockRooty(String name, Material material, boolean hasTileEntity) {
+	public BlockRooty(String name, Material material, boolean isTileEntity) {
 		super(material);
-        this.isBlockContainer = hasTileEntity;
+        this.isBlockContainer = isTileEntity;
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15));
 		setTickRandomly(true);
@@ -81,9 +85,14 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider 
     	return isBlockContainer;
     }
     
-	@Override
+	/*@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return isBlockContainer ? new TileEntitySpecies() : null;
+	}*/
+	
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileEntitySpecies();
 	}
 	
     /**
@@ -91,7 +100,8 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider 
      * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
      * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
      */
-    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+	@Override
+	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
         TileEntity tileentity = worldIn.getTileEntity(pos);
         return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
     }
@@ -102,7 +112,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider 
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[]{LIFE});
+		return new ExtendedBlockState(this, new IProperty[]{LIFE}, new IUnlistedProperty[] {MIMIC});
 	}
 	
 	/**
@@ -120,6 +130,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider 
 	public int getMetaFromState(IBlockState state) {
 		return state.getValue(LIFE).intValue();
 	}
+	
 	
 	///////////////////////////////////////////
 	// INTERACTION
@@ -353,6 +364,36 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider 
 	@Override
 	public final boolean isRootNode() {
 		return true;
+	}
+	
+	public static class MimicProperty implements IUnlistedProperty<IBlockState> {
+		
+		private final String name;
+		
+		public MimicProperty(String name) {
+			this.name = name;
+		}
+		
+		@Override
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public boolean isValid(IBlockState value) {
+			return value != null;
+		}
+
+		@Override
+		public Class<IBlockState> getType() {
+			return IBlockState.class;
+		}
+
+		@Override
+		public String valueToString(IBlockState value) {
+			return value.toString();
+		}
+		
 	}
 	
 }

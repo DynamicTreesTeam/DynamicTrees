@@ -18,6 +18,7 @@ public class ModConfigs {
 	public static boolean vineGen;
 	public static boolean podzolGen;
 	public static boolean worldGen;
+	public static boolean vanillaCactusWorldGen;
 	public static boolean worldGenDebug;
 	
 	public static boolean poissonDiscImageWrite = false;
@@ -42,6 +43,8 @@ public class ModConfigs {
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
 		podzolGen = config.getBoolean("podzolGen", "world", true, "Randomly generate podzol under select trees.");
 		worldGen = config.getBoolean("worldGen", "world", true, "World Generation produces Dynamic Trees instead of Vanilla trees.");
+		
+		vanillaCactusWorldGen = config.getBoolean("vanillaCactusWorldGen", "world", false, "World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.");
 		
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");
 		

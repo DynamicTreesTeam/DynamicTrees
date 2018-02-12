@@ -26,12 +26,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRootyDirt extends BlockRooty {
-
-	public static final PropertyEnum MIMIC = PropertyEnum.create("mimic", EnumMimicDirtType.class);
 	
 	static String name = "rootydirt";
 		
@@ -41,7 +42,6 @@ public class BlockRootyDirt extends BlockRooty {
 	
 	public BlockRootyDirt(String name, boolean isTileEntity) {
 		super(name, Material.GROUND, isTileEntity);
-		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15).withProperty(MIMIC, EnumMimicDirtType.DIRT));
 	}
 	
 	///////////////////////////////////////////
@@ -49,31 +49,32 @@ public class BlockRootyDirt extends BlockRooty {
 	///////////////////////////////////////////
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[]{LIFE, MIMIC});
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state instanceof IExtendedBlockState) {
+			IExtendedBlockState extState = (IExtendedBlockState) state;
+			
+			final int dMap[] = {0, -1, 1};
+			
+			IBlockState mimic = Blocks.DIRT.getDefaultState(); // Default to dirt in case no dirt or grass is found
+			
+			for (int depth : dMap) {
+				for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+					IBlockState ground = world.getBlockState(pos.offset(dir).down(depth));
+					
+					if (ground.getBlock() instanceof BlockGrass) {
+						return extState.withProperty(MIMIC, ground); // Prioritize Grass by returning as soon as grass is found
+					}
+					if (ground.getBlock() instanceof BlockDirt) {
+						mimic = ground; // Store the dirt in case grass isn't found
+					}
+				}
+			}
+			return extState.withProperty(MIMIC, mimic);
+		}
+		return state;
 	}
 	
-	@Override
-	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-		return state.withProperty(MIMIC, getMimicType(worldIn, pos));
-	}
-
-    /**
-     * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
-     * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
-     * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
-     */
-    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
-    }
     
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntitySpecies();
-	}
-
-	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
@@ -82,26 +83,6 @@ public class BlockRootyDirt extends BlockRooty {
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
-	
-	public EnumMimicDirtType getMimicType(IBlockAccess blockAccess, BlockPos pos) {
-		final int dMap[] = {0, -1, 1};
-		
-		for(int depth: dMap) {
-			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-				IBlockState mimic = blockAccess.getBlockState(pos.offset(dir).down(depth));
-				
-				for(EnumMimicDirtType muse: EnumMimicDirtType.values()) {
-					if(muse != EnumMimicDirtType.DIRT) {
-						if(mimic == muse.getBlockState()) {
-							return muse;
-						}
-					}
-				}
-			}
-		}
-		
-		return EnumMimicDirtType.DIRT;//Default to plain old dirt
 	}
 	
 	/**
@@ -139,31 +120,4 @@ public class BlockRootyDirt extends BlockRooty {
 		return true;
 	}
 	
-	public static enum EnumMimicDirtType implements IStringSerializable {
-		
-		DIRT(ModBlocks.blockStates.dirt, "dirt"),
-		GRASS(Blocks.GRASS.getDefaultState(), "grass"),
-		PODZOL(ModBlocks.blockStates.podzol, "podzol"),
-		MYCELIUM(Blocks.MYCELIUM.getDefaultState(), "mycelium"),
-		COARSEDIRT(Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT) , "coarsedirt"),
-		SNOWY(Blocks.GRASS.getDefaultState().withProperty(BlockGrass.SNOWY, true), "snowy");
-		
-		private final IBlockState muse;
-		private final String name;
-		
-		private EnumMimicDirtType(IBlockState muse, String name) {
-			this.muse = muse;
-			this.name = name;
-		}
-		
-		@Override
-		public String getName() {
-			return name;
-		}
-		
-		public IBlockState getBlockState() {
-			return muse;
-		}
-		
-	}
 }

@@ -1,22 +1,5 @@
 {
-    "multipart": [
-        {   "when": { "mimic": "dirt" },
-            "apply": { "model": "dynamictrees:rootydirt-dirt" }
-        },
-        {   "when": { "mimic": "grass" },
-            "apply": { "model": "dynamictrees:rootydirt-grass" }
-        },
-        {   "when": { "mimic": "podzol" },
-            "apply": { "model": "dynamictrees:rootydirt-podzol" }
-        },
-        {   "when": { "mimic": "mycelium" },
-            "apply": { "model": "dynamictrees:rootydirt-mycelium" }
-        },
-        {   "when": { "mimic": "coarsedirt" },
-            "apply": { "model": "dynamictrees:rootydirt-coarsedirt" }
-        },
-        {   "when": { "mimic": "snowy" },
-            "apply": { "model": "dynamictrees:rootydirt-snowy" }
-        }
-    ]
+  "variants": {
+		"roots": { "model": "dirt" }
+	}
 }
