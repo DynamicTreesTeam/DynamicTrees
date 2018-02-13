@@ -14,7 +14,7 @@ public class BlockDynamicSaplingRare extends BlockDynamicSapling implements ITil
 	
 	public BlockDynamicSaplingRare(String name) {
 		super(name);
-		isBlockContainer = true;
+		hasTileEntity = true;
 	}
 	
 	@Override

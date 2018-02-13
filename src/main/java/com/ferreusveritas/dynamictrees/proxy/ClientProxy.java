@@ -155,7 +155,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Potion Colorizer
 		ModelHelper.regColorHandler(ModItems.dendroPotion, new IItemColor() {
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				return tintIndex == 0 ? ModItems.dendroPotion.getColor(stack) : white;
 			}
 		});
@@ -163,7 +163,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Woodland Staff Mesher and Colorizer
 		ModelHelper.regColorHandler(ModItems.treeStaff, new IItemColor() {
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				return tintIndex == 1 ? ModItems.treeStaff.getColor(stack) : white;
 			}
 		});
@@ -187,7 +187,7 @@ public class ClientProxy extends CommonProxy {
 				
 			ModelHelper.regColorHandler(Item.getItemFromBlock(leaves), new IItemColor() {
 				@Override
-				public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				public int colorMultiplier(ItemStack stack, int tintIndex) {
 					return ColorizerFoliage.getFoliageColorBasic();
 				}
 			});

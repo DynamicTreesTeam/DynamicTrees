@@ -58,7 +58,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
 	public BlockRooty(String name, Material material, boolean isTileEntity) {
 		super(material);
-        this.isBlockContainer = isTileEntity;
+        this.hasTileEntity = isTileEntity;
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15));
 		setTickRandomly(true);
@@ -81,7 +81,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
     @Override
     public boolean hasTileEntity(IBlockState state) {
-    	return isBlockContainer;
+    	return hasTileEntity;
     }
     
 	/*@Override
@@ -328,7 +328,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 
 		DynamicTree tree = getTree(world, rootPos);
 		
-		if(isBlockContainer) {
+		if(hasTileEntity) {
 			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
 			
 			if(rootyDirtTE instanceof TileEntitySpecies) {
@@ -343,7 +343,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	public void setSpecies(World world, BlockPos rootPos, Species species) {
-		if(isBlockContainer) {
+		if(hasTileEntity) {
 			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
 			if(rootyDirtTE instanceof TileEntitySpecies) {
 				rootyDirtTE.setSpecies(species);

@@ -68,6 +68,7 @@ public class ModelHelper {
 	}
 
 	public static void regColorHandler(Item item, IItemColor itemColor) {
+		System.out.println("Registered Color Handler: " + item);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(itemColor, new Item[] {item});
 	}
 
