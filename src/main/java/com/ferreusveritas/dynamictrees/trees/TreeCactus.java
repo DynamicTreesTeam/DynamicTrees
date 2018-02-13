@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -13,6 +14,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
@@ -44,6 +46,14 @@ public class TreeCactus extends DynamicTree {
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.5f);
 			
 			this.setSoilLongevity(1); // Doesn't live very long
+			
+			addDropCreator(new DropCreator(new ResourceLocation(ModConstants.MODID, "cactusseeds")) {
+				@Override
+				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+					dropList.add(species.getSeedStack(volume / 4096));
+					return dropList;
+				}
+			});
 			
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
