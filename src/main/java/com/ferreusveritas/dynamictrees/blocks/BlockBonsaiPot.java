@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -108,8 +107,15 @@ public class BlockBonsaiPot extends BlockContainer {
 			
 			if(!world.isRemote) {
 				ItemStack seedStack = species.getSeedStack(1);
-				ItemStack saplingStack = new ItemStack(species.getTree().getPrimitiveSaplingBlockState().getBlock(), 1, species.getTree().getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).getMetadata());
-				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
+				
+				if(player.isSneaking()) {
+					ItemStack convertStack = species.getTree().getPrimitiveSaplingItemStack();
+					if(!convertStack.isEmpty()) {
+						seedStack = convertStack;
+					}
+				}
+				
+				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
 			}
 
 			world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState());

@@ -31,23 +31,23 @@ public class BonsaiCompositeModel implements IBakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+
+    	List<BakedQuad> quads = new ArrayList<BakedQuad>();
+    	quads.addAll(potModel.getQuads(state, side, rand));
+
 		IBlockState mimicState = null;
-		
+    	
 		if (state != null && state.getBlock() instanceof BlockBonsaiPot && state instanceof IExtendedBlockState) {
 			mimicState = ((IExtendedBlockState) state).getValue(BlockBonsaiPot.SPECIES);
 		}
-		
 		if(mimicState == null || !(mimicState.getBlock() instanceof BlockDynamicSapling)) {
-			return new ArrayList<BakedQuad>();
+			return quads;
 		}
 		
 		Minecraft mc = Minecraft.getMinecraft();
     	BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
     	BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
     	IBakedModel saplingModel = blockModelShapes.getModelForState(mimicState);
-    	
-    	List<BakedQuad> quads = new ArrayList<BakedQuad>();
-    	quads.addAll(potModel.getQuads(state, side, rand));
     	
     	if(!cachedSaplingQuads.containsKey(mimicState)) {
     		ArrayList<BakedQuad> saplingQuads = new ArrayList<BakedQuad>();
