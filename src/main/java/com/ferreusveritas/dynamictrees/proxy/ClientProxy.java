@@ -64,14 +64,8 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new RootyStateMapper());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new RootyStateMapper());
 		
-		//ModelHelper.regModel(ModBlocks.blockRootyDirt);
-
 		//Register Rooty Sand Mesher
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new RootyStateMapper());
-		//ModelHelper.regModel(ModBlocks.blockRootySand);
-		
-		//Register Bonsai Pot Mesher
-		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
 		
 		//Register DendroCoil Mesher
 		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
@@ -146,8 +140,8 @@ public class ClientProxy extends CommonProxy {
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).getCommonSpecies().getLeavesProperties().foliageColorMultiplier(state, world, pos);
+			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+				return access == null || pos == null ? white : ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
 			}
 		});
 		

@@ -91,7 +91,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntitySpecies();
+		return hasTileEntity ? new TileEntitySpecies() : null;
 	}
 	
     /**

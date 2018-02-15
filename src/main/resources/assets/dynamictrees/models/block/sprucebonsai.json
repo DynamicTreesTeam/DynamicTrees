@@ -1,8 +1,0 @@
-{
-"parent": "dynamictrees:block/bonsai",
-    "textures": {
-        "particle": "blocks/leaves_spruce",
-        "log": "blocks/log_spruce",
-        "leaves": "blocks/leaves_spruce"
-    }
-}

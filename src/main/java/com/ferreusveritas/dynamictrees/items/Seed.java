@@ -83,7 +83,7 @@ public class Seed extends Item {
 		IBlockState blockState = world.getBlockState(pos);
 		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
 			Species species = getSpecies(seedStack);
-			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();//FIXME: Species need their own bonsai pots.. or find another solution
+			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();
 			if(bonzaiPot.setSpecies(world, species, pos)) {
 				CompatHelper.shrinkStack(seedStack, 1);
 				return EnumActionResult.SUCCESS;

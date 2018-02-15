@@ -1,18 +1,17 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty.MimicProperty;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -24,7 +23,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -32,13 +33,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockBonsaiPot extends Block {
+public class BlockBonsaiPot extends BlockContainer {
 
-	protected Map<Integer, DynamicTree> trees = new HashMap<Integer, DynamicTree>();
-	
+	public static final MimicProperty SPECIES = new MimicProperty("species");
+		
 	public static final String name = "bonsaipot";
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
@@ -48,42 +52,47 @@ public class BlockBonsaiPot extends Block {
 	
 	public BlockBonsaiPot(String name) {
 		super(Blocks.FLOWER_POT.getMaterial(Blocks.FLOWER_POT.getDefaultState()));
-		setDefaultState(this.blockState.getBaseState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK));
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
 
-	public void setupVanillaTree(DynamicTree tree) {
-		trees.put(tree.getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).ordinal(), tree);
-	}
-
 	//////////////////////////////
-	// TREE PROPERTIES
+	// SPECIES PROPERTIES
 	//////////////////////////////
 	
-	public DynamicTree getTree(IBlockState state) {
-		if(state.getBlock() == this) {
-			return trees.get(state.getValue(BlockSapling.TYPE).ordinal());
-		}
-    	return trees.get(0);
+	public Species getSpecies(IBlockAccess access, BlockPos rootPos) {
+		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(access, rootPos);
+		return rootyDirtTE instanceof TileEntitySpecies ? rootyDirtTE.getSpecies() : Species.NULLSPECIES;
 	}
 	
-	public boolean setTree(World world, DynamicTree tree, BlockPos pos) {
-		IBlockState primitiveSapling = tree.getPrimitiveSaplingBlockState();
-		if(primitiveSapling.getBlock() == Blocks.SAPLING) {
-			BlockPlanks.EnumType woodType = primitiveSapling.getValue(BlockSapling.TYPE);
-			world.setBlockState(pos, getDefaultState().withProperty(BlockSapling.TYPE, woodType));
+	public boolean setSpecies(World world, Species species, BlockPos pos) {
+		world.setBlockState(pos, getDefaultState());
+		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, pos);
+		if(rootyDirtTE instanceof TileEntitySpecies) {
+			rootyDirtTE.setSpecies(species);
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean setSpecies(World world, Species species, BlockPos pos) {
-		if(species == species.getTree().getCommonSpecies()) {//Make sure the seed is a common species
-			return setTree(world, species.getTree(), pos);
-		}
-		return false;
+	public IBlockState getSaplingState(IBlockAccess access, BlockPos pos) {
+		return getSpecies(access, pos).getDynamicSapling();
 	}
+
+	
+	///////////////////////////////////////////
+	// TILE ENTITY
+	///////////////////////////////////////////
+	
+	private TileEntitySpecies getTileEntitySpecies(IBlockAccess access, BlockPos pos) {
+		return (TileEntitySpecies) access.getTileEntity(pos);
+	}
+	
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileEntitySpecies();
+	}
+	
 	
 	///////////////////////////////////////////
 	// INTERACTION
@@ -95,11 +104,11 @@ public class BlockBonsaiPot extends Block {
 		ItemStack heldItem = player.getHeldItem(hand);
 		
 		if(hand == EnumHand.MAIN_HAND && heldItem.getItem() == ItemBlock.getItemFromBlock(Blocks.AIR)) { //Empty hand
-			DynamicTree tree = getTree(state);
+			Species species = getSpecies(world, pos);
 			
 			if(!world.isRemote) {
-				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
-				ItemStack saplingStack = new ItemStack(tree.getPrimitiveSaplingBlockState().getBlock(), 1, tree.getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).getMetadata());
+				ItemStack seedStack = species.getSeedStack(1);
+				ItemStack saplingStack = new ItemStack(species.getTree().getPrimitiveSaplingBlockState().getBlock(), 1, species.getTree().getPrimitiveSaplingBlockState().getValue(BlockSapling.TYPE).getMetadata());
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), player.isSneaking() ? saplingStack : seedStack));
 			}
 
@@ -126,9 +135,8 @@ public class BlockBonsaiPot extends Block {
 
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);
-		DynamicTree tree = getTree(state);
-		ret.add(tree.getCommonSpecies().getSeedStack(1));
+		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);//Return the pot itself
+		ret.add(getSpecies(world, pos).getSeedStack(1));//Add the seed in the pot
 		return ret;
 	}
 
@@ -144,25 +152,16 @@ public class BlockBonsaiPot extends Block {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
-	/** Convert the given metadata into a BlockState for this Block */
-	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		return this.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.byMetadata(meta & 0xF));
-	}
-
-	/**
-	 * Convert the BlockState into the correct metadata value
-	 */
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return state.getValue(BlockSapling.TYPE).getMetadata();
-	}
-
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] {BlockSapling.TYPE});
+		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SPECIES});
 	}
-
+	
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SPECIES, getSaplingState(access, pos)) : state;
+	}
+	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
@@ -191,5 +190,10 @@ public class BlockBonsaiPot extends Block {
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
-
+	
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
+	}
+	
 }

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.models.BonsaiCompositeModel;
 import com.ferreusveritas.dynamictrees.models.RootyCompositeModel;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -45,4 +46,16 @@ public class ModelBakeEventListener {
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onBonsaiModelBakeEvent(ModelBakeEvent event) {
+				
+		Object flowerPotObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
+		if (flowerPotObject instanceof IBakedModel) {
+		      IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
+		      BonsaiCompositeModel bonsaiPotModel = new BonsaiCompositeModel(flowerPotModel);
+		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
+		}
+	}
+	
 }
