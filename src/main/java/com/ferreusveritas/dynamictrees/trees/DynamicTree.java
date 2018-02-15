@@ -7,15 +7,11 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
@@ -151,65 +147,15 @@ public class DynamicTree {
 		return getCommonSpecies();
 	}
 
-	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
-		
-		//Bonemeal fertilizes the soil and causes a single growth pulse
-		if( itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
-			return new SubstanceFertilize().setAmount(1).setGrow(true);
-		}
-		
-		//Use substance provider interface if it's available
-		if(itemStack.getItem() instanceof ISubstanceEffectProvider) {
-			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
-			return provider.getSubstanceEffect(itemStack);
-		}
-		
-		return null;
-	}
-	
-	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-	
-	/**
-	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
-	* 
-	* @param world The current world
-	* @param hitPos Position
-	* @param player The player applying the substance
-	* @param itemStack The itemstack to be used.
-	* @return true if item was used, false otherwise
-	*/
-	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		
-		ISubstanceEffect effect = getSubstanceEffect(itemStack);
-		
-		if(effect != null) {
-			if(effect.isLingering()) {
-				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
-				return true;
-			} else {
-				return effect.apply(world, rootPos);
-			}
-		}
-		
-		return false;
-	}
 	
 	public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		BlockPos rootPos = findRootNode(world, hitPos);
 		
 		if(rootPos != BlockPos.ORIGIN) {
-			if (heldItem != null) {//Something in the hand
-				if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-					CompatHelper.consumePlayerItem(player, hand, heldItem);
-					return true;
-				}
-			}
-
-			//Empty hand or inactive substance
 			getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 

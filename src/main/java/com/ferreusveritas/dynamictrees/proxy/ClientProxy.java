@@ -121,8 +121,9 @@ public class ClientProxy extends CommonProxy {
 		
 		//BLOCKS
 		
-		//Register Rootydirt Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
+		//Register Rooty Colorizers
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(
+		new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 				if(world == null || pos == null) {
@@ -135,30 +136,8 @@ public class ClientProxy extends CommonProxy {
 					}
 				}
 			}
-		});
-
-		//Register Rootysand Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockRootySand, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				if(world == null || pos == null) {
-					return white;
-				} else {
-					switch(tintIndex) {
-						case 1: return 0xFFF1AE;
-						default: return white;
-					}
-				}
-			}
-		});
-		
-		//Register Rootydirt Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
-			}
-		});
+		},
+		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand});
 		
 		//Register Sapling Colorizers
 		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);

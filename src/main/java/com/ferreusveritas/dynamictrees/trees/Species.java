@@ -14,6 +14,8 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
@@ -23,6 +25,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -30,6 +33,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -42,6 +46,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -422,12 +427,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		return false;
 	}
-
+	
+	//This is for the sapling.
+	//If false is returned then nothing happens.
+	//If true is returned canUseBoneMealNow is run then the bonemeal is consumed regardless of it's return.
 	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {
-		return true;
+		return canBoneMeal();
 	}
 	
+	//This is for the sapling.
+	//Return weather or not the bonemealing should cause growth 
 	public boolean canUseBoneMealNow(World world, Random rand, BlockPos pos) {
+		return canBoneMeal();
+	}
+	
+	//This is for the tree itself.
+	public boolean canBoneMeal() {
 		return true;
 	}
 	
@@ -810,10 +825,58 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	// INTERACTIVE
 	//////////////////////////////
 	
-	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+		
+		//Bonemeal fertilizes the soil and causes a single growth pulse
+		if( canBoneMeal() && itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
+			return new SubstanceFertilize().setAmount(1).setGrow(true);
+		}
+		
+		//Use substance provider interface if it's available
+		if(itemStack.getItem() instanceof ISubstanceEffectProvider) {
+			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
+			return provider.getSubstanceEffect(itemStack);
+		}
+		
+		return null;
+	}
+	
+	/**
+	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
+	* 
+	* @param world The current world
+	* @param hitPos Position
+	* @param player The player applying the substance
+	* @param itemStack The itemstack to be used.
+	* @return true if item was used, false otherwise
+	*/
+	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+		
+		ISubstanceEffect effect = getSubstanceEffect(itemStack);
+		
+		if(effect != null) {
+			if(effect.isLingering()) {
+				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
+				return true;
+			} else {
+				return effect.apply(world, rootPos);
+			}
+		}
+		
 		return false;
 	}
 	
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		
+		if (heldItem != null) {//Something in the hand
+			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
+				CompatHelper.consumePlayerItem(player, hand, heldItem);
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	//////////////////////////////
 	// WORLDGEN
