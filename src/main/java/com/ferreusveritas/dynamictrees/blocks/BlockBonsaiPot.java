@@ -6,7 +6,7 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty.MimicProperty;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -41,6 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockBonsaiPot extends BlockContainer {
 
 	public static final MimicProperty SPECIES = new MimicProperty("species");
+	public static final MimicProperty POT = new MimicProperty("pot");
 		
 	public static final String name = "bonsaipot";
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
@@ -59,16 +60,15 @@ public class BlockBonsaiPot extends BlockContainer {
 	// SPECIES PROPERTIES
 	//////////////////////////////
 	
-	public Species getSpecies(IBlockAccess access, BlockPos rootPos) {
-		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(access, rootPos);
-		return rootyDirtTE instanceof TileEntitySpecies ? rootyDirtTE.getSpecies() : Species.NULLSPECIES;
+	public Species getSpecies(IBlockAccess access, BlockPos pos) {
+		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(access, pos);
+		return bonsaiPotTE instanceof TileEntityBonsai ? bonsaiPotTE.getSpecies() : Species.NULLSPECIES;
 	}
 	
 	public boolean setSpecies(World world, Species species, BlockPos pos) {
-		world.setBlockState(pos, getDefaultState());
-		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, pos);
-		if(rootyDirtTE instanceof TileEntitySpecies) {
-			rootyDirtTE.setSpecies(species);
+		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(world, pos);
+		if(bonsaiPotTE instanceof TileEntityBonsai) {
+			bonsaiPotTE.setSpecies(species);
 			return true;
 		}
 		return false;
@@ -78,18 +78,32 @@ public class BlockBonsaiPot extends BlockContainer {
 		return getSpecies(access, pos).getDynamicSapling();
 	}
 
+	public IBlockState getPotState(IBlockAccess access, BlockPos pos) {
+		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(access, pos);
+		return bonsaiPotTE instanceof TileEntityBonsai ? bonsaiPotTE.getPot() : Blocks.FLOWER_POT.getDefaultState();
+	}
+
+	public boolean setPotState(World world, IBlockState potState, BlockPos pos) {
+		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(world, pos);
+		if(bonsaiPotTE instanceof TileEntityBonsai) {
+			bonsaiPotTE.setPot(potState);
+			return true;
+		}
+		return false;
+	}
+	
 	
 	///////////////////////////////////////////
 	// TILE ENTITY
 	///////////////////////////////////////////
 	
-	private TileEntitySpecies getTileEntitySpecies(IBlockAccess access, BlockPos pos) {
-		return (TileEntitySpecies) access.getTileEntity(pos);
+	private TileEntityBonsai getTileEntityBonsai(IBlockAccess access, BlockPos pos) {
+		return (TileEntityBonsai) access.getTileEntity(pos);
 	}
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntitySpecies();
+		return new TileEntityBonsai();
 	}
 	
 	
@@ -118,7 +132,7 @@ public class BlockBonsaiPot extends BlockContainer {
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
 			}
 
-			world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState());
+			world.setBlockState(pos, getPotState(world, pos));//Return back to an empty pot
 
 			return true;
 		}
@@ -160,12 +174,12 @@ public class BlockBonsaiPot extends BlockContainer {
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SPECIES});
+		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SPECIES, POT});
 	}
 	
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
-		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SPECIES, getSaplingState(access, pos)) : state;
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SPECIES, getSaplingState(access, pos)).withProperty(POT, getPotState(access, pos)) : state;
 	}
 	
 	///////////////////////////////////////////

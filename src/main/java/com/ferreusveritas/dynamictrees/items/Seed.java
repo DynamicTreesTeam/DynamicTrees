@@ -8,10 +8,10 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -75,21 +75,24 @@ public class Seed extends Item {
 		return false;
 	}
 	
-	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		ItemStack seedStack = player.getHeldItem(hand);
-
+	public EnumActionResult onItemUseFlowerPot(EntityPlayer player, World world, BlockPos pos, EnumHand hand, ItemStack seedStack, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		//Handle Flower Pot interaction
-		IBlockState blockState = world.getBlockState(pos);
-		if(blockState.equals(Blocks.FLOWER_POT.getDefaultState())) { //Empty Flower Pot
+		IBlockState emptyPotState = world.getBlockState(pos);
+		if(emptyPotState.getBlock() instanceof BlockFlowerPot && (emptyPotState == emptyPotState.getBlock().getDefaultState()) ) { //Empty Flower Pot of some kind
 			Species species = getSpecies(seedStack);
 			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();
-			if(bonzaiPot.setSpecies(world, species, pos)) {
+			world.setBlockState(pos, bonzaiPot.getDefaultState());
+			if(bonzaiPot.setSpecies(world, species, pos) && bonzaiPot.setPotState(world, emptyPotState, pos)) {
 				CompatHelper.shrinkStack(seedStack, 1);
 				return EnumActionResult.SUCCESS;
 			}
 		}
 		
+		return EnumActionResult.PASS;
+	}
+	
+	public EnumActionResult onItemUsePlantSeed(EntityPlayer player, World world, BlockPos pos, EnumHand hand, ItemStack seedStack, EnumFacing facing, float hitX, float hitY, float hitZ) {
+
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
 				if(getSpecies(seedStack).plantSapling(world, pos.up())) {//Do the planting
@@ -97,6 +100,23 @@ public class Seed extends Item {
 					return EnumActionResult.SUCCESS;
 				}
 			}
+		}
+		
+		return EnumActionResult.PASS;
+	}
+	
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack seedStack = player.getHeldItem(hand);
+		
+		//Handle Flower Pot interaction
+		if(onItemUseFlowerPot(player, world, pos, hand, seedStack, facing, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+			return EnumActionResult.SUCCESS;
+		}
+		
+		//Handle Planting Seed interaction
+		if(onItemUsePlantSeed(player, world, pos, hand, seedStack, facing, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
+			return EnumActionResult.SUCCESS;
 		}
 
 		return EnumActionResult.FAIL;

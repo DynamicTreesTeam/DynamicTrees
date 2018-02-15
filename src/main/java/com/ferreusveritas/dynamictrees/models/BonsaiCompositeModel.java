@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.google.common.collect.Maps;
 
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -21,26 +22,26 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class BonsaiCompositeModel implements IBakedModel {
 	
-	protected IBakedModel potModel;
-	
+	protected IBakedModel basePotModel;
 	protected Map<IBlockState, ArrayList<BakedQuad>> cachedSaplingQuads = Maps.<IBlockState, ArrayList<BakedQuad>>newLinkedHashMap();
 	
-	public BonsaiCompositeModel(IBakedModel rootsModel) {
-		this.potModel = rootsModel;
+	public BonsaiCompositeModel(IBakedModel basePotModel) {
+		this.basePotModel = basePotModel;
 	}
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
 
     	List<BakedQuad> quads = new ArrayList<BakedQuad>();
-    	quads.addAll(potModel.getQuads(state, side, rand));
 
 		IBlockState mimicState = null;
-    	
+		IBlockState potState = null;
+		
 		if (state != null && state.getBlock() instanceof BlockBonsaiPot && state instanceof IExtendedBlockState) {
 			mimicState = ((IExtendedBlockState) state).getValue(BlockBonsaiPot.SPECIES);
+			potState = ((IExtendedBlockState) state).getValue(BlockBonsaiPot.POT);
 		}
-		if(mimicState == null || !(mimicState.getBlock() instanceof BlockDynamicSapling)) {
+		if(mimicState == null || !(mimicState.getBlock() instanceof BlockDynamicSapling) || !(potState.getBlock() instanceof BlockFlowerPot)) {
 			return quads;
 		}
 		
@@ -48,6 +49,9 @@ public class BonsaiCompositeModel implements IBakedModel {
     	BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
     	BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
     	IBakedModel saplingModel = blockModelShapes.getModelForState(mimicState);
+    	IBakedModel potModel = blockModelShapes.getModelForState(potState);
+    	
+    	quads.addAll(potModel.getQuads(potState, side, rand));
     	
     	if(!cachedSaplingQuads.containsKey(mimicState)) {
     		ArrayList<BakedQuad> saplingQuads = new ArrayList<BakedQuad>();
@@ -85,7 +89,7 @@ public class BonsaiCompositeModel implements IBakedModel {
 
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
-		return potModel.getParticleTexture();
+		return basePotModel.getParticleTexture();
 	}
 
 	@Override

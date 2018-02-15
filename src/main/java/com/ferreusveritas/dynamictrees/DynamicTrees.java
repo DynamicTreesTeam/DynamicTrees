@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
@@ -78,6 +79,8 @@ public class DynamicTrees {
 		TreeGenerator.preInit();//Create the generator
 		
 		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
+		GameRegistry.registerTileEntity(TileEntityBonsai.class, "bonsai_tile_entity");
+
 		
 		ModBlocks.preInit();
 		ModItems.preInit();
