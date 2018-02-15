@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.models.BonsaiCompositeModel;
 import com.ferreusveritas.dynamictrees.models.RootyCompositeModel;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -16,40 +17,17 @@ public class ModelBakeEventListener {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRootyDirtModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "normal"));
-		if (rootsObject instanceof IBakedModel) {
-		      IBakedModel rootsModel = (IBakedModel) rootsObject;
-		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "normal"), rootyModel);
-		}
-	}
-	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onRootyDirtSpeciesModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "normal"));
-		if (rootsObject instanceof IBakedModel) {
-		      IBakedModel rootsModel = (IBakedModel) rootsObject;
-		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "normal"), rootyModel);
-		}
-	}
-	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onRootySandModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "normal"));
-		if (rootsObject instanceof IBakedModel) {
-		      IBakedModel rootsModel = (IBakedModel) rootsObject;
-		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "normal"), rootyModel);
-		}
-	}
+		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand};
 
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onBonsaiModelBakeEvent(ModelBakeEvent event) {
-				
+		for(Block block: rootyBlocks) {
+			Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
+			if (rootsObject instanceof IBakedModel) {
+				IBakedModel rootsModel = (IBakedModel) rootsObject;
+				RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
+				event.getModelRegistry().putObject(new ModelResourceLocation(block.getRegistryName(), "normal"), rootyModel);
+			}
+		}
+		
 		Object flowerPotObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
 		if (flowerPotObject instanceof IBakedModel) {
 		      IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
