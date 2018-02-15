@@ -39,7 +39,10 @@ public class RootyCompositeModel implements IBakedModel {
     	BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
     	IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
     	
-		return mimicModel.getQuads(mimicState, side, rand);
+    	List<BakedQuad> quads = new ArrayList<BakedQuad>();
+    	quads.addAll(mimicModel.getQuads(mimicState, side, rand));
+    	quads.addAll(rootsModel.getQuads(state, side, rand));
+    	return quads;
 	}
 
 	@Override

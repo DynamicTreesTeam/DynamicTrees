@@ -1,5 +1,5 @@
 {
   "variants": {
-		"roots": { "model": "sand" }
+		"roots": { "model": "dynamictrees:roots" }
 	}
 }

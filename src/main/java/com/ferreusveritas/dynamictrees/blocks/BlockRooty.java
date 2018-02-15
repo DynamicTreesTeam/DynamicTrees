@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -33,10 +32,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 /**
@@ -62,7 +63,6 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15));
 		setTickRandomly(true);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
@@ -134,7 +134,6 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-	
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
 		updateTree(world, pos, random, false);
@@ -191,6 +190,12 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Item.getItemFromBlock(Blocks.DIRT);
+	}
+	
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		IBlockState mimicState = getMimic(world, pos);
+		return new ItemStack(mimicState.getBlock(), 1, mimicState.getBlock().damageDropped(mimicState));
 	}
 	
 	@Override
@@ -363,6 +368,16 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	@Override
 	public final boolean isRootNode() {
 		return true;
+	}
+	
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(MIMIC, getMimic(access, pos)) : state;
+	}
+	
+	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
+		IBlockState mimic = Blocks.DIRT.getDefaultState(); //Default to dirt
+		return mimic;
 	}
 	
 	public static class MimicProperty implements IUnlistedProperty<IBlockState> {

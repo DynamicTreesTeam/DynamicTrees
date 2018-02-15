@@ -64,11 +64,11 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new RootyStateMapper());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new RootyStateMapper());
 		
-		ModelHelper.regModel(ModBlocks.blockRootyDirt);
+		//ModelHelper.regModel(ModBlocks.blockRootyDirt);
 
 		//Register Rooty Sand Mesher
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new RootyStateMapper());
-		ModelHelper.regModel(ModBlocks.blockRootySand);
+		//ModelHelper.regModel(ModBlocks.blockRootySand);
 		
 		//Register Bonsai Pot Mesher
 		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
@@ -125,7 +125,30 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
+				if(world == null || pos == null) {
+					return white;
+				} else {
+					switch(tintIndex) {
+						case 0: return BiomeColorHelper.getGrassColorAtPos(world, pos);
+						case 1: return 0xFFF1AE;
+						default: return white;
+					}
+				}
+			}
+		});
+
+		//Register Rootysand Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockRootySand, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+				if(world == null || pos == null) {
+					return white;
+				} else {
+					switch(tintIndex) {
+						case 1: return 0xFFF1AE;
+						default: return white;
+					}
+				}
 			}
 		});
 		

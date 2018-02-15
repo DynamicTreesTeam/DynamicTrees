@@ -3,8 +3,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockGrass;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleDigging;
@@ -18,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -39,32 +36,35 @@ public class BlockRootyDirt extends BlockRooty {
 	///////////////////////////////////////////
 	
 	@Override
-	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-		if (state instanceof IExtendedBlockState) {
-			IExtendedBlockState extState = (IExtendedBlockState) state;
-			
-			final int dMap[] = {0, -1, 1};
-			
-			IBlockState mimic = Blocks.DIRT.getDefaultState(); // Default to dirt in case no dirt or grass is found
-			
-			for (int depth : dMap) {
-				for (EnumFacing dir : EnumFacing.HORIZONTALS) {
-					IBlockState ground = world.getBlockState(pos.offset(dir).down(depth));
-					
-					if (ground.getBlock() instanceof BlockGrass) {
-						return extState.withProperty(MIMIC, ground); // Prioritize Grass by returning as soon as grass is found
-					}
-					if (ground.getBlock() instanceof BlockDirt) {
-						mimic = ground; // Store the dirt in case grass isn't found
-					}
+	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
+		final int dMap[] = {0, -1, 1};//Y-Axis depth map
+		
+		IBlockState mimic = Blocks.DIRT.getDefaultState();//Default to dirt in case no dirt or grass is found
+		IBlockState cache[] = new IBlockState[12];//A cache so we don't need to pull the blocks from the world twice
+		int i = 0;
+		
+		//Prioritize Grass by searching for grass first
+		for (int depth : dMap) {
+			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+				IBlockState ground = cache[i++] = access.getBlockState(pos.offset(dir).down(depth));
+				if (ground.getMaterial() == Material.GRASS) {
+					return ground; 
 				}
 			}
-			return extState.withProperty(MIMIC, mimic);
 		}
-		return state;
+
+		//Settle for other kinds of dirt
+		for (i = 0; i < 12; i++) {
+			IBlockState ground = cache[i];
+			if(ground != mimic && ground.getMaterial() == Material.GROUND){
+				return ground;
+			}
+		}
+		
+		//If all else fails then just return plain ol' dirt
+		return mimic;
 	}
 	
-    
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
