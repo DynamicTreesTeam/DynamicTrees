@@ -59,6 +59,7 @@ public class BonsaiCompositeModel implements IBakedModel {
         		}
         		saplingQuads.add(n);
         	}
+        	saplingQuads.trimToSize();
         	cachedSaplingQuads.put(mimicState, saplingQuads);
     	}
 
