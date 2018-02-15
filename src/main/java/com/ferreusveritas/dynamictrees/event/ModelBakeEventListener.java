@@ -16,33 +16,33 @@ public class ModelBakeEventListener {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRootyDirtModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "roots"));
+		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "normal"));
 		if (rootsObject instanceof IBakedModel) {
 		      IBakedModel rootsModel = (IBakedModel) rootsObject;
 		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "roots"), rootyModel);
+		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirt.getRegistryName(), "normal"), rootyModel);
 		}
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRootyDirtSpeciesModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "roots"));
+		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "normal"));
 		if (rootsObject instanceof IBakedModel) {
 		      IBakedModel rootsModel = (IBakedModel) rootsObject;
 		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "roots"), rootyModel);
+		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootyDirtSpecies.getRegistryName(), "normal"), rootyModel);
 		}
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRootySandModelBakeEvent(ModelBakeEvent event) {
-		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "roots"));
+		Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "normal"));
 		if (rootsObject instanceof IBakedModel) {
 		      IBakedModel rootsModel = (IBakedModel) rootsObject;
 		      RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "roots"), rootyModel);
+		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockRootySand.getRegistryName(), "normal"), rootyModel);
 		}
 	}
 
