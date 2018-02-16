@@ -8,6 +8,7 @@ import java.util.function.Function;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -46,6 +47,7 @@ protected ModelBlock modelBlock;
 	private IBakedModel cores[][] = new IBakedModel[3][2]; // 2 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel rings[] = new IBakedModel[2]; // 2 Cores with the ring textures on all 6 sides
 	private IBakedModel coreSpikes[] = new IBakedModel[2]; // 2 cores with only the spikey edges
+	private IBakedModel sleeveTopSpikes;
 	
 	public CompositeCactusModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
@@ -58,7 +60,7 @@ protected ModelBlock modelBlock;
 			int radius = i + 4;
 			
 			for (EnumFacing dir: EnumFacing.VALUES) {
-				sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkIcon);
+				sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkIcon, ringIcon);
 			}
 			
 			cores[0][i] = bakeCore(radius, Axis.Y, barkIcon); //DOWN<->UP
@@ -68,10 +70,11 @@ protected ModelBlock modelBlock;
 			rings[i] = bakeCore(radius, Axis.Y, ringIcon);
 			
 			coreSpikes[i] = bakeCoreSpikes(radius, barkIcon);
+			sleeveTopSpikes = bakeTopSleeveSpikes(barkIcon);
 		}
 	}
 
-	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark) {		
+	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark, TextureAtlasSprite top) {		
 		// Work in double units(*2)
 		int dradius = radius * 2;
 		int halfSize = (16 - dradius) / 2;
@@ -97,7 +100,7 @@ protected ModelBlock modelBlock;
 			if (dir.getOpposite() != face) { // Discard side of sleeve that faces core
 				BlockFaceUV uvface = null;
 				if (dir == face) { // Side of sleeve that faces away from core
-					if (radius == 1) { // We're only interested in end faces for radius == 1
+					if (radius == 4) { // We're only interested in end faces for radius == 4
 						uvface = new BlockFaceUV(new float[] {8 - radius, 8 - radius, 8 + radius, 8 + radius}, 0);
 					}
 				} else { // UV for Bark texture
@@ -114,7 +117,7 @@ protected ModelBlock modelBlock;
 		
 		for (Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, false));
 		}
 		float minV = negative ? 16 - halfSize : 0;
 		float maxV = negative ? 16 : halfSize;
@@ -471,6 +474,70 @@ protected ModelBlock modelBlock;
 	
 		return builder.makeBakedModel();
 	}
+	
+	public IBakedModel bakeTopSleeveSpikes(TextureAtlasSprite bark) {
+		float minV = 4;
+		float maxV = 12;
+		
+		Vector3f posFrom = new Vector3f(4, 16, 4);
+		Vector3f posTo = new Vector3f(12, 16, 12);
+		
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
+		
+		
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, minV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, minV),
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, maxV)
+		), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, maxV),
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, minV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, minV)
+		), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV)
+		), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
+				vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
+				vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV)
+		), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+		
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
+				vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+				vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
+		), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV),
+				vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+				vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV)
+		), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
+				vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+				vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+				vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
+		), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+		builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+				vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV),
+				vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
+				vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
+				vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
+		), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+		
+		
+		return builder.makeBakedModel();
+	}
 
 	/**
 	 * A Hack to determine the UV face angle for a block column on a certain axis
@@ -524,6 +591,12 @@ protected ModelBlock modelBlock;
 				numConnections += (i != 0) ? 1 : 0;
 			}
 			
+			boolean extraUpSleeve = false;
+			if (numConnections == 1 && ((IExtendedBlockState) blockState).getValue(BlockBranchCactus.ORIGIN).getAxis().isHorizontal()) {
+				connections[1] = 4;
+				extraUpSleeve = true;
+			}
+			
 			//The source direction is the biggest connection from one of the 6 directions
 			EnumFacing sourceDir = getSourceDir(coreRadius, connections);
 			if (sourceDir == null) {
@@ -557,9 +630,12 @@ protected ModelBlock modelBlock;
 				int idx = connDir.getIndex();
 				int connRadius = connections[idx];
 				// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-				if ((connRadius == 4 || connRadius == 5)  && (side != connDir)) {
+				if (connRadius > 0 && ((connDir == EnumFacing.UP && connRadius == 4 && extraUpSleeve) || side != connDir)) {
 					quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(extendedBlockState, side, rand));
 				}
+			}
+			if (extraUpSleeve) {
+				quadsList.addAll(sleeveTopSpikes.getQuads(extendedBlockState, EnumFacing.UP, rand));
 			}
 		}
 		
