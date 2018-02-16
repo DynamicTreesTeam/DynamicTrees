@@ -240,7 +240,7 @@ public class TreeOak extends DynamicTree {
 			return swampSpecies;
 		}
 		
-		return getCommonSpecies();
+		return super.getSpeciesForLocation(world, trunkPos);
 	}
 	
 	@Override
