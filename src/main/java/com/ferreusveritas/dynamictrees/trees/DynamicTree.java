@@ -133,7 +133,7 @@ public class DynamicTree {
 	public Species getCommonSpecies() {
 		return commonSpecies;
 	}
-
+	
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
 	 * For instance Oak may use this to select a Swamp Oak species if the coordinates 
@@ -152,7 +152,7 @@ public class DynamicTree {
 		}
 		return getCommonSpecies();
 	}
-
+	
 	public void addSpeciesLocationOverride(ISpeciesLocationOverride override) {
 		speciesLocationOverrides.add(override);
 	}
@@ -299,11 +299,11 @@ public class DynamicTree {
 		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
 	}
 	
-
+	
 	public static BlockPos findRootNode(World world, BlockPos pos) {
 		
 		ITreePart treePart = TreeHelper.getTreePart(world, pos);
-
+		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
 				MapSignal signal = treePart.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
@@ -333,7 +333,7 @@ public class DynamicTree {
 		BlockDynamicLeaves leaves = TreeHelper.getLeaves(state);
 		return (leaves != null) && this == leaves.getTree(state);
 	}
-
+	
 	public interface IConnectable {
 		boolean isConnectable(IBlockState blockState);
 	}
