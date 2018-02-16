@@ -139,4 +139,23 @@ public class LeafClusters {
 	
 	public static final SimpleVoxmap bare = new SimpleVoxmap(1, 1, 1, new byte[] { 0x20 });
 	
+	public static final SimpleVoxmap palm = new SimpleVoxmap(3, 3, 3, new byte[] {
+			
+			//Layer 0(Bottom)
+			0, 0, 0,
+			0, 0, 0,
+			0, 0, 0,
+			
+			//Layer 1(Middle)
+			0, 0, 0,
+			0, 4, 0,
+			0, 0, 0,
+			
+			//Layer 2 (Top)
+			1, 2, 1,
+			2, 3, 2,
+			1, 2, 1
+			
+	}).setCenter(new BlockPos(3, 0, 3));
+	
 }
