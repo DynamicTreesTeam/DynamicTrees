@@ -45,6 +45,7 @@ protected ModelBlock modelBlock;
 	private IBakedModel sleeves[][] = new IBakedModel[6][2];
 	private IBakedModel cores[][] = new IBakedModel[3][2]; // 2 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel rings[] = new IBakedModel[2]; // 2 Cores with the ring textures on all 6 sides
+	private IBakedModel coreSpikes[] = new IBakedModel[2]; // 2 cores with only the spikey edges
 	
 	public CompositeCactusModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
@@ -60,11 +61,13 @@ protected ModelBlock modelBlock;
 				sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkIcon);
 			}
 			
-			cores[0][i] = bakeCore(radius, Axis.Y, barkIcon, true); //DOWN<->UP
-			cores[1][i] = bakeCore(radius, Axis.Z, barkIcon, true); //NORTH<->SOUTH
-			cores[2][i] = bakeCore(radius, Axis.X, barkIcon, true); //WEST<->EAST
+			cores[0][i] = bakeCore(radius, Axis.Y, barkIcon); //DOWN<->UP
+			cores[1][i] = bakeCore(radius, Axis.Z, barkIcon); //NORTH<->SOUTH
+			cores[2][i] = bakeCore(radius, Axis.X, barkIcon); //WEST<->EAST
 			
-			rings[i] = bakeCore(radius, Axis.Y, ringIcon, false);
+			rings[i] = bakeCore(radius, Axis.Y, ringIcon);
+			
+			coreSpikes[i] = bakeCoreSpikes(radius, barkIcon);
 		}
 	}
 
@@ -280,14 +283,14 @@ protected ModelBlock modelBlock;
 		return builder.makeBakedModel();
 	}
 	
-	public IBakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon, boolean spikey) {
+	public IBakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
 		
 		Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
 		Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 		
 		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 		
-		for(EnumFacing face: EnumFacing.VALUES) {
+		for (EnumFacing face: EnumFacing.VALUES) {
 			BlockFaceUV uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(axis, face));
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 		}
@@ -299,173 +302,173 @@ protected ModelBlock modelBlock;
 			EnumFacing face = e.getKey();
 			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
-		if (spikey) {
-			TextureAtlasSprite bark = icon;
+		
+		return builder.makeBakedModel();
+	}
+	
+	public IBakedModel bakeCoreSpikes(int radius, TextureAtlasSprite bark) {
 			float minV = 8 - radius;
 			float maxV = 8 + radius;
-			switch (axis) {
-			case X:
-				
-				builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, maxV)
-				), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 2, maxV)
-				), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, minV)
-				), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 2, minV)
-				), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
-				
-				builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV)
-				), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV)
-				), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV)
-				), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV)
-				), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
-				
-				break;
-			case Y:
-				
-				builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV)
-				), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV)
-				), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV)
-				), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV)
-				), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
-				
-				builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, minV)
-				), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 2, minV)
-				), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, maxV)
-				), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 2, maxV)
-				), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
-				
-				break;
-			case Z:
-				
-				builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
-				), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
-				), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV)
-				), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV)
-				), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
-				
-				builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV)
-				), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV)
-				), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
-						vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
-						vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
-						vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
-				), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
-				builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
-						vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
-						vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
-						vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
-				), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
-				
-				break;
-			}
-		}
+			
+			Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
+			Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
+			
+			SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
+			
+			// X
+			builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, maxV)
+			), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 2, maxV)
+			), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f - 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.0625f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, minV)
+			), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f + 0.0625f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.0625f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.0625f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f + 0.0625f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 2, minV)
+			), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
+			
+			builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV)
+			), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posTo.x / 16f, posFrom.y / 16f - 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posFrom.x / 16f, posFrom.y / 16f - 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV)
+			), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.001f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV)
+			), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posTo.x / 16f, posTo.y / 16f + 0.002f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV)
+			), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+			
+			// Y
+			builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posFrom.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV)
+			), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f - 0.002f, posTo.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posTo.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV)
+			), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.SOUTH, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posTo.x / 16f + 0.001f, posFrom.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posTo.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f, posTo.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 16, minV)
+			), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.NORTH, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posTo.x / 16f + 0.002f, posTo.y / 16f, posFrom.z / 16f - 0.0625f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posTo.x / 16f + 0.002f, posTo.y / 16f, posFrom.z / 16f + 0.0625f, 0xFFFFFFFF, bark, 2, minV)
+			), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
+			
+			builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.001f, 0xFFFFFFFF, bark, 16, minV)
+			), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f, posFrom.z / 16f - 0.002f, 0xFFFFFFFF, bark, 2, minV)
+			), 0, EnumFacing.NORTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.001f, 0xFFFFFFFF, bark, 16, maxV)
+			), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f, posTo.z / 16f + 0.002f, 0xFFFFFFFF, bark, 2, maxV)
+			), 0, EnumFacing.SOUTH, bark, true, DefaultVertexFormats.BLOCK));
+			
+			// Z
+			builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posFrom.x / 16f - 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
+			), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f - 0.002f, posFrom.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
+			), 0, EnumFacing.WEST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.UP, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f + 0.001f, posTo.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV)
+			), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.DOWN, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f + 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f - 0.0625f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f - 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posTo.x / 16f + 0.002f, posFrom.y / 16f + 0.0625f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV)
+			), 0, EnumFacing.EAST, bark, true, DefaultVertexFormats.BLOCK));
+			
+			builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f + 0.0625f, posFrom.y / 16f - 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV)
+			), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f - 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f - 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posFrom.y / 16f - 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f + 0.0625f, posFrom.y / 16f - 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV)
+			), 0, EnumFacing.DOWN, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.EAST, new BakedQuad(Ints.concat(
+					vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 16, minV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posFrom.z / 16f, 0xFFFFFFFF, bark, 14, minV),
+					vertexToInts(posTo.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 14, maxV),
+					vertexToInts(posTo.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 16, maxV)
+			), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
+			builder.addFaceQuad(EnumFacing.WEST, new BakedQuad(Ints.concat(
+					vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 2, minV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.002f, posFrom.z / 16f, 0xFFFFFFFF, bark, 0, minV),
+					vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
+					vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.002f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
+			), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
 
+	
 		return builder.makeBakedModel();
 	}
 
@@ -537,6 +540,16 @@ protected ModelBlock modelBlock;
 					quadsList.addAll(cores[coreDir][coreRadius - 4].getQuads(blockState, side, rand));
 				} else {
 					quadsList.addAll(rings[coreRadius - 4].getQuads(blockState, side, rand));
+				}
+			}
+			// Get quads for core spikes
+			for (EnumFacing dir : EnumFacing.values()) {
+				if (coreRadius > connections[dir.getIndex()]) {
+					for (BakedQuad quad : coreSpikes[coreRadius - 4].getQuads(blockState, dir, rand)) {
+						if (coreRadius > connections[quad.getFace().getIndex()]) {
+							quadsList.add(quad);
+						}
+					}
 				}
 			}
 			// Get quads for sleeves models
