@@ -25,6 +25,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -136,6 +137,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public Species() {
 		this.treeFamily = DynamicTree.NULLTREE;
+		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
 	}
 	
 	/**
