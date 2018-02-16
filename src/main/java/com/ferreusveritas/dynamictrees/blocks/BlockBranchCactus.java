@@ -23,6 +23,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
@@ -110,6 +111,16 @@ public class BlockBranchCactus extends BlockBranch {
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
         entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
     }
+	
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		IBlockState returnState = this.getDefaultState();
+		
+		IBlockState adjState = world.getBlockState(pos.offset(facing.getOpposite()));
+		boolean trunk = (facing == EnumFacing.UP && (adjState.isSideSolid(world, pos.offset(facing.getOpposite()), facing) || (adjState.getBlock() == this && adjState.getValue(TRUNK))));
+		
+		return returnState.withProperty(TRUNK, trunk).withProperty(ORIGIN, facing != EnumFacing.DOWN ? facing.getOpposite() : EnumFacing.DOWN);
+	}
 	
 	///////////////////////////////////////////
 	// RENDERING
@@ -221,11 +232,16 @@ public class BlockBranchCactus extends BlockBranch {
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
 		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+		int numConnections = 0;
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			if (getSideConnectionRadius(blockAccess, pos, thisRadius, dir) > 0) {
 				connectionMade = true;
+				numConnections ++;
 				aabb = aabb.expand(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap);
 			}
+		}
+		if (!state.getValue(TRUNK) && numConnections == 1 && state.getValue(ORIGIN).getAxis().isHorizontal()) {
+			aabb = aabb.expand(EnumFacing.UP.getFrontOffsetX() * gap, EnumFacing.UP.getFrontOffsetY() * gap, EnumFacing.UP.getFrontOffsetZ() * gap);
 		}
 		if (connectionMade) {
 			return aabb.offset(0.5, 0.5, 0.5);
@@ -237,15 +253,24 @@ public class BlockBranchCactus extends BlockBranch {
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
 		int thisRadius = getRadius(state);
 		
+		int numConnections = 0;
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
 			if (connRadius > 0) {
+				numConnections++;
 				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
 				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
+		}
+		if (!state.getValue(TRUNK) && numConnections == 1 && state.getValue(ORIGIN).getAxis().isHorizontal()) {
+			double radius = MathHelper.clamp(4, 1, thisRadius) / 16.0;
+			double gap = 0.5 - radius;
+			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+			aabb = aabb.offset(EnumFacing.UP.getFrontOffsetX() * gap, EnumFacing.UP.getFrontOffsetY() * gap, EnumFacing.UP.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
+			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 		}
 		
 		double min = 0.5 - (thisRadius / 16.0), max = 0.5 + (thisRadius / 16.0);
@@ -260,7 +285,6 @@ public class BlockBranchCactus extends BlockBranch {
 	@Override
 	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
-		//ITreePart otherPart = TreeHelper.getTreePart(blockAccess, deltaPos);
 		IBlockState otherState = blockAccess.getBlockState(deltaPos);
 		IBlockState state = blockAccess.getBlockState(pos);
 		
