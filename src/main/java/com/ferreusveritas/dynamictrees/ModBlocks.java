@@ -70,12 +70,12 @@ public class ModBlocks {
 		
 		oakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous"));
 		
 		spruceLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata() & 3),
 				TreeRegistry.findCellKit("conifer")) {
 					@Override
 					public int getSmotherLeavesMax() {
@@ -91,7 +91,7 @@ public class ModBlocks {
 				
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous") ) {
 			@Override
 			@SideOnly(Side.CLIENT)
@@ -102,7 +102,7 @@ public class ModBlocks {
 		
 		jungleLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous")) {
 			
 			@Override
@@ -113,7 +113,7 @@ public class ModBlocks {
 		
 		acaciaLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata()),
+				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata() & 3),
 				TreeRegistry.findCellKit("acacia")) {
 					@Override
 					public int getSmotherLeavesMax() {
@@ -123,7 +123,7 @@ public class ModBlocks {
 		
 		darkOakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata()),
+				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() & 3),
 				TreeRegistry.findCellKit("darkoak")) {
 					@Override
 					public int getSmotherLeavesMax() {
