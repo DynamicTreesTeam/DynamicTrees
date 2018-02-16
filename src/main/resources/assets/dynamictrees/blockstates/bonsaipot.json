@@ -1,11 +1,5 @@
 {
-    "multipart": [
-        {   "apply": { "model": "flower_pot" }},
-        {   "when": { "type": "oak" }, "apply": { "model": "dynamictrees:oakbonsai" }},
-        {   "when": { "type": "birch" }, "apply": { "model": "dynamictrees:birchbonsai" }},
-        {   "when": { "type": "jungle" }, "apply": { "model": "dynamictrees:junglebonsai" }},
-        {   "when": { "type": "spruce" }, "apply": { "model": "dynamictrees:sprucebonsai" }},
-        {   "when": { "type": "acacia" }, "apply": { "model": "dynamictrees:acaciabonsai" }},
-        {   "when": { "type": "dark_oak" }, "apply": { "model": "dynamictrees:darkoakbonsai" }}        
-    ]
+    "variants": {
+        "normal": { "model": "flower_pot" }
+    }
 }

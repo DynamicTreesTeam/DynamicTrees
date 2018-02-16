@@ -12,11 +12,11 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
-import com.ferreusveritas.dynamictrees.models.RootyStateMapper;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -60,19 +60,9 @@ public class ClientProxy extends CommonProxy {
 	public void registerModels() {
 		
 		//BLOCKS
-		
-		//Register Rooty Dirt Mesher
-		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new RootyStateMapper());
-		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new RootyStateMapper());
-		
-		//ModelHelper.regModel(ModBlocks.blockRootyDirt);
-
-		//Register Rooty Sand Mesher
-		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new RootyStateMapper());
-		//ModelHelper.regModel(ModBlocks.blockRootySand);
-		
-		//Register Bonsai Pot Mesher
-		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		
 		//Register DendroCoil Mesher
 		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
@@ -148,8 +138,8 @@ public class ClientProxy extends CommonProxy {
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).getCommonSpecies().getLeavesProperties().foliageColorMultiplier(state, world, pos);
+			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+				return access == null || pos == null ? white : ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
 			}
 		});
 		
