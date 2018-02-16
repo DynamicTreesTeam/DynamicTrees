@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -143,6 +144,18 @@ public class BlockBonsaiPot extends BlockContainer {
 	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		
+		if(target.sideHit == EnumFacing.UP) {
+			Species species = getSpecies(world, pos);
+			if(species != Species.NULLSPECIES) {
+				return species.getSeedStack(1);
+			}
+		}
+		
+		IBlockState potState = getPotState(world, pos);
+		if(potState.getBlock() instanceof BlockFlowerPot) {
+			return new ItemStack(potState.getBlock(), 1, potState.getBlock().damageDropped(potState));
+		}
 		return new ItemStack(Items.FLOWER_POT);
 	}
 	
