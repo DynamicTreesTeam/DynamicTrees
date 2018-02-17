@@ -289,7 +289,7 @@ public class CellKits {
 				new CellPalmFrond(4)
 			}; 
 		
-		private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0211});
+		private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0221});
 		
 		@Override
 		public ICell getCellForLeaves(int hydro) {
@@ -298,7 +298,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? palmBranch : CellNull.NULLCELL;
+			return palmBranch;
 		}
 		
 		@Override

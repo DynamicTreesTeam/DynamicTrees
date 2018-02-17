@@ -12,7 +12,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ILeavesProperties {
-
+	
+	/** The type of tree these leaves connect to */
 	ILeavesProperties setTree(DynamicTree tree);
 	
 	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */

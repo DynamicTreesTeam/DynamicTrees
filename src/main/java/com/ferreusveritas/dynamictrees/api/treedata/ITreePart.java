@@ -51,10 +51,11 @@ public interface ITreePart {
 	* @param world The current world
 	* @param pos Position
 	* @param branch The branch making the request
+	* @param side The side the block is requesting(relative to the requesting block)
 	* @param fromRadius The radius of the branch requesting connection data
 	* @return Radius of the connection point to this block from the branch
 	*/
-	int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius);
+	int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
 
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0

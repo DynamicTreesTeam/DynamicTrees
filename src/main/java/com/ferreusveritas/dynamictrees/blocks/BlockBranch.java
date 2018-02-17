@@ -164,15 +164,15 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	// WORLD UPDATE
 	///////////////////////////////////////////
 	
-	static int setSupport(int branches, int leaves) {
+	public static int setSupport(int branches, int leaves) {
 		return ((branches & 0xf) << 4) | (leaves & 0xf);
 	}
 	
-	static int getBranchSupport(int support) {
+	public static int getBranchSupport(int support) {
 		return (support >> 4) & 0xf;
 	}
 	
-	static int getLeavesSupport(int support) {
+	public static int getLeavesSupport(int support) {
 		return support & 0xf;
 	}
 	
@@ -434,13 +434,13 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return getRadius(world, pos);
 	}
 	
 	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
-		return TreeHelper.getTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, radius);
+		return TreeHelper.getTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, side, radius);
 	}
 	
 	///////////////////////////////////////////

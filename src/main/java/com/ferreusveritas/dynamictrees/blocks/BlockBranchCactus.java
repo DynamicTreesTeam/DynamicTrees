@@ -278,7 +278,7 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 0;
 	}
 	

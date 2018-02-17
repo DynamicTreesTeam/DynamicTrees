@@ -273,7 +273,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 8;
 	}
 	

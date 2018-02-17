@@ -30,7 +30,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
 			return from.getTree().isCompatibleVanillaLeaves(blockAccess, pos) ? 1: 0;
