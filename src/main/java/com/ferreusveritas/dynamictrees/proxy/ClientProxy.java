@@ -201,7 +201,6 @@ public class ClientProxy extends CommonProxy {
 	}
  
 	public void registerClientEventHandlers() {
-		//There are currently no Client Side events to handle
 		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
 	}
 	

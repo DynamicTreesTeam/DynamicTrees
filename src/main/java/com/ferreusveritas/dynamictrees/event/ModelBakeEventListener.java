@@ -16,7 +16,7 @@ public class ModelBakeEventListener {
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public void onRootyDirtModelBakeEvent(ModelBakeEvent event) {
+	public void onModelBakeEvent(ModelBakeEvent event) {
 		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand};
 
 		for(Block block: rootyBlocks) {
