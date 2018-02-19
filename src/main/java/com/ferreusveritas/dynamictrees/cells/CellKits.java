@@ -271,12 +271,10 @@ public class CellKits {
 			public int getValue() {
 				return 5;
 			}
-			
-			final int map[] = {0, 5, 0, 0, 0, 0};
-			
+						
 			@Override
 			public int getValueFromSide(EnumFacing side) {
-				return map[side.ordinal()];
+				return side == EnumFacing.UP ? getValue() : 0;
 			}
 			
 		};

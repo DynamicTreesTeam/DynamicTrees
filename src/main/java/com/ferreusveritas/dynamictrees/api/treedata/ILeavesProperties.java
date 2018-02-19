@@ -47,4 +47,6 @@ public interface ILeavesProperties {
 	@SideOnly(Side.CLIENT)
 	int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos);
 	
+	boolean appearanceChangesWithHydro();
+	
 }

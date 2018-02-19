@@ -136,5 +136,10 @@ public class LeavesProperties implements ILeavesProperties {
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
 	}
+
+	@Override
+	public boolean appearanceChangesWithHydro() {
+		return false;
+	}
 	
 }
