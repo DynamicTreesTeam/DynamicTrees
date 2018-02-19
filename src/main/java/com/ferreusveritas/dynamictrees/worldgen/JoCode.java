@@ -222,7 +222,7 @@ public class JoCode {
 
 	protected boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-			world.setBlockState(pos, species.getTree().getDynamicBranch().getDefaultState(), careful ? 3 : 2);
+			world.setBlockState(pos, species.getTree().getDynamicBranch((int)species.getPrimaryThickness()), careful ? 3 : 2);
 			return false;
 		}
 		return true;

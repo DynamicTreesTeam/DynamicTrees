@@ -218,15 +218,31 @@ public class DynamicTree {
 	public ResourceLocation getName() {
 		return name;
 	}
+
+	IBlockState branchStates[] = new IBlockState[9];
 	
 	protected DynamicTree setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setTree(this);//Link the branch back to the tree
+		
+		//Cache the branch blocks states for rapid lookup
+		branchStates[0] = Blocks.AIR.getDefaultState();
+		for(int radius = 1; radius <= 8; radius++) {
+			branchStates[radius] = gBranch.getDefaultState();
+			if(gBranch.getDefaultState().getProperties().containsKey(BlockBranch.RADIUS)) {//Make compatible with cactus which doesn't have a radius
+				branchStates[radius] = branchStates[radius].withProperty(BlockBranch.RADIUS, radius);
+			}
+		}
+		
 		return this;
 	}
 	
 	public BlockBranch getDynamicBranch() {
 		return dynamicBranch;
+	}
+	
+	public IBlockState getDynamicBranch(int radius) {
+		return branchStates[radius];
 	}
 	
 	protected DynamicTree setStick(ItemStack itemStack) {

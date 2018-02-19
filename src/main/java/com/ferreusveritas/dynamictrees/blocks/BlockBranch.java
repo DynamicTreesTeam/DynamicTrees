@@ -308,7 +308,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	public void setRadius(World world, BlockPos pos, int radius) {
-		world.setBlockState(pos, this.blockState.getBaseState().withProperty(RADIUS, MathHelper.clamp(radius, 1, 8)), 2);
+		world.setBlockState(pos, tree.getDynamicBranch(MathHelper.clamp(radius, 1, 8)), 2);
 	}
 	
 	// Directionless probability grabber

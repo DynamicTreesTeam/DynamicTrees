@@ -29,9 +29,9 @@ public class NodeInflator implements INodeInspector {
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(block);
-		
+				
 		if(branch != null){
-			radius = 1.0f;
+			radius = species.getPrimaryThickness();
 		}
 
 		return false;
