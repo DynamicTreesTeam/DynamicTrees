@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public interface ITreePart {
-
+	
 	/**
 	* Get a cell that provides the level of hydration to neighboring structures
 	*
@@ -25,7 +25,7 @@ public interface ITreePart {
 	* @return Cell for getting hydration level
 	*/
 	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties);
-
+	
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.
 	* 
@@ -35,7 +35,7 @@ public interface ITreePart {
 	* @return Signal parameter for chaining
 	*/
 	GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal);
-
+	
 	/**
 	* The probability that the branch logic will follow into this block as part of it's path.
 	* 
@@ -45,7 +45,7 @@ public interface ITreePart {
 	* @return Probability weight used to determine if the growth path will take this block as a path next. 
 	*/
 	int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
-
+	
 	/**
 	* The radius of the part that a neighbor is expected to connect with 
 	* @param world The current world
@@ -56,9 +56,10 @@ public interface ITreePart {
 	* @return Radius of the connection point to this block from the branch
 	*/
 	int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
-
+	
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
+	* @param blockState the blockState of the block we are trying to get the radius of.
 	* @param blockAccess Readonly access to blocks
 	* @param pos Position
 	* @return Radius of the treepart(branch)
@@ -75,7 +76,7 @@ public interface ITreePart {
 	* @return
 	*/
 	MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
-
+	
 	/**
 	* Get the appropriate dynamic tree this block is used to build.
 	*  

@@ -66,7 +66,7 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
 	};
 	
-	IBlockState branchStates[] = new IBlockState[9];
+	IBlockState branchStates[];
 	
 	// Useful for more unique subclasses
 	protected BlockBranch(Material material) {
@@ -81,13 +81,16 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		
+		cacheBranchStates();
+	}
+	
+	public void cacheBranchStates() {
+		branchStates = new IBlockState[9];
+		
 		//Cache the branch blocks states for rapid lookup
 		branchStates[0] = Blocks.AIR.getDefaultState();
 		for(int radius = 1; radius <= 8; radius++) {
-			branchStates[radius] = getDefaultState();
-			if(getDefaultState().getProperties().containsKey(BlockBranch.RADIUS)) {//Make compatible with cactus which doesn't have a radius
-				branchStates[radius] = branchStates[radius].withProperty(BlockBranch.RADIUS, radius);
-			}
+				branchStates[radius] = getDefaultState().withProperty(BlockBranch.RADIUS, radius);
 		}
 	}
 	

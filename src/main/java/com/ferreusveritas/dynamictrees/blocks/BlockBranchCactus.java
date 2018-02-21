@@ -40,6 +40,7 @@ public class BlockBranchCactus extends BlockBranch {
 	
 	// The direction it grew from. Can't be up, since cacti can't grow down.
 	public static final PropertyEnum<EnumFacing> ORIGIN = PropertyEnum.<EnumFacing>create("origin", EnumFacing.class, new Predicate<EnumFacing>() {
+		@Override
 		public boolean apply(@Nullable EnumFacing dir) {
 			return dir != EnumFacing.UP;
 		}
@@ -54,6 +55,11 @@ public class BlockBranchCactus extends BlockBranch {
 		setDefaultState(this.blockState.getBaseState().withProperty(TRUNK, true).withProperty(ORIGIN, EnumFacing.DOWN));
 		setUnlocalizedName(name);
 		setRegistryName(name);
+	}
+	
+	@Override
+	public void cacheBranchStates() {
+		//Do nothing
 	}
 	
 	///////////////////////////////////////////
