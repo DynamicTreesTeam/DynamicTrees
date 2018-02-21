@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.IBranch;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -48,21 +49,24 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
-public class BlockBranch extends Block implements ITreePart, IBurningListener {
+public class BlockBranch extends Block implements ITreePart, IBranch, IBurningListener {
 	
 	private DynamicTree tree; //The tree this branch type creates
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
-	public static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
+	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
 	
 	// This is a nightmare
-	public static final IUnlistedProperty<Integer> RADIUSD = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8));
-	public static final IUnlistedProperty<Integer> RADIUSU = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8));
-	public static final IUnlistedProperty<Integer> RADIUSN = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8));
-	public static final IUnlistedProperty<Integer> RADIUSS = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8));
-	public static final IUnlistedProperty<Integer> RADIUSW = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8));
-	public static final IUnlistedProperty<Integer> RADIUSE = new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8));
-	public static final IUnlistedProperty CONNECTIONS[] = { RADIUSD, RADIUSU, RADIUSN, RADIUSS, RADIUSW, RADIUSE };
+	public static final IUnlistedProperty CONNECTIONS[] = { 
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
+	};
+	
+	IBlockState branchStates[] = new IBlockState[9];
 	
 	// Useful for more unique subclasses
 	protected BlockBranch(Material material) {
@@ -76,6 +80,19 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setUnlocalizedName(name);
 		setRegistryName(name);
+		
+		//Cache the branch blocks states for rapid lookup
+		branchStates[0] = Blocks.AIR.getDefaultState();
+		for(int radius = 1; radius <= 8; radius++) {
+			branchStates[radius] = getDefaultState();
+			if(getDefaultState().getProperties().containsKey(BlockBranch.RADIUS)) {//Make compatible with cactus which doesn't have a radius
+				branchStates[radius] = branchStates[radius].withProperty(BlockBranch.RADIUS, radius);
+			}
+		}
+	}
+	
+	public IProperty<?>[] getIgnorableProperties() {
+		return new IProperty<?>[]{ RADIUS };
 	}
 	
 	///////////////////////////////////////////
@@ -266,7 +283,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-		return state.getValue(BlockBranch.RADIUS) == 8;
+		return getRawRadius(state) == 8;
 	}
 	
 	@Override
@@ -299,8 +316,9 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
 	}
 	
-	public void setRadius(World world, BlockPos pos, int radius) {
-		world.setBlockState(pos, tree.getDynamicBranch(MathHelper.clamp(radius, 1, 8)), 2);
+	@Override
+	public void setRadius(World world, BlockPos pos, int radius, int flags) {
+		world.setBlockState(pos, branchStates[MathHelper.clamp(radius, 0, 8)], flags);
 	}
 	
 	public int getRawRadius(IBlockState blockState) {
@@ -635,12 +653,13 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		IBlockState neighBlockState = world.getBlockState(neighbor);
 		
 		if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {
-			int age = neighBlockState.getBlock() == Blocks.FIRE ? ((Integer)neighBlockState.getValue(BlockFire.AGE)).intValue() : 0;
+			int age = neighBlockState.getBlock() == Blocks.FIRE ? neighBlockState.getValue(BlockFire.AGE).intValue() : 0;
 			world.setBlockState(neighbor, ModBlocks.blockVerboseFire.getDefaultState().withProperty(BlockFire.AGE, age));
 		}
 		
 	}
 	
+	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.BRANCH;
 	}

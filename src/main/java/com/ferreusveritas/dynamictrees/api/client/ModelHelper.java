@@ -30,7 +30,7 @@ public class ModelHelper {
 	 * @param tree
 	 */
 	public static void regModel(DynamicTree tree) {
-		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranch.RADIUS).build());
+		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build());
 	}	
 	
 	public static void regModel(Block block) {
