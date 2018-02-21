@@ -337,7 +337,7 @@ public class DynamicTree {
 	}
 	
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		return branch.getRadius(blockState);
+		return branch.getRadius(blockState, blockAccess, pos);
 	}
 	
 	//////////////////////////////

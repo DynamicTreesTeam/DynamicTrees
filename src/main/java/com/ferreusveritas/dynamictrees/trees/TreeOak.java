@@ -189,9 +189,10 @@ public class TreeOak extends DynamicTree {
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 			if(ModConfigs.enableAppleTrees) {
-				BlockBranch branch = TreeHelper.getBranch(world, treePos);
+				IBlockState blockState = world.getBlockState(treePos);
+				BlockBranch branch = TreeHelper.getBranch(blockState);
 				
-				if(branch != null && branch.getRadius(world, treePos) >= 8 && !rapid) {
+				if(branch != null && branch.getRadius(blockState, world, treePos) >= 8 && !rapid) {
 					NodeFindEnds endFinder = new NodeFindEnds();
 					TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 					appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds());
@@ -245,7 +246,7 @@ public class TreeOak extends DynamicTree {
 	
 	@Override
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		int radius = branch.getRadius(blockState);
+		int radius = branch.getRadius(blockState, blockAccess, pos);
 		if(radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
 				return 128;

@@ -89,13 +89,13 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess blockAcess, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;
-			int thisRadius = getRadius(state);
+			int thisRadius = getRadius(state, blockAcess, pos);
 	
 			for (EnumFacing dir : EnumFacing.VALUES) {
-				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(blockAcess, pos, thisRadius, dir));
 			}
 			return retval;
 		}
@@ -152,12 +152,12 @@ public class BlockBranchCactus extends BlockBranch {
 	}
     
     @Override
-	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
-		return getRadius(blockAccess.getBlockState(pos));
-	}
-	
-    @Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+    	
+		if(blockState == null) {
+			blockState = blockAccess.getBlockState(pos);
+		}
+    	
 		if (blockState.getBlock() == this) {
 			return blockState.getValue(TRUNK) ? 5 : 4;
 		} else {
@@ -173,7 +173,7 @@ public class BlockBranchCactus extends BlockBranch {
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameWood(from) ? getRadius(blockAccess, pos) + 2 : 0;
+		return isSameWood(from) ? getRadius(blockAccess.getBlockState(pos), blockAccess, pos) + 2 : 0;
 	}
     
     @Override
@@ -226,7 +226,7 @@ public class BlockBranchCactus extends BlockBranch {
 			return NULL_AABB;
 		}
 		
-		int thisRadius = getRadius(state);
+		int thisRadius = getRadius(state, blockAccess, pos);
 		
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
@@ -250,12 +250,12 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-		int thisRadius = getRadius(state);
+	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
+		int thisRadius = getRadius(state, world, pos);
 		
 		int numConnections = 0;
 		for (EnumFacing dir : EnumFacing.VALUES) {
-			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
+			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
 			if (connRadius > 0) {
 				numConnections++;
 				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
@@ -278,7 +278,7 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 0;
 	}
 	

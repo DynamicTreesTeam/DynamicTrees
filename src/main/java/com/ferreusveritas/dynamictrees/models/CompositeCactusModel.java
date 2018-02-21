@@ -29,9 +29,9 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -582,7 +582,7 @@ protected ModelBlock modelBlock;
 		
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {
-			int coreRadius = getRadius(blockState);
+			int coreRadius = getRawRadius(blockState);
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
 			//Count number of connections
@@ -693,9 +693,9 @@ protected ModelBlock modelBlock;
 		return dir.getIndex() >> 1;
 	}
 	
-	protected int getRadius(IBlockState blockState) {
+	protected int getRawRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
-		return ((BlockBranch) blockState.getBlock()).getRadius(blockState);
+		return ((BlockBranch) blockState.getBlock()).getRawRadius(blockState);
 	}
 	
 	/**

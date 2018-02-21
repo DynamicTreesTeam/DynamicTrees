@@ -154,8 +154,8 @@ public class TreeJungle extends DynamicTree {
 		//Place Cocoa Pod if we are holding Cocoa Beans
 		if(heldItem != null) {
 			if(heldItem.getItem() == Items.DYE && heldItem.getItemDamage() == 3) {
-				BlockBranch branch = TreeHelper.getBranch(world, pos);
-				if(branch != null && branch.getRadius(world, pos) == 8) {
+				BlockBranch branch = TreeHelper.getBranch(state);
+				if(branch != null && branch.getRadius(state, world, pos) == 8) {
 					if(side != EnumFacing.UP && side != EnumFacing.DOWN) {
 						pos = pos.offset(side);
 					}

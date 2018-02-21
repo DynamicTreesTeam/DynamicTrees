@@ -376,9 +376,12 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	/** Used to find if the leaf block is at the bottom of the stack */
 	public static boolean isBottom(World world, BlockPos pos, Block belowBlock) {
-		if(TreeHelper.isTreePart(belowBlock)) {
+		BlockPos below = pos.down();
+		IBlockState belowBlockState = world.getBlockState(below);
+		
+		if(TreeHelper.isTreePart(belowBlockState.getBlock())) {
 			ITreePart belowTreepart = (ITreePart) belowBlock;
-			return belowTreepart.getRadius(world, pos.down()) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
+			return belowTreepart.getRadius(belowBlockState, world, below) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
 		}
 		return true;//Non-Tree parts below indicate the bottom of stack
 	}
@@ -511,7 +514,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				IBlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BlockBranch branch = TreeHelper.getBranch(state);
-					if(branch.getTree() == leavesProperties && branch.getRadius(state) == 1) {
+					if(branch.getTree() == leavesProperties && branch.getRadius(state, access, pos) == 1) {
 						branchList.add(dPos);
 					}
 				}
@@ -572,7 +575,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//////////////////////////////
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return fromRadius == 1 && from.getTree().isCompatibleDynamicLeaves(blockAccess, pos) ? 1 : 0;
 	}
 	
@@ -597,7 +600,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
 	

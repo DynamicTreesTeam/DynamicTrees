@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -57,9 +58,10 @@ public class NodeInflator implements INodeInspector {
 						continue;
 					}
 					
-					ITreePart treepart = TreeHelper.getTreePart(world, dPos);
+					IBlockState deltaBlockState = world.getBlockState(dPos);
+					ITreePart treepart = TreeHelper.getTreePart(deltaBlockState);
 					if(branch.isSameWood(treepart)) {
-						int branchRadius = treepart.getRadius(world, dPos);
+						int branchRadius = treepart.getRadius(deltaBlockState, world, dPos);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}

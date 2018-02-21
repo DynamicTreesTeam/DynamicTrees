@@ -169,7 +169,7 @@ public class CompositeModel implements IBakedModel {
 		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {
-			int coreRadius = getRadius(blockState);
+			int coreRadius = getRawRadius(blockState);
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
 			//Count number of connections
@@ -265,9 +265,9 @@ public class CompositeModel implements IBakedModel {
 		return dir.getIndex() >> 1;
 	}
 	
-	protected int getRadius(IBlockState blockState) {
+	protected int getRawRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
-		return ((BlockBranch) blockState.getBlock()).getRadius(blockState);
+		return ((BlockBranch) blockState.getBlock()).getRawRadius(blockState);
 		//return blockState.getValue(BlockBranch.RADIUS);
 	}
 	

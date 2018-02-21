@@ -108,7 +108,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;
-			int thisRadius = getRadius(state);
+			int thisRadius = getRadius(state, world, pos);
 			
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
@@ -208,9 +208,9 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
 			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
-				IBlockState state = world.getBlockState(neighPos);
-				if(state.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, species, getRadius(state), rand, 1.0f, true);
+				IBlockState neighState = world.getBlockState(neighPos);
+				if(neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
+					checkForRot(world, neighPos, species, getRadius(neighState, world, neighPos), rand, 1.0f, true);
 				}
 			}
 		}
@@ -230,7 +230,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
-		int radius = getRadius(world, pos);
+		int radius = getRadius(blockState, world, pos);
 		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
 	
@@ -241,7 +241,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		int radius = getRadius(world, pos);
+		int radius = getRadius(world.getBlockState(pos), world, pos);
 		return (fireSpreadSpeed * radius) / 8 ;
 	}
 	
@@ -266,12 +266,12 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-		return getRadius(state) == 8;
+		return state.getValue(BlockBranch.RADIUS) == 8;
 	}
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
-		if (getRadius(blockState) == 8) {
+		if (getRadius(blockState, blockAccess, pos) == 8) {
 			return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
 		} else {
 			return true;
@@ -295,26 +295,22 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	@Override
-	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
-		return getRadius(blockAccess.getBlockState(pos));
-	}
-	
-	public int getRadius(IBlockState blockState) {
-		if (blockState.getBlock() == this) {
-			return blockState.getValue(RADIUS);
-		} else {
-			return 0;
-		}
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
 	}
 	
 	public void setRadius(World world, BlockPos pos, int radius) {
 		world.setBlockState(pos, tree.getDynamicBranch(MathHelper.clamp(radius, 1, 8)), 2);
 	}
 	
+	public int getRawRadius(IBlockState blockState) {
+		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
+	}
+	
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameWood(from) ? getRadius(blockAccess, pos) + 2 : 0;
+		return isSameWood(from) ? getRadius(blockAccess.getBlockState(pos), blockAccess, pos) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
@@ -343,13 +339,14 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			
 			{
 				BlockPos deltaPos = pos.offset(targetDir);
+				IBlockState blockState = world.getBlockState(deltaPos);
 				
 				// Pass grow signal to next block in path
-				ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
+				ITreePart treepart = TreeHelper.getTreePart(blockState);
 				if (treepart != TreeHelper.nullTreePart) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
 				} else if (world.isAirBlock(deltaPos)) {
-					signal = growIntoAir(world, deltaPos, signal, getRadius(world, pos));
+					signal = growIntoAir(world, deltaPos, signal, getRadius(blockState, world, pos));
 				}
 			}
 			
@@ -364,17 +361,20 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 					// swing, rotting, burned or infested branch, etc) then this new block could be
 					// derived from BlockBranch and this works perfectly. Should even work with
 					// tileEntity blocks derived from BlockBranch.
-					ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
+					IBlockState blockState = world.getBlockState(deltaPos);
+					ITreePart treepart = TreeHelper.getTreePart(blockState);
 					if (isSameWood(treepart)) {
-						int branchRadius = treepart.getRadius(world, deltaPos);
+						int branchRadius = treepart.getRadius(blockState, world, deltaPos);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}
 			}
+
+			IBlockState currBlockState = world.getBlockState(pos);
 			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState, world, pos), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius));
 		}
 		
@@ -399,7 +399,7 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 			return NULL_AABB;
 		}
 		
-		int thisRadius = getRadius(state);
+		int thisRadius = getRadius(state, blockAccess, pos);
 		
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
@@ -418,11 +418,11 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-		int thisRadius = getRadius(state);
+	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
+		int thisRadius = getRadius(state, world, pos);
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
-			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
+			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
 			if (connRadius > 0) {
 				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
@@ -434,13 +434,14 @@ public class BlockBranch extends Block implements ITreePart, IBurningListener {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
-		return getRadius(world, pos);
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return getRadius(blockState, world, pos);
 	}
 	
 	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
-		return TreeHelper.getTreePart(blockAccess, deltaPos).getRadiusForConnection(blockAccess, deltaPos, this, side, radius);
+		IBlockState blockState = blockAccess.getBlockState(deltaPos);
+		return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 	}
 	
 	///////////////////////////////////////////

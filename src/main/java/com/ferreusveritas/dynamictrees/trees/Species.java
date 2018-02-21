@@ -588,7 +588,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			IBlockState branchState = world.getBlockState(endPos);
 			BlockBranch branch = TreeHelper.getBranch(branchState);
 			if(branch != null) {
-				int radius = branch.getRadius(branchState);
+				int radius = branch.getRadius(branchState, world, endPos);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
 				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, rapid) || radius != 1) {
 					if(rapid) {
@@ -708,7 +708,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		//Do custom stuff or override probability map for various species
-		probMap = customDirectionManipulation(world, pos, branch.getRadius(world, pos), signal, probMap);
+		probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos), world, pos), signal, probMap);
 		
 		//Select a direction from the probability map
 		int choice = MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
