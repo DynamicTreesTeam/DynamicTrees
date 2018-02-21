@@ -123,7 +123,7 @@ public class CoordUtils {
 			{4111, 271, 3067},
 			{7933711, 6144389, 9538033},
 			{9973, 8287, 9721},
-			{9973, 8287, 9721}
+			{7211, 5437, 9613}
 	};
 	
 	public static int coordHashCode(BlockPos pos, int a, int b, int c) {
