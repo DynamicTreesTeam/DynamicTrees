@@ -56,17 +56,12 @@ public class FeatureGenUndergrowth implements IGenFeature {
 					SimpleVoxmap leafMap = species.getLeavesProperties().getCellKit().getLeafCluster();
 					for(BlockPos dPos : leafMap.getAllNonZero()) {
 						BlockPos leafPos = pos.add(dPos);
-						if((coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+						if((CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
 							world.setBlockState(leafPos, leavesState);
 						}
 					}
 			}
 		}
-	}
-
-	public static int coordHashCode(BlockPos pos) {
-		int hash = (pos.getX() * 4111 ^ pos.getY() * 271 ^ pos.getZ() * 3067) >> 1;
-		return hash & 0xFFFF;
 	}
 	
 }

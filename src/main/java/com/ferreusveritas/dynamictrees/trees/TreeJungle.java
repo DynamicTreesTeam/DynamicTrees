@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockPlanks;
@@ -59,8 +60,8 @@ public class TreeJungle extends DynamicTree {
 			
 			EnumFacing originDir = signal.dir.getOpposite();
 			
-			int treeHash = coordHashCode(signal.rootPos);
-			int posHash = coordHashCode(pos);
+			int treeHash = CoordUtils.coordHashCode(signal.rootPos, 2);
+			int posHash = CoordUtils.coordHashCode(pos, 2);
 			
 			//Alter probability map for direction change
 			probMap[0] = 0;//Down is always disallowed for jungle
@@ -88,11 +89,6 @@ public class TreeJungle extends DynamicTree {
 				signal.energy = 4.0f;
 			}
 			return newDir;
-		}
-		
-		private int coordHashCode(BlockPos pos) {
-			int hash = (pos.getX() * 9973 ^ pos.getY() * 8287 ^ pos.getZ() * 9721) >> 1;
-			return hash & 0xFFFF;
 		}
 		
 		//Jungle trees grow taller in suitable biomes

@@ -117,4 +117,23 @@ public class CoordUtils {
 		}
 		return pos;
 	}
+
+	//Some ready made not terrible prime hash factors
+	private static final int coordHashMap[][] = {
+			{4111, 271, 3067},
+			{7933711, 6144389, 9538033},
+			{9973, 8287, 9721},
+			{9973, 8287, 9721}
+	};
+	
+	public static int coordHashCode(BlockPos pos, int a, int b, int c) {
+		int hash = (pos.getX() * a ^ pos.getY() * b ^ pos.getZ() * c) >> 1;
+		return hash & 0xFFFF;
+	}
+	
+	public static int coordHashCode(BlockPos pos, int readyMade) {
+		int factors[] = coordHashMap[readyMade & 3];
+		return coordHashCode(pos, factors[0], factors[1], factors[2]);
+	}
+	
 }

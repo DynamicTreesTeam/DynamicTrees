@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCocoa;
@@ -28,7 +29,7 @@ public class NodeFruitCocoa implements INodeInspector {
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
-			int hashCode = coordHashCode(pos);
+			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {
 				BlockBranch branch = TreeHelper.getBranch(world, pos);
 				if(branch != null && branch.getRadius(world.getBlockState(pos), world, pos) == 8) {
@@ -46,12 +47,7 @@ public class NodeFruitCocoa implements INodeInspector {
 		}
 		return false;
 	}
-
-	public static int coordHashCode(BlockPos pos) {
-		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
-		return hash & 0xFFFF;
-	}
-
+	
 	@Override
 	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 		return false;
