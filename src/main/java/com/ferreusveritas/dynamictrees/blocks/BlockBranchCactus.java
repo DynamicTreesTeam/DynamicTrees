@@ -156,21 +156,12 @@ public class BlockBranchCactus extends BlockBranch {
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
 		return CellNull.NULLCELL;
 	}
-    
-    @Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-    	
-		if(blockState == null) {
-			blockState = blockAccess.getBlockState(pos);
-		}
-    	
-		if (blockState.getBlock() == this) {
-			return blockState.getValue(TRUNK) ? 5 : 4;
-		} else {
-			return 0;
-		}
-	}
 	
+	@Override
+	public int getRawRadius(IBlockState blockState) {
+		return blockState.getValue(TRUNK) ? 5 : 4;
+	}
+    
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius) {
 		// Do nothing
