@@ -169,8 +169,8 @@ public class BlockBranchCactus extends BlockBranch {
 	
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameWood(from) ? getRadius(blockAccess.getBlockState(pos), blockAccess, pos) + 2 : 0;
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+		return isSameWood(from) ? getRadius(blockState, blockAccess, pos) + 2 : 0;
 	}
     
     @Override

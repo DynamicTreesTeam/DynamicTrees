@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -209,6 +210,13 @@ public class TreeOak extends DynamicTree {
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
 		ModBlocks.oakLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK);
+			}
+		});
 	}
 	
 	@Override

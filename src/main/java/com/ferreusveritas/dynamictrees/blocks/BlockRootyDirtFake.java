@@ -80,7 +80,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
 
@@ -100,7 +100,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return BlockBranch.setSupport(1, 0);
 	}
 

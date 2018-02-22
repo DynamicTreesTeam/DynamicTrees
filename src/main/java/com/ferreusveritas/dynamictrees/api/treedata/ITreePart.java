@@ -44,7 +44,7 @@ public interface ITreePart {
 	* @param from The branch making the request
 	* @return Probability weight used to determine if the growth path will take this block as a path next. 
 	*/
-	int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
+	int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
 	
 	/**
 	* The radius of the part that a neighbor is expected to connect with 
@@ -98,7 +98,7 @@ public interface ITreePart {
 	* @param radius The radius of the branch requesting support
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
-	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
+	int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 	
 	public enum TreePartType {
 		NULL,

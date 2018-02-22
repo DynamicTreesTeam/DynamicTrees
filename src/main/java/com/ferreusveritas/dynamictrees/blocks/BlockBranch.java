@@ -176,7 +176,7 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 	}
 	
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return isSameWood(branch) ? BlockBranch.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
@@ -217,7 +217,8 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
-			neigh += TreeHelper.getTreePart(world, deltaPos).branchSupport(world, this, deltaPos, dir, radius);
+			IBlockState deltaBlockState = world.getBlockState(deltaPos);
+			neigh += TreeHelper.getTreePart(deltaBlockState).branchSupport(deltaBlockState, world, this, deltaPos, dir, radius);
 			if (getBranchSupport(neigh) >= 1 && getLeavesSupport(neigh) >= 2) {// Need two neighbors.. one of which must be another branch
 				return false;// We've proven that this branch is reinforced so there is no need to continue
 			}
@@ -330,8 +331,8 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 	
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameWood(from) ? getRadius(blockAccess.getBlockState(pos), blockAccess, pos) + 2 : 0;
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+		return isSameWood(from) ? getRadius(blockState, blockAccess, pos) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {

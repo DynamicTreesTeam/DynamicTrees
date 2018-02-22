@@ -703,7 +703,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				BlockPos deltaPos = pos.offset(dir);
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[dir.getIndex()] += TreeHelper.getTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
+				IBlockState deltaBlockState = world.getBlockState(deltaPos);
+				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
 			}
 		}
 		

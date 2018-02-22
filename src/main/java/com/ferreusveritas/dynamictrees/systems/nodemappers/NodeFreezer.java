@@ -46,7 +46,7 @@ public class NodeFreezer implements INodeInspector {
 			DynamicTree tree = branch.getTree();
 			IBlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
+				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
 					world.setBlockState(leavesPos, primLeaves.withProperty(BlockLeaves.DECAYABLE, false).withProperty(BlockLeaves.CHECK_DECAY, false));
 				}
 			}

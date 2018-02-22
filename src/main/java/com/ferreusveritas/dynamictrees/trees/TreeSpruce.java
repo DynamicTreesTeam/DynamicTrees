@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -108,6 +109,13 @@ public class TreeSpruce extends DynamicTree {
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		ModBlocks.spruceLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE);
+			}
+		});
 	}
 	
 	@Override

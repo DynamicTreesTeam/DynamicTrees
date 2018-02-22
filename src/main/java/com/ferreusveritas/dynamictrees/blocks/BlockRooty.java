@@ -278,7 +278,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
 	
@@ -302,7 +302,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? BlockBranch.setSupport(1, 1) : 0;
 	}
 

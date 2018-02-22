@@ -329,10 +329,9 @@ public class DynamicTree {
 	// LEAVES HANDLING
 	//////////////////////////////
 	
-	public boolean isCompatibleDynamicLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		IBlockState state = blockAccess.getBlockState(pos);
-		BlockDynamicLeaves leaves = TreeHelper.getLeaves(state);
-		return (leaves != null) && this == leaves.getTree(state);
+	public boolean isCompatibleDynamicLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		BlockDynamicLeaves leaves = TreeHelper.getLeaves(blockState);
+		return (leaves != null) && this == leaves.getTree(blockState);
 	}
 	
 	public interface IConnectable {
@@ -341,18 +340,17 @@ public class DynamicTree {
 	
 	LinkedList<IConnectable> vanillaConnectables = new LinkedList<>(); 
 	
-	public void addVanillaLeavesConnectable(IConnectable connectable) {
+	public void addConnectableVanillaLeaves(IConnectable connectable) {
 		vanillaConnectables.add(connectable);
 	}
 	
-	public boolean isCompatibleVanillaLeaves(IBlockAccess blockAccess, BlockPos pos) {
+	public boolean isCompatibleVanillaLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		
-		IBlockState testState = blockAccess.getBlockState(pos);
-		Block block = testState.getBlock();
+		Block block = blockState.getBlock();
 		
 		if(!(block instanceof BlockDynamicLeaves) && block instanceof BlockLeaves) {
 			for(IConnectable connectable : vanillaConnectables) {
-				if(connectable.isConnectable(testState)) {
+				if(connectable.isConnectable(blockState)) {
 					return true;
 				}
 			}
@@ -361,8 +359,8 @@ public class DynamicTree {
 		return false;
 	}
 	
-	public boolean isCompatibleGenericLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isCompatibleDynamicLeaves(blockAccess, pos) || isCompatibleVanillaLeaves(blockAccess, pos);
+	public boolean isCompatibleGenericLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
 	
 	//////////////////////////////

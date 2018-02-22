@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -59,6 +60,13 @@ public class TreeBirch extends DynamicTree {
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 		ModBlocks.birchLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH);
+			}
+		});
 	}
 	
 	@Override

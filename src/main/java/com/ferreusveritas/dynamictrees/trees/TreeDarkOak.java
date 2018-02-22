@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 
+import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -101,6 +102,13 @@ public class TreeDarkOak extends DynamicTree {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		ModBlocks.darkOakLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockNewLeaf && (blockState.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.DARK_OAK);
+			}
+		});
 	}
 	
 	@Override

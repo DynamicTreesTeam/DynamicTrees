@@ -477,8 +477,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return from.getTree().isCompatibleDynamicLeaves(blockAccess, pos) ? 2: 0;
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+		return from.getTree().isCompatibleDynamicLeaves(blockState, blockAccess, pos) ? 2: 0;
 	}
 	
 	//////////////////////////////
@@ -576,7 +576,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
-		return fromRadius == 1 && from.getTree().isCompatibleDynamicLeaves(blockAccess, pos) ? 1 : 0;
+		return fromRadius == 1 && from.getTree().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}
 	
 	/*	FUTURE: Particle effects. Future leaves dropping from trees and wisps and stuff. Client side only
@@ -610,9 +610,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
-		return radius == 1 && branch.getTree() == getTree(blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
+		return radius == 1 && branch.getTree() == getTree(blockState) ? BlockBranch.setSupport(0, 1) : 0;
 	}
 	
 	@Override

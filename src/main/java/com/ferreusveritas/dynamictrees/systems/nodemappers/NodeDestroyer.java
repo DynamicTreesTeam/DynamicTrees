@@ -52,7 +52,7 @@ public class NodeDestroyer implements INodeInspector {
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
 			DynamicTree tree = species.getTree();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
+				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
 					world.setBlockToAir(leavesPos);
 					dropList.clear();
 					species.getTreeHarvestDrops(world, leavesPos, dropList, world.rand);

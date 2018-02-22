@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -137,6 +138,13 @@ public class TreeJungle extends DynamicTree {
 		super(BlockPlanks.EnumType.JUNGLE);
 		ModBlocks.jungleLeavesProperties.setTree(this);
 		canSupportCocoa = true;
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE);
+			}
+		});
 	}
 
 	@Override
