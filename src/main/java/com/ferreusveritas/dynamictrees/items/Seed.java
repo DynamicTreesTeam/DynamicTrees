@@ -5,6 +5,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -19,6 +20,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 
 
 public class Seed extends Item {
@@ -57,12 +59,16 @@ public class Seed extends Item {
 				BlockPos pos = new BlockPos(entityItem);
 				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
-					ItemStack seedStack = CompatHelper.getEntityItem(entityItem);
-					int count = CompatHelper.getStackCount(seedStack);
-					while(count-- > 0) {
-						if( getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat()){
-							if(getSpecies(seedStack).plantSapling(world, pos)) {
-								break;
+					ItemStack seedStack = CompatHelper.getEntityItem(entityItem);			
+					SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, species, pos);
+					MinecraftForge.EVENT_BUS.post(seedVolEvent);
+					if(!seedVolEvent.isCanceled()) {
+						int count = CompatHelper.getStackCount(seedStack);
+						while(count-- > 0) {
+							if( seedVolEvent.doForcePlant() || (getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat())){
+								if(getSpecies(seedStack).plantSapling(world, pos)) {
+									break;
+								}
 							}
 						}
 					}
