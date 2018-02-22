@@ -92,11 +92,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		return getTree(blockAccess.getBlockState(pos));
-	}
-	
-	public DynamicTree getTree(IBlockState blockState) {
+	public DynamicTree getTree(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return getProperties(blockState).getTree();
 	}
 	
@@ -612,7 +608,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
-		return radius == 1 && branch.getTree() == getTree(blockState) ? BlockBranch.setSupport(0, 1) : 0;
+		return radius == 1 && branch.getTree() == getTree(blockState, blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
 	}
 	
 	@Override

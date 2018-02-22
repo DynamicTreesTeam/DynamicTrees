@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,9 +16,10 @@ public class SubstanceDisease implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
+		IBlockState rootyState = world.getBlockState(rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
-			Species species = dirt.getSpecies(world, rootPos);
+			Species species = dirt.getSpecies(rootyState, world, rootPos);
 			if(species != Species.NULLSPECIES) {
 				if(world.isRemote) {
 					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.CRIT, 8);

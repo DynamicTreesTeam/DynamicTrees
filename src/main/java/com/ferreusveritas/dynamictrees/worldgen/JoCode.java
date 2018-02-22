@@ -136,7 +136,7 @@ public class JoCode {
 		generateFork(world, species, 0, rootPos, false);
 
 		//Fix branch thicknesses and map out leaf locations
-		BlockBranch branch = TreeHelper.getBranch(world, treePos);
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(treePos));
 		if(branch != null) {//If a branch exists then the growth was successful
 			ILeavesProperties leavesProperties = species.getLeavesProperties();
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
@@ -276,7 +276,7 @@ public class JoCode {
 	protected boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
 
 		for(EnumFacing dir: EnumFacing.VALUES) {
-			if(dir != except && TreeHelper.getBranch(world, pos.offset(dir)) != null) {
+			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.offset(dir))) != null) {
 				return false;
 			}
 		}
@@ -290,7 +290,7 @@ public class JoCode {
 	* @return JoCode for chaining
 	*/
 	public JoCode buildFromTree(World world, BlockPos pos, EnumFacing facing) {
-		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos.up()));
 		if(branch != null) {
 			NodeCoder coder = new NodeCoder();
 			branch.analyse(world, pos, EnumFacing.DOWN, new MapSignal(coder));

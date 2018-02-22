@@ -67,9 +67,10 @@ public class TreeHelper {
 	 * @param rootPos
 	 */
 	public static void growPulse(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
+		IBlockState rootyState = world.getBlockState(rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
-			dirt.updateTree(world, rootPos, world.rand, true);
+			dirt.updateTree(rootyState, world, rootPos, world.rand, true);
 			ageVolume(world, rootPos, 1);
 		}
 	}
@@ -121,7 +122,7 @@ public class TreeHelper {
 	}
 
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {
 			dirt.startAnalysis(world, rootPos, signal);
 			return true;
@@ -141,10 +142,6 @@ public class TreeHelper {
 	
 	public final static ITreePart getTreePart(Block block) {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
-	}
-	
-	public final static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(blockAccess.getBlockState(pos));
 	}
 	
 	public final static ITreePart getTreePart(IBlockState blockState) {
@@ -174,10 +171,6 @@ public class TreeHelper {
 		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
 	}
 	
-	public final static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(blockAccess.getBlockState(pos));
-	}
-	
 	public final static BlockBranch getBranch(IBlockState state) {
 		return getBranch(state.getBlock());
 	}
@@ -204,10 +197,6 @@ public class TreeHelper {
 		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
-	public final static BlockDynamicLeaves getLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return getLeaves(blockAccess.getBlockState(pos));
-	}
-	
 	public final static BlockDynamicLeaves getLeaves(IBlockState state) {
 		return getLeaves(state.getBlock());
 	}
@@ -230,8 +219,8 @@ public class TreeHelper {
 		return isRooty(block) ? (BlockRooty)block : null;
 	}
 	
-	public final static BlockRooty getRooty(IBlockAccess blockAccess, BlockPos pos) {
-		return getRooty(blockAccess.getBlockState(pos).getBlock());
+	public final static BlockRooty getRooty(IBlockState blockState) {
+		return getRooty(blockState.getBlock());
 	}
 	
 }

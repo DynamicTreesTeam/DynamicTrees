@@ -131,7 +131,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	///////////////////////////////////////////
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
-		updateTree(world, pos, random, false);
+		updateTree(state, world, pos, random, false);
 	}
 	
 	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos rootPos) {
@@ -145,20 +145,20 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	 * @param random
 	 * @return false if tree was not found
 	 */
-	public boolean updateTree(World world, BlockPos rootPos, Random random, boolean rapid) {
+	public boolean updateTree(IBlockState rootyState, World world, BlockPos rootPos, Random random, boolean rapid) {
 		
 		if(CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 			
 			boolean viable = false;
 			
-			Species species = getSpecies(world, rootPos);
+			Species species = getSpecies(rootyState, world, rootPos);
 			
 			if(species != Species.NULLSPECIES) {
 				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
-				ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
+				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
 				
 				if(treeBase != TreeHelper.nullTreePart) {
-					viable = species.update(world, this, rootPos, getSoilLife(world, rootPos), treeBase, treePos, random, rapid);
+					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, rapid);
 				}
 			}
 			
@@ -210,17 +210,17 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
 	@Override
 	public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
-		return getSoilLife(world, pos);
+		return getSoilLife(blockState, world, pos);
 	}
 	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		return getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
+		return getTree(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	public void destroyTree(World world, BlockPos pos) {
-		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos.up()));
 		if(branch != null) {
 			branch.destroyEntireTree(world, pos.up());
 		}
@@ -236,12 +236,12 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		destroyTree(world, pos);
 	}
 	
-	public int getSoilLife(IBlockAccess blockAccess, BlockPos pos) {
-		return blockAccess.getBlockState(pos).getValue(LIFE);
+	public int getSoilLife(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return blockState.getValue(LIFE);
 	}
 	
 	public void setSoilLife(World world, BlockPos rootPos, int life) {
-		Species species = getSpecies(world, rootPos);
+		Species species = getSpecies(world.getBlockState(rootPos), world, rootPos);
 		world.setBlockState(rootPos, getDefaultState().withProperty(LIFE, MathHelper.clamp(life, 0, 15)), 3);
 		world.notifyNeighborsOfStateChange(rootPos, this, false);//Notify all neighbors of NSEWUD neighbors(for comparator)
 		setSpecies(world, rootPos, species);
@@ -249,7 +249,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	public boolean fertilize(World world, BlockPos pos, int amount) {
-		int soilLife = getSoilLife(world, pos);
+		int soilLife = getSoilLife(world.getBlockState(pos), world, pos);
 		if((soilLife == 0 && amount < 0) || (soilLife == 15 && amount > 0)) {
 			return false;//Already maxed out
 		}
@@ -286,7 +286,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		EnumFacing dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
 		
-		TreeHelper.getTreePart(world, treePos).analyse(world, treePos, null, signal);
+		TreeHelper.getTreePart(world.getBlockState(treePos)).analyse(world, treePos, null, signal);
 		
 		return signal;
 	}
@@ -307,9 +307,10 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		BlockPos treePos = pos.offset(getTrunkDirection(blockAccess, pos));
-		return TreeHelper.isBranch(blockAccess, treePos) ? TreeHelper.getBranch(blockAccess, treePos).getTree(blockAccess, treePos) : DynamicTree.NULLTREE;
+	public DynamicTree getTree(IBlockState rootyState, IBlockAccess blockAccess, BlockPos rootPos) {
+		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
+		IBlockState treeState = blockAccess.getBlockState(treePos);
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getTree(treeState, blockAccess, treePos) : DynamicTree.NULLTREE;
 	}
 
 	private TileEntitySpecies getTileEntitySpecies(World world, BlockPos pos) {
@@ -324,9 +325,9 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be. In this
 	 * version we'll use a stored value to determine the species.
 	 */
-	public Species getSpecies(World world, BlockPos rootPos) {
+	public Species getSpecies(IBlockState blockState, World world, BlockPos rootPos) {
 
-		DynamicTree tree = getTree(world, rootPos);
+		DynamicTree tree = getTree(blockState, world, rootPos);
 		
 		if(hasTileEntity) {
 			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);

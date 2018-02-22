@@ -199,9 +199,10 @@ public class BlockBranchCactus extends BlockBranch {
 			signal.doTurn(targetDir);
 			
 			BlockPos deltaPos = pos.offset(targetDir);
+			IBlockState deltaState = world.getBlockState(deltaPos);
 			
 			// Pass grow signal to next block in path
-			ITreePart treepart = TreeHelper.getTreePart(world, deltaPos);
+			ITreePart treepart = TreeHelper.getTreePart(deltaState);
 			
 			if (treepart == this) {
 				signal = treepart.growSignal(world, deltaPos, signal); // Recurse
@@ -307,12 +308,12 @@ public class BlockBranchCactus extends BlockBranch {
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
-					IBlockState adjState = world.getBlockState(deltaPos);
+					IBlockState deltaState = world.getBlockState(deltaPos);
 					
-					if (adjState.getBlock() == this && adjState.getValue(ORIGIN) == dir.getOpposite()) {
-						signal = ((ITreePart) adjState.getBlock()).analyse(world, deltaPos, dir.getOpposite(), signal);
+					if (deltaState.getBlock() == this && deltaState.getValue(ORIGIN) == dir.getOpposite()) {
+						signal = ((ITreePart) deltaState.getBlock()).analyse(world, deltaPos, dir.getOpposite(), signal);
 					} else if (state.getBlock() == this && state.getValue(ORIGIN) == dir) {
-						signal = TreeHelper.getTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
+						signal = TreeHelper.getTreePart(deltaState).analyse(world, deltaPos, dir.getOpposite(), signal);
 					}
 					
 					// This should only be true for the originating block when the root node is found

@@ -67,7 +67,7 @@ public class Staff extends Item {
 			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
-				treePart = TreeHelper.getTreePart(world, rootPos);
+				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
 			}
 		}
 

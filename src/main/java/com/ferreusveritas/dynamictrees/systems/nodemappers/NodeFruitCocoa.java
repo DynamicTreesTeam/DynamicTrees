@@ -31,7 +31,7 @@ public class NodeFruitCocoa implements INodeInspector {
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {
-				BlockBranch branch = TreeHelper.getBranch(world, pos);
+				BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
 				if(branch != null && branch.getRadius(world.getBlockState(pos), world, pos) == 8) {
 					int side = (hashCode % 4) + 2;
 					EnumFacing dir = EnumFacing.getFront(side);

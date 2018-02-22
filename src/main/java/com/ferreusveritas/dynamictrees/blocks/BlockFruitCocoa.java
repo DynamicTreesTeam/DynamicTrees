@@ -25,7 +25,7 @@ public class BlockFruitCocoa extends BlockCocoa {
 	@Override
 	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {		
 		pos = pos.offset(state.getValue(FACING));
-		BlockBranch branch = TreeHelper.getBranch(world, pos);
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
 		return branch != null && branch.getRadius(state, world, pos) == 8 && branch.getTree().canSupportCocoa;
 	}
 

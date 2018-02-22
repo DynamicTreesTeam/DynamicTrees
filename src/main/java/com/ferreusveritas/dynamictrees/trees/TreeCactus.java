@@ -194,7 +194,7 @@ public class TreeCactus extends DynamicTree {
 			generateFork(world, species, 0, rootPos, false);
 
 			// Fix branch thicknesses and map out leaf locations
-			BlockBranch branch = TreeHelper.getBranch(world, treePos);
+			BlockBranch branch = TreeHelper.getBranch(world.getBlockState(treePos));
 			if(branch != null) {//If a branch exists then the growth was successful
 				NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
 				MapSignal signal = new MapSignal(endFinder);

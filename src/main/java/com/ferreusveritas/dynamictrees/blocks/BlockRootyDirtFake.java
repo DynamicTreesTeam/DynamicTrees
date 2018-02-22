@@ -95,7 +95,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
+	public DynamicTree getTree(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return DynamicTree.NULLTREE;
 	}
 

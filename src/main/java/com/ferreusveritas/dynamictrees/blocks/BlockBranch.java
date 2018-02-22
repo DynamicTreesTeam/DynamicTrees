@@ -152,7 +152,7 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 	}
 	
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
+	public DynamicTree getTree(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
 		return getTree();
 	}
 	
@@ -246,7 +246,7 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		return TreeHelper.getTreePart(world, pos).getTree(world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
+		return TreeHelper.getTreePart(state).getTree(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	@Override
@@ -479,7 +479,8 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
 					
-					signal = TreeHelper.getTreePart(world, deltaPos).analyse(world, deltaPos, dir.getOpposite(), signal);
+					IBlockState deltaState = world.getBlockState(deltaPos);
+					signal = TreeHelper.getTreePart(deltaState).analyse(world, deltaPos, dir.getOpposite(), signal);
 					
 					// This should only be true for the originating block when the root node is found
 					if (signal.found && signal.localRootDir == null && fromDir == null) {
@@ -500,8 +501,9 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 	public Species getSpeciesFromSignal(World world, MapSignal signal) {
 		Species species;
 		if(signal.found) {
-			BlockRooty rootyDirt = (BlockRooty) world.getBlockState(signal.root).getBlock();
-			species = rootyDirt.getSpecies(world, signal.root);
+			IBlockState rootyState = world.getBlockState(signal.root);
+			BlockRooty rootyDirt = (BlockRooty) rootyState.getBlock();
+			species = rootyDirt.getSpecies(rootyState, world, signal.root);
 		} else {
 			species = getTree().getCommonSpecies();
 		}

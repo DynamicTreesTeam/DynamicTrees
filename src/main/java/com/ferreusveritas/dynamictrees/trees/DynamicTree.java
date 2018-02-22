@@ -297,13 +297,14 @@ public class DynamicTree {
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
 		BlockPos rootPos = findRootNode(world, pos);
-		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(world, rootPos).getSpecies(world, rootPos) : Species.NULLSPECIES;
+		IBlockState rootyState = world.getBlockState(rootPos);
+		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos) : Species.NULLSPECIES;
 	}
 	
 	
 	public static BlockPos findRootNode(World world, BlockPos pos) {
 		
-		ITreePart treePart = TreeHelper.getTreePart(world, pos);
+		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
 		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
@@ -331,7 +332,7 @@ public class DynamicTree {
 	
 	public boolean isCompatibleDynamicLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		BlockDynamicLeaves leaves = TreeHelper.getLeaves(blockState);
-		return (leaves != null) && this == leaves.getTree(blockState);
+		return (leaves != null) && this == leaves.getTree(blockState, blockAccess, pos);
 	}
 	
 	public interface IConnectable {

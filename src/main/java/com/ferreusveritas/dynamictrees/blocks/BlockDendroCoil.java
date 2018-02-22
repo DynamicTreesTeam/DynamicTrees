@@ -91,7 +91,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public String getSpecies(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			return DynamicTree.getExactSpecies(world, pos.up()).toString();
 		}
@@ -105,29 +105,30 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public void growPulse(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			TreeHelper.growPulse(world, pos.up());
 		}
 	}
 	
 	public void killTree(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			((BlockRooty)part).destroyTree(world, pos.up());
 		}
 	}
 
 	public int getSoilLife(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
-		if(part.isRootNode()) {
-			return ((BlockRooty)part).getSoilLife(world, pos.up());
+		IBlockState rootyState = world.getBlockState(pos.up());
+		BlockRooty rooty = TreeHelper.getRooty(rootyState);
+		if(rooty != null) {
+			return rooty.getSoilLife(rootyState, world, pos.up());
 		}
 		return 0;
 	}
 
 	public void setSoilLife(World world, BlockPos pos, int life) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			((BlockRooty)part).setSoilLife(world, pos.up(), life);
 		}

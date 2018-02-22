@@ -84,7 +84,7 @@ public interface ITreePart {
 	* @param pos Position
 	* @return DynamicTree
 	*/
-	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
+	DynamicTree getTree(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
 	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
