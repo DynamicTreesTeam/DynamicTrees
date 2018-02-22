@@ -164,7 +164,7 @@ public class TreeHelper {
 	}
 	
 	public final static BlockBranch getBranch(ITreePart treepart) {
-		return getBranch((Block)treepart);
+		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
 	}
 	
 	public final static BlockBranch getBranch(IBlockState state) {
@@ -186,7 +186,7 @@ public class TreeHelper {
 	}
 	
 	public final static BlockDynamicLeaves getLeaves(ITreePart treepart) {
-		return getLeaves((Block)treepart);
+		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
 	public final static BlockDynamicLeaves getLeaves(IBlockState state) {
@@ -208,7 +208,7 @@ public class TreeHelper {
 	}
 	
 	public final static BlockRooty getRooty(ITreePart treepart) {
-		return getRooty((Block)treepart);
+		return treepart instanceof BlockRooty ? (BlockRooty)treepart : null;
 	}
 	
 	public final static BlockRooty getRooty(IBlockState blockState) {
