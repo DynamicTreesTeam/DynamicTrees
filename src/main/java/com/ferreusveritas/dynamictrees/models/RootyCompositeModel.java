@@ -3,7 +3,8 @@ package com.ferreusveritas.dynamictrees.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.MimicProperty;
+import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -26,22 +27,21 @@ public class RootyCompositeModel implements IBakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-		IBlockState mimicState;
+		List<BakedQuad> quads = new ArrayList<BakedQuad>();
 		
-		if (state != null && state.getBlock() instanceof BlockRooty && state instanceof IExtendedBlockState) {
-			mimicState = ((IExtendedBlockState) state).getValue(BlockRooty.MIMIC);
-		} else {
-			return new ArrayList<BakedQuad>();
+		if (state != null && state.getBlock() instanceof IMimic && state instanceof IExtendedBlockState) {
+			IExtendedBlockState extendedState = ((IExtendedBlockState) state);
+			IBlockState mimicState = extendedState.getValue(MimicProperty.MIMIC);
+
+			Minecraft mc = Minecraft.getMinecraft();
+			BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
+			BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
+			IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
+
+			quads.addAll(mimicModel.getQuads(mimicState, side, rand));
+			quads.addAll(rootsModel.getQuads(state, side, rand));
 		}
-			
-		Minecraft mc = Minecraft.getMinecraft();
-    	BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
-    	BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
-    	IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
-    	
-    	List<BakedQuad> quads = new ArrayList<BakedQuad>();
-    	quads.addAll(mimicModel.getQuads(mimicState, side, rand));
-    	quads.addAll(rootsModel.getQuads(state, side, rand));
+		
     	return quads;
 	}
 

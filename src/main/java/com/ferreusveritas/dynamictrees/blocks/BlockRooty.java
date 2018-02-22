@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
@@ -52,14 +53,13 @@ import net.minecraftforge.common.property.IUnlistedProperty;
  * @author ferreusveritas
  *
  */
-public abstract class BlockRooty extends Block implements ITreePart, ITileEntityProvider {
+public abstract class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic {
 	
-	public static final MimicProperty MIMIC = new MimicProperty("mimic");
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	
 	public BlockRooty(String name, Material material, boolean isTileEntity) {
 		super(material);
-        this.hasTileEntity = isTileEntity;
+		this.hasTileEntity = isTileEntity;
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15));
 		setTickRandomly(true);
@@ -71,47 +71,42 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	// TILE ENTITY
 	///////////////////////////////////////////
 	
-    /** Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated */
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        super.breakBlock(worldIn, pos, state);
-        if(hasTileEntity(state)) {
-        	worldIn.removeTileEntity(pos);
-        }
-    }
+	/** Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated */
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+		if(hasTileEntity(state)) {
+			worldIn.removeTileEntity(pos);
+		}
+	}
 	
-    @Override
-    public boolean hasTileEntity(IBlockState state) {
-    	return hasTileEntity;
-    }
-    
-	/*@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return isBlockContainer ? new TileEntitySpecies() : null;
-	}*/
+	@Override
+	public boolean hasTileEntity(IBlockState state) {
+		return hasTileEntity;
+	}
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return hasTileEntity ? new TileEntitySpecies() : null;
 	}
 	
-    /**
-     * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
-     * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
-     * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
-     */
+	/**
+	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
+	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
+	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
+	 */
 	@Override
 	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
-    }
-    
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	}
+	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(this, new IProperty[]{LIFE}, new IUnlistedProperty[] {MIMIC});
+		return new ExtendedBlockState(this, new IProperty[]{LIFE}, new IUnlistedProperty[] {MimicProperty.MIMIC});
 	}
 	
 	/**
@@ -153,11 +148,11 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public boolean updateTree(World world, BlockPos rootPos, Random random, boolean rapid) {
 		
 		if(CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
-
+			
 			boolean viable = false;
 			
 			Species species = getSpecies(world, rootPos);
-
+			
 			if(species != Species.NULLSPECIES) {
 				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 				ITreePart treeBase = TreeHelper.getTreePart(world, treePos);
@@ -170,9 +165,9 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 			if(!viable) {
 				world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
 			}
-
+			
 		}
-
+		
 		return true;
 	}
 	
@@ -372,42 +367,13 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
-		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(MIMIC, getMimic(access, pos)) : state;
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(MimicProperty.MIMIC, getMimic(access, pos)) : state;
 	}
 	
+	@Override
 	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
 		IBlockState mimic = Blocks.DIRT.getDefaultState(); //Default to dirt
 		return mimic;
-	}
-	
-	public static class MimicProperty implements IUnlistedProperty<IBlockState> {
-		
-		private final String name;
-		
-		public MimicProperty(String name) {
-			this.name = name;
-		}
-		
-		@Override
-		public String getName() {
-			return this.name;
-		}
-
-		@Override
-		public boolean isValid(IBlockState value) {
-			return value != null;
-		}
-
-		@Override
-		public Class<IBlockState> getType() {
-			return IBlockState.class;
-		}
-
-		@Override
-		public String valueToString(IBlockState value) {
-			return value.toString();
-		}
-		
 	}
 	
 }

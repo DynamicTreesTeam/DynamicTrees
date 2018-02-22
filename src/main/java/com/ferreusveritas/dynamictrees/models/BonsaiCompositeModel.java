@@ -74,7 +74,7 @@ public class BonsaiCompositeModel implements IBakedModel {
 
 	@Override
 	public boolean isAmbientOcclusion() {
-		return true;
+		return basePotModel.isAmbientOcclusion();
 	}
 
 	@Override

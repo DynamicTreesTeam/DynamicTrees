@@ -17,7 +17,7 @@ public class ModelBakeEventListener {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
-		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand};
+		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake};
 
 		for(Block block: rootyBlocks) {
 			Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));

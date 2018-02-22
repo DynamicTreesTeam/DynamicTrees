@@ -313,7 +313,7 @@ public class DynamicTree {
 				}
 				break;
 			case ROOT:
-				return pos;
+				return treePart.isRootNode() ? pos : BlockPos.ORIGIN;
 			default:
 				return BlockPos.ORIGIN;
 		}

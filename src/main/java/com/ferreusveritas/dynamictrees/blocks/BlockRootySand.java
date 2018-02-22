@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,19 +32,7 @@ public class BlockRootySand extends BlockRooty {
 	
 	@Override
 	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
-		final int dMap[] = {0, -1, 1};
-		
-		IBlockState mimic = Blocks.SAND.getDefaultState(); // Default to sand
-		
-		for (int depth : dMap) {
-			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
-				IBlockState ground = access.getBlockState(pos.offset(dir).down(depth));
-				if (ground.getMaterial() == Material.SAND) {
-					return ground; // Anything made of sand will do fine 
-				}
-			}
-		}
-		return mimic;
+		return MimicProperty.getSandMimic(access, pos);
 	}
 	
 	

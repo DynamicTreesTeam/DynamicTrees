@@ -7,9 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -37,32 +35,7 @@ public class BlockRootyDirt extends BlockRooty {
 	
 	@Override
 	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
-		final int dMap[] = {0, -1, 1};//Y-Axis depth map
-		
-		IBlockState mimic = Blocks.DIRT.getDefaultState();//Default to dirt in case no dirt or grass is found
-		IBlockState cache[] = new IBlockState[12];//A cache so we don't need to pull the blocks from the world twice
-		int i = 0;
-		
-		//Prioritize Grass by searching for grass first
-		for (int depth : dMap) {
-			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
-				IBlockState ground = cache[i++] = access.getBlockState(pos.offset(dir).down(depth));
-				if (ground.getMaterial() == Material.GRASS) {
-					return ground; 
-				}
-			}
-		}
-
-		//Settle for other kinds of dirt
-		for (i = 0; i < 12; i++) {
-			IBlockState ground = cache[i];
-			if(ground != mimic && ground.getMaterial() == Material.GROUND){
-				return ground;
-			}
-		}
-		
-		//If all else fails then just return plain ol' dirt
-		return mimic;
+		return MimicProperty.getDirtMimic(access, pos);
 	}
 	
 	///////////////////////////////////////////

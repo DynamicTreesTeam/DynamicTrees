@@ -129,7 +129,7 @@ public class ClientProxy extends CommonProxy {
 				}
 			}
 		},
-		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand});
+		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake});
 		
 		//Register Sapling Colorizers
 		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);

@@ -5,7 +5,6 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty.MimicProperty;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;

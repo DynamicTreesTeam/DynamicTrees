@@ -60,7 +60,7 @@ public class NullTreePart implements ITreePart {
 
 	@Override
 	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		return null;
+		return DynamicTree.NULLTREE;
 	}
 
 	public final TreePartType getTreePartType() {
