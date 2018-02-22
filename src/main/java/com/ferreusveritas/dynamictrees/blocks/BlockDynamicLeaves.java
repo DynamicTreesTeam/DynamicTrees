@@ -122,7 +122,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		//Check hydration level.  Dry leaves are dead leaves.
 		int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
-		if(newHydro == 0 || (!rapid && !hasAdequateLight(world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
+		if(newHydro == 0 || (!rapid && !hasAdequateLight(state, world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			world.setBlockToAir(pos);//No water, no light .. no leaves
 			return true;//Leaves were destroyed
 		} else { 
@@ -324,13 +324,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 		
-		return world.isAirBlock(pos) && hasAdequateLight(world, leavesProperties, pos);
+		return world.isAirBlock(pos) && hasAdequateLight(blockState, world, leavesProperties, pos);
 	}
 	
 
 	
 	/** Check to make sure the leaves have enough light to exist */
-	public boolean hasAdequateLight(World world, ILeavesProperties leavesProperties, BlockPos pos) {
+	public boolean hasAdequateLight(IBlockState blockState, World world, ILeavesProperties leavesProperties, BlockPos pos) {
 		
 		//If clear sky is above the block then we needn't go any further
 		if(world.canBlockSeeSky(pos)) {
@@ -357,7 +357,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		//If there's already leaves here then don't kill them if it's a little dark
 		//If it's empty space then don't create leaves unless it's sufficiently bright
 		//The range allows for adaptation to the hysteretic effect that could cause blocks to rapidly appear and disappear 
-		if(world.getLightFor(EnumSkyBlock.SKY, pos) >= (TreeHelper.isLeaves(world, pos) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement())) {
+		if(world.getLightFor(EnumSkyBlock.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement())) {
 			return true;
 		}
 		
@@ -445,7 +445,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(!dir.equals(originDir)) {
-				if(TreeHelper.isBranch(world, pos.offset(dir))) {
+				if(TreeHelper.isBranch(world.getBlockState(pos.offset(dir)))) {
 					signal.success = false;
 					return signal;
 				}
@@ -529,7 +529,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 					}
 				}
 				
-				return DynamicTree.getExactSpecies(world, closest);
+				return DynamicTree.getExactSpecies(world.getBlockState(closest), world, closest);
 			}
 		}
 		

@@ -643,8 +643,9 @@ public class BlockBranch extends Block implements ITreePart, IBranch, IBurningLi
 		if(oldState.getBlock() == this) {
 			for(EnumFacing dir: EnumFacing.VALUES) {
 				BlockPos neighPos = burnedPos.offset(dir);
-				if(TreeHelper.isBranch(world, neighPos)) {
-					BlockPos rootPos = DynamicTree.findRootNode(world, neighPos);
+				IBlockState neighState = world.getBlockState(neighPos);
+				if(TreeHelper.isBranch(neighState)) {
+					BlockPos rootPos = DynamicTree.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
 						analyse(world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
 					}

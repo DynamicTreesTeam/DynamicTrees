@@ -120,7 +120,7 @@ public class TreeHelper {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
 		}
 	}
-
+	
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
 		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {
@@ -155,10 +155,6 @@ public class TreeHelper {
 		return block instanceof BlockBranch;//Oh shuddap you java purists.. this is minecraft!
 	}
 	
-	public final static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return isBranch(blockAccess.getBlockState(pos).getBlock());
-	}
-	
 	public final static boolean isBranch(IBlockState state) {
 		return isBranch(state.getBlock());
 	}
@@ -168,7 +164,7 @@ public class TreeHelper {
 	}
 	
 	public final static BlockBranch getBranch(ITreePart treepart) {
-		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
+		return getBranch((Block)treepart);
 	}
 	
 	public final static BlockBranch getBranch(IBlockState state) {
@@ -181,10 +177,6 @@ public class TreeHelper {
 		return block instanceof BlockDynamicLeaves;
 	}
 	
-	public final static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isLeaves(blockAccess.getBlockState(pos).getBlock());
-	}
-	
 	public final static boolean isLeaves(IBlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
@@ -194,29 +186,29 @@ public class TreeHelper {
 	}
 	
 	public final static BlockDynamicLeaves getLeaves(ITreePart treepart) {
-		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
+		return getLeaves((Block)treepart);
 	}
 	
 	public final static BlockDynamicLeaves getLeaves(IBlockState state) {
 		return getLeaves(state.getBlock());
 	}
 	
-	//Rooty Dirt
+	//Rooty
 	
 	public final static boolean isRooty(Block block) {
 		return block instanceof BlockRooty;
 	}
 	
-	public final static boolean isRooty(IBlockState soilBlockState) {
-		return isRooty(soilBlockState.getBlock());
-	}
-	
-	public final static boolean isRooty(IBlockAccess blockAccess, BlockPos pos) {
-		return isRooty(blockAccess.getBlockState(pos));
+	public final static boolean isRooty(IBlockState blockState) {
+		return isRooty(blockState.getBlock());
 	}
 	
 	public final static BlockRooty getRooty(Block block) {
 		return isRooty(block) ? (BlockRooty)block : null;
+	}
+	
+	public final static BlockRooty getRooty(ITreePart treepart) {
+		return getRooty((Block)treepart);
 	}
 	
 	public final static BlockRooty getRooty(IBlockState blockState) {

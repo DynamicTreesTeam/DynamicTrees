@@ -169,10 +169,10 @@ public class DynamicTree {
 	
 	public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
-		BlockPos rootPos = findRootNode(world, hitPos);
+		BlockPos rootPos = findRootNode(state, world, hitPos);
 		
 		if(rootPos != BlockPos.ORIGIN) {
-			getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+			getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 
 		return false;
@@ -295,16 +295,16 @@ public class DynamicTree {
 	 * @param pos
 	 * @return
 	 */
-	public static Species getExactSpecies(World world, BlockPos pos) {
-		BlockPos rootPos = findRootNode(world, pos);
+	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
+		BlockPos rootPos = findRootNode(blockState, world, pos);
 		IBlockState rootyState = world.getBlockState(rootPos);
 		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos) : Species.NULLSPECIES;
 	}
 	
 	
-	public static BlockPos findRootNode(World world, BlockPos pos) {
+	public static BlockPos findRootNode(IBlockState blockState, World world, BlockPos pos) {
 		
-		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
 		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:

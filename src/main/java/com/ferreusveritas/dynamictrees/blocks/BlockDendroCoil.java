@@ -62,7 +62,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
-		if(TreeHelper.isRooty(world, pos)) {
+		if(TreeHelper.isRooty(world.getBlockState(pos))) {
 			return new JoCode().buildFromTree(world, pos).toString();
 		}
 		
@@ -91,9 +91,10 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public String getSpecies(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
+		IBlockState rootyState = world.getBlockState(pos.up());
+		ITreePart part = TreeHelper.getTreePart(rootyState);
 		if(part.isRootNode()) {
-			return DynamicTree.getExactSpecies(world, pos.up()).toString();
+			return DynamicTree.getExactSpecies(rootyState, world, pos.up()).toString();
 		}
 		
 		return "";
