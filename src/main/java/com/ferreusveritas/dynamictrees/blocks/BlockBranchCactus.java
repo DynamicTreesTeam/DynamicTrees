@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +21,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -33,10 +35,21 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBranchCactus extends BlockBranch {
+	
+	public static final IUnlistedProperty CONNECTIONS[] = { 
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
+	};
 	
 	// The direction it grew from. Can't be up, since cacti can't grow down.
 	public static final PropertyEnum<EnumFacing> ORIGIN = PropertyEnum.<EnumFacing>create("origin", EnumFacing.class, new Predicate<EnumFacing>() {
@@ -49,17 +62,10 @@ public class BlockBranchCactus extends BlockBranch {
 	public static final PropertyBool TRUNK = PropertyBool.create("trunk");
 	
 	public BlockBranchCactus(String name) {
-		super(Material.CACTUS);
+		super(Material.CACTUS, name);
 		setSoundType(SoundType.CLOTH);
 		setHarvestLevel("axe", 0);
 		setDefaultState(this.blockState.getBaseState().withProperty(TRUNK, true).withProperty(ORIGIN, EnumFacing.DOWN));
-		setUnlocalizedName(name);
-		setRegistryName(name);
-	}
-	
-	@Override
-	public void cacheBranchStates() {
-		//Do nothing
 	}
 	
 	///////////////////////////////////////////
@@ -79,7 +85,7 @@ public class BlockBranchCactus extends BlockBranch {
 	public IBlockState getStateFromMeta(int meta) {
 		EnumFacing rootDir = EnumFacing.getFront((meta & 7) % 6);
 		boolean trunk = rootDir == EnumFacing.UP;
-			
+		
 		return this.getDefaultState().withProperty(ORIGIN, trunk ? EnumFacing.DOWN : rootDir).withProperty(TRUNK, trunk);
 	}
 	
@@ -110,6 +116,33 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	///////////////////////////////////////////
+	// TREE INFORMATION
+	///////////////////////////////////////////
+	
+	@Override
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+		return 0;// Cacti don't have leaves and don't rot
+	}
+	
+	///////////////////////////////////////////
+	// PHYSICAL PROPERTIES
+	///////////////////////////////////////////
+	
+	@Override
+	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
+		int radius = getRadius(blockState, world, pos);
+		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+	};
+	
+	///////////////////////////////////////////
+	// WORLD UPDATE
+	///////////////////////////////////////////
+	
+	public boolean checkForRot(World world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
+		return false;//Do nothing.  Cacti don't rot
+	}
+	
+	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
 	
@@ -133,16 +166,6 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
-		return true;
-	}
-	
-	@Override
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
@@ -157,23 +180,26 @@ public class BlockBranchCactus extends BlockBranch {
 		return CellNull.NULLCELL;
 	}
 	
-	@Override
 	public int getRawRadius(IBlockState blockState) {
 		return blockState.getValue(TRUNK) ? 5 : 4;
 	}
-    
+
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius) {
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return getRawRadius(blockState);
+	}
+	
+	@Override
+	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
 		// Do nothing
 	}
 	
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameWood(from) ? getRadius(blockState, blockAccess, pos) + 2 : 0;
+		return isSameTree(from) ? getRadius(blockState, blockAccess, pos) + 2 : 0;
 	}
     
-    @Override
     public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
     	EnumFacing originDir = signal.dir.getOpposite(); // Direction this signal originated from
     	boolean trunk = signal.isInTrunk();
@@ -280,8 +306,7 @@ public class BlockBranchCactus extends BlockBranch {
 		return 0;
 	}
 	
-	@Override
-	public int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
+	protected int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
 		BlockPos deltaPos = pos.offset(side);
 		IBlockState otherState = blockAccess.getBlockState(deltaPos);
 		IBlockState state = blockAccess.getBlockState(pos);

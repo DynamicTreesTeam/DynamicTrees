@@ -106,7 +106,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 
 	@Override
 	public TreePartType getTreePartType() {
-		return TreePartType.ROOT;
+		return TreePartType.OTHER;
 	}
 	
 	@Override

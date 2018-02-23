@@ -43,7 +43,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -147,32 +146,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 		
 		return false;//Leaves were not destroyed
-	}
-	
-	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		
-		EnumFacing dir = facing.getOpposite();
-		
-		BlockPos deltaPos = pos.offset(dir);
-		IBlockState blockState = world.getBlockState(deltaPos);
-		ITreePart treePart = TreeHelper.getTreePart(blockState);
-		
-		//If a branch is clicked on
-		BlockBranch branch = TreeHelper.getBranch(treePart);
-		if(branch != null) {
-			MapSignal signal = analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-			Species species = branch.getSpeciesFromSignal(world, signal);//Get the species from the root node
-			return species.getLeavesProperties().getDynamicLeavesState();
-		}
-		
-		//If dynamic leaves are clicked on
-		BlockDynamicLeaves leaves = TreeHelper.getLeaves(treePart);
-		if(leaves != null) {
-			return leaves.getProperties(blockState).getDynamicLeavesState();
-		}
-		
-		return getDefaultState();
 	}
 	
 	@Override
@@ -463,7 +436,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			signal.getSpecies().getTree().getDynamicBranch().setRadius(world, pos, (int) signal.getSpecies().getPrimaryThickness());
+			signal.getSpecies().getTree().getDynamicBranch().setRadius(world, pos, (int) signal.getSpecies().getPrimaryThickness(), null);
 			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
 		}
 		

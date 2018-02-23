@@ -49,4 +49,5 @@ public class MapSignal {
 	public ArrayList<INodeInspector> getInspectors() {
 		return nodeInspectors;
 	}
+	
 }

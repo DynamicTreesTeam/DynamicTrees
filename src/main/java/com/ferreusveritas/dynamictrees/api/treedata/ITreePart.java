@@ -101,10 +101,11 @@ public interface ITreePart {
 	int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 	
 	public enum TreePartType {
-		NULL,
-		ROOT,
-		BRANCH,
-		LEAVES
+		NULL,//Not an official tree part
+		ROOT,//Anything based off of BlockRooty
+		BRANCH,//Anything based off of BlockBranch
+		LEAVES,//Anything based off of BlockDynamicLeaves
+		OTHER//Anything else
 	}
 	
 	TreePartType getTreePartType();

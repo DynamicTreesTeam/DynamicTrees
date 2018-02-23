@@ -60,7 +60,7 @@ public class NodeInflator implements INodeInspector {
 					
 					IBlockState deltaBlockState = world.getBlockState(dPos);
 					ITreePart treepart = TreeHelper.getTreePart(deltaBlockState);
-					if(branch.isSameWood(treepart)) {
+					if(branch.isSameTree(treepart)) {
 						int branchRadius = treepart.getRadius(deltaBlockState, world, dPos);
 						areaAccum += branchRadius * branchRadius;
 					}
@@ -82,7 +82,7 @@ public class NodeInflator implements INodeInspector {
 					radius = secondaryThickness;
 				}
 				
-				branch.setRadius(world, pos, (int)Math.floor(radius));
+				branch.setRadius(world, pos, (int)Math.floor(radius), null);
 				leafMap.setVoxel(pos, (byte) 32);//32(bit 6) is code for a branch
 			}
 			

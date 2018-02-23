@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
@@ -115,7 +116,7 @@ public class DynamicTree {
 	public DynamicTree(ResourceLocation name) {
 		this.name = name;
 		
-		setDynamicBranch(new BlockBranch(name + "branch"));
+		setDynamicBranch(new BlockBranchBasic(name + "branch"));
 		
 		createSpecies();
 	}
@@ -314,7 +315,7 @@ public class DynamicTree {
 				}
 				break;
 			case ROOT:
-				return treePart.isRootNode() ? pos : BlockPos.ORIGIN;
+				return pos;
 			default:
 				return BlockPos.ORIGIN;
 		}
