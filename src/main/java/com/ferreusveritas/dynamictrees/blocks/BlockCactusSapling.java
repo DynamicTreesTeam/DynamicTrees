@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.SoundType;
@@ -24,7 +24,7 @@ public class BlockCactusSapling extends BlockDynamicSapling {
 		Species species = getSpecies(world, pos, state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			DynamicTree tree = species.getTree();
+			TreeFamily tree = species.getFamily();
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch
 				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath

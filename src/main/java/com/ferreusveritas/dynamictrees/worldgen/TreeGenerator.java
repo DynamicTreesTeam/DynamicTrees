@@ -32,7 +32,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
-	public TreeCodeStore codeStore;
+	public JoCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 	protected RandomXOR random;
 	

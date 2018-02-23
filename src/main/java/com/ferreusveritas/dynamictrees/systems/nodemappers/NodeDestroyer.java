@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
@@ -32,7 +32,7 @@ public class NodeDestroyer implements INodeInspector {
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 
-		if(branch != null && species.getTree() == branch.getTree()) {
+		if(branch != null && species.getFamily() == branch.getTree()) {
 			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
@@ -50,7 +50,7 @@ public class NodeDestroyer implements INodeInspector {
 	public void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
-			DynamicTree tree = species.getTree();
+			TreeFamily tree = species.getFamily();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
 					world.setBlockToAir(leavesPos);

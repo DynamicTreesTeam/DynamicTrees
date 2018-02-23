@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -59,8 +59,8 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-		return DynamicTree.NULLTREE;
+	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return TreeFamily.NULLFAMILY;
 	}
 
 	public final TreePartType getTreePartType() {

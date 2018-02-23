@@ -27,14 +27,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeJungle extends DynamicTree {
+public class TreeJungle extends TreeFamily {
 	
 	public class SpeciesJungle extends Species {
 
 		FeatureGenVine vineGen;
 		FeatureGenUndergrowth underGen;
 		
-		SpeciesJungle(DynamicTree treeFamily) {
+		SpeciesJungle(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
 
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing

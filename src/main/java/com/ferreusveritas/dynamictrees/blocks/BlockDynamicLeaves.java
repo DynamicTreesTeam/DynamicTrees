@@ -14,7 +14,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -91,7 +91,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public DynamicTree getTree(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return getProperties(blockState).getTree();
 	}
 	
@@ -436,7 +436,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			signal.getSpecies().getTree().getDynamicBranch().setRadius(world, pos, (int) signal.getSpecies().getPrimaryThickness(), null);
+			signal.getSpecies().getFamily().getDynamicBranch().setRadius(world, pos, (int) signal.getSpecies().getPrimaryThickness(), null);
 			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
 		}
 		
@@ -581,7 +581,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
-		return radius == 1 && branch.getTree() == getTree(blockState, blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
+		return radius == 1 && branch.getTree() == getFamily(blockState, blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
 	}
 	
 	@Override

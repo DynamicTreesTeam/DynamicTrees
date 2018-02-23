@@ -156,7 +156,7 @@ public class ModBlocks {
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
 

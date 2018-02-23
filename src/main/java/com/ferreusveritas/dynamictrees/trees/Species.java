@@ -41,7 +41,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -69,7 +69,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public final static Species NULLSPECIES = new Species() {
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
-		@Override public DynamicTree getTree() { return DynamicTree.NULLTREE; }
+		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
@@ -101,7 +101,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected final DynamicTree treeFamily;
+	protected final TreeFamily treeFamily;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -134,10 +134,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	protected TreeCodeStore joCodeStore = new TreeCodeStore(this);
+	protected JoCodeStore joCodeStore = new JoCodeStore(this);
 	
 	public Species() {
-		this.treeFamily = DynamicTree.NULLTREE;
+		this.treeFamily = TreeFamily.NULLFAMILY;
 		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
 	}
 	
@@ -146,9 +146,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param modid The MODID of the mod that is registering this species
 	 * @param name The simple name of the species e.g. "oak"
-	 * @param treeFamily The {@link DynamicTree} that this species belongs to.
+	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, DynamicTree treeFamily, ILeavesProperties leavesProperties) {
+	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
 		setLeavesProperties(leavesProperties);
@@ -160,7 +160,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		addDropCreator(new DropCreatorLogs());
 	}
 	
-	public DynamicTree getTree() {
+	public TreeFamily getFamily() {
 		return treeFamily;
 	}
 	
@@ -303,7 +303,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link DynamicTree} at
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link TreeFamily} at
 	 * random with no player interaction.
 	 * 
 	 * @param world
@@ -526,7 +526,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
@@ -558,9 +558,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * A little internal convenience function for getting branch endpoints
 	 * 
 	 * @param world The world
-	 * @param treePos The {@link BlockPos} of the base of the {@link DynamicTree} trunk
-	 * @param treeBase The tree part that is the base of the {@link DynamicTree} trunk.  Provided for easy analysis.
-	 * @return A list of all branch endpoints for the {@link DynamicTree}
+	 * @param treePos The {@link BlockPos} of the base of the {@link TreeFamily} trunk
+	 * @param treeBase The tree part that is the base of the {@link TreeFamily} trunk.  Provided for easy analysis.
+	 * @return A list of all branch endpoints for the {@link TreeFamily}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
 		NodeFindEnds endFinder = new NodeFindEnds();
@@ -573,10 +573,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link DynamicTree}
-	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link TreeFamily}
+	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
 	 * @param soilLife The soil life of the {@link BlockRooty}
-	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly.
+	 * @param rapid Whether or not this {@link TreeFamily} is to be process rapidly.
 	 * @return true if last piece of tree rotted away.
 	 */
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
@@ -648,7 +648,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
@@ -925,7 +925,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
-	public TreeCodeStore getJoCodeStore() {
+	public JoCodeStore getJoCodeStore() {
 		return joCodeStore;
 	}
 	
@@ -934,7 +934,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
+	 * A {@link JoCode} defines the block model of the {@link TreeFamily}
 	 */
 	public void addJoCodes() {
 		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");

@@ -37,7 +37,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 /**
  * This structure describes a Tree Family whose member Species all have a common wood type.
  * 
-* A {@link DynamicTree} is more or less just a definition of {@link BlockBranch} blocks.
+* A {@link TreeFamily} is more or less just a definition of {@link BlockBranch} blocks.
 * It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
 * the tree is made of and consequently what kind of log you get when you cut it down.
 * 
@@ -48,9 +48,9 @@ import net.minecraftforge.registries.IForgeRegistry;
 * 
 * @author ferreusveritas
 */
-public class DynamicTree {
+public class TreeFamily {
 	
-	public final static DynamicTree NULLTREE = new DynamicTree() {
+	public final static TreeFamily NULLFAMILY = new TreeFamily() {
 		@Override public void setCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
@@ -64,7 +64,7 @@ public class DynamicTree {
 	protected Species commonSpecies = Species.NULLSPECIES;
 	
 	//Branches
-	/** The dynamic branch used by this tree */
+	/** The dynamic branch used by this tree family */
 	private BlockBranch dynamicBranch;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
 	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
@@ -78,7 +78,7 @@ public class DynamicTree {
 	public boolean canSupportCocoa = false;
 	
 	/** Get your Cheeto fingers off! Only the DynamicTrees mod should use this and only for vanilla trees */
-	public DynamicTree(BlockPlanks.EnumType wood) {
+	public TreeFamily(BlockPlanks.EnumType wood) {
 		this(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
 		
 		//Setup tree references
@@ -90,7 +90,7 @@ public class DynamicTree {
 		getCommonSpecies().generateSeed();
 	}
 	
-	public DynamicTree() {
+	public TreeFamily() {
 		this.name = new ResourceLocation(ModConstants.MODID, "null");
 	}
 	
@@ -102,7 +102,7 @@ public class DynamicTree {
 	 * @param seq The registration sequence number for this MODID. Used for registering 4 leaves types per {@link BlockDynamicLeaves}.
 	 * Sequence numbers must be unique within each mod.  It's recommended to define the sequence consecutively and avoid later rearrangement. 
 	 */
-	public DynamicTree(ResourceLocation name) {
+	public TreeFamily(ResourceLocation name) {
 		this.name = name;
 		
 		setDynamicBranch(new BlockBranchBasic(name + "branch"));
@@ -217,7 +217,7 @@ public class DynamicTree {
 		return true;
 	}
 	
-	protected DynamicTree setDynamicBranch(BlockBranch gBranch) {
+	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setTree(this);//Link the branch back to the tree
 		
@@ -228,7 +228,7 @@ public class DynamicTree {
 		return dynamicBranch;
 	}
 	
-	protected DynamicTree setStick(ItemStack itemStack) {
+	protected TreeFamily setStick(ItemStack itemStack) {
 		stick = itemStack;
 		return this;
 	}
@@ -243,11 +243,11 @@ public class DynamicTree {
 		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
-	protected DynamicTree setPrimitiveLog(IBlockState primLog) {
+	protected TreeFamily setPrimitiveLog(IBlockState primLog) {
 		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock()), 1, primLog.getBlock().damageDropped(primLog)));
 	}
 	
-	protected DynamicTree setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
+	protected TreeFamily setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
 		primitiveLog = primLog;
 		primitiveLogItemStack = primLogStack;
 		return this;
@@ -277,7 +277,7 @@ public class DynamicTree {
 	
 	public boolean isCompatibleDynamicLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		BlockDynamicLeaves leaves = TreeHelper.getLeaves(blockState);
-		return (leaves != null) && this == leaves.getTree(blockState, blockAccess, pos);
+		return (leaves != null) && this == leaves.getFamily(blockState, blockAccess, pos);
 	}
 	
 	public interface IConnectable {

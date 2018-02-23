@@ -21,11 +21,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeDarkOak extends DynamicTree {
+public class TreeDarkOak extends TreeFamily {
 	
 	public class SpeciesDarkOak extends Species {
 
-		SpeciesDarkOak(DynamicTree treeFamily) {
+		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees

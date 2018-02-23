@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * A {@link DynamicTree} builder class to ease in the creation of new trees for other mods.
+ * A {@link TreeFamily} builder class to ease in the creation of new trees for other mods.
  * 
  * 
  * @author ferreusveritas
@@ -75,7 +75,7 @@ public class TreeBuilder {
 	 *  
 	 * Each {@link BlockDynamicLeaves} can handle 4 different trees by using metadata.  It's the mod authors
 	 * responsibility to assign and maintain an ordered set of numbers that each represent a tree.  The sequence
-	 * should start from 0 for each Mod and incremented for each {@link DynamicTree} that the mod creates.  Gaps in
+	 * should start from 0 for each Mod and incremented for each {@link TreeFamily} that the mod creates.  Gaps in
 	 * the numbered list are okay(if a tree is removed for instance), duplicates will result in undefined behavior.
 	 * DynamicTrees internally maintains a mapping of {@link BlockDynamicLeaves} for each mod.  This is done to
 	 * reduce the number of registered blocks.
@@ -173,7 +173,7 @@ public class TreeBuilder {
 	 * OPTIONAL
 	 * 
 	 * Sets the cellular automata kit to use for the {@link BlockDynamicLeaves} for this 
-	 * {@link DynamicTree}
+	 * {@link TreeFamily}
 	 * 
 	 * A CellKit contains all the algorithms and data to make a leaves grow a certain way.
 	 * 
@@ -241,13 +241,13 @@ public class TreeBuilder {
 	}
 	
 	/**
-	 * Builds a {@link DynamicTree} according to the specs provided. Called last in the builder chain.
+	 * Builds a {@link TreeFamily} according to the specs provided. Called last in the builder chain.
 	 * Repeated calls can be made but be sure to change the Name and Sequence for the tree before
 	 * creating multiple trees. 
 	 * 
-	 * @return The newly built {@link DynamicTree}
+	 * @return The newly built {@link TreeFamily}
 	 */
-	public DynamicTree build() {
+	public TreeFamily build() {
 	
 		if(name == null) {
 			System.err.println("Error: Attempted to build an nameless tree");
@@ -259,7 +259,7 @@ public class TreeBuilder {
 			return null;
 		}
 		
-		DynamicTree tree = new DynamicTree(name) {
+		TreeFamily treeFamily = new TreeFamily(name) {
 						
 			{
 				
@@ -324,11 +324,11 @@ public class TreeBuilder {
 			
 		};
 		
-		return tree;
+		return treeFamily;
 	}
 	
 	public interface ISpeciesCreator {
-		Species create(DynamicTree tree);
+		Species create(TreeFamily tree);
 	}
 	
 }

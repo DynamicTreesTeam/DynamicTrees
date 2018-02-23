@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumFacing;
@@ -44,7 +44,7 @@ public class CoordUtils {
 	 * Find a suitable position for seed drops or fruit placement using ray tracing.
 	 * 
 	 * @param world The world
-	 * @param treePos The block position of the {@link DynamicTree} trunk base.
+	 * @param treePos The block position of the {@link TreeFamily} trunk base.
 	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
 	 */
@@ -57,7 +57,7 @@ public class CoordUtils {
 			if(hitPos != BlockPos.ORIGIN) {
 				do { //Run straight down until we hit a block that's non compatible leaves.
 					hitPos = hitPos.down();
-				} while(species.getTree().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
+				} while(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
 				if(world.isAirBlock(hitPos)) {//If that block is air then we have a winner.
 					return hitPos;
 				}
@@ -96,7 +96,7 @@ public class CoordUtils {
 			if(result != null) {
 				BlockPos hitPos = result.getBlockPos();
 				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
-					if(species.getTree().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 						return result;
 					}
 				}

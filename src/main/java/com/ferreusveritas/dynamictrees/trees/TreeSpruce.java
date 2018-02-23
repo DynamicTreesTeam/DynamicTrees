@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeSpruce extends DynamicTree {
+public class TreeSpruce extends TreeFamily {
 	
 	public class SpeciesSpruce extends Species {
 
 		FeatureGenPodzol podzolGen;
 		
-		SpeciesSpruce(DynamicTree treeFamily) {
+		SpeciesSpruce(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.spruceLeavesProperties);
 			
 			//Spruce are conical thick slower growing trees

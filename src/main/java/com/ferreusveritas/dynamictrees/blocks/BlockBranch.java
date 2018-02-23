@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
-	private DynamicTree tree; //The tree this branch type creates
+	private TreeFamily tree; //The tree this branch type creates
 	
 	public BlockBranch(Material material, String name) {
 		super(material); //Trees are made of wood. Brilliant.
@@ -53,16 +53,16 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// TREE INFORMATION
 	///////////////////////////////////////////
 	
-	public void setTree(DynamicTree tree) {
+	public void setTree(TreeFamily tree) {
 		this.tree = tree;
 	}
 	
-	public DynamicTree getTree() {
+	public TreeFamily getTree() {
 		return tree;
 	}
 	
 	@Override
-	public DynamicTree getTree(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
+	public TreeFamily getFamily(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
 		return getTree();
 	}
 	
@@ -123,7 +123,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		return TreeHelper.getTreePart(state).getTree(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
+		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	

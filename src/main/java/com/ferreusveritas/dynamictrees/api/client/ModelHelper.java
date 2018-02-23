@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -29,7 +29,7 @@ public class ModelHelper {
 	 * 
 	 * @param tree
 	 */
-	public static void regModel(DynamicTree tree) {
+	public static void regModel(TreeFamily tree) {
 		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build());
 	}	
 	

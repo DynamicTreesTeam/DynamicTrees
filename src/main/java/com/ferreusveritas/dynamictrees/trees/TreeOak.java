@@ -33,11 +33,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class TreeOak extends DynamicTree {
+public class TreeOak extends TreeFamily {
 	
 	public class SpeciesOak extends Species {
 		
-		SpeciesOak(DynamicTree treeFamily) {
+		SpeciesOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			//Oak trees are about as average as you can get
@@ -83,7 +83,7 @@ public class TreeOak extends DynamicTree {
 		
 		FeatureGenVine vineGen;
 		
-		SpeciesSwampOak(DynamicTree treeFamily) {
+		SpeciesSwampOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
@@ -159,7 +159,7 @@ public class TreeOak extends DynamicTree {
 		FeatureGenFruit appleGen;
 		private static final String speciesName = "apple";
 		
-		public SpeciesAppleOak(DynamicTree treeFamily) {
+		public SpeciesAppleOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily, ModBlocks.oakLeavesProperties);
 			
 			//A bit stockier, smaller and slower than your basic oak

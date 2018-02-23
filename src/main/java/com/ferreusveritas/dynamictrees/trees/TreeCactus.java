@@ -34,11 +34,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class TreeCactus extends DynamicTree {
+public class TreeCactus extends TreeFamily {
 	
 	public class SpeciesCactus extends Species {
 		
-		public SpeciesCactus(DynamicTree treeFamily) {
+		public SpeciesCactus(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.cactusLeavesProperties);
 			
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
@@ -204,7 +204,7 @@ public class TreeCactus extends DynamicTree {
 		
 		@Override
 		public boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
-			IBlockState defaultBranchState = species.getTree().getDynamicBranch().getDefaultState();
+			IBlockState defaultBranchState = species.getFamily().getDynamicBranch().getDefaultState();
 			if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
 				boolean trunk = false;
 				if (dir == EnumFacing.UP) {

@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -48,7 +48,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
  *  You can't determine a species of a tree family by location alone (e.g. Swamp Oak by biome)
  * 	The species is rare and you don't want to commit all the resources necessary to make a whole tree family(e.g. Apple Oak)
  * 
- * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link DynamicTree} family.
+ * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link TreeFamily} family.
  * 
  * @author ferreusveritas
  *
@@ -216,7 +216,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack heldItem = player.getHeldItem(hand);
-		return getTree(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
+		return getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
 	public void destroyTree(World world, BlockPos pos) {
@@ -318,10 +318,10 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockState rootyState, IBlockAccess blockAccess, BlockPos rootPos) {
+	public TreeFamily getFamily(IBlockState rootyState, IBlockAccess blockAccess, BlockPos rootPos) {
 		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
 		IBlockState treeState = blockAccess.getBlockState(treePos);
-		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getTree(treeState, blockAccess, treePos) : DynamicTree.NULLTREE;
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULLFAMILY;
 	}
 
 	private TileEntitySpecies getTileEntitySpecies(World world, BlockPos pos) {
@@ -329,23 +329,21 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	/**
-	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be.  By default we'll just 
-	 * make it report whatever {@link DynamicTree} the above {@link BlockBranch} says it is.
-	 */
-	/**
-	 * Rooty Dirt can report whatever {@link DynamicTree} species it wants to be. In this
-	 * version we'll use a stored value to determine the species.
+	 * Rooty Dirt can report whatever {@link TreeFamily} species it wants to be.  
+	 * We'll use a stored value to determine the species for the {@link TileEntity} version.
+	 * Otherwise we'll just make it report whatever {@link DynamicTree} the above 
+	 * {@link BlockBranch} says it is.
 	 */
 	public Species getSpecies(IBlockState blockState, World world, BlockPos rootPos) {
 
-		DynamicTree tree = getTree(blockState, world, rootPos);
+		TreeFamily tree = getFamily(blockState, world, rootPos);
 		
 		if(hasTileEntity) {
 			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
 			
 			if(rootyDirtTE instanceof TileEntitySpecies) {
 				Species species = rootyDirtTE.getSpecies();
-				if(species.getTree() == tree) {//As a sanity check we should see if the tree and the stored species are a match
+				if(species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
 					return rootyDirtTE.getSpecies();
 				}
 			}		

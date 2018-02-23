@@ -19,11 +19,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeBirch extends DynamicTree {
+public class TreeBirch extends TreeFamily {
 		
 	public class SpeciesBirch extends Species {
 		
-		SpeciesBirch(DynamicTree treeFamily) {
+		SpeciesBirch(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.birchLeavesProperties);
 			
 			//Birch are tall, skinny, fast growing trees

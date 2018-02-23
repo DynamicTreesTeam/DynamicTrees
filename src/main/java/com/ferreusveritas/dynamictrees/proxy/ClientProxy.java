@@ -17,7 +17,7 @@ import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -84,7 +84,7 @@ public class ClientProxy extends CommonProxy {
 		//TREE PARTS
 		
 		//Register Meshers for Branches and Seeds
-		for(DynamicTree tree: ModTrees.baseTrees) {
+		for(TreeFamily tree: ModTrees.baseFamilies) {
 			ModelHelper.regModel(tree.getDynamicBranch());//Register Branch itemBlock
 			ModelHelper.regModel(tree.getCommonSpecies().getSeed());//Register Seed Item Models
 			ModelHelper.regModel(tree);//Register custom state mapper for branch

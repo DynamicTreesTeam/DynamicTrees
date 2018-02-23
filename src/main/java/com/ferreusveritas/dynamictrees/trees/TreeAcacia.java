@@ -9,11 +9,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeAcacia extends DynamicTree {
+public class TreeAcacia extends TreeFamily {
 		
 	public class SpeciesAcacia extends Species {
 
-		SpeciesAcacia(DynamicTree treeFamily) {
+		SpeciesAcacia(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.acaciaLeavesProperties);
 			
 			//Acacia Trees are short, very slowly growing trees

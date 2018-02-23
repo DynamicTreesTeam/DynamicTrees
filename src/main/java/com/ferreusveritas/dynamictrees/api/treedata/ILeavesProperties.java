@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -14,10 +14,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface ILeavesProperties {
 	
 	/** The type of tree these leaves connect to */
-	ILeavesProperties setTree(DynamicTree tree);
+	ILeavesProperties setTree(TreeFamily tree);
 	
 	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */
-	DynamicTree getTree();
+	TreeFamily getTree();
 	
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	IBlockState getPrimitiveLeaves();
