@@ -35,6 +35,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistry;
 
 /**
+ * This structure describes a Tree Family whose member Species all have a common wood type.
+ * 
 * A {@link DynamicTree} is more or less just a definition of {@link BlockBranch} blocks.
 * It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
 * the tree is made of and consequently what kind of log you get when you cut it down.
@@ -75,7 +77,7 @@ public class DynamicTree {
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 	
-	/** Get your Cheeto fingers off! Only dynamictrees mod should use this and only for vanilla trees */
+	/** Get your Cheeto fingers off! Only the DynamicTrees mod should use this and only for vanilla trees */
 	public DynamicTree(BlockPlanks.EnumType wood) {
 		this(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
 		
@@ -122,6 +124,10 @@ public class DynamicTree {
 		return commonSpecies;
 	}
 	
+	///////////////////////////////////////////
+	// SPECIES LOCATION OVERRIDES
+	///////////////////////////////////////////
+	
 	/**
 	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
 	 * For instance Oak may use this to select a Swamp Oak species if the coordinates 
@@ -167,9 +173,9 @@ public class DynamicTree {
 	}
 	
 	
-	//////////////////////////////
+	///////////////////////////////////////////
 	// REGISTRATION
-	//////////////////////////////
+	///////////////////////////////////////////
 	
 	/**
 	 * Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch} 
@@ -199,9 +205,9 @@ public class DynamicTree {
 	}
 	
 	
-	//////////////////////////////
+	///////////////////////////////////////////
 	// TREE PROPERTIES
-	//////////////////////////////
+	///////////////////////////////////////////
 	
 	public ResourceLocation getName() {
 		return name;
@@ -265,9 +271,9 @@ public class DynamicTree {
 	}
 
 	
-	//////////////////////////////
+	///////////////////////////////////////////
 	// LEAVES HANDLING
-	//////////////////////////////
+	///////////////////////////////////////////
 	
 	public boolean isCompatibleDynamicLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		BlockDynamicLeaves leaves = TreeHelper.getLeaves(blockState);
@@ -302,6 +308,7 @@ public class DynamicTree {
 	public boolean isCompatibleGenericLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
+	
 	
 	//////////////////////////////
 	// JAVA OBJECT STUFF
