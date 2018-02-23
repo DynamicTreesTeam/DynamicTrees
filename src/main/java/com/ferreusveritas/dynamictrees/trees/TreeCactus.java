@@ -15,7 +15,6 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -167,12 +166,6 @@ public class TreeCactus extends DynamicTree {
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
 		return super.getRegisterableBlocks(blockList);
-	}
-	
-	// This prevents a crash when recipes are generated to convert seeds to saplings and vice versa	
-	@Override
-	public ItemStack getPrimitiveSaplingItemStack() {
-		return CompatHelper.emptyStack();
 	}
 	
 	protected class JoCodeCactus extends JoCode {

@@ -32,7 +32,6 @@ public class TreeBuilder {
 	//Drops
 	private IBlockState primitiveLeavesBlockState = Blocks.LEAVES.getDefaultState();
 	private IBlockState primitiveLogBlockState = Blocks.LOG.getDefaultState();
-	private ItemStack primitiveSaplingItemStack;
 	private ItemStack stickItemStack;
 
 	//Leaves
@@ -131,21 +130,6 @@ public class TreeBuilder {
 	 */
 	public TreeBuilder setPrimitiveLog(IBlockState primLog) {
 		primitiveLogBlockState = primLog;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
-	 * This is simply a way to store a reference to a primitive sapling in the tree for
-	 * convenience.  Could be used for recipes or other logic like for a bonsai pot. 
-	 * 
-	 * @param primSapling
-	 * @param primSaplingStack
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setPrimitiveSapling(ItemStack primSaplingStack) {
-		primitiveSaplingItemStack = primSaplingStack;
 		return this;
 	}
 	
@@ -303,10 +287,6 @@ public class TreeBuilder {
 				this.setPrimitiveLog(primitiveLogBlockState);
 				
 				dynamicLeavesProperties.setTree(this);
-				
-				if(primitiveSaplingItemStack != null) {
-					setPrimitiveSapling(primitiveSaplingItemStack);
-				}
 				
 				if(stickItemStack != null) {
 					setStick(stickItemStack);

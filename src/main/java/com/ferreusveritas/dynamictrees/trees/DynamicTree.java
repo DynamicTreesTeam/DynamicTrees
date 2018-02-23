@@ -69,11 +69,7 @@ public class DynamicTree {
 	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
 	private ItemStack primitiveLogItemStack = CompatHelper.emptyStack();
-	
-	//Saplings
-	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
-	private ItemStack primitiveSaplingItemStack = CompatHelper.emptyStack();
-	
+
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
 	private ItemStack stick = new ItemStack(Items.STICK);
@@ -88,8 +84,6 @@ public class DynamicTree {
 		boolean isOld = wood.getMetadata() < 4;
 		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
 				
-		setPrimitiveSapling(new ItemStack(Blocks.SAPLING, 1, wood.getMetadata()));
-		
 		//Setup common species
 		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 		getCommonSpecies().generateSeed();
@@ -260,15 +254,6 @@ public class DynamicTree {
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
 		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
-	}
-	
-	protected DynamicTree setPrimitiveSapling(ItemStack primSaplingStack) {
-		primitiveSaplingItemStack = primSaplingStack;
-		return this;
-	}
-	
-	public ItemStack getPrimitiveSaplingItemStack() {
-		return primitiveSaplingItemStack;
 	}
 	
 	

@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees;
 
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
@@ -27,56 +29,55 @@ public class ModRecipes {
 		GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, "dirtbucket"), null, new ItemStack(ModItems.dirtBucket), 
 				new Ingredient[]{ Ingredient.fromItem(Items.BUCKET), Ingredient.fromItem(ItemBlock.getItemFromBlock(Blocks.DIRT))});
 		
-		for(DynamicTree tree: ModTrees.baseTrees) {
-
-			ItemStack saplingStack = tree.getPrimitiveSaplingItemStack();
-
-			if(!saplingStack.isEmpty()) {
-				
-				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
-				
-				//Create a seed from a sapling and dirt bucket
-				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(ModConstants.MODID, tree.getName().getResourcePath() + "seed"),
-					null,
-					seedStack,
-					new Ingredient[]{
-						Ingredient.fromStacks(saplingStack),
-						Ingredient.fromItem(ModItems.dirtBucket)
-					}
-				);
-
-				//Creates a vanilla sapling from a seed and dirt bucket
-				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(ModConstants.MODID, tree.getName().getResourcePath() + "sapling"),
-					null,
-					saplingStack,
-					new Ingredient[]{
-						Ingredient.fromStacks(seedStack),
-						Ingredient.fromItem(ModItems.dirtBucket)
-					}
-				);
-
-				//Register the seed in the ore dictionary as a sapling since we can convert for free anyway.
-				OreDictionary.registerOre("treeSapling", seedStack);
-			}
-
+		//Create a seed <-> sapling exchange for the 6 vanilla tree types
+		for(BlockPlanks.EnumType woodType: BlockPlanks.EnumType.values()) {
+			Species species = TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, woodType.getName().replace("_","")));
+			ItemStack saplingStack = new ItemStack(Blocks.SAPLING, 1, woodType.getMetadata());
+			ItemStack seedStack = species.getSeedStack(1);
+			createDirtBucketExchangeRecipes(saplingStack, seedStack, true);
 		}
 		
 		//Create an apple seed from an apple and dirt bucket
 		if(ModConfigs.enableAppleTrees) {
-			GameRegistry.addShapelessRecipe(
-				new ResourceLocation(ModConstants.MODID, "appleseed"),
-				null,
-				Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeedStack(1),
-				new Ingredient[]{
-						Ingredient.fromStacks(new ItemStack(Items.APPLE)),
-						Ingredient.fromItem(ModItems.dirtBucket)
-				}
-			);
+			createDirtBucketExchangeRecipes(new ItemStack(Items.APPLE), TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, "apple")).getSeedStack(1), false);
 		}
 		
 		DynamicTrees.compatProxy.registerRecipes(registry);
 	}
 	
+	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling) {
+		if(!saplingStack.isEmpty() && !seedStack.isEmpty() && seedStack.getItem() instanceof Seed) {
+			
+			Seed seed = (Seed) seedStack.getItem();
+			String speciesPath = seed.getSpecies(seedStack).getRegistryName().getResourcePath();
+			String speciesDomain = seed.getSpecies(seedStack).getRegistryName().getResourceDomain();
+			
+			//Create a seed from a sapling and dirt bucket
+			GameRegistry.addShapelessRecipe(
+					new ResourceLocation(speciesDomain, speciesPath + "seed"),
+					null,
+					seedStack,
+					new Ingredient[]{
+							Ingredient.fromStacks(saplingStack),
+							Ingredient.fromItem(ModItems.dirtBucket)
+					}
+					);
+			
+			if(seedIsSapling) {
+				//Creates a vanilla sapling from a seed and dirt bucket
+				GameRegistry.addShapelessRecipe(
+						new ResourceLocation(speciesDomain, speciesPath + "sapling"),
+						null,
+						saplingStack,
+						new Ingredient[]{
+								Ingredient.fromStacks(seedStack),
+								Ingredient.fromItem(ModItems.dirtBucket)
+						}
+						);
+				
+				//Register the seed in the ore dictionary as a sapling since we can convert for free anyway.
+				OreDictionary.registerOre("treeSapling", seedStack);
+			}
+		}
+	}
 }
