@@ -7,8 +7,6 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
@@ -170,10 +168,10 @@ public class DynamicTree {
 	
 	public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
-		BlockPos rootPos = findRootNode(state, world, hitPos);
+		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
 		
 		if(rootPos != BlockPos.ORIGIN) {
-			getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 
 		return false;
@@ -286,46 +284,11 @@ public class DynamicTree {
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////
-		
-	/**
-	 * This is resource intensive.  Use only for interaction code.
-	 * Only the root node can determine the exact species and it has
-	 * to be found by mapping the branch network.
-	 * 
-	 * @param world
-	 * @param pos
-	 * @return
-	 */
-	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
-		BlockPos rootPos = findRootNode(blockState, world, pos);
-		IBlockState rootyState = world.getBlockState(rootPos);
-		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos) : Species.NULLSPECIES;
-	}
-	
-	
-	public static BlockPos findRootNode(IBlockState blockState, World world, BlockPos pos) {
-		
-		ITreePart treePart = TreeHelper.getTreePart(blockState);
-		
-		switch(treePart.getTreePartType()) {
-			case BRANCH:
-				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-				if(signal.found) {
-					return signal.root;
-				}
-				break;
-			case ROOT:
-				return pos;
-			default:
-				return BlockPos.ORIGIN;
-		}
-		
-		return BlockPos.ORIGIN;
-	}
 	
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		return branch.getRadius(blockState, blockAccess, pos);
 	}
+
 	
 	//////////////////////////////
 	// LEAVES HANDLING

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -115,12 +116,72 @@ public class TreeHelper {
 		
 	}
 	
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
+		BlockPos rootPos = findRootNode(blockState, world, pos);
+		IBlockState rootyState = world.getBlockState(rootPos);
+		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos) : Species.NULLSPECIES;
+	}
+	
+	/**
+	 * Find the root node of a tree.
+	 * 
+	 * @param blockState The blockState of either a branch or root block in world at pos
+	 * @param world The world
+	 * @param pos The position being analyzed
+	 * @return The position of the root node of the tree or BlockPos.ORIGIN if nothing was found.
+	 */
+	public static BlockPos findRootNode(IBlockState blockState, World world, BlockPos pos) {
+		
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
+		
+		switch(treePart.getTreePartType()) {
+			case BRANCH:
+				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				if(signal.found) {
+					return signal.root;
+				}
+				break;
+			case ROOT:
+				return pos;
+			default:
+				return BlockPos.ORIGIN;
+		}
+		
+		return BlockPos.ORIGIN;
+	}
+	
+	/**
+	 * Convenience function that spawns particles all over the tree branches
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param type
+	 * @param num
+	 */
 	public static void treeParticles(World world, BlockPos rootPos, EnumParticleTypes type, int num) {
 		if(world.isRemote) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
 		}
 	}
 	
+	/**
+	 * Convenience function that verifies an analysis is starting from the root
+	 * node before commencing.
+	 * 
+	 * @param world The world
+	 * @param rootPos The position of the rootyBlock
+	 * @param signal The signal carrying the inspectors
+	 * @return true if a root block was found.
+	 */
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
 		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {

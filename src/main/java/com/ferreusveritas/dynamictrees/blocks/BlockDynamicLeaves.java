@@ -502,7 +502,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 					}
 				}
 				
-				return DynamicTree.getExactSpecies(world.getBlockState(closest), world, closest);
+				return TreeHelper.getExactSpecies(world.getBlockState(closest), world, closest);
 			}
 		}
 		

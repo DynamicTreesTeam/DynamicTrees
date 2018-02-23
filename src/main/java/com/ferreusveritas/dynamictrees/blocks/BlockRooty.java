@@ -282,6 +282,16 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		return 0;
 	}
 	
+	/**
+	 * Analysis typically begins with the root node.  This function allows
+	 * the rootyBlock to direct the analysis in the direction of the tree since
+	 * trees are not always "up" from the rootyBlock
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param signal
+	 * @return
+	 */
 	public MapSignal startAnalysis(World world, BlockPos rootPos, MapSignal signal) {
 		EnumFacing dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
