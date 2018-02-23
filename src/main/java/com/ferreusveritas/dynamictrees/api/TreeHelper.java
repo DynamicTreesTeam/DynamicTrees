@@ -127,8 +127,11 @@ public class TreeHelper {
 	 */
 	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
 		BlockPos rootPos = findRootNode(blockState, world, pos);
-		IBlockState rootyState = world.getBlockState(rootPos);
-		return rootPos != BlockPos.ORIGIN ? TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos) : Species.NULLSPECIES;
+		if(rootPos != BlockPos.ORIGIN) {
+			IBlockState rootyState = world.getBlockState(rootPos);
+			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
+		}
+		return Species.NULLSPECIES;
 	}
 	
 	/**
