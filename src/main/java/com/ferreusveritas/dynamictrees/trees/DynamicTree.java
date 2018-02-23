@@ -87,11 +87,8 @@ public class DynamicTree {
 		//Setup tree references
 		boolean isOld = wood.getMetadata() < 4;
 		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
-		
-		IBlockState saplingBlockState = Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood);
-		ItemStack saplingStack = new ItemStack(Item.getItemFromBlock(saplingBlockState.getBlock()), 1, saplingBlockState.getBlock().damageDropped(saplingBlockState));
-		
-		setPrimitiveSapling(saplingStack);
+				
+		setPrimitiveSapling(new ItemStack(Blocks.SAPLING, 1, wood.getMetadata()));
 		
 		//Setup common species
 		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
