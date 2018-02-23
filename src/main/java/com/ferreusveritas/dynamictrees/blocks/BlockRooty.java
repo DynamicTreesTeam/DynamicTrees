@@ -285,14 +285,15 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public MapSignal startAnalysis(World world, BlockPos rootPos, MapSignal signal) {
 		EnumFacing dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
+		IBlockState treeState = world.getBlockState(treePos);
 		
-		TreeHelper.getTreePart(world.getBlockState(treePos)).analyse(world, treePos, null, signal);
+		TreeHelper.getTreePart(treeState).analyse(treeState, world, treePos, null, signal);
 		
 		return signal;
 	}
 	
 	@Override
-	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		signal.run(world, this, pos, fromDir);//Run inspector of choice
 		
 		signal.root = pos;

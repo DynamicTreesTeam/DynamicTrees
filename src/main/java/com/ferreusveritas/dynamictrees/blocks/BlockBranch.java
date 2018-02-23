@@ -169,12 +169,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
 	public int destroyTreeFromNode(World world, BlockPos pos) {//, float fortuneFactor) {
+		IBlockState blockState = world.getBlockState(pos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
-		MapSignal signal = analyse(world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
+		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
 		Species species = nodeSpecies.getSpecies();//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze only part of the tree beyond the break point and calculate it's volume
-		analyse(world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
+		analyse(blockState, world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 	
@@ -186,12 +187,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @return The volume of the tree that was destroyed
 	 */
 	public int destroyEntireTree(World world, BlockPos pos) {
+		IBlockState blockState = world.getBlockState(pos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
-		analyse(world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find the species
+		analyse(blockState, world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find the species
 		Species species = nodeSpecies.getSpecies();//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		// Analyze the entire tree and calculate it's volume
-		analyse(world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
+		analyse(blockState, world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 	
@@ -316,7 +318,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if(TreeHelper.isBranch(neighState)) {
 					BlockPos rootPos = DynamicTree.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
-						analyse(world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
+						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
 					}
 				}
 			}

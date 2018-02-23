@@ -309,7 +309,7 @@ public class DynamicTree {
 		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
-				MapSignal signal = treePart.analyse(world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 				if(signal.found) {
 					return signal.root;
 				}

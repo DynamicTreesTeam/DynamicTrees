@@ -2,8 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -18,18 +17,21 @@ public class NodeSpecies implements INodeInspector {
 	@Override
 	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
 
-		BlockRooty rootyBlock = TreeHelper.getRooty(block);
-		if(rootyBlock != null) {
-			determination = rootyBlock.getSpecies(world.getBlockState(pos), world, pos);
+		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
+
+		switch(treePart.getTreePartType()) {
+			case BRANCH:
+				if(determination == Species.NULLSPECIES) {
+					determination = TreeHelper.getBranch(treePart).getTree().getCommonSpecies();
+				}
+				break;
+			case ROOT:
+				determination = TreeHelper.getRooty(treePart).getSpecies(world.getBlockState(pos), world, pos);
+				break;
+			default:
+				break;
 		}
-		
-		if(determination == Species.NULLSPECIES) {
-			BlockBranch branchBlock = TreeHelper.getBranch(block);
-			if(branchBlock != null) {
-				determination = branchBlock.getTree().getCommonSpecies();
-			}
-		}
-		
+
 		return true;
 	}
 

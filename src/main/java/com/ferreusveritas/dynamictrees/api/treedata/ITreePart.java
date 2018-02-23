@@ -75,7 +75,7 @@ public interface ITreePart {
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
-	MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
+	MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
 	
 	/**
 	* Get the appropriate dynamic tree this block is used to build.

@@ -391,7 +391,7 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
@@ -400,7 +400,7 @@ public class BlockBranchBasic extends BlockBranch {
 					BlockPos deltaPos = pos.offset(dir);
 					
 					IBlockState deltaState = world.getBlockState(deltaPos);
-					signal = TreeHelper.getTreePart(deltaState).analyse(world, deltaPos, dir.getOpposite(), signal);
+					signal = TreeHelper.getTreePart(deltaState).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 					
 					// This should only be true for the originating block when the root node is found
 					if (signal.found && signal.localRootDir == null && fromDir == null) {
