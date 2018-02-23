@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -146,7 +145,7 @@ public class DynamicTree {
 		speciesLocationOverrides.add(override);
 	}
 	
-	private ArrayList<ISpeciesLocationOverride> speciesLocationOverrides = new ArrayList<>(0);
+	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 	
 	public interface ISpeciesLocationOverride {
 		Species getSpeciesForLocation(World access, BlockPos trunkPos);
