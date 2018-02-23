@@ -394,7 +394,7 @@ public class BlockBranchBasic extends BlockBranch {
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
-			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
+			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
@@ -408,7 +408,7 @@ public class BlockBranchBasic extends BlockBranch {
 					}
 				}
 			}
-			signal.returnRun(world, this, pos, fromDir);
+			signal.returnRun(blockState, world, pos, fromDir);
 		} else {
 			world.setBlockToAir(pos);// Destroy one of the offending nodes
 			signal.overflow = true;

@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -23,11 +22,11 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && fromSpecies.getTree() == branch.getTree()) {
-			int radius = branch.getRadius(world.getBlockState(pos), world, pos);
+			int radius = branch.getRadius(blockState, world, pos);
 			if(radius > 0) {
 				toSpecies.getTree().getDynamicBranch().setRadius(world, pos, radius, null);
 				if(radius == 1) {
@@ -40,7 +39,7 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	

@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -28,8 +27,8 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 				
 		if(branch != null){
 			radius = species.getPrimaryThickness();
@@ -39,10 +38,10 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		//Calculate Branch Thickness based on neighboring branches
 		
-		BlockBranch branch = TreeHelper.getBranch(block);
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null) {
 			float areaAccum = radius * radius;//Start by accumulating the branch we just came from

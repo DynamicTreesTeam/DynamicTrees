@@ -64,7 +64,7 @@ public class Staff extends Item {
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
-			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
+			MapSignal signal = branch.analyse(clickedBlock, world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
 				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));

@@ -136,14 +136,15 @@ public class JoCode {
 		generateFork(world, species, 0, rootPos, false);
 
 		//Fix branch thicknesses and map out leaf locations
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(treePos));
+		IBlockState treeState = world.getBlockState(treePos);
+		BlockBranch branch = TreeHelper.getBranch(treeState);
 		if(branch != null) {//If a branch exists then the growth was successful
 			ILeavesProperties leavesProperties = species.getLeavesProperties();
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
 			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
 			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
-			branch.analyse(world, treePos, EnumFacing.DOWN, signal);
+			branch.analyse(treeState, world, treePos, EnumFacing.DOWN, signal);
 			List<BlockPos> endPoints = endFinder.getEnds();
 			
 			smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
@@ -286,14 +287,15 @@ public class JoCode {
 
 	/**
 	* @param world The world
-	* @param pos Block position of rootyDirt block
+	* @param rootPos Block position of rootyDirt block
 	* @return JoCode for chaining
 	*/
-	public JoCode buildFromTree(World world, BlockPos pos, EnumFacing facing) {
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos.up()));
+	public JoCode buildFromTree(World world, BlockPos rootPos, EnumFacing facing) {
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
 			NodeCoder coder = new NodeCoder();
-			branch.analyse(world, pos, EnumFacing.DOWN, new MapSignal(coder));
+			//Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
+			branch.analyse(world.getBlockState(rootPos), world, rootPos, EnumFacing.DOWN, new MapSignal(coder));
 			coder.compile(this, facing);
 			instructions.trimToSize();
 		}

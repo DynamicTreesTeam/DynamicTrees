@@ -563,7 +563,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
 		NodeFindEnds endFinder = new NodeFindEnds();
-		treeBase.analyse(world, treePos, null, new MapSignal(endFinder));
+		treeBase.analyse(world.getBlockState(treePos), world, treePos, null, new MapSignal(endFinder));
 		return endFinder.getEnds();
 	}
 	
@@ -750,7 +750,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
 		if(soilLife == 0 && ModConfigs.diseaseChance > random.nextFloat() ) {
-			baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
 			return true;
 		}
 		

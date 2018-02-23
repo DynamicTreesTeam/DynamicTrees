@@ -325,20 +325,20 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			IBlockState state = world.getBlockState(pos);
-			signal.run(world, this, pos, fromDir);// Run the inspectors of choice
+			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
 					BlockPos deltaPos = pos.offset(dir);
 					IBlockState deltaState = world.getBlockState(deltaPos);
 					
 					if (deltaState.getBlock() == this && deltaState.getValue(ORIGIN) == dir.getOpposite()) {
-						signal = ((ITreePart) deltaState.getBlock()).analyse(world, deltaPos, dir.getOpposite(), signal);
+						signal = ((ITreePart) deltaState.getBlock()).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 					} else if (state.getBlock() == this && state.getValue(ORIGIN) == dir) {
-						signal = TreeHelper.getTreePart(deltaState).analyse(world, deltaPos, dir.getOpposite(), signal);
+						signal = TreeHelper.getTreePart(deltaState).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 					}
 					
 					// This should only be true for the originating block when the root node is found
@@ -347,7 +347,7 @@ public class BlockBranchCactus extends BlockBranch {
 					}
 				}
 			}
-			signal.returnRun(world, this, pos, fromDir);
+			signal.returnRun(blockState, world, pos, fromDir);
 		} else {
 			world.setBlockToAir(pos);// Destroy one of the offending nodes
 			signal.overflow = true;

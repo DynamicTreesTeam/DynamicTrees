@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -26,19 +25,19 @@ public class NodeFruitCocoa implements INodeInspector {
 		return this;
 	}
 	
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {
-				BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
-				if(branch != null && branch.getRadius(world.getBlockState(pos), world, pos) == 8) {
+				BlockBranch branch = TreeHelper.getBranch(blockState);
+				if(branch != null && branch.getRadius(blockState, world, pos) == 8) {
 					int side = (hashCode % 4) + 2;
 					EnumFacing dir = EnumFacing.getFront(side);
-					pos = pos.offset(dir);
-					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
-						world.setBlockState(pos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
+					BlockPos deltaPos = pos.offset(dir);
+					if (world.isAirBlock(deltaPos)) {
+						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, deltaPos, dir, 0, 0, 0, 0, null);
+						world.setBlockState(deltaPos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;
@@ -49,7 +48,7 @@ public class NodeFruitCocoa implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 

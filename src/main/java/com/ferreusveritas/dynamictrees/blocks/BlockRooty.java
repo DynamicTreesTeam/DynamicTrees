@@ -294,7 +294,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
-		signal.run(world, this, pos, fromDir);//Run inspector of choice
+		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		
 		signal.root = pos;
 		signal.found = true;

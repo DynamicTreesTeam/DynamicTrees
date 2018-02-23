@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -29,11 +29,11 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 
 		if(branch != null && species.getTree() == branch.getTree()) {
-			if(branch.getRadius(world.getBlockState(pos), world, pos) == species.getPrimaryThickness()) {
+			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
 			world.setBlockToAir(pos);//Destroy the branch
@@ -43,7 +43,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 

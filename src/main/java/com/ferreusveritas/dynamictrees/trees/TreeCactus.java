@@ -198,7 +198,7 @@ public class TreeCactus extends DynamicTree {
 			if(branch != null) {//If a branch exists then the growth was successful
 				NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
 				MapSignal signal = new MapSignal(endFinder);
-				branch.analyse(world, treePos, EnumFacing.DOWN, signal);
+				branch.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN, signal);
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself

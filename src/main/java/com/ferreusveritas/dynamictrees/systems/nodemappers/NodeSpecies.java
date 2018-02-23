@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,9 +15,9 @@ public class NodeSpecies implements INodeInspector {
 	private Species determination = Species.NULLSPECIES;
 
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 
-		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
 
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
@@ -36,7 +36,7 @@ public class NodeSpecies implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
