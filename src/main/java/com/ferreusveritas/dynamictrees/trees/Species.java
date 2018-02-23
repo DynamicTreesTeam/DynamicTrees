@@ -21,6 +21,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -879,6 +880,20 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		return false;
+	}
+	
+	//////////////////////////////
+	// BONSAI POT
+	//////////////////////////////
+	
+	/**
+	 * Provides the {@link BlockBonsaiPot} for this Species.  A mod can
+	 * derive it's own BonzaiPot subclass if it wants something custom.
+	 * 
+	 * @return A {@link BlockBonsaiPot}
+	 */
+	public BlockBonsaiPot getBonzaiPot() {
+		return ModBlocks.blockBonsaiPot;
 	}
 	
 	//////////////////////////////

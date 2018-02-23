@@ -7,7 +7,6 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
@@ -37,12 +36,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistry;
 
 /**
-* All data related to a tree family.
-* A {@link DynamicTree} is more or less just a definition of {@link BlockDynamicLeaves} and {@link BlockBranch} blocks.
-* It also defines the cellular automata function of the {@link BlockDynamicLeaves}.  It defines the type of wood that
+* A {@link DynamicTree} is more or less just a definition of {@link BlockBranch} blocks.
+* It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
 * the tree is made of and consequently what kind of log you get when you cut it down.
 * 
-* A DynamicTree does not contain a reference to a Seed, Sapling, or how it should grow(how fast, how tall, etc).
+* A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
 * It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
 * All of these capabilities lie in the Species class for which a DynamicTree should always contain one default 
 * species(the common species).
@@ -74,10 +72,7 @@ public class DynamicTree {
 	
 	//Saplings
 	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
-	private IBlockState primitiveSaplingBlockState = Blocks.AIR.getDefaultState();
-	/** The primitive(vanilla) sapling for this type of tree. Used for crafting recipes */
 	private ItemStack primitiveSaplingItemStack = CompatHelper.emptyStack();
-	
 	
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
@@ -92,8 +87,12 @@ public class DynamicTree {
 		//Setup tree references
 		boolean isOld = wood.getMetadata() < 4;
 		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
-		setPrimitiveSapling(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-
+		
+		IBlockState saplingBlockState = Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, wood);
+		ItemStack saplingStack = new ItemStack(Item.getItemFromBlock(saplingBlockState.getBlock()), 1, saplingBlockState.getBlock().damageDropped(saplingBlockState));
+		
+		setPrimitiveSapling(saplingStack);
+		
 		//Setup common species
 		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 		getCommonSpecies().generateSeed();
@@ -218,6 +217,10 @@ public class DynamicTree {
 		return name;
 	}
 	
+	public boolean isWood() {
+		return true;
+	}
+	
 	protected DynamicTree setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setTree(this);//Link the branch back to the tree
@@ -262,18 +265,9 @@ public class DynamicTree {
 		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
-	protected DynamicTree setPrimitiveSapling(IBlockState primSapling) {
-		return setPrimitiveSapling(primSapling, new ItemStack(Item.getItemFromBlock(primSapling.getBlock()), 1, primSapling.getBlock().damageDropped(primSapling)));
-	}
-	
-	protected DynamicTree setPrimitiveSapling(IBlockState primSapling, ItemStack primSaplingStack) {
-		primitiveSaplingBlockState = primSapling;
+	protected DynamicTree setPrimitiveSapling(ItemStack primSaplingStack) {
 		primitiveSaplingItemStack = primSaplingStack;
 		return this;
-	}
-
-	public IBlockState getPrimitiveSaplingBlockState() {
-		return primitiveSaplingBlockState;
 	}
 	
 	public ItemStack getPrimitiveSaplingItemStack() {
@@ -327,21 +321,6 @@ public class DynamicTree {
 	public boolean isCompatibleGenericLeaves(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
-	
-	//////////////////////////////
-	// BONSAI POT
-	//////////////////////////////
-	
-	/**
-	 * Provides the {@link BlockBonsaiPot} for this tree.  Each mod will
-	 * have to derive it's own BonzaiPot subclass if it wants this feature.
-	 * 
-	 * @return
-	 */
-	public BlockBonsaiPot getBonzaiPot() {
-		return ModBlocks.blockBonsaiPot;
-	}
-
 	
 	//////////////////////////////
 	// JAVA OBJECT STUFF

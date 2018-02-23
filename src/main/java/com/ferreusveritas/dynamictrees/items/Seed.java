@@ -86,7 +86,7 @@ public class Seed extends Item {
 		IBlockState emptyPotState = world.getBlockState(pos);
 		if(emptyPotState.getBlock() instanceof BlockFlowerPot && (emptyPotState == emptyPotState.getBlock().getDefaultState()) ) { //Empty Flower Pot of some kind
 			Species species = getSpecies(seedStack);
-			BlockBonsaiPot bonzaiPot = species.getTree().getBonzaiPot();
+			BlockBonsaiPot bonzaiPot = species.getBonzaiPot();
 			world.setBlockState(pos, bonzaiPot.getDefaultState());
 			if(bonzaiPot.setSpecies(world, species, pos) && bonzaiPot.setPotState(world, emptyPotState, pos)) {
 				CompatHelper.shrinkStack(seedStack, 1);

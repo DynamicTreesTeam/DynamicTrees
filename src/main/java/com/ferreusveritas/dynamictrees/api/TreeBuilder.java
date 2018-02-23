@@ -32,7 +32,6 @@ public class TreeBuilder {
 	//Drops
 	private IBlockState primitiveLeavesBlockState = Blocks.LEAVES.getDefaultState();
 	private IBlockState primitiveLogBlockState = Blocks.LOG.getDefaultState();
-	private IBlockState primitiveSaplingBlockState;
 	private ItemStack primitiveSaplingItemStack;
 	private ItemStack stickItemStack;
 
@@ -145,8 +144,7 @@ public class TreeBuilder {
 	 * @param primSaplingStack
 	 * @return TreeBuilder for chaining
 	 */
-	public TreeBuilder setPrimitiveSapling(IBlockState primSapling, ItemStack primSaplingStack) {
-		primitiveSaplingBlockState = primSapling;
+	public TreeBuilder setPrimitiveSapling(ItemStack primSaplingStack) {
 		primitiveSaplingItemStack = primSaplingStack;
 		return this;
 	}
@@ -306,8 +304,8 @@ public class TreeBuilder {
 				
 				dynamicLeavesProperties.setTree(this);
 				
-				if(primitiveSaplingBlockState != null && primitiveSaplingItemStack != null) {
-					setPrimitiveSapling(primitiveSaplingBlockState, primitiveSaplingItemStack);
+				if(primitiveSaplingItemStack != null) {
+					setPrimitiveSapling(primitiveSaplingItemStack);
 				}
 				
 				if(stickItemStack != null) {

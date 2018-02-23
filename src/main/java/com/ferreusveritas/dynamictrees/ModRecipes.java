@@ -3,8 +3,6 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
@@ -31,12 +29,10 @@ public class ModRecipes {
 		
 		for(DynamicTree tree: ModTrees.baseTrees) {
 
-			IBlockState primitiveSapling = tree.getPrimitiveSaplingBlockState();
+			ItemStack saplingStack = tree.getPrimitiveSaplingItemStack();
 
-			if(primitiveSapling != null) {
-				ItemStack saplingStack = new ItemStack(primitiveSapling.getBlock());
-				saplingStack.setItemDamage(primitiveSapling.getValue(BlockSapling.TYPE).getMetadata());
-
+			if(!saplingStack.isEmpty()) {
+				
 				ItemStack seedStack = tree.getCommonSpecies().getSeedStack(1);
 				
 				//Create a seed from a sapling and dirt bucket

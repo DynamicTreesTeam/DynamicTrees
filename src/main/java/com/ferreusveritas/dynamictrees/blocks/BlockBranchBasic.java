@@ -126,11 +126,6 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public boolean isWood(IBlockAccess world, BlockPos pos) {
-		return true;
-	}
-	
-	@Override
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return isSameTree(branch) ? BlockBranchBasic.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}

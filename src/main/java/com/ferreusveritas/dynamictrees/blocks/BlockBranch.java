@@ -71,7 +71,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	
 	/**
-	 * Branches are considered the same wood if they have the same tree
+	 * Branches are considered the same if they have the same tree
 	 * 
 	 * @param branch
 	 * @return 
@@ -83,6 +83,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	@Override
 	public abstract int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 	
+	@Override
+	public boolean isWood(IBlockAccess world, BlockPos pos) {
+		return getTree().isWood();
+	}
 	
 	///////////////////////////////////////////
 	// WORLD UPDATE
@@ -112,7 +116,6 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	
 
-	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
