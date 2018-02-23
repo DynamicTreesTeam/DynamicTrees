@@ -121,14 +121,6 @@ public class BlockBonsaiPot extends BlockContainer {
 			
 			if(!world.isRemote) {
 				ItemStack seedStack = species.getSeedStack(1);
-				
-				if(player.isSneaking()) {
-					ItemStack convertStack = species.getTree().getPrimitiveSaplingItemStack();
-					if(!convertStack.isEmpty()) {
-						seedStack = convertStack;
-					}
-				}
-				
 				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
 			}
 
