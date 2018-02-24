@@ -57,13 +57,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		this.tree = tree;
 	}
 	
-	public TreeFamily getTree() {
+	public TreeFamily getFamily() {
 		return tree;
 	}
 	
 	@Override
 	public TreeFamily getFamily(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
-		return getTree();
+		return getFamily();
 	}
 	
 	public boolean isSameTree(ITreePart treepart) {
@@ -77,7 +77,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @return 
 	 */
 	public boolean isSameTree(BlockBranch branch) {
-		return branch != null && getTree() == branch.getTree();
+		return branch != null && getFamily() == branch.getFamily();
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	
 	@Override
 	public boolean isWood(IBlockAccess world, BlockPos pos) {
-		return getTree().isWood();
+		return getFamily().isWood();
 	}
 	
 	///////////////////////////////////////////
@@ -207,7 +207,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
 		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
-		return getTree().getCommonSpecies().getLogsDrops(world, pos, ret, volume);
+		return getFamily().getCommonSpecies().getLogsDrops(world, pos, ret, volume);
 	}
 	
 	/*
@@ -321,7 +321,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if(TreeHelper.isBranch(neighState)) {
 					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
-						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getTree().getCommonSpecies())));
+						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies())));
 					}
 				}
 			}

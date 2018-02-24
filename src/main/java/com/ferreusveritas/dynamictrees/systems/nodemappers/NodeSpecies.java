@@ -22,7 +22,7 @@ public class NodeSpecies implements INodeInspector {
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
 				if(determination == Species.NULLSPECIES) {
-					determination = TreeHelper.getBranch(treePart).getTree().getCommonSpecies();
+					determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
 				}
 				break;
 			case ROOT:

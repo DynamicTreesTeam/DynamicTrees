@@ -32,7 +32,7 @@ public class NodeDestroyer implements INodeInspector {
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 
-		if(branch != null && species.getFamily() == branch.getTree()) {
+		if(branch != null && species.getFamily() == branch.getFamily()) {
 			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}

@@ -176,7 +176,7 @@ public class BlockBranchBasic extends BlockBranch {
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		int radius = getRadius(blockState, world, pos);
-		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
 	
 	@Override
@@ -221,7 +221,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
-		TreeFamily thisTree = getTree();
+		TreeFamily thisTree = getFamily();
 		
 		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			return leavesProperties.getCellKit().getCellForBranch(thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this));

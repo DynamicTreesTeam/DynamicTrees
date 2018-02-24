@@ -33,7 +33,7 @@ public class NullTreePart implements ITreePart {
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
-			return from.getTree().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
+			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
 		}
 		return 0;
 	}
@@ -55,7 +55,7 @@ public class NullTreePart implements ITreePart {
 	
 	@Override
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return BlockBranch.setSupport(0, branch.getTree().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
+		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
 	}
 
 	@Override

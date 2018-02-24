@@ -131,7 +131,7 @@ public class BlockBranchCactus extends BlockBranch {
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		int radius = getRadius(blockState, world, pos);
-		return getTree().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
 	
 	///////////////////////////////////////////
