@@ -43,6 +43,8 @@ public class TreeCactus extends TreeFamily {
 			
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
 			
+			setDynamicSapling(new BlockCactusSapling("cactussapling").getDefaultState());
+			
 			this.setSoilLongevity(1); // Doesn't live very long
 			
 			addDropCreator(new DropCreator(new ResourceLocation(ModConstants.MODID, "cactusseeds")) {
@@ -140,15 +142,14 @@ public class TreeCactus extends TreeFamily {
 	
 	public TreeCactus() {
 		super(new ResourceLocation(ModConstants.MODID, "cactus"));
-		
-		IBlockState primCactus = Blocks.CACTUS.getDefaultState();
-		
-		setPrimitiveLog(primCactus, new ItemStack(Blocks.CACTUS));
+				
+		setPrimitiveLog(Blocks.CACTUS.getDefaultState(), new ItemStack(Blocks.CACTUS));
 		setStick(ItemStack.EMPTY);
-		
-		setDynamicBranch(new BlockBranchCactus("cactusbranch"));
-		
-		getCommonSpecies().setDynamicSapling(new BlockCactusSapling("cactussapling").getDefaultState());
+	}
+	
+	@Override
+	public BlockBranch createBranch() {
+		return new BlockBranchCactus("cactusbranch");
 	}
 	
 	@Override

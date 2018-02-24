@@ -105,8 +105,7 @@ public class TreeFamily {
 	public TreeFamily(ResourceLocation name) {
 		this.name = name;
 		
-		setDynamicBranch(new BlockBranchBasic(name + "branch"));
-		
+		setDynamicBranch(createBranch());
 		createSpecies();
 	}
 	
@@ -215,6 +214,10 @@ public class TreeFamily {
 	
 	public boolean isWood() {
 		return true;
+	}
+	
+	public BlockBranch createBranch() {
+		return new BlockBranchBasic(name + "branch");
 	}
 	
 	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
