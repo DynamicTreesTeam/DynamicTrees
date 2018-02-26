@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -8,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
@@ -54,4 +57,38 @@ public class BlockThickBranch extends BlockBranchBasic {
 		return state;
 	}
 	
+	///////////////////////////////////////////
+	// GROWTH
+	///////////////////////////////////////////
+	
+	@Override
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+
+		int heartRadius = super.getRadius(blockState, blockAccess, pos);
+		
+		if(blockState.getValue(QBIT)) {
+			boolean pBit = false;
+			for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
+				IBlockState shellState = blockAccess.getBlockState(pos.add(surr.getOffset()));
+				if(shellState instanceof BlockTrunkShell) {
+					pBit = shellState.getValue(BlockTrunkShell.PBIT);
+					break;
+				}
+			}
+			return heartRadius + (pBit ? 16 : 8);
+		}
+		
+		return heartRadius;
+	}
+	
+	@Override
+	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
+
+		if(radius <= 8) {
+			super.setRadius(world, pos, radius, dir, flags);
+			return;
+		}
+		
+		
+	}
 }
