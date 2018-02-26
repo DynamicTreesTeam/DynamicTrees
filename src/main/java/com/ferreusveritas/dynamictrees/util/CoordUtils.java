@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
@@ -45,6 +45,10 @@ public class CoordUtils {
 		
 		public Vec3i getOffset() {
 			return offset;
+		}
+		
+		public Surround getOpposite() {
+			return values()[(ordinal() + 4) & 7];
 		}
 	}
 	

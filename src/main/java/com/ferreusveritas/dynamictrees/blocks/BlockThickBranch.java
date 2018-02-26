@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -64,13 +65,13 @@ public class BlockThickBranch extends BlockBranchBasic {
 	@Override
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 
-		int heartRadius = super.getRadius(blockState, blockAccess, pos);
+		int heartRadius = super.getRawRadius(blockState);
 		
 		if(blockState.getValue(QBIT)) {
 			boolean pBit = false;
 			for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
 				IBlockState shellState = blockAccess.getBlockState(pos.add(surr.getOffset()));
-				if(shellState instanceof BlockTrunkShell) {
+				if(shellState instanceof BlockTrunkShell && shellState.getValue(BlockTrunkShell.TRUNKDIR) == surr.getOpposite()) {
 					pBit = shellState.getValue(BlockTrunkShell.PBIT);
 					break;
 				}
@@ -83,12 +84,40 @@ public class BlockThickBranch extends BlockBranchBasic {
 	
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
-
-		if(radius <= 8) {
-			super.setRadius(world, pos, radius, dir, flags);
-			return;
+		
+		radius = MathHelper.clamp(radius, 1, 24) - 1;
+		boolean pBit = radius >= 16;
+		boolean qBit = radius >= 8;
+		int rBits = radius & 7;
+		
+		world.setBlockState(pos, getDefaultState().withProperty(RADIUS, rBits + 1).withProperty(QBIT, qBit));
+		
+		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
+			BlockPos shellPos = pos.add(surr.getOffset());
+			IBlockState shellState = world.getBlockState(shellPos);
+			if(shellState.getMaterial().isReplaceable()
+				|| (shellState instanceof BlockTrunkShell && shellState.getValue(BlockTrunkShell.TRUNKDIR) == surr.getOpposite()) ) {
+				setShell(world, pos, surr, pBit, qBit);
+			}
 		}
 		
-		
 	}
+	
+	private void setShell(World world, BlockPos shellPos, CoordUtils.Surround surr, boolean pBit, boolean qBit) {
+		//TODO:  Make a proper version of this
+		BlockTrunkShell trunkShell = new BlockTrunkShell(Material.WOOD, "trunkshell");
+		
+		if(qBit) {
+			world.setBlockState(shellPos,
+				trunkShell.getDefaultState()
+				.withProperty(BlockTrunkShell.PBIT, pBit)
+				.withProperty(BlockTrunkShell.TRUNKDIR, surr.getOpposite())
+			);
+		} else {
+			world.setBlockToAir(shellPos.add(surr.getOffset()));
+		}
+	}
+	
 }
+
+
