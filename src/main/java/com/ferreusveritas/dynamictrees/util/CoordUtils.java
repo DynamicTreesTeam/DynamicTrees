@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -15,7 +16,7 @@ import net.minecraft.world.World;
 
 public class CoordUtils {
 
-	public enum Surround {
+	public enum Surround implements IStringSerializable {
 		N ("n" , EnumFacing.NORTH),
 		NW("nw", EnumFacing.NORTH, EnumFacing.WEST),
 		W ("w" , EnumFacing.WEST),
