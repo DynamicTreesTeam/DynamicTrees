@@ -15,19 +15,41 @@ import net.minecraft.world.World;
 
 public class CoordUtils {
 
-	public static final Vec3i[] surround = {
-			new Vec3i( 0, 0,-1),//N
-			new Vec3i( 0, 0, 1),//S
-			new Vec3i(-1, 0, 0),//W
-			new Vec3i( 1, 0, 0),//E
-			new Vec3i(-1, 0,-1),//NW
-			new Vec3i( 1, 0,-1),//NE
-			new Vec3i(-1, 0, 1),//SW
-			new Vec3i( 1, 0, 1) //SE
-		};
+	public enum Surround {
+		N ("n" , EnumFacing.NORTH),
+		NW("nw", EnumFacing.NORTH, EnumFacing.WEST),
+		W ("w" , EnumFacing.WEST),
+		SW("sw", EnumFacing.SOUTH, EnumFacing.WEST),
+		S ("s" , EnumFacing.SOUTH),
+		SE("se", EnumFacing.SOUTH, EnumFacing.EAST),
+		E ("e" , EnumFacing.EAST),		
+		NE("ne", EnumFacing.NORTH, EnumFacing.EAST);
+
+		
+		final private String name;
+		final private Vec3i offset;
+		
+		private Surround(String name, EnumFacing ... dirs) {
+			this.name = name;
+			BlockPos pos = BlockPos.ORIGIN;
+			for(EnumFacing d : dirs) {
+				pos = pos.add(d.getDirectionVec());
+			}
+			this.offset = pos;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public Vec3i getOffset() {
+			return offset;
+		}
+	}
 	
 	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
-		for(Vec3i dir: CoordUtils.surround) {
+		for(Surround surr: CoordUtils.Surround.values()) {
+			Vec3i dir = surr.getOffset();
 			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()) == null ){
 				return false;
 			}

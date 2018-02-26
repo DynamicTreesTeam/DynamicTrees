@@ -71,7 +71,8 @@ public class ChunkCircleManager {
 		ArrayList<Circle> unsolvedCircles = new ArrayList<Circle>(64);
 		
 		//Collect already solved circles from surrounding chunks
-		for(Vec3i dir: CoordUtils.surround) {
+		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
+			Vec3i dir = surr.getOffset();
 			getChunkCircles(circles, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
 		
