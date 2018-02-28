@@ -268,6 +268,8 @@ public class BlockBranchBasic extends BlockBranch {
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
+			
+			IBlockState currBlockState = world.getBlockState(pos);
 			Species species = signal.getSpecies();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
@@ -276,14 +278,14 @@ public class BlockBranchBasic extends BlockBranch {
 			
 			{
 				BlockPos deltaPos = pos.offset(targetDir);
-				IBlockState blockState = world.getBlockState(deltaPos);
+				IBlockState deltaState = world.getBlockState(deltaPos);
 				
 				// Pass grow signal to next block in path
-				ITreePart treepart = TreeHelper.getTreePart(blockState);
+				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.nullTreePart) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
 				} else if (world.isAirBlock(deltaPos)) {
-					signal = growIntoAir(world, deltaPos, signal, getRadius(blockState, world, pos));
+					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState, world, pos));
 				}
 			}
 			
@@ -307,7 +309,6 @@ public class BlockBranchBasic extends BlockBranch {
 				}
 			}
 
-			IBlockState currBlockState = world.getBlockState(pos);
 			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
