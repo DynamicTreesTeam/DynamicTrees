@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
@@ -139,7 +140,9 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return access == null || pos == null ? white : ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
+				return (access == null || pos == null || !(state.getBlock() instanceof BlockBonsaiPot))
+					? white
+					: ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
 			}
 		});
 		

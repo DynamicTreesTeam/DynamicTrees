@@ -98,7 +98,8 @@ public class BlockBonsaiPot extends BlockContainer {
 	///////////////////////////////////////////
 	
 	private TileEntityBonsai getTileEntityBonsai(IBlockAccess access, BlockPos pos) {
-		return (TileEntityBonsai) access.getTileEntity(pos);
+		TileEntity tileEntity = access.getTileEntity(pos);
+		return tileEntity instanceof TileEntityBonsai ? (TileEntityBonsai) tileEntity : null;
 	}
 	
 	@Override
