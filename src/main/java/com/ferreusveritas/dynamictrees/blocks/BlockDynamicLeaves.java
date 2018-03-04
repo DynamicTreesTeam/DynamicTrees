@@ -483,7 +483,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				IBlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BlockBranch branch = TreeHelper.getBranch(state);
-					if(branch.getFamily() == leavesProperties && branch.getRadius(state, access, pos) == 1) {
+					if(branch.getFamily() == leavesProperties.getTree() && branch.getRadius(state, access, pos) == 1) {
 						branchList.add(dPos);
 					}
 				}
