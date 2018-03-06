@@ -12,26 +12,25 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TreeSpruce extends DynamicTree {
+public class TreeSpruce extends TreeFamily {
 	
 	public class SpeciesSpruce extends Species {
 
 		FeatureGenPodzol podzolGen;
 		
-		SpeciesSpruce(DynamicTree treeFamily) {
+		SpeciesSpruce(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.spruceLeavesProperties);
 			
 			//Spruce are conical thick slower growing trees
@@ -83,14 +82,9 @@ public class TreeSpruce extends DynamicTree {
 			long day = world.getTotalWorldTime() / 24000L;
 			int month = (int)day / 30;//Change the hashs every in-game month
 			
-			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (coordHashCode(pos.up(month)) % 5);//Vary the height energy by a psuedorandom hash function
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 5);//Vary the height energy by a psuedorandom hash function
 		}
 		
-		public int coordHashCode(BlockPos pos) {
-			int hash = (pos.getX() * 9973 ^ pos.getY() * 8287 ^ pos.getZ() * 9721) >> 1;
-			return hash & 0xFFFF;
-		}
-
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
 			if(ModConfigs.podzolGen) {
@@ -115,6 +109,13 @@ public class TreeSpruce extends DynamicTree {
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		ModBlocks.spruceLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE);
+			}
+		});
 	}
 	
 	@Override
@@ -122,20 +123,15 @@ public class TreeSpruce extends DynamicTree {
 		setCommonSpecies(new SpeciesSpruce(this));
 	}
 	
+	@Override
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		int radius = branch.getRadius(blockState);
+		int radius = branch.getRadius(blockState, blockAccess, pos);
 		if(radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
 				return 128;
 			}
 		}
 		return radius;
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return ColorizerFoliage.getFoliageColorPine();
 	}
 	
 }

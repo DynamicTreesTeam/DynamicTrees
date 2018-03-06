@@ -1,21 +1,21 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
@@ -34,24 +34,33 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class TreeCactus extends DynamicTree {
+public class TreeCactus extends TreeFamily {
 	
-	// TODO: Seeds, sapling, add more JoCodes to the file, tweak growth pattern if necessary
-	// This is still WIP, just committing it now to sync up with other changes.
 	public class SpeciesCactus extends Species {
 		
-		public SpeciesCactus(DynamicTree treeFamily) {
+		public SpeciesCactus(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.cactusLeavesProperties);
 			
-			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.5f);
+			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
+			
+			setDynamicSapling(new BlockCactusSapling("cactussapling").getDefaultState());
 			
 			this.setSoilLongevity(1); // Doesn't live very long
+			
+			addDropCreator(new DropCreator(new ResourceLocation(ModConstants.MODID, "cactusseeds")) {
+				@Override
+				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+					dropList.add(species.getSeedStack(volume / 4096));
+					return dropList;
+				}
+			});
 			
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
 			
-			addAcceptableSoil(Blocks.SAND, Blocks.HARDENED_CLAY); //TODO: remove dirt and grass and add rooty sand or something
+			clearAcceptableSoils();
+			addAcceptableSoil(Blocks.SAND);
 		}
 		
 		@Override
@@ -64,17 +73,12 @@ public class TreeCactus extends DynamicTree {
 			long day = world.getTotalWorldTime() / 24000L;
 			int month = (int)day / 30; //Change the hashs every in-game month
 			
-			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (coordHashCode(pos.up(month)) % 3);//Vary the height energy by a psuedorandom hash function
+			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
 		}
 		
 		@Override
 		public BlockRooty getRootyBlock() {
 			return ModBlocks.blockRootySand;
-		}
-		
-		public int coordHashCode(BlockPos pos) {
-			int hash = (pos.getX() * 9973 ^ pos.getY() * 8287 ^ pos.getZ() * 9721) >> 1;
-			return hash & 0xFFFF;
 		}
 		
 		@Override
@@ -118,19 +122,34 @@ public class TreeCactus extends DynamicTree {
 			return newDir;
 		}
 		
+		@Override
+		public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+
+			// Prevent transformation potions from being used on Cacti
+			if(!(getSubstanceEffect(itemStack) instanceof SubstanceTransform)) {
+				return super.applySubstance(world, rootPos, hitPos, player, hand, itemStack);
+			}
+
+			return false;
+		}
+		
+		@Override
+		public boolean canBoneMeal() {
+			return false;
+		}
+		
 	}
 	
 	public TreeCactus() {
 		super(new ResourceLocation(ModConstants.MODID, "cactus"));
-		
-		IBlockState primCactus = Blocks.CACTUS.getDefaultState();
-		
-		setPrimitiveLog(primCactus, new ItemStack(Blocks.CACTUS));
+				
+		setPrimitiveLog(Blocks.CACTUS.getDefaultState(), new ItemStack(Blocks.CACTUS));
 		setStick(ItemStack.EMPTY);
-		
-		setDynamicBranch(new BlockBranchCactus("cactusbranch"));
-		
-		getCommonSpecies().setDynamicSapling(new BlockCactusSapling("cactussapling").getDefaultState());
+	}
+	
+	@Override
+	public BlockBranch createBranch() {
+		return new BlockBranchCactus("cactusbranch");
 	}
 	
 	@Override
@@ -148,29 +167,6 @@ public class TreeCactus extends DynamicTree {
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
 		return super.getRegisterableBlocks(blockList);
-	}
-	
-	// This prevents a crash when recipes are generated to convert seeds to saplings and vice versa
-	@Override
-	public IBlockState getPrimitiveSaplingBlockState() {
-		return null;
-	}
-	
-	// Prevent transformation potions from being used on Cacti
-	@Override
-	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-		ISubstanceEffect effect = getSubstanceEffect(itemStack);
-		
-		if (effect != null && !(effect instanceof SubstanceTransform)) {
-			if(effect.isLingering()) {
-				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
-				return true;
-			} else {
-				return effect.apply(world, rootPos);
-			}
-		}
-		
-		return false;
 	}
 	
 	protected class JoCodeCactus extends JoCode {
@@ -193,11 +189,11 @@ public class TreeCactus extends DynamicTree {
 			generateFork(world, species, 0, rootPos, false);
 
 			// Fix branch thicknesses and map out leaf locations
-			BlockBranch branch = TreeHelper.getBranch(world, treePos);
+			BlockBranch branch = TreeHelper.getBranch(world.getBlockState(treePos));
 			if(branch != null) {//If a branch exists then the growth was successful
 				NodeFindEnds endFinder = new NodeFindEnds(); // This is responsible for gathering a list of branch end points
 				MapSignal signal = new MapSignal(endFinder);
-				branch.analyse(world, treePos, EnumFacing.DOWN, signal);
+				branch.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN, signal);
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself
@@ -209,7 +205,7 @@ public class TreeCactus extends DynamicTree {
 		
 		@Override
 		public boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
-			IBlockState defaultBranchState = species.getTree().getDynamicBranch().getDefaultState();
+			IBlockState defaultBranchState = species.getFamily().getDynamicBranch().getDefaultState();
 			if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
 				boolean trunk = false;
 				if (dir == EnumFacing.UP) {

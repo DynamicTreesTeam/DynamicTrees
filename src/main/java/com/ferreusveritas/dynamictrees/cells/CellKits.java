@@ -35,6 +35,7 @@ public class CellKits {
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "acacia"), acacia);
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "darkoak"), darkoak);
 		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "bare"), bare);
+		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "palm"), palm);
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {
@@ -62,7 +63,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : CellNull.NULLCELL;
+			return radius == 1 || radius == 128 ? branchCell : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -263,6 +264,57 @@ public class CellKits {
 		
 	};
 	
+	private final ICellKit palm = new ICellKit() {
+		
+		private final ICell palmBranch = new ICell() {
+			@Override
+			public int getValue() {
+				return 5;
+			}
+						
+			@Override
+			public int getValueFromSide(EnumFacing side) {
+				return side == EnumFacing.UP ? getValue() : 0;
+			}
+			
+		};
+		
+		private final ICell palmFrondCells[] = {
+				CellNull.NULLCELL,
+				new CellPalmFrond(1),
+				new CellPalmFrond(2),
+				new CellPalmFrond(3),
+				new CellPalmFrond(4)
+			}; 
+		
+		private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0221});
+		
+		@Override
+		public ICell getCellForLeaves(int hydro) {
+			return palmFrondCells[hydro];
+		}
+		
+		@Override
+		public ICell getCellForBranch(int radius) {
+			return palmBranch;
+		}
+		
+		@Override
+		public SimpleVoxmap getLeafCluster() {
+			return LeafClusters.palm;
+		}
+		
+		@Override
+		public ICellSolver getCellSolver() {
+			return palmSolver;
+		}
+		
+		@Override
+		public int getDefaultHydration() {
+			return 4;
+		}
+		
+	};
 	
 	/**
 	* Cellular automata function that determines the behavior of the center cell from it's neighbors.

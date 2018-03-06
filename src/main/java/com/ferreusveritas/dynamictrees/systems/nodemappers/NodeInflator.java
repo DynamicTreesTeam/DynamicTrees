@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -27,21 +27,21 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
-		
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
+				
 		if(branch != null){
-			radius = 1.0f;
+			radius = species.getPrimaryThickness();
 		}
 
 		return false;
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		//Calculate Branch Thickness based on neighboring branches
 		
-		BlockBranch branch = TreeHelper.getBranch(block);
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null) {
 			float areaAccum = radius * radius;//Start by accumulating the branch we just came from
@@ -57,9 +57,10 @@ public class NodeInflator implements INodeInspector {
 						continue;
 					}
 					
-					ITreePart treepart = TreeHelper.getTreePart(world, dPos);
-					if(branch.isSameWood(treepart)) {
-						int branchRadius = treepart.getRadius(world, dPos);
+					IBlockState deltaBlockState = world.getBlockState(dPos);
+					ITreePart treepart = TreeHelper.getTreePart(deltaBlockState);
+					if(branch.isSameTree(treepart)) {
+						int branchRadius = treepart.getRadius(deltaBlockState, world, dPos);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}
@@ -80,7 +81,7 @@ public class NodeInflator implements INodeInspector {
 					radius = secondaryThickness;
 				}
 				
-				branch.setRadius(world, pos, (int)Math.floor(radius));
+				branch.setRadius(world, pos, (int)Math.floor(radius), null);
 				leafMap.setVoxel(pos, (byte) 32);//32(bit 6) is code for a branch
 			}
 			

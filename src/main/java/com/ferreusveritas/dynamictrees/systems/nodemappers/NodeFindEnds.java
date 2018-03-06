@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -31,12 +31,12 @@ public class NodeFindEnds implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return true;
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 
 		//Okay.. so.. a little explanation. If we are only one block away from the last block we returned from then we can't be on an end
 		BlockPos dPos = pos.subtract(last);

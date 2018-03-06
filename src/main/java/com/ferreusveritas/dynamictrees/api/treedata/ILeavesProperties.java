@@ -1,18 +1,25 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ILeavesProperties {
-
-	ILeavesProperties setTree(DynamicTree tree);
+	
+	/** The type of tree these leaves connect to */
+	ILeavesProperties setTree(TreeFamily tree);
 	
 	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */
-	DynamicTree getTree();
+	TreeFamily getTree();
 	
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	IBlockState getPrimitiveLeaves();
@@ -38,5 +45,12 @@ public interface ILeavesProperties {
 	
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
+	
+	@SideOnly(Side.CLIENT)
+	int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos);
+	
+	boolean appearanceChangesWithHydro();
+	
+	int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
 	
 }

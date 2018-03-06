@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -29,11 +29,11 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 
-		if(branch != null && species.getTree() == branch.getTree()) {
-			if(branch.getRadius(world, pos) == 1) {
+		if(branch != null && species.getFamily() == branch.getFamily()) {
+			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
 			world.setBlockToAir(pos);//Destroy the branch
@@ -43,16 +43,16 @@ public class NodeDestroyer implements INodeInspector {
 	}
 
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 
 	public void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
-			DynamicTree tree = species.getTree();
+			TreeFamily tree = species.getFamily();
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-				if(tree.isCompatibleGenericLeaves(world, leavesPos)) {
+				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
 					world.setBlockToAir(leavesPos);
 					dropList.clear();
 					species.getTreeHarvestDrops(world, leavesPos, dropList, world.rand);

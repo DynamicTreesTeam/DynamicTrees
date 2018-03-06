@@ -3,10 +3,11 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -15,19 +16,45 @@ import net.minecraft.world.World;
 
 public class CoordUtils {
 
-	public static final Vec3i[] surround = {
-			new Vec3i( 0, 0,-1),//N
-			new Vec3i( 0, 0, 1),//S
-			new Vec3i(-1, 0, 0),//W
-			new Vec3i( 1, 0, 0),//E
-			new Vec3i(-1, 0,-1),//NW
-			new Vec3i( 1, 0,-1),//NE
-			new Vec3i(-1, 0, 1),//SW
-			new Vec3i( 1, 0, 1) //SE
-		};
+	public enum Surround implements IStringSerializable {
+		N ("n" , EnumFacing.NORTH),
+		NW("nw", EnumFacing.NORTH, EnumFacing.WEST),
+		W ("w" , EnumFacing.WEST),
+		SW("sw", EnumFacing.SOUTH, EnumFacing.WEST),
+		S ("s" , EnumFacing.SOUTH),
+		SE("se", EnumFacing.SOUTH, EnumFacing.EAST),
+		E ("e" , EnumFacing.EAST),		
+		NE("ne", EnumFacing.NORTH, EnumFacing.EAST);
+
+		
+		final private String name;
+		final private Vec3i offset;
+		
+		private Surround(String name, EnumFacing ... dirs) {
+			this.name = name;
+			BlockPos pos = BlockPos.ORIGIN;
+			for(EnumFacing d : dirs) {
+				pos = pos.add(d.getDirectionVec());
+			}
+			this.offset = pos;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public Vec3i getOffset() {
+			return offset;
+		}
+		
+		public Surround getOpposite() {
+			return values()[(ordinal() + 4) & 7];
+		}
+	}
 	
 	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
-		for(Vec3i dir: CoordUtils.surround) {
+		for(Surround surr: CoordUtils.Surround.values()) {
+			Vec3i dir = surr.getOffset();
 			if(world.getChunkProvider().getLoadedChunk((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()) == null ){
 				return false;
 			}
@@ -44,7 +71,7 @@ public class CoordUtils {
 	 * Find a suitable position for seed drops or fruit placement using ray tracing.
 	 * 
 	 * @param world The world
-	 * @param treePos The block position of the {@link DynamicTree} trunk base.
+	 * @param treePos The block position of the {@link TreeFamily} trunk base.
 	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
 	 */
@@ -57,7 +84,7 @@ public class CoordUtils {
 			if(hitPos != BlockPos.ORIGIN) {
 				do { //Run straight down until we hit a block that's non compatible leaves.
 					hitPos = hitPos.down();
-				} while(species.getTree().isCompatibleGenericLeaves(world, hitPos));
+				} while(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
 				if(world.isAirBlock(hitPos)) {//If that block is air then we have a winner.
 					return hitPos;
 				}
@@ -96,7 +123,7 @@ public class CoordUtils {
 			if(result != null) {
 				BlockPos hitPos = result.getBlockPos();
 				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
-					if(species.getTree().isCompatibleGenericLeaves(world, hitPos)) {//Test if it's the right kind of leaves for the species
+					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 						return result;
 					}
 				}
@@ -117,4 +144,23 @@ public class CoordUtils {
 		}
 		return pos;
 	}
+
+	//Some ready made not terrible prime hash factors
+	private static final int coordHashMap[][] = {
+			{4111, 271, 3067},
+			{7933711, 6144389, 9538033},
+			{9973, 8287, 9721},
+			{7211, 5437, 9613}
+	};
+	
+	public static int coordHashCode(BlockPos pos, int a, int b, int c) {
+		int hash = (pos.getX() * a ^ pos.getY() * b ^ pos.getZ() * c) >> 1;
+		return hash & 0xFFFF;
+	}
+	
+	public static int coordHashCode(BlockPos pos, int readyMade) {
+		int factors[] = coordHashMap[readyMade & 3];
+		return coordHashCode(pos, factors[0], factors[1], factors[2]);
+	}
+	
 }

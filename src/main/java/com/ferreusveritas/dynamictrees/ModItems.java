@@ -26,11 +26,10 @@ public class ModItems {
 	
 	public static void registerItems(IForgeRegistry<Item> registry) {
 		ArrayList<Item> treeItems = new ArrayList<Item>();
-		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableItems(treeItems));
+		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 		ModTrees.dynamicCactus.getRegisterableItems(treeItems);
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
 		
-		registry.registerAll(makeItemBlock(ModBlocks.blockRootyDirt), makeItemBlock(ModBlocks.blockRootySand), makeItemBlock(ModBlocks.blockBonsaiPot));
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
 		

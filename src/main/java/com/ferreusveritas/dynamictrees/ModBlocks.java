@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtSpecies;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
@@ -25,6 +25,11 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -32,6 +37,7 @@ public class ModBlocks {
 	public static BlockRooty blockRootyDirt;
 	public static BlockRooty blockRootySand;
 	public static BlockRooty blockRootyDirtSpecies;
+	public static Block blockRootyDirtFake;
 	public static BlockDynamicSapling blockDynamicSapling;
 	public static BlockDynamicSaplingRare blockDynamicSaplingSpecies;
 	public static BlockFruit blockFruit;
@@ -54,9 +60,10 @@ public class ModBlocks {
 	public static void preInit() {
 		blockStates = new CommonBlockStates();
 		
-		blockRootyDirt = new BlockRootyDirt();//Dirt
-		blockRootySand = new BlockRootySand();//Sand
-		blockRootyDirtSpecies = new BlockRootyDirtSpecies();//Special dirt for rarer species
+		blockRootyDirt = new BlockRootyDirt(false);//Dirt
+		blockRootySand = new BlockRootySand(false);//Sand
+		blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
+		blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
 		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");//Dynamic version of a Vanilla sapling
 		blockDynamicSaplingSpecies = new BlockDynamicSaplingRare("saplingrare");//Species extended sapling(Apple)
 		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
@@ -66,27 +73,39 @@ public class ModBlocks {
 		
 		oakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous"));
 		
 		spruceLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata() & 3),
 				TreeRegistry.findCellKit("conifer")) {
 					@Override
 					public int getSmotherLeavesMax() {
 						return 3;
 					}
+					
+					@Override
+					@SideOnly(Side.CLIENT)
+					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+						return ColorizerFoliage.getFoliageColorPine();
+					}
 				};
-		
+				
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata()),
-				TreeRegistry.findCellKit("deciduous"));
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
+				TreeRegistry.findCellKit("deciduous") ) {
+			@Override
+			@SideOnly(Side.CLIENT)
+			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+				return ColorizerFoliage.getFoliageColorBirch();
+			}
+		};
 		
 		jungleLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata()),
+				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous")) {
 			
 			@Override
@@ -97,7 +116,7 @@ public class ModBlocks {
 		
 		acaciaLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata()),
+				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata() & 3),
 				TreeRegistry.findCellKit("acacia")) {
 					@Override
 					public int getSmotherLeavesMax() {
@@ -107,7 +126,7 @@ public class ModBlocks {
 		
 		darkOakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata()),
+				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() & 3),
 				TreeRegistry.findCellKit("darkoak")) {
 					@Override
 					public int getSmotherLeavesMax() {
@@ -137,11 +156,22 @@ public class ModBlocks {
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-		ModTrees.baseTrees.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
 
-		registry.registerAll(blockRootyDirt, blockRootySand, blockRootyDirtSpecies, blockDynamicSapling, blockDynamicSaplingSpecies, blockBonsaiPot, blockFruitCocoa, blockFruit, blockVerboseFire);
+		registry.registerAll(
+			blockRootyDirt,
+			blockRootySand,
+			blockRootyDirtSpecies,
+			blockRootyDirtFake,
+			blockDynamicSapling,
+			blockDynamicSaplingSpecies,
+			blockBonsaiPot,
+			blockFruitCocoa,
+			blockFruit,
+			blockVerboseFire
+		);
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 		
 		DynamicTrees.compatProxy.registerBlocks(registry);

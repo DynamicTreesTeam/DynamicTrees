@@ -48,3 +48,9 @@ WorldGen:
 	[ ]Undergrowth generates under JungleTrees
 	[ ]Swamp Oaks generate in Swamp biomes in shallow water.
 	[ ]Vines generate on Swamp Oaks
+	
+Woodland Staff:
+	[ ]Captures JoCodes
+	[ ]Plant JoCodes
+	[ ]Respects rotation
+	[ ]Pull species without overwriting the JoCodes 

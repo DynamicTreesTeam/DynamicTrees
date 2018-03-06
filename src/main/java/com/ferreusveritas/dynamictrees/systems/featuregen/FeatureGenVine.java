@@ -82,9 +82,4 @@ public class FeatureGenVine implements IGenFeature {
 		}
 	}
 	
-	public static int coordHashCode(BlockPos pos) {
-		int hash = (pos.getX() * 4111 ^ pos.getY() * 271 ^ pos.getZ() * 3067) >> 1;
-		return hash & 0xFFFF;
-	}
-	
 }

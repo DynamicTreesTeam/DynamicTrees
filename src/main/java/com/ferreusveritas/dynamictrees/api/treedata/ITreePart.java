@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public interface ITreePart {
-
+	
 	/**
 	* Get a cell that provides the level of hydration to neighboring structures
 	*
@@ -25,7 +25,7 @@ public interface ITreePart {
 	* @return Cell for getting hydration level
 	*/
 	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties);
-
+	
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.
 	* 
@@ -35,7 +35,7 @@ public interface ITreePart {
 	* @return Signal parameter for chaining
 	*/
 	GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal);
-
+	
 	/**
 	* The probability that the branch logic will follow into this block as part of it's path.
 	* 
@@ -44,26 +44,28 @@ public interface ITreePart {
 	* @param from The branch making the request
 	* @return Probability weight used to determine if the growth path will take this block as a path next. 
 	*/
-	int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
-
+	int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from);
+	
 	/**
 	* The radius of the part that a neighbor is expected to connect with 
 	* @param world The current world
 	* @param pos Position
 	* @param branch The branch making the request
+	* @param side The side the block is requesting(relative to the requesting block)
 	* @param fromRadius The radius of the branch requesting connection data
 	* @return Radius of the connection point to this block from the branch
 	*/
-	int getRadiusForConnection(IBlockAccess world, BlockPos pos, BlockBranch from, int fromRadius);
-
+	int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
+	
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
+	* @param blockState the blockState of the block we are trying to get the radius of.
 	* @param blockAccess Readonly access to blocks
 	* @param pos Position
 	* @return Radius of the treepart(branch)
 	*/
-	int getRadius(IBlockAccess blockAccess, BlockPos pos);
-
+	int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
+	
 	/**
 	* Configurable general purpose branch network scanner to gather data and/or perform operations
 	* 
@@ -73,16 +75,16 @@ public interface ITreePart {
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
-	MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
-
+	MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal);
+	
 	/**
-	* Get the appropriate dynamic tree this block is used to build.
+	* Get the appropriate {@link TreeFamily} this block is used to build.
 	*  
 	* @param blockAccess Readonly access to blocks
 	* @param pos Position
 	* @return DynamicTree
 	*/
-	DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos);
+	TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
 	
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch
@@ -96,13 +98,14 @@ public interface ITreePart {
 	* @param radius The radius of the branch requesting support
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
-	int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
+	int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 	
 	public enum TreePartType {
-		NULL,
-		ROOT,
-		BRANCH,
-		LEAVES
+		NULL,//Not an official tree part
+		ROOT,//Anything based off of BlockRooty
+		BRANCH,//Anything based off of BlockBranch
+		LEAVES,//Anything based off of BlockDynamicLeaves
+		OTHER//Anything else
 	}
 	
 	TreePartType getTreePartType();

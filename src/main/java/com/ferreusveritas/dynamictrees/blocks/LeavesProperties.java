@@ -5,21 +5,28 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.biome.BiomeColorHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LeavesProperties implements ILeavesProperties {
 
 	public static final LeavesProperties NULLPROPERTIES = new LeavesProperties() {
-		@Override public ILeavesProperties setTree(DynamicTree tree) { return this; }
-		@Override public DynamicTree getTree() { return DynamicTree.NULLTREE; }
+		@Override public ILeavesProperties setTree(TreeFamily tree) { return this; }
+		@Override public TreeFamily getTree() { return TreeFamily.NULLFAMILY; }
 		@Override public IBlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
 		@Override public ItemStack getPrimitiveLeavesItemStack() { return CompatHelper.emptyStack(); }
 		@Override public ILeavesProperties setDynamicLeavesState(IBlockState state) { return this; }
@@ -35,7 +42,7 @@ public class LeavesProperties implements ILeavesProperties {
 	private IBlockState primitiveLeaves;
 	private ItemStack primitiveLeavesItemStack;
 	private ICellKit cellKit;
-	private DynamicTree tree = DynamicTree.NULLTREE;
+	private TreeFamily tree = TreeFamily.NULLFAMILY;
 	private IBlockState dynamicLeavesBlockHydroStates[] = new IBlockState[5];
 
 	private LeavesProperties() {}
@@ -91,13 +98,13 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 	
 	@Override
-	public ILeavesProperties setTree(DynamicTree tree) {
+	public ILeavesProperties setTree(TreeFamily tree) {
 		this.tree = tree;
 		return this;
 	}
 	
 	@Override
-	public DynamicTree getTree() {
+	public TreeFamily getTree() {
 		return tree;
 	}
 
@@ -126,4 +133,18 @@ public class LeavesProperties implements ILeavesProperties {
 		return cellKit;
 	}
 	
+	@SideOnly(Side.CLIENT)
+	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
+	}
+
+	@Override
+	public boolean appearanceChangesWithHydro() {
+		return false;
+	}
+	
+	@Override
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+	}	
 }

@@ -86,6 +86,6 @@ public class ModelLoaderBranch implements ICustomModelLoader {
 		this.resourceManager = resourceManager;
 	}
 
-	private IResourceManager resourceManager;
+	protected IResourceManager resourceManager;
 	
 }

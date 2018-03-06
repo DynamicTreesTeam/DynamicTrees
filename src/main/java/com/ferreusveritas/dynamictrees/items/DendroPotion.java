@@ -14,7 +14,7 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -140,7 +140,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		return null;
 	}
 	
-	public ItemStack setTargetTree(ItemStack itemStack, DynamicTree tree) {
+	public ItemStack setTargetTree(ItemStack itemStack, TreeFamily tree) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
 		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
 		itemStack.setTagCompound(nbtTag);
@@ -186,7 +186,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 
-		for(DynamicTree tree : ModTrees.baseTrees) {
+		for(TreeFamily tree : ModTrees.baseFamilies) {
 			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
 			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
 		}

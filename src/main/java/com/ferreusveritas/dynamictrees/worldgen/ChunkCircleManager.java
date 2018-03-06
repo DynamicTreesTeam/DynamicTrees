@@ -71,7 +71,8 @@ public class ChunkCircleManager {
 		ArrayList<Circle> unsolvedCircles = new ArrayList<Circle>(64);
 		
 		//Collect already solved circles from surrounding chunks
-		for(Vec3i dir: CoordUtils.surround) {
+		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
+			Vec3i dir = surr.getOffset();
 			getChunkCircles(circles, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
 		
@@ -110,7 +111,7 @@ public class ChunkCircleManager {
 			
 			int radius = getRadiusAtCircleTangent(world, master);
 			
-			Circle slave = CircleHelper.findSecondCircle(master, radius);//Create a second circle tangential to the master circle.
+			Circle slave = CircleHelper.findSecondCircle(master, radius, true);//Create a second circle tangential to the master circle.
 			Vec2i slavePos = new Vec2i(slave);//Cache slave position
 			
 			//Mask off the master so it won't happen again.

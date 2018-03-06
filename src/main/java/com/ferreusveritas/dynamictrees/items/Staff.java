@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -64,16 +63,16 @@ public class Staff extends Item {
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
-			MapSignal signal = branch.analyse(world, pos, null, new MapSignal());//Analyze entire tree network to find root node
+			MapSignal signal = branch.analyse(clickedBlock, world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
-				treePart = TreeHelper.getTreePart(world, rootPos);
+				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
 			}
 		}
 
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			Species species = DynamicTree.getExactSpecies(world, rootPos);
+			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
 			if(species != Species.NULLSPECIES) {
 				if(!player.isSneaking()) {
 					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();

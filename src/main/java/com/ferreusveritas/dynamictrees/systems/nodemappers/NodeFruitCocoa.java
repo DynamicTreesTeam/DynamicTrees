@@ -4,8 +4,8 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -25,19 +25,19 @@ public class NodeFruitCocoa implements INodeInspector {
 		return this;
 	}
 	
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 
 		if(!finished) {
-			int hashCode = coordHashCode(pos);
+			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {
-				BlockBranch branch = TreeHelper.getBranch(world, pos);
-				if(branch != null && branch.getRadius(world, pos) == 8) {
+				BlockBranch branch = TreeHelper.getBranch(blockState);
+				if(branch != null && branch.getRadius(blockState, world, pos) == 8) {
 					int side = (hashCode % 4) + 2;
 					EnumFacing dir = EnumFacing.getFront(side);
-					pos = pos.offset(dir);
-					if (world.isAirBlock(pos)) {
-						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, pos, dir, 0, 0, 0, 0, null);
-						world.setBlockState(pos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
+					BlockPos deltaPos = pos.offset(dir);
+					if (world.isAirBlock(deltaPos)) {
+						IBlockState cocoaState = ModBlocks.blockFruitCocoa.getStateForPlacement(world, deltaPos, dir, 0, 0, 0, 0, null);
+						world.setBlockState(deltaPos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;
@@ -46,14 +46,9 @@ public class NodeFruitCocoa implements INodeInspector {
 		}
 		return false;
 	}
-
-	public static int coordHashCode(BlockPos pos) {
-		int hash = (pos.getX() * 7933711 ^ pos.getY() * 6144389 ^ pos.getZ() * 9538033) >> 1;
-		return hash & 0xFFFF;
-	}
-
+	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 

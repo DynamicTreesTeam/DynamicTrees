@@ -11,8 +11,10 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,14 +27,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeJungle extends DynamicTree {
+public class TreeJungle extends TreeFamily {
 	
 	public class SpeciesJungle extends Species {
 
 		FeatureGenVine vineGen;
 		FeatureGenUndergrowth underGen;
 		
-		SpeciesJungle(DynamicTree treeFamily) {
+		SpeciesJungle(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
 
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
@@ -59,8 +61,8 @@ public class TreeJungle extends DynamicTree {
 			
 			EnumFacing originDir = signal.dir.getOpposite();
 			
-			int treeHash = coordHashCode(signal.rootPos);
-			int posHash = coordHashCode(pos);
+			int treeHash = CoordUtils.coordHashCode(signal.rootPos, 2);
+			int posHash = CoordUtils.coordHashCode(pos, 2);
 			
 			//Alter probability map for direction change
 			probMap[0] = 0;//Down is always disallowed for jungle
@@ -88,11 +90,6 @@ public class TreeJungle extends DynamicTree {
 				signal.energy = 4.0f;
 			}
 			return newDir;
-		}
-		
-		private int coordHashCode(BlockPos pos) {
-			int hash = (pos.getX() * 9973 ^ pos.getY() * 8287 ^ pos.getZ() * 9721) >> 1;
-			return hash & 0xFFFF;
 		}
 		
 		//Jungle trees grow taller in suitable biomes
@@ -141,6 +138,13 @@ public class TreeJungle extends DynamicTree {
 		super(BlockPlanks.EnumType.JUNGLE);
 		ModBlocks.jungleLeavesProperties.setTree(this);
 		canSupportCocoa = true;
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE);
+			}
+		});
 	}
 
 	@Override
@@ -154,8 +158,8 @@ public class TreeJungle extends DynamicTree {
 		//Place Cocoa Pod if we are holding Cocoa Beans
 		if(heldItem != null) {
 			if(heldItem.getItem() == Items.DYE && heldItem.getItemDamage() == 3) {
-				BlockBranch branch = TreeHelper.getBranch(world, pos);
-				if(branch != null && branch.getRadius(world, pos) == 8) {
+				BlockBranch branch = TreeHelper.getBranch(state);
+				if(branch != null && branch.getRadius(state, world, pos) == 8) {
 					if(side != EnumFacing.UP && side != EnumFacing.DOWN) {
 						pos = pos.offset(side);
 					}

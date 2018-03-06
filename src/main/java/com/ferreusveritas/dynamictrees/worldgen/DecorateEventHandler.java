@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.util.ResourceLocation;
@@ -48,7 +49,7 @@ public class DecorateEventHandler {
 
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
-		if(event.getType() == EventType.TREE || event.getType() == EventType.CACTUS) {//Affects roofed forests in 1.10.2(Not 1.7.10)
+		if(event.getType() == EventType.TREE) {//Affects roofed forests in 1.10.2(Not 1.7.10)
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			ResourceLocation resloc = biome.getRegistryName();
 			//Only deny tree decoration for Vanilla Minecraft Biomes
@@ -60,6 +61,14 @@ public class DecorateEventHandler {
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			//We need to disable Giant Mushroom creation until after the trees are built
 			if(CompatHelper.biomeHasType(biome, Type.SPOOKY)) { //Disable shrooms for roofedForest only
+				event.setResult(Result.DENY);
+			}
+		} else
+		if(!ModConfigs.vanillaCactusWorldGen && event.getType() == EventType.CACTUS){
+			Biome biome = event.getWorld().getBiome(event.getPos());
+			ResourceLocation resloc = biome.getRegistryName();
+			//Only deny cactus decoration for Vanilla Minecraft Biomes
+			if(resloc.getResourceDomain().equals("minecraft")) {
 				event.setResult(Result.DENY);
 			}
 		}

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "dynamictrees:cactusbranch#dynamictree" }
+        "normal": { "model": "dynamictrees:cactusbranch#dynamiccactus" }
     }
 }

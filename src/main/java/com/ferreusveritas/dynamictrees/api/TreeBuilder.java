@@ -4,12 +4,11 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.api.treedata.IFoliageColorHandler;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -17,13 +16,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * A {@link DynamicTree} builder class to ease in the creation of new trees for other mods.
+ * A {@link TreeFamily} builder class to ease in the creation of new trees for other mods.
  * 
  * 
  * @author ferreusveritas
@@ -37,8 +32,6 @@ public class TreeBuilder {
 	//Drops
 	private IBlockState primitiveLeavesBlockState = Blocks.LEAVES.getDefaultState();
 	private IBlockState primitiveLogBlockState = Blocks.LOG.getDefaultState();
-	private IBlockState primitiveSaplingBlockState;
-	private ItemStack primitiveSaplingItemStack;
 	private ItemStack stickItemStack;
 
 	//Leaves
@@ -46,7 +39,6 @@ public class TreeBuilder {
 	private int dynamicLeavesSmotherMax = 4;
 	private int dynamicLeavesLightRequirement = 13;
 	private ResourceLocation dynamicLeavesCellKit;
-	private IFoliageColorHandler dynamicLeavesColorHandler;
 
 	//Common Species
 	private ISpeciesCreator speciesCreator;
@@ -83,7 +75,7 @@ public class TreeBuilder {
 	 *  
 	 * Each {@link BlockDynamicLeaves} can handle 4 different trees by using metadata.  It's the mod authors
 	 * responsibility to assign and maintain an ordered set of numbers that each represent a tree.  The sequence
-	 * should start from 0 for each Mod and incremented for each {@link DynamicTree} that the mod creates.  Gaps in
+	 * should start from 0 for each Mod and incremented for each {@link TreeFamily} that the mod creates.  Gaps in
 	 * the numbered list are okay(if a tree is removed for instance), duplicates will result in undefined behavior.
 	 * DynamicTrees internally maintains a mapping of {@link BlockDynamicLeaves} for each mod.  This is done to
 	 * reduce the number of registered blocks.
@@ -144,22 +136,6 @@ public class TreeBuilder {
 	/**
 	 * OPTIONAL
 	 * 
-	 * This is simply a way to store a reference to a primitive sapling in the tree for
-	 * convenience.  Could be used for recipes or other logic like for a bonsai pot. 
-	 * 
-	 * @param primSapling
-	 * @param primSaplingStack
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setPrimitiveSapling(IBlockState primSapling, ItemStack primSaplingStack) {
-		primitiveSaplingBlockState = primSapling;
-		primitiveSaplingItemStack = primSaplingStack;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
 	 * Generally this is not used.  Some mods have custom sticks like iron sticks and this is for them.
 	 * 
 	 * @param stick The sticks to drop when there's not enough harvested material to produce another whole log.
@@ -197,7 +173,7 @@ public class TreeBuilder {
 	 * OPTIONAL
 	 * 
 	 * Sets the cellular automata kit to use for the {@link BlockDynamicLeaves} for this 
-	 * {@link DynamicTree}
+	 * {@link TreeFamily}
 	 * 
 	 * A CellKit contains all the algorithms and data to make a leaves grow a certain way.
 	 * 
@@ -206,21 +182,6 @@ public class TreeBuilder {
 	 */
 	public TreeBuilder setCellKit(ResourceLocation kit) {
 		dynamicLeavesCellKit = kit; 
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
-	 * It's up to the mod author to provide an interface that respects Client {@link SideOnly} function 
-	 * calls.  For simple colors and mapping it's typically not a problem.  The interface provided 
-	 * by the handler is only ever called client side.
-	 * 
-	 * @param handler
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setColorHandler(IFoliageColorHandler handler) {
-		dynamicLeavesColorHandler = handler;
 		return this;
 	}
 	
@@ -280,13 +241,13 @@ public class TreeBuilder {
 	}
 	
 	/**
-	 * Builds a {@link DynamicTree} according to the specs provided. Called last in the builder chain.
+	 * Builds a {@link TreeFamily} according to the specs provided. Called last in the builder chain.
 	 * Repeated calls can be made but be sure to change the Name and Sequence for the tree before
 	 * creating multiple trees. 
 	 * 
-	 * @return The newly built {@link DynamicTree}
+	 * @return The newly built {@link TreeFamily}
 	 */
-	public DynamicTree build() {
+	public TreeFamily build() {
 	
 		if(name == null) {
 			System.err.println("Error: Attempted to build an nameless tree");
@@ -298,7 +259,7 @@ public class TreeBuilder {
 			return null;
 		}
 		
-		DynamicTree tree = new DynamicTree(name) {
+		TreeFamily treeFamily = new TreeFamily(name) {
 						
 			{
 				
@@ -325,9 +286,7 @@ public class TreeBuilder {
 				
 				this.setPrimitiveLog(primitiveLogBlockState);
 				
-				if(primitiveSaplingBlockState != null && primitiveSaplingItemStack != null) {
-					setPrimitiveSapling(primitiveSaplingBlockState, primitiveSaplingItemStack);
-				}
+				dynamicLeavesProperties.setTree(this);
 				
 				if(stickItemStack != null) {
 					setStick(stickItemStack);
@@ -363,23 +322,13 @@ public class TreeBuilder {
 				return super.getRegisterableBlocks(blockList);
 			}
 			
-			@SideOnly(Side.CLIENT)
-			@Override
-			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-				if(dynamicLeavesColorHandler != null) {
-					return dynamicLeavesColorHandler.foliageColorMultiplier(state, world, pos);
-				} else {
-					return super.foliageColorMultiplier(state, world, pos);
-				}
-			}
-			
 		};
 		
-		return tree;
+		return treeFamily;
 	}
 	
 	public interface ISpeciesCreator {
-		Species create(DynamicTree tree);
+		Species create(TreeFamily tree);
 	}
 	
 }

@@ -3,11 +3,12 @@ package com.ferreusveritas.dynamictrees.proxy;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.DropEventHandler;
+import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
@@ -17,6 +18,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
@@ -39,7 +41,11 @@ public class CommonProxy {
 		if(ModConfigs.worldGen) {
 			MinecraftForge.EVENT_BUS.register(new DropEventHandler());
 		}
-
+		
+		if(Loader.isModLoaded("fastleafdecay")) {
+			MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
+		}
+		
 		//An event for dealing with Vanilla Saplings
 		if(ModConfigs.replaceVanillaSapling) {
 			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
@@ -53,7 +59,7 @@ public class CommonProxy {
 		}
 	}
 	
-	public int getTreeFoliageColor(DynamicTree tree, World world, IBlockState blockState, BlockPos pos) {
+	public int getFoliageColor(ILeavesProperties leavesProperties, World world, IBlockState blockState, BlockPos pos) {
 		return 0x00FF00FF;//Magenta shading as error indicator
 	}
 

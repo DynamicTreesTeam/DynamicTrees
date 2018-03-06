@@ -73,11 +73,11 @@
     │   │
     │   ╰[✔]Bone meal should attempt a single growth cycle in a developing tree.
     │
-    ├[ ]┬Loot table for tree species voluntaries and harvestables.
+    ├[✔]┬Loot table for tree species voluntaries and harvestables.
     │   │
-    │   ╰[ ]Create a drop provider interface with some sensible default implementations
+    │   ╰[✔]Create a drop provider interface with some sensible default implementations
     │
-    ├[ ]Cacti
+    ├[✔]Cacti
     ├[ ]Seasons
     ├[ ]Trees fall over when harvested
     ╰[ ]Thick tree trunks
@@ -95,10 +95,10 @@
     ├[✔]MUTATED_REDWOOD_TAIGA and MUTATED_REDWOOD_TAIGA_HILLS now properly spawn spruce instead of Oak.
     ├[✔]Fix jungle worldgen(forest floor is bare)
     │
-    ├[⌛]┬Poisson disc rework
+    ├[✔]┬Poisson disc rework
     │   ├[✔]Fixed broken poisson disc algorithm
     │   ├[✔]Poisson discs fit more tightly together(better, more continuous forest canopies)
-    │   ╰[ ]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.)
+    │   ╰[✔]Some discs don't generate during poisson disc distribution stage. (Enable WorldGen debug to be harassed by the errors.)
     │
     ╰[⌛]Fix spawning leaves in ungenerated chunks(cascading worldgen lag problem)
 
@@ -109,6 +109,8 @@
     ├[✔]Added OreDictionary for Seeds and treeSapling
     ├[✔]Passable Leaves
     ├[✔]Quark greener grass compatibility added
+    ├[✔]Quark colored pots compatibility added
+    ├[✔]Modded DynamicTrees work in bonsai pot
     ╰[✔]Rework block flow so BlockEvent.HarvestDropsEvent works as expected
 
 

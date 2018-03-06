@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -29,8 +29,8 @@ public class ModelHelper {
 	 * 
 	 * @param tree
 	 */
-	public static void regModel(DynamicTree tree) {
-		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranch.RADIUS).build());
+	public static void regModel(TreeFamily tree) {
+		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build());
 	}	
 	
 	public static void regModel(Block block) {
@@ -58,7 +58,7 @@ public class ModelHelper {
 		regColorHandler(sapling, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return access == null || pos == null ? -1 : sapling.getSpecies(access, pos, state).getTree().foliageColorMultiplier(state, access, pos);
+				return access == null || pos == null ? -1 : sapling.getSpecies(access, pos, state).getLeavesProperties().foliageColorMultiplier(state, access, pos);
 			}
 		});
 	}

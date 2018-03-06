@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -30,37 +30,37 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(IBlockAccess blockAccess, BlockPos pos, BlockBranch from, int fromRadius) {
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
-			return from.getTree().isCompatibleVanillaLeaves(blockAccess, pos) ? 1: 0;
+			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
 		}
 		return 0;
 	}
 
 	@Override
-	public int probabilityForBlock(IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return blockAccess.isAirBlock(pos) ? 1 : 0;
+	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+		return blockState.getBlock().isAir(blockState, blockAccess, pos) ? 1 : 0;
 	}
 
 	@Override
-	public int getRadius(IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
 
 	@Override
-	public MapSignal analyse(World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
 	
 	@Override
-	public int branchSupport(IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return BlockBranch.setSupport(0, branch.getTree().isCompatibleVanillaLeaves(blockAccess, pos) ? 1 : 0);
+	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
 	}
 
 	@Override
-	public DynamicTree getTree(IBlockAccess blockAccess, BlockPos pos) {
-		return null;
+	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		return TreeFamily.NULLFAMILY;
 	}
 
 	public final TreePartType getTreePartType() {

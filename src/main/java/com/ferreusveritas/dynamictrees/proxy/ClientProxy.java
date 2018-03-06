@@ -8,12 +8,17 @@ import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -36,6 +41,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -55,15 +61,9 @@ public class ClientProxy extends CommonProxy {
 	public void registerModels() {
 		
 		//BLOCKS
-		
-		//Register Rooty Dirt Mesher
-		ModelHelper.regModel(ModBlocks.blockRootyDirt);
-
-		//Register Rooty Sand Mesher
-		ModelHelper.regModel(ModBlocks.blockRootySand);
-		
-		//Register Bonsai Pot Mesher
-		ModelHelper.regModel(ModBlocks.blockBonsaiPot);//Register this just in case something weird happens.
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		
 		//Register DendroCoil Mesher
 		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
@@ -85,7 +85,7 @@ public class ClientProxy extends CommonProxy {
 		//TREE PARTS
 		
 		//Register Meshers for Branches and Seeds
-		for(DynamicTree tree: ModTrees.baseTrees) {
+		for(TreeFamily tree: ModTrees.baseFamilies) {
 			ModelHelper.regModel(tree.getDynamicBranch());//Register Branch itemBlock
 			ModelHelper.regModel(tree.getCommonSpecies().getSeed());//Register Seed Item Models
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
@@ -104,6 +104,7 @@ public class ClientProxy extends CommonProxy {
 		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
+		ModelLoaderRegistry.registerLoader(new ModelLoaderCactus());
 	}
 	
 	public void registerColorHandlers() {
@@ -113,21 +114,23 @@ public class ClientProxy extends CommonProxy {
 		
 		//BLOCKS
 		
-		//Register Rootydirt Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockRootyDirt, new IBlockColor() {
+		//Register Rooty Colorizers
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(
+		new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
+				if(world == null || pos == null) {
+					return white;
+				} else {
+					switch(tintIndex) {
+						case 0: return BiomeColorHelper.getGrassColorAtPos(world, pos);
+						case 1: return 0xFFF1AE;
+						default: return white;
+					}
+				}
 			}
-		});
-		
-		//Register Rootydirt Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockRootyDirtSpecies, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : BiomeColorHelper.getGrassColorAtPos(world, pos);
-			}
-		});
+		},
+		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake});
 		
 		//Register Sapling Colorizers
 		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);
@@ -136,8 +139,10 @@ public class ClientProxy extends CommonProxy {
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
 			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				return world == null || pos == null ? white : ModBlocks.blockBonsaiPot.getTree(state).foliageColorMultiplier(state, world, pos);
+			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+				return (access == null || pos == null || !(state.getBlock() instanceof BlockBonsaiPot))
+					? white
+					: ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
 			}
 		});
 		
@@ -147,7 +152,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Potion Colorizer
 		ModelHelper.regColorHandler(ModItems.dendroPotion, new IItemColor() {
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				return tintIndex == 0 ? ModItems.dendroPotion.getColor(stack) : white;
 			}
 		});
@@ -155,7 +160,7 @@ public class ClientProxy extends CommonProxy {
 		//Register Woodland Staff Mesher and Colorizer
 		ModelHelper.regColorHandler(ModItems.treeStaff, new IItemColor() {
 			@Override
-			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			public int colorMultiplier(ItemStack stack, int tintIndex) {
 				return tintIndex == 1 ? ModItems.treeStaff.getColor(stack) : white;
 			}
 		});
@@ -171,7 +176,7 @@ public class ClientProxy extends CommonProxy {
 				public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
 					Block block = state.getBlock();
 					if(TreeHelper.isLeaves(block)) {
-						return ((BlockDynamicLeaves) block).getTree(state).foliageColorMultiplier(state, worldIn, pos);
+						return ((BlockDynamicLeaves) block).getProperties(state).foliageColorMultiplier(state, worldIn, pos);
 					}
 					return magenta;
 				}
@@ -179,7 +184,7 @@ public class ClientProxy extends CommonProxy {
 				
 			ModelHelper.regColorHandler(Item.getItemFromBlock(leaves), new IItemColor() {
 				@Override
-				public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				public int colorMultiplier(ItemStack stack, int tintIndex) {
 					return ColorizerFoliage.getFoliageColorBasic();
 				}
 			});
@@ -199,12 +204,12 @@ public class ClientProxy extends CommonProxy {
 	}
  
 	public void registerClientEventHandlers() {
-		//There are currently no Client Side events to handle
+		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
 	}
 	
 	@Override
-	public int getTreeFoliageColor(DynamicTree tree, World world, IBlockState blockState, BlockPos pos) {
-		return tree.foliageColorMultiplier(blockState, world, pos);
+	public int getFoliageColor(ILeavesProperties leavesProperties, World world, IBlockState blockState, BlockPos pos) {
+		return leavesProperties.foliageColorMultiplier(blockState, world, pos);
 	}
 	
 	///////////////////////////////////////////
@@ -234,21 +239,19 @@ public class ClientProxy extends CommonProxy {
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
 			if(treePart instanceof BlockDynamicLeaves) {
 				BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
-				DynamicTree tree = leaves.getTree(blockState);
-				if(tree != null) {
-					int color = getTreeFoliageColor(tree, world, blockState, pos);
-					float r = (color >> 16 & 255) / 255.0F;
-					float g = (color >> 8 & 255) / 255.0F;
-					float b = (color & 255) / 255.0F;
-					for(int dz = 0; dz < 8; dz++) {
-						for(int dy = 0; dy < 8; dy++) {
-							for(int dx = 0; dx < 8; dx++) {
-								if(random.nextInt(8) == 0) {
-									double fx = pos.getX() + dx / 8.0;
-									double fy = pos.getY() + dy / 8.0;
-									double fz = pos.getZ() + dz / 8.0;
-									addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
-								}
+				ILeavesProperties leavesProperties = leaves.getProperties(blockState);
+				int color = getFoliageColor(leavesProperties, world, blockState, pos);
+				float r = (color >> 16 & 255) / 255.0F;
+				float g = (color >> 8 & 255) / 255.0F;
+				float b = (color & 255) / 255.0F;
+				for(int dz = 0; dz < 8; dz++) {
+					for(int dy = 0; dy < 8; dy++) {
+						for(int dx = 0; dx < 8; dx++) {
+							if(random.nextInt(8) == 0) {
+								double fx = pos.getX() + dx / 8.0;
+								double fy = pos.getY() + dy / 8.0;
+								double fz = pos.getZ() + dz / 8.0;
+								addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.motionY, 0, blockState, r, g, b);
 							}
 						}
 					}
@@ -256,5 +259,5 @@ public class ClientProxy extends CommonProxy {
 			}
 		}
 	}
-	
+
 }

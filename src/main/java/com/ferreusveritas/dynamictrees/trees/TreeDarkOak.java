@@ -5,23 +5,27 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 
+import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeDarkOak extends DynamicTree {
+public class TreeDarkOak extends TreeFamily {
 	
 	public class SpeciesDarkOak extends Species {
 
-		SpeciesDarkOak(DynamicTree treeFamily) {
+		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
@@ -84,7 +88,7 @@ public class TreeDarkOak extends DynamicTree {
 		@Override
 		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 			if(super.rot(world, pos, neighborCount, radius, random)) {
-				if(radius > 2 && TreeHelper.isRooty(world, pos.down()) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
+				if(radius > 2 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
 					world.setBlockState(pos, ModBlocks.blockStates.redMushroom);//Change branch to a red mushroom
 					world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
 				}
@@ -98,11 +102,29 @@ public class TreeDarkOak extends DynamicTree {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		ModBlocks.darkOakLeavesProperties.setTree(this);
+		
+		addConnectableVanillaLeaves(new IConnectable() {
+			@Override
+			public boolean isConnectable(IBlockState blockState) {
+				return blockState.getBlock() instanceof BlockNewLeaf && (blockState.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.DARK_OAK);
+			}
+		});
 	}
 	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesDarkOak(this));
+	}
+	
+	@Override
+	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
+		int radius = branch.getRadius(blockState, blockAccess, pos);
+		if(radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				return 128;
+			}
+		}
+		return radius;
 	}
 	
 }

@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -23,13 +22,13 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(World world, Block block, BlockPos pos, EnumFacing fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(block);
+	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
-		if(branch != null && fromSpecies.getTree() == branch.getTree()) {
-			int radius = branch.getRadius(world, pos);
+		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
+			int radius = branch.getRadius(blockState, world, pos);
 			if(radius > 0) {
-				world.setBlockState(pos, toSpecies.getTree().getDynamicBranch().getDefaultState().withProperty(BlockBranch.RADIUS, radius));
+				toSpecies.getFamily().getDynamicBranch().setRadius(world, pos, radius, null);
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}
@@ -40,7 +39,7 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(World world, Block block, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	
@@ -48,8 +47,8 @@ public class NodeTransform implements INodeInspector {
 		if (!world.isRemote) {
 			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
 				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
-					if(fromSpecies.getTree().isCompatibleGenericLeaves(world, leavesPos)) {
-						IBlockState state = world.getBlockState(leavesPos);
+					IBlockState state = world.getBlockState(leavesPos);
+					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
 						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.getValue(BlockDynamicLeaves.HYDRO) : 2;
 						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
 					}

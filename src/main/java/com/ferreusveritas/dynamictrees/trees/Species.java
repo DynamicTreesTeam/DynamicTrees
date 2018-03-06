@@ -14,15 +14,20 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -30,18 +35,20 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.TreeCodeStore;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -62,7 +69,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public final static Species NULLSPECIES = new Species() {
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
-		@Override public DynamicTree getTree() { return DynamicTree.NULLTREE; }
+		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
@@ -94,7 +101,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected final DynamicTree treeFamily;
+	protected final TreeFamily treeFamily;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -127,10 +134,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	protected TreeCodeStore joCodeStore = new TreeCodeStore(this);
+	protected JoCodeStore joCodeStore = new JoCodeStore(this);
 	
 	public Species() {
-		this.treeFamily = DynamicTree.NULLTREE;
+		this.treeFamily = TreeFamily.NULLFAMILY;
+		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
 	}
 	
 	/**
@@ -138,9 +146,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param modid The MODID of the mod that is registering this species
 	 * @param name The simple name of the species e.g. "oak"
-	 * @param treeFamily The {@link DynamicTree} that this species belongs to.
+	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, DynamicTree treeFamily, ILeavesProperties leavesProperties) {
+	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
 		setLeavesProperties(leavesProperties);
@@ -152,7 +160,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		addDropCreator(new DropCreatorLogs());
 	}
 	
-	public DynamicTree getTree() {
+	public TreeFamily getFamily() {
 		return treeFamily;
 	}
 	
@@ -295,7 +303,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link DynamicTree} at
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link TreeFamily} at
 	 * random with no player interaction.
 	 * 
 	 * @param world
@@ -422,12 +430,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		return false;
 	}
-
+	
+	//This is for the sapling.
+	//If false is returned then nothing happens.
+	//If true is returned canUseBoneMealNow is run then the bonemeal is consumed regardless of it's return.
 	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {
-		return true;
+		return canBoneMeal();
 	}
 	
+	//This is for the sapling.
+	//Return weather or not the bonemealing should cause growth 
 	public boolean canUseBoneMealNow(World world, Random rand, BlockPos pos) {
+		return canBoneMeal();
+	}
+	
+	//This is for the tree itself.
+	public boolean canBoneMeal() {
 		return true;
 	}
 	
@@ -508,7 +526,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
@@ -540,13 +558,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * A little internal convenience function for getting branch endpoints
 	 * 
 	 * @param world The world
-	 * @param treePos The {@link BlockPos} of the base of the {@link DynamicTree} trunk
-	 * @param treeBase The tree part that is the base of the {@link DynamicTree} trunk.  Provided for easy analysis.
-	 * @return A list of all branch endpoints for the {@link DynamicTree}
+	 * @param treePos The {@link BlockPos} of the base of the {@link TreeFamily} trunk
+	 * @param treeBase The tree part that is the base of the {@link TreeFamily} trunk.  Provided for easy analysis.
+	 * @return A list of all branch endpoints for the {@link TreeFamily}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
 		NodeFindEnds endFinder = new NodeFindEnds();
-		treeBase.analyse(world, treePos, null, new MapSignal(endFinder));
+		treeBase.analyse(world.getBlockState(treePos), world, treePos, null, new MapSignal(endFinder));
 		return endFinder.getEnds();
 	}
 	
@@ -555,10 +573,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link DynamicTree}
-	 * @param treePos The {@link BlockPos} of the trunk base for this {@link DynamicTree}
+	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link TreeFamily}
+	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
 	 * @param soilLife The soil life of the {@link BlockRooty}
-	 * @param rapid Whether or not this {@link DynamicTree} is to be process rapidly.
+	 * @param rapid Whether or not this {@link TreeFamily} is to be process rapidly.
 	 * @return true if last piece of tree rotted away.
 	 */
 	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
@@ -571,7 +589,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			IBlockState branchState = world.getBlockState(endPos);
 			BlockBranch branch = TreeHelper.getBranch(branchState);
 			if(branch != null) {
-				int radius = branch.getRadius(branchState);
+				int radius = branch.getRadius(branchState, world, endPos);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
 				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, rapid) || radius != 1) {
 					if(rapid) {
@@ -582,7 +600,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			}
 		}
 		
-		return ends.isEmpty() && !TreeHelper.isBranch(world, treePos);//There are no endpoints and the trunk is missing
+		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
 
 	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
@@ -630,7 +648,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link DynamicTree} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
@@ -686,12 +704,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				BlockPos deltaPos = pos.offset(dir);
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
-				probMap[dir.getIndex()] += TreeHelper.getTreePart(world, deltaPos).probabilityForBlock(world, deltaPos, branch);
+				IBlockState deltaBlockState = world.getBlockState(deltaPos);
+				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
 			}
 		}
 		
 		//Do custom stuff or override probability map for various species
-		probMap = customDirectionManipulation(world, pos, branch.getRadius(world, pos), signal, probMap);
+		probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos), world, pos), signal, probMap);
 		
 		//Select a direction from the probability map
 		int choice = MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
@@ -732,7 +751,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
 		if(soilLife == 0 && ModConfigs.diseaseChance > random.nextFloat() ) {
-			baseTreePart.analyse(world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
 			return true;
 		}
 		
@@ -810,10 +829,72 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	// INTERACTIVE
 	//////////////////////////////
 	
-	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+		
+		//Bonemeal fertilizes the soil and causes a single growth pulse
+		if( canBoneMeal() && itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
+			return new SubstanceFertilize().setAmount(1).setGrow(true);
+		}
+		
+		//Use substance provider interface if it's available
+		if(itemStack.getItem() instanceof ISubstanceEffectProvider) {
+			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
+			return provider.getSubstanceEffect(itemStack);
+		}
+		
+		return null;
+	}
+	
+	/**
+	* Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after applying.
+	* 
+	* @param world The current world
+	* @param hitPos Position
+	* @param player The player applying the substance
+	* @param itemStack The itemstack to be used.
+	* @return true if item was used, false otherwise
+	*/
+	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+		
+		ISubstanceEffect effect = getSubstanceEffect(itemStack);
+		
+		if(effect != null) {
+			if(effect.isLingering()) {
+				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
+				return true;
+			} else {
+				return effect.apply(world, rootPos);
+			}
+		}
+		
 		return false;
 	}
 	
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		
+		if (heldItem != null) {//Something in the hand
+			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
+				CompatHelper.consumePlayerItem(player, hand, heldItem);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	//////////////////////////////
+	// BONSAI POT
+	//////////////////////////////
+	
+	/**
+	 * Provides the {@link BlockBonsaiPot} for this Species.  A mod can
+	 * derive it's own BonzaiPot subclass if it wants something custom.
+	 * 
+	 * @return A {@link BlockBonsaiPot}
+	 */
+	public BlockBonsaiPot getBonzaiPot() {
+		return ModBlocks.blockBonsaiPot;
+	}
 	
 	//////////////////////////////
 	// WORLDGEN
@@ -844,7 +925,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
-	public TreeCodeStore getJoCodeStore() {
+	public JoCodeStore getJoCodeStore() {
 		return joCodeStore;
 	}
 	
@@ -853,7 +934,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * A {@link JoCode} defines the block model of the {@link DynamicTree}
+	 * A {@link JoCode} defines the block model of the {@link TreeFamily}
 	 */
 	public void addJoCodes() {
 		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");

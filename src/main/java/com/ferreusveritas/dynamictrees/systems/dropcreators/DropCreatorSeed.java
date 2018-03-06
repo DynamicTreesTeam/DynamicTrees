@@ -6,6 +6,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
+import com.ferreusveritas.dynamictrees.event.SeedVoluntaryDropEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 
 public class DropCreatorSeed implements IDropCreator {
 
@@ -43,6 +45,11 @@ public class DropCreatorSeed implements IDropCreator {
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
 		if(rarity * ModConfigs.seedDropRate > random.nextFloat()) {
 			dropList.add(species.getSeedStack(1));
+			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(rootPos, species, dropList);
+			MinecraftForge.EVENT_BUS.post(seedDropEvent);
+			if(seedDropEvent.isCanceled()) {
+				dropList.clear();
+			}
 		}
 		return dropList;
 	}

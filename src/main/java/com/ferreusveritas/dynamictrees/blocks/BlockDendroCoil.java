@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
@@ -62,7 +61,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 
 	public String getCode(World world, BlockPos pos) {
 		pos = pos.up();
-		if(TreeHelper.isRooty(world, pos)) {
+		if(TreeHelper.isRooty(world.getBlockState(pos))) {
 			return new JoCode().buildFromTree(world, pos).toString();
 		}
 		
@@ -91,9 +90,10 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public String getSpecies(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		IBlockState rootyState = world.getBlockState(pos.up());
+		ITreePart part = TreeHelper.getTreePart(rootyState);
 		if(part.isRootNode()) {
-			return DynamicTree.getExactSpecies(world, pos.up()).toString();
+			return TreeHelper.getExactSpecies(rootyState, world, pos.up()).toString();
 		}
 		
 		return "";
@@ -105,35 +105,36 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 	}
 
 	public void growPulse(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			TreeHelper.growPulse(world, pos.up());
 		}
 	}
 	
 	public void killTree(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			((BlockRooty)part).destroyTree(world, pos.up());
 		}
 	}
 
 	public int getSoilLife(World world, BlockPos pos) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
-		if(part.isRootNode()) {
-			return ((BlockRooty)part).getSoilLife(world, pos.up());
+		IBlockState rootyState = world.getBlockState(pos.up());
+		BlockRooty rooty = TreeHelper.getRooty(rootyState);
+		if(rooty != null) {
+			return rooty.getSoilLife(rootyState, world, pos.up());
 		}
 		return 0;
 	}
 
 	public void setSoilLife(World world, BlockPos pos, int life) {
-		ITreePart part = TreeHelper.getTreePart(world, pos.up());
+		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos.up()));
 		if(part.isRootNode()) {
 			((BlockRooty)part).setSoilLife(world, pos.up(), life);
 		}
 	}
 	
-	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle) {
+	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle, boolean onlyTight) {
 		pos = pos.up();
 		
 		for(int y = 0; y < 2; y++) {
@@ -148,13 +149,13 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 			Circle circleA = new Circle(pos, rad1);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 
-			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle, onlyTight);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
-			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isLoose() ? Blocks.COBBLESTONE.getDefaultState() : Blocks.DIAMOND_BLOCK.getDefaultState());
+			world.setBlockState(new BlockPos(circleB.x, pos.up().getY(), circleB.z), circleB.isTight() ? Blocks.DIAMOND_BLOCK.getDefaultState() : Blocks.COBBLESTONE.getDefaultState());
 		}
 	}
 	
-	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3) {
+	public void testPoisson2(World world, BlockPos pos, int rad1, int rad2, double angle, int rad3, boolean onlyTight) {
 		pos = pos.up();
 				
 		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
@@ -171,7 +172,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 			Circle circleA = new Circle(pos, rad1);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 			
-			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle);
+			Circle circleB = CircleHelper.findSecondCircle(circleA, rad2, angle, onlyTight);
 			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, pos.getY(), EnumGeneratorResult.NOTREE, 3);
 			
 			CircleHelper.maskCircles(circleA, circleB);
@@ -182,6 +183,38 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 			} else {
 				System.out.println("Angle:" + angle);
 				world.setBlockState(new BlockPos(circleA.x, pos.up().getY(), circleA.z), Blocks.REDSTONE_BLOCK.getDefaultState());
+			}
+		}
+	}
+	
+	public void testPoisson3(World world, BlockPos posA, int radA, BlockPos posB, int radB, int radC) {
+		posA = posA.up();
+		posB = posB.up();
+				
+		//System.out.println("Test: " + "R1:" + rad1 + ", R2:" + rad2 + ", angle:" + angle + ", R3:" + rad3);
+		
+		for(int y = 0; y < 2; y++) {
+			for(int z = -28; z <= 28; z++) {
+				for(int x = -28; x <= 28; x++) {
+					world.setBlockToAir(posA.add(x, y, z));
+				}
+			}
+		}
+		
+		if(radA >= 2 && radB >= 2 && radA <= 8 && radB <= 8 && radC >= 2 && radC <= 8) {
+			Circle circleA = new Circle(posA, radA);
+			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleA, posA.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			Circle circleB = new Circle(posB, radB);
+			TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleB, posB.getY(), EnumGeneratorResult.NOTREE, 3);
+			
+			CircleHelper.maskCircles(circleA, circleB);
+			
+			Circle circleC = CircleHelper.findThirdCircle(circleA, circleB, radC);
+			if(circleC != null) {
+				TreeGenerator.getTreeGenerator().makeWoolCircle(world, circleC, posA.getY(), EnumGeneratorResult.NOTREE, 3);
+			} else {
+				world.setBlockState(new BlockPos(circleA.x, posA.up().getY(), circleA.z), Blocks.REDSTONE_BLOCK.getDefaultState());
 			}
 		}
 	}

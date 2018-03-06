@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -67,9 +68,10 @@ public class TreeHelper {
 	 * @param rootPos
 	 */
 	public static void growPulse(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
+		IBlockState rootyState = world.getBlockState(rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
-			dirt.updateTree(world, rootPos, world.rand, true);
+			dirt.updateTree(rootyState, world, rootPos, world.rand, true);
 			ageVolume(world, rootPos, 1);
 		}
 	}
@@ -114,14 +116,77 @@ public class TreeHelper {
 		
 	}
 	
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
+		BlockPos rootPos = findRootNode(blockState, world, pos);
+		if(rootPos != BlockPos.ORIGIN) {
+			IBlockState rootyState = world.getBlockState(rootPos);
+			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
+		}
+		return Species.NULLSPECIES;
+	}
+	
+	/**
+	 * Find the root node of a tree.
+	 * 
+	 * @param blockState The blockState of either a branch or root block in world at pos
+	 * @param world The world
+	 * @param pos The position being analyzed
+	 * @return The position of the root node of the tree or BlockPos.ORIGIN if nothing was found.
+	 */
+	public static BlockPos findRootNode(IBlockState blockState, World world, BlockPos pos) {
+		
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
+		
+		switch(treePart.getTreePartType()) {
+			case BRANCH:
+				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				if(signal.found) {
+					return signal.root;
+				}
+				break;
+			case ROOT:
+				return pos;
+			default:
+				return BlockPos.ORIGIN;
+		}
+		
+		return BlockPos.ORIGIN;
+	}
+	
+	/**
+	 * Convenience function that spawns particles all over the tree branches
+	 * 
+	 * @param world
+	 * @param rootPos
+	 * @param type
+	 * @param num
+	 */
 	public static void treeParticles(World world, BlockPos rootPos, EnumParticleTypes type, int num) {
 		if(world.isRemote) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
 		}
 	}
-
+	
+	/**
+	 * Convenience function that verifies an analysis is starting from the root
+	 * node before commencing.
+	 * 
+	 * @param world The world
+	 * @param rootPos The position of the rootyBlock
+	 * @param signal The signal carrying the inspectors
+	 * @return true if a root block was found.
+	 */
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {
 			dirt.startAnalysis(world, rootPos, signal);
 			return true;
@@ -143,10 +208,6 @@ public class TreeHelper {
 		return isTreePart(block)? (ITreePart)block : nullTreePart;
 	}
 	
-	public final static ITreePart getTreePart(IBlockAccess blockAccess, BlockPos pos) {
-		return getTreePart(blockAccess.getBlockState(pos));
-	}
-	
 	public final static ITreePart getTreePart(IBlockState blockState) {
 		return getTreePart(blockState.getBlock());
 	}
@@ -156,10 +217,6 @@ public class TreeHelper {
 	
 	public final static boolean isBranch(Block block) {
 		return block instanceof BlockBranch;//Oh shuddap you java purists.. this is minecraft!
-	}
-	
-	public final static boolean isBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return isBranch(blockAccess.getBlockState(pos).getBlock());
 	}
 	
 	public final static boolean isBranch(IBlockState state) {
@@ -174,10 +231,6 @@ public class TreeHelper {
 		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
 	}
 	
-	public final static BlockBranch getBranch(IBlockAccess blockAccess, BlockPos pos) {
-		return getBranch(blockAccess.getBlockState(pos));
-	}
-	
 	public final static BlockBranch getBranch(IBlockState state) {
 		return getBranch(state.getBlock());
 	}
@@ -186,10 +239,6 @@ public class TreeHelper {
 	
 	public final static boolean isLeaves(Block block) {
 		return block instanceof BlockDynamicLeaves;
-	}
-	
-	public final static boolean isLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return isLeaves(blockAccess.getBlockState(pos).getBlock());
 	}
 	
 	public final static boolean isLeaves(IBlockState blockState) {
@@ -204,34 +253,30 @@ public class TreeHelper {
 		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
 	}
 	
-	public final static BlockDynamicLeaves getLeaves(IBlockAccess blockAccess, BlockPos pos) {
-		return getLeaves(blockAccess.getBlockState(pos));
-	}
-	
 	public final static BlockDynamicLeaves getLeaves(IBlockState state) {
 		return getLeaves(state.getBlock());
 	}
 	
-	//Rooty Dirt
+	//Rooty
 	
 	public final static boolean isRooty(Block block) {
 		return block instanceof BlockRooty;
 	}
 	
-	public final static boolean isRooty(IBlockState soilBlockState) {
-		return isRooty(soilBlockState.getBlock());
-	}
-	
-	public final static boolean isRooty(IBlockAccess blockAccess, BlockPos pos) {
-		return isRooty(blockAccess.getBlockState(pos));
+	public final static boolean isRooty(IBlockState blockState) {
+		return isRooty(blockState.getBlock());
 	}
 	
 	public final static BlockRooty getRooty(Block block) {
 		return isRooty(block) ? (BlockRooty)block : null;
 	}
 	
-	public final static BlockRooty getRooty(IBlockAccess blockAccess, BlockPos pos) {
-		return getRooty(blockAccess.getBlockState(pos).getBlock());
+	public final static BlockRooty getRooty(ITreePart treepart) {
+		return treepart instanceof BlockRooty ? (BlockRooty)treepart : null;
+	}
+	
+	public final static BlockRooty getRooty(IBlockState blockState) {
+		return getRooty(blockState.getBlock());
 	}
 	
 }

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFreezer;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,8 +16,9 @@ public class SubstanceFreeze implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world, rootPos);
-		Species species = dirt.getSpecies(world, rootPos);
+		IBlockState rootyState = world.getBlockState(rootPos);
+		BlockRooty dirt = TreeHelper.getRooty(rootyState);
+		Species species = dirt.getSpecies(rootyState, world, rootPos);
 		if(species != Species.NULLSPECIES && dirt != null) {
 			if(world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);

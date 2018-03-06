@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.trees.DynamicTree;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -76,9 +76,9 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		Species species = getSpecies(world, pos, state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			DynamicTree tree = species.getTree();
+			TreeFamily tree = species.getFamily();
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch with 1 radius
+				tree.getDynamicBranch().setRadius(world, pos, (int)species.getPrimaryThickness(), null);//set to a single branch with 1 radius
 				world.setBlockState(pos.up(), species.getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			}

@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.collect.Maps;
 
@@ -31,7 +31,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class CompositeModel implements IBakedModel {
+public class CompositeBasicModel implements IBakedModel {
 
 	protected ModelBlock modelBlock;
 	
@@ -42,7 +42,7 @@ public class CompositeModel implements IBakedModel {
 	private IBakedModel cores[][] = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel rings[] = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
-	public CompositeModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
+	public CompositeBasicModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
 		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);
@@ -169,7 +169,7 @@ public class CompositeModel implements IBakedModel {
 		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {
-			int coreRadius = getRadius(blockState);
+			int coreRadius = getRawRadius(blockState);
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
 			//Count number of connections
@@ -224,7 +224,7 @@ public class CompositeModel implements IBakedModel {
 	protected int[] pollConnections(int coreRadius, IExtendedBlockState extendedBlockState) {
 		int[] connections = new int[6];
 		for(EnumFacing dir: EnumFacing.VALUES) {
-			int connection = getConnectionRadius(extendedBlockState, BlockBranch.CONNECTIONS[dir.getIndex()]);
+			int connection = getConnectionRadius(extendedBlockState, BlockBranchBasic.CONNECTIONS[dir.getIndex()]);
 			connections[dir.getIndex()] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
 		}
 		return connections;
@@ -265,9 +265,9 @@ public class CompositeModel implements IBakedModel {
 		return dir.getIndex() >> 1;
 	}
 	
-	protected int getRadius(IBlockState blockState) {
+	protected int getRawRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
-		return ((BlockBranch) blockState.getBlock()).getRadius(blockState);
+		return ((BlockBranchBasic) blockState.getBlock()).getRawRadius(blockState);
 		//return blockState.getValue(BlockBranch.RADIUS);
 	}
 	
