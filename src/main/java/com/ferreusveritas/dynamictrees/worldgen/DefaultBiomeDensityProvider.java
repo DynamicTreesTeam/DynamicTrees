@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -107,16 +108,26 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 				};
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
-				chance = new ChanceStatic(EnumChance.OK);
+				if (ModConfigs.forestDensityMultiplier == 1) {
+					chance = new ChanceStatic(EnumChance.OK);
+				}
+				else {
+					chance = new ChanceRandom(1 * ModConfigs.forestDensityMultiplier);
+				}
 			}
 			else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
-				chance = new ChanceStatic(EnumChance.OK);
+				if (ModConfigs.forestDensityMultiplier == 1) {
+					chance = new ChanceStatic(EnumChance.OK);
+				}
+				else {
+					chance = new ChanceRandom(1 * ModConfigs.forestDensityMultiplier);
+				}
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-				chance = new ChanceRandom(0.75f);
+				chance = new ChanceRandom(0.75f * ModConfigs.swampDensityMultiplier);
 			} 
 			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {//Deserts (for cacti)
-				chance = new ChanceRandom(0.075f); // TODO: tweak cactus scarcity
+				chance = new ChanceRandom(0.075f * ModConfigs.sandyDensityMultiplier); // TODO: tweak cactus scarcity
 			}
 			else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 				chance = new ChanceStatic(EnumChance.CANCEL);
