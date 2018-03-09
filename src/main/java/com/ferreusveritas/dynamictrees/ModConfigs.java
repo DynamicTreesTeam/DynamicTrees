@@ -18,6 +18,9 @@ public class ModConfigs {
 	public static boolean vineGen;
 	public static boolean podzolGen;
 	public static boolean worldGen;
+	public static float forestDensityMultiplier;
+	public static float swampDensityMultiplier;
+	public static float sandyDensityMultiplier;
 	public static boolean vanillaCactusWorldGen;
 	public static boolean worldGenDebug;
 	
@@ -43,6 +46,9 @@ public class ModConfigs {
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");
 		podzolGen = config.getBoolean("podzolGen", "world", true, "Randomly generate podzol under select trees.");
 		worldGen = config.getBoolean("worldGen", "world", true, "World Generation produces Dynamic Trees instead of Vanilla trees.");
+		forestDensityMultiplier = config.getFloat("forestDensityMultiplier", "world", 1f, 0, 1, "Factor that multiplies the chance a tree will spawn in a forest biome type.");
+		swampDensityMultiplier = config.getFloat("swampDensityMultiplier", "world", 1f, 0, 1, "Factor that multiplies the chance a tree will spawn in a swamp biome type.");
+		sandyDensityMultiplier = config.getFloat("sandyDensityMultiplier", "world", 1f, 0, 1, "Factor that multiplies the chance a tree/cactus will spawn in a sandy biome type.");
 		
 		vanillaCactusWorldGen = config.getBoolean("vanillaCactusWorldGen", "world", false, "World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.");
 		
