@@ -58,8 +58,8 @@ public class BonsaiCompositeModel implements IBakedModel {
         	for(BakedQuad q: saplingModel.getQuads(mimicState, side, rand)) {
     			BakedQuad n = new BakedQuad(q.getVertexData().clone(), q.getTintIndex(), q.getFace(), q.getSprite(), q.shouldApplyDiffuseLighting(), q.getFormat());
         		int[] data = n.getVertexData();
-        		for(int i = 0; i < data.length; i+=6) {
-        			data[++i] = Float.floatToIntBits(Float.intBitsToFloat(data[i]) + 0.25f);//Move all of the quads by 0.25 on the +Y axis
+        		for(int i = 0; i < data.length; i += q.getFormat().getIntegerSize()) {
+        			data[i + 1] = Float.floatToIntBits(Float.intBitsToFloat(data[i + 1]) + 0.25f);//Move all of the quads by 0.25 on the +Y axis
         		}
         		saplingQuads.add(n);
         	}
