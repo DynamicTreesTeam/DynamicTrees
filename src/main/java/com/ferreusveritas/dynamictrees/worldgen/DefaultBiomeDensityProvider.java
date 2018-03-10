@@ -116,7 +116,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 				chance = new ChanceRandom(0.75f);
 			} 
 			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {//Deserts (for cacti)
-				chance = new ChanceRandom(0.075f); // TODO: tweak cactus scarcity
+				chance = new ChanceRandom(0.075f);
 			}
 			else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 				chance = new ChanceStatic(EnumChance.CANCEL);

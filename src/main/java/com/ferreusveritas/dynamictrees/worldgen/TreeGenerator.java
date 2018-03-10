@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
@@ -119,7 +120,8 @@ public class TreeGenerator implements IWorldGenerator {
 			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
 		
 			BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-			if(CompatHelper.biomeHasType(world.getBiome(pos), Type.SPOOKY)) {//FIXME: Shouldn't this check directly for roofed forest, since some modded biomes could also have the SPOOKY type?
+			Biome biome = world.getBiome(pos);
+			if (biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
 				roofedForestCompensation(world, random, pos);
 			}
 		}

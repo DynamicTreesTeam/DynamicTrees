@@ -99,7 +99,7 @@ protected ModelBlock modelBlock;
 			if (dir.getOpposite() != face) { // Discard side of sleeve that faces core
 				BlockFaceUV uvface = null;
 				if (dir == face) { // Side of sleeve that faces away from core
-					if (radius == 4) { // We're only interested in end faces for radius == 4
+					if (radius == 4 || (radius == 5 && dir == EnumFacing.DOWN)) {
 						uvface = new BlockFaceUV(new float[] {8 - radius, 8 - radius, 8 + radius, 8 + radius}, 0);
 					}
 				} else { // UV for Bark texture
@@ -629,7 +629,7 @@ protected ModelBlock modelBlock;
 				int idx = connDir.getIndex();
 				int connRadius = connections[idx];
 				// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-				if (connRadius > 0 && ((connDir == EnumFacing.UP && connRadius == 4 && extraUpSleeve) || side != connDir)) {
+				if (connRadius > 0 && ((connDir == EnumFacing.UP && connRadius == 4 && extraUpSleeve) || side != connDir || connDir == EnumFacing.DOWN)) {
 					quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(extendedBlockState, side, rand));
 				}
 			}
