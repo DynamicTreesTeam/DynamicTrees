@@ -22,6 +22,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -101,6 +102,7 @@ public class ClientProxy extends CommonProxy {
 		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
+		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
 		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());

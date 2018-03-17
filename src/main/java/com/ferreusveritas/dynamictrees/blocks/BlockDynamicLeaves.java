@@ -69,7 +69,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE});
+		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE, DECAYABLE});
 	}
 	
 	@Override
