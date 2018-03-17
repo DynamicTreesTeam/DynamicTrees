@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
@@ -31,9 +33,13 @@ public class BonsaiCompositeModel implements IBakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-
+		
     	List<BakedQuad> quads = new ArrayList<BakedQuad>();
 
+		if(side != null) {
+			return quads;
+		}
+    	
 		IBlockState mimicState = null;
 		IBlockState potState = null;
 		
@@ -54,17 +60,35 @@ public class BonsaiCompositeModel implements IBakedModel {
     	quads.addAll(potModel.getQuads(potState, side, rand));
     	
     	if(!cachedSaplingQuads.containsKey(mimicState)) {
-    		ArrayList<BakedQuad> saplingQuads = new ArrayList<BakedQuad>();
-        	for(BakedQuad q: saplingModel.getQuads(mimicState, side, rand)) {
-    			BakedQuad n = new BakedQuad(q.getVertexData().clone(), q.getTintIndex(), q.getFace(), q.getSprite(), q.shouldApplyDiffuseLighting(), q.getFormat());
-        		int[] data = n.getVertexData();
-        		for(int i = 0; i < data.length; i += q.getFormat().getIntegerSize()) {
-        			data[i + 1] = Float.floatToIntBits(Float.intBitsToFloat(data[i + 1]) + 0.25f);//Move all of the quads by 0.25 on the +Y axis
+    		ArrayList<BakedQuad> inQuads = new ArrayList<BakedQuad>();
+    		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
+    		
+    		//Gather all of the quads for all directions and none
+    		for(EnumFacing dir: EnumFacing.VALUES) {
+    			inQuads.addAll(saplingModel.getQuads(mimicState, dir, rand));
+    		}
+    		inQuads.addAll(saplingModel.getQuads(mimicState, null, rand));
+    		
+        	for(BakedQuad inQuad: inQuads) {
+    			BakedQuad quadCopy = new BakedQuad(inQuad.getVertexData().clone(), inQuad.getTintIndex(), inQuad.getFace(), inQuad.getSprite(), inQuad.shouldApplyDiffuseLighting(), inQuad.getFormat());
+        		int[] vertexData = quadCopy.getVertexData();
+        		for(int i = 0; i < vertexData.length; i += inQuad.getFormat().getIntegerSize()) {
+        			int pos = 0;
+            		for(VertexFormatElement vfe: inQuad.getFormat().getElements()) {
+            			if(vfe.getUsage() == EnumUsage.POSITION) {
+            				float y = Float.intBitsToFloat(vertexData[i + pos + 1]);
+            				y += 0.25f;//Move all of the quads by 0.25 on the +Y axis
+                			vertexData[i + pos + 1] = Float.floatToIntBits(y);
+                			break;
+            			}
+            			pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
+            		}
         		}
-        		saplingQuads.add(n);
+        		
+        		outQuads.add(quadCopy);
         	}
-        	saplingQuads.trimToSize();
-        	cachedSaplingQuads.put(mimicState, saplingQuads);
+        	outQuads.trimToSize();
+        	cachedSaplingQuads.put(mimicState, outQuads);
     	}
 
 		quads.addAll(cachedSaplingQuads.get(mimicState));

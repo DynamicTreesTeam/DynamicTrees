@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumCh
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockColored;
@@ -24,7 +23,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
 public class TreeGenerator implements IWorldGenerator {
