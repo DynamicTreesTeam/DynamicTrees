@@ -12,12 +12,8 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
-import com.ferreusveritas.dynamictrees.worldgen.CircleHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator.EnumGeneratorResult;
 
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -28,7 +24,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -134,6 +129,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		}
 	}
 	
+	/*
 	public void testPoisson(World world, BlockPos pos, int rad1, int rad2, double angle, boolean onlyTight) {
 		pos = pos.up();
 		
@@ -217,7 +213,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 				world.setBlockState(new BlockPos(circleA.x, posA.up().getY(), circleA.z), Blocks.REDSTONE_BLOCK.getDefaultState());
 			}
 		}
-	}
+	}*/
 	
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {

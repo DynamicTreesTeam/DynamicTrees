@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.tileentity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockDendroCoil;
@@ -11,7 +13,9 @@ import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITickable {
 
@@ -26,14 +30,15 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		setSoilLife("n", true, "life"),
 		getSpeciesList("", false),
 		createStaff("sssb", true, "treeName", "joCode", "rgbColor", "readOnly"),
-		testPoisson("nnn", true, "radius1", "radius2", "angle"),
-		testPoisson2("nnnn", true, "radius1", "radius2", "angle", "radius3", "onlyTight"),
-		testPoisson3("nnnnnb", true, "radius1", "delX", "delZ", "radius2", "radius3", "onlyTight");
+		//testPoisson("nnn", true, "radius1", "radius2", "angle"),
+		//testPoisson2("nnnn", true, "radius1", "radius2", "angle", "radius3", "onlyTight"),
+		//testPoisson3("nnnnnb", true, "radius1", "delX", "delZ", "radius2", "radius3", "onlyTight"),
+		getBiome("nn", false, "xCoord", "zCoord");
 		
 		private final String argTypes;
 		private final String args[];
 		private final boolean cached;
-		
+
 		private ComputerMethod(String argTypes, boolean cached, String ... args) {
 			this.argTypes = argTypes;
 			this.args = args;
@@ -82,9 +87,9 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 			this.arguments = args;
 		}
 		
-		public double d() {
+		/*public double d() {
 			return ((Double)arguments[argRead++]).doubleValue();
-		}
+		}*/
 		
 		public int i() {
 			return ((Double)arguments[argRead++]).intValue();
@@ -102,6 +107,9 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 	private ArrayList<CachedCommand> cachedCommands = new ArrayList<CachedCommand>(1);
 	private String treeName;
 	private int soilLife;
+
+	//Dealing with multithreaded biome requests
+	BiomeRequest biomeRequest = null;
 	
 	public static final int numMethods = ComputerMethod.values().length;
 	public static final String[] methodNames = new String[numMethods]; 
@@ -140,15 +148,20 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 							case setCode: dendroCoil.setCode(world, getPos(), cmd.s(), cmd.s()); break;
 							case setSoilLife: dendroCoil.setSoilLife(world, getPos(), cmd.i()); break;
 							case createStaff: dendroCoil.createStaff(world, getPos(), cmd.s(), cmd.s(), cmd.s(), cmd.b()); break;
-							case testPoisson: dendroCoil.testPoisson(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.b()); break;
-							case testPoisson2: dendroCoil.testPoisson2(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.i(), cmd.b()); break;
-							case testPoisson3: dendroCoil.testPoisson3(world, getPos(), cmd.i(), getPos().add(cmd.i(), 0, cmd.i()), cmd.i(), cmd.i()); break;
+							//case testPoisson: dendroCoil.testPoisson(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.b()); break;
+							//case testPoisson2: dendroCoil.testPoisson2(world, getPos(), cmd.i(), cmd.i(), cmd.d(), cmd.i(), cmd.b()); break;
+							//case testPoisson3: dendroCoil.testPoisson3(world, getPos(), cmd.i(), getPos().add(cmd.i(), 0, cmd.i()), cmd.i(), cmd.i()); break;
 							default: break;
 						}
 					}
 					cachedCommands.clear();
 				}
 			}
+		}
+		
+		//Fulfill data requests
+		if(biomeRequest != null) {
+			biomeRequest.process(world);
 		}
 	}
 	
@@ -193,6 +206,38 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 						ArrayList<String> species = new ArrayList<String>();
 						TreeRegistry.getSpeciesDirectory().forEach(r -> species.add(r.toString()));
 						return species.toArray();
+					case getBiome:
+						if( (arguments[0] instanceof Double) &&
+							(arguments[1] instanceof Double) &&
+							(arguments[2] instanceof Double) &&
+							(arguments[3] instanceof Double) &&
+							(arguments[4] instanceof Double) ) {
+							int xPosStart = ((Double)arguments[0]).intValue();
+							int zPosStart = ((Double)arguments[1]).intValue();
+							int xPosEnd = ((Double)arguments[2]).intValue();
+							int zPosEnd = ((Double)arguments[3]).intValue();
+							int step = ((Double)arguments[4]).intValue();
+							
+							biomeRequest = new BiomeRequest(
+								new BlockPos(xPosStart, 0, zPosStart),
+								new BlockPos(xPosEnd, 0, zPosEnd),
+								step);
+					
+							Map<Integer, String> biomeNames = new HashMap<>();
+							Map<Integer, Integer> biomeIds = new HashMap<>();
+							
+							int i = 1;
+							for(Biome biome: biomeRequest.getBiomes()) {
+								biomeNames.put(i, biome.getBiomeName());
+								biomeIds.put(i, Biome.getIdForBiome(biome));
+								i++;
+							}
+							
+							biomeRequest = null;
+							
+							return new Object[] { biomeNames, biomeIds };
+						}
+						return new Object[] { new Object[] {}, new Object[] {} };
 					default:
 						if(method.isCached()) {
 							cacheCommand(methodNum, arguments);
@@ -202,6 +247,45 @@ public class TileEntityDendroCoil extends TileEntity implements IPeripheral, ITi
 		}
 		
 		return null;
+	}
+	
+	private class BiomeRequest {
+		public BlockPos startPos;
+		public BlockPos endPos;
+		public int step;
+		public boolean fulfilled = false;
+		public ArrayList<Biome> result = new ArrayList<Biome>();
+
+		public BiomeRequest(BlockPos start, BlockPos end, int step) {
+			this.startPos = start;
+			this.endPos = end;
+			this.step = step;
+		}
+		
+		//This is run by the server thread
+		public synchronized void process(World world) {
+			if(!fulfilled) {
+				for(int z = startPos.getZ(); z < endPos.getZ(); z += step) {
+					for(int x = startPos.getX(); x < endPos.getX(); x += step) {
+						Biome biome = world.getBiomeProvider().getBiome(new BlockPos(x, 0, z));
+						result.add(biome);
+					}
+				}
+				fulfilled = true;
+				notifyAll();
+			}
+		}
+
+		//This is run by the CC thread
+		public synchronized ArrayList<Biome> getBiomes() {
+			while(!fulfilled) {
+				try {
+					wait();
+				} catch (InterruptedException e) {}
+			}
+			return result;
+		}
+
 	}
 	
 	@Override
