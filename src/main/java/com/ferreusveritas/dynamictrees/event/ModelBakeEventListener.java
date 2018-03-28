@@ -17,9 +17,7 @@ public class ModelBakeEventListener {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
-		
-		System.out.println("onModelBakeEvent XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		
+				
 		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake};
 
 		for(Block block: rootyBlocks) {

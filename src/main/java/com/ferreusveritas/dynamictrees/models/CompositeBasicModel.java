@@ -124,6 +124,7 @@ public class CompositeBasicModel implements IBakedModel {
 		for(EnumFacing face: EnumFacing.VALUES) {
 			BlockFaceUV uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(axis, face));
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+			//mapFacesIn.put(null, new BlockPartFace(null, -1, null, uvface));
 		}
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
@@ -132,6 +133,7 @@ public class CompositeBasicModel implements IBakedModel {
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
 			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
+			//builder.addFaceQuad(null, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
 
 		return builder.makeBakedModel();
@@ -285,7 +287,7 @@ public class CompositeBasicModel implements IBakedModel {
 	
 	@Override
 	public boolean isAmbientOcclusion() {
-		return false;
+		return true;
 	}
 
 	@Override
