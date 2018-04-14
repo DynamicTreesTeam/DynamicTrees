@@ -46,7 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * </b></tt></pre></p>
 * 
 * <p>
-* 2016-2017 Ferreusveritas
+* 2016-2018 Ferreusveritas
 * </p>
 *
 */
