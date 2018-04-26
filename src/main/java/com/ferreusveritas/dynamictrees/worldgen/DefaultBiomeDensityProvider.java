@@ -19,46 +19,6 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	private interface IChance {
 		EnumChance getChance(Random random, int radius);
 	}
-
-	private class ChanceStatic implements IChance {
-		private final EnumChance chance;
-		
-		public ChanceStatic(EnumChance chance) {
-			this.chance = chance;
-		}
-		
-		@Override
-		public EnumChance getChance(Random random, int radius) {
-			return chance;
-		}
-	}
-
-	private class ChanceRandom implements IChance {
-		private final float value;
-		
-		public ChanceRandom(float value) {
-			this.value = value;
-		}
-		
-		@Override
-		public EnumChance getChance(Random random, int radius) {
-			return random.nextFloat() < value ? EnumChance.OK : EnumChance.CANCEL;
-		}
-	}
-	
-	private class ChanceByRadius implements IChance {
-		@Override
-		public EnumChance getChance(Random random, int radius) {
-			float chance = 1.0f;
-			
-			if(radius > 3) {//Start dropping tree spawn opportunities when the radius gets bigger than 3
-				chance = 2.0f / radius;
-				return random.nextFloat() < chance ? EnumChance.OK : EnumChance.CANCEL;
-			}
-
-			return random.nextFloat() < chance ? EnumChance.OK : EnumChance.CANCEL;
-		}
-	}
 		
 	HashMap<Integer, IChance> fastChanceLookup = new HashMap<Integer, IChance>();
 	
@@ -95,34 +55,28 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 		
 		if(chance == null) {
 			if(CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
-				chance = new IChance() {
-					@Override
-					public EnumChance getChance(Random random, int radius) {
-						if(radius > 6) {
-							return random.nextFloat() < 0.5f ? EnumChance.OK : EnumChance.CANCEL;
-						}
-
-						return EnumChance.OK;
-					}
-				};
+				chance = (rnd, rad) -> { return radius > 6 && rnd.nextFloat() < 0.5f ? EnumChance.CANCEL : EnumChance.OK; };
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
-				chance = new ChanceStatic(EnumChance.OK);
+				chance = (rnd, rad) -> { return EnumChance.OK; };
 			}
 			else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
-				chance = new ChanceStatic(EnumChance.OK);
+				chance = (rnd, rad) -> { return EnumChance.OK; };
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-				chance = new ChanceRandom(0.75f);
+				chance = (rnd, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 			} 
 			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {//Deserts (for cacti)
-				chance = new ChanceRandom(0.075f);
+				chance = (rnd, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 			}
 			else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
-				chance = new ChanceStatic(EnumChance.CANCEL);
+				chance = (rnd, rad) -> { return EnumChance.CANCEL; };
 			}
 			else {
-				chance = new ChanceByRadius();//Let the radius determine the chance
+				chance = (rnd, rad) -> {//Let the radius determine the chance
+					//Start dropping tree spawn opportunities when the radius gets bigger than 3
+					return random.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL;
+				};
 			}
 
 			fastChanceLookup.put(biomeId, chance);
