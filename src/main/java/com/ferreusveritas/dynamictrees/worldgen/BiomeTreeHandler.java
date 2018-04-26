@@ -53,9 +53,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	
 	@Override
 	public void init() {
-		for(IBiomeSpeciesSelector selector : biomeTreeSelectors) {
-			selector.init();
-		}
+		biomeTreeSelectors.forEach(s -> s.init());
 	}
 	
 	@Override
@@ -86,7 +84,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	
 	@Override
 	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
-				
+		
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
 			EnumChance c = provider.chance(biome, species, radius, random);
 			if(c != EnumChance.UNHANDLED) {
