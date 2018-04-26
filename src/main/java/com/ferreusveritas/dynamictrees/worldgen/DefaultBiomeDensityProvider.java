@@ -46,15 +46,25 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	@Override
 	public double getDensity(Biome biome, double noiseDensity, Random random) {
 		int biomeId = Biome.getIdForBiome(biome);
+
+		if(biomeId != lastBiomeDensityId) {
+			lastBiomeDensityId = biomeId;
+			lastBiomeDensity = fastDensityLookup.computeIfAbsent(biomeId, k -> computeDensity(biome, noiseDensity, random));
+		}
 		
-		return fastDensityLookup.computeIfAbsent(biomeId, k -> computeDensity(biome, noiseDensity, random)).getDensity(random, noiseDensity);
+		return lastBiomeDensity.getDensity(random, noiseDensity);
 	}
 
 	@Override
 	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
 		int biomeId = Biome.getIdForBiome(biome);
 		
-		return fastChanceLookup.computeIfAbsent(biomeId, k -> computeChance(biome, species, radius, random)).getChance(random, radius);
+		if(biomeId != lastBiomeChanceId) {
+			lastBiomeChanceId = biomeId;
+			lastBiomeChance = fastChanceLookup.computeIfAbsent(biomeId, k -> computeChance(biome, species, radius, random));
+		}
+		
+		return lastBiomeChance.getChance(random, radius);
 	}
 	
 	public IDensity computeDensity(Biome biome, double noiseDensity, Random random) {
