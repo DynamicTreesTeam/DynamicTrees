@@ -53,7 +53,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// TREE INFORMATION
 	///////////////////////////////////////////
 	
-	public void setTree(TreeFamily tree) {
+	public void setFamily(TreeFamily tree) {
 		this.tree = tree;
 	}
 	

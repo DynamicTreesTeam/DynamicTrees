@@ -222,7 +222,7 @@ public class TreeFamily {
 	
 	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
-		dynamicBranch.setTree(this);//Link the branch back to the tree
+		dynamicBranch.setFamily(this);//Link the branch back to the tree
 		
 		return this;
 	}

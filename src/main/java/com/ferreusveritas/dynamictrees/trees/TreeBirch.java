@@ -61,12 +61,14 @@ public class TreeBirch extends TreeFamily {
 		super(BlockPlanks.EnumType.BIRCH);
 		ModBlocks.birchLeavesProperties.setTree(this);
 		
-		addConnectableVanillaLeaves(new IConnectable() {
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH); } );
+		
+		/*addConnectableVanillaLeaves(new IConnectable() {
 			@Override
 			public boolean isConnectable(IBlockState blockState) {
 				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH);
 			}
-		});
+		});*/
 	}
 	
 	@Override
