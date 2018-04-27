@@ -102,13 +102,7 @@ public class TreeDarkOak extends TreeFamily {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		ModBlocks.darkOakLeavesProperties.setTree(this);
-		
-		addConnectableVanillaLeaves(new IConnectable() {
-			@Override
-			public boolean isConnectable(IBlockState blockState) {
-				return blockState.getBlock() instanceof BlockNewLeaf && (blockState.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.DARK_OAK);
-			}
-		});
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.DARK_OAK); });
 	}
 	
 	@Override

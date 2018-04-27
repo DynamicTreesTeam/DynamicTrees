@@ -109,13 +109,7 @@ public class TreeSpruce extends TreeFamily {
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		ModBlocks.spruceLeavesProperties.setTree(this);
-		
-		addConnectableVanillaLeaves(new IConnectable() {
-			@Override
-			public boolean isConnectable(IBlockState blockState) {
-				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE);
-			}
-		});
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
 	}
 	
 	@Override

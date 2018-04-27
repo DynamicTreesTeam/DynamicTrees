@@ -210,13 +210,7 @@ public class TreeOak extends TreeFamily {
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
 		ModBlocks.oakLeavesProperties.setTree(this);
-		
-		addConnectableVanillaLeaves(new IConnectable() {
-			@Override
-			public boolean isConnectable(IBlockState blockState) {
-				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK);
-			}
-		});
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK); });
 	}
 	
 	@Override

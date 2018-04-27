@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
@@ -36,13 +35,7 @@ public class TreeAcacia extends TreeFamily {
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
 		ModBlocks.acaciaLeavesProperties.setTree(this);
-		
-		addConnectableVanillaLeaves(new IConnectable() {
-			@Override
-			public boolean isConnectable(IBlockState blockState) {
-				return blockState.getBlock() instanceof BlockNewLeaf && (blockState.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.ACACIA);
-			}
-		});
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.ACACIA); });
 	}
 
 	@Override

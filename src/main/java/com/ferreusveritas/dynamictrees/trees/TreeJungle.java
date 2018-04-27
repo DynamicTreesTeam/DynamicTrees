@@ -138,13 +138,7 @@ public class TreeJungle extends TreeFamily {
 		super(BlockPlanks.EnumType.JUNGLE);
 		ModBlocks.jungleLeavesProperties.setTree(this);
 		canSupportCocoa = true;
-		
-		addConnectableVanillaLeaves(new IConnectable() {
-			@Override
-			public boolean isConnectable(IBlockState blockState) {
-				return blockState.getBlock() instanceof BlockOldLeaf && (blockState.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE);
-			}
-		});
+		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE); });
 	}
 
 	@Override
