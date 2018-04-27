@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -16,7 +17,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
-	ArrayList<DensityData> densityDataLookup = new ArrayList<DensityData>(256);
+	private ArrayList<DensityData> densityDataLookup = new ArrayList<DensityData>(Collections.nCopies(256, null));
 	
 	@Override
 	public ResourceLocation getName() {
