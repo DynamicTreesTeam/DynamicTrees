@@ -63,7 +63,7 @@ public interface IBiomeDensityProvider {
 	 * @param noiseDensity The density that the noise function returned(0.0 - 1.0)
 	 * @return density 0.0(lowest) - 1.0(highest)  anything less than 0 will signal unhandled 
 	 */
-	double getDensity(Biome biome, double noiseDensity, Random random);
+	double density(Biome biome, double noiseDensity, Random random);
 	
 	/**
 	 * Given the set of parameters determine if the tree should really be created

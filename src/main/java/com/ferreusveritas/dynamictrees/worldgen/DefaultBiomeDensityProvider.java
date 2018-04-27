@@ -30,7 +30,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	}
 
 	@Override
-	public double getDensity(Biome biome, double noiseDensity, Random random) {
+	public double density(Biome biome, double noiseDensity, Random random) {
 		return getDensityData(biome).getDensity().getDensity(random, noiseDensity);
 	}
 

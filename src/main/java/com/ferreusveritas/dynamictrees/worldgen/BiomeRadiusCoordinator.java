@@ -25,7 +25,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		double scale = 128;//Effectively scales up the noisemap
 		Biome biome = world.getBiome(new BlockPos((int)x, 0, (int)z));
 		double noiseDensity = (noiseGenerator.getValue(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = densityProvider.getDensity(biome, noiseDensity, world.rand);
+		double density = densityProvider.density(biome, noiseDensity, world.rand);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 		
 		//Oh Joy.  Java Random isn't thread safe.  Which means that when minecraft creates multiple chunk generation

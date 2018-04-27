@@ -74,10 +74,10 @@ public class BiomeSpeciesHandler implements IBiomeDensityProvider, IBiomeSpecies
 	}
 	
 	@Override
-	public double getDensity(Biome biome, double noiseDensity, Random random) {
+	public double density(Biome biome, double noiseDensity, Random random) {
 		
 		for(IBiomeDensityProvider provider : biomeDensityProvider) {
-			double density = provider.getDensity(biome, noiseDensity, random);
+			double density = provider.density(biome, noiseDensity, random);
 			if(density >= 0) {
 				return MathHelper.clamp(density, 0.0, 1.0);
 			}
