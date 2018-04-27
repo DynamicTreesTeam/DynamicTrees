@@ -20,7 +20,7 @@ import net.minecraft.world.biome.BiomeHills;
 import net.minecraft.world.biome.BiomePlains;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
+public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 
 	private Species oak;
 	private Species birch;
@@ -39,7 +39,7 @@ public class DefaultBiomeTreeSelector implements IBiomeSpeciesSelector {
 	
 	HashMap<Integer, DecisionProvider> fastTreeLookup = new HashMap<Integer, DecisionProvider>();
 	
-	public DefaultBiomeTreeSelector() {		
+	public DefaultBiomeSpeciesSelector() {		
 	}
 	
 	@Override

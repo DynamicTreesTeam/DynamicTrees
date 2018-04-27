@@ -29,7 +29,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
 	
-	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
+	public BiomeSpeciesHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public JoCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
@@ -82,7 +82,7 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	public TreeGenerator() {
-		biomeTreeHandler = new BiomeTreeHandler();
+		biomeTreeHandler = new BiomeSpeciesHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();

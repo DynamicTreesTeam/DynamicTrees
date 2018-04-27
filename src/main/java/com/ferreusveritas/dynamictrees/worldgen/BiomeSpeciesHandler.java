@@ -21,17 +21,17 @@ import net.minecraft.world.biome.Biome;
 * 
 * @author ferreusveritas
 */
-public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSelector {
+public class BiomeSpeciesHandler implements IBiomeDensityProvider, IBiomeSpeciesSelector {
 
 	private ArrayList<IBiomeSpeciesSelector> biomeTreeSelectors = new ArrayList<IBiomeSpeciesSelector>();
 	private ArrayList<IBiomeDensityProvider> biomeDensityProvider = new ArrayList<IBiomeDensityProvider>();
 	
 	public final DefaultBiomeDensityProvider defaultDensityProvider;
 	
-	public BiomeTreeHandler() {
+	public BiomeSpeciesHandler() {
 		defaultDensityProvider = new DefaultBiomeDensityProvider();
 		
-		addTreeSelector(new DefaultBiomeTreeSelector());
+		addTreeSelector(new DefaultBiomeSpeciesSelector());
 		addDensityProvider(defaultDensityProvider);
 	}
 	
@@ -54,7 +54,7 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 			}
 		});
 	}
-	
+		
 	@Override
 	public void init() {
 		biomeTreeSelectors.forEach(s -> s.init());

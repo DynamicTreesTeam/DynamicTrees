@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -17,9 +16,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
-	HashMap<Integer, DensityData> fastDensityDataLookup = new HashMap<Integer, DensityData>();
-	int lastBiomeDensityId = -1;
-	DensityData lastBiomeDensity = null;
+	ArrayList<DensityData> densityDataLookup = new ArrayList<DensityData>(256);
 	
 	@Override
 	public ResourceLocation getName() {
@@ -43,19 +40,19 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 	
 	public DensityData getDensityData(Biome biome) {
 		int biomeId = Biome.getIdForBiome(biome);
-
-		//The idea here is that the next biome is usually the same as the last
-		if(biomeId != lastBiomeDensityId) {
-			lastBiomeDensityId = biomeId;
-			lastBiomeDensity = fastDensityDataLookup.computeIfAbsent(biomeId, k -> computeDensityData(biome));
+		DensityData densityData = densityDataLookup.get(biomeId);
+		
+		if(densityData == null) {
+			densityData = computeDensityData(biome);
+			densityDataLookup.set(biomeId, densityData);
 		}
 		
-		return lastBiomeDensity;
+		return densityData;
 	}
 	
 	public void injectDensityData(Biome biome, DensityData data) {
 		int biomeId = Biome.getIdForBiome(biome);
-		fastDensityDataLookup.put(biomeId, data);
+		densityDataLookup.set(biomeId, data);
 	}
 	
 	public DensityData computeDensityData(Biome biome) {
