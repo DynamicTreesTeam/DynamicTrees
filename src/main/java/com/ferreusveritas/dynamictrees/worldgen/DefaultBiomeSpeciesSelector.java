@@ -32,12 +32,12 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 	private Species apple;
 	private Species cactus;
 	
-	private StaticDecision staticOakDecision;
-	private StaticDecision staticSpruceDecision;
-	private StaticDecision staticBirchDecision;
-	private StaticDecision staticDarkOakDecision;
+	private StaticSpeciesSelector staticOakDecision;
+	private StaticSpeciesSelector staticSpruceDecision;
+	private StaticSpeciesSelector staticBirchDecision;
+	private StaticSpeciesSelector staticDarkOakDecision;
 	
-	HashMap<Integer, DecisionProvider> fastTreeLookup = new HashMap<Integer, DecisionProvider>();
+	HashMap<Integer, ISpeciesSelector> fastTreeLookup = new HashMap<Integer, ISpeciesSelector>();
 	
 	public DefaultBiomeSpeciesSelector() {		
 	}
@@ -55,10 +55,10 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 		
 		cactus = TreeRegistry.findSpeciesSloppy("cactus");
 		
-		staticOakDecision = new StaticDecision(new Decision(oak));
-		staticSpruceDecision = new StaticDecision(new Decision(spruce));
-		staticBirchDecision = new StaticDecision(new Decision(birch));
-		staticDarkOakDecision = new StaticDecision(new Decision(darkoak));
+		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
+		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
+		staticBirchDecision = new StaticSpeciesSelector(new SpeciesSelection(birch));
+		staticDarkOakDecision = new StaticSpeciesSelector(new SpeciesSelection(darkoak));
 	}
 	
 	@Override
@@ -72,18 +72,18 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 	}
 	
 	@Override
-	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
+	public SpeciesSelection getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random rand) {
 
 		int biomeId = Biome.getIdForBiome(biome);
-		DecisionProvider select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
+		ISpeciesSelector select = fastTreeLookup.get(biomeId);//Speedily look up the selector for the biome id
 				
 		if(select == null) {
 			if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
-				select = new RandomDecision(world.rand).addSpecies(spruce, 2).addSpecies(oak, 1);
+				select = new RandomSpeciesSelector(world.rand).addSpecies(spruce, 2).addSpecies(oak, 1);
 			}
 			else if(biome instanceof BiomePlains) {
 				if(ModConfigs.enableAppleTrees) {
-					select = new RandomDecision(world.rand).addSpecies(oak, 24).addSpecies(apple, 1);
+					select = new RandomSpeciesSelector(world.rand).addSpecies(oak, 24).addSpecies(apple, 1);
 				} else {
 					select = staticOakDecision;
 				}
@@ -98,7 +98,7 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 				} else if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 					select = staticBirchDecision;
 				} else {//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
-					select = new RandomDecision(world.rand).addSpecies(oak, 4).addSpecies(birch, 1);
+					select = new RandomSpeciesSelector(world.rand).addSpecies(oak, 4).addSpecies(birch, 1);
 				}
 			} else if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
 				select = staticDarkOakDecision;
@@ -107,19 +107,19 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 				select = staticOakDecision;
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.JUNGLE)) {
-				select = new StaticDecision(new Decision(jungle));
+				select = new StaticSpeciesSelector(new SpeciesSelection(jungle));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SAVANNA)) {
-				select = new StaticDecision(new Decision(acacia));
+				select = new StaticSpeciesSelector(new SpeciesSelection(acacia));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
-				select = new StaticDecision(new Decision(oakswamp));
+				select = new StaticSpeciesSelector(new SpeciesSelection(oakswamp));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.SANDY)) {
-				select = new StaticDecision(new Decision(cactus));
+				select = new StaticSpeciesSelector(new SpeciesSelection(cactus));
 			}
 			else if(CompatHelper.biomeHasType(biome, Type.WASTELAND)) {
-				select = new StaticDecision(new Decision());//Not handled, no tree
+				select = new StaticSpeciesSelector(new SpeciesSelection());//Not handled, no tree
 			}
 			else {
 				select = staticOakDecision;//Just default to oak for everything else
@@ -128,7 +128,7 @@ public class DefaultBiomeSpeciesSelector implements IBiomeSpeciesSelector {
 			fastTreeLookup.put(biomeId, select);//Cache decision for future use
 		}
 
-		return select.getDecision();
+		return select.getSpecies(pos, dirt, rand);
 	}
 
 }

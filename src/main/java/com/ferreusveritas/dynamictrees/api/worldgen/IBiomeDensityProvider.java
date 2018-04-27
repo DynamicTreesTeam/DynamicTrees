@@ -16,28 +16,29 @@ import net.minecraft.world.biome.Biome;
  */
 public interface IBiomeDensityProvider {
 	
-	public interface IChance {
+	public interface IChanceSelector {
 		EnumChance getChance(Random random, Species species, int radius);
 	}
 
-	public interface IDensity {
+	public interface IDensitySelector {
 		double getDensity(Random random, double noiseDensity);
 	}
 
+	@Deprecated
 	public class DensityData {
-		private final IChance chance;
-		private final IDensity density;
+		private final IChanceSelector chance;
+		private final IDensitySelector density;
 		
-		public DensityData(IChance chance, IDensity density) {
+		public DensityData(IChanceSelector chance, IDensitySelector density) {
 			this.chance = chance;
 			this.density = density;
 		}
 		
-		public IDensity getDensity() {
+		public IDensitySelector getDensitySelector() {
 			return density;
 		}
 		
-		public IChance getChance() {
+		public IChanceSelector getChanceSelector() {
 			return chance;
 		}
 	}

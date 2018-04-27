@@ -61,16 +61,16 @@ public class BiomeSpeciesHandler implements IBiomeDensityProvider, IBiomeSpecies
 	}
 	
 	@Override
-	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
+	public SpeciesSelection getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random) {
 		
 		for(IBiomeSpeciesSelector selector : biomeTreeSelectors) {
-			Decision decision = selector.getSpecies(world, biome, pos, dirt, random);
+			SpeciesSelection decision = selector.getSpecies(world, biome, pos, dirt, random);
 			if(decision != null && decision.isHandled()) {
 				return decision;
 			}
 		}
 		
-		return new Decision(null);//No species at all
+		return new SpeciesSelection(null);//No species at all
 	}
 	
 	@Override

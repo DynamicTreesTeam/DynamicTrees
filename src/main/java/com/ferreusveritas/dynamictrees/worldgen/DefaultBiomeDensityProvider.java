@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -9,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Entry;
 
 import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
@@ -16,9 +15,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
-	
-	private ArrayList<DensityData> densityDataLookup = new ArrayList<DensityData>(Collections.nCopies(256, null));
-	
+		
 	@Override
 	public ResourceLocation getName() {
 		return new ResourceLocation(ModConstants.MODID, "default");
@@ -31,36 +28,30 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 
 	@Override
 	public double density(Biome biome, double noiseDensity, Random random) {
-		return getDensityData(biome).getDensity().getDensity(random, noiseDensity);
+		return getDensityData(biome).getDensitySelector().getDensity(random, noiseDensity);
 	}
 
 	@Override
 	public EnumChance chance(Biome biome, Species species, int radius, Random random) {
-		return getDensityData(biome).getChance().getChance(random, species, radius);
+		return getDensityData(biome).getChanceSelector().getChance(random, species, radius);
 	}
 	
 	public DensityData getDensityData(Biome biome) {
-		int biomeId = Biome.getIdForBiome(biome);
-		DensityData densityData = densityDataLookup.get(biomeId);
-		
-		if(densityData == null) {
-			densityData = computeDensityData(biome);
-			densityDataLookup.set(biomeId, densityData);
-		}
-		
-		return densityData;
+		Entry entry = TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome);
+		return new DensityData(entry.getChanceSelector(), entry.getDensitySelector());
 	}
 	
 	public void injectDensityData(Biome biome, DensityData data) {
-		int biomeId = Biome.getIdForBiome(biome);
-		densityDataLookup.set(biomeId, data);
+		TreeGenerator.getTreeGenerator().biomeDataBase.setDensitySelector(biome, data.getDensitySelector());
+		TreeGenerator.getTreeGenerator().biomeDataBase.setChanceSelector(biome, data.getChanceSelector());
 	}
 	
 	public DensityData computeDensityData(Biome biome) {
 		return new DensityData(computeChance(biome), computeDensity(biome));
 	}
 	
-	public IDensity computeDensity(Biome biome) {
+	public IDensitySelector computeDensity(Biome biome) {
+		
 		if(CompatHelper.biomeHasType(biome, Type.SPOOKY)) { //Roofed Forest
 			return (rnd, nd) -> { return 0.4f + (nd / 3.0f); };
 		}
@@ -71,7 +62,7 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 		return (rnd, nd) -> { return nd * treeDensity; };
 	}
 	
-	public IChance computeChance(Biome biome) {
+	public IChanceSelector computeChance(Biome biome) {
 		if(CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
 			return (rnd, spc, rad) -> { return rad > 6 && rnd.nextFloat() < 0.5f ? EnumChance.CANCEL : EnumChance.OK; };
 		}

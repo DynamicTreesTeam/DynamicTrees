@@ -22,6 +22,36 @@ import net.minecraft.world.biome.Biome;
 public interface IBiomeSpeciesSelector {
 
 	/**
+	 * This is the data that represents a species selection.
+	 * This class was necessary to have an unhandled state.
+	 */
+	public class SpeciesSelection {
+		private boolean handled;
+		private Species species;
+		
+		public SpeciesSelection() {
+			handled = false;
+		}
+		
+		public SpeciesSelection(Species species) {
+			this.species = species;
+			handled = true;
+		}
+		
+		public boolean isHandled() {
+			return handled;
+		}
+		
+		public Species getSpecies() {
+			return species;
+		}
+	}
+	
+	public interface ISpeciesSelector {
+		SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random);
+	}
+	
+	/**
 	 * A unique name to identify this {@link IBiomeSpeciesSelector}.
 	 * It's recommended to use something like "modid:name"
 	 * 
@@ -43,7 +73,7 @@ public interface IBiomeSpeciesSelector {
 	 * @param dirt
 	 * @return A decision on which tree to use.  Set decision to null for no tree.
 	 */
-	public Decision getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random);
+	public SpeciesSelection getSpecies(World world, Biome biome, BlockPos pos, IBlockState dirt, Random random);
 	
 	/**
 	 * Used to determine which selector should run first.  Higher values are executed first.  Negative values are allowed.
@@ -52,54 +82,36 @@ public interface IBiomeSpeciesSelector {
 	 */
 	public int getPriority();
 	
-	public class Decision {
-		private boolean handled;
-		private Species species;
+	public class StaticSpeciesSelector implements ISpeciesSelector {
+		final SpeciesSelection decision;
 		
-		public Decision() {
-			handled = false;
-		}
-		
-		public Decision(Species species) {
-			this.species = species;
-			handled = true;
-		}
-		
-		public boolean isHandled() {
-			return handled;
-		}
-		
-		public Species getSpecies() {
-			return species;
-		}
-	}
-
-	public interface DecisionProvider {
-		Decision getDecision();
-	}
-	
-	public class StaticDecision implements DecisionProvider {
-		final Decision decision;
-		
-		public StaticDecision(Decision decision) {
+		public StaticSpeciesSelector(SpeciesSelection decision) {
 			this.decision = decision;
 		}
 
+		public StaticSpeciesSelector(Species species) {
+			this(new SpeciesSelection(species));
+		}
+		
+		public StaticSpeciesSelector() {
+			this(new SpeciesSelection());
+		}
+		
 		@Override
-		public Decision getDecision() {
+		public SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random) {
 			return decision;
 		}
 	}
 	
-	public class RandomDecision implements DecisionProvider {
+	public class RandomSpeciesSelector implements ISpeciesSelector {
 
 		private class Entry {
-			public Entry(Decision d, int w) {
+			public Entry(SpeciesSelection d, int w) {
 				decision = d;
 				weight = w;
 			}
 			
-			public Decision decision;
+			public SpeciesSelection decision;
 			public int weight;
 		}
 		
@@ -107,25 +119,25 @@ public interface IBiomeSpeciesSelector {
 		int totalWeight;
 		Random rand;
 		
-		public RandomDecision(Random rand) {
+		public RandomSpeciesSelector(Random rand) {
 			this.rand = rand;
 		}
 		
-		public RandomDecision addSpecies(Species species, int weight) {
-			decisionTable.add(new Entry(new Decision(species), weight));
+		public RandomSpeciesSelector addSpecies(Species species, int weight) {
+			decisionTable.add(new Entry(new SpeciesSelection(species), weight));
 			totalWeight += weight;
 			return this;
 		}
 		
-		public RandomDecision addUnhandled(int weight) {
-			decisionTable.add(new Entry(new Decision(), weight));
+		public RandomSpeciesSelector addUnhandled(int weight) {
+			decisionTable.add(new Entry(new SpeciesSelection(), weight));
 			totalWeight += weight;
 			return this;
 			
 		}
 		
 		@Override
-		public Decision getDecision() {
+		public SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random) {
 			int chance = rand.nextInt(totalWeight);
 			
 			for(Entry entry: decisionTable) {

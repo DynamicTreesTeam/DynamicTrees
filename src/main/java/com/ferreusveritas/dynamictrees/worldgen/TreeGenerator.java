@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.Decision;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -29,6 +29,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
 	
+	public BiomeDataBase biomeDataBase;
 	public BiomeSpeciesHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public JoCodeStore codeStore;
@@ -82,6 +83,7 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	public TreeGenerator() {
+		biomeDataBase = new BiomeDataBase();
 		biomeTreeHandler = new BiomeSpeciesHandler();
 		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
@@ -187,7 +189,7 @@ public class TreeGenerator implements IWorldGenerator {
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		Biome biome = world.getBiome(pos);
-		Decision decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
+		SpeciesSelection decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
 		if(decision.isHandled()) {
 			Species species = decision.getSpecies();
 			if(species != null) {
