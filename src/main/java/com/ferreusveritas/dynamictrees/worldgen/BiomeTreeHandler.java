@@ -26,9 +26,13 @@ public class BiomeTreeHandler implements IBiomeDensityProvider, IBiomeSpeciesSel
 	private ArrayList<IBiomeSpeciesSelector> biomeTreeSelectors = new ArrayList<IBiomeSpeciesSelector>();
 	private ArrayList<IBiomeDensityProvider> biomeDensityProvider = new ArrayList<IBiomeDensityProvider>();
 	
+	public final DefaultBiomeDensityProvider defaultDensityProvider;
+	
 	public BiomeTreeHandler() {
+		defaultDensityProvider = new DefaultBiomeDensityProvider();
+		
 		addTreeSelector(new DefaultBiomeTreeSelector());
-		addDensityProvider(new DefaultBiomeDensityProvider());
+		addDensityProvider(defaultDensityProvider);
 	}
 	
 	public void addTreeSelector(IBiomeSpeciesSelector treeSelector) {
