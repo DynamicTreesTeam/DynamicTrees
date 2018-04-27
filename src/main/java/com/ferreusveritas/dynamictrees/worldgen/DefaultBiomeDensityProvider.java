@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -89,6 +90,9 @@ public class DefaultBiomeDensityProvider implements IBiomeDensityProvider {
 			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 		}
 		else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
+			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
+		}
+		if (biome == Biomes.RIVER) {
 			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
 		}
 		else {
