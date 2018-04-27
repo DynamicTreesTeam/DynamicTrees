@@ -5,11 +5,12 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider.EnumChance;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeSpeciesSelector.SpeciesSelection;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
@@ -30,7 +31,6 @@ public class TreeGenerator implements IWorldGenerator {
 	private static TreeGenerator INSTANCE;
 	
 	public BiomeDataBase biomeDataBase;
-	public BiomeSpeciesHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public JoCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
@@ -52,7 +52,7 @@ public class TreeGenerator implements IWorldGenerator {
 	 */
 	public static void init() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			INSTANCE.biomeTreeHandler.init();
+			new DefaultBiomeDataBasePopulator().init();
 		}
 	}
 	
@@ -84,8 +84,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public TreeGenerator() {
 		biomeDataBase = new BiomeDataBase();
-		biomeTreeHandler = new BiomeSpeciesHandler();
-		radiusCoordinator = new BiomeRadiusCoordinator(biomeTreeHandler);
+		radiusCoordinator = new BiomeRadiusCoordinator(biomeDataBase);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
@@ -189,12 +188,14 @@ public class TreeGenerator implements IWorldGenerator {
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 		
 		Biome biome = world.getBiome(pos);
-		SpeciesSelection decision = biomeTreeHandler.getSpecies(world, biome, pos, blockState, random);
-		if(decision.isHandled()) {
-			Species species = decision.getSpecies();
+		BiomeEntry biomeEntry = biomeDataBase.getEntry(biome);
+		
+		SpeciesSelection speciesSelection = biomeEntry.getSpeciesSelector().getSpecies(pos, blockState, random);
+		if(speciesSelection.isHandled()) {
+			Species species = speciesSelection.getSpecies();
 			if(species != null) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, blockState)) {
-					if(biomeTreeHandler.chance(biome, species, circle.radius, random) == EnumChance.OK) {
+					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
 						if(species.generate(world, pos, biome, random, circle.radius)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {

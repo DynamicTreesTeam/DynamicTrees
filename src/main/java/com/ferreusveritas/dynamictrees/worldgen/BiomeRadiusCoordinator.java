@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDensityProvider;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.util.math.BlockPos;
@@ -13,11 +12,11 @@ import net.minecraft.world.gen.NoiseGeneratorPerlin;
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
 	NoiseGeneratorPerlin noiseGenerator;
-	IBiomeDensityProvider densityProvider;
+	BiomeDataBase database;
 	
-	public BiomeRadiusCoordinator(IBiomeDensityProvider densityProvider) {
+	public BiomeRadiusCoordinator(BiomeDataBase database) {
 		noiseGenerator = new NoiseGeneratorPerlin(new Random(96), 1);
-		this.densityProvider = densityProvider;
+		this.database = database;
 	}
 
 	@Override
@@ -25,7 +24,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		double scale = 128;//Effectively scales up the noisemap
 		Biome biome = world.getBiome(new BlockPos((int)x, 0, (int)z));
 		double noiseDensity = (noiseGenerator.getValue(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = densityProvider.density(biome, noiseDensity, world.rand);
+		double density = database.getDensity(biome).getDensity(world.rand, noiseDensity);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 		
 		//Oh Joy.  Java Random isn't thread safe.  Which means that when minecraft creates multiple chunk generation
