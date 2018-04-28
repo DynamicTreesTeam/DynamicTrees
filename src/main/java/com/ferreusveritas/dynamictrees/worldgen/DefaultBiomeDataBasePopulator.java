@@ -60,6 +60,12 @@ public class DefaultBiomeDataBasePopulator {
 				dbase.setChanceSelector(biome, computeChance(biome), Operation.REPLACE);
 				dbase.setDensitySelector(biome, computeDensity(biome), Operation.REPLACE);
 				dbase.setSpeciesSelector(biome, computeSpecies(biome), Operation.REPLACE);
+				
+				//Cancel all tree decoration for Vanilla Minecraft Biomes
+				if(biome.getRegistryName().getResourceDomain().equals("minecraft")) {
+					dbase.setCancelVanillaTreeGen(biome, true);
+				}
+				
 			}
 		);
 	}

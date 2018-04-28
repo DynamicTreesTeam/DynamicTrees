@@ -18,15 +18,12 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
-import net.minecraftforge.fml.common.IWorldGenerator;
 
-public class TreeGenerator implements IWorldGenerator {
+public class TreeGenerator {
 	
 	private static TreeGenerator INSTANCE;
 	
@@ -86,33 +83,15 @@ public class TreeGenerator implements IWorldGenerator {
 	public ChunkCircleManager getChunkCircleManager() {
 		return circleMan;
 	}
-	
-	@Override
-	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		
+	public void generate(World world, Biome biome, ChunkPos chunkPos) {
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
-		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
+		random.setXOR(new BlockPos(chunkPos.x, 0, chunkPos.z));
 		
-		switch (world.provider.getDimension()) {
-		case 0: //Overworld
-			generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
-			break;
-		case -1: //Nether
-			break;
-		case 1: //End
-			break;
-		}
-	}
-	
-	private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if(world.getWorldType() != WorldType.FLAT) {
-			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
+		circleMan.getCircles(world, random, chunkPos.x, chunkPos.z).forEach(c -> makeTree(world, c));
 		
-			BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-			Biome biome = world.getBiome(pos);
-			if (biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
-				roofedForestCompensation(world, random, pos);
-			}
+		if (biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
+			roofedForestCompensation(world, random, chunkPos.getBlock(0, 0, 0));
 		}
 	}
 	

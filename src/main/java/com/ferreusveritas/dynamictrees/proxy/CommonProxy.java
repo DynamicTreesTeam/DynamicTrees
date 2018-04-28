@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 
@@ -53,7 +51,6 @@ public class CommonProxy {
 		
 		//Conveniently accessible disaster(Optional World Generation)
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			GameRegistry.registerWorldGenerator(TreeGenerator.getTreeGenerator(), 20);
 			MinecraftForge.TERRAIN_GEN_BUS.register(new DecorateEventHandler());
 			MinecraftForge.EVENT_BUS.register(new CircleEventHandler());
 		}
