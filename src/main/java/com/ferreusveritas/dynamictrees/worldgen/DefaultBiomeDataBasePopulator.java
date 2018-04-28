@@ -108,11 +108,11 @@ public class DefaultBiomeDataBasePopulator {
 	
 	public ISpeciesSelector computeSpecies(Biome biome) {
 		if(biome instanceof BiomeHills) {//All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time.
-			return new RandomSpeciesSelector().addSpecies(spruce, 2).addSpecies(oak, 1);
+			return new RandomSpeciesSelector().add(spruce, 2).add(oak, 1);
 		}
 		if(biome instanceof BiomePlains) {
 			if(ModConfigs.enableAppleTrees) {
-				return new RandomSpeciesSelector().addSpecies(oak, 24).addSpecies(apple, 1);
+				return new RandomSpeciesSelector().add(oak, 24).add(apple, 1);
 			} else {
 				return staticOakDecision;
 			}
@@ -131,7 +131,7 @@ public class DefaultBiomeDataBasePopulator {
 				return staticBirchDecision;
 			}
 			//At this point we are mostly sure that we are dealing with a plain "BiomeForest" which generates a Birch Tree 1/5 of the time.
-			return new RandomSpeciesSelector().addSpecies(oak, 4).addSpecies(birch, 1);
+			return new RandomSpeciesSelector().add(oak, 4).add(birch, 1);
 		}
 		if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
 			return staticDarkOakDecision;

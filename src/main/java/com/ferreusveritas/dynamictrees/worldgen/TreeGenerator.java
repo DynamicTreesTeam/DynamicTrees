@@ -47,16 +47,6 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	/**
-	 * This is run during the init phase to cache 
-	 * tree data that was created during the preInit phase
-	 */
-	public static void init() {
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			new DefaultBiomeDataBasePopulator().init();
-		}
-	}
-	
-	/**
 	 * This is for world debugging.
 	 * The colors signify the different tree spawn failure modes.
 	 *

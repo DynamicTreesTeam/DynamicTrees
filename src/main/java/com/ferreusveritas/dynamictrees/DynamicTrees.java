@@ -1,12 +1,14 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
@@ -93,7 +95,9 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		
-		TreeGenerator.init();//This is run during the init phase to cache tree data that was created during the preInit phase
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			new DefaultBiomeDataBasePopulator().init();
+		}
 		
 		proxy.init();
 		compatProxy.init();
