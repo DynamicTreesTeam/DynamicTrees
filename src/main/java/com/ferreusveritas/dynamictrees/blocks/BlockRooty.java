@@ -437,7 +437,9 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		
 		//Safe to spawn particles here since this is a client side only member function
 		ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), d0, d1, d2, 0, 0, 0, new int[]{Block.getStateId(mimicState)});
-		particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+		if(particle != null) {
+			particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+		}
 		
 		return true;
 	}
