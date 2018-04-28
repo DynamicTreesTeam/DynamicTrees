@@ -59,6 +59,7 @@ public class BiomeDataBase {
 		
 		if(entry == null) {
 			entry = new BiomeEntry(biome, biomeId);
+			table.set(biomeId, entry);
 		}
 		
 		return entry;
@@ -85,20 +86,20 @@ public class BiomeDataBase {
 		ISpeciesSelector existing = entry.speciesSelector;
 		
 		switch (op) {
-		case REPLACE:
-			entry.speciesSelector = selector;
-			break;
-		case SPLICE_AFTER:
-			entry.speciesSelector = (pos, dirt, rnd) -> {
-				SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
-				return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
-			};
-			break;
-		case SPLICE_BEFORE:
-			entry.speciesSelector = (pos, dirt, rnd) -> {
-				SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
-				return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
-			};
+			case REPLACE:
+				entry.speciesSelector = selector;
+				break;
+			case SPLICE_AFTER:
+				entry.speciesSelector = (pos, dirt, rnd) -> {
+					SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
+					return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
+				};
+				break;
+			case SPLICE_BEFORE:
+				entry.speciesSelector = (pos, dirt, rnd) -> {
+					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
+					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
+				};
 			break;
 		}
 		
