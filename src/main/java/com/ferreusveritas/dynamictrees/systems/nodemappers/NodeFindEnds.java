@@ -21,7 +21,7 @@ public class NodeFindEnds implements INodeInspector {
 	private BlockPos last;
 
 	public NodeFindEnds() { //Array is provided for you
-		this.endPoints = new ArrayList<BlockPos>();
+		this.endPoints = new ArrayList<BlockPos>(32);
 		last = BlockPos.ORIGIN;
 	}
 	

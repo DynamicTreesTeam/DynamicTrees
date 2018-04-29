@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
@@ -23,8 +25,10 @@ import net.minecraft.world.World;
 public class NodeDestroyer implements INodeInspector {
 
 	Species species;//Destroy any node that's made of the same kind of wood
+	private List<BlockPos> endPoints;
 
 	public NodeDestroyer(Species species) {
+		this.endPoints = new ArrayList<BlockPos>(32);
 		this.species = species;
 	}
 
@@ -34,6 +38,7 @@ public class NodeDestroyer implements INodeInspector {
 
 		if(branch != null && species.getFamily() == branch.getFamily()) {
 			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
+				endPoints.add(pos);
 				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
 			world.setBlockToAir(pos);//Destroy the branch
@@ -47,7 +52,7 @@ public class NodeDestroyer implements INodeInspector {
 		return false;
 	}
 
-	public void killSurroundingLeaves(World world, BlockPos twigPos) {
+	protected void killSurroundingLeaves(World world, BlockPos twigPos) {
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
 			TreeFamily tree = species.getFamily();
