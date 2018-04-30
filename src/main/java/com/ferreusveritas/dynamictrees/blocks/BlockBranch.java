@@ -13,6 +13,8 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -30,6 +32,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -169,36 +172,101 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * 
 	 * @param world The world
 	 * @param pos The position of the branch being lobbed
+	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public int destroyTreeFromNode(World world, BlockPos pos) {//, float fortuneFactor) {
+	public int destroyBranchFromNode(World world, BlockPos pos, boolean wholeTree) {
 		IBlockState blockState = world.getBlockState(pos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
 		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
 		Species species = nodeSpecies.getSpecies();//Get the species from the root node
 		NodeNetVolume volumeSum = new NodeNetVolume();
+		NodeDestroyer destroyer = new NodeDestroyer(species);
 		// Analyze only part of the tree beyond the break point and calculate it's volume
-		analyse(blockState, world, pos, signal.localRootDir, new MapSignal(volumeSum, new NodeDestroyer(species)));
+		analyse(blockState, world, pos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
+		destroyLeaves(world, species, destroyer.getEnds());//Destroy all the leaves on the branch
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 	
-	/**
-	 * Destroys all branches recursively in the entire tree
-	 * 
-	 * @param world The world
-	 * @param pos The position of the branch being lobbed
-	 * @return The volume of the tree that was destroyed
+	/*
+	 * Attempt to destroy all of the leaves on the branch while leaving the other
+	 * leaves unharmed.
 	 */
-	public int destroyEntireTree(World world, BlockPos pos) {
-		IBlockState blockState = world.getBlockState(pos);
-		NodeSpecies nodeSpecies = new NodeSpecies();
-		analyse(blockState, world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find the species
-		Species species = nodeSpecies.getSpecies();//Get the species from the root node
-		NodeNetVolume volumeSum = new NodeNetVolume();
-		// Analyze the entire tree and calculate it's volume
-		analyse(blockState, world, pos, null, new MapSignal(volumeSum, new NodeDestroyer(species)));
-		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
+	protected void destroyLeaves(World world, Species species, List<BlockPos> endPoints) {
+		
+		if(endPoints.isEmpty()) {
+			return;
+		}
+				
+		BlockPos firstPos = endPoints.get(0);
+		
+		//Make a bounding volume that holds all of the endpoints;
+		int loX = firstPos.getX();
+		int loY = firstPos.getY();
+		int loZ = firstPos.getZ();
+		int hiX = loX;
+		int hiY = loY;
+		int hiZ = loZ;
+				
+		for(BlockPos pos : endPoints) {
+			loX = Math.min(loX, pos.getX());
+			loY = Math.min(loY, pos.getY());
+			loZ = Math.min(loZ, pos.getZ());
+			hiX = Math.max(hiX, pos.getX());
+			hiY = Math.max(hiY, pos.getY());
+			hiZ = Math.max(hiZ, pos.getZ());
+		};
+		
+		//Expand the volume by 3 blocks for the leaves radius
+		loX -= 3; loY -= 3; loZ -= 3;
+		hiX += 3; hiY += 3; hiZ += 3;
+		
+		//Create a voxmap to store the leaf destruction map
+		SimpleVoxmap vmap = new SimpleVoxmap(hiX - loX + 1, hiY - loY + 1, hiZ - loZ + 1).setMapAndCenter(new BlockPos(loX, loY, loZ), new BlockPos(0, 0, 0));
+		
+		//For each of the endpoints add a 7x7 destruction volume around it
+		for(BlockPos endPos : endPoints) {
+			for(BlockPos leafPos : BlockPos.getAllInBoxMutable(endPos.add(-3, -3, -3), endPos.add(3, 3, 3)) ) {
+				vmap.setVoxel(leafPos, (byte) 1);
+			}
+			vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does have a leaves block in it
+		}
+		
+		//vmap.print();
+				
+		TreeFamily family = species.getFamily();
+		BlockBranch familyBranch = family.getDynamicBranch();
+		int primaryThickness = (int) species.getPrimaryThickness();
+		
+		//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
+		for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
+			if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
+				for(BlockPos leafpos : species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero()) {
+					vmap.setVoxel(new BlockPos(findPos).add(leafpos), (byte) 1);
+				}
+				/*
+				for(MutableBlockPos leafPos : BlockPos.getAllInBoxMutable(
+						findPos.getX() - 3, findPos.getY() - 3, findPos.getZ() - 3,
+						findPos.getX() + 3, findPos.getY() + 3, findPos.getZ() + 3 )
+					) {
+					vmap.setVoxel(leafPos, (byte) 0); //Do not destroy leaves that are around supporting branches
+				}
+				*/
+			}
+		}
+		
+		//vmap.print();
+		
+		//Destroy all family compatible leaves
+		for(Cell cell: vmap.getAllNonZeroCells()) {
+			BlockPos pos = cell.getPos();
+			if( family.isCompatibleGenericLeaves(world.getBlockState(pos), world, pos) ) {
+				world.setBlockToAir(pos);
+			}
+		}
+		
 	}
+	
 	
 	///////////////////////////////////////////
 	// DROPS AND HARVESTING
@@ -247,7 +315,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		int woodVolume = destroyTreeFromNode(world, pos);
+		int woodVolume = destroyBranchFromNode(world, pos, false);
 		List<ItemStack> items = getLogDrops(world, pos, (int)(woodVolume * fortuneFactor));
 		
 		//For An-Sar's PrimalCore mod :)
@@ -305,7 +373,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-		int woodVolume = destroyTreeFromNode(world, pos);
+		int woodVolume = destroyBranchFromNode(world, pos, false);
 		for (ItemStack item : getLogDrops(world, pos, woodVolume)) {
 			spawnAsEntity(world, pos, item);
 		}

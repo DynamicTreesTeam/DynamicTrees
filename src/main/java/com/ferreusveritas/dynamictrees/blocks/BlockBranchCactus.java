@@ -181,12 +181,12 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	public int getRawRadius(IBlockState blockState) {
-		return blockState.getValue(TRUNK) ? 5 : 4;
+		return blockState.getBlock() == this ? (blockState.getValue(TRUNK) ? 5 : 4) : 0;
 	}
 
 	@Override
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-		return getRawRadius(blockState);
+		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
 	}
 	
 	@Override

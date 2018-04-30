@@ -16,13 +16,13 @@ public class SimpleVoxmap {
 
 	private byte data[];
 	private boolean touched[];
-
+	
 	private int lenX;
 	private int lenY;
 	private int lenZ;
-
+	
 	BlockPos center = new BlockPos(0, 0, 0);
-
+	
 	public SimpleVoxmap(int lenX, int lenY, int lenZ) {
 		data = new byte[lenX * lenY * lenZ];
 		touched = new boolean[lenY];
@@ -30,7 +30,7 @@ public class SimpleVoxmap {
 		this.lenY = lenY;
 		this.lenZ = lenZ;
 	}
-
+	
 	public SimpleVoxmap(int lenX, int lenY, int lenZ, byte[] extData) {
 		data = Arrays.copyOf(extData, lenX * lenY * lenZ);
 		touched = new boolean[lenY];
@@ -41,20 +41,16 @@ public class SimpleVoxmap {
 		this.lenY = lenY;
 		this.lenZ = lenZ;
 	}
-
+	
 	public SimpleVoxmap(SimpleVoxmap vmp) {
 		this(vmp.getLenX(), vmp.getLenY(), vmp.getLenZ(), vmp.data);
 	}
-
+	
 	/** 
 	* Convenience function to take the guessing and remembering out of how to convert local to world coordinates.
 	* 
-	* @param mapX
-	* @param mapY
-	* @param mapZ
-	* @param xCenter
-	* @param yCenter
-	* @param zCenter
+	* @param mapPos
+	* @param centerPos
 	* @return
 	*/
 	public SimpleVoxmap setMapAndCenter(BlockPos mapPos, BlockPos centerPos) {
@@ -62,50 +58,50 @@ public class SimpleVoxmap {
 		center = center.subtract(mapPos);
 		return this;
 	}
-
+	
 	public SimpleVoxmap setMap(BlockPos mapPos) {
 		center = center.subtract(mapPos);
 		return this;
 	}
-
+	
 	public SimpleVoxmap setCenter(BlockPos centerPos) {
 		center = centerPos;
 		return this;
 	}
-
+	
 	public BlockPos getCenter() {
 		return center;
 	}
-
+	
 	public byte[] getData() {
 		return data;
 	}
-
+	
 	/** @return Size along X-Axis */
 	public int getLenX() {
 		return lenX;
 	}
-
+	
 	/** @return Size along Y-Axis */
 	public int getLenY() {
 		return lenY;
 	}
-
+	
 	/** @return Size along Z-Axis */
 	public int getLenZ() {
 		return lenZ;
 	}
-
+	
 	public SimpleVoxmap clear() {
 		data = new byte[data.length];
 		touched = new boolean[touched.length];
 		return this;
 	}
-
+	
 	public static final byte max(byte a, byte b) {
 		return (a >= b) ? a : b;
 	}
-
+	
 	public void BlitMax(BlockPos pos, SimpleVoxmap src) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
 			int srcY = iy - src.center.getY();
@@ -124,7 +120,7 @@ public class SimpleVoxmap {
 			}
 		}
 	}
-
+	
 	public void BlitClear(BlockPos pos, SimpleVoxmap src) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
 			int srcY = iy - src.center.getY();
@@ -145,27 +141,27 @@ public class SimpleVoxmap {
 		}
 
 	}
-
+	
 	private int calcPos(int x, int y, int z) {
 		return y * lenX * lenZ + z * lenX + x;
 	}
-
+	
 	public void setVoxel(BlockPos pos, byte value) {
 		setVoxel(pos.getX(), pos.getY(), pos.getZ(), value);
 	}
-
+	
 	public void setVoxel(int x, int y, int z, byte value) {
 		x += center.getX();
 		y += center.getY();
 		z += center.getZ();
 		if(testBounds(x, y, z)) {
 			if(value != 0) {
-				setYTouched(y);
+				setYTouched(y - center.getY());
 			}
 			data[calcPos(x, y, z)] = value;
 		}
 	}
-
+	
 	/**
 	 * Get voxel data relative to world coords
 	 * 
@@ -183,7 +179,7 @@ public class SimpleVoxmap {
 	public byte getVoxel(BlockPos pos) {
 		return getVoxel(pos.getX(), pos.getY(), pos.getZ());
 	}
-
+	
 	public byte getVoxel(int x, int y, int z) {
 		if(isYTouched(y)) {
 			x += center.getX();
@@ -194,23 +190,23 @@ public class SimpleVoxmap {
 		
 		return 0;
 	}
-
+	
 	private boolean testBounds(int x, int y, int z) {
 		return x >= 0 && x < lenX && y >= 0 && y < lenY && z >= 0 && z < lenZ;
 	}
-
+	
 	public boolean isYTouched(int y) {
 		y += center.getY();
 		return y >= 0 && y < lenY && touched[y];
 	}
-
+	
 	public void setYTouched(int y) {
 		y += center.getY();
 		if(y >= 0 && y < lenY) {
 			touched[y] = true;
 		}
 	}
-
+	
 	public class Cell {
 		private byte value;
 		private BlockPos pos;
@@ -228,8 +224,7 @@ public class SimpleVoxmap {
 			return pos;
 		}
 	}
-
-	
+		
 	public Iterable<Cell> getAllNonZeroCells() {
 		return getAllNonZeroCells((byte) 0xFF);
 	}
@@ -245,14 +240,14 @@ public class SimpleVoxmap {
 					private int y = 0;
 					private int z = 0;
 					private BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
-
+					
 					@Override
 					protected Cell computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
 							dPos.setPos(x, y, z);
-														
+													
 							if (x < lenX - 1) {
 								++x;
 							}
@@ -264,12 +259,12 @@ public class SimpleVoxmap {
 								x = 0;
 								z = 0;
 								++y;
-							} 
+							}
 							
 							if (y >= lenY) {
 								return this.endOfData();
 							}
-
+							
 							if(touched[y]) {
 								byte value = (byte) (data[pos] & mask);
 								if(value > 0) {
@@ -279,14 +274,13 @@ public class SimpleVoxmap {
 								++y;
 							}
 						}
-						
+					
 					}
 				};
 			}
 		};
 	}
-
-
+	
 	public Iterable<Cell> getAllNonZeroCellsFromTop() {
 		return getAllNonZeroCellsFromTop((byte) 0xFF);
 	}
@@ -302,7 +296,7 @@ public class SimpleVoxmap {
 					private int y = lenY - 1;
 					private int z = 0;
 					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
-
+					
 					@Override
 					protected Cell computeNext() {
 						
@@ -321,12 +315,12 @@ public class SimpleVoxmap {
 								x = 0;
 								z = 0;
 								--y;
-							} 
+							}
 							
 							if (y < 0) {
 								return this.endOfData();
 							}
-
+							
 							if(touched[y]) {
 								byte value = (byte) (data[pos] & mask);
 								if(value > 0) {
@@ -336,7 +330,7 @@ public class SimpleVoxmap {
 								--y;
 							}
 						}
-						
+					
 					}
 				};
 			}
@@ -358,14 +352,14 @@ public class SimpleVoxmap {
 					private int y = 0;
 					private int z = 0;
 					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
-
+					
 					@Override
 					protected BlockPos computeNext() {
-
+						
 						while(true) {
 							int pos = calcPos(x, y, z);
 							dPos.setPos(x, y, z);
-
+							
 							if (x < lenX - 1) {
 								++x;
 							}
@@ -378,7 +372,7 @@ public class SimpleVoxmap {
 								z = 0;
 								++y;
 							} 
-
+							
 							if (y >= lenY) {
 								return this.endOfData();
 							}
@@ -391,7 +385,7 @@ public class SimpleVoxmap {
 								++y;
 							}
 						}
-						
+					
 					}
 				};
 			}
@@ -399,6 +393,7 @@ public class SimpleVoxmap {
 	}
 	
 	public void print() {
+				
 		String buffer;
 		for(int y = 0; y < lenY; y++) {
 			for(int z = 0; z < lenZ; z++) {
