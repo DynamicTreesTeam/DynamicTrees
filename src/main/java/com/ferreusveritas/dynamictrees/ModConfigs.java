@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees;
 
+
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch.EnumAxeDamage;
+
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -16,6 +19,7 @@ public class ModConfigs {
 	public static boolean vanillaLeavesCollision;
 	public static boolean canopyCrash;
 	public static boolean enableAppleTrees;
+	public static EnumAxeDamage axeDamageMode;
 	public static boolean replaceVanillaSapling;
 	public static boolean vineGen;
 	public static boolean podzolGen;
@@ -37,9 +41,11 @@ public class ModConfigs {
 		treeHarvestMultiplier = config.getFloat("harvestMultiplier", "trees", 1f, 0f, 128f, "Factor that multiplies the wood returned from harvesting a tree.  You cheat.");
 		ignoreBiomeGrowthRate = config.getBoolean("ignoreBiomeGrowthRate", "trees", false, "If enabled all trees grow as if they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
-		isLeavesPassable = config.getBoolean("isLeavesPassable", "trees", false, "If enabled all leaves will be passable");
-		vanillaLeavesCollision = config.getBoolean("vanillaLeavesCollision", "trees", false, "If enabled player movement on leaves will not be enhanced");
-		canopyCrash = config.getBoolean("canopyCrash", "trees", true, "If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction");
+
+		isLeavesPassable = config.getBoolean("isLeavesPassable", "interaction", false, "If enabled all leaves will be passable");
+		vanillaLeavesCollision = config.getBoolean("vanillaLeavesCollision", "interaction", false, "If enabled player movement on leaves will not be enhanced");
+		canopyCrash = config.getBoolean("canopyCrash", "interaction", true, "If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction");
+		axeDamageMode = EnumAxeDamage.values()[config.getInt("axeDamageMode", "interaction", 1, 0, 2, "Modes: 0=Standard 1 Damage, 1=By Branch/Trunk Thickness, 2=By Tree Volume")];
 		
 		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
 		
@@ -50,6 +56,7 @@ public class ModConfigs {
 		worldGen = config.getBoolean("worldGen", "world", true, "World Generation produces Dynamic Trees instead of Vanilla trees.");
 		
 		vanillaCactusWorldGen = config.getBoolean("vanillaCactusWorldGen", "world", false, "World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.");
+		
 		
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");
 		

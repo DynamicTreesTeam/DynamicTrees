@@ -28,6 +28,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -303,8 +304,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
+		int radius = getRadius(state, world, pos);
 		int woodVolume = destroyBranchFromNode(world, pos, false);
 		List<ItemStack> items = getLogDrops(world, pos, (int)(woodVolume * fortuneFactor));
+		
+		//Damage the axe by a prescribed amount
+		damageAxe(player, heldItem, radius, woodVolume);
 		
 		//For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, player);
@@ -316,6 +321,39 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		}
 		
 		return true;// Function returns true if Block was destroyed
+	}
+	
+	public enum EnumAxeDamage {
+		VANILLA,
+		THICKNESS,
+		VOLUME
+	}
+	
+	public void damageAxe(EntityPlayer player, ItemStack heldItem, int radius, int woodVolume) {
+		
+		if(heldItem.getItem() instanceof ItemAxe) {
+			
+			int damage;
+			
+			switch(ModConfigs.axeDamageMode) {
+				default:
+				case VANILLA:
+					damage = 1;
+					break;
+				case THICKNESS:
+					damage = Math.min(1, radius) / 2;
+					break;
+				case VOLUME:
+					damage = woodVolume / 4096;//There are 4096 "texel sized voxels" of wood in a log
+					break;
+			}
+			
+			damage--;//Minecraft already damaged the tool by one unit
+			if(damage > 0) {
+				heldItem.damageItem(damage, player);
+			}
+		}
+		
 	}
 	
 	// Super member also does nothing
