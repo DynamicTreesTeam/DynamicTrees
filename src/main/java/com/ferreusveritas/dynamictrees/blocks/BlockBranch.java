@@ -341,7 +341,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					damage = 1;
 					break;
 				case THICKNESS:
-					damage = Math.min(1, radius) / 2;
+					damage = Math.max(1, radius) / 2;
 					break;
 				case VOLUME:
 					damage = woodVolume / 4096;//There are 4096 "texel sized voxels" of wood in a log
