@@ -42,7 +42,6 @@ public class NodeDestroyer implements INodeInspector {
 		if(branch != null && species.getFamily() == branch.getFamily()) {
 			if(branch.getRadius(blockState, world, pos) == species.getPrimaryThickness()) {
 				endPoints.add(pos);
-				//killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
 			}
 			world.setBlockToAir(pos);//Destroy the branch
 		}
