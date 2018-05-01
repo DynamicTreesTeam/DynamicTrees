@@ -1,5 +1,108 @@
 Changelog:
 
+0.7.7a
+* Make log dropper able to drop more than 64 logs
+* Added config options for axe damage behavior.
+* Added config options for enhanced leaves movement and canopy crashing
+* Fix leaves destruction algorithm so it doesn't take out so many leaves blocks when a small branch is harvested
+* Replaced IBiomeDensityProvider and IBiomeSpeciesSelector with unified BiomeDataBase
+* Moved tree generation into decorate event. Add decor cancel to BiomeDataBase.
+* Added support for other dimensions other than the overworld
+* Added blacklist for dimensions in config file
+* Do not decorate river biomes with trees
+* Code cleanup with Lambdas
+
+0.7.6 The Cactus Update(Summary of all added features in Alpha/Beta 0.7.5):
+* Dynamic cacti. Generates in desert biomes
+* Dendrocoil can now read world biome data by coordinates
+* Added function in Dendrocoil peripheral to list all available tree species
+* Seeds are now compatible with Quark colored pots
+* Seeds from other Dynamic Trees mods work with pots
+* Added fake decayable property to DynamicLeaves for better future compatibility
+* Apple tree now produces fruit when bottom of trunk reaches full block size instead of low soil fertility
+* Added Mandarin Chinese translation
+* Added ambient occlusion to branch blocks
+* Fix Dark Oak leaf clusters
+* Fixed a few Poisson disc generation errors
+* Big mushrooms no longer spawn in swamps and other inappropriate areas
+* Fixed bonsai rendering under optifine
+* Bug fix attempt for FastLeafDecay mod
+* Big fix for trees being disconnected from ground
+* Removed poisson disc test code from Dendrocoil
+* Dynamic Leaves item block removed
+* Abstract model loader to help fix DTBoP palm rendering
+
+0.7.5c
+* Fixed bonsai rendering under optifine
+* Dendrocoil can now read world biome data by coordinates
+* Removed poisson disc test code from Dendrocoil
+* Added fake decayable property to DynamicLeaves for better future compatibility.
+* Big mushrooms no longer spawn in swamps and other inappropriate areas
+
+0.7.5b
+* Fix Dark Oak leaf clusters
+* Abstract model loader to help fix DTBoP palm rendering
+* Fix giant mushrooms spawning in swamps
+
+0.7.5a
+* Dynamic cacti.  Generates in desert biomes
+* Seeds are now compatible with Quark colored pots
+* Seeds from other Dynamic Trees mods work with pots
+* Dynamic Leaves item block removed
+* Added function in Dendrocoil peripheral to list all available tree species
+* Fixed a few Poisson disc generation errors
+* Apple tree now produces fruit when bottom of trunk reaches full block size
+* Bug fix attempt for FastLeafDecay mod
+* Big fix for trees being disconnected from ground
+* Mandarin Chinese translation added
+
+0.7.4 The Apple Tree Update(Summary of all added features in Alpha/Beta 0.7.3):
+* Added German, Russian and Ukranian lang translations
+* Added Apple Trees
+* Proper support for passable leaves mod
+* Normalized seed drop rate for worlds that have modified randomTickSpeed(helps with too many seeds on ground)
+* Halved the drop of voluntary seeds but doubled the plant rate of seeds on ground(fewer seeds on ground, but forests spread rate not impacted)
+* Added TreeBuilder to API
+* Added drop creator registry system for adding and removing tree drops for individual trees or globally
+* Added addAcceptableSoil(...) function to Species class so mods can add dirt blocks to trees from other mods
+* Workaround for Better Foliage bug. Thanks mangoose3039
+* Fixed bug where species growth functionality wasn't being respected.
+* Fix for issue #36(Compatibility with Better With Mods "Hardcore Lumber")
+* Fixed world generation bug when there's no ground
+* Fixed client crash with rooty dirt block color multiplier
+* Fix crash involving TNT
+* Fixed problem with trees not growing in multiplayer.
+* Trees no longer generate in superflat world.
+
+0.7.3e
+* replace leaves blockstates with forge format jsons.  Workaround for Better Foliage bug.  Thanks mangoose3039
+* fixed bug where species growth functionality wasn't being respected.
+
+0.7.3d
+* Fix for issue #36(Compatibility with Better With Mods "Hardcore Lumber")
+* Apples now grow on apple trees when the bottom trunk block is full sized.
+
+0.7.3c
+* Added German translation
+* Fixed world generation bug when there's no ground
+* Fixed client crash with rooty dirt block color multiplier
+
+0.7.3b
+* Fix crash involving TNT
+
+0.7.3a
+* Fixed problem with trees not growing in multiplayer.
+* Added Apple Trees
+* Normalized seed drop rate for worlds that have modified randomTickSpeed(helps with too many seeds on ground)
+* Added drop creator registry system for adding and removing tree drops for individual trees or globally
+* Proper support for passable leaves mod
+* Russian and Ukranian lang translations
+* Added TreeBuilder to API
+
+0.7.2d
+* Fix client side crash
+* Fix multiplayer issue where trees won't grow
+
 0.7.2c:
 * Fix dedicated server crash. Closes #26
 * Added Russian translation(thanks AlexRover)
