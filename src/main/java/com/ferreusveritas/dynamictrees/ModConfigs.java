@@ -13,6 +13,8 @@ public class ModConfigs {
 	public static boolean ignoreBiomeGrowthRate;
 	public static float diseaseChance;
 	public static boolean isLeavesPassable;
+	public static boolean vanillaLeavesCollision;
+	public static boolean canopyCrash;
 	public static boolean enableAppleTrees;
 	public static boolean replaceVanillaSapling;
 	public static boolean vineGen;
@@ -36,8 +38,11 @@ public class ModConfigs {
 		ignoreBiomeGrowthRate = config.getBoolean("ignoreBiomeGrowthRate", "trees", false, "If enabled all trees grow as if they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
 		isLeavesPassable = config.getBoolean("isLeavesPassable", "trees", false, "If enabled all leaves will be passable");
+		vanillaLeavesCollision = config.getBoolean("vanillaLeavesCollision", "trees", false, "If enabled player movement on leaves will not be enhanced");
+		canopyCrash = config.getBoolean("canopyCrash", "trees", true, "If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction");
+		
 		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
-			
+		
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
 				
 		vineGen = config.getBoolean("vineGen", "world", true, "Randomly generate vines on jungle trees.");

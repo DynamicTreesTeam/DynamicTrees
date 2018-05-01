@@ -171,7 +171,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean unknown) {
-		if(passableLeavesModLoaded) {
+		if(passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
 			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, unknown);
 		} 
 		else if (!ModConfigs.isLeavesPassable) {
@@ -183,7 +183,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
 		
-		if(entity instanceof EntityLivingBase) { //We are only interested in Living things crashing through the canopy.
+		if(ModConfigs.canopyCrash && entity instanceof EntityLivingBase) { //We are only interested in Living things crashing through the canopy.
 			entity.fallDistance--;
 			
 			AxisAlignedBB aabb = entity.getEntityBoundingBox();
@@ -225,7 +225,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(passableLeavesModLoaded) {
+		if(passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
 			super.onEntityCollidedWithBlock(world, pos, state, entity);
 		} 
 		else {
