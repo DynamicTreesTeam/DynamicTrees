@@ -31,7 +31,7 @@ public class ModConfigs {
 	public static boolean podzolGen;
 	public static boolean worldGen;
 	public static boolean vanillaCactusWorldGen;
-	public static HashSet<Integer> dimensionBlacklist;
+	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 	
 	public static boolean worldGenDebug;
 	
