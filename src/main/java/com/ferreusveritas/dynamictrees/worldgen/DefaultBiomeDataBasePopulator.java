@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ISpec
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.RandomSpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.StaticSpeciesSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -20,8 +21,10 @@ import net.minecraft.world.biome.BiomeHills;
 import net.minecraft.world.biome.BiomePlains;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class DefaultBiomeDataBasePopulator {
+public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 
+	protected final BiomeDataBase dbase;
+	
 	private Species oak;
 	private Species birch;
 	private Species spruce;
@@ -37,7 +40,11 @@ public class DefaultBiomeDataBasePopulator {
 	private StaticSpeciesSelector staticBirchDecision;
 	private StaticSpeciesSelector staticDarkOakDecision;
 	
-	public void init () {
+	public DefaultBiomeDataBasePopulator(BiomeDataBase dbase) {
+		this.dbase = dbase;
+	}
+	
+	public void populate () {
 		oak = TreeRegistry.findSpeciesSloppy("oak");
 		birch = TreeRegistry.findSpeciesSloppy("birch");
 		spruce = TreeRegistry.findSpeciesSloppy("spruce");

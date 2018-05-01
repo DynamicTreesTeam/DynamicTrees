@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.worldgen.JsonBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
@@ -96,7 +97,8 @@ public class DynamicTrees {
 	public void init(FMLInitializationEvent event) {
 		
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			new DefaultBiomeDataBasePopulator().init();
+			new DefaultBiomeDataBasePopulator(TreeGenerator.getTreeGenerator().biomeDataBase).populate();
+			new JsonBiomeDataBasePopulator(TreeGenerator.getTreeGenerator().biomeDataBase).populate();
 		}
 		
 		proxy.init();
