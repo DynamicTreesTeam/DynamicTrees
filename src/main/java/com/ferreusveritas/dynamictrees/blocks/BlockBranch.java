@@ -231,9 +231,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			}
 			vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does have a leaves block in it
 		}
-		
-		//vmap.print();
-				
+						
 		TreeFamily family = species.getFamily();
 		BlockBranch familyBranch = family.getDynamicBranch();
 		int primaryThickness = (int) species.getPrimaryThickness();
@@ -242,21 +240,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
 			if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
 				for(BlockPos leafpos : species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero()) {
-					vmap.setVoxel(new BlockPos(findPos).add(leafpos), (byte) 1);
+					vmap.setVoxel(new BlockPos(findPos).add(leafpos), (byte) 0);
 				}
-				/*
-				for(MutableBlockPos leafPos : BlockPos.getAllInBoxMutable(
-						findPos.getX() - 3, findPos.getY() - 3, findPos.getZ() - 3,
-						findPos.getX() + 3, findPos.getY() + 3, findPos.getZ() + 3 )
-					) {
-					vmap.setVoxel(leafPos, (byte) 0); //Do not destroy leaves that are around supporting branches
-				}
-				*/
 			}
 		}
-		
-		//vmap.print();
-		
+				
 		//Destroy all family compatible leaves
 		for(Cell cell: vmap.getAllNonZeroCells()) {
 			BlockPos pos = cell.getPos();
