@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -122,7 +121,7 @@ public class BlockBonsaiPot extends BlockContainer {
 			
 			if(!world.isRemote) {
 				ItemStack seedStack = species.getSeedStack(1);
-				CompatHelper.spawnEntity(world, new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
+				world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
 			}
 
 			world.setBlockState(pos, getPotState(world, pos));//Return back to an empty pot

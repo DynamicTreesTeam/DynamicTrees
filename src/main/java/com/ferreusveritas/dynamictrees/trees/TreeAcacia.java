@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeAcacia extends TreeFamily {
@@ -27,7 +27,7 @@ public class TreeAcacia extends TreeFamily {
 		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return CompatHelper.biomeHasType(biome, Type.SAVANNA);
+			return BiomeDictionary.hasType(biome, Type.SAVANNA);
 		}
 		
 	}

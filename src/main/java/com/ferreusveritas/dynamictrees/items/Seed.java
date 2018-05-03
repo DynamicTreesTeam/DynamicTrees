@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.ItemHelper;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
@@ -52,18 +52,18 @@ public class Seed extends Item {
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
-		World world = CompatHelper.getEntityWorld(entityItem);
+		World world = entityItem.world;
 		
 		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
 			if(!world.isRemote) {//Server side only
 				BlockPos pos = new BlockPos(entityItem);
 				if(world.canBlockSeeSky(pos)) {
 					Random rand = new Random();
-					ItemStack seedStack = CompatHelper.getEntityItem(entityItem);			
+					ItemStack seedStack = entityItem.getItem();			
 					SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, species, pos);
 					MinecraftForge.EVENT_BUS.post(seedVolEvent);
 					if(!seedVolEvent.isCanceled()) {
-						int count = CompatHelper.getStackCount(seedStack);
+						int count = ItemHelper.getStackCount(seedStack);
 						while(count-- > 0) {
 							if( seedVolEvent.doForcePlant() || (getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat())){
 								if(getSpecies(seedStack).plantSapling(world, pos)) {
@@ -72,7 +72,7 @@ public class Seed extends Item {
 							}
 						}
 					}
-					CompatHelper.setStackCount(CompatHelper.getEntityItem(entityItem), 0);
+					ItemHelper.setStackCount(entityItem.getItem(), 0);
 				}
 			}
 			entityItem.setDead();
@@ -89,7 +89,7 @@ public class Seed extends Item {
 			BlockBonsaiPot bonzaiPot = species.getBonzaiPot();
 			world.setBlockState(pos, bonzaiPot.getDefaultState());
 			if(bonzaiPot.setSpecies(world, species, pos) && bonzaiPot.setPotState(world, emptyPotState, pos)) {
-				CompatHelper.shrinkStack(seedStack, 1);
+				ItemHelper.shrinkStack(seedStack, 1);
 				return EnumActionResult.SUCCESS;
 			}
 		}
@@ -102,7 +102,7 @@ public class Seed extends Item {
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
 				if(getSpecies(seedStack).plantSapling(world, pos.up())) {//Do the planting
-					CompatHelper.shrinkStack(seedStack, 1);
+					ItemHelper.shrinkStack(seedStack, 1);
 					return EnumActionResult.SUCCESS;
 				}
 			}

@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
@@ -65,7 +64,7 @@ public class NodeDestroyer implements INodeInspector {
 					species.getTreeHarvestDrops(world, leavesPos, dropList, world.rand);
 					for(ItemStack stack : dropList) {
 						EntityItem itemEntity = new EntityItem(world, leavesPos.getX() + 0.5, leavesPos.getY() + 0.5, leavesPos.getZ() + 0.5, stack);
-						CompatHelper.spawnEntity(world, itemEntity);
+						world.spawnEntity(itemEntity);
 					}
 				}
 			}

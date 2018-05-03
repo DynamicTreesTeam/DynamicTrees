@@ -16,7 +16,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -536,7 +536,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess blockAccess, BlockPos pos, int fortune) {
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 		ILeavesProperties properties = getProperties(blockAccess.getBlockState(pos));
-		ret.add(CompatHelper.setStackCount(properties.getPrimitiveLeavesItemStack().copy(), 1));
+		ret.add(ItemHelper.setStackCount(properties.getPrimitiveLeavesItemStack().copy(), 1));
 		return ret;
 	}
 

@@ -36,7 +36,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -232,7 +232,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return CompatHelper.setStackCount(seedStack.copy(), qty);
+		return ItemHelper.setStackCount(seedStack.copy(), qty);
 	}
 	
 	public Seed getSeed() {
@@ -257,7 +257,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		} else {
 			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
 		}
-		return CompatHelper.emptyStack();
+		return ItemHelper.emptyStack();
 	}
 
 	//It's mostly for seeds.. mostly.
@@ -367,8 +367,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
 							float distAngle = 15;//The spread angle(center to edge)
 							float launchSpeed = 4;//Blocks(meters) per second
-							motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f); 
-							CompatHelper.spawnEntity(world, itemEntity, motion);
+							motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f);
+							itemEntity.motionX = motion.x;
+							itemEntity.motionY = motion.y;
+							itemEntity.motionZ = motion.z;
+							return world.spawnEntity(itemEntity);
 						}
 					}
 				}
@@ -850,7 +853,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				CompatHelper.spawnEntity(world, new EntityLingeringEffector(world, rootPos, effect));
+				world.spawnEntity(new EntityLingeringEffector(world, rootPos, effect));
 				return true;
 			} else {
 				return effect.apply(world, rootPos);
@@ -864,7 +867,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		if (heldItem != null) {//Something in the hand
 			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-				CompatHelper.consumePlayerItem(player, hand, heldItem);
+				ItemHelper.consumePlayerItem(player, hand, heldItem);
 				return true;
 			}
 		}

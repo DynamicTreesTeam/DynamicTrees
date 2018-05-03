@@ -14,7 +14,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
@@ -30,6 +29,7 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -106,7 +106,7 @@ public class TreeOak extends TreeFamily {
 			
 			if(soilBlockState.getBlock() == Blocks.WATER) {
 				Biome biome = world.getBiome(pos);
-				if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
+				if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
 					BlockPos down = pos.down();
 					if(isAcceptableSoil(world, down, world.getBlockState(down))) {
 						return true;
@@ -239,7 +239,7 @@ public class TreeOak extends TreeFamily {
 	 */
 	@Override
 	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
-		if(CompatHelper.biomeHasType(world.getBiome(trunkPos), Type.SWAMP)) {
+		if(BiomeDictionary.hasType(world.getBiome(trunkPos), Type.SWAMP)) {
 			return swampSpecies;
 		}
 		

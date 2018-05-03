@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
@@ -69,7 +69,7 @@ public class TreeFamily {
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
 	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
-	private ItemStack primitiveLogItemStack = CompatHelper.emptyStack();
+	private ItemStack primitiveLogItemStack = ItemHelper.emptyStack();
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
@@ -243,7 +243,7 @@ public class TreeFamily {
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		return CompatHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
+		return ItemHelper.setStackCount(stick.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
 	protected TreeFamily setPrimitiveLog(IBlockState primLog) {
@@ -261,7 +261,7 @@ public class TreeFamily {
 	}
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
-		return CompatHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
+		return ItemHelper.setStackCount(primitiveLogItemStack.copy(), MathHelper.clamp(qty, 0, 64));
 	}
 	
 	

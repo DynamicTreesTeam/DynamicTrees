@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.StaticSpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 
@@ -19,6 +18,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHills;
 import net.minecraft.world.biome.BiomePlains;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
@@ -78,33 +78,33 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	}
 	
 	public IDensitySelector computeDensity(Biome biome) {
-		if(CompatHelper.biomeHasType(biome, Type.SPOOKY)) { //Roofed Forest
+		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Roofed Forest
 			return (rnd, nd) -> { return 0.4f + (nd / 3.0f); };
 		}
-		if(CompatHelper.biomeHasType(biome, Type.SANDY)) { //Desert
+		if(BiomeDictionary.hasType(biome, Type.SANDY)) { //Desert
 			return (rnd, nd) -> { return ( nd * 0.6) + 0.4; };
 		}
-		final double treeDensity = MathHelper.clamp((CompatHelper.getBiomeTreesPerChunk(biome)) / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
+		final double treeDensity = MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return (rnd, nd) -> { return nd * treeDensity; };
 	}
 	
 	public IChanceSelector computeChance(Biome biome) {
-		if(CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
+		if(BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
 			return (rnd, spc, rad) -> { return rad > 6 && rnd.nextFloat() < 0.5f ? EnumChance.CANCEL : EnumChance.OK; };
 		}
-		if(CompatHelper.biomeHasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
+		if(BiomeDictionary.hasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
 			return (rnd, spc, rad) -> { return EnumChance.OK; };
 		}
 		if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
 			return (rnd, spc, rad) -> { return EnumChance.OK; };
 		}
-		if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
+		if(BiomeDictionary.hasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
 			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 		} 
-		if(CompatHelper.biomeHasType(biome, Type.SANDY)) {//Deserts (for cacti)
+		if(BiomeDictionary.hasType(biome, Type.SANDY)) {//Deserts (for cacti)
 			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 		}
-		else if(CompatHelper.getBiomeTreesPerChunk(biome) < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
+		else if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
 		}
 		if (biome == Biomes.RIVER) {
@@ -130,14 +130,14 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 				return staticOakDecision;
 			}
 		}
-		if(CompatHelper.biomeHasType(biome, Type.FOREST)) {
+		if(BiomeDictionary.hasType(biome, Type.FOREST)) {
 			if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
 				return staticSpruceDecision;
 			}
-			if (CompatHelper.biomeHasType(biome, Type.CONIFEROUS)) {
+			if (BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
 				return staticSpruceDecision;
 			}
-			if (CompatHelper.biomeHasType(biome, Type.SPOOKY)) {
+			if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
 				return staticDarkOakDecision;
 			}
 			if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
@@ -152,19 +152,19 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		if(biome == Biomes.MESA_ROCK) {
 			return staticOakDecision;
 		}
-		if(CompatHelper.biomeHasType(biome, Type.JUNGLE)) {
+		if(BiomeDictionary.hasType(biome, Type.JUNGLE)) {
 			return new StaticSpeciesSelector(new SpeciesSelection(jungle));
 		}
-		if(CompatHelper.biomeHasType(biome, Type.SAVANNA)) {
+		if(BiomeDictionary.hasType(biome, Type.SAVANNA)) {
 			return new StaticSpeciesSelector(new SpeciesSelection(acacia));
 		}
-		if(CompatHelper.biomeHasType(biome, Type.SWAMP)) {
+		if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
 			return new StaticSpeciesSelector(new SpeciesSelection(oakswamp));
 		}
-		if(CompatHelper.biomeHasType(biome, Type.SANDY)) {
+		if(BiomeDictionary.hasType(biome, Type.SANDY)) {
 			return new StaticSpeciesSelector(new SpeciesSelection(cactus));
 		}
-		if(CompatHelper.biomeHasType(biome, Type.WASTELAND)) {
+		if(BiomeDictionary.hasType(biome, Type.WASTELAND)) {
 			return new StaticSpeciesSelector(new SpeciesSelection());//Not handled, no tree
 		}
 		

@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
+import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockHorizontal;
@@ -25,6 +25,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeJungle extends TreeFamily {
@@ -53,7 +54,7 @@ public class TreeJungle extends TreeFamily {
 
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
-			return CompatHelper.biomeHasType(biome, Type.JUNGLE);
+			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 		
 		@Override
@@ -162,7 +163,7 @@ public class TreeJungle extends TreeFamily {
 						EnumFacing facing = cocoaState.getValue(BlockHorizontal.FACING);
 						world.setBlockState(pos, ModBlocks.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
 						if (!player.capabilities.isCreativeMode) {
-							CompatHelper.shrinkStack(heldItem, 1);
+							ItemHelper.shrinkStack(heldItem, 1);
 						}
 						return true;
 					}

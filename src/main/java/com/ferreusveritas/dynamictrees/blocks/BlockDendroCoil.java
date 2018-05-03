@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CompatHelper;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import dan200.computercraft.api.ComputerCraftAPI;
@@ -81,7 +80,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		entityItem.motionX = 0;
 		entityItem.motionY = 0;
 		entityItem.motionZ = 0;
-		CompatHelper.spawnEntity(world, entityItem);
+		world.spawnEntity(entityItem);
 	}
 
 	public String getSpecies(World world, BlockPos pos) {
