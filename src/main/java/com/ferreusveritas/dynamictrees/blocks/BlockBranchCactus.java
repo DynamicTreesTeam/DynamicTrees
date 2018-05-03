@@ -210,7 +210,7 @@ public class BlockBranchCactus extends BlockBranch {
     	}
     	
     	signal.success = world.setBlockState(pos, this.blockState.getBaseState().withProperty(TRUNK, trunk).withProperty(ORIGIN, originDir), 2);
-    	signal.radius = (int) (trunk ? signal.getSpecies().getPrimaryThickness(): signal.getSpecies().getSecondaryThickness());
+    	signal.radius = (int) (trunk ? signal.getSpecies().getFamily().getPrimaryThickness(): signal.getSpecies().getFamily().getSecondaryThickness());
     	return signal;
     }
     

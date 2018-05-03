@@ -31,7 +31,7 @@ public class NodeInflator implements INodeInspector {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 				
 		if(branch != null){
-			radius = species.getPrimaryThickness();
+			radius = species.getFamily().getPrimaryThickness();
 		}
 
 		return false;
@@ -76,7 +76,7 @@ public class NodeInflator implements INodeInspector {
 				radius = (float)Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 				
 				//Make sure that non-twig branches are at least radius 2
-				float secondaryThickness = species.getSecondaryThickness();
+				float secondaryThickness = species.getFamily().getSecondaryThickness();
 				if(radius < secondaryThickness) {
 					radius = secondaryThickness;
 				}

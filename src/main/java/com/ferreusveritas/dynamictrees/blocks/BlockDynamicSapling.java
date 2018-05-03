@@ -76,9 +76,9 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		Species species = getSpecies(world, pos, state);
 		if(canBlockStay(world, pos, state)) {
 			//Ensure planting conditions are right
-			TreeFamily tree = species.getFamily();
+			TreeFamily family = species.getFamily();
 			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-				tree.getDynamicBranch().setRadius(world, pos, (int)species.getPrimaryThickness(), null);//set to a single branch with 1 radius
+				family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 				world.setBlockState(pos.up(), species.getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			}

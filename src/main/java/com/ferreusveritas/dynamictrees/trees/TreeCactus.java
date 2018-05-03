@@ -86,16 +86,6 @@ public class TreeCactus extends TreeFamily {
 		}
 		
 		@Override
-		public float getPrimaryThickness() {
-			return 5.0f;
-		}
-
-		@Override
-		public float getSecondaryThickness() {
-			return 4.0f;
-		}
-		
-		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.MUTATED_DESERT);
 		}
@@ -154,6 +144,16 @@ public class TreeCactus extends TreeFamily {
 	@Override
 	public BlockBranch createBranch() {
 		return new BlockBranchCactus("cactusbranch");
+	}
+
+	@Override
+	public float getPrimaryThickness() {
+		return 5.0f;
+	}
+
+	@Override
+	public float getSecondaryThickness() {
+		return 4.0f;
 	}
 	
 	@Override

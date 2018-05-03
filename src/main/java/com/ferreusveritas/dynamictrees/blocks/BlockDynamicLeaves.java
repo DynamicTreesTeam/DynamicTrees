@@ -436,8 +436,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			signal.getSpecies().getFamily().getDynamicBranch().setRadius(world, pos, (int) signal.getSpecies().getPrimaryThickness(), null);
-			signal.radius = signal.getSpecies().getSecondaryThickness();//For the benefit of the parent branch
+			TreeFamily family = signal.getSpecies().getFamily();
+			family.getDynamicBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);
+			signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
 		}
 		
 		signal.success = hasLeaves;

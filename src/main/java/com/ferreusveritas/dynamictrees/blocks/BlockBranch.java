@@ -235,7 +235,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 						
 		TreeFamily family = species.getFamily();
 		BlockBranch familyBranch = family.getDynamicBranch();
-		int primaryThickness = (int) species.getPrimaryThickness();
+		int primaryThickness = (int) family.getPrimaryThickness();
 		
 		//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
 		for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
