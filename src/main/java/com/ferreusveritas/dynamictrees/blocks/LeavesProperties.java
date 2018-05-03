@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.ItemHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -28,7 +27,7 @@ public class LeavesProperties implements ILeavesProperties {
 		@Override public ILeavesProperties setTree(TreeFamily tree) { return this; }
 		@Override public TreeFamily getTree() { return TreeFamily.NULLFAMILY; }
 		@Override public IBlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
-		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemHelper.emptyStack(); }
+		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemStack.EMPTY; }
 		@Override public ILeavesProperties setDynamicLeavesState(IBlockState state) { return this; }
 		@Override public IBlockState getDynamicLeavesState() { return Blocks.AIR.getDefaultState(); }
 		@Override public IBlockState getDynamicLeavesState(int hydro) { return Blocks.AIR.getDefaultState(); }

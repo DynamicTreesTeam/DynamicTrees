@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
-import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockHorizontal;
@@ -163,7 +162,7 @@ public class TreeJungle extends TreeFamily {
 						EnumFacing facing = cocoaState.getValue(BlockHorizontal.FACING);
 						world.setBlockState(pos, ModBlocks.blockFruitCocoa.getDefaultState().withProperty(BlockHorizontal.FACING, facing), 2);
 						if (!player.capabilities.isCreativeMode) {
-							ItemHelper.shrinkStack(heldItem, 1);
+							heldItem.shrink(1);
 						}
 						return true;
 					}

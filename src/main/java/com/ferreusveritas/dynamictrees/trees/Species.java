@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
@@ -36,7 +37,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.util.ItemHelper;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -232,7 +232,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return ItemHelper.setStackCount(seedStack.copy(), qty);
+		seedStack.copy().setCount(MathHelper.clamp(qty, 0, 64));
+		return seedStack;
 	}
 	
 	public Seed getSeed() {
@@ -257,7 +258,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		} else {
 			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
 		}
-		return ItemHelper.emptyStack();
+		return ItemStack.EMPTY;
 	}
 
 	//It's mostly for seeds.. mostly.
@@ -867,12 +868,28 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		if (heldItem != null) {//Something in the hand
 			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-				ItemHelper.consumePlayerItem(player, hand, heldItem);
+				Species.consumePlayerItem(player, hand, heldItem);
 				return true;
 			}
 		}
 		
 		return false;
+	}
+	
+	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
+		if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
+			if(!player.capabilities.isCreativeMode) {
+				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
+				player.setHeldItem(hand, emptiable.getEmptyContainer());
+			}
+		}
+		else if(heldItem.getItem() == Items.POTIONITEM) {//An actual potion
+			if(!player.capabilities.isCreativeMode) {
+				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
+			}
+		} else {
+			heldItem.shrink(1);//Just a regular item like bonemeal
+		}
 	}
 	
 	//////////////////////////////

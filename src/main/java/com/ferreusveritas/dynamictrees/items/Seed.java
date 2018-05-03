@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.ItemHelper;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
@@ -63,7 +62,7 @@ public class Seed extends Item {
 					SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, species, pos);
 					MinecraftForge.EVENT_BUS.post(seedVolEvent);
 					if(!seedVolEvent.isCanceled()) {
-						int count = ItemHelper.getStackCount(seedStack);
+						int count = seedStack.getCount();
 						while(count-- > 0) {
 							if( seedVolEvent.doForcePlant() || (getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat())){
 								if(getSpecies(seedStack).plantSapling(world, pos)) {
@@ -72,7 +71,7 @@ public class Seed extends Item {
 							}
 						}
 					}
-					ItemHelper.setStackCount(entityItem.getItem(), 0);
+					seedStack.setCount(0);
 				}
 			}
 			entityItem.setDead();
@@ -89,7 +88,7 @@ public class Seed extends Item {
 			BlockBonsaiPot bonzaiPot = species.getBonzaiPot();
 			world.setBlockState(pos, bonzaiPot.getDefaultState());
 			if(bonzaiPot.setSpecies(world, species, pos) && bonzaiPot.setPotState(world, emptyPotState, pos)) {
-				ItemHelper.shrinkStack(seedStack, 1);
+				seedStack.shrink(1);
 				return EnumActionResult.SUCCESS;
 			}
 		}
@@ -102,7 +101,7 @@ public class Seed extends Item {
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
 				if(getSpecies(seedStack).plantSapling(world, pos.up())) {//Do the planting
-					ItemHelper.shrinkStack(seedStack, 1);
+					seedStack.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}
 			}
