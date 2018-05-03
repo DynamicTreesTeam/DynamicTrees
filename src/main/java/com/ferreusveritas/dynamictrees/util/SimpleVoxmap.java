@@ -209,11 +209,11 @@ public class SimpleVoxmap {
 	}
 	
 	
-	public class MutableCell {
+	public class Cell {
 		private byte value;
 		private MutableBlockPos pos;
 
-		public MutableCell() {
+		public Cell() {
 			pos = new MutableBlockPos();
 		}
 		
@@ -232,25 +232,25 @@ public class SimpleVoxmap {
 	}
 	
 	
-	public Iterable<MutableCell> getAllNonZeroMutableCells() {
-		return getAllNonZeroMutableCells((byte) 0xFF);
+	public Iterable<Cell> getAllNonZeroCells() {
+		return getAllNonZeroCells((byte) 0xFF);
 	}
 	
 	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
-	public Iterable<MutableCell> getAllNonZeroMutableCells(final byte mask) {
+	public Iterable<Cell> getAllNonZeroCells(final byte mask) {
 		
-		return new Iterable<MutableCell>() {
+		return new Iterable<Cell>() {
 			@Override
-			public Iterator<MutableCell> iterator() {
-				return new AbstractIterator<MutableCell>() {
+			public Iterator<Cell> iterator() {
+				return new AbstractIterator<Cell>() {
 					private int x = 0;
 					private int y = 0;
 					private int z = 0;
-					private MutableCell workingCell = new MutableCell();
+					private Cell workingCell = new Cell();
 					private MutableBlockPos dPos = workingCell.getPos();
 					
 					@Override
-					protected MutableCell computeNext() {
+					protected Cell computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
@@ -293,12 +293,12 @@ public class SimpleVoxmap {
 	
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<MutableBlockPos> getAllNonZeroMutable() {
-		return getAllNonZeroMutable((byte) 0xFF);
+	public Iterable<MutableBlockPos> getAllNonZero() {
+		return getAllNonZero((byte) 0xFF);
 	}
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<MutableBlockPos> getAllNonZeroMutable(final byte mask) {
+	public Iterable<MutableBlockPos> getAllNonZero(final byte mask) {
 		
 		return new Iterable<MutableBlockPos>() {
 			@Override

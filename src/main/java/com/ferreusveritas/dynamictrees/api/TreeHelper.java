@@ -98,7 +98,7 @@ public class TreeHelper {
 	 */
 	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
-		Iterable<MutableBlockPos> iterable = leafMap != null ? leafMap.getAllNonZeroMutable((byte) 0x0F) : 
+		Iterable<MutableBlockPos> iterable = leafMap != null ? leafMap.getAllNonZero((byte) 0x0F) : 
 			BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
 		for(int i = 0; i < iterations; i++) {

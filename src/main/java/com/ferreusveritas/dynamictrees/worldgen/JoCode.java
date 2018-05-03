@@ -14,7 +14,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.MutableCell;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -154,7 +154,7 @@ public class JoCode {
 			SafeChunkBounds safeBounds = new SafeChunkBounds(world, rootPos);//Area that is safe to place leaves during worldgen
 			
 			//Place Growing Leaves Blocks from voxmap
-			for(MutableCell cell: leafMap.getAllNonZeroMutableCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
 				MutableBlockPos cellPos = cell.getPos();
 				if(safeBounds.inBounds(cellPos)) {
 					IBlockState testBlockState = world.getBlockState(cellPos);
@@ -169,7 +169,7 @@ public class JoCode {
 			
 			//Shrink the safeBounds down by 1 so that the aging process won't look for neighbors outside of the bounds.
 			safeBounds.setShrink(1);
-			for(MutableCell cell: leafMap.getAllNonZeroMutableCells((byte) 0x0F)) {
+			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
 				MutableBlockPos cellPos = cell.getPos();
 				if(!safeBounds.inBounds(cellPos)) {
 					leafMap.setVoxel(cellPos, (byte) 0);
