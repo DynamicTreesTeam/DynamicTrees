@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.google.common.collect.AbstractIterator;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 
 /**
 * A simple implementation of a voxel map
@@ -207,42 +208,49 @@ public class SimpleVoxmap {
 		}
 	}
 	
-	public class Cell {
+	
+	public class MutableCell {
 		private byte value;
-		private BlockPos pos;
+		private MutableBlockPos pos;
 
-		public Cell(byte value, BlockPos pos) {
-			this.value = value;
-			this.pos = pos;
+		public MutableCell() {
+			pos = new MutableBlockPos();
 		}
-
+		
+		public void setValue(byte value) {
+			this.value = value;
+		}
+		
 		public byte getValue() {
 			return value;
 		}
 		
-		public BlockPos getPos() {
+		public MutableBlockPos getPos() {
 			return pos;
 		}
-	}
 		
-	public Iterable<Cell> getAllNonZeroCells() {
-		return getAllNonZeroCells((byte) 0xFF);
+	}
+	
+	
+	public Iterable<MutableCell> getAllNonZeroMutableCells() {
+		return getAllNonZeroMutableCells((byte) 0xFF);
 	}
 	
 	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
-	public Iterable<Cell> getAllNonZeroCells(final byte mask) {
+	public Iterable<MutableCell> getAllNonZeroMutableCells(final byte mask) {
 		
-		return new Iterable<Cell>() {
+		return new Iterable<MutableCell>() {
 			@Override
-			public Iterator<Cell> iterator() {
-				return new AbstractIterator<Cell>() {
+			public Iterator<MutableCell> iterator() {
+				return new AbstractIterator<MutableCell>() {
 					private int x = 0;
 					private int y = 0;
 					private int z = 0;
-					private BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
+					private MutableCell workingCell = new MutableCell();
+					private MutableBlockPos dPos = workingCell.getPos();
 					
 					@Override
-					protected Cell computeNext() {
+					protected MutableCell computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
@@ -268,7 +276,9 @@ public class SimpleVoxmap {
 							if(touched[y]) {
 								byte value = (byte) (data[pos] & mask);
 								if(value > 0) {
-									return new Cell(value, dPos.subtract(center));
+									dPos.setPos(dPos.getX() - center.getX(), dPos.getY() - center.getY(), dPos.getZ() - center.getZ());
+									workingCell.setValue(value);
+									return workingCell;
 								}
 							} else {
 								++y;
@@ -281,80 +291,26 @@ public class SimpleVoxmap {
 		};
 	}
 	
-	public Iterable<Cell> getAllNonZeroCellsFromTop() {
-		return getAllNonZeroCellsFromTop((byte) 0xFF);
-	}
 	
-	/** Create an Iterable that returns all cells(value and position) in the map whose value is non-zero */
-	public Iterable<Cell> getAllNonZeroCellsFromTop(final byte mask) {
-		
-		return new Iterable<Cell>() {
-			@Override
-			public Iterator<Cell> iterator() {
-				return new AbstractIterator<Cell>() {
-					private int x = 0;
-					private int y = lenY - 1;
-					private int z = 0;
-					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
-					
-					@Override
-					protected Cell computeNext() {
-						
-						while(true) {
-							int pos = calcPos(x, y, z);
-							dPos.setPos(x, y, z);
-							
-							if (x < lenX - 1) {
-								++x;
-							}
-							else if (z < lenZ - 1) {
-								x = 0;
-								++z;
-							}
-							else {
-								x = 0;
-								z = 0;
-								--y;
-							}
-							
-							if (y < 0) {
-								return this.endOfData();
-							}
-							
-							if(touched[y]) {
-								byte value = (byte) (data[pos] & mask);
-								if(value > 0) {
-									return new Cell(value, dPos.subtract(center));
-								}
-							} else {
-								--y;
-							}
-						}
-					
-					}
-				};
-			}
-		};
-	}
-	
-	public Iterable<BlockPos> getAllNonZero() {
-		return getAllNonZero((byte) 0xFF);
+	/** Create an Iterable that returns all positions in the map whose value is non-zero */
+	public Iterable<MutableBlockPos> getAllNonZeroMutable() {
+		return getAllNonZeroMutable((byte) 0xFF);
 	}
 	
 	/** Create an Iterable that returns all positions in the map whose value is non-zero */
-	public Iterable<BlockPos> getAllNonZero(final byte mask) {
+	public Iterable<MutableBlockPos> getAllNonZeroMutable(final byte mask) {
 		
-		return new Iterable<BlockPos>() {
+		return new Iterable<MutableBlockPos>() {
 			@Override
-			public Iterator<BlockPos> iterator() {
-				return new AbstractIterator<BlockPos>() {
+			public Iterator<MutableBlockPos> iterator() {
+				return new AbstractIterator<MutableBlockPos>() {
 					private int x = 0;
 					private int y = 0;
 					private int z = 0;
 					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
 					
 					@Override
-					protected BlockPos computeNext() {
+					protected MutableBlockPos computeNext() {
 						
 						while(true) {
 							int pos = calcPos(x, y, z);
@@ -379,7 +335,7 @@ public class SimpleVoxmap {
 							
 							if(touched[y]) {
 								if((data[pos] & mask) > 0) {
-									return dPos.subtract(center);
+									return dPos.setPos(dPos.getX() - center.getX(), dPos.getY() - center.getY(), dPos.getZ() - center.getZ());
 								}
 							} else {
 								++y;

@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -133,14 +134,16 @@ public class CoordUtils {
 		return null;
 	}
 	
-	public static BlockPos findGround(World world, BlockPos pos) {
+	public static BlockPos findGround(World world, BlockPos startPos) {
+		MutableBlockPos pos = new MutableBlockPos(startPos);
+		
 		//Rise up until we are no longer in a solid block
 		while(world.getBlockState(pos).isFullCube()) {
-			pos = pos.up();
+			pos.setPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		}
 		//Dive down until we are again
 		while(!world.getBlockState(pos).isFullCube() && pos.getY() > 50) {
-			pos = pos.down();
+			pos.setPos(pos.getX(), pos.getY() - 1, pos.getZ());
 		}
 		return pos;
 	}

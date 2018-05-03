@@ -478,8 +478,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			ArrayList<BlockPos> branchList = new ArrayList<BlockPos>();
 			
 			//Find all of the branches that are nearby
-			for(BlockPos dPos: leavesProperties.getCellKit().getLeafCluster().getAllNonZero()) {
-				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));
+			for(BlockPos dPos: leavesProperties.getCellKit().getLeafCluster().getAllNonZeroMutable()) {
+				dPos = pos.add(BlockPos.ORIGIN.subtract(dPos));//Becomes immutable at this point
 				IBlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BlockBranch branch = TreeHelper.getBranch(state);

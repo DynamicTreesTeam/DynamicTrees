@@ -17,6 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -97,11 +98,11 @@ public class TreeHelper {
 	 */
 	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
 		
-		Iterable<BlockPos> iterable = leafMap != null ? leafMap.getAllNonZero((byte) 0x0F) : 
-			BlockPos.getAllInBox(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
+		Iterable<MutableBlockPos> iterable = leafMap != null ? leafMap.getAllNonZeroMutable((byte) 0x0F) : 
+			BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		
 		for(int i = 0; i < iterations; i++) {
-			for(BlockPos iPos: iterable) {
+			for(MutableBlockPos iPos: iterable) {
 				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {

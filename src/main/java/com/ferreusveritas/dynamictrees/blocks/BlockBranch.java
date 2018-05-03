@@ -12,10 +12,10 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.MutableCell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
@@ -240,15 +240,16 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
 		for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
 			if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
-				for(BlockPos leafpos : species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero()) {
-					vmap.setVoxel(new BlockPos(findPos).add(leafpos), (byte) 0);
+				Iterable<MutableBlockPos> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZeroMutable();
+				for(MutableBlockPos leafpos : leaves) {
+					vmap.setVoxel(findPos.getX() + leafpos.getX(), findPos.getY() + leafpos.getY(), findPos.getZ() + leafpos.getZ(), (byte) 0);
 				}
 			}
 		}
 				
 		//Destroy all family compatible leaves
-		for(Cell cell: vmap.getAllNonZeroCells()) {
-			BlockPos pos = cell.getPos();
+		for(MutableCell cell: vmap.getAllNonZeroMutableCells()) {
+			MutableBlockPos pos = cell.getPos();
 			if( family.isCompatibleGenericLeaves(world.getBlockState(pos), world, pos) ) {
 				world.setBlockToAir(pos);
 			}
