@@ -217,8 +217,9 @@ public class SimpleVoxmap {
 			pos = new MutableBlockPos();
 		}
 		
-		public void setValue(byte value) {
+		public Cell setValue(byte value) {
 			this.value = value;
+			return this;
 		}
 		
 		public byte getValue() {
@@ -243,48 +244,48 @@ public class SimpleVoxmap {
 			@Override
 			public Iterator<Cell> iterator() {
 				return new AbstractIterator<Cell>() {
-					private int x = 0;
+					private int x = -1;
 					private int y = 0;
 					private int z = 0;
-					private Cell workingCell = new Cell();
-					private MutableBlockPos dPos = workingCell.getPos();
+					private int dataPos = -1;
+					private final int layerSize = lenX * lenZ;
+					private final Cell workingCell = new Cell();
+					private final MutableBlockPos dPos = workingCell.getPos();
 					
 					@Override
 					protected Cell computeNext() {
-						
-						while(true) {
-							int pos = calcPos(x, y, z);
-							dPos.setPos(x, y, z);
-													
-							if (x < lenX - 1) {
-								++x;
+
+						main: while(true) {
+							
+							if (x < lenX - 1) { 
+								x++;
 							}
 							else if (z < lenZ - 1) {
 								x = 0;
-								++z;
+								z++;
 							}
 							else {
-								x = 0;
+								x = -1;
 								z = 0;
-								++y;
-							}
-							
-							if (y >= lenY) {
-								return this.endOfData();
-							}
-							
-							if(touched[y]) {
-								byte value = (byte) (data[pos] & mask);
-								if(value > 0) {
-									dPos.setPos(dPos.getX() - center.getX(), dPos.getY() - center.getY(), dPos.getZ() - center.getZ());
-									workingCell.setValue(value);
-									return workingCell;
+								y++;
+								
+								while(y < lenY) {
+									if(touched[y]) {
+										continue main;
+									}
+									dataPos += layerSize;
+									y++;
 								}
-							} else {
-								++y;
+								
+								return this.endOfData();
+							} 
+							
+							byte value = (byte) (data[++dataPos] & mask);
+							if(value > 0) {
+								dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+								return workingCell.setValue(value);
 							}
 						}
-					
 					}
 				};
 			}
@@ -304,45 +305,48 @@ public class SimpleVoxmap {
 			@Override
 			public Iterator<MutableBlockPos> iterator() {
 				return new AbstractIterator<MutableBlockPos>() {
-					private int x = 0;
+					private int x = -1;
 					private int y = 0;
 					private int z = 0;
-					BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos(x, y, z);
+					private int dataPos = -1;
+					private final int layerSize = lenX * lenZ;
+					private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 					
 					@Override
 					protected MutableBlockPos computeNext() {
 						
-						while(true) {
-							int pos = calcPos(x, y, z);
-							dPos.setPos(x, y, z);
+						main: while(true) {
 							
 							if (x < lenX - 1) {
-								++x;
+								x++;
 							}
 							else if (z < lenZ - 1) {
 								x = 0;
-								++z;
+								z++;
 							}
 							else {
-								x = 0;
+								x = -1;
 								z = 0;
-								++y;
-							} 
-							
-							if (y >= lenY) {
+								y++;
+								
+								while(y < lenY) {
+									if(touched[y]) {
+										continue main;
+									}
+									dataPos += layerSize;
+									y++;
+								}
+								
 								return this.endOfData();
 							}
 							
-							if(touched[y]) {
-								if((data[pos] & mask) > 0) {
-									return dPos.setPos(dPos.getX() - center.getX(), dPos.getY() - center.getY(), dPos.getZ() - center.getZ());
-								}
-							} else {
-								++y;
+							if((data[++dataPos] & mask) > 0) {
+								return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
 							}
 						}
-					
+						
 					}
+					
 				};
 			}
 		};
