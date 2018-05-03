@@ -255,7 +255,8 @@ public class SimpleVoxmap {
 					@Override
 					protected Cell computeNext() {
 
-						main: while(true) {
+						main:
+						while(true) {
 							
 							if (x < lenX - 1) { 
 								x++;
@@ -315,7 +316,8 @@ public class SimpleVoxmap {
 					@Override
 					protected MutableBlockPos computeNext() {
 						
-						main: while(true) {
+						main:
+						while(true) {
 							
 							if (x < lenX - 1) {
 								x++;
