@@ -15,12 +15,12 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 */
 public class SimpleVoxmap {
 
-	private byte data[];
-	private boolean touched[];
+	private final byte data[];
+	private final boolean touched[];
 	
-	private int lenX;
-	private int lenY;
-	private int lenZ;
+	private final int lenX;
+	private final int lenY;
+	private final int lenZ;
 	
 	BlockPos center = new BlockPos(0, 0, 0);
 	
@@ -93,17 +93,11 @@ public class SimpleVoxmap {
 		return lenZ;
 	}
 	
-	public SimpleVoxmap clear() {
-		data = new byte[data.length];
-		touched = new boolean[touched.length];
-		return this;
+	public interface IBlitOp {
+		byte getOp(byte srcValue, byte dstValue);
 	}
 	
-	public static final byte max(byte a, byte b) {
-		return (a >= b) ? a : b;
-	}
-	
-	public void BlitMax(BlockPos pos, SimpleVoxmap src) {
+	public void BlitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
 			int srcY = iy - src.center.getY();
 			int dstY = pos.getY() + srcY;
@@ -116,31 +110,22 @@ public class SimpleVoxmap {
 					int dstX = pos.getX() + srcX;
 					byte srcValue = src.getVoxel(srcX, srcY, srcZ);
 					byte dstValue = getVoxel(dstX, dstY, dstZ);
-					setVoxel(dstX, dstY, dstZ, max(srcValue, dstValue));
+					setVoxel(dstX, dstY, dstZ, op.getOp(srcValue, dstValue));
 				}
 			}
 		}
 	}
 	
+	public void BlitReplace(BlockPos pos, SimpleVoxmap src) {
+		BlitOp(pos, src, (s, d) -> { return s; } );
+	}
+	
+	public void BlitMax(BlockPos pos, SimpleVoxmap src) {
+		BlitOp(pos, src, (s, d) -> { return (s >= d) ? s : d; } );
+	}
+	
 	public void BlitClear(BlockPos pos, SimpleVoxmap src) {
-		for(int iy = 0; iy < src.getLenY(); iy++) {
-			int srcY = iy - src.center.getY();
-			int dstY = pos.getY() + srcY;
-			setYTouched(dstY);
-			for(int iz = 0; iz < src.getLenZ(); iz++) {
-				int srcZ = iz - src.center.getZ();
-				int dstZ = pos.getZ() + srcZ;
-				for(int ix = 0; ix < src.getLenX(); ix++) {
-					int srcX = ix - src.center.getX();
-					int dstX = pos.getX() + srcX;
-					byte srcValue = src.getVoxel(srcX, srcY, srcZ);
-					if(srcValue > 0) {
-						setVoxel(dstX, dstY, dstZ, (byte)0);
-					}
-				}
-			}
-		}
-
+		BlitOp(pos, src, (s, d) -> { return (s >= 0) ? 0 : d; } );
 	}
 	
 	private int calcPos(int x, int y, int z) {
