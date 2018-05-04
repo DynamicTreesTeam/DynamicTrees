@@ -34,11 +34,13 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	private Species oakswamp;
 	private Species apple;
 	private Species cactus;
+	private Species mushroomred;
+	private Species mushroombrn;
 	
 	private StaticSpeciesSelector staticOakDecision;
 	private StaticSpeciesSelector staticSpruceDecision;
 	private StaticSpeciesSelector staticBirchDecision;
-	private StaticSpeciesSelector staticDarkOakDecision;
+	private RandomSpeciesSelector randomRoofedForestDecision;
 	
 	public DefaultBiomeDataBasePopulator(BiomeDataBase dbase) {
 		this.dbase = dbase;
@@ -56,10 +58,13 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		
 		cactus = TreeRegistry.findSpeciesSloppy("cactus");
 		
+		mushroomred = TreeRegistry.findSpeciesSloppy("mushroomred");
+		mushroombrn = TreeRegistry.findSpeciesSloppy("mushroombrn");
+		
 		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
 		staticBirchDecision = new StaticSpeciesSelector(new SpeciesSelection(birch));
-		staticDarkOakDecision = new StaticSpeciesSelector(new SpeciesSelection(darkoak));
+		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 5).add(mushroombrn, 1).add(mushroomred, 1);
 		
 		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().biomeDataBase;
 		
@@ -138,7 +143,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 				return staticSpruceDecision;
 			}
 			if (BiomeDictionary.hasType(biome, Type.SPOOKY)) {
-				return staticDarkOakDecision;
+				return randomRoofedForestDecision;
 			}
 			if (Species.isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS)) {
 				return staticBirchDecision;
@@ -147,7 +152,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return new RandomSpeciesSelector().add(oak, 4).add(birch, 1);
 		}
 		if(biome == Biomes.MUTATED_ROOFED_FOREST) {//For some reason this isn't registered as either FOREST or SPOOKY
-			return staticDarkOakDecision;
+			return randomRoofedForestDecision;
 		}
 		if(biome == Biomes.MESA_ROCK) {
 			return staticOakDecision;

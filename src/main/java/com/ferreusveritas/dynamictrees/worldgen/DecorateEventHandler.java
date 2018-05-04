@@ -2,10 +2,9 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 
+import net.minecraft.init.Biomes;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -31,7 +30,7 @@ public class DecorateEventHandler {
 					break;
 				case BIG_SHROOM:
 					//We need to disable Giant Mushroom creation until after the trees are built
-					if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {
+					if(biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
 						event.setResult(Result.DENY);//Disable shrooms for roofedForest only
 					}
 				default: break;

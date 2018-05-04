@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
@@ -9,19 +7,16 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumC
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 
 public class TreeGenerator {
 	
@@ -89,32 +84,6 @@ public class TreeGenerator {
 		random.setXOR(new BlockPos(chunkPos.x, 0, chunkPos.z));
 		
 		circleMan.getCircles(world, random, chunkPos.x, chunkPos.z).forEach(c -> makeTree(world, c));
-		
-		if (biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
-			roofedForestCompensation(world, random, chunkPos.getBlock(0, 0, 0));
-		}
-	}
-	
-	/**
-	 * Decorate the roofedForest exactly like Minecraft, except leave out the trees and just make giant mushrooms
-	 * 
-	 * @param world
-	 * @param random
-	 * @param pos
-	 */
-	public void roofedForestCompensation(World world, Random random, BlockPos pos) {
-		for (int xi = 0; xi < 4; ++xi) {
-			for (int zi = 0; zi < 4; ++zi) {
-				int posX = xi * 4 + 1 + 8 + random.nextInt(3);
-				int posZ = zi * 4 + 1 + 8 + random.nextInt(3);
-				BlockPos blockpos = world.getHeight(pos.add(posX, 0, posZ));
-				blockpos = CoordUtils.findGround(world, blockpos).up();
-				
-				if (random.nextInt(6) == 0) {
-					new WorldGenBigMushroom().generate(world, random, blockpos);
-				}
-			}
-		}
 	}
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
@@ -122,7 +91,6 @@ public class TreeGenerator {
 	}
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
-		//System.out.println("Making circle at: " + circle.x + "," + circle.z + ":" + circle.radius + " H: " + h);
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {

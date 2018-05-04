@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
 import com.ferreusveritas.dynamictrees.trees.TreeBirch;
@@ -32,6 +33,10 @@ public class ModTrees {
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
 		dynamicCactus = new TreeCactus();
 		dynamicCactus.registerSpecies(Species.REGISTRY);
+		
+		//Registers a fake species for generating mushrooms
+		Species.REGISTRY.register(new Mushroom(true));
+		Species.REGISTRY.register(new Mushroom(false));
 	}
 	
 }
