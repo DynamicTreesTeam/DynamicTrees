@@ -16,10 +16,14 @@ public class DecorateEventHandler {
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
 		if(!ModConfigs.dimensionBlacklist.contains(event.getWorld().provider.getDimension())) {
+			Biome biome = event.getWorld().getBiome(event.getPos());
 			switch(event.getType()) {
-				case CACTUS: if(ModConfigs.vanillaCactusWorldGen) { break; } 
-				case TREE:
-					Biome biome = event.getWorld().getBiome(event.getPos());
+				case CACTUS:
+					if(!ModConfigs.vanillaCactusWorldGen && TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome).shouldCancelVanillaTreeGen()) {
+						event.setResult(Result.DENY);
+					} 
+					break;
+				case TREE://Cactus is also done by the tree generator
 					if(TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome).shouldCancelVanillaTreeGen()) {
 						event.setResult(Result.DENY);
 					}
@@ -27,7 +31,7 @@ public class DecorateEventHandler {
 					break;
 				case BIG_SHROOM:
 					//We need to disable Giant Mushroom creation until after the trees are built
-					if(BiomeDictionary.hasType(event.getWorld().getBiome(event.getPos()), Type.SPOOKY)) {
+					if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {
 						event.setResult(Result.DENY);//Disable shrooms for roofedForest only
 					}
 				default: break;
