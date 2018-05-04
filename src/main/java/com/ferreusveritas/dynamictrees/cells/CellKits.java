@@ -169,7 +169,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? acaciaBranch : CellNull.NULLCELL;
+			return radius == 1 || radius == 128 ? acaciaBranch : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -212,7 +212,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius) {
-			return radius == 1 ? branchCell : CellNull.NULLCELL;
+			return radius == 1 || radius == 128 ? branchCell : CellNull.NULLCELL;
 		}
 
 		@Override
