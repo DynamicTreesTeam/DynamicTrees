@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 * @author ferreusveritas
 */
 public class NodeDisease implements INodeInspector {
-
+	
 	Species species;//Destroy any thin branches made of the same kind of wood.
-
+	
 	public NodeDisease(Species tree) {
 		this.species = tree;
 	}
-
+	
 	@Override
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
@@ -31,13 +31,13 @@ public class NodeDisease implements INodeInspector {
 				world.setBlockToAir(pos);//Destroy the thin branch
 			}
 		}
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
-
+	
 }

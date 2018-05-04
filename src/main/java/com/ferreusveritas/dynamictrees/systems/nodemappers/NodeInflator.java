@@ -13,10 +13,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeInflator implements INodeInspector {
-
+	
 	private float radius;
 	private BlockPos last;
-
+	
 	Species species;
 	SimpleVoxmap leafMap;
 	
@@ -33,7 +33,7 @@ public class NodeInflator implements INodeInspector {
 		if(branch != null){
 			radius = species.getFamily().getPrimaryThickness();
 		}
-
+		
 		return false;
 	}
 	

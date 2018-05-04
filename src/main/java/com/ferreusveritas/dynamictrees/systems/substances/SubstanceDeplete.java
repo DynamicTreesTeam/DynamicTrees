@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceDeplete implements ISubstanceEffect {
-
+	
 	int amount;
 	
 	@Override
@@ -21,7 +21,7 @@ public class SubstanceDeplete implements ISubstanceEffect {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
@@ -36,7 +36,7 @@ public class SubstanceDeplete implements ISubstanceEffect {
 		this.amount = amount;
 		return this;
 	}
-
+	
 	@Override
 	public boolean isLingering() {
 		return false;

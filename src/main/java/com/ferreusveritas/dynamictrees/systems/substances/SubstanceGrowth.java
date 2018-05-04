@@ -8,21 +8,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceGrowth implements ISubstanceEffect{
-
+	
 	int duration = 1600;
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
 		return true;
 	}
-
+	
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
-
+		
 		if(deltaTicks > duration) {
 			return false;//Time's up
 		}
-
+		
 		if(world.isRemote) {
 			if(deltaTicks % 8 == 0) {//Run twinkles every 8 ticks.
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.SPELL, 2);
@@ -32,7 +32,7 @@ public class SubstanceGrowth implements ISubstanceEffect{
 				TreeHelper.growPulse(world, rootPos);
 			}
 		}
-
+		
 		return true;
 	}
 	
@@ -45,10 +45,10 @@ public class SubstanceGrowth implements ISubstanceEffect{
 	public boolean isLingering() {
 		return true;
 	}
-
+	
 	public SubstanceGrowth setDuration(int duration) {
 		this.duration = duration;
 		return this;
 	}
-
+	
 }

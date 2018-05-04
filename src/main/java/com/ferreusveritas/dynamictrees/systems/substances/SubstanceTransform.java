@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceTransform implements ISubstanceEffect {
-
+	
 	Species toSpecies;
 	
 	public SubstanceTransform(Species toTree) {
@@ -22,10 +22,10 @@ public class SubstanceTransform implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-
+		
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
-
+		
 		if(dirt != null && toSpecies != null) {
 			if(world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
@@ -37,23 +37,23 @@ public class SubstanceTransform implements ISubstanceEffect {
 			}
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
 	}
-
+	
 	@Override
 	public String getName() {
 		return "transform";
 	}
-
+	
 	@Override
 	public boolean isLingering() {
 		return false;
 	}
-
+	
 }

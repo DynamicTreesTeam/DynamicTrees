@@ -13,20 +13,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeFruitCocoa implements INodeInspector {
-
+	
 	boolean finished = false;
 	boolean worldGen = false;
 	
 	public NodeFruitCocoa() {
 	}
-
+	
 	public NodeFruitCocoa setWorldGen(boolean worldGen) {
 		this.worldGen = worldGen;
 		return this;
 	}
 	
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
-
+		
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {

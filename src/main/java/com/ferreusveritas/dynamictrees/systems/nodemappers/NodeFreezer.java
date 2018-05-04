@@ -14,9 +14,9 @@ import net.minecraft.world.World;
 
 
 public class NodeFreezer implements INodeInspector {
-
+	
 	Species species;
-
+	
 	public NodeFreezer(Species species) {
 		this.species = species;
 	}
@@ -30,15 +30,15 @@ public class NodeFreezer implements INodeInspector {
 				freezeSurroundingLeaves(world, branch, pos);
 			}
 		}
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
-
+	
 	//Clumsy hack to freeze leaves
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, BlockPos twigPos) {		
 		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
@@ -51,5 +51,5 @@ public class NodeFreezer implements INodeInspector {
 			}
 		}
 	}
-
+	
 }

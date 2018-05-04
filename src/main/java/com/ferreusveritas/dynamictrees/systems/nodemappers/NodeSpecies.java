@@ -11,14 +11,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeSpecies implements INodeInspector {
-
+	
 	private Species determination = Species.NULLSPECIES;
-
+	
 	@Override
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
-
+		
 		ITreePart treePart = TreeHelper.getTreePart(blockState);
-
+		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
 				if(determination == Species.NULLSPECIES) {
@@ -31,17 +31,17 @@ public class NodeSpecies implements INodeInspector {
 			default:
 				break;
 		}
-
+		
 		return true;
 	}
-
+	
 	@Override
 	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
-
+	
 	public Species getSpecies() {
 		return determination;
 	}
-
+	
 }

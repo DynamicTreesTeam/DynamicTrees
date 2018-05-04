@@ -16,10 +16,10 @@ import net.minecraft.world.World;
 * @author ferreusveritas
 */
 public class NodeFindEnds implements INodeInspector {
-
+	
 	private List<BlockPos> endPoints;
 	private BlockPos last;
-
+	
 	public NodeFindEnds() { //Array is provided for you
 		this.endPoints = new ArrayList<BlockPos>(32);
 		last = BlockPos.ORIGIN;
@@ -34,10 +34,10 @@ public class NodeFindEnds implements INodeInspector {
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return true;
 	}
-
+	
 	@Override
 	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
-
+		
 		//Okay.. so.. a little explanation. If we are only one block away from the last block we returned from then we can't be on an end
 		BlockPos dPos = pos.subtract(last);
 		if(dPos.getX() * dPos.getX() + dPos.getY() * dPos.getY() + dPos.getZ() * dPos.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
@@ -45,7 +45,7 @@ public class NodeFindEnds implements INodeInspector {
 		}
 			
 		last = pos;//We can only be in a branch on the return run 
-
+		
 		return false;
 	}
 	

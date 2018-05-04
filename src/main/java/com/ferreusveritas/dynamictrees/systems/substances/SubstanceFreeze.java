@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceFreeze implements ISubstanceEffect {
-
+	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
 		IBlockState rootyState = world.getBlockState(rootPos);
@@ -30,7 +30,7 @@ public class SubstanceFreeze implements ISubstanceEffect {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;
@@ -45,5 +45,5 @@ public class SubstanceFreeze implements ISubstanceEffect {
 	public boolean isLingering() {
 		return false;
 	}
-
+	
 }

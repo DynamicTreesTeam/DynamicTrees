@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceFertilize implements ISubstanceEffect {
-
+	
 	int amount = 1;
 	boolean grow;
 	
@@ -28,7 +28,7 @@ public class SubstanceFertilize implements ISubstanceEffect {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
 		return false;

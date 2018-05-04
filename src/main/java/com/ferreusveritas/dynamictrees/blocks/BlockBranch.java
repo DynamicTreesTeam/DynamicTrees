@@ -198,9 +198,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	protected void destroyLeaves(World world, Species species, List<BlockPos> endPoints) {
 		
 		if (!world.isRemote && !world.restoringBlockSnapshots && !endPoints.isEmpty()) { // do not drop items while restoring blockstates, prevents item dupe
-
+			
 			BlockPos firstPos = endPoints.get(0);
-
+			
 			//Make a bounding volume that holds all of the endpoints;
 			int loX = firstPos.getX();
 			int loY = firstPos.getY();
@@ -208,7 +208,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			int hiX = loX;
 			int hiY = loY;
 			int hiZ = loZ;
-
+			
 			for(BlockPos pos : endPoints) {
 				loX = Math.min(loX, pos.getX());
 				loY = Math.min(loY, pos.getY());
@@ -217,14 +217,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				hiY = Math.max(hiY, pos.getY());
 				hiZ = Math.max(hiZ, pos.getZ());
 			};
-
+			
 			//Expand the volume by 3 blocks for the leaves radius
 			loX -= 3; loY -= 3; loZ -= 3;
 			hiX += 3; hiY += 3; hiZ += 3;
-
+			
 			//Create a voxmap to store the leaf destruction map
 			SimpleVoxmap vmap = new SimpleVoxmap(hiX - loX + 1, hiY - loY + 1, hiZ - loZ + 1).setMapAndCenter(new BlockPos(loX, loY, loZ), new BlockPos(0, 0, 0));
-
+			
 			//For each of the endpoints add a 7x7 destruction volume around it
 			for(BlockPos endPos : endPoints) {
 				for(BlockPos leafPos : BlockPos.getAllInBoxMutable(endPos.add(-3, -3, -3), endPos.add(3, 3, 3)) ) {
@@ -232,11 +232,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				}
 				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does have a leaves block in it
 			}
-
+			
 			TreeFamily family = species.getFamily();
 			BlockBranch familyBranch = family.getDynamicBranch();
 			int primaryThickness = (int) family.getPrimaryThickness();
-
+			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
 			for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
 				if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
@@ -246,9 +246,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					}
 				}
 			}
-
+			
 			ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
-
+			
 			//Destroy all family compatible leaves
 			for(Cell cell: vmap.getAllNonZeroCells()) {
 				MutableBlockPos pos = cell.getPos();
