@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -16,31 +15,40 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class BlockThickBranch extends BlockBranchBasic {
-
-	public static final PropertyBool QBIT = PropertyBool.create("qbit");
+	
+	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 24);
+	boolean extended = false;
+	public BlockThickBranch otherBlock;
 	
 	public BlockThickBranch(Material material, String name) {
-		super(material, name);
+		this(material, name, false);
+		otherBlock = new BlockThickBranch(material, name, true);
+		otherBlock.otherBlock = this;
 	}
-
+	
+	protected BlockThickBranch(Material material, String name, boolean extended) {
+		super(material, name);
+		this.extended = extended;
+	}
+	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		IProperty[] listedProperties = { RADIUS, QBIT };
+		IProperty[] listedProperties = { RADIUS };
 		return new ExtendedBlockState(this, listedProperties, CONNECTIONS);
 	}
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return this.getDefaultState().withProperty(RADIUS, (meta & 7) + 1).withProperty(QBIT, (meta & 8) != 0);
+		return this.getDefaultState().withProperty(RADIUS, meta + 1);
 	}
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(RADIUS) - 1 | (state.getValue(QBIT) ? 8 : 0);
+		return state.getValue(RADIUS) - 1;
 	}
 	
 	@Override
@@ -64,60 +72,17 @@ public class BlockThickBranch extends BlockBranchBasic {
 	
 	@Override
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-
-		int heartRadius = super.getRawRadius(blockState);
-		
-		if(blockState.getValue(QBIT)) {
-			boolean pBit = false;
-			for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
-				IBlockState shellState = blockAccess.getBlockState(pos.add(surr.getOffset()));
-				if(shellState instanceof BlockTrunkShell && shellState.getValue(BlockTrunkShell.TRUNKDIR) == surr.getOpposite()) {
-					pBit = shellState.getValue(BlockTrunkShell.PBIT);
-					break;
-				}
-			}
-			return heartRadius + (pBit ? 16 : 8);
-		}
-		
-		return heartRadius;
+		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
+	}
+	
+	public int getRawRadius(IBlockState blockState) {
+		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
 	}
 	
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
-		
-		radius = MathHelper.clamp(radius, 1, 24) - 1;
-		boolean pBit = radius >= 16;
-		boolean qBit = radius >= 8;
-		int rBits = radius & 7;
-		
-		world.setBlockState(pos, getDefaultState().withProperty(RADIUS, rBits + 1).withProperty(QBIT, qBit));
-		
-		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
-			BlockPos shellPos = pos.add(surr.getOffset());
-			IBlockState shellState = world.getBlockState(shellPos);
-			if(shellState.getMaterial().isReplaceable()
-				|| (shellState instanceof BlockTrunkShell && shellState.getValue(BlockTrunkShell.TRUNKDIR) == surr.getOpposite()) ) {
-				setShell(world, pos, surr, pBit, qBit);
-			}
-		}
-		
-	}
-	
-	private void setShell(World world, BlockPos shellPos, CoordUtils.Surround surr, boolean pBit, boolean qBit) {
-		//TODO:  Make a proper version of this
-		BlockTrunkShell trunkShell = new BlockTrunkShell(Material.WOOD, "trunkshell");
-		
-		if(qBit) {
-			world.setBlockState(shellPos,
-				trunkShell.getDefaultState()
-				.withProperty(BlockTrunkShell.PBIT, pBit)
-				.withProperty(BlockTrunkShell.TRUNKDIR, surr.getOpposite())
-			);
-		} else {
-			world.setBlockToAir(shellPos.add(surr.getOffset()));
-		}
+		radius = MathHelper.clamp(radius, 1, 16);
+		world.setBlockState(pos, getDefaultState().withProperty(RADIUS, radius));
 	}
 	
 }
-
-
