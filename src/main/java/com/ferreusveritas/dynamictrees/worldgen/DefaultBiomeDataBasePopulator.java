@@ -102,7 +102,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
 		} 
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) {//Deserts (for cacti)
-			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
+			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.075f ? EnumChance.OK : EnumChance.CANCEL; };
 		}
 		else if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
