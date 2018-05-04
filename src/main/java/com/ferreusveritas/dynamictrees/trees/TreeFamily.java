@@ -242,8 +242,9 @@ public class TreeFamily {
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		stick.copy().setCount(MathHelper.clamp(qty, 0, 64));
-		return stick;
+		ItemStack stack = stick.copy();
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
+		return stack;
 	}
 	
 	protected TreeFamily setPrimitiveLog(IBlockState primLog) {

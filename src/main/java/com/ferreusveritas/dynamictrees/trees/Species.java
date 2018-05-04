@@ -232,8 +232,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		seedStack.copy().setCount(MathHelper.clamp(qty, 0, 64));
-		return seedStack;
+		ItemStack stack = seedStack.copy();
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
+		return stack;
 	}
 	
 	public Seed getSeed() {
