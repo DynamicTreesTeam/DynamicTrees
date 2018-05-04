@@ -12,8 +12,7 @@ public class JsonBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	}
 
 	public void populate () {
-		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().biomeDataBase;
-		System.out.println(dbase.getClass().getName());
+		//Super important Json loading stuff goes here
 	}
 	
 }
