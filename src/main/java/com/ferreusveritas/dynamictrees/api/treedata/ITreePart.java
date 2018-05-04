@@ -67,6 +67,15 @@ public interface ITreePart {
 	int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
 	
 	/**
+	 * Whether this node should be analyzed or not.
+	 * Branches should always be true.  Leaves should always be false.
+	 * Other types may vary in return depending on implementation.
+	 * 
+	 * @return
+	 */
+	boolean shouldAnalyse();
+	
+	/**
 	* Configurable general purpose branch network scanner to gather data and/or perform operations
 	* 
 	* @param world The current world

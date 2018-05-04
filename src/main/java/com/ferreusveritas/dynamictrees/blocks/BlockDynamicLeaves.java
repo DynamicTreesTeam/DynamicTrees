@@ -574,6 +574,14 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
+
+	/**
+	 * Generally Leaves blocks should not be analyzed
+	 */
+	@Override
+	public boolean shouldAnalyse() {
+		return false;
+	}
 	
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {

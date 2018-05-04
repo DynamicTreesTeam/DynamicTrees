@@ -65,6 +65,11 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	///////////////////////////////////////////
 	
 	@Override
+	public boolean shouldAnalyse() {
+		return false;
+	}
+	
+	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}

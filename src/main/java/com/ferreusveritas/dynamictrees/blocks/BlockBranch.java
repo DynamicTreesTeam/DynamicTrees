@@ -171,6 +171,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	///////////////////////////////////////////
 	
 	/**
+	 * Generally all branch blocks should be analyzed.
+	 */
+	@Override
+	public boolean shouldAnalyse() {
+		return true;
+	}
+	
+	/**
 	 * Destroys all branches recursively not facing the branching direction with the root node
 	 * 
 	 * @param world The world

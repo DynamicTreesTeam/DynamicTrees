@@ -15,20 +15,20 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class NullTreePart implements ITreePart {
-
+	
 	//This is a safe dump for blocks that aren't tree parts
 	//Handles some vanilla blocks
-
+	
 	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
 		return CellNull.NULLCELL;
 	}
-
+	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		return signal;
 	}
-
+	
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
@@ -37,17 +37,22 @@ public class NullTreePart implements ITreePart {
 		}
 		return 0;
 	}
-
+	
 	@Override
 	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return blockState.getBlock().isAir(blockState, blockAccess, pos) ? 1 : 0;
 	}
-
+	
 	@Override
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
-
+	
+	@Override
+	public boolean shouldAnalyse() {
+		return false;
+	}
+	
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
@@ -57,12 +62,12 @@ public class NullTreePart implements ITreePart {
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
 	}
-
+	
 	@Override
 	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return TreeFamily.NULLFAMILY;
 	}
-
+	
 	public final TreePartType getTreePartType() {
 		return TreePartType.NULL;
 	}

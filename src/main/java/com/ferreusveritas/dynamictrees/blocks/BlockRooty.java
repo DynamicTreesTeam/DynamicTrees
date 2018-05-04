@@ -309,6 +309,11 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	@Override
+	public boolean shouldAnalyse() {
+		return true;
+	}
+	
+	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		

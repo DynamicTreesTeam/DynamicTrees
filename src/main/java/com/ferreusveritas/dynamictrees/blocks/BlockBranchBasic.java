@@ -386,6 +386,22 @@ public class BlockBranchBasic extends BlockBranch {
 	// NODE ANALYSIS
 	///////////////////////////////////////////
 	
+	/**
+	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out
+	 * and a returnRun() on the way back.
+	 * 
+	 * Okay so a little explanation here..  
+	 * I've been hit up by people who claim that recursion is a bad idea.  The reason why they think this is because java has to push values
+	 * on the stack for each level of recursion and then pop them off as the levels complete.  Many time this can lead to performance issues.
+	 * Fine, I understand that.  The reason why it doesn't matter here is because of the object oriented nature of how the tree parts
+	 * function demand that a different analyze function be called for each object type.  Even if this were rewritten to be iterative the
+	 * same number of stack pushes and pops would need to be performed to run the custom function for each node in the network anyway.  The
+	 * depth of recursion for this algorithm is less than 32.  So there's no real risk of a stack overflow.
+	 * 
+	 * The difference being that in an iterative design I would need to maintain a stack array holding all of the values and push and pop
+	 * them manually or use a stack index.  This is messy and not something I would want to maintain for practically non-existent gains.
+	 * Java does a pretty good job of managing the stack on its own.
+	 */
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
@@ -396,11 +412,15 @@ public class BlockBranchBasic extends BlockBranch {
 					BlockPos deltaPos = pos.offset(dir);
 					
 					IBlockState deltaState = world.getBlockState(deltaPos);
-					signal = TreeHelper.getTreePart(deltaState).analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
+					ITreePart treePart = TreeHelper.getTreePart(deltaState);
 					
-					// This should only be true for the originating block when the root node is found
-					if (signal.found && signal.localRootDir == null && fromDir == null) {
-						signal.localRootDir = dir;
+					if(treePart.shouldAnalyse()) {
+						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
+					
+						// This should only be true for the originating block when the root node is found
+						if (signal.found && signal.localRootDir == null && fromDir == null) {
+							signal.localRootDir = dir;
+						}
 					}
 				}
 			}
