@@ -187,7 +187,7 @@ public class JoCode {
 			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
 		
 			//Add snow to parts of the tree in chunks where snow was already placed
-			addSnow(leafMap, safeBounds, world, species, rootPos, biome, radius);
+			addSnow(leafMap, world, rootPos, biome, radius);
 		} else { //The growth failed.. turn the soil back to what it was
 			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
@@ -289,7 +289,7 @@ public class JoCode {
 		return true;
 	}
 	
-	protected void addSnow(SimpleVoxmap leafMap, SafeChunkBounds safeBounds, World world, Species species, BlockPos rootPos, Biome biome, int radius) {
+	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome, int radius) {
 		BlockPos saveCenter = leafMap.getCenter();
 		leafMap.setCenter(new BlockPos(0, 0, 0));
 		
@@ -301,6 +301,11 @@ public class JoCode {
 				break;
 			}
 		}
+		
+		
+		int decorStartX, decorStartZ;
+		decorStartX = ((rootPos.getX() - 8) & 0xFFFFFFF0) + 8;
+		decorStartZ = ((rootPos.getZ() - 8) & 0xFFFFFFF0) + 8;
 		
 		MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
 		for (int iz = 0; iz < leafMap.getLenZ(); iz++) {
@@ -322,10 +327,16 @@ public class JoCode {
 		leafMap.setCenter(saveCenter);
 		
 		Iterable<MutableBlockPos> iterable = leafMap.getAllNonZero((byte) 8);
+		it:
 		for (MutableBlockPos iPos : iterable) {
 			
-			if (safeBounds.inBounds(iPos) && world.canSnowAt(pos, false)) {
-				//System.out.println(!safeBounds.inBounds(iPos));
+			if (world.canSnowAt(pos, false) && !(pos.getX() >= decorStartX && pos.getX() < decorStartX + 16 && pos.getZ() >= decorStartZ && pos.getZ() < decorStartZ + 16)) {
+				int yOffset = 0;
+				while (!world.isAirBlock(iPos) && yOffset < 4) {
+					if (world.getBlockState(iPos).getBlock() == Blocks.SNOW_LAYER) continue it;
+					yOffset++;
+					iPos.setY(iPos.getY() + 1);
+				}
 				world.setBlockState(iPos, Blocks.SNOW_LAYER.getDefaultState(), 2);
 			}
 		}
