@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -187,7 +188,8 @@ public class JoCode {
 			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
 		
 			//Add snow to parts of the tree in chunks where snow was already placed
-			addSnow(leafMap, world, rootPos, biome, radius);
+			addSnow(leafMap, world, rootPos, biome);
+			
 		} else { //The growth failed.. turn the soil back to what it was
 			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
@@ -289,59 +291,31 @@ public class JoCode {
 		return true;
 	}
 	
-	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome, int radius) {
-		BlockPos saveCenter = leafMap.getCenter();
-		leafMap.setCenter(new BlockPos(0, 0, 0));
-		
-		int startY;
+	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome) {
 
-		// Find topmost block in build volume
-		for (startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
-			if (leafMap.isYTouched(startY)) {
-				break;
-			}
-		}
-		
-		
-		int decorStartX, decorStartZ;
-		decorStartX = ((rootPos.getX() - 8) & 0xFFFFFFF0) + 8;
-		decorStartZ = ((rootPos.getZ() - 8) & 0xFFFFFFF0) + 8;
-		
-		MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
-		for (int iz = 0; iz < leafMap.getLenZ(); iz++) {
-			for (int ix = 0; ix < leafMap.getLenX(); ix++) {
-				pos.setPos(ix, 0, iz);
-				for (int iy = startY; iy >= 0; iy--) {
-					pos.setY(iy);
-					int v = leafMap.getVoxel(pos);
-					if ((pos.getX() + saveCenter.getX() >= decorStartX && pos.getX() + saveCenter.getX() < decorStartX + 16 && pos.getZ() + saveCenter.getZ() >= decorStartZ && pos.getZ() + saveCenter.getZ() < decorStartZ + 16)) {
-						leafMap.setVoxel(pos, (byte) 0);
-					} else if (v != 0) {
-						pos.setY(iy + 1);
-						leafMap.setVoxel(pos, (byte) 8);
-						
-						break;
-					}
-				}
-			}
-		}
-		
-		leafMap.setCenter(saveCenter);
-		
-		Iterable<MutableBlockPos> iterable = leafMap.getAllNonZero((byte) 8);
-		it:
-		for (MutableBlockPos iPos : iterable) {
+		if(biome.isSnowyBiome()) {
+			int decorStartX = ((rootPos.getX() - 8) & 0xFFFFFFF0) + 8;
+			int decorStartZ = ((rootPos.getZ() - 8) & 0xFFFFFFF0) + 8;
 			
-			if (world.canSnowAt(pos, false)) {
-				int yOffset = 0;
-				while (!world.isAirBlock(iPos) && yOffset < 4) {
-					if (world.getBlockState(iPos).getBlock() == Blocks.SNOW_LAYER) continue it;
-					yOffset++;
-					iPos.setY(iPos.getY() + 1);
+			for ( MutableBlockPos top : leafMap.getTops() ) {
+				if ( world.canSnowAt(top, false) && top.getX() >= decorStartX && top.getX() < decorStartX + 16 && top.getZ() >= decorStartZ && top.getZ() < decorStartZ + 16 ) {
+					MutableBlockPos iPos = new MutableBlockPos(top);
+					int yOffset = 0;
+					do {
+						IBlockState state = world.getBlockState(iPos);
+						if(state.getMaterial() == Material.AIR) {
+							world.setBlockState(iPos, Blocks.SNOW_LAYER.getDefaultState(), 2);
+							break;
+						}
+						else if (state.getBlock() == Blocks.SNOW_LAYER) {
+							break;
+						}
+						iPos.setY(iPos.getY() + 1);
+					} while (yOffset++ < 4);
 				}
-				world.setBlockState(iPos, Blocks.SNOW_LAYER.getDefaultState(), 2);
 			}
 		}
+		
 	}
 
 	/**

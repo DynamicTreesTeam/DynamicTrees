@@ -21,6 +21,7 @@ public class SimpleVoxmap {
 	private final int lenX;
 	private final int lenY;
 	private final int lenZ;
+	private final int layerSize;
 	
 	BlockPos center = new BlockPos(0, 0, 0);
 	
@@ -30,6 +31,7 @@ public class SimpleVoxmap {
 		this.lenX = lenX;
 		this.lenY = lenY;
 		this.lenZ = lenZ;
+		this.layerSize = lenX * lenZ;
 	}
 	
 	public SimpleVoxmap(int lenX, int lenY, int lenZ, byte[] extData) {
@@ -41,6 +43,7 @@ public class SimpleVoxmap {
 		this.lenX = lenX;
 		this.lenY = lenY;
 		this.lenZ = lenZ;
+		this.layerSize = lenX * lenZ;
 	}
 	
 	public SimpleVoxmap(SimpleVoxmap vmp) {
@@ -274,7 +277,6 @@ public class SimpleVoxmap {
 					private int y = 0;
 					private int z = 0;
 					private int dataPos = -1;
-					private final int layerSize = lenX * lenZ;
 					private final Cell workingCell = new Cell();
 					private final MutableBlockPos dPos = workingCell.getPos();
 					
@@ -336,7 +338,6 @@ public class SimpleVoxmap {
 					private int y = 0;
 					private int z = 0;
 					private int dataPos = -1;
-					private final int layerSize = lenX * lenZ;
 					private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 					
 					@Override
@@ -370,6 +371,58 @@ public class SimpleVoxmap {
 							
 							if((data[++dataPos] & mask) > 0) {
 								return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+							}
+						}
+						
+					}
+					
+				};
+			}
+		};
+	}
+	
+	/** Create an Iterable that returns all top(Y-axis) positions in the map whose value is non-zero */
+	public Iterable<MutableBlockPos> getTops() {
+		
+		return new Iterable<MutableBlockPos>() {
+			@Override
+			public Iterator<MutableBlockPos> iterator() {
+				return new AbstractIterator<MutableBlockPos>() {
+					private int x = -1;
+					private int y = 0;
+					private int z = 0;
+					private int yStart = getStartY();
+					private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
+					
+					protected int getStartY() {
+						int yi;
+						for(yi = lenY - 1; yi >= 0 && !touched[yi]; yi--) {}
+						return yi;
+					}
+					
+					@Override
+					protected MutableBlockPos computeNext() {
+						
+						while(true) {
+							if (x < lenX - 1) {
+								x++;
+							}
+							else if (z < lenZ - 1) {
+								x = 0;
+								z++;
+							} else {
+								return this.endOfData();
+							}
+							
+							y = yStart;
+							int dataPos = calcPos(x, y, z);
+							
+							while(y >= 0) {
+								if(data[dataPos] != 0) {
+									return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+								}
+								dataPos -= layerSize;
+								y--;
 							}
 						}
 						
