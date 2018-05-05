@@ -21,15 +21,10 @@ public class DecorateEventHandler {
 						event.setResult(Result.DENY);
 					} 
 					break;
+				case BIG_SHROOM:
 				case TREE://Cactus is also done by the tree generator
 					if(TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome).shouldCancelVanillaTreeGen()) {
 						event.setResult(Result.DENY);
-					}
-					break;
-				case BIG_SHROOM:
-					//We need to disable Giant Mushroom creation until after the trees are built
-					if(biome == Biomes.ROOFED_FOREST || biome == Biomes.MUTATED_ROOFED_FOREST) {
-						event.setResult(Result.DENY);//Disable shrooms for roofedForest only
 					}
 				default: break;
 			}
