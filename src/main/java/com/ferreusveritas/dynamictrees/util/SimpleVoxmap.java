@@ -97,7 +97,7 @@ public class SimpleVoxmap {
 		byte getOp(byte srcValue, byte dstValue);
 	}
 	
-	public void BlitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
+	public SimpleVoxmap BlitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
 			int srcY = iy - src.center.getY();
 			int dstY = pos.getY() + srcY;
@@ -114,18 +114,59 @@ public class SimpleVoxmap {
 				}
 			}
 		}
+		return this;
 	}
 	
-	public void BlitReplace(BlockPos pos, SimpleVoxmap src) {
-		BlitOp(pos, src, (s, d) -> { return s; } );
+	public SimpleVoxmap BlitReplace(BlockPos pos, SimpleVoxmap src) {
+		return BlitOp(pos, src, (s, d) -> { return s; } );
 	}
 	
-	public void BlitMax(BlockPos pos, SimpleVoxmap src) {
-		BlitOp(pos, src, (s, d) -> { return (s >= d) ? s : d; } );
+	public SimpleVoxmap BlitMax(BlockPos pos, SimpleVoxmap src) {
+		return BlitOp(pos, src, (s, d) -> { return (s >= d) ? s : d; } );
 	}
 	
-	public void BlitClear(BlockPos pos, SimpleVoxmap src) {
-		BlitOp(pos, src, (s, d) -> { return (s >= 0) ? 0 : d; } );
+	public SimpleVoxmap BlitClear(BlockPos pos, SimpleVoxmap src) {
+		return BlitOp(pos, src, (s, d) -> { return (s >= 0) ? 0 : d; } );
+	}
+	
+	public interface IFilterOp {
+		byte getOp(byte data);
+	}
+	
+	public SimpleVoxmap filter(IFilterOp op) {
+		for(int i = 0; i < data.length; i++) {
+			data[i] = op.getOp(data[i]);
+		}
+		return this;
+	}
+	
+	public SimpleVoxmap crop(BlockPos from, BlockPos to) {
+		for(MutableBlockPos pos : getAllNonZero()) {
+			if( pos.getX() < from.getX() ||
+				pos.getY() < from.getY() ||
+				pos.getZ() < from.getZ() ||
+				pos.getX() > to.getX() ||
+				pos.getY() > to.getY() ||
+				pos.getZ() > to.getZ() ) {
+				setVoxel(pos, (byte) 0);
+			}
+		}
+		return this;
+	}
+	
+	public SimpleVoxmap filter(BlockPos from, BlockPos to, IFilterOp op) {
+		for(MutableBlockPos pos : BlockPos.getAllInBoxMutable(from, to) ) {
+			setVoxel(pos, op.getOp(getVoxel(pos)));
+		}
+		return this;
+	}
+	
+	public SimpleVoxmap fill(byte value) {
+		return filter((v) -> { return value; } );
+	}
+
+	public SimpleVoxmap fill(BlockPos from, BlockPos to, byte value) {
+		return filter(from, to, (v) -> { return value; } );
 	}
 	
 	private int calcPos(int x, int y, int z) {
