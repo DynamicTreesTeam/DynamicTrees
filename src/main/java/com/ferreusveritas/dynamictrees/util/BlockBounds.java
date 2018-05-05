@@ -6,22 +6,33 @@ import net.minecraft.util.math.ChunkPos;
 
 public class BlockBounds {
 
-	public static final BlockBounds INVALID = new BlockBounds();
+	public static final BlockBounds INVALID = new BlockBounds() {
+		@Override
+		public boolean inBounds(BlockPos pos) {
+			return false;
+		}
+	};
 	
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
-	private boolean valid = false;
 	
 	public BlockBounds() {
-		valid = false;
 	}
 	
 	public BlockBounds(BlockPos pos) {
-		init(pos);
+		minX = maxX = pos.getX();
+		minY = maxY = pos.getY();
+		minZ = maxZ = pos.getZ();
 	}
 
 	public BlockBounds(ChunkPos cPos) {
-		init(cPos);
+		minX = cPos.getXStart();
+		minY = 0;
+		minZ = cPos.getZStart();
+
+		maxX = cPos.getXEnd();
+		maxY = 255;
+		maxZ = cPos.getZEnd();
 	}
 	
 	public BlockBounds(BlockBounds other) {
@@ -31,33 +42,9 @@ public class BlockBounds {
 		maxX = other.maxX;
 		maxY = other.maxY;
 		maxZ = other.maxZ;
-		valid = other.valid;
-	}
-	
-	public void init(ChunkPos cPos) {
-		minX = cPos.getXStart();
-		minY = 0;
-		minZ = cPos.getZStart();
-
-		maxX = cPos.getXEnd();
-		maxY = 255;
-		maxZ = cPos.getZEnd();
-		valid = true;
-	}
-	
-	public void init(BlockPos pos) {
-		minX = maxX = pos.getX();
-		minY = maxY = pos.getY();
-		minZ = maxZ = pos.getZ();
-		valid = true;
 	}
 	
 	public void union(BlockPos pos) {
-		
-		if(!valid) {
-			init(pos);
-			return;
-		}
 		
 		if(pos.getX() < minX) {
 			minX = pos.getX();
@@ -86,7 +73,7 @@ public class BlockBounds {
 	}
 	
 	public boolean inBounds(BlockPos pos) {
-		return valid && !(pos.getX() < minX || pos.getX() > maxX || pos.getZ() < minZ || pos.getZ() > maxZ);
+		return !(pos.getX() < minX || pos.getX() > maxX || pos.getZ() < minZ || pos.getZ() > maxZ);
 	}
 	
 	public BlockPos getMin() {
@@ -130,6 +117,5 @@ public class BlockBounds {
 		}
 		return this;
 	}
-	
 	
 }

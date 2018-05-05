@@ -181,7 +181,7 @@ public class JoCode {
 			species.handleRot(world, endPoints, rootPos, treePos, 0, true);
 			
 			//Allow for special decorations by the tree itself
-			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
+			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful, safeBounds);
 		
 			//Add snow to parts of the tree in chunks where snow was already placed
 			addSnow(leafMap, world, rootPos, biome);

@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockOldLeaf;
@@ -99,8 +100,8 @@ public class TreeJungle extends TreeFamily {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen, SafeChunkBounds safeBounds) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen, safeBounds);
 
 			if(world.rand.nextInt() % 8 == 0) {
 				addCocoa(world, rootPos, true);
@@ -110,10 +111,10 @@ public class TreeJungle extends TreeFamily {
 				BlockPos treePos = rootPos.up();
 				
 				//Generate Vines
-				vineGen.setQuantity(endPoints.size()).setMaxLength(20).gen(world, treePos, endPoints);
+				vineGen.setQuantity(endPoints.size()).setMaxLength(20).gen(world, treePos, endPoints, safeBounds);
 
 				//Generate undergrowth
-				underGen.setRadius(radius).gen(world, treePos, endPoints);
+				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
 			}
 		}
 		

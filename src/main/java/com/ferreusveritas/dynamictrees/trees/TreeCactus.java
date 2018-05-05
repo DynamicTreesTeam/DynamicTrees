@@ -202,7 +202,7 @@ public class TreeCactus extends TreeFamily {
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself
-				species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
+				species.postGeneration(world, rootPos, biome, radius, endPoints, !careful, safeBounds);
 			} else { // The growth failed.. turn the soil back to what it was
 				world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 			}

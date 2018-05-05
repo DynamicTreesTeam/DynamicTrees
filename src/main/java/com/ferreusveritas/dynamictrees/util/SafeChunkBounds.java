@@ -54,7 +54,6 @@ public class SafeChunkBounds {
 			BlockBounds curr = chunkBounds[t.index];
 			int border = t.borders;
 			if(curr != BlockBounds.INVALID) {
-				curr.init(new ChunkPos(center.x + t.pos.x, center.z + t.pos.z));
 				for(EnumFacing dir : EnumFacing.HORIZONTALS) {
 					boolean validDir = false;
 					if((border & (1 << dir.getIndex())) != 0) {
@@ -73,10 +72,7 @@ public class SafeChunkBounds {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
 		int index = 5 + (chunkX - center.x) + ((chunkZ - center.x) * 4);
-		if(!gap && chunkBounds[index] != BlockBounds.INVALID) {//No gap.. take it to the limit.
-			return true;
-		}
-		return chunkBounds[index].inBounds(pos);
+		return (!gap && chunkBounds[index] != BlockBounds.INVALID) ? true : chunkBounds[index].inBounds(pos);
 	}
 	
 }

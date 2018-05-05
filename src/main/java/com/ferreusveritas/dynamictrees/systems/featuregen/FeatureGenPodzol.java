@@ -6,6 +6,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -23,7 +24,7 @@ import net.minecraft.world.World;
 public class FeatureGenPodzol implements IGenFeature {
 	
 	@Override
-	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints) {
+	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
 
 		if(!endPoints.isEmpty()) {
 
