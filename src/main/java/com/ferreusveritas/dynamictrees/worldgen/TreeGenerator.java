@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
 import net.minecraft.block.BlockColored;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -124,13 +125,15 @@ public class TreeGenerator implements IWorldGenerator {
 		while(pos.getY() < 256) {
 			while(!world.isAirBlock(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
 			while(world.isAirBlock(pos))  { pos.move(EnumFacing.DOWN);  } //Move down 1 block at a time until we hit not-air
-			layers.add(pos.getY()); //Record this position
+			if (world.getBlockState(pos).getMaterial() != Material.LAVA) { layers.add(pos.getY()); } //Record this position
 			pos.move(EnumFacing.UP, 16); //Move up 16 blocks
 			while(world.isAirBlock(pos) && pos.getY() < 256) {  pos.move(EnumFacing.UP); } //Zip up 4 blocks at a time until we hit ground
 		}
 		
 		//Discard the last result as it's just the top of the biome(bedrock for nether)
-		layers.remove(layers.size() - 1);
+		if (layers.size() > 0) {
+			layers.remove(layers.size() - 1);
+		}
 		
 		return layers;
 	}
@@ -154,7 +157,11 @@ public class TreeGenerator implements IWorldGenerator {
 			}
 		} else {
 			ArrayList<Integer> layers = findSubterraneanLayerHeights(world, mPos);
+			if (layers.size() < 1) {
+				return EnumGeneratorResult.NOGROUND;
+			}
 			int y = layers.get(world.rand.nextInt(layers.size()));
+			
 			mPos.setY(y);
 		}
 		
