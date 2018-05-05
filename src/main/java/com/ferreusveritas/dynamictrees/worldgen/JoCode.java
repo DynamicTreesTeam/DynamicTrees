@@ -314,7 +314,9 @@ public class JoCode {
 				for (int iy = startY; iy >= 0; iy--) {
 					pos.setY(iy);
 					int v = leafMap.getVoxel(pos);
-					if (v != 0) {
+					if ((pos.getX() + saveCenter.getX() >= decorStartX && pos.getX() + saveCenter.getX() < decorStartX + 16 && pos.getZ() + saveCenter.getZ() >= decorStartZ && pos.getZ() + saveCenter.getZ() < decorStartZ + 16)) {
+						leafMap.setVoxel(pos, (byte) 0);
+					} else if (v != 0) {
 						pos.setY(iy + 1);
 						leafMap.setVoxel(pos, (byte) 8);
 						
@@ -330,7 +332,7 @@ public class JoCode {
 		it:
 		for (MutableBlockPos iPos : iterable) {
 			
-			if (world.canSnowAt(pos, false) && !(pos.getX() >= decorStartX && pos.getX() < decorStartX + 16 && pos.getZ() >= decorStartZ && pos.getZ() < decorStartZ + 16)) {
+			if (world.canSnowAt(pos, false)) {
 				int yOffset = 0;
 				while (!world.isAirBlock(iPos) && yOffset < 4) {
 					if (world.getBlockState(iPos).getBlock() == Blocks.SNOW_LAYER) continue it;
