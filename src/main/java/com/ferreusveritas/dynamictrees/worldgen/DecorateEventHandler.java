@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 
 import net.minecraft.init.Biomes;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
@@ -26,7 +25,6 @@ public class DecorateEventHandler {
 					if(TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome).shouldCancelVanillaTreeGen()) {
 						event.setResult(Result.DENY);
 					}
-					TreeGenerator.getTreeGenerator().generate(event.getWorld(), biome, new ChunkPos(event.getPos()));
 					break;
 				case BIG_SHROOM:
 					//We need to disable Giant Mushroom creation until after the trees are built

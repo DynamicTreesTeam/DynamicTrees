@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -18,11 +19,13 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraftforge.fml.common.IWorldGenerator;
 
-public class TreeGenerator {
+public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
 	
@@ -41,6 +44,7 @@ public class TreeGenerator {
 			INSTANCE = new TreeGenerator();
 		}
 	}
+	
 	
 	/**
 	 * This is for world debugging.
@@ -82,12 +86,13 @@ public class TreeGenerator {
 	public ChunkCircleManager getChunkCircleManager() {
 		return circleMan;
 	}
-		
-	public void generate(World world, Biome biome, ChunkPos chunkPos) {
+	
+	@Override
+	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
-		random.setXOR(new BlockPos(chunkPos.x, 0, chunkPos.z));
+		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 		
-		circleMan.getCircles(world, random, chunkPos.x, chunkPos.z).forEach(c -> makeTree(world, c));
+		circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
 	}
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
