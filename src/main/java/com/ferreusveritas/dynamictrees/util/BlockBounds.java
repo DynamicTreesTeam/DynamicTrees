@@ -73,7 +73,12 @@ public class BlockBounds {
 	}
 	
 	public boolean inBounds(BlockPos pos) {
-		return !(pos.getX() < minX || pos.getX() > maxX || pos.getZ() < minZ || pos.getZ() > maxZ);
+		return !(	pos.getX() < minX ||
+					pos.getX() > maxX ||
+					pos.getY() < minY ||
+					pos.getY() > maxY ||
+					pos.getZ() < minZ ||
+					pos.getZ() > maxZ );
 	}
 	
 	public BlockPos getMin() {
@@ -96,26 +101,13 @@ public class BlockBounds {
 		return this;
 	}
 	
-	public BlockBounds shrinkAll() {
-		return shrinkAll(1);
-	}
-	
-	public BlockBounds shrinkAll(int amount) {
-		for(EnumFacing dir : EnumFacing.VALUES) {
-			shrink(dir, amount);
-		}
+	public BlockBounds move(int x, int y, int z) {
+		minX += x;
+		minY += y;
+		minZ += z;
+		maxX += x;
+		maxY += y;
+		maxZ += z;
 		return this;
 	}
-	
-	public BlockBounds shrinkHorizontal() {
-		return shrinkHorizontal(1);
-	}
-	
-	public BlockBounds shrinkHorizontal(int amount) {
-		for(EnumFacing dir : EnumFacing.HORIZONTALS) {
-			shrink(dir, amount);
-		}
-		return this;
-	}
-	
 }
