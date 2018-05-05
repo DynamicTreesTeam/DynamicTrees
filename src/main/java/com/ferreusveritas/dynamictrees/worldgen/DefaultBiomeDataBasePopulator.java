@@ -80,6 +80,8 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 				
 			}
 		);
+		
+		dbase.setIsSubterranean(Biomes.HELL, true);
 	}
 	
 	public IDensitySelector computeDensity(Biome biome) {

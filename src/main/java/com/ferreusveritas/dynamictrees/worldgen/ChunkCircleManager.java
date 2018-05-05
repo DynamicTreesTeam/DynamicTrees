@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.util.Circle;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -23,10 +24,10 @@ import net.minecraft.world.World;
 public class ChunkCircleManager {
 
 	IRadiusCoordinator radiusCoordinator;
-	HashMap<Vec2i, ChunkCircleSet> chunkCircles;
+	HashMap<ChunkPos, ChunkCircleSet> chunkCircles;
 
 	public ChunkCircleManager(IRadiusCoordinator radCoord) {
-		chunkCircles = new HashMap<Vec2i, ChunkCircleSet>();
+		chunkCircles = new HashMap<ChunkPos, ChunkCircleSet>();
 		radiusCoordinator = radCoord;
 	}
 
@@ -202,7 +203,7 @@ public class ChunkCircleManager {
 	}
 	
 	private ChunkCircleSet getChunkCircleSet(int chunkX, int chunkZ) {
-		Vec2i key = new Vec2i(chunkX, chunkZ);
+		ChunkPos key = new ChunkPos(chunkX, chunkZ);
 		ChunkCircleSet cSet;
 		
 		if(chunkCircles.containsKey(key)) {
@@ -224,7 +225,7 @@ public class ChunkCircleManager {
 	}
 	
 	public void unloadChunkCircleData(int chunkX, int chunkZ) {
-		chunkCircles.remove(new Vec2i(chunkX, chunkZ));
+		chunkCircles.remove(new ChunkPos(chunkX, chunkZ));
 	}
 	
 	private ArrayList<Circle> getChunkCircles(int chunkX, int chunkZ) {

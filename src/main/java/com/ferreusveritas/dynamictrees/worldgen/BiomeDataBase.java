@@ -22,6 +22,7 @@ public class BiomeDataBase {
 		private IDensitySelector densitySelector = (rnd, nd) -> { return -1; };
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> { return new SpeciesSelection(); };
 		private boolean cancelVanillaTreeGen = false;
+		private boolean isSubterranean = false;
 		
 		public BiomeEntry(Biome biome, int biomeId) {
 			this.biome = biome;
@@ -50,6 +51,10 @@ public class BiomeDataBase {
 		
 		public boolean shouldCancelVanillaTreeGen() {
 			return cancelVanillaTreeGen;
+		}
+		
+		public boolean isSubterraneanBiome() {
+			return isSubterranean;
 		}
 	}
 	
@@ -158,6 +163,11 @@ public class BiomeDataBase {
 	
 	public BiomeDataBase setCancelVanillaTreeGen(Biome biome, boolean cancel) {
 		getEntry(biome).cancelVanillaTreeGen = cancel;
+		return this;
+	}
+	
+	public BiomeDataBase setIsSubterranean(Biome biome, boolean sub) {
+		getEntry(biome).isSubterranean = sub;
 		return this;
 	}
 	

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import java.util.ArrayList;
+
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
@@ -13,7 +15,9 @@ import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -108,24 +112,52 @@ public class TreeGenerator {
 		}
 	}
 	
+	private ArrayList<Integer> findSubterraneanLayerHeights(World world, MutableBlockPos pos) {
+		
+		ArrayList<Integer> layers = new ArrayList();
+		
+		while(pos.getY() < 256) {
+			while(!world.isAirBlock(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
+			while(world.isAirBlock(pos))  { pos.move(EnumFacing.DOWN);  } //Move down 1 block at a time until we hit not-air
+			layers.add(pos.getY()); //Record this position
+			pos.move(EnumFacing.UP, 16); //Move up 16 blocks
+			while(world.isAirBlock(pos) && pos.getY() < 256) {  pos.move(EnumFacing.UP); } //Zip up 4 blocks at a time until we hit ground
+		}
+		
+		//Discard the last result as it's just the top of the biome(bedrock for nether)
+		layers.remove(layers.size() - 1);
+		
+		return layers;
+	}
+	
 	private EnumGeneratorResult makeTree(World world, Circle circle) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
-		BlockPos pos = world.getHeight(new BlockPos(circle.x, 0, circle.z)).down();
-		while(world.isAirBlock(pos) || TreeHelper.isTreePart(world, pos)) {//Skip down past the bits of generated tree and air
-			pos = pos.down();
-			if(pos.getY() < 0) {
-				return EnumGeneratorResult.NOGROUND;
+		MutableBlockPos mPos = new MutableBlockPos(circle.x, 0, circle.z);
+		
+		Biome biome = world.getBiome(mPos);
+		BiomeEntry biomeEntry = biomeDataBase.getEntry(biome);
+		
+		if(!biomeEntry.isSubterraneanBiome()) {
+			mPos = new MutableBlockPos(world.getHeight(mPos)).move(EnumFacing.DOWN);
+			while(world.isAirBlock(mPos) || TreeHelper.isTreePart(world, mPos)) {//Skip down past the bits of generated tree and air
+				mPos.move(EnumFacing.DOWN);
+				if(mPos.getY() < 0) {
+					return EnumGeneratorResult.NOGROUND;
+				}
 			}
+		} else {
+			ArrayList<Integer> layers = findSubterraneanLayerHeights(world, mPos);
+			int y = layers.get(world.rand.nextInt(layers.size()));
+			mPos.setY(y);
 		}
+		
+		BlockPos pos = mPos.toImmutable();
 		
 		IBlockState blockState = world.getBlockState(pos);
 		
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
-		
-		Biome biome = world.getBiome(pos);
-		BiomeEntry biomeEntry = biomeDataBase.getEntry(biome);
 		
 		SpeciesSelection speciesSelection = biomeEntry.getSpeciesSelector().getSpecies(pos, blockState, random);
 		if(speciesSelection.isHandled()) {
