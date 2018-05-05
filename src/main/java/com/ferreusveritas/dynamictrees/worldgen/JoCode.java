@@ -168,7 +168,7 @@ public class JoCode {
 				}
 			}
 			
-			//Shrink the safeBounds down by 1 so that the aging process won't look for neighbors outside of the bounds.
+			//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
 			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
 				MutableBlockPos cellPos = cell.getPos();
 				if(!safeBounds.inBounds(cellPos, true)) {
@@ -177,7 +177,7 @@ public class JoCode {
 			}
 			
 			//Age volume for 3 cycles using a leafmap
-			TreeHelper.ageVolume(world, treePos, radius, 32, leafMap, 3);
+			TreeHelper.ageVolume(world, leafMap, 3);
 			
 			//Rot the unsupported branches
 			species.handleRot(world, endPoints, rootPos, treePos, 0, true);

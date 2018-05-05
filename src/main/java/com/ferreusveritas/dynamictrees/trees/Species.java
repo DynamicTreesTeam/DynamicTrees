@@ -589,7 +589,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				float rotChance = rotChance(world, endPos, world.rand, radius);
 				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, rapid) || radius != 1) {
 					if(rapid) {
-						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), null, 2);
+						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2);
 					}
 					iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 				}

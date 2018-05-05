@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -73,18 +74,60 @@ public class TreeHelper {
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
 			dirt.updateTree(rootyState, world, rootPos, world.rand, true);
-			ageVolume(world, rootPos, 1);
+			ageVolume(world, rootPos, 8, 32, 1);//blindly age a cuboid volume
 		}
 	}
 	
-	/** 
-	 * Shortcut to blindly age a cuboid volume.
+	/**
+	 * Pulses an entire leafMap volume of blocks each with an age signal.
+	 * Warning: CPU intensive and should be used sparingly
 	 * 
-	 * @param world
-	 * @param pos The position of the bottom most block of a trees trunk
+	 * @param world The world
+	 * @param iterMap The voxel map of hydrovalues to use as a iterator
+	 * @param iterations The number of times to age the map
 	 */
-	public static void ageVolume(World world, BlockPos pos, int iterations) {
-		ageVolume(world, pos, 8, 32, null, iterations);
+	public static void ageVolume(World world, SimpleVoxmap leafMap, int iterations){
+		
+		//The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
+		SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
+		Iterable<MutableBlockPos> iterable = iterMap.getAllNonZero();
+		
+		for(int i = 0; i < iterations; i++) {
+			for(MutableBlockPos iPos: iterable) {
+				IBlockState blockState = world.getBlockState(iPos);
+				Block block = blockState.getBlock();
+				if(block instanceof BlockDynamicLeaves) {//Special case for leaves
+					int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
+					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.rand, true);//Get new values from neighbors
+					if(newHydro == -1) {
+						//Leaf block died.  Take it out of the leafMap and iterMap
+						leafMap.setVoxel(iPos, (byte) 0);
+						iterMap.setVoxel(iPos, (byte) 0);
+					} else {
+						//Leaf did not die so the block is still leaves
+						if(prevHydro == newHydro) { //But it didn't change
+							iterMap.setVoxel(iPos, (byte) 0); //Stop iterating over it if it's not changing
+						} else {//Oh wait.. it did change
+							//Update both maps with this new hydro value
+							leafMap.setVoxel(iPos, (byte) newHydro);
+							iterMap.setVoxel(iPos, (byte) newHydro);
+							//Copy all the surrounding values from the leafMap to the iterMap since they now also have potential to change
+							for(EnumFacing dir: EnumFacing.values()) {
+								BlockPos dPos = iPos.offset(dir);
+								iterMap.setVoxel(dPos, leafMap.getVoxel(dPos));
+							}
+						}
+					}
+				}
+				else if(block instanceof IAgeable) {//Treat just a regular ageable block
+					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				} else {//You're not supposed to be here
+					leafMap.setVoxel(iPos, (byte) 0);
+					iterMap.setVoxel(iPos, (byte) 0);
+				}
+			}
+		}
+		
 	}
 	
 	/**
@@ -95,27 +138,23 @@ public class TreeHelper {
 	 * @param treePos The position of the bottom most block of a trees trunk
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
+ 	 * @param iterations The number of times to age the volume
 	 */
-	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, SimpleVoxmap leafMap, int iterations){
-		
-		Iterable<MutableBlockPos> iterable = leafMap != null ? leafMap.getAllNonZero((byte) 0x0F) : 
-			BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
-		
+	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, int iterations){
+		//Slow and dirty iteration over a cuboid volume.  Try to avoid this by using a voxmap if you can
+		Iterable<MutableBlockPos> iterable = BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		for(int i = 0; i < iterations; i++) {
 			for(MutableBlockPos iPos: iterable) {
 				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
-					if(((IAgeable)block).age(world, iPos, blockState, world.rand, true)) {
-						if(leafMap != null) {
-							leafMap.setVoxel(iPos, (byte) 0);
-						}
-					}
+					((IAgeable)block).age(world, iPos, blockState, world.rand, true);//Treat just a regular ageable block
 				}
 			}
 		}
 		
 	}
+
 	
 	/**
 	 * This is resource intensive.  Use only for interaction code.

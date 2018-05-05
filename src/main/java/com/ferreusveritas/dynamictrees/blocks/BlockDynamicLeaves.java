@@ -115,7 +115,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public boolean age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
+	public int age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		ILeavesProperties leavesProperties = getProperties(state);
 		int oldHydro = state.getValue(BlockDynamicLeaves.HYDRO);
 		
@@ -123,7 +123,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
 		if(newHydro == 0 || (!rapid && !hasAdequateLight(state, world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			world.setBlockToAir(pos);//No water, no light .. no leaves
-			return true;//Leaves were destroyed
+			return -1;//Leaves were destroyed
 		} else { 
 			if(oldHydro != newHydro) {//Only update if the hydro has changed. A little performance gain
 				//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
@@ -145,7 +145,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 		
-		return false;//Leaves were not destroyed
+		return newHydro;//Leaves were not destroyed
 	}
 	
 	@Override

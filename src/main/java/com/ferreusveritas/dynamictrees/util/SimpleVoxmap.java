@@ -48,6 +48,7 @@ public class SimpleVoxmap {
 	
 	public SimpleVoxmap(SimpleVoxmap vmp) {
 		this(vmp.getLenX(), vmp.getLenY(), vmp.getLenZ(), vmp.data);
+		this.center = vmp.center;
 	}
 	
 	/** 
@@ -338,6 +339,7 @@ public class SimpleVoxmap {
 					private int y = 0;
 					private int z = 0;
 					private int dataPos = -1;
+					private boolean yclean;
 					private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 					
 					@Override
@@ -347,29 +349,39 @@ public class SimpleVoxmap {
 						while(true) {
 							
 							if (x < lenX - 1) {
-								x++;
+								x++;//Move to read next cell on x axis
 							}
 							else if (z < lenZ - 1) {
-								x = 0;
-								z++;
+								//We have completed an x scan of a y layer but we still have some more z
+								x = 0;//Reset x for another z scan
+								z++;//Jump to the next z bar
 							}
 							else {
-								x = -1;
-								z = 0;
-								y++;
+								//We have completed an x and z scan of a y layer.
+								x = -1;//Reset the x to just before the first cell for another y layer
+								z = 0;//Reset z for another y layer
+								
+								//Once we get here we have completed an entire y layer scan
+								//if the layer is clean then we mark it as such to self optimize
+								touched[y] = !yclean;
+								
+								y++;//Bump up a layer
+								yclean = true; //Let's pretend this new layer is clean
 								
 								while(y < lenY) {
 									if(touched[y]) {
-										continue main;
+										continue main;//We suspect there's data on this layer so let's hit it
 									}
-									dataPos += layerSize;
-									y++;
+									dataPos += layerSize;//Jump the indexer to the next layer data
+									y++;//Bump up a layer
+									yclean = true; //Let's pretend this new layer is clean
 								}
 								
-								return this.endOfData();
+								return this.endOfData();//There's no more data
 							}
 							
 							if((data[++dataPos] & mask) > 0) {
+								yclean = false; //We found non-zero data.  Therefore this y layer is dirty
 								return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
 							}
 						}
