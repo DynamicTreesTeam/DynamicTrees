@@ -64,7 +64,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
 		staticBirchDecision = new StaticSpeciesSelector(new SpeciesSelection(birch));
-		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 5).add(mushroombrn, 1).add(mushroomred, 1);
+		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 20).add(mushroombrn, 1).add(mushroomred, 1);
 		
 		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().biomeDataBase;
 		
