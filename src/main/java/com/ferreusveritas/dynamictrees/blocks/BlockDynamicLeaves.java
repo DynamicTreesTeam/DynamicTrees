@@ -29,6 +29,7 @@ import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -154,6 +155,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {}
+	
+	@Override
+	public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return getProperties(state).getPrimitiveLeaves().getMapColor(world, pos);
+	}
 	
 	/**
 	 * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
