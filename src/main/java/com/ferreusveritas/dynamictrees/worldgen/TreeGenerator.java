@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumC
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
 import net.minecraft.block.BlockColored;
@@ -20,6 +21,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -93,7 +95,9 @@ public class TreeGenerator implements IWorldGenerator {
 		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
 		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 		
-		circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c));
+		SafeChunkBounds safeBounds = new SafeChunkBounds(world, new ChunkPos(chunkX, chunkZ));//Area that is safe to place blocks during worldgen
+		
+		circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c, safeBounds));
 	}
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
@@ -138,7 +142,7 @@ public class TreeGenerator implements IWorldGenerator {
 		return layers;
 	}
 	
-	private EnumGeneratorResult makeTree(World world, Circle circle) {
+	private EnumGeneratorResult makeTree(World world, Circle circle, SafeChunkBounds safeBounds) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
@@ -177,7 +181,7 @@ public class TreeGenerator implements IWorldGenerator {
 			if(species != null) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, blockState)) {
 					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if(species.generate(world, pos, biome, random, circle.radius)) {
+						if(species.generate(world, pos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.GENERATED;
 						} else {
 							result = EnumGeneratorResult.FAILGENERATION;

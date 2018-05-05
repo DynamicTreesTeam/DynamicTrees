@@ -3,95 +3,80 @@ package com.ferreusveritas.dynamictrees.util;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class SafeChunkBounds {
 	
-	private final int centerX;
-	private final int centerZ;
-	private BlockBounds chunkBounds[] = new BlockBounds[9];
-	private int shrink = 0;
+	public static final SafeChunkBounds ANY = new SafeChunkBounds() {
+		@Override
+		public boolean inBounds(BlockPos pos, boolean gap) { return true; }
+	};
 	
-	private enum Tile {
-		NW(0, new Vec3i(-1, 0,-1), EnumFacing.SOUTH, EnumFacing.EAST),
-		N (1, new Vec3i( 0, 0,-1), EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST),
-		NE(2, new Vec3i( 1, 0,-1), EnumFacing.SOUTH, EnumFacing.WEST),
-		W (3, new Vec3i(-1, 0, 0), EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST),		
-		M (4, new Vec3i( 0, 0, 0), EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST),
-		E (5, new Vec3i( 1, 0, 0), EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST),
-		SW(6, new Vec3i(-1, 0, 1), EnumFacing.NORTH, EnumFacing.EAST),
-		S (7, new Vec3i( 0, 0, 1), EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.EAST),
-		SE(8, new Vec3i( 1, 0, 1), EnumFacing.NORTH, EnumFacing.WEST);
-		
-		public final Vec3i pos;
+	protected static final Tile tiles[] = new Tile[16];
+	
+	static class Tile {
+		public final ChunkPos pos;
 		public final int borders;
 		public final int index;
 		
-		private Tile(int index, Vec3i pos, EnumFacing ... dirs) {
+		public Tile(int index, ChunkPos pos, int borderFlags) {
 			this.index = index;
 			this.pos = pos;
-			
-			int b = 0;
-			for(EnumFacing dir : dirs) {
-				b |= 1 << dir.getIndex();
-			}
-			
-			this.borders = b;
+			this.borders = borderFlags;
 		}
 	}
 	
+	static {
+		for(int z = 0; z < 4; z++) {
+			for(int x = 0; x < 4; x++) {
+				int index = z * 4 + x;
+				tiles[index] = new Tile(index, new ChunkPos(x - 1, z - 1), (z != 0 ? 4 : 0) | (z != 3 ? 8 : 0) | (x != 0 ? 16 : 0) | (x != 3 ? 32 : 0));
+			}
+		}
+	}
 	
-	public SafeChunkBounds(World world, BlockPos pos) {
+	private final ChunkPos center;
+	private BlockBounds chunkBounds[] = new BlockBounds[16];
+	
+	protected SafeChunkBounds() {
+		center = null;
+	}
+	
+	public SafeChunkBounds(World world, ChunkPos pos) {
+		center = pos;
 		
-		centerX = pos.getX() >> 4;
-		centerZ = pos.getZ() >> 4;
-		
-		for(Tile t : Tile.values()) {
-			int chunkX = centerX + t.pos.getX();
-			int chunkZ = centerZ + t.pos.getZ();
-			chunkBounds[t.index] = world.isChunkGeneratedAt(chunkX, chunkZ) ? new BlockBounds(new ChunkPos(chunkX, chunkZ)) : BlockBounds.INVALID;
+		for(Tile t : tiles) {
+			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
+			chunkBounds[t.index] = world.isChunkGeneratedAt(cp.x, cp.z) ? new BlockBounds(cp) : BlockBounds.INVALID;
 		}
 		
-		rebuildChunkBorders();
-	}	
-	
-	private void rebuildChunkBorders() {
-		for(Tile t : Tile.values()) {
+		for(Tile t : tiles) {
 			BlockBounds curr = chunkBounds[t.index];
 			int border = t.borders;
 			if(curr != BlockBounds.INVALID) {
-				int chunkX = centerX + t.pos.getX();
-				int chunkZ = centerZ + t.pos.getZ();
-				curr.init(new ChunkPos(chunkX, chunkZ));//reset the tile
+				curr.init(new ChunkPos(center.x + t.pos.x, center.z + t.pos.z));
 				for(EnumFacing dir : EnumFacing.HORIZONTALS) {
 					boolean validDir = false;
 					if((border & (1 << dir.getIndex())) != 0) {
-						BlockBounds inv = chunkBounds[t.index + dir.getFrontOffsetX() + dir.getFrontOffsetZ() * 3];
+						BlockBounds inv = chunkBounds[t.index + dir.getFrontOffsetX() + dir.getFrontOffsetZ() * 4];
 						validDir = inv != BlockBounds.INVALID;
 					}
 					if(!validDir) {
-						curr.shrink(dir, shrink);
+						curr.shrink(dir, 1);
 					}
 				}
 			}
 		}
 	}
 	
-	public SafeChunkBounds setShrink(int amount) {
-		shrink = amount;
-		rebuildChunkBorders();
-		return this;
-	}
-	
-	public boolean inBounds(BlockPos pos) {
+	public boolean inBounds(BlockPos pos, boolean gap) {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
-		int p = 4 + (chunkX - centerX) + ((chunkZ - centerZ) * 3);
-		if(shrink == 0 && chunkBounds[p] != BlockBounds.INVALID) {
+		int index = 5 + (chunkX - center.x) + ((chunkZ - center.x) * 4);
+		if(!gap && chunkBounds[index] != BlockBounds.INVALID) {//No gap.. take it to the limit.
 			return true;
 		}
-		return chunkBounds[p].inBounds(pos);
+		return chunkBounds[index].inBounds(pos);
 	}
 	
 }

@@ -126,7 +126,7 @@ public class JoCode {
 	* @param facing Direction of tree
 	* @param radius Constraint radius
 	*/
-	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
+	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
 		IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
 		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
 
@@ -151,14 +151,11 @@ public class JoCode {
 			List<BlockPos> endPoints = endFinder.getEnds();
 			
 			smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
-			
-			//Establish a zone where we can place leaves without hitting ungenerated chunks.
-			SafeChunkBounds safeBounds = new SafeChunkBounds(world, rootPos);//Area that is safe to place leaves during worldgen
-			
+						
 			//Place Growing Leaves Blocks from voxmap
 			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
 				MutableBlockPos cellPos = cell.getPos();
-				if(safeBounds.inBounds(cellPos)) {
+				if(safeBounds.inBounds(cellPos, false)) {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
@@ -170,10 +167,9 @@ public class JoCode {
 			}
 			
 			//Shrink the safeBounds down by 1 so that the aging process won't look for neighbors outside of the bounds.
-			safeBounds.setShrink(1);
 			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
 				MutableBlockPos cellPos = cell.getPos();
-				if(!safeBounds.inBounds(cellPos)) {
+				if(!safeBounds.inBounds(cellPos, true)) {
 					leafMap.setVoxel(cellPos, (byte) 0);
 				}
 			}

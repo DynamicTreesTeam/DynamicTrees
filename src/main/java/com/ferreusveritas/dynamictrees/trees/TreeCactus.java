@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
@@ -180,7 +181,7 @@ public class TreeCactus extends TreeFamily {
 		}
 		
 		@Override
-		public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius) {
+		public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
 			IBlockState initialState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
 			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 

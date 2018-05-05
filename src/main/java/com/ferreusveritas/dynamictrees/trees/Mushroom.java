@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockMushroom;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +27,7 @@ public class Mushroom extends Species {
 	}
 	
 	@Override
-	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
+	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		BlockPos mushPos = pos.up();
 		BlockMushroom shroom = (BlockMushroom)(red ? Blocks.RED_MUSHROOM : Blocks.BROWN_MUSHROOM);
 		IBlockState originalSoil = world.getBlockState(pos);

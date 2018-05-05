@@ -39,6 +39,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
@@ -74,7 +75,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
-		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) { return false; }
+		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
@@ -923,12 +924,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius) {
+	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		EnumFacing facing = CoordUtils.getRandomDir(random);
 		if(getJoCodeStore() != null) {
 			JoCode code = getJoCodeStore().getRandomCode(radius, random);
 			if(code != null) {
-				code.generate(world, this, pos, biome, facing, radius);
+				code.generate(world, this, pos, biome, facing, radius, safeBounds);
 				return true;
 			}
 		}

@@ -24,6 +24,16 @@ public class BlockBounds {
 		init(cPos);
 	}
 	
+	public BlockBounds(BlockBounds other) {
+		minX = other.minX;
+		minY = other.minY;
+		minZ = other.minZ;
+		maxX = other.maxX;
+		maxY = other.maxY;
+		maxZ = other.maxZ;
+		valid = other.valid;
+	}
+	
 	public void init(ChunkPos cPos) {
 		minX = cPos.getXStart();
 		minY = 0;

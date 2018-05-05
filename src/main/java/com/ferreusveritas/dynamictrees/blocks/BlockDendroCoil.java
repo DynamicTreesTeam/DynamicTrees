@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityDendroCoil;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import dan200.computercraft.api.ComputerCraftAPI;
@@ -66,7 +67,7 @@ public class BlockDendroCoil extends BlockContainer implements IPeripheralProvid
 		Species species = TreeRegistry.findSpeciesSloppy(treeName);
 		JoCode jo = species.getJoCode(JoCode);
 		if(species != Species.NULLSPECIES) {
-			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8);
+			jo.setCareful(true).generate(world, species, pos.up(), world.getBiome(pos), EnumFacing.NORTH, 8, SafeChunkBounds.ANY);
 		} else {
 			Logger.getLogger(ModConstants.MODID).log(Level.WARNING, "Tree: " + treeName + " not found.");
 		}
