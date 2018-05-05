@@ -97,7 +97,7 @@ public class SimpleVoxmap {
 		byte getOp(byte srcValue, byte dstValue);
 	}
 	
-	public SimpleVoxmap BlitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
+	public SimpleVoxmap blitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
 		for(int iy = 0; iy < src.getLenY(); iy++) {
 			int srcY = iy - src.center.getY();
 			int dstY = pos.getY() + srcY;
@@ -117,16 +117,16 @@ public class SimpleVoxmap {
 		return this;
 	}
 	
-	public SimpleVoxmap BlitReplace(BlockPos pos, SimpleVoxmap src) {
-		return BlitOp(pos, src, (s, d) -> { return s; } );
+	public SimpleVoxmap blitReplace(BlockPos pos, SimpleVoxmap src) {
+		return blitOp(pos, src, (s, d) -> { return s; } );
 	}
 	
-	public SimpleVoxmap BlitMax(BlockPos pos, SimpleVoxmap src) {
-		return BlitOp(pos, src, (s, d) -> { return (s >= d) ? s : d; } );
+	public SimpleVoxmap blitMax(BlockPos pos, SimpleVoxmap src) {
+		return blitOp(pos, src, (s, d) -> { return (s >= d) ? s : d; } );
 	}
 	
-	public SimpleVoxmap BlitClear(BlockPos pos, SimpleVoxmap src) {
-		return BlitOp(pos, src, (s, d) -> { return (s >= 0) ? 0 : d; } );
+	public SimpleVoxmap blitClear(BlockPos pos, SimpleVoxmap src) {
+		return blitOp(pos, src, (s, d) -> { return (s >= 0) ? 0 : d; } );
 	}
 	
 	public interface IFilterOp {

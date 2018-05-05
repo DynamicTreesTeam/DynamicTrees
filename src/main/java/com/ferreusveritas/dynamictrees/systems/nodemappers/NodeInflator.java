@@ -70,7 +70,7 @@ public class NodeInflator implements INodeInspector {
 				//Handle leaves here
 				leafMap.setVoxel(pos, (byte) 16);//16(bit 5) is code for a twig
 				SimpleVoxmap leafCluster = species.getLeavesProperties().getCellKit().getLeafCluster();
-				leafMap.BlitMax(pos, leafCluster);
+				leafMap.blitMax(pos, leafCluster);
 			} else {
 				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				radius = (float)Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
