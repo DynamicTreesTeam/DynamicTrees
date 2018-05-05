@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -185,6 +186,8 @@ public class JoCode {
 			//Allow for special decorations by the tree itself
 			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful);
 		
+			//Add snow to parts of the tree in chunks where snow was already placed
+			addSnow(leafMap, safeBounds, world, species, rootPos, biome, radius);
 		} else { //The growth failed.. turn the soil back to what it was
 			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
@@ -284,6 +287,48 @@ public class JoCode {
 		}
 
 		return true;
+	}
+	
+	protected void addSnow(SimpleVoxmap leafMap, SafeChunkBounds safeBounds, World world, Species species, BlockPos rootPos, Biome biome, int radius) {
+		BlockPos saveCenter = leafMap.getCenter();
+		leafMap.setCenter(new BlockPos(0, 0, 0));
+		
+		int startY;
+
+		// Find topmost block in build volume
+		for (startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
+			if (leafMap.isYTouched(startY)) {
+				break;
+			}
+		}
+		
+		MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
+		for (int iz = 0; iz < leafMap.getLenZ(); iz++) {
+			for (int ix = 0; ix < leafMap.getLenX(); ix++) {
+				pos.setPos(ix, 0, iz);
+				for (int iy = startY; iy >= 0; iy--) {
+					pos.setY(iy);
+					int v = leafMap.getVoxel(pos);
+					if (v != 0) {
+						pos.setY(iy + 1);
+						leafMap.setVoxel(pos, (byte) 8);
+						
+						break;
+					}
+				}
+			}
+		}
+		
+		leafMap.setCenter(saveCenter);
+		
+		Iterable<MutableBlockPos> iterable = leafMap.getAllNonZero((byte) 8);
+		for (MutableBlockPos iPos : iterable) {
+			
+			if (safeBounds.inBounds(iPos) && world.canSnowAt(pos, false)) {
+				//System.out.println(!safeBounds.inBounds(iPos));
+				world.setBlockState(iPos, Blocks.SNOW_LAYER.getDefaultState(), 2);
+			}
+		}
 	}
 
 	/**
