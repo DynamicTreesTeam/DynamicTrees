@@ -14,7 +14,7 @@ public class SafeChunkBounds {
 	
 	protected static final Tile tiles[] = new Tile[16];
 	
-	static class Tile {
+	protected static class Tile {
 		public final ChunkPos pos;
 		public final int borders;
 		public final int index;
@@ -52,13 +52,12 @@ public class SafeChunkBounds {
 		
 		for(Tile t : tiles) {
 			BlockBounds curr = chunkBounds[t.index];
-			int border = t.borders;
 			if(curr != BlockBounds.INVALID) {
 				for(EnumFacing dir : EnumFacing.HORIZONTALS) {
 					boolean validDir = false;
-					if((border & (1 << dir.getIndex())) != 0) {
-						BlockBounds inv = chunkBounds[t.index + dir.getFrontOffsetX() + dir.getFrontOffsetZ() * 4];
-						validDir = inv != BlockBounds.INVALID;
+					if((t.borders & (1 << dir.getIndex())) != 0) {
+						BlockBounds adjTile = chunkBounds[t.index + dir.getFrontOffsetX() + dir.getFrontOffsetZ() * 4];
+						validDir = adjTile != BlockBounds.INVALID;
 					}
 					if(!validDir) {
 						curr.shrink(dir, 1);
@@ -71,8 +70,13 @@ public class SafeChunkBounds {
 	public boolean inBounds(BlockPos pos, boolean gap) {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
-		int index = 5 + (chunkX - center.x) + ((chunkZ - center.z) * 4);
-		return (!gap && chunkBounds[index] != BlockBounds.INVALID) ? true : chunkBounds[index].inBounds(pos);
+		int tileX = (chunkX - center.x + 1);
+		int tileZ = (chunkZ - center.z + 1);
+		if ( ((tileX | tileZ) & 0xFFFFFFFC) == 0 ) {//Quick way to test if tileX and tileZ are both 0 - 3
+			int index = tileX + (tileZ * 4);
+			return (!gap && chunkBounds[index] != BlockBounds.INVALID) ? true : chunkBounds[index].inBounds(pos);
+		}
+		return false;
 	}
 	
 }
