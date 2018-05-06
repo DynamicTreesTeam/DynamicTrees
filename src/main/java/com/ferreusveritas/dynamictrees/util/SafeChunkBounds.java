@@ -71,7 +71,7 @@ public class SafeChunkBounds {
 	public boolean inBounds(BlockPos pos, boolean gap) {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
-		int index = 5 + (chunkX - center.x) + ((chunkZ - center.x) * 4);
+		int index = 5 + (chunkX - center.x) + ((chunkZ - center.z) * 4);
 		return (!gap && chunkBounds[index] != BlockBounds.INVALID) ? true : chunkBounds[index].inBounds(pos);
 	}
 	
