@@ -94,13 +94,13 @@ public class BiomeDataBase {
 			case REPLACE:
 				entry.speciesSelector = selector;
 				break;
-			case SPLICE_AFTER:
+			case SPLICE_BEFORE:
 				entry.speciesSelector = (pos, dirt, rnd) -> {
 					SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
 					return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
 				};
 				break;
-			case SPLICE_BEFORE:
+			case SPLICE_AFTER:
 				entry.speciesSelector = (pos, dirt, rnd) -> {
 					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
 					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
@@ -119,13 +119,13 @@ public class BiomeDataBase {
 			case REPLACE:
 				entry.chanceSelector = selector;
 				break;
-			case SPLICE_AFTER:
+			case SPLICE_BEFORE:
 				entry.chanceSelector = (rnd, spc, rad) -> {
 					EnumChance c = selector.getChance(rnd, spc, rad);
 					return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
 				};
 				break;
-			case SPLICE_BEFORE:
+			case SPLICE_AFTER:
 				entry.chanceSelector = (rnd, spc, rad) -> {
 					EnumChance c = existing.getChance(rnd, spc, rad);
 					return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
@@ -144,13 +144,13 @@ public class BiomeDataBase {
 			case REPLACE:
 				entry.densitySelector = selector;
 				break;
-			case SPLICE_AFTER:
+			case SPLICE_BEFORE:
 				entry.densitySelector = (rnd, nd) -> {
 					double d = selector.getDensity(rnd, nd);
 					return d >= 0 ? d : existing.getDensity(rnd, nd);
 				};
 				break;
-			case SPLICE_BEFORE:
+			case SPLICE_AFTER:
 				entry.densitySelector = (rnd, nd) -> {
 					double d = existing.getDensity(rnd, nd);
 					return d >= 0 ? d : selector.getDensity(rnd, nd);
