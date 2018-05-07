@@ -798,7 +798,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		//Linear interpolation of suitability with universal growth scalar
-		suit = ugs <= 0.5f ? ugs * 2.0f * suit : (1.0f - ugs) * 2.0f * suit + (ugs - 0.5f) * 2.0f;
+		suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 		
 		return MathHelper.clamp(suit, 0.0f, 1.0f);
 	}
