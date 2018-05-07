@@ -114,6 +114,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		//}
 	}
 	
+	
 	@Override
 	public int age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
 		ILeavesProperties leavesProperties = getProperties(state);
@@ -133,13 +134,15 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 		
 		//We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
-		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
-			if(newHydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
-				BlockPos offpos = pos.offset(dir);
-				if(isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
-					int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
-					if(hydro > 0) {
-						world.setBlockState(offpos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
+		if(!rapid) {//During worldgen we are not interesting in making new leaves
+			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
+				if(newHydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
+					BlockPos offpos = pos.offset(dir);
+					if(isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
+						int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
+						if(hydro > 0) {
+							world.setBlockState(offpos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
+						}
 					}
 				}
 			}

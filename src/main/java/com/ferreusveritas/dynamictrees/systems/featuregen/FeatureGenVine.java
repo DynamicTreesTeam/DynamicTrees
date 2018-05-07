@@ -69,7 +69,7 @@ public class FeatureGenVine implements IGenFeature {
 	
 	protected void addVine(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 		
-		RayTraceResult result = CoordUtils.branchRayTrace(world, species, treePos, branchPos, 90, verSpread, rayDistance);
+		RayTraceResult result = CoordUtils.branchRayTrace(world, species, treePos, branchPos, 90, verSpread, rayDistance, safeBounds);
 		
 		if(result != null) {
 			BlockPos vinePos = result.getBlockPos().offset(result.sideHit);

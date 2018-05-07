@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -24,7 +23,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -161,7 +159,7 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 16);//Flag 16 to prevent observers from causing cascading lag
 					}
 				} else {
 					leafMap.setVoxel(cellPos, (byte) 0);
@@ -169,7 +167,7 @@ public class JoCode {
 			}
 			
 			//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
-			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
+			for(Cell cell: leafMap.getAllNonZeroCells()) {
 				MutableBlockPos cellPos = cell.getPos();
 				if(!safeBounds.inBounds(cellPos, true)) {
 					leafMap.setVoxel(cellPos, (byte) 0);
@@ -290,12 +288,10 @@ public class JoCode {
 	}
 	
 	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome) {
-
-		if(biome.isSnowyBiome()) {
-			BlockBounds bounds = new BlockBounds(new ChunkPos(rootPos.getX() - 8, rootPos.getZ() - 8)).move(8, 0, 8);
-			
+		
+		if(biome.getDefaultTemperature() < 0.4f) {
 			for ( MutableBlockPos top : leafMap.getTops() ) {
-				if ( world.canSnowAt(top, false) && bounds.inBounds(top) ) {
+				if ( world.canSnowAt(top, false) ) {
 					MutableBlockPos iPos = new MutableBlockPos(top);
 					int yOffset = 0;
 					do {
@@ -314,7 +310,7 @@ public class JoCode {
 		}
 		
 	}
-
+	
 	/**
 	* @param world The world
 	* @param rootPos Block position of rootyDirt block
