@@ -1,16 +1,26 @@
 Changelog:
 
 0.7.7a
-* Make log dropper able to drop more than 64 logs
-* Added config options for axe damage behavior.
-* Added config options for enhanced leaves movement and canopy crashing
-* Fix leaves destruction algorithm so it doesn't take out so many leaves blocks when a small branch is harvested
-* Replaced IBiomeDensityProvider and IBiomeSpeciesSelector with unified BiomeDataBase
-* Moved tree generation into decorate event. Add decor cancel to BiomeDataBase.
 * Added support for other dimensions other than the overworld
 * Added blacklist for dimensions in config file
-* Do not decorate river biomes with trees
-* Code cleanup with Lambdas
+* Added config options for axe damage behavior.
+* Added config options for enhanced leaves movement and canopy crashing
+* Added config option to scale growth speed based on biome.  Replaces ignoreBiomeGrowthRate with a float
+* Added the ability to generate in subterranean biomes like the nether
+* Replaced IBiomeDensityProvider and IBiomeSpeciesSelector with unified BiomeDataBase to improve worldGen speed
+* Added decor cancel to BiomeDataBase for use in decorate event to improve worldGen speed
+* Huge improvements to SimpleVoxmap iterator to improve worldGen speed
+* Replaced many BlockPos with MutableBlockPos in many iterators to improve worldGen speed
+* Aging during worldgen tracks changing hydro values with a voxelmap to improve worldGen speed
+* Fixed river biome being decorated with trees when it shouldn't be
+* Fixed Map color support for Dynamic Leaves blocks
+* Fixed cascading chunk lag problem(also improves worldGen speed)
+* Fixed log dropper not being able to drop more than 64 logs
+* Fixed leaves destruction algorithm so it doesn't take out so many leaves blocks when a small branch is harvested
+* Fixed snow on trees during worldgen
+* Fixed RoofedForest generation problems
+* Fixed erroneous Dark Oak and Acacia branch hydration providers
+
 
 0.7.6 The Cactus Update(Summary of all added features in Alpha/Beta 0.7.5):
 * Dynamic cacti. Generates in desert biomes
