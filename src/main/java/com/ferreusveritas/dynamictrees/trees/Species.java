@@ -785,17 +785,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			}
 		}
 		
-		if(ModConfigs.ignoreBiomeGrowthRate || isBiomePerfect(biome)) {
+		float ugs = ModConfigs.scaleBiomeGrowthRate;//universal growth scalar
+
+		if(ugs == 1.0f || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
 		
-		float s = defaultSuitability();
+		float suit = defaultSuitability();
 		
 		for(Type t : BiomeDictionary.getTypes(biome)) {
-			s *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
+			suit *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
 		}
 		
-		return MathHelper.clamp(s, 0.0f, 1.0f);
+		//Linear interpolation of suitability with universal growth scalar
+		suit = ugs <= 0.5f ? ugs * 2.0f * suit : (1.0f - ugs) * 2.0f * suit + (ugs - 0.5f) * 2.0f;
+		
+		return MathHelper.clamp(suit, 0.0f, 1.0f);
 	}
 	
 	public boolean isBiomePerfect(Biome biome) {
