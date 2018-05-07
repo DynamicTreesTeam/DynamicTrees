@@ -50,13 +50,13 @@ public class FeatureGenFruit implements IGenFeature {
 		if(!endPoints.isEmpty()) {
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-				addFruit(world, species, treePos, endPoint);
+				addFruit(world, species, treePos, endPoint, safeBounds);
 			}
 		}
 	}
 	
-	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos) {
-		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos);
+	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ORIGIN) {
 			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
 				world.setBlockState(fruitPos, fruitState);

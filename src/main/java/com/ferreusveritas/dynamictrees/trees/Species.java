@@ -363,7 +363,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 					for(ItemStack drop: drops) {
 						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
 						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos);
+						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos, SafeChunkBounds.ANY);
 
 						if(itemPos != BlockPos.ORIGIN) {
 							EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);

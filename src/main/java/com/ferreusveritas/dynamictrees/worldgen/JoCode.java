@@ -161,7 +161,7 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 0);
+						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 16);//Flag 16 to prevent observers from causing cascading lag
 					}
 				} else {
 					leafMap.setVoxel(cellPos, (byte) 0);
@@ -169,7 +169,7 @@ public class JoCode {
 			}
 			
 			//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
-			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {
+			for(Cell cell: leafMap.getAllNonZeroCells()) {
 				MutableBlockPos cellPos = cell.getPos();
 				if(!safeBounds.inBounds(cellPos, true)) {
 					leafMap.setVoxel(cellPos, (byte) 0);

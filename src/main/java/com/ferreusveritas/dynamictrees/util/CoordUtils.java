@@ -76,9 +76,9 @@ public class CoordUtils {
 	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
 	 */
-	public static BlockPos getRayTraceFruitPos(World world, Species species, BlockPos treePos, BlockPos branchPos) {
+	public static BlockPos getRayTraceFruitPos(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 
-		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.rand.nextInt(3));
+		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.rand.nextInt(3), safeBounds);
 
 		if(result != null) {
 			BlockPos hitPos = result.getBlockPos();
@@ -96,7 +96,7 @@ public class CoordUtils {
 	}
 	
 	
-	public static RayTraceResult branchRayTrace(World world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance) {
+	public static RayTraceResult branchRayTrace(World world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
 		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
 
 		Vec3d vOut = new Vec3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
@@ -118,14 +118,16 @@ public class CoordUtils {
 		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
 
-		if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
-			RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
+		if(safeBounds.inBounds(vantagePos, true)) {
+			if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
+				RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
 
-			if(result != null) {
-				BlockPos hitPos = result.getBlockPos();
-				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
-					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
-						return result;
+				if(result != null) {
+					BlockPos hitPos = result.getBlockPos();
+					if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
+						if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+							return result;
+						}
 					}
 				}
 			}
