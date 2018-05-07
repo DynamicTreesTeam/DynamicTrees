@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
@@ -973,9 +974,18 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}
+
+	public int getWorldGenLeafMapHeight() {
+		return 32;
+	}
+
+	public INodeInspector getNodeInflator() {
+		return null;
+	}
 	
 	@Override
 	public String toString() {
 		return getRegistryName().toString();
 	}
+
 }

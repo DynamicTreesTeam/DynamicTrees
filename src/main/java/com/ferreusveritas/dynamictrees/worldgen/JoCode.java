@@ -143,7 +143,7 @@ public class JoCode {
 		BlockBranch branch = TreeHelper.getBranch(treeState);
 		if(branch != null) {//If a branch exists then the growth was successful
 			ILeavesProperties leavesProperties = species.getLeavesProperties();
-			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, 32, radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
+			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
 			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
 			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
