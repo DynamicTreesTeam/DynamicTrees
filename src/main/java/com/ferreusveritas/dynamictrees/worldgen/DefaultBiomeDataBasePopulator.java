@@ -86,43 +86,41 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	
 	public IDensitySelector computeDensity(Biome biome) {
 		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Roofed Forest
-			return (rnd, nd) -> { return 0.4f + (nd / 3.0f); };
+			return (rnd, nd) -> 0.4f + (nd / 3.0f);
 		}
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) { //Desert
-			return (rnd, nd) -> { return ( nd * 0.6) + 0.4; };
+			return (rnd, nd) -> ( nd * 0.6) + 0.4;
 		}
 		final double treeDensity = MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
-		return (rnd, nd) -> { return nd * treeDensity; };
+		return (rnd, nd) -> nd * treeDensity;
 	}
 	
 	public IChanceSelector computeChance(Biome biome) {
 		if(BiomeDictionary.hasType(biome, Type.CONIFEROUS)) {
-			return (rnd, spc, rad) -> { return rad > 6 && rnd.nextFloat() < 0.5f ? EnumChance.CANCEL : EnumChance.OK; };
+			return (rnd, spc, rad) -> rad > 6 && rnd.nextFloat() < 0.5f ? EnumChance.CANCEL : EnumChance.OK;
 		}
 		if(BiomeDictionary.hasType(biome, Type.FOREST)) {//Never miss a chance to spawn a tree in a forest.
-			return (rnd, spc, rad) -> { return EnumChance.OK; };
+			return (rnd, spc, rad) -> EnumChance.OK;
 		}
 		if(biome == Biomes.MUTATED_ROOFED_FOREST) {//Although this is a forest it's not registered as one for some reason
-			return (rnd, spc, rad) -> { return EnumChance.OK; };
+			return (rnd, spc, rad) -> EnumChance.OK;
 		}
 		if(BiomeDictionary.hasType(biome, Type.SWAMP)) {//Swamps need more tree opportunities since it's so watery
-			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL; };
+			return (rnd, spc, rad) -> rnd.nextFloat() < 0.75f ? EnumChance.OK : EnumChance.CANCEL;
 		} 
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) {//Deserts (for cacti)
-			return (rnd, spc, rad) -> { return rnd.nextFloat() < 0.075f ? EnumChance.OK : EnumChance.CANCEL; };
+			return (rnd, spc, rad) -> rnd.nextFloat() < 0.075f ? EnumChance.OK : EnumChance.CANCEL;
 		}
 		else if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
-			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
+			return (rnd, spc, rad) -> EnumChance.CANCEL;
 		}
 		if (biome == Biomes.RIVER) {
-			return (rnd, spc, rad) -> { return EnumChance.CANCEL; };
+			return (rnd, spc, rad) -> EnumChance.CANCEL;
 		}
-		else {
-			return (rnd, spc, rad) -> {//Let the radius determine the chance
-				//Start dropping tree spawn opportunities when the radius gets bigger than 3
-				return rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL;
-				//Note: the last call should never be UNHANDLED for the DefaultBiomeDensityProvider since it is the last in the chain
-			};
+		else {//Let the radius determine the chance
+			return (rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL; 
+			//Start dropping tree spawn opportunities when the radius gets bigger than 3
+			//Note: the last call should never be UNHANDLED for the DefaultBiomeDensityProvider since it is the last in the chain
 		}
 	}
 	

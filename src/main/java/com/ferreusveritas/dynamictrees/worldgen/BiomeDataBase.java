@@ -18,9 +18,9 @@ public class BiomeDataBase {
 	public class BiomeEntry {
 		private final Biome biome;
 		private final int biomeId;
-		private IChanceSelector chanceSelector = (rnd, spc, rad) -> { return EnumChance.UNHANDLED; };
-		private IDensitySelector densitySelector = (rnd, nd) -> { return -1; };
-		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> { return new SpeciesSelection(); };
+		private IChanceSelector chanceSelector = (rnd, spc, rad) -> EnumChance.UNHANDLED;
+		private IDensitySelector densitySelector = (rnd, nd) -> -1;
+		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
 		private boolean cancelVanillaTreeGen = false;
 		private boolean isSubterranean = false;
 		
