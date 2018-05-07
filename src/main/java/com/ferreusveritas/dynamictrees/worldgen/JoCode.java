@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -144,7 +144,7 @@ public class JoCode {
 		if(branch != null) {//If a branch exists then the growth was successful
 			ILeavesProperties leavesProperties = species.getLeavesProperties();
 			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
-			NodeInflator inflator = new NodeInflator(species, leafMap);//This is responsible for thickening the branches
+			INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
 			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
 			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
 			branch.analyse(treeState, world, treePos, EnumFacing.DOWN, signal);
@@ -175,7 +175,7 @@ public class JoCode {
 			}
 			
 			//Age volume for 3 cycles using a leafmap
-			TreeHelper.ageVolume(world, leafMap, 3);
+			TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations());
 			
 			//Rot the unsupported branches
 			species.handleRot(world, endPoints, rootPos, treePos, 0, true);

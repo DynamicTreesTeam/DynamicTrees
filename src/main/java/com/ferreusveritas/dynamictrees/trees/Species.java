@@ -37,6 +37,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
@@ -979,8 +980,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return 32;
 	}
 
-	public INodeInspector getNodeInflator() {
-		return null;
+	public int getWorldGenAgeIterations() {
+		return 3;
+	}
+	
+	public INodeInspector getNodeInflator(SimpleVoxmap leafMap) {
+		return new NodeInflator(this, leafMap);
 	}
 	
 	@Override
