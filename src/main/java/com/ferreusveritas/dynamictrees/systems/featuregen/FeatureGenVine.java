@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +26,7 @@ public class FeatureGenVine implements IGenFeature {
 	protected float verSpread = 60;
 	protected float rayDistance = 5;
 	protected Species species;
+	protected Block vineBlock = Blocks.VINE;
 	
 	public FeatureGenVine(Species species) {
 		this.species = species;
@@ -50,6 +52,11 @@ public class FeatureGenVine implements IGenFeature {
 		return this;
 	}
 	
+	public FeatureGenVine setVineBlock(Block vineBlock) {
+		this.vineBlock = vineBlock;
+		return this;
+	}
+	
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
 		if(!endPoints.isEmpty()) {
@@ -69,7 +76,7 @@ public class FeatureGenVine implements IGenFeature {
 			if(vinePos != BlockPos.ORIGIN && safeBounds.inBounds(vinePos, true)) {
 				PropertyBool vineSide = vineMap[result.sideHit.getOpposite().getIndex()];
 				if(vineSide != null) {
-					IBlockState vineState = Blocks.VINE.getDefaultState().withProperty(vineSide, Boolean.valueOf(true));
+					IBlockState vineState = vineBlock.getDefaultState().withProperty(vineSide, Boolean.valueOf(true));
 					int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
 					MutableBlockPos mPos = new MutableBlockPos(vinePos);
 					for(int i = 0; i < len; i++) {
