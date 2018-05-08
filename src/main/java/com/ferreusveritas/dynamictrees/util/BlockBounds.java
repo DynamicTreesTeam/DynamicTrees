@@ -134,7 +134,7 @@ public class BlockBounds {
 		return expand(-amount);
 	}
 	
-	public Iterable<BlockPos.MutableBlockPos> interate() {
+	public Iterable<BlockPos.MutableBlockPos> iterate() {
 		return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 	

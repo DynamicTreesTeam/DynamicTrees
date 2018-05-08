@@ -227,7 +227,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			int primaryThickness = (int) family.getPrimaryThickness();
 			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
-			for(MutableBlockPos findPos : bounds.expand(3).interate() ) {
+			for(MutableBlockPos findPos : bounds.expand(3).iterate() ) {
 				if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
 					Iterable<MutableBlockPos> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
 					for(MutableBlockPos leafpos : leaves) {
