@@ -1,5 +1,9 @@
 Changelog:
 
+0.7.7b
+* Fixed log DropCreator
+* BiomeDataBase now deals with invalid biomes gracefully.
+
 0.7.7a
 * Added support for other dimensions other than the overworld
 * Added blacklist for dimensions in config file
