@@ -9,13 +9,22 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IDens
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ISpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 
+import net.minecraft.init.Biomes;
 import net.minecraft.world.biome.Biome;
 
 public class BiomeDataBase {
 
-	private final ArrayList<BiomeEntry> table = new ArrayList<BiomeEntry>(Collections.nCopies(256, null));
+	public static BiomeEntry BADENTRY = new BiomeEntry() {
+		public void setChanceSelector(IChanceSelector chanceSelector) {}
+		public void setDensitySelector(IDensitySelector densitySelector) {}
+		public void setSpeciesSelector(ISpeciesSelector speciesSelector) {}
+		public void setCancelVanillaTreeGen(boolean cancel) {}
+		public void setSubterraneanBiome(boolean is) {}
+	};
 	
-	public class BiomeEntry {
+	private final ArrayList<BiomeEntry> table = new ArrayList<BiomeEntry>(Collections.nCopies(256, BADENTRY));
+	
+	public static class BiomeEntry {
 		private final Biome biome;
 		private final int biomeId;
 		private IChanceSelector chanceSelector = (rnd, spc, rad) -> EnumChance.UNHANDLED;
@@ -23,6 +32,11 @@ public class BiomeDataBase {
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
 		private boolean cancelVanillaTreeGen = false;
 		private boolean isSubterranean = false;
+		
+		public BiomeEntry() {
+			biome = Biomes.DEFAULT;
+			biomeId = -1;
+		}
 		
 		public BiomeEntry(Biome biome, int biomeId) {
 			this.biome = biome;
@@ -48,6 +62,26 @@ public class BiomeDataBase {
 		public ISpeciesSelector getSpeciesSelector() {
 			return speciesSelector;
 		}
+
+		public void setChanceSelector(IChanceSelector chanceSelector) {
+			this.chanceSelector = chanceSelector;
+		}
+		
+		public void setDensitySelector(IDensitySelector densitySelector) {
+			this.densitySelector = densitySelector;
+		}
+		
+		public void setSpeciesSelector(ISpeciesSelector speciesSelector) {
+			this.speciesSelector = speciesSelector;
+		}
+		
+		public void setCancelVanillaTreeGen(boolean cancel) {
+			this.cancelVanillaTreeGen = cancel;
+		}
+		
+		public void setSubterraneanBiome(boolean is) {
+			this.isSubterranean = is;
+		}
 		
 		public boolean shouldCancelVanillaTreeGen() {
 			return cancelVanillaTreeGen;
@@ -60,14 +94,18 @@ public class BiomeDataBase {
 	
 	public BiomeEntry getEntry(Biome biome) {
 		int biomeId = Biome.getIdForBiome(biome);
-		BiomeEntry entry = table.get(biomeId);
+		if(biome != null && biomeId >= 0 && biomeId <= 255) {
+			BiomeEntry entry = table.get(biomeId);
 		
-		if(entry == null) {
-			entry = new BiomeEntry(biome, biomeId);
-			table.set(biomeId, entry);
+			if(entry == BADENTRY) {
+				entry = new BiomeEntry(biome, biomeId);
+				table.set(biomeId, entry);
+			}
+		
+			return entry;
 		}
 		
-		return entry;
+		return BADENTRY;
 	}
 	
 	public ISpeciesSelector getSpecies(Biome biome) {
@@ -88,86 +126,83 @@ public class BiomeDataBase {
 	
 	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
 		BiomeEntry entry = getEntry(biome);
-		ISpeciesSelector existing = entry.speciesSelector;
+		ISpeciesSelector existing = entry.getSpeciesSelector();
 		
 		switch (op) {
 			case REPLACE:
-				entry.speciesSelector = selector;
+				entry.setSpeciesSelector( selector );
 				break;
 			case SPLICE_BEFORE:
-				entry.speciesSelector = (pos, dirt, rnd) -> {
+				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
 					SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
 					return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
-				};
+				} );
 				break;
 			case SPLICE_AFTER:
-				entry.speciesSelector = (pos, dirt, rnd) -> {
+				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
 					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
 					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
-				};
-			break;
+				} );
+				break;
 		}
-		
 		return this;
 	}
 	
 	public BiomeDataBase setChanceSelector(Biome biome, IChanceSelector selector, Operation op) {
-		BiomeEntry entry = getEntry(biome);
-		IChanceSelector existing = entry.chanceSelector;
-		
-		switch(op) {
-			case REPLACE:
-				entry.chanceSelector = selector;
-				break;
-			case SPLICE_BEFORE:
-				entry.chanceSelector = (rnd, spc, rad) -> {
-					EnumChance c = selector.getChance(rnd, spc, rad);
-					return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
-				};
-				break;
-			case SPLICE_AFTER:
-				entry.chanceSelector = (rnd, spc, rad) -> {
-					EnumChance c = existing.getChance(rnd, spc, rad);
-					return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
-				};
-				break;
-		}
-		
+			BiomeEntry entry = getEntry(biome);
+			IChanceSelector existing = entry.getChanceSelector();
+			
+			switch(op) {
+				case REPLACE:
+					entry.setChanceSelector( selector );
+					break;
+				case SPLICE_BEFORE:
+					entry.setChanceSelector( (rnd, spc, rad) -> {
+						EnumChance c = selector.getChance(rnd, spc, rad);
+						return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+					} );
+					break;
+				case SPLICE_AFTER:
+					entry.setChanceSelector( (rnd, spc, rad) -> {
+						EnumChance c = existing.getChance(rnd, spc, rad);
+						return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+					} );
+					break;
+			}
 		return this;
 	}
 	
 	public BiomeDataBase setDensitySelector(Biome biome, IDensitySelector selector, Operation op) {
-		BiomeEntry entry = getEntry(biome);
-		IDensitySelector existing = entry.densitySelector;
-		
-		switch (op) {
-			case REPLACE:
-				entry.densitySelector = selector;
-				break;
-			case SPLICE_BEFORE:
-				entry.densitySelector = (rnd, nd) -> {
-					double d = selector.getDensity(rnd, nd);
-					return d >= 0 ? d : existing.getDensity(rnd, nd);
-				};
-				break;
-			case SPLICE_AFTER:
-				entry.densitySelector = (rnd, nd) -> {
-					double d = existing.getDensity(rnd, nd);
-					return d >= 0 ? d : selector.getDensity(rnd, nd);
-				};
-				break;
-		}
-		
+			BiomeEntry entry = getEntry(biome);
+			IDensitySelector existing = entry.getDensitySelector();
+			
+			switch (op) {
+				case REPLACE:
+					entry.setDensitySelector( selector );
+					break;
+				case SPLICE_BEFORE:
+					entry.setDensitySelector( (rnd, nd) -> {
+						double d = selector.getDensity(rnd, nd);
+						return d >= 0 ? d : existing.getDensity(rnd, nd);
+					} );
+					break;
+				case SPLICE_AFTER:
+					entry.setDensitySelector( (rnd, nd) -> {
+						double d = existing.getDensity(rnd, nd);
+						return d >= 0 ? d : selector.getDensity(rnd, nd);
+					} );
+					break;
+			}
 		return this;
 	}
 	
 	public BiomeDataBase setCancelVanillaTreeGen(Biome biome, boolean cancel) {
-		getEntry(biome).cancelVanillaTreeGen = cancel;
+		getEntry(biome).setCancelVanillaTreeGen(cancel);
 		return this;
 	}
 	
-	public BiomeDataBase setIsSubterranean(Biome biome, boolean sub) {
-		getEntry(biome).isSubterranean = sub;
+	public BiomeDataBase setIsSubterranean(Biome biome, boolean is) {
+		getEntry(biome).setSubterraneanBiome(is);
 		return this;
 	}
 	
