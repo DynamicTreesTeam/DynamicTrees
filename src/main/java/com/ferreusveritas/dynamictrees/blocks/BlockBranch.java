@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
@@ -207,38 +208,18 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		
 		if (!world.isRemote && !world.restoringBlockSnapshots && !endPoints.isEmpty()) { // do not drop items while restoring blockstates, prevents item dupe
 			
-			BlockPos firstPos = endPoints.get(0);
-			
-			//Make a bounding volume that holds all of the endpoints;
-			int loX = firstPos.getX();
-			int loY = firstPos.getY();
-			int loZ = firstPos.getZ();
-			int hiX = loX;
-			int hiY = loY;
-			int hiZ = loZ;
-			
-			for(BlockPos pos : endPoints) {
-				loX = Math.min(loX, pos.getX());
-				loY = Math.min(loY, pos.getY());
-				loZ = Math.min(loZ, pos.getZ());
-				hiX = Math.max(hiX, pos.getX());
-				hiY = Math.max(hiY, pos.getY());
-				hiZ = Math.max(hiZ, pos.getZ());
-			};
-			
-			//Expand the volume by 3 blocks for the leaves radius
-			loX -= 3; loY -= 3; loZ -= 3;
-			hiX += 3; hiY += 3; hiZ += 3;
+			//Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius
+			BlockBounds bounds = new BlockBounds(endPoints).expand(3);
 			
 			//Create a voxmap to store the leaf destruction map
-			SimpleVoxmap vmap = new SimpleVoxmap(hiX - loX + 1, hiY - loY + 1, hiZ - loZ + 1).setMapAndCenter(new BlockPos(loX, loY, loZ), new BlockPos(0, 0, 0));
+			SimpleVoxmap vmap = new SimpleVoxmap(bounds);
 			
 			//For each of the endpoints add a 7x7 destruction volume around it
 			for(BlockPos endPos : endPoints) {
 				for(BlockPos leafPos : BlockPos.getAllInBoxMutable(endPos.add(-3, -3, -3), endPos.add(3, 3, 3)) ) {
-					vmap.setVoxel(leafPos, (byte) 1);
+					vmap.setVoxel(leafPos, (byte) 1);//Flag this position for destruction
 				}
-				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does have a leaves block in it
+				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does not have a leaves block in it because it was a branch
 			}
 			
 			TreeFamily family = species.getFamily();
@@ -246,7 +227,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			int primaryThickness = (int) family.getPrimaryThickness();
 			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
-			for(MutableBlockPos findPos : BlockPos.getAllInBoxMutable(loX - 3, loY - 3, loZ - 3, hiX + 3, hiY + 3, hiZ + 3) ) {
+			for(MutableBlockPos findPos : bounds.expand(3).interate() ) {
 				if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
 					Iterable<MutableBlockPos> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
 					for(MutableBlockPos leafpos : leaves) {

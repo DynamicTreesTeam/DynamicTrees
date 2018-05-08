@@ -15,11 +15,11 @@ import net.minecraft.world.biome.Biome;
 public class BiomeDataBase {
 
 	public static BiomeEntry BADENTRY = new BiomeEntry() {
-		public void setChanceSelector(IChanceSelector chanceSelector) {}
-		public void setDensitySelector(IDensitySelector densitySelector) {}
-		public void setSpeciesSelector(ISpeciesSelector speciesSelector) {}
-		public void setCancelVanillaTreeGen(boolean cancel) {}
-		public void setSubterraneanBiome(boolean is) {}
+		@Override public void setChanceSelector(IChanceSelector chanceSelector) {}
+		@Override public void setDensitySelector(IDensitySelector densitySelector) {}
+		@Override public void setSpeciesSelector(ISpeciesSelector speciesSelector) {}
+		@Override public void setCancelVanillaTreeGen(boolean cancel) {}
+		@Override public void setSubterraneanBiome(boolean is) {}
 	};
 	
 	private final ArrayList<BiomeEntry> table = new ArrayList<BiomeEntry>(Collections.nCopies(256, BADENTRY));

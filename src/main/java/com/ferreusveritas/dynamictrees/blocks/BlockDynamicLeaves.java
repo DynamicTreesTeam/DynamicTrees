@@ -619,18 +619,21 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return Blocks.LEAVES.isOpaqueCube(state);
 	}
 	
-    @SideOnly(Side.CLIENT)
+    @Override
+	@SideOnly(Side.CLIENT)
     public BlockRenderLayer getBlockLayer() {
     	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
     	return super.getBlockLayer();
     }
     
-    @SideOnly(Side.CLIENT)
+    @Override
+	@SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
     	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
 		return super.shouldSideBeRendered(blockState, blockAccess, pos, side); 
 	}
     
+	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.LEAVES;
 	}

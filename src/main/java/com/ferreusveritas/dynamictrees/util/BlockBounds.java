@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import java.util.List;
+
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -7,17 +9,13 @@ import net.minecraft.util.math.ChunkPos;
 public class BlockBounds {
 
 	public static final BlockBounds INVALID = new BlockBounds() {
-		@Override
-		public boolean inBounds(BlockPos pos) {
-			return false;
-		}
+		@Override public boolean inBounds(BlockPos pos) { return false; }
 	};
 	
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
 	
-	public BlockBounds() {
-	}
+	private BlockBounds() { }
 	
 	public BlockBounds(BlockPos pos) {
 		minX = maxX = pos.getX();
@@ -44,7 +42,12 @@ public class BlockBounds {
 		maxZ = other.maxZ;
 	}
 	
-	public void union(BlockPos pos) {
+	public BlockBounds(List<BlockPos> blockPosList) {
+		this(blockPosList.get(0));
+		union(blockPosList);
+	}
+	
+	public BlockBounds union(BlockPos pos) {
 		
 		if(pos.getX() < minX) {
 			minX = pos.getX();
@@ -70,6 +73,12 @@ public class BlockBounds {
 			maxZ = pos.getZ();
 		}
 		
+		return this;
+	}
+	
+	public BlockBounds union(List<BlockPos> blockPosList) {
+		blockPosList.forEach(b -> union(b));
+		return this;
 	}
 	
 	public boolean inBounds(BlockPos pos) {
@@ -110,4 +119,35 @@ public class BlockBounds {
 		maxZ += z;
 		return this;
 	}
+	
+	public BlockBounds expand(int amount) {
+		minX -= amount;
+		minY -= amount;
+		minZ -= amount;
+		maxX += amount;
+		maxY += amount;
+		maxZ += amount;
+		return this;
+	}
+	
+	public BlockBounds shrink(int amount) {
+		return expand(-amount);
+	}
+	
+	public Iterable<BlockPos.MutableBlockPos> interate() {
+		return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
+	}
+	
+	public int getXSize() {
+		return maxX - minX + 1;
+	}
+	
+	public int getYSize() {
+		return maxY - minY + 1;
+	}
+	
+	public int getZSize() {
+		return maxZ - minZ + 1;
+	}
+	
 }

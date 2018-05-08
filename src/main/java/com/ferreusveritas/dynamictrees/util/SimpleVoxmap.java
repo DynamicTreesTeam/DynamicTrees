@@ -51,6 +51,11 @@ public class SimpleVoxmap {
 		this.center = vmp.center;
 	}
 	
+	public SimpleVoxmap(BlockBounds bounds) {
+		this(bounds.getXSize(), bounds.getYSize(), bounds.getZSize());
+		setMapAndCenter(bounds.getMin(), new BlockPos(0, 0, 0));
+	}
+	
 	/** 
 	* Convenience function to take the guessing and remembering out of how to convert local to world coordinates.
 	* 
