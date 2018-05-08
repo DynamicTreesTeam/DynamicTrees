@@ -262,7 +262,8 @@ public class TreeFamily {
 	}
 
 	public ItemStack getPrimitiveLogItemStack(int qty) {
-		primitiveLogItemStack.copy().setCount(MathHelper.clamp(qty, 0, 64));
+		ItemStack stack = primitiveLogItemStack.copy();
+		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return primitiveLogItemStack;
 	}
 	
