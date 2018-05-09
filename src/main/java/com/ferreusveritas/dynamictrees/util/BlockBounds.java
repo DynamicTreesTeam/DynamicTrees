@@ -150,4 +150,8 @@ public class BlockBounds {
 		return maxZ - minZ + 1;
 	}
 	
+	@Override
+	public String toString() {
+		return this != INVALID ? "Bounds{x1=" + minX + ", y1=" + minY + ", z1=" + minZ + " -> x2=" + maxX + ", y2=" + maxY + ", z2=" + maxZ + "}" : "Invalid";
+	}
 }

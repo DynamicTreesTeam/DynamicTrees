@@ -4,6 +4,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 public class SafeChunkBounds {
 	
@@ -37,6 +38,7 @@ public class SafeChunkBounds {
 	
 	private final ChunkPos center;
 	private BlockBounds chunkBounds[] = new BlockBounds[16];
+	//private Chunk chunk[] = new Chunk[16];
 	
 	protected SafeChunkBounds() {
 		center = null;
@@ -44,12 +46,14 @@ public class SafeChunkBounds {
 	
 	public SafeChunkBounds(World world, ChunkPos pos) {
 		center = pos;
-		
+
 		for(Tile t : tiles) {
 			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
-			chunkBounds[t.index] = world.isChunkGeneratedAt(cp.x, cp.z) ? new BlockBounds(cp) : BlockBounds.INVALID;
+			Chunk c = world.getChunkProvider().getLoadedChunk(cp.x, cp.z);
+			chunkBounds[t.index] = c != null ? new BlockBounds(cp) : BlockBounds.INVALID;
+			//chunk[t.index] = c;
 		}
-		
+
 		for(Tile t : tiles) {
 			BlockBounds curr = chunkBounds[t.index];
 			if(curr != BlockBounds.INVALID) {

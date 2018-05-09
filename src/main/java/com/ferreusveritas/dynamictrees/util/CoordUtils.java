@@ -117,11 +117,11 @@ public class CoordUtils {
 		Vec3d branchVec = new Vec3d(branchPos).addVector(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
 		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
-
+		
 		if(safeBounds.inBounds(vantagePos, true)) {
 			if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
 				RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
-
+				
 				if(result != null) {
 					BlockPos hitPos = result.getBlockPos();
 					if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
