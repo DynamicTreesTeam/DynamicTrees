@@ -192,82 +192,82 @@ public class CoordUtils {
                         return returnLastUncollidableBlock ? raytraceresult2 : null;
                     }
 
-                    boolean flag2 = true;
-                    boolean flag = true;
-                    boolean flag1 = true;
-                    double d0 = 999.0D;
-                    double d1 = 999.0D;
-                    double d2 = 999.0D;
+                    boolean flagX = true;
+                    boolean flagY = true;
+                    boolean flagZ = true;
+                    double modX = 999.0D;
+                    double modY = 999.0D;
+                    double modZ = 999.0D;
 
                     if (vantX > lookX) {
-                        d0 = (double)lookX + 1.0D;
+                        modX = (double)lookX + 1.0D;
                     }
                     else if (vantX < lookX) {
-                        d0 = (double)lookX + 0.0D;
+                        modX = (double)lookX + 0.0D;
                     }
                     else {
-                        flag2 = false;
+                        flagX = false;
                     }
 
                     if (vantY > lookY) {
-                        d1 = (double)lookY + 1.0D;
+                        modY = (double)lookY + 1.0D;
                     }
                     else if (vantY < lookY) {
-                        d1 = (double)lookY + 0.0D;
+                        modY = (double)lookY + 0.0D;
                     }
                     else {
-                        flag = false;
+                        flagY = false;
                     }
 
                     if (vantZ > lookZ) {
-                        d2 = (double)lookZ + 1.0D;
+                        modZ = (double)lookZ + 1.0D;
                     }
                     else if (vantZ < lookZ) {
-                        d2 = (double)lookZ + 0.0D;
+                        modZ = (double)lookZ + 0.0D;
                     }
                     else {
-                        flag1 = false;
+                        flagZ = false;
                     }
 
-                    double d3 = 999.0D;
-                    double d4 = 999.0D;
-                    double d5 = 999.0D;
+                    double unkX = 999.0D;
+                    double unkY = 999.0D;
+                    double unkZ = 999.0D;
                     double deltaX = lookingAt.x - vantage.x;
                     double deltaY = lookingAt.y - vantage.y;
                     double deltaZ = lookingAt.z - vantage.z;
 
-                    if (flag2) {
-                        d3 = (d0 - vantage.x) / deltaX;
+                    if (flagX) {
+                        unkX = (modX - vantage.x) / deltaX;
                     }
-                    if (flag) {
-                        d4 = (d1 - vantage.y) / deltaY;
+                    if (flagY) {
+                        unkY = (modY - vantage.y) / deltaY;
                     }
-                    if (flag1) {
-                        d5 = (d2 - vantage.z) / deltaZ;
+                    if (flagZ) {
+                        unkZ = (modZ - vantage.z) / deltaZ;
                     }
-                    if (d3 == -0.0D) {
-                        d3 = -1.0E-4D;
+                    if (unkX == -0.0D) {
+                        unkX = -1.0E-4D;
                     }
-                    if (d4 == -0.0D) {
-                        d4 = -1.0E-4D;
+                    if (unkY == -0.0D) {
+                        unkY = -1.0E-4D;
                     }
-                    if (d5 == -0.0D) {
-                        d5 = -1.0E-4D;
+                    if (unkZ == -0.0D) {
+                        unkZ = -1.0E-4D;
                     }
 
                     EnumFacing enumfacing;
 
-                    if (d3 < d4 && d3 < d5) {
+                    if (unkX < unkY && unkX < unkZ) {
                         enumfacing = vantX > lookX ? EnumFacing.WEST : EnumFacing.EAST;
-                        vantage = new Vec3d(d0, vantage.y + deltaY * d3, vantage.z + deltaZ * d3);
+                        vantage = new Vec3d(modX, vantage.y + deltaY * unkX, vantage.z + deltaZ * unkX);
                     }
-                    else if (d4 < d5) {
+                    else if (unkY < unkZ) {
                         enumfacing = vantY > lookY ? EnumFacing.DOWN : EnumFacing.UP;
-                        vantage = new Vec3d(vantage.x + deltaX * d4, d1, vantage.z + deltaZ * d4);
+                        vantage = new Vec3d(vantage.x + deltaX * unkY, modY, vantage.z + deltaZ * unkY);
                     }
                     else {
                         enumfacing = vantZ > lookZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
-                        vantage = new Vec3d(vantage.x + deltaX * d5, vantage.y + deltaY * d5, d2);
+                        vantage = new Vec3d(vantage.x + deltaX * unkZ, vantage.y + deltaY * unkZ, modZ);
                     }
 
                     lookX = MathHelper.floor(vantage.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
