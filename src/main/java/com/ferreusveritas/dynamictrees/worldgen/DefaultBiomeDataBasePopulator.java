@@ -81,6 +81,9 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			}
 		);
 		
+		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND, false);
+		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND_SHORE, false);
+
 		dbase.setIsSubterranean(Biomes.HELL, true);
 	}
 	
