@@ -6,10 +6,16 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -118,16 +124,14 @@ public class CoordUtils {
 		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
 		
-		if(safeBounds.inBounds(vantagePos, true)) {
-			if(world.isAirBlock(vantagePos)) {//The observing block must be in free space
-				RayTraceResult result = world.rayTraceBlocks(vantageVec, branchVec, false, true, false);
-				
-				if(result != null) {
-					BlockPos hitPos = result.getBlockPos();
-					if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
-						if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
-							return result;
-						}
+		if(!safeBounds.inBounds(vantagePos, false) || world.isAirBlock(vantagePos)) {//The observing block must be in free space
+			RayTraceResult result = rayTraceBlocks(world, vantageVec, branchVec, false, true, false, safeBounds);
+			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
+			if(result != null) {
+				BlockPos hitPos = result.getBlockPos();
+				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
+					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+						return result;
 					}
 				}
 			}
@@ -135,6 +139,170 @@ public class CoordUtils {
 		
 		return null;
 	}
+	
+
+	/**
+	 * I had to import Minecraft's block ray trace algorithm to make it worldgen blocksafe.
+	 * I honestly don't know much about what's going on in here because I haven't studied it.
+	 * 
+	 * If an attempt is made to read a block in an unloaded chunk it will simply return AIR or
+	 * the properties of AIR where applicable.
+	 * 
+	 * @param world
+	 * @param vantage
+	 * @param lookingAt
+	 * @param stopOnLiquid
+	 * @param ignoreBlockWithoutBoundingBox
+	 * @param returnLastUncollidableBlock
+	 * @return
+	 */
+    public static RayTraceResult rayTraceBlocks(World world, Vec3d vantage, Vec3d lookingAt, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, SafeChunkBounds safeBounds) {
+
+    	if (!Double.isNaN(vantage.x) && !Double.isNaN(vantage.y) && !Double.isNaN(vantage.z)) {
+            if (!Double.isNaN(lookingAt.x) && !Double.isNaN(lookingAt.y) && !Double.isNaN(lookingAt.z)) {
+                int vantX = MathHelper.floor(lookingAt.x);
+                int vantY = MathHelper.floor(lookingAt.y);
+                int vantZ = MathHelper.floor(lookingAt.z);
+                int lookX = MathHelper.floor(vantage.x);
+                int lookY = MathHelper.floor(vantage.y);
+                int lookZ = MathHelper.floor(vantage.z);
+                BlockPos lookPos = new BlockPos(lookX, lookY, lookZ);
+                IBlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
+                Block block = lookState.getBlock();
+
+                AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
+                
+                if ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && block.canCollideCheck(lookState, stopOnLiquid)) {
+                    RayTraceResult raytraceresult = lookState.collisionRayTrace(world, lookPos, vantage, lookingAt);
+
+                    if (raytraceresult != null) {
+                        return raytraceresult;
+                    }
+                }
+
+                RayTraceResult raytraceresult2 = null;
+                int ropeLen = 200;
+
+                while (ropeLen-- >= 0) {
+                    if (Double.isNaN(vantage.x) || Double.isNaN(vantage.y) || Double.isNaN(vantage.z)) {
+                        return null;
+                    }
+
+                    if (lookX == vantX && lookY == vantY && lookZ == vantZ) {
+                        return returnLastUncollidableBlock ? raytraceresult2 : null;
+                    }
+
+                    boolean flag2 = true;
+                    boolean flag = true;
+                    boolean flag1 = true;
+                    double d0 = 999.0D;
+                    double d1 = 999.0D;
+                    double d2 = 999.0D;
+
+                    if (vantX > lookX) {
+                        d0 = (double)lookX + 1.0D;
+                    }
+                    else if (vantX < lookX) {
+                        d0 = (double)lookX + 0.0D;
+                    }
+                    else {
+                        flag2 = false;
+                    }
+
+                    if (vantY > lookY) {
+                        d1 = (double)lookY + 1.0D;
+                    }
+                    else if (vantY < lookY) {
+                        d1 = (double)lookY + 0.0D;
+                    }
+                    else {
+                        flag = false;
+                    }
+
+                    if (vantZ > lookZ) {
+                        d2 = (double)lookZ + 1.0D;
+                    }
+                    else if (vantZ < lookZ) {
+                        d2 = (double)lookZ + 0.0D;
+                    }
+                    else {
+                        flag1 = false;
+                    }
+
+                    double d3 = 999.0D;
+                    double d4 = 999.0D;
+                    double d5 = 999.0D;
+                    double deltaX = lookingAt.x - vantage.x;
+                    double deltaY = lookingAt.y - vantage.y;
+                    double deltaZ = lookingAt.z - vantage.z;
+
+                    if (flag2) {
+                        d3 = (d0 - vantage.x) / deltaX;
+                    }
+                    if (flag) {
+                        d4 = (d1 - vantage.y) / deltaY;
+                    }
+                    if (flag1) {
+                        d5 = (d2 - vantage.z) / deltaZ;
+                    }
+                    if (d3 == -0.0D) {
+                        d3 = -1.0E-4D;
+                    }
+                    if (d4 == -0.0D) {
+                        d4 = -1.0E-4D;
+                    }
+                    if (d5 == -0.0D) {
+                        d5 = -1.0E-4D;
+                    }
+
+                    EnumFacing enumfacing;
+
+                    if (d3 < d4 && d3 < d5) {
+                        enumfacing = vantX > lookX ? EnumFacing.WEST : EnumFacing.EAST;
+                        vantage = new Vec3d(d0, vantage.y + deltaY * d3, vantage.z + deltaZ * d3);
+                    }
+                    else if (d4 < d5) {
+                        enumfacing = vantY > lookY ? EnumFacing.DOWN : EnumFacing.UP;
+                        vantage = new Vec3d(vantage.x + deltaX * d4, d1, vantage.z + deltaZ * d4);
+                    }
+                    else {
+                        enumfacing = vantZ > lookZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
+                        vantage = new Vec3d(vantage.x + deltaX * d5, vantage.y + deltaY * d5, d2);
+                    }
+
+                    lookX = MathHelper.floor(vantage.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+                    lookY = MathHelper.floor(vantage.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
+                    lookZ = MathHelper.floor(vantage.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+                    lookPos = new BlockPos(lookX, lookY, lookZ);
+                    IBlockState iblockstate1 = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
+                    Block block1 = iblockstate1.getBlock();
+
+                    AxisAlignedBB colBB2 = safeBounds.inBounds(lookPos, false) ? iblockstate1.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
+                    
+                    if (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL || colBB2 != Block.NULL_AABB) {
+                        if (block1.canCollideCheck(iblockstate1, stopOnLiquid)) {
+                            RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(world, lookPos, vantage, lookingAt);
+                            if (raytraceresult1 != null) {
+                                return raytraceresult1;
+                            }
+                        }
+                        else {
+                            raytraceresult2 = new RayTraceResult(RayTraceResult.Type.MISS, vantage, enumfacing, lookPos);
+                        }
+                    }
+                }
+
+                return returnLastUncollidableBlock ? raytraceresult2 : null;
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
 	
 	public static BlockPos findGround(World world, BlockPos startPos) {
 		MutableBlockPos pos = new MutableBlockPos(startPos);
