@@ -1,5 +1,9 @@
 Changelog:
 
+0.7.7c
+* Fixed mushroom islands biomes not populating with giant mushrooms
+* Adopted custom ray tracer to deal with cascading chunk lag errors
+
 0.7.7b
 * Fixed log DropCreator
 * BiomeDataBase now deals with invalid biomes gracefully.
