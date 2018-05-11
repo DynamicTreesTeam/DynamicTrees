@@ -80,7 +80,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
-		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return seedStack; }
+		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return new ItemStack(Seed.NULLSEED); }
 		@Override public void setupStandardSeedDropping() {}
 		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
@@ -127,7 +127,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	/** Hold damage value for seed items with multiple variants */
-	protected ItemStack seedStack = new ItemStack(Seed.NULLSEED);
+	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
 	protected IBlockState saplingBlock = Blocks.AIR.getDefaultState();
 	/** A place to store what drops from the species. Similar to a loot table */
@@ -157,6 +157,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		setLeavesProperties(leavesProperties);
 		
 		setStandardSoils();
+		seedStack = new ItemStack(Seed.NULLSEED);
 		
 		//Add JoCode models for worldgen
 		addJoCodes();

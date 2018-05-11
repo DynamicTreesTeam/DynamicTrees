@@ -55,6 +55,7 @@ public class TreeFamily {
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) { return false; }
+		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 	};
 	
 	/** Simple name of the tree e.g. "oak" */
@@ -72,7 +73,7 @@ public class TreeFamily {
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
-	private ItemStack stick = new ItemStack(Items.STICK);
+	private ItemStack stick;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 	
@@ -105,6 +106,7 @@ public class TreeFamily {
 		this.name = name;
 		
 		setDynamicBranch(createBranch());
+		stick = new ItemStack(Items.STICK);
 		createSpecies();
 	}
 	
