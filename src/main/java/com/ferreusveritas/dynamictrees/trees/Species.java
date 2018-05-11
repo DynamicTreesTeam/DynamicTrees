@@ -80,7 +80,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
-		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return new ItemStack(Seed.NULLSEED); }
+		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return new ItemStack(getSeed()); }
+		@Override public ItemStack getSeedStack(int qty) { return new ItemStack(getSeed()); }
 		@Override public void setupStandardSeedDropping() {}
 		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
