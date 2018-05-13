@@ -83,7 +83,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	@Override
 	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-		return ((Integer)state.getValue(AGE)).intValue() < 3;
+		return false;
 	}
 	
 	@Override
