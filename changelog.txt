@@ -1,5 +1,9 @@
 Changelog:
 
+0.7.7d
+* Fixed apple harvesting and disable non-functional bonemealing
+* Make branch climbing optional
+
 0.7.7c
 * Fixed mushroom islands biomes not populating with giant mushrooms
 * Adopted custom ray tracer to deal with cascading chunk lag errors
