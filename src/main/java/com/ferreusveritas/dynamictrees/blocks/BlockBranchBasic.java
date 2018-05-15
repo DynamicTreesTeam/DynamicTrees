@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.List;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -327,7 +328,7 @@ public class BlockBranchBasic extends BlockBranch {
 	// The result is that only thin branches and trunks can be climbed
 	@Override
 	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
-		return true;
+		return ModConfigs.enableBranchClimbling;
 	}
 	
 	@Override

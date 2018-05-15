@@ -22,6 +22,7 @@ public class ModConfigs {
 
 	public static boolean isLeavesPassable;
 	public static boolean vanillaLeavesCollision;
+	public static boolean enableBranchClimbling;
 	public static boolean canopyCrash;
 	public static EnumAxeDamage axeDamageMode;
 	
@@ -56,6 +57,7 @@ public class ModConfigs {
 		//Interaction
 		isLeavesPassable = config.getBoolean("isLeavesPassable", "interaction", false, "If enabled all leaves will be passable");
 		vanillaLeavesCollision = config.getBoolean("vanillaLeavesCollision", "interaction", false, "If enabled player movement on leaves will not be enhanced");
+		enableBranchClimbling = config.getBoolean("enableBranchClimbling", "interaction", true, "If enabled then thinner branches can be climbed");
 		canopyCrash = config.getBoolean("canopyCrash", "interaction", true, "If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction");
 		axeDamageMode = EnumAxeDamage.values()[config.getInt("axeDamageMode", "interaction", 1, 0, 2, "Modes: 0=Standard 1 Damage, 1=By Branch/Trunk Thickness, 2=By Tree Volume")];
 		
