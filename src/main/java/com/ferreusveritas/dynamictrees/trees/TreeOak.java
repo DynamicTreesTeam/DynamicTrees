@@ -131,8 +131,8 @@ public class TreeOak extends TreeFamily {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen, SafeChunkBounds safeBounds) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen, safeBounds);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
 			
 			//Generate Vines
 			vineGen.setQuantity(5).gen(world, rootPos.up(), endPoints, safeBounds);
@@ -183,18 +183,18 @@ public class TreeOak extends TreeFamily {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen, SafeChunkBounds safeBounds) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, worldGen, safeBounds);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
 			appleGen.setQuantity(10).setEnableHash(false).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3)).gen(world, rootPos.up(), endPoints, safeBounds);
 		}
 		
 		@Override
-		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 			if(ModConfigs.enableAppleTrees) {
 				IBlockState blockState = world.getBlockState(treePos);
 				BlockBranch branch = TreeHelper.getBranch(blockState);
 				
-				if(branch != null && branch.getRadius(blockState, world, treePos) >= 8 && !rapid) {
+				if(branch != null && branch.getRadius(blockState, world, treePos) >= 8 && !natural) {
 					NodeFindEnds endFinder = new NodeFindEnds();
 					TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 					appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds(), SafeChunkBounds.ANY);

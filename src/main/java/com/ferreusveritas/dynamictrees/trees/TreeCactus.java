@@ -92,7 +92,7 @@ public class TreeCactus extends TreeFamily {
 		}
 		
 		@Override
-		public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+		public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
 			return false;
 		}
 		
@@ -202,7 +202,7 @@ public class TreeCactus extends TreeFamily {
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself
-				species.postGeneration(world, rootPos, biome, radius, endPoints, !careful, safeBounds);
+				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
 			} else { // The growth failed.. turn the soil back to what it was
 				world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 			}

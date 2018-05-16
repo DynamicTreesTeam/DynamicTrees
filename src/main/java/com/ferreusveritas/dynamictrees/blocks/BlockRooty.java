@@ -137,7 +137,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	///////////////////////////////////////////
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
-		updateTree(state, world, pos, random, false);
+		updateTree(state, world, pos, random, true);
 	}
 	
 	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos rootPos) {
@@ -149,9 +149,10 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	 * @param world
 	 * @param rootPos
 	 * @param random
+	 * @param natural
 	 * @return false if tree was not found
 	 */
-	public boolean updateTree(IBlockState rootyState, World world, BlockPos rootPos, Random random, boolean rapid) {
+	public boolean updateTree(IBlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
 		
 		if(CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 			
@@ -164,7 +165,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
 				
 				if(treeBase != TreeHelper.nullTreePart) {
-					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, rapid);
+					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, natural);
 				}
 			}
 			

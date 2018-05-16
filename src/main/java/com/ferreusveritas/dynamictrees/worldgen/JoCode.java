@@ -130,6 +130,8 @@ public class JoCode {
 		IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
 		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
 
+		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+		
 		//A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);
 		BlockPos treePos = rootPos.up();
@@ -159,7 +161,7 @@ public class JoCode {
 					IBlockState testBlockState = world.getBlockState(cellPos);
 					Block testBlock = testBlockState.getBlock();
 					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), careful ? 2 : 16);//Flag 16 to prevent observers from causing cascading lag
+						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
 					}
 				} else {
 					leafMap.setVoxel(cellPos, (byte) 0);
@@ -175,13 +177,13 @@ public class JoCode {
 			}
 			
 			//Age volume for 3 cycles using a leafmap
-			TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations());
+			TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
 			
 			//Rot the unsupported branches
-			species.handleRot(world, endPoints, rootPos, treePos, 0, true);
+			species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds);
 			
 			//Allow for special decorations by the tree itself
-			species.postGeneration(world, rootPos, biome, radius, endPoints, !careful, safeBounds);
+			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
 		
 			//Add snow to parts of the tree in chunks where snow was already placed
 			addSnow(leafMap, world, rootPos, biome);

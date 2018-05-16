@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
@@ -110,19 +111,20 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		//if(random.nextInt() % 4 == 0) {
-			age(worldIn, pos, state, rand, false);
+			age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 		//}
 	}
 	
 	
 	@Override
-	public int age(World world, BlockPos pos, IBlockState state, Random rand, boolean rapid) {
+	public int age(World world, BlockPos pos, IBlockState state, Random rand, SafeChunkBounds safeBounds) {
 		ILeavesProperties leavesProperties = getProperties(state);
 		int oldHydro = state.getValue(BlockDynamicLeaves.HYDRO);
+		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
 		//Check hydration level.  Dry leaves are dead leaves.
 		int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
-		if(newHydro == 0 || (!rapid && !hasAdequateLight(state, world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
+		if(newHydro == 0 || (!worldGen && !hasAdequateLight(state, world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			world.setBlockToAir(pos);//No water, no light .. no leaves
 			return -1;//Leaves were destroyed
 		} else { 
@@ -134,15 +136,13 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		}
 		
 		//We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
-		if(!rapid) {//During worldgen we are not interesting in making new leaves
-			for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
-				if(newHydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
-					BlockPos offpos = pos.offset(dir);
-					if(isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
-						int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
-						if(hydro > 0) {
-							world.setBlockState(offpos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
-						}
+		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
+			if(newHydro > 1 || rand.nextInt(4) == 0 ) {//we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
+				BlockPos offpos = pos.offset(dir);
+				if(safeBounds.inBounds(offpos, true) && isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) {//Attempt to grow new leaves
+					int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
+					if(hydro > 0) {
+						world.setBlockState(offpos, leavesProperties.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
 					}
 				}
 			}

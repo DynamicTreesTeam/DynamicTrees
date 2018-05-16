@@ -87,7 +87,7 @@ public class TreeSpruce extends TreeFamily {
 		}
 		
 		@Override
-		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 			if(ModConfigs.podzolGen) {
 				NodeFindEnds endFinder = new NodeFindEnds();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
@@ -97,7 +97,7 @@ public class TreeSpruce extends TreeFamily {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen, SafeChunkBounds safeBounds) {
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
 			//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
 			BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
 			world.setBlockState(highest.up(1), leavesProperties.getDynamicLeavesState(4));

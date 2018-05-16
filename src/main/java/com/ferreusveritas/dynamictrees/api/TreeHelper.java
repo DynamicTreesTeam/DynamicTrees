@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.block.Block;
@@ -64,7 +65,7 @@ public class TreeHelper {
 	
 	/**
 	 * Convenience method to pulse a single growth cycle and age the cuboid volume.
-	 * Used by the growth potion and the dendrocoil.
+	 * Used by growth potions, fertilizers and the dendrocoil.
 	 * 
 	 * @param world
 	 * @param rootPos
@@ -73,8 +74,8 @@ public class TreeHelper {
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
-			dirt.updateTree(rootyState, world, rootPos, world.rand, true);
-			ageVolume(world, rootPos, 8, 32, 1);//blindly age a cuboid volume
+			dirt.updateTree(rootyState, world, rootPos, world.rand, false);
+			ageVolume(world, rootPos, 8, 32, 1, SafeChunkBounds.ANY);//blindly age a cuboid volume
 		}
 	}
 	
@@ -86,7 +87,7 @@ public class TreeHelper {
 	 * @param iterMap The voxel map of hydrovalues to use as a iterator
 	 * @param iterations The number of times to age the map
 	 */
-	public static void ageVolume(World world, SimpleVoxmap leafMap, int iterations){
+	public static void ageVolume(World world, SimpleVoxmap leafMap, int iterations, SafeChunkBounds safeBounds){
 		
 		//The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
 		SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
@@ -98,7 +99,7 @@ public class TreeHelper {
 				Block block = blockState.getBlock();
 				if(block instanceof BlockDynamicLeaves) {//Special case for leaves
 					int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
-					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.rand, true);//Get new values from neighbors
+					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);//Get new values from neighbors
 					if(newHydro == -1) {
 						//Leaf block died.  Take it out of the leafMap and iterMap
 						leafMap.setVoxel(iPos, (byte) 0);
@@ -119,8 +120,8 @@ public class TreeHelper {
 						}
 					}
 				}
-				else if(block instanceof IAgeable) {//Treat just a regular ageable block
-					((IAgeable)block).age(world, iPos, blockState, world.rand, true);
+				else if(block instanceof IAgeable) {//Treat as just a regular ageable block
+					((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);
 				} else {//You're not supposed to be here
 					leafMap.setVoxel(iPos, (byte) 0);
 					iterMap.setVoxel(iPos, (byte) 0);
@@ -140,7 +141,7 @@ public class TreeHelper {
 	 * @param height The height of the cuboid volume
  	 * @param iterations The number of times to age the volume
 	 */
-	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, int iterations){
+	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, int iterations, SafeChunkBounds safeBounds){
 		//Slow and dirty iteration over a cuboid volume.  Try to avoid this by using a voxmap if you can
 		Iterable<MutableBlockPos> iterable = BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		for(int i = 0; i < iterations; i++) {
@@ -148,7 +149,7 @@ public class TreeHelper {
 				IBlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
-					((IAgeable)block).age(world, iPos, blockState, world.rand, true);//Treat just a regular ageable block
+					((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);//Treat as just a regular ageable block
 				}
 			}
 		}

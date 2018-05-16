@@ -524,6 +524,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively.
 	 * If the rapid option is enabled then drops, fruit and disease are skipped.
+	 * 
+	 * This should never be run by the world generator.
 	 *  
 	 *  
 	 * @param world The world
@@ -532,20 +534,20 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
-	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
+	 * @param natural Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
-	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
 		//This will prune rotted positions from the world and the end point list
-		if(handleRot(world, ends, rootPos, treePos, soilLife, false)) {
+		if(handleRot(world, ends, rootPos, treePos, soilLife, SafeChunkBounds.ANY)) {
 			return false;//Last piece of tree rotted away.
 		}
 		
-		if(!rapid) {
+		if(natural) {
 			//This will handle seed drops
 			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
 			
@@ -555,7 +557,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			}
 		}
 		
-		return grow(world, rootyDirt, rootPos, soilLife, treeBase, treePos, random, rapid);
+		return grow(world, rootyDirt, rootPos, soilLife, treeBase, treePos, random, natural);
 	}
 	
 	/**
@@ -580,10 +582,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link TreeFamily}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
 	 * @param soilLife The soil life of the {@link BlockRooty}
-	 * @param rapid Whether or not this {@link TreeFamily} is to be process rapidly.
+	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
 	 */
-	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
@@ -595,9 +597,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			if(branch != null) {
 				int radius = branch.getRadius(branchState, world, endPos);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
-				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, rapid) || radius != 1) {
-					if(rapid) {
-						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2);
+				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, safeBounds != SafeChunkBounds.ANY) || radius != 1) {
+					if(safeBounds != SafeChunkBounds.ANY) { //worldgen
+						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
 					}
 					iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 				}
@@ -654,10 +656,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
-	 * @param rapid Set this to true if this member is being used to quickly grow the tree(no drops or fruit)
+	 * @param natural Set this to true if this member is being used to grow the tree naturally(create drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
-	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
 		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
 		do {
@@ -674,7 +676,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			}
 		} while(--growthRate > 0.0f);
 		
-		return postGrow(world, rootPos, treePos, soilLife, rapid);
+		return postGrow(world, rootPos, treePos, soilLife, natural);
 	}
 	
 	/**
@@ -740,7 +742,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param treePos
 	 * @param soilLife
 	 */
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean rapid) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 		return true;
 	}
 	
@@ -975,7 +977,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
 	 * @param worldGen true if this is being generated by the world generator, false if it's the staff, dendrocoil, etc.
 	 */
-	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, boolean worldGen, SafeChunkBounds safeBounds) {}
+	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {}
 	
 	/**
 	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
