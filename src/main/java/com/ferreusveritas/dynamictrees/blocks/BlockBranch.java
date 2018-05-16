@@ -260,10 +260,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 	
-	public List<ItemStack> getLogDrops(World world, BlockPos pos, int volume) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, int volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
 		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
-		return getFamily().getCommonSpecies().getLogsDrops(world, pos, ret, volume);
+		return species.getLogsDrops(world, pos, ret, volume);
 	}
 	
 	/*
@@ -304,8 +304,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		int radius = getRadius(state, world, pos);
+		Species species = TreeHelper.getExactSpecies(state, world, pos);
 		int woodVolume = destroyBranchFromNode(world, pos, false);
-		List<ItemStack> items = getLogDrops(world, pos, (int)(woodVolume * fortuneFactor));
+		List<ItemStack> items = getLogDrops(world, pos, species, (int)(woodVolume * fortuneFactor));
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, radius, woodVolume);
@@ -399,7 +400,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		int woodVolume = destroyBranchFromNode(world, pos, false);
-		for (ItemStack item : getLogDrops(world, pos, woodVolume)) {
+		for (ItemStack item : getLogDrops(world, pos, getFamily().getCommonSpecies(), woodVolume)) {
 			spawnAsEntity(world, pos, item);
 		}
 	}
