@@ -399,9 +399,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-		int woodVolume = destroyBranchFromNode(world, pos, false);
-		for (ItemStack item : getLogDrops(world, pos, getFamily().getCommonSpecies(), woodVolume)) {
-			spawnAsEntity(world, pos, item);
+		IBlockState state = world.getBlockState(pos);
+		if(state.getBlock() == this) {
+			Species species = TreeHelper.getExactSpecies(state, world, pos);
+			int woodVolume = destroyBranchFromNode(world, pos, false);
+			for (ItemStack item : getLogDrops(world, pos, species, woodVolume)) {
+				spawnAsEntity(world, pos, item);
+			}
 		}
 	}
 	
