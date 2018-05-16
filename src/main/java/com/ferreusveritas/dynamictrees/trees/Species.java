@@ -75,8 +75,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
 		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
-		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
+		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
@@ -130,7 +130,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** Hold damage value for seed items with multiple variants */
 	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
-	protected IBlockState saplingBlock = Blocks.AIR.getDefaultState();
+	protected IBlockState saplingBlock;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 	
@@ -140,6 +140,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
 	
+	/**
+	 * Constructor only used by NULLSPECIES
+	 */
 	public Species() {
 		this.treeFamily = TreeFamily.NULLFAMILY;
 		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
@@ -159,6 +162,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		setStandardSoils();
 		seedStack = new ItemStack(Seed.NULLSEED);
+		saplingBlock = Blocks.AIR.getDefaultState();
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
