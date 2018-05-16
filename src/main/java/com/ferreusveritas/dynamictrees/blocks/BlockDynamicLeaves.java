@@ -35,7 +35,6 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -244,7 +243,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				if (entity.motionY > 0 && entity.motionY < 0.25D) {
 					entity.motionY += 0.025;//Allow a little climbing
 				}
-
+			
 			entity.setSprinting(false);//One cannot sprint upon tree tops
 			entity.motionX *= 0.25D;//Make travel slow and laborious
 			entity.motionZ *= 0.25D;
@@ -308,7 +307,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return world.isAirBlock(pos) && hasAdequateLight(blockState, world, leavesProperties, pos);
 	}
 	
-
+	
 	
 	/** Check to make sure the leaves have enough light to exist */
 	public boolean hasAdequateLight(IBlockState blockState, World world, ILeavesProperties leavesProperties, BlockPos pos) {
@@ -550,7 +549,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		ret.add(stack);
 		return ret;
 	}
-
+	
 	//////////////////////////////
 	// RENDERING FUNCTIONS
 	//////////////////////////////
@@ -584,7 +583,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
 		return 0;
 	}
-
+	
 	/**
 	 * Generally Leaves blocks should not be analyzed
 	 */
@@ -619,20 +618,19 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return Blocks.LEAVES.isOpaqueCube(state);
 	}
 	
-    @Override
+	@Override
 	@SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
-    	return super.getBlockLayer();
-    }
-    
-    @Override
+	public BlockRenderLayer getBlockLayer() {
+		return Blocks.LEAVES.getBlockLayer();
+	}
+	
+	@Override
 	@SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-    	setGraphicsLevel(Minecraft.isFancyGraphicsEnabled());
+	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+		setGraphicsLevel(!Blocks.LEAVES.isOpaqueCube(blockState));
 		return super.shouldSideBeRendered(blockState, blockAccess, pos, side); 
 	}
-    
+	
 	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.LEAVES;
