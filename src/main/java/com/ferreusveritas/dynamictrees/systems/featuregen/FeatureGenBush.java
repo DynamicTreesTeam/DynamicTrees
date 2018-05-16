@@ -68,7 +68,7 @@ public class FeatureGenBush implements IGenFeature {
 				MutableBlockPos leafPos = new MutableBlockPos();
 				for (MutableBlockPos dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
-					if ((coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+					if ((coordHashCode(leafPos) % 5) != 0 && safeBounds.inBounds(leafPos, false) && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
 						world.setBlockState(leafPos, (secondaryLeavesState == null || world.rand.nextInt(4) != 0) ? leavesState : secondaryLeavesState);
 					}
 				}
