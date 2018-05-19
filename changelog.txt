@@ -1,5 +1,10 @@
 Changelog:
 
+0.7.7e
+* Attempt to fix Optifine leaves "flickering" problem
+* Add safebounds to ageable to prevent Cascading Chunk Lag
+* Explosions and harvesting now drop species sensitive logs
+
 0.7.7d
 * Fixed apple harvesting and disable non-functional bonemealing
 * Make branch climbing optional
