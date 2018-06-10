@@ -1,0 +1,45 @@
+itemGroup.dynamictrees=Dynamic Trees
+
+tile.rootydirt.name=Terre Racineuse
+tile.rootysand.name=Sable Racineuse
+
+tile.leaves0.name=Feuilles Dynamiques
+tile.leaves1.name=Feuilles Dynamiques
+
+tile.oakbranch.name=Chêne Dynamique
+tile.sprucebranch.name=Épicéa Dynamique
+tile.birchbranch.name=Bouleau Dynamique
+tile.junglebranch.name=Arbre de Jungle Dynamique
+tile.darkoakbranch.name=Chêne Noir Dynamique
+tile.acaciabranch.name=Acacia Dynamique
+tile.cactusbranch.name=Cactus Dynamique
+
+tile.dynamictrees:oakbranch.name=Chêne Dynamique
+tile.dynamictrees:sprucebranch.name=Épicéa Dynamique
+tile.dynamictrees:birchbranch.name=Bouleau Dynamique
+tile.dynamictrees:junglebranch.name=Arbre de Jungle Dynamique
+tile.dynamictrees:darkoakbranch.name=Chêne Noir Dynamique
+tile.dynamictrees:acaciabranch.name=Acacia Dynamique
+tile.dynamictrees:cactusbranch.name=Cactus Dynamique
+
+item.oakseed.name=Gland de Chêne
+item.spruceseed.name=Pomme d'Épicéa
+item.birchseed.name=Graine de Bouleau
+item.jungleseed.name=Cosse d'arbre de Jungle
+item.darkoakseed.name=Gland de Chêne Noir
+item.acaciaseed.name=Graine d'Acacia
+item.appleseed.name=Pépin de Pomme
+item.cactusseed.name=Graine de Cactus
+
+item.dendropotion.biochar.name=Potion Biochar
+item.dendropotion.depletion.name=Potion d'Épuisement
+item.dendropotion.defoliance.name=Potion de Défoliance
+item.dendropotion.burgeoning.name=Potion de Bourgeonnement
+item.dendropotion.fertility.name=Potion de Fertilité
+item.dendropotion.persistance.name=Potion de Persistance
+item.dendropotion.transform.name=Potion de Transformation
+
+item.dirtbucket.name=Saut de Terre
+item.staff.name=Bâton Forestier
+tile.dendrocoil.name=Dendrocoil
+tile.bonsaipot.name=Pot pour Bonzaï
