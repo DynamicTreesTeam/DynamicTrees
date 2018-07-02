@@ -1,12 +1,11 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
@@ -14,6 +13,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -51,33 +51,85 @@ public class Seed extends Item {
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
 
-		World world = entityItem.world;
+		if(entityItem.lifespan == 6000) { //6000(5 minutes) is the default lifespan for an entity item
+			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20;//override default lifespan with new value + 20 ticks(1 second)
+			if(entityItem.lifespan == 6000) {
+				entityItem.lifespan = 6001;//Ensure this isn't run again
+			}
+		}
 		
-		if(entityItem.ticksExisted >= ModConfigs.seedTimeToLive) {//1 minute by default(helps with lag)
+		if(entityItem.ticksExisted >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
+			World world = entityItem.world;
 			if(!world.isRemote) {//Server side only
+				ItemStack seedStack = entityItem.getItem();
 				BlockPos pos = new BlockPos(entityItem);
-				if(world.canBlockSeeSky(pos)) {
-					Random rand = new Random();
-					ItemStack seedStack = entityItem.getItem();			
-					SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, species, pos);
-					MinecraftForge.EVENT_BUS.post(seedVolEvent);
-					if(!seedVolEvent.isCanceled()) {
-						int count = seedStack.getCount();
-						while(count-- > 0) {
-							if( seedVolEvent.doForcePlant() || (getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate > rand.nextFloat())){
-								if(getSpecies(seedStack).plantSapling(world, pos)) {
-									break;
-								}
-							}
-						}
+				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(seedStack), pos, shouldPlant(world, pos, seedStack));
+				MinecraftForge.EVENT_BUS.post(seedVolEvent);
+				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
+					Species species = seedVolEvent.getSpecies();
+					String joCode = getJoCode(seedStack);
+					if(!joCode.isEmpty()) {
+						species.getJoCode(joCode).setCareful(true).generate(world, species, pos, world.getBiome(pos), EnumFacing.NORTH, 8, SafeChunkBounds.ANY);
+					} else {
+						species.plantSapling(world, pos);
 					}
-					seedStack.setCount(0);
 				}
+				seedStack.setCount(0);
 			}
 			entityItem.setDead();
 		}
 
 		return false;
+	}
+	
+	public boolean shouldPlant(World world, BlockPos pos, ItemStack seedStack) {
+		
+		if(hasForcePlant(seedStack)) {
+			return true;
+		}
+		
+		if(!world.canBlockSeeSky(pos)) {
+			return false;
+		}
+		
+		float plantChance = getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate;		
+		float accum = 1.0f;
+		int count = seedStack.getCount();
+		while(count-- > 0) {
+			accum *= 1.0f - plantChance;
+		}
+		plantChance = 1.0f - accum;
+		
+		return plantChance > world.rand.nextFloat();
+	}
+	
+	public boolean hasForcePlant(ItemStack seedStack) {
+		boolean forcePlant = false;
+		if(seedStack.hasTagCompound()) {
+			NBTTagCompound nbtData = seedStack.getTagCompound();
+			forcePlant = nbtData.getBoolean("forceplant");
+		}
+		return forcePlant;
+	}
+	
+	public int getTimeToLive(ItemStack seedStack) {
+		int lifespan = ModConfigs.seedTimeToLive;//1 minute by default(helps with lag)
+		if(seedStack.hasTagCompound()) {
+			NBTTagCompound nbtData = seedStack.getTagCompound();
+			if(nbtData.hasKey("lifespan")) {
+				lifespan = nbtData.getInteger("lifespan");
+			}
+		}
+		return lifespan;
+	}
+	
+	public String getJoCode(ItemStack seedStack) {
+		String joCode = "";
+		if(seedStack.hasTagCompound()) {
+			NBTTagCompound nbtData = seedStack.getTagCompound();
+			joCode = nbtData.getString("jocode");
+		}
+		return joCode;
 	}
 	
 	public EnumActionResult onItemUseFlowerPot(EntityPlayer player, World world, BlockPos pos, EnumHand hand, ItemStack seedStack, EnumFacing facing, float hitX, float hitY, float hitZ) {
