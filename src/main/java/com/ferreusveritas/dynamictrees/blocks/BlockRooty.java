@@ -226,10 +226,10 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		return getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
 	}
 	
-	public void destroyTree(World world, BlockPos pos) {
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos.up()));
+	public void destroyTree(World world, BlockPos rootPos) {
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
-			branch.destroyBranchFromNode(world, pos.up(), true);
+			branch.destroyBranchFromNode(world, rootPos.up(), true);
 		}
 	}
 	
