@@ -75,7 +75,7 @@ public class Staff extends Item {
 			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
 			if(species != Species.NULLSPECIES) {
 				if(!player.isSneaking()) {
-					String code = new JoCode().buildFromTree(world, rootPos, getPlayerDirection(player)).toString();
+					String code = new JoCode().buildFromTree(world, rootPos, player.getHorizontalFacing()).toString();
 					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}
@@ -87,7 +87,7 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), getPlayerDirection(player), 8, SafeChunkBounds.ANY);
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
@@ -179,10 +179,6 @@ public class Staff extends Item {
 		return code;
 	}
 
-	public EnumFacing getPlayerDirection(EntityPlayer player) {
-		return player.getHorizontalFacing();
-	}
-	
 	/**
 	* returns the action that specifies what animation to play when the items are being used
 	*/

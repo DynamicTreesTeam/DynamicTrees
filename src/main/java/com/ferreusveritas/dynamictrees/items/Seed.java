@@ -66,19 +66,26 @@ public class Seed extends Item {
 				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(seedStack), pos, shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
 				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
-					Species species = seedVolEvent.getSpecies();
-					String joCode = getJoCode(seedStack);
-					if(!joCode.isEmpty()) {
-						species.getJoCode(joCode).setCareful(true).generate(world, species, pos, world.getBiome(pos), EnumFacing.NORTH, 8, SafeChunkBounds.ANY);
-					} else {
-						species.plantSapling(world, pos);
-					}
+					doPlanting(world, pos, null, seedStack);
 				}
 				seedStack.setCount(0);
 			}
 			entityItem.setDead();
 		}
 
+		return false;
+	}
+	
+	public boolean doPlanting(World world, BlockPos pos, EntityPlayer planter, ItemStack seedStack) {
+		Species species = getSpecies(seedStack);
+		if(species.plantSapling(world, pos)) {//Do the planting
+			String joCode = getJoCode(seedStack);
+			if(!joCode.isEmpty()) {
+				world.setBlockToAir(pos);//Remove the newly created dynamic sapling
+				species.getJoCode(joCode).setCareful(true).generate(world, species, pos.down(), world.getBiome(pos), planter != null ? planter.getHorizontalFacing() : EnumFacing.NORTH, 8, SafeChunkBounds.ANY);
+			}
+			return true;
+		}
 		return false;
 	}
 	
@@ -149,10 +156,10 @@ public class Seed extends Item {
 	}
 	
 	public EnumActionResult onItemUsePlantSeed(EntityPlayer player, World world, BlockPos pos, EnumHand hand, ItemStack seedStack, EnumFacing facing, float hitX, float hitY, float hitZ) {
-
+		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
-				if(getSpecies(seedStack).plantSapling(world, pos.up())) {//Do the planting
+				if(doPlanting(world, pos.up(), player, seedStack)) {
 					seedStack.shrink(1);
 					return EnumActionResult.SUCCESS;
 				}
