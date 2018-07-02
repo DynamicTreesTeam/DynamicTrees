@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.items;
 
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
@@ -9,6 +11,7 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -79,7 +82,7 @@ public class Seed extends Item {
 	public boolean doPlanting(World world, BlockPos pos, EntityPlayer planter, ItemStack seedStack) {
 		Species species = getSpecies(seedStack);
 		if(species.plantSapling(world, pos)) {//Do the planting
-			String joCode = getJoCode(seedStack);
+			String joCode = getCode(seedStack);
 			if(!joCode.isEmpty()) {
 				world.setBlockToAir(pos);//Remove the newly created dynamic sapling
 				species.getJoCode(joCode).setCareful(true).generate(world, species, pos.down(), world.getBiome(pos), planter != null ? planter.getHorizontalFacing() : EnumFacing.NORTH, 8, SafeChunkBounds.ANY);
@@ -130,11 +133,11 @@ public class Seed extends Item {
 		return lifespan;
 	}
 	
-	public String getJoCode(ItemStack seedStack) {
+	public String getCode(ItemStack seedStack) {
 		String joCode = "";
 		if(seedStack.hasTagCompound()) {
 			NBTTagCompound nbtData = seedStack.getTagCompound();
-			joCode = nbtData.getString("jocode");
+			joCode = nbtData.getString("code");
 		}
 		return joCode;
 	}
@@ -184,6 +187,25 @@ public class Seed extends Item {
 		}
 
 		return EnumActionResult.FAIL;
+	}
+	
+	@Override
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, world, tooltip, flagIn);
+		
+		if(stack.hasTagCompound()) {
+			String joCode = getCode(stack);
+			if(!joCode.isEmpty()) {
+				tooltip.add("Code: §6" + joCode);
+			}
+			if(hasForcePlant(stack)) {
+				tooltip.add("Force Planting: §3Enabled");
+			}
+			NBTTagCompound nbtData = stack.getTagCompound();
+			if(nbtData.hasKey("lifespan")) {
+				tooltip.add("Seed Life Span: §3" + nbtData.getInteger("lifespan") );
+			}
+		}
 	}
 	
 }
