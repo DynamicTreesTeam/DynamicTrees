@@ -11,20 +11,25 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 @Cancelable
 public class SeedVoluntaryPlantEvent extends Event  {
 
-	EntityItem seedEntityItem;
-	ItemStack seedStack;
-	Species species;
-	BlockPos pos;//Where the sapling will be created
-	boolean forcePlant = false;
+	protected EntityItem seedEntityItem;
+	protected ItemStack seedStack;
+	protected Species species;
+	protected BlockPos pos;//Where the sapling will be created
+	protected boolean willPlant = false;
 	
-	public SeedVoluntaryPlantEvent(EntityItem entityItem, Species species, BlockPos pos) {
+	public SeedVoluntaryPlantEvent(EntityItem entityItem, Species species, BlockPos pos, boolean willPlant) {
 		this.seedEntityItem = entityItem;
 		this.pos = pos;
 		this.species = species;
+		this.willPlant = willPlant;
 	}
 	
 	public Species getSpecies() {
 		return species;
+	}
+	
+	public void setSpecies(Species species) {
+		this.species = species;
 	}
 	
 	public EntityItem getEntityItem() {
@@ -40,11 +45,11 @@ public class SeedVoluntaryPlantEvent extends Event  {
 	 *  
 	 * @param force true to force sapling to plant.  false will allow nature to take it's coarse.
 	 */
-	public void forcePlanting(boolean force) {
-		this.forcePlant = force;
+	public void setWillPlant(boolean willPlant) {
+		this.willPlant = willPlant;
 	}
 	
-	public boolean doForcePlant() {
-		return forcePlant;
+	public boolean getWillPlant() {
+		return willPlant;
 	}
 }
