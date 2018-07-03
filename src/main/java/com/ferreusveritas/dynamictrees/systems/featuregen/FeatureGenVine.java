@@ -19,7 +19,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 public class FeatureGenVine implements IGenFeature {
-
+	
 	protected final PropertyBool vineMap[] = new PropertyBool[] {null, null, BlockVine.NORTH, BlockVine.SOUTH, BlockVine.WEST, BlockVine.EAST};
 	protected int qty = 4;
 	protected int maxLength = 8;

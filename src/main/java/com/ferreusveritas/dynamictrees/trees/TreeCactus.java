@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
@@ -32,6 +33,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -119,12 +121,12 @@ public class TreeCactus extends TreeFamily {
 		
 		@Override
 		public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
-
+			
 			// Prevent transformation potions from being used on Cacti
 			if(!(getSubstanceEffect(itemStack) instanceof SubstanceTransform)) {
 				return super.applySubstance(world, rootPos, hitPos, player, hand, itemStack);
 			}
-
+			
 			return false;
 		}
 		
@@ -146,12 +148,12 @@ public class TreeCactus extends TreeFamily {
 	public BlockBranch createBranch() {
 		return new BlockBranchCactus("cactusbranch");
 	}
-
+	
 	@Override
 	public float getPrimaryThickness() {
 		return 5.0f;
 	}
-
+	
 	@Override
 	public float getSecondaryThickness() {
 		return 4.0f;
@@ -184,7 +186,7 @@ public class TreeCactus extends TreeFamily {
 		public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
 			IBlockState initialState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
 			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
-
+			
 			// A Tree generation boundary radius is at least 2 and at most 8
 			radius = MathHelper.clamp(radius, 2, 8);
 			BlockPos treePos = rootPos.up();
@@ -192,7 +194,7 @@ public class TreeCactus extends TreeFamily {
 			// Create tree
 			setFacing(facing);
 			generateFork(world, species, 0, rootPos, false);
-
+			
 			// Fix branch thicknesses and map out leaf locations
 			BlockBranch branch = TreeHelper.getBranch(world.getBlockState(treePos));
 			if(branch != null) {//If a branch exists then the growth was successful
@@ -203,6 +205,7 @@ public class TreeCactus extends TreeFamily {
 				
 				// Allow for special decorations by the tree itself
 				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
+				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds));
 			} else { // The growth failed.. turn the soil back to what it was
 				world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 			}

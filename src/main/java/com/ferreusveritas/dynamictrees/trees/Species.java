@@ -121,7 +121,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected int soilLongevity = 8;
 	
 	protected HashSet<Block> soilList = new HashSet<Block>();
-
+	
 	//Leaves
 	protected ILeavesProperties leavesProperties;
 	
@@ -270,7 +270,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return ItemStack.EMPTY;
 	}
-
+	
 	//It's mostly for seeds.. mostly.
 	public void setupStandardSeedDropping() {
 		addDropCreator(new DropCreatorSeed());
@@ -279,7 +279,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean addDropCreator(IDropCreator dropCreator) {
 		return dropCreatorStorage.addDropCreator(dropCreator);
 	}
-
+	
 	public boolean remDropCreator(ResourceLocation dropCreatorName) {
 		return dropCreatorStorage.remDropCreator(dropCreatorName);
 	}
@@ -366,13 +366,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
 			if(world.rand.nextDouble() < slowFactor) {
 				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
-
+				
 				if(!drops.isEmpty() && !endPoints.isEmpty()) {
 					for(ItemStack drop: drops) {
 						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
 						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
 						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos, SafeChunkBounds.ANY);
-
+						
 						if(itemPos != BlockPos.ORIGIN) {
 							EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
 							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
@@ -390,7 +390,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return true;
 	}
-
+	
 	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
@@ -477,7 +477,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public void addAcceptableSoil(Block ... soilBlocks) {
 		Collections.addAll(soilList, soilBlocks);
 	}
-
+	
 	public void remAcceptableSoil(Block soilBlock) {
 		soilList.remove(soilBlock);
 	}
@@ -520,7 +520,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//////////////////////////////
 	// GROWTH
 	//////////////////////////////
-
+	
 	/**
 	 * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively.
 	 * If the rapid option is enabled then drops, fruit and disease are skipped.
@@ -538,7 +538,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
 	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
-
+		
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
@@ -608,7 +608,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		
 		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
-
+	
 	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 	
 	/**
@@ -794,7 +794,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		float ugs = ModConfigs.scaleBiomeGrowthRate;//universal growth scalar
-
+		
 		if(ugs == 1.0f || isBiomePerfect(biome)) {
 			return 1.0f;
 		}
@@ -835,7 +835,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return false;
 	}
-
+	
 	//////////////////////////////
 	// INTERACTIVE
 	//////////////////////////////
@@ -926,7 +926,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//////////////////////////////
 	// WORLDGEN
 	//////////////////////////////
-
+	
 	/**
 	 * Default worldgen spawn mechanism.
 	 * This method uses JoCodes to generate tree models.
@@ -988,11 +988,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}
-
+	
 	public int getWorldGenLeafMapHeight() {
 		return 32;
 	}
-
+	
 	public int getWorldGenAgeIterations() {
 		return 3;
 	}
@@ -1005,5 +1005,5 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public String toString() {
 		return getRegistryName().toString();
 	}
-
+	
 }

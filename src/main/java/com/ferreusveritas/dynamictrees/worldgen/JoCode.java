@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -25,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.MinecraftForge;
 
 /**
 * So named because the base64 codes it generates almost always start with "JO"
@@ -34,32 +36,32 @@ import net.minecraft.world.biome.Biome;
 * @author ferreusveritas
 */
 public class JoCode {
-
+	
 	static private final String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	static protected final byte forkCode = 6;
 	static protected final byte returnCode = 7;
-
+	
 	public ArrayList<Byte> instructions;
 	protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
-
+	
 	public JoCode() {
 		instructions = new ArrayList<Byte>();
 	}
-
+	
 	public JoCode(String code) {
 		loadCode(code);
 	}
-
+	
 	public JoCode loadCode(String code) {
 		instructions = decode(code);
 		return this;
 	}
-
+	
 	public JoCode setCareful(boolean c) {
 		careful = c;
 		return this;
 	}
-
+	
 	/**
 	 * A facing matrix for mapping instructions to different rotations
 	 */
@@ -72,11 +74,11 @@ public class JoCode {
 			{0, 1, 5, 4, 2, 3, 6, 7},//FACING WEST:	 N->E S->W W->N E->S 90 CW
 			{0, 1, 4, 5, 3, 2, 6, 7},//FACING EAST:	 N->W S->E W->S E->N 90 CCW
 		};
-
+	
 	//"Pointers" to the current rotation direction.
 	private int facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 	private int unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
-
+	
 	/**
 	 * Get the instruction at a locus.  
 	 * Automatically performs rotation based on what facing matrix is selected.
@@ -87,7 +89,7 @@ public class JoCode {
 	protected int getCode(int pos) {
 		return unfacingMap[instructions.get(pos)];
 	}
-
+	
 	/**
 	 * Sets the active facing matrix to a specific direction
 	 * 
@@ -101,7 +103,7 @@ public class JoCode {
 		unfacingMap = dirmap[faceNum];
 		return this;
 	}
-
+	
 	/**
 	 * Rotates the JoCode such that the model's "north" faces a new direction.
 	 * 
@@ -115,7 +117,7 @@ public class JoCode {
 		}
 		return this;
 	}
-
+	
 	/**
 	* Generate a tree from a JoCode instruction list.
 	* 
@@ -129,7 +131,7 @@ public class JoCode {
 	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
 		IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
 		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
-
+		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
 		//A Tree generation boundary radius is at least 2 and at most 8
@@ -139,7 +141,7 @@ public class JoCode {
 		//Create tree
 		setFacing(facing);
 		generateFork(world, species, 0, rootPos, false);
-
+		
 		//Fix branch thicknesses and map out leaf locations
 		IBlockState treeState = world.getBlockState(treePos);
 		BlockBranch branch = TreeHelper.getBranch(treeState);
@@ -184,14 +186,15 @@ public class JoCode {
 			
 			//Allow for special decorations by the tree itself
 			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
-		
+			MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds));
+			
 			//Add snow to parts of the tree in chunks where snow was already placed
 			addSnow(leafMap, world, rootPos, biome);
 			
 		} else { //The growth failed.. turn the soil back to what it was
 			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
 		}
-
+		
 	}
 	
 	/**
@@ -205,7 +208,7 @@ public class JoCode {
 	 * @return
 	 */
 	protected int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
-
+		
 		while(codePos < instructions.size()) {
 			int code = getCode(codePos);
 			if(code == forkCode) {
@@ -221,10 +224,10 @@ public class JoCode {
 				codePos++;
 			}
 		}
-
+		
 		return codePos;
 	}
-
+	
 	protected boolean setBlockForGeneration(World world, Species species, BlockPos pos, EnumFacing dir, boolean careful) {
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
@@ -242,16 +245,16 @@ public class JoCode {
 	protected void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
 		BlockPos saveCenter = leafMap.getCenter();
 		leafMap.setCenter(new BlockPos(0, 0, 0));
-
+		
 		int startY;
-
+		
 		//Find topmost block in build volume
 		for(startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
 			if(leafMap.isYTouched(startY)) {
 				break;
 			}
 		}
-
+		
 		//Precompute smothering
 		for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
 			for(int ix = 0; ix < leafMap.getLenX(); ix++) {
@@ -277,15 +280,15 @@ public class JoCode {
 		
 		leafMap.setCenter(saveCenter);
 	}
-
+	
 	protected boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
-
+		
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.offset(dir))) != null) {
 				return false;
 			}
 		}
-
+		
 		return true;
 	}
 	
@@ -329,7 +332,7 @@ public class JoCode {
 		}
 		return this;
 	}
-
+	
 	/**
 	 * Build a JoCode instruction set from the tree found at pos.
 	 * 
@@ -340,21 +343,21 @@ public class JoCode {
 	public JoCode buildFromTree(World world, BlockPos pos) {
 		return buildFromTree(world, pos, EnumFacing.NORTH);
 	}
-
+	
 	static public String encode(ArrayList<Byte> instructions) {
 		if((instructions.size() & 1) == 1) {//Check if odd
 			instructions.add(returnCode);//Add a return code to even up the series
 		}
-
+		
 		//Smallest Base64 encoder ever.
 		String code = "";
 		for(int b = 0; b < instructions.size(); b+=2) {
 			code += base64.charAt(instructions.get(b) << 3 | instructions.get(b + 1));
 		}
-
+		
 		return code;
 	}
-
+	
 	static public ArrayList<Byte> decode(String code) {
 		ArrayList<Byte> instructions = new ArrayList<Byte>(code.length() * 2);
 		
@@ -366,27 +369,27 @@ public class JoCode {
 				instructions.add((byte) (sixbits & 7));
 			}
 		}
-
+		
 		return instructions;
 	}
-
+	
 	public void addDirection(byte dir) {
 		if(dir >= 0){
 			instructions.add((byte) (dir & 7));
 		}
 	}
-
+	
 	public void addReturn() {
 		instructions.add(returnCode);
 	}
-
+	
 	public void addFork() {
 		instructions.add(forkCode);
 	}
-
+	
 	@Override
 	public String toString() {
 		return encode(instructions);
 	}
-
+	
 }
