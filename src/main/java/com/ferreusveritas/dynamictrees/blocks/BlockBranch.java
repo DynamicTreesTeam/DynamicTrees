@@ -2,7 +2,10 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -12,6 +15,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -41,6 +45,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
@@ -201,6 +206,23 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
 	}
 	
+	/**
+	 * This will get a map of all of the ExtendedBlockStates for use with the falling tree renderer.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @param wholeTree
+	 * @return
+	 */
+	public Map<BlockPos, IExtendedBlockState> getExtStateMapFromNode(World world, BlockPos pos, boolean wholeTree) {
+		IBlockState blockState = world.getBlockState(pos);
+		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node and species
+		NodeExtState extStateMapper = new NodeExtState();
+		// Analyze only part of the tree beyond the break point
+		analyse(blockState, world, pos, wholeTree ? null : signal.localRootDir, new MapSignal(extStateMapper));
+		return extStateMapper.getExtStateMap();
+	}
+	
 	/*
 	 * Attempt to destroy all of the leaves on the branch while leaving the other
 	 * leaves unharmed.
@@ -245,7 +267,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if( family.isCompatibleGenericLeaves(world.getBlockState(pos), world, pos) ) {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
-					world.setBlockToAir(pos);
+					world.destroyBlock(pos, false);
 					for(ItemStack stack : dropList) {
 						EntityItem itemEntity = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
 						world.spawnEntity(itemEntity);
@@ -306,12 +328,15 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		int radius = getRadius(state, world, pos);
 		Species species = TreeHelper.getExactSpecies(state, world, pos);
+		Map<BlockPos, IExtendedBlockState> extStateMap = ModConfigs.enableFallingTrees ? getExtStateMapFromNode(world, pos, false) : null;
 		int woodVolume = destroyBranchFromNode(world, pos, false);
 		List<ItemStack> items = getLogDrops(world, pos, species, (int)(woodVolume * fortuneFactor));
 		
-		EntityFallingTree fallingTree = new EntityFallingTree(world);
-		fallingTree.setData(species, pos, items);
-		world.spawnEntity(fallingTree);
+		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+		IBlockState belowState = world.getBlockState(pos.down());
+		if(TreeHelper.isRooty(belowState)) {
+			belowState.getBlock().updateTick(world, pos.down(), state, world.rand);
+		}
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, radius, woodVolume);
@@ -319,10 +344,15 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, player);
 		
-		for (ItemStack item : items) {
-			if (world.rand.nextFloat() <= chance) {
-				spawnAsEntity(world, pos, item);
-			}
+		//Build the final drop list taking chance into consideration
+		Stream<ItemStack> dropList = items.stream().filter(i -> world.rand.nextFloat() <= chance);
+		
+		if(ModConfigs.enableFallingTrees) {
+			EntityFallingTree fallingTree = new EntityFallingTree(world);
+			fallingTree.setData(species, pos, dropList.collect(Collectors.toList()), extStateMap);
+			world.spawnEntity(fallingTree);
+		} else {
+			dropList.forEach(i -> spawnAsEntity(world, pos, i));
 		}
 		
 		return true;// Function returns true if Block was destroyed

@@ -40,22 +40,25 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		
-		for( Map.Entry<BlockPos, IExtendedBlockState> entry : entity.stateMap.entrySet()) {
+		int numQuads = 0;
+		
+		for( Map.Entry<BlockPos, IExtendedBlockState> entry : entity.getStateMap().entrySet()) {
 			BlockPos relPos = entry.getKey().subtract(entity.getCutPos()); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
 			IBakedModel model = dispatcher.getModelForState(exState.getClean());
 			
-			List<BakedQuad> list = new ArrayList<>();
+			List<BakedQuad> quadList = new ArrayList<>();
 			for (EnumFacing enumfacing : EnumFacing.values()) {
-				list.addAll(model.getQuads(exState, enumfacing, 0));
+				quadList.addAll(model.getQuads(exState, enumfacing, 0));
 			}
-			list.addAll(model.getQuads(exState, null, 0));
+			quadList.addAll(model.getQuads(exState, null, 0));
 			
-			for(BakedQuad quad : list) {
-				
+			for(BakedQuad quad : quadList) {
+				numQuads++;
 			}
 		}
-		
+
+		System.out.println("Number of quads: " + numQuads);
 		//At this point we have a list of all of the quads
 	}
 	
