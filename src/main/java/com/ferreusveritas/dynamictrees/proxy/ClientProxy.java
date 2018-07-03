@@ -14,12 +14,14 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
@@ -43,6 +45,7 @@ import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -50,6 +53,7 @@ public class ClientProxy extends CommonProxy {
 	public void preInit() {
 		super.preInit();
 		registerClientEventHandlers();
+		registerEntityRenderers();
 	}
 	
 	@Override
@@ -65,11 +69,6 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
-		
-		//Register DendroCoil Mesher
-		ModelHelper.regModel(Block.REGISTRY.getObject(new ResourceLocation(ModConstants.MODID, "dendrocoil")));
-		
-		//ITEMS
 		
 		//Register Potion Mesher
 		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
@@ -191,7 +190,7 @@ public class ClientProxy extends CommonProxy {
 				}
 			});
 		}
-
+		
 		//makePlantsBlue();
 	}
 	
@@ -204,9 +203,13 @@ public class ClientProxy extends CommonProxy {
 			}
 		}, new Block[] {Blocks.GRASS, Blocks.TALLGRASS, Blocks.DOUBLE_PLANT, Blocks.LEAVES, Blocks.LEAVES2});
 	}
- 
+	
 	public void registerClientEventHandlers() {
 		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
+	}
+	
+	public void registerEntityRenderers() {
+		RenderingRegistry.registerEntityRenderingHandler(EntityFallingTree.class, new RenderFallingTree.Factory());
 	}
 	
 	@Override
@@ -233,7 +236,7 @@ public class ClientProxy extends CommonProxy {
 			world.spawnParticle(particleType, x, y, z, mx, my, mz);
 		}
 	}
-
+	
 	@Override
 	public void crushLeavesBlock(World world, BlockPos pos, IBlockState blockState, Entity entity) {
 		if(world.isRemote) {
@@ -261,5 +264,5 @@ public class ClientProxy extends CommonProxy {
 			}
 		}
 	}
-
+	
 }

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
@@ -307,6 +308,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		Species species = TreeHelper.getExactSpecies(state, world, pos);
 		int woodVolume = destroyBranchFromNode(world, pos, false);
 		List<ItemStack> items = getLogDrops(world, pos, species, (int)(woodVolume * fortuneFactor));
+		
+		EntityFallingTree fallingTree = new EntityFallingTree(world);
+		fallingTree.setData(species, pos, items);
+		world.spawnEntity(fallingTree);
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, radius, woodVolume);

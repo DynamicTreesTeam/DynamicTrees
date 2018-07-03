@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
@@ -18,6 +19,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,6 +27,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -134,6 +138,11 @@ public class DynamicTrees {
 			Species.newRegistry(event);
 		}
 		
+		@SubscribeEvent
+		public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
+			int id = 0;
+			EntityRegistry.registerModEntity(new ResourceLocation(ModConstants.MODID, "falling_tree"), EntityFallingTree.class, "falling_tree", id++, ModConstants.MODID, 32, 1, true);
+		}
 	}
 	
 }
