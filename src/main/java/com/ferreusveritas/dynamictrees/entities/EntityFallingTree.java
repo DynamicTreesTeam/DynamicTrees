@@ -9,12 +9,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -24,7 +21,7 @@ public class EntityFallingTree extends Entity {
 	
 	protected Species species;
 	protected BlockPos cutPos = BlockPos.ORIGIN;
-	protected List<ItemStack> payload;
+	protected List<ItemStack> payload = new ArrayList<>();
 	protected Map<BlockPos, IExtendedBlockState> stateMap = new HashMap<>();
 	
 	public EntityFallingTree(World worldIn) {
@@ -75,13 +72,15 @@ public class EntityFallingTree extends Entity {
 	@Override
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
-
-		System.out.println("I'm updating");
 		
-		if(ticksExisted > 10) {
-			payload.forEach(i -> Block.spawnAsEntity(world, cutPos, i));
+		motionY += 0.02;
+		posY += motionY;
+		rotationYaw += motionY * 10;
+		
+		if(ticksExisted > 30) {
+			BlockPos pos = new BlockPos(posX, posY, posZ);
+			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
 			setDead();
-			System.out.println("I died");
 		}
 	}
 	
