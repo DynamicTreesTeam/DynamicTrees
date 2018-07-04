@@ -219,7 +219,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node and species
 		NodeExtState extStateMapper = new NodeExtState();
 		// Analyze only part of the tree beyond the break point
+		BlockPos savePos = pos.offset(signal.localRootDir);
+		IBlockState saveState = world.getBlockState(savePos);
+		world.setBlockState(savePos, Blocks.AIR.getDefaultState(), 4);
 		analyse(blockState, world, pos, wholeTree ? null : signal.localRootDir, new MapSignal(extStateMapper));
+		world.setBlockState(savePos, saveState, 4);
 		return extStateMapper.getExtStateMap();
 	}
 	
@@ -267,7 +271,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if( family.isCompatibleGenericLeaves(world.getBlockState(pos), world, pos) ) {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
-					world.destroyBlock(pos, false);
+					world.destroyBlock(pos.toImmutable(), false);
 					for(ItemStack stack : dropList) {
 						EntityItem itemEntity = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
 						world.spawnEntity(itemEntity);

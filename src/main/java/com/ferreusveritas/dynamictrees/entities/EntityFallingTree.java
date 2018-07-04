@@ -73,7 +73,7 @@ public class EntityFallingTree extends Entity {
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
 		
-		motionY += 0.02;
+		motionY += 0.01;
 		posY += motionY;
 		rotationYaw += motionY * 10;
 		
