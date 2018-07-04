@@ -34,6 +34,8 @@ public class EntityFallingTree extends Entity {
 		this.payload = payload;
 		this.stateMap = stateMap;
 		
+		this.motionY = 0.5;
+		
 		setPosition(cutPos.getX() + 0.5, cutPos.getY() + 0.5, cutPos.getZ() + 0.5);
 	}
 
@@ -73,7 +75,7 @@ public class EntityFallingTree extends Entity {
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
 		
-		motionY += 0.01;
+		motionY -= 0.03;
 		posY += motionY;
 		rotationYaw += motionY * 10;
 		
