@@ -10,8 +10,10 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -23,9 +25,12 @@ public class EntityFallingTree extends Entity {
 	protected BlockPos cutPos = BlockPos.ORIGIN;
 	protected List<ItemStack> payload = new ArrayList<>();
 	protected Map<BlockPos, IExtendedBlockState> stateMap = new HashMap<>();
+	protected Vec3d geomCenter;
+	protected Vec3d massCenter;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
+		setSize(1.0f, 1.0f);
 	}
 	
 	public void setData(Species species, BlockPos cutPos, List<ItemStack> payload, Map<BlockPos, IExtendedBlockState> stateMap) {
@@ -36,35 +41,51 @@ public class EntityFallingTree extends Entity {
 		
 		this.motionY = 0.5;
 		
-		setPosition(cutPos.getX() + 0.5, cutPos.getY() + 0.5, cutPos.getZ() + 0.5);
-	}
-
-	public Vec3d calcCenterOfMass() {
-
-		Vec3d c = new Vec3d(0, 0, 0);
+		this.posX = cutPos.getX() + 0.5;
+		this.posY = cutPos.getY();
+		this.posZ = cutPos.getZ() + 0.5;
 		
-		for( Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
+		geomCenter = new Vec3d(0, 0, 0);
+		AxisAlignedBB aabb = new AxisAlignedBB(cutPos);
+		int numBlocks = stateMap.size();
+
+		//Calculate center of geometry and bounding box
+		for(Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
+			BlockPos absPos = entry.getKey();
+			BlockPos relPos = absPos.subtract(getCutPos()); //Get the relative position of the block
+			aabb = aabb.union(new AxisAlignedBB(absPos));
+			geomCenter.addVector(relPos.getX(), relPos.getY(), relPos.getZ());
+		}
+		
+		geomCenter = new Vec3d(geomCenter.x / numBlocks, geomCenter.y / numBlocks, geomCenter.z / numBlocks);
+		massCenter = geomCenter;
+		this.setEntityBoundingBox(aabb);
+		
+		//Calculate center of mass
+		for(Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
 			BlockPos relPos = entry.getKey().subtract(getCutPos()); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
-			
 			int radius = 1;
-			
 			if(exState.getBlock() instanceof BlockBranchBasic) {
 				BlockBranchBasic bbb = (BlockBranchBasic) exState.getBlock();
 				radius = bbb.getRawRadius(exState); //This needs to be better
 			}
-			
 			float weight = (radius * radius * radius) / 512f;
-			
-			c.addVector(relPos.getX() + 0.5, relPos.getY() + 0.5, relPos.getZ() + 0.5);
+			massCenter.addVector(relPos.getX() * weight, relPos.getY() * weight, relPos.getZ() * weight);
 		}
 		
-		int numBlocks = stateMap.size();		
-		return new Vec3d(c.x / numBlocks, c.y / numBlocks, c.z / numBlocks);
 	}
 	
 	public BlockPos getCutPos() {
 		return cutPos;
+	}
+
+	public Vec3d getGeomCenter() {
+		return geomCenter;
+	}
+	
+	public Vec3d getMassCenter() {
+		return massCenter;
 	}
 	
 	public Map<BlockPos, IExtendedBlockState> getStateMap() {
@@ -73,18 +94,42 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	public void onEntityUpdate() {
-		super.onEntityUpdate();
+		//super.onEntityUpdate();
 		
-		motionY -= 0.03;
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
+        this.prevPosZ = this.posZ;
+		
+        //motionY = 0.025;
+        //motionY = 0.00;
+        
+		motionY -= 0.03;//Gravity
+        posX += motionX;
 		posY += motionY;
+		posZ += motionZ;
 		rotationYaw += motionY * 10;
+		
+        //this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
 		
 		if(ticksExisted > 30) {
 			BlockPos pos = new BlockPos(posX, posY, posZ);
 			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
 			setDead();
 		}
+		
+		//setPosition(posX, posY, posZ);
 	}
+	
+    /*public void setPosition(double x, double y, double z) {
+    	double dx = this.posX - x;
+    	double dy = this.posY - y;
+    	double dz = this.posZ - z;
+        this.posX = x;
+        this.posY = y;
+        this.posZ = z;
+        this.setEntityBoundingBox( getEntityBoundingBox().offset(dx + dx, dy, dz) );
+    }*/
 	
 	@Override
 	protected void entityInit() { }
