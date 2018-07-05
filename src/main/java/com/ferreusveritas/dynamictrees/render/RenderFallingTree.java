@@ -40,13 +40,12 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-		
 		BlockPos cutPos = entity.getCutPos();
 		
-		//System.out.println(partialTicks);
+		GlStateManager.disableLighting();
 		
 		for( Map.Entry<BlockPos, IExtendedBlockState> entry : entity.getStateMap().entrySet()) {
-			BlockPos relPos = entry.getKey().subtract(cutPos); //Get the relative position of the block
+			BlockPos pos = entry.getKey(); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
 			IBakedModel model = dispatcher.getModelForState(exState.getClean());
 			
@@ -54,31 +53,31 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			
 			this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 			GlStateManager.pushMatrix();
-			GlStateManager.disableLighting();
 			
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferbuilder = tessellator.getBuffer();
 			bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
-			BlockPos blockpos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-			double dx = x - cutPos.getX() + relPos.getX() - 0.5;
-			double dy = y - cutPos.getY() + relPos.getY();
-			double dz = z - cutPos.getZ() + relPos.getZ() - 0.5;
 			
-			dy -= entity.motionY;//(entity.posY - entity.prevPosY) * 2;
+			Vec3d gc = entity.getMassCenter();
 			
-			Vec3d gc = entity.getGeomCenter();
-			//GlStateManager.translate(-gc.x, -gc.y, -gc.z);
-			//GlStateManager.rotate(entityYaw, 0, 1, 0);
-			//GlStateManager.translate(gc.x, gc.y, gc.z);
+			GlStateManager.translate(x, y, z);
+			GlStateManager.translate(gc.x, gc.y, gc.z);
+			GlStateManager.rotate(entityYaw, 0, 1, 0);
+			GlStateManager.translate(-gc.x, -gc.y, -gc.z);
+			GlStateManager.translate(-x, -y, -z);
 			
+			double dx = x - cutPos.getX() + pos.getX() - 0.5;
+			double dy = y - cutPos.getY() + pos.getY();
+			double dz = z - cutPos.getZ() + pos.getZ() - 0.5;
 			GlStateManager.translate(dx, dy, dz);
+
 			dispatcher.getBlockModelRenderer().renderModel(world, model, exState, cutPos, bufferbuilder, false, 0);
 			tessellator.draw();
 				
-			GlStateManager.enableLighting();
 			GlStateManager.popMatrix();
 		}
-
+		
+		GlStateManager.enableLighting();
 	}
 	
 	public static class Factory implements IRenderFactory<EntityFallingTree> {

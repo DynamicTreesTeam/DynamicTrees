@@ -33,11 +33,11 @@ public class EntityFallingTree extends Entity {
 		setSize(1.0f, 1.0f);
 	}
 	
-	public void setData(Species species, BlockPos cutPos, List<ItemStack> payload, Map<BlockPos, IExtendedBlockState> stateMap) {
+	public void setData(Species species, BlockPos cutPos, List<ItemStack> payload, Map<BlockPos, IExtendedBlockState> inStateMap) {
 		this.species = species;
 		this.cutPos = cutPos;
 		this.payload = payload;
-		this.stateMap = stateMap;
+		this.stateMap = inStateMap;
 		
 		this.motionY = 0.5;
 		
@@ -47,33 +47,43 @@ public class EntityFallingTree extends Entity {
 		
 		geomCenter = new Vec3d(0, 0, 0);
 		AxisAlignedBB aabb = new AxisAlignedBB(cutPos);
-		int numBlocks = stateMap.size();
 
-		//Calculate center of geometry and bounding box
+		Map<BlockPos, IExtendedBlockState> relStateMap = new HashMap<>();
+		
+		//Calculate center of geometry and bounding box, remap to relative coordinates
 		for(Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
 			BlockPos absPos = entry.getKey();
-			BlockPos relPos = absPos.subtract(getCutPos()); //Get the relative position of the block
+			BlockPos relPos = absPos.subtract(cutPos); //Get the relative position of the block
+			relStateMap.put(relPos, entry.getValue());
+			
 			aabb = aabb.union(new AxisAlignedBB(absPos));
-			geomCenter.addVector(relPos.getX(), relPos.getY(), relPos.getZ());
+			geomCenter = geomCenter.addVector(relPos.getX(), relPos.getY(), relPos.getZ());
 		}
 		
-		geomCenter = new Vec3d(geomCenter.x / numBlocks, geomCenter.y / numBlocks, geomCenter.z / numBlocks);
-		massCenter = geomCenter;
+		stateMap = relStateMap;//The state map is now in relative coordinates
+		int numBlocks = stateMap.size();
+		geomCenter = geomCenter.scale(1.0 / numBlocks);
 		this.setEntityBoundingBox(aabb);
+		
+		double totalMass = 0;
+		Vec3d totalMassLen = new Vec3d(0, 0, 0);
 		
 		//Calculate center of mass
 		for(Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
-			BlockPos relPos = entry.getKey().subtract(getCutPos()); //Get the relative position of the block
+			BlockPos pos = entry.getKey(); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
 			int radius = 1;
 			if(exState.getBlock() instanceof BlockBranchBasic) {
 				BlockBranchBasic bbb = (BlockBranchBasic) exState.getBlock();
 				radius = bbb.getRawRadius(exState); //This needs to be better
 			}
-			float weight = (radius * radius * radius) / 512f;
-			massCenter.addVector(relPos.getX() * weight, relPos.getY() * weight, relPos.getZ() * weight);
+			float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
+			
+			totalMass += mass;
+			totalMassLen = totalMassLen.addVector(pos.getX() * mass, pos.getY() * mass, pos.getZ() * mass);
 		}
 		
+		massCenter = totalMassLen.scale(1 / totalMass);
 	}
 	
 	public BlockPos getCutPos() {
@@ -94,22 +104,18 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	public void onEntityUpdate() {
-		//super.onEntityUpdate();
-		
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-		
-        //motionY = 0.025;
-        //motionY = 0.00;
         
+        //motionY = 0.0;
+        //motionY = 0.03;
 		motionY -= 0.03;//Gravity
         posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		rotationYaw += motionY * 10;
+		rotationYaw += 10;
 		
-        //this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
 		
 		if(ticksExisted > 30) {
@@ -117,19 +123,7 @@ public class EntityFallingTree extends Entity {
 			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
 			setDead();
 		}
-		
-		//setPosition(posX, posY, posZ);
 	}
-	
-    /*public void setPosition(double x, double y, double z) {
-    	double dx = this.posX - x;
-    	double dy = this.posY - y;
-    	double dz = this.posZ - z;
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        this.setEntityBoundingBox( getEntityBoundingBox().offset(dx + dx, dy, dz) );
-    }*/
 	
 	@Override
 	protected void entityInit() { }
