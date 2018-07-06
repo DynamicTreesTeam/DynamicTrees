@@ -63,7 +63,7 @@ public class CirclePairData {
 	}
 	
 	private static byte[] uncompressCurve(int codeSize, long curveCode) {
-		byte[] wave = new byte[codeSize + 2];//TODO: Determine if we need the extra 2 bytes
+		byte[] wave = new byte[codeSize + 2];
 		
 		for(int i = 0; i <= codeSize; i++) {
 			wave[i + 1] = (byte) (wave[i] + ((curveCode >> i) & 1));

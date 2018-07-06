@@ -208,7 +208,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-		return getRawRadius(state) == 8;
+		return getRadius(state) == 8;
 	}
 	
 	@Override
@@ -233,16 +233,12 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public int getRadius(IBlockState blockState) {
-		return getRawRadius(blockState);
+		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
 	}
 	
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
 		world.setBlockState(pos, branchStates[MathHelper.clamp(radius, 0, 8)], flags);
-	}
-	
-	public int getRawRadius(IBlockState blockState) {
-		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
 	}
 	
 	// Directionless probability grabber

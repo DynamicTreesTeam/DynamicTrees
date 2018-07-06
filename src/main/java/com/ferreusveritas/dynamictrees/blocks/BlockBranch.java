@@ -163,9 +163,29 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
-
+	
+	//TODO: This will eventually be abstract once add-ons have caught up.
 	@Override
-	public abstract int getRadius(IBlockState blockState);
+	public int getRadius(IBlockState blockState) {
+		return 1;
+	}
+	
+	/**
+	 * Do not use this in new code.  Migrate existing calls to getRadius(IBlockState) whenever
+	 * possible.  This will be dropped from the API at my discretion.
+	 * 
+	 * @param blockState
+	 * @param blockAccess
+	 * @param pos
+	 * @return
+	 */
+	@Deprecated
+	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+		if(apiBother < 100000 && (apiBother++ % 500) == 0) { System.err.println("Please have mod author update API calls for getRadius()"); }
+		return getRadius(blockState);
+	}
+	
+	static int apiBother = 0;
 	
 	public abstract void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags);
 	

@@ -21,7 +21,7 @@ public interface ITreePart {
 	* @param pos Position of the cell
 	* @param blockState the blockState of the block we are getting the cell from
 	* @param dir The direction of the request(opposite the direction of the requester)
-	* @param leavesProperties The tree data of the leaves the request came from  TODO
+	* @param leavesProperties The tree data of the leaves the request came from
 	* @return Cell for getting hydration level
 	*/
 	ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties);
