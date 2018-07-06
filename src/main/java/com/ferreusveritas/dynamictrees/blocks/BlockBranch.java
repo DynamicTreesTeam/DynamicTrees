@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
@@ -45,6 +46,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
@@ -205,55 +207,88 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return true;
 	}
 	
+	public class BlockItemStack {
+		public final ItemStack stack;
+		public final BlockPos pos;
+		
+		public BlockItemStack(ItemStack stack, BlockPos pos) {
+			this.stack = stack;
+			this.pos = pos;
+		}
+	}
+	
+	public class BranchDestructionData {
+		public final Species species;
+		public final Map<BlockPos, IExtendedBlockState> destroyedBranches;
+		public final Map<BlockPos, IBlockState> destroyedLeaves;
+		public final List<BlockItemStack> leavesDrops;
+		public final List<BlockPos> endPoints;
+		public final int woodVolume;
+		public final EnumFacing cutDir;
+		public final BlockPos cutPos;
+		
+		public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir) {
+			this.species = species;
+			this.destroyedBranches = branches;
+			this.destroyedLeaves = leaves;
+			this.leavesDrops = leavesDrops;
+			this.endPoints = ends;
+			this.woodVolume = volume;
+			this.cutPos = cutPos;
+			this.cutDir = cutDir;
+		}
+		
+	}
+	
 	/**
 	 * Destroys all branches recursively not facing the branching direction with the root node
 	 * 
 	 * @param world The world
-	 * @param pos The position of the branch being lobbed
+	 * @param cutPos The position of the branch being lobbed
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public int destroyBranchFromNode(World world, BlockPos pos, boolean wholeTree) {
-		IBlockState blockState = world.getBlockState(pos);
+	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, boolean wholeTree) {
+		IBlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
-		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
+		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
 		Species species = nodeSpecies.getSpecies();//Get the species from the root node
+		
+		// Analyze only part of the tree beyond the break point and map out the extended block states
+		// We can't destroy the branches during this step since we need accurate extended block states that include connections
+		NodeExtState extStateMapper = new NodeExtState(cutPos);
+		if(ModConfigs.enableFallingTrees) {
+			analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(extStateMapper));
+		}
+		
+		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		NodeDestroyer destroyer = new NodeDestroyer(species);
-		// Analyze only part of the tree beyond the break point and calculate it's volume
-		analyse(blockState, world, pos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
-		destroyLeaves(world, species, destroyer.getEnds());//Destroy all the leaves on the branch
-		return volumeSum.getVolume();// Drop an amount of wood calculated from the body of the tree network
+		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
+		
+		//Destroy all the leaves on the branch, store them in a map and convert endpoint the coordinates from absolute to relative
+		List<BlockPos> endPoints = destroyer.getEnds();
+		Map<BlockPos, IBlockState> destroyedLeaves = new HashMap<>();
+		List<BlockItemStack> leavesDropsList = new ArrayList<>();
+		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
+		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
+		
+		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir);
 	}
 	
 	/**
-	 * This will get a map of all of the ExtendedBlockStates for use with the falling tree renderer.
+	 * Attempt to destroy all of the leaves on the branch while leaving the other leaves unharmed.
 	 * 
-	 * @param world
-	 * @param pos
-	 * @param wholeTree
-	 * @return
+	 * @param world The world
+	 * @param cutPos The position of the block that was initially destroyed
+	 * @param species The species of the tree that is being modified 
+	 * @param endPoints The absolute positions of the branch endpoints  
+	 * @param destroyedLeaves A map for collecting the positions and blockstates for all of the leaves blocks that will be destroyed.
+	 * @param drops A list for collecting the ItemStacks and their positions relative to the cut position 
 	 */
-	public Map<BlockPos, IExtendedBlockState> getExtStateMapFromNode(World world, BlockPos pos, boolean wholeTree) {
-		IBlockState blockState = world.getBlockState(pos);
-		MapSignal signal = analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node and species
-		NodeExtState extStateMapper = new NodeExtState();
-		// Analyze only part of the tree beyond the break point
-		BlockPos savePos = pos.offset(signal.localRootDir);
-		IBlockState saveState = world.getBlockState(savePos);
-		world.setBlockState(savePos, Blocks.AIR.getDefaultState(), 4);
-		analyse(blockState, world, pos, wholeTree ? null : signal.localRootDir, new MapSignal(extStateMapper));
-		world.setBlockState(savePos, saveState, 4);
-		return extStateMapper.getExtStateMap();
-	}
-	
-	/*
-	 * Attempt to destroy all of the leaves on the branch while leaving the other
-	 * leaves unharmed.
-	 */
-	protected void destroyLeaves(World world, Species species, List<BlockPos> endPoints) {
+	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, IBlockState> destroyedLeaves, List<BlockItemStack> drops) {
 		
-		if (!world.isRemote && !world.restoringBlockSnapshots && !endPoints.isEmpty()) { // do not drop items while restoring blockstates, prevents item dupe
+		if (!world.isRemote && !endPoints.isEmpty()) { 
 			
 			//Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius
 			BlockBounds bounds = new BlockBounds(endPoints).expand(3);
@@ -289,14 +324,17 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			//Destroy all family compatible leaves
 			for(Cell cell: vmap.getAllNonZeroCells()) {
 				MutableBlockPos pos = cell.getPos();
-				if( family.isCompatibleGenericLeaves(world.getBlockState(pos), world, pos) ) {
+				IBlockState blockState = world.getBlockState(pos);
+				if( family.isCompatibleGenericLeaves(blockState, world, pos) ) {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
-					world.destroyBlock(pos.toImmutable(), false);
-					for(ItemStack stack : dropList) {
-						EntityItem itemEntity = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-						world.spawnEntity(itemEntity);
+					BlockPos imPos = pos.toImmutable();
+					BlockPos relPos = pos.subtract(cutPos);
+					world.destroyBlock(imPos, false);
+					if(ModConfigs.enableFallingTrees) {
+						destroyedLeaves.put(relPos, blockState);
 					}
+					dropList.forEach(i -> drops.add(new BlockItemStack(i, relPos)) );
 				}
 			}
 		}
@@ -347,38 +385,52 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean canHarvest) {
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
+		//Do the actual destruction
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, false);
+
+		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+		IBlockState belowState = world.getBlockState(cutPos.down());
+		if(TreeHelper.isRooty(belowState)) {
+			belowState.getBlock().updateTick(world, cutPos.down(), state, world.rand);
+		}
+
+		//Get all of the wood drops
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		int radius = getRadius(state);
-		Species species = TreeHelper.getExactSpecies(state, world, pos);
-		Map<BlockPos, IExtendedBlockState> extStateMap = ModConfigs.enableFallingTrees ? getExtStateMapFromNode(world, pos, false) : null;
-		int woodVolume = destroyBranchFromNode(world, pos, false);
-		List<ItemStack> items = getLogDrops(world, pos, species, (int)(woodVolume * fortuneFactor));
+		Species species = TreeHelper.getExactSpecies(state, world, cutPos);
+		int woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
+		List<ItemStack> woodItems = getLogDrops(world, cutPos, species, (int)(woodVolume * fortuneFactor));
 		
-		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		IBlockState belowState = world.getBlockState(pos.down());
-		if(TreeHelper.isRooty(belowState)) {
-			belowState.getBlock().updateTick(world, pos.down(), state, world.rand);
-		}
+		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, 1.0f, false, player);
 		
-		//Damage the axe by a prescribed amount
-		damageAxe(player, heldItem, radius, woodVolume);
+		//Build the final wood drop list taking chance into consideration
+		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
-		//For An-Sar's PrimalCore mod :)
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, fortune, 1.0f, false, player);
-		
-		//Build the final drop list taking chance into consideration
-		Stream<ItemStack> dropList = items.stream().filter(i -> world.rand.nextFloat() <= chance);
-		
+		//Spawn the appropriate item entities into the world
 		if(ModConfigs.enableFallingTrees) {
 			EntityFallingTree fallingTree = new EntityFallingTree(world);
-			fallingTree.setData(species, pos, dropList.collect(Collectors.toList()), extStateMap);
-			world.spawnEntity(fallingTree);
+			fallingTree.setData(destroyData, woodDropList);
+			FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+			MinecraftForge.EVENT_BUS.post(fallEvent);
+			if(!fallEvent.isCanceled()) {
+				world.spawnEntity(fallingTree);
+			}
 		} else {
-			dropList.forEach(i -> spawnAsEntity(world, pos, i));
+			if(!world.isRemote && !world.restoringBlockSnapshots) {// do not drop items while restoring blockstates, prevents item dupe
+				woodDropList.forEach(i -> spawnAsEntity(world, cutPos, i));
+				for(BlockItemStack bis : destroyData.leavesDrops) {
+					BlockPos itemPos = cutPos.add(bis.pos);
+					EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, bis.stack);
+					world.spawnEntity(itemEntity);
+				}
+			}
 		}
+
+		//Damage the axe by a prescribed amount
+		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		
 		return true;// Function returns true if Block was destroyed
 	}
@@ -456,13 +508,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// EXPLOSIONS AND FIRE
 	///////////////////////////////////////////
 	
-	// Explosive harvesting methods will likely result in mostly sticks but i'm okay with that since it kinda makes sense.
+	// Explosive harvesting methods will likely result in mostly sticks but I'm okay with that since it kinda makes sense.
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		IBlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(state, world, pos);
-			int woodVolume = destroyBranchFromNode(world, pos, false);
+			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, false);
+			int woodVolume = destroyData.woodVolume;
 			for (ItemStack item : getLogDrops(world, pos, species, woodVolume)) {
 				spawnAsEntity(world, pos, item);
 			}

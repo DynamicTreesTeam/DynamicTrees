@@ -19,7 +19,12 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 */
 public class NodeExtState implements INodeInspector {
 	
-	Map<BlockPos, IExtendedBlockState> map = new HashMap<>();
+	private final Map<BlockPos, IExtendedBlockState> map = new HashMap<>();
+	private final BlockPos origin;
+	
+	public NodeExtState(BlockPos origin) {
+		this.origin = origin;
+	}
 	
 	public Map<BlockPos, IExtendedBlockState> getExtStateMap() {
 		return map;
@@ -30,7 +35,7 @@ public class NodeExtState implements INodeInspector {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null) {
-			map.put(pos, (IExtendedBlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
+			map.put(pos.subtract(origin), (IExtendedBlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
 		}
 		
 		return true;
