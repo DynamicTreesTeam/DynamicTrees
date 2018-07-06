@@ -25,7 +25,7 @@ public class NodeFreezer implements INodeInspector {
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		if(branch != null) {
-			int radius = branch.getRadius(blockState, world, pos);
+			int radius = branch.getRadius(blockState);
 			if(radius == 1) {
 				freezeSurroundingLeaves(world, branch, pos);
 			}

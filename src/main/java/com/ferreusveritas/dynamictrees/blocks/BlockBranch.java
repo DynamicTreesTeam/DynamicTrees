@@ -163,9 +163,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
-	
+
 	@Override
-	public abstract int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
+	public abstract int getRadius(IBlockState blockState);
 	
 	public abstract void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags);
 	
@@ -255,7 +255,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
 			for(MutableBlockPos findPos : bounds.expand(3).iterate() ) {
-				if( familyBranch.getRadius(null, world, findPos) == primaryThickness ) { //Search for endpoints of the same tree family
+				IBlockState findState = world.getBlockState(findPos);
+				if( familyBranch.getRadius(findState) == primaryThickness ) { //Search for endpoints of the same tree family
 					Iterable<MutableBlockPos> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
 					for(MutableBlockPos leafpos : leaves) {
 						vmap.setVoxel(findPos.getX() + leafpos.getX(), findPos.getY() + leafpos.getY(), findPos.getZ() + leafpos.getZ(), (byte) 0);
@@ -330,7 +331,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		int radius = getRadius(state, world, pos);
+		int radius = getRadius(state);
 		Species species = TreeHelper.getExactSpecies(state, world, pos);
 		Map<BlockPos, IExtendedBlockState> extStateMap = ModConfigs.enableFallingTrees ? getExtStateMapFromNode(world, pos, false) : null;
 		int woodVolume = destroyBranchFromNode(world, pos, false);

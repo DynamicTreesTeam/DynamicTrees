@@ -55,7 +55,7 @@ public class BlockThickBranch extends BlockBranchBasic {
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;
-			int thisRadius = getRadius(state, world, pos);
+			int thisRadius = getRadius(state);
 			
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
@@ -70,12 +70,7 @@ public class BlockThickBranch extends BlockBranchBasic {
 	// GROWTH
 	///////////////////////////////////////////
 	
-	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
-	}
-	
-	public int getRawRadius(IBlockState blockState) {
+	public int getRadius(IBlockState blockState) {
 		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
 	}
 	

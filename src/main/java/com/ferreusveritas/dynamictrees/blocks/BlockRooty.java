@@ -275,7 +275,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState) {
 		return 8;
 	}
 	

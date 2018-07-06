@@ -60,11 +60,9 @@ public interface ITreePart {
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
 	* @param blockState the blockState of the block we are trying to get the radius of.
-	* @param blockAccess Readonly access to blocks
-	* @param pos Position
 	* @return Radius of the treepart(branch)
 	*/
-	int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos);
+	int getRadius(IBlockState blockState);
 	
 	/**
 	 * Whether this node should be analyzed or not.

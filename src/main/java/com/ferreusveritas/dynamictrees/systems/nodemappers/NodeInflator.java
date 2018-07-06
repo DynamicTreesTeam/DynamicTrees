@@ -60,7 +60,7 @@ public class NodeInflator implements INodeInspector {
 					IBlockState deltaBlockState = world.getBlockState(dPos);
 					ITreePart treepart = TreeHelper.getTreePart(deltaBlockState);
 					if(branch.isSameTree(treepart)) {
-						int branchRadius = treepart.getRadius(deltaBlockState, world, dPos);
+						int branchRadius = treepart.getRadius(deltaBlockState);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}

@@ -38,45 +38,40 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 	@Override
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
-
+		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		BlockPos cutPos = entity.getCutPos();
+		World world = entity.getEntityWorld();
+		Vec3d mc = entity.getMassCenter();
 		
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.disableLighting();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(mc.x + x, mc.y + y, mc.z + z);
+		GlStateManager.rotate(entityYaw, 0, 1, 0);
+		GlStateManager.translate(-mc.x - x, -mc.y - y, -mc.z - z);
+		
+		double baseX = x - cutPos.getX() - 0.5;
+		double baseY = y - cutPos.getY();
+		double baseZ = z - cutPos.getZ() - 0.5;
 		
 		for( Map.Entry<BlockPos, IExtendedBlockState> entry : entity.getStateMap().entrySet()) {
 			BlockPos pos = entry.getKey(); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
 			IBakedModel model = dispatcher.getModelForState(exState.getClean());
-			
-			World world = entity.getEntityWorld();
-			
-			this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			GlStateManager.pushMatrix();
-			
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferbuilder = tessellator.getBuffer();
 			bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
-			
-			Vec3d gc = entity.getMassCenter();
-			
-			GlStateManager.translate(x, y, z);
-			GlStateManager.translate(gc.x, gc.y, gc.z);
-			GlStateManager.rotate(entityYaw, 0, 1, 0);
-			GlStateManager.translate(-gc.x, -gc.y, -gc.z);
-			GlStateManager.translate(-x, -y, -z);
-			
-			double dx = x - cutPos.getX() + pos.getX() - 0.5;
-			double dy = y - cutPos.getY() + pos.getY();
-			double dz = z - cutPos.getZ() + pos.getZ() - 0.5;
+			double dx = baseX + pos.getX();
+			double dy = baseY + pos.getY();
+			double dz = baseZ + pos.getZ();
 			GlStateManager.translate(dx, dy, dz);
-
 			dispatcher.getBlockModelRenderer().renderModel(world, model, exState, cutPos, bufferbuilder, false, 0);
 			tessellator.draw();
-				
-			GlStateManager.popMatrix();
+			GlStateManager.translate(-dx, -dy, -dz);
 		}
 		
+		GlStateManager.popMatrix();
 		GlStateManager.enableLighting();
 	}
 	

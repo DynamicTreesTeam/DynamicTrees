@@ -120,7 +120,7 @@ public class TreeSpruce extends TreeFamily {
 	
 	@Override
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		int radius = branch.getRadius(blockState, blockAccess, pos);
+		int radius = branch.getRadius(blockState);
 		if(radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
 				return 128;

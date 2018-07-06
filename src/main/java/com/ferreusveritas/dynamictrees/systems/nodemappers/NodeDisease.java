@@ -27,7 +27,7 @@ public class NodeDisease implements INodeInspector {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
-			if(branch.getRadius(blockState, world, pos) == 1) {
+			if(branch.getRadius(blockState) == 1) {
 				world.setBlockToAir(pos);//Destroy the thin branch
 			}
 		}

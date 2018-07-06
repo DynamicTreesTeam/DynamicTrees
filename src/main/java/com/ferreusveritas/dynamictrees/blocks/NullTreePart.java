@@ -44,7 +44,7 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState) {
 		return 0;
 	}
 	

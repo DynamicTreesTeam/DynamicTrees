@@ -95,7 +95,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 
 	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState) {
 		return 8;
 	}
 

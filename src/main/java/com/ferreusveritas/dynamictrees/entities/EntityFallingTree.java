@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -25,8 +24,8 @@ public class EntityFallingTree extends Entity {
 	protected BlockPos cutPos = BlockPos.ORIGIN;
 	protected List<ItemStack> payload = new ArrayList<>();
 	protected Map<BlockPos, IExtendedBlockState> stateMap = new HashMap<>();
-	protected Vec3d geomCenter;
-	protected Vec3d massCenter;
+	protected Vec3d geomCenter = Vec3d.ZERO;
+	protected Vec3d massCenter = Vec3d.ZERO;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
@@ -73,9 +72,9 @@ public class EntityFallingTree extends Entity {
 			BlockPos pos = entry.getKey(); //Get the relative position of the block
 			IExtendedBlockState exState = entry.getValue();
 			int radius = 1;
-			if(exState.getBlock() instanceof BlockBranchBasic) {
-				BlockBranchBasic bbb = (BlockBranchBasic) exState.getBlock();
-				radius = bbb.getRawRadius(exState); //This needs to be better
+			if(exState.getBlock() instanceof BlockBranch) {
+				BlockBranch bbb = (BlockBranch) exState.getBlock();
+				radius = bbb.getRadius(exState);
 			}
 			float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
 			
@@ -104,14 +103,14 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	public void onEntityUpdate() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        
-        //motionY = 0.0;
-        //motionY = 0.03;
+		prevPosX = posX;
+		prevPosY = posY;
+		prevPosZ = posZ;
+		
+		//motionY = 0.0;
+		//motionY = 0.03;
 		motionY -= 0.03;//Gravity
-        posX += motionX;
+		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
 		rotationYaw += 10;

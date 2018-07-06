@@ -26,7 +26,7 @@ public class NodeTransform implements INodeInspector {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
-			int radius = branch.getRadius(blockState, world, pos);
+			int radius = branch.getRadius(blockState);
 			if(radius > 0) {
 				toSpecies.getFamily().getDynamicBranch().setRadius(world, pos, radius, null);
 				if(radius == 1) {

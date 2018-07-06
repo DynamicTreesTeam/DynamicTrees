@@ -357,7 +357,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		if(TreeHelper.isTreePart(belowBlockState.getBlock())) {
 			ITreePart belowTreepart = (ITreePart) belowBlock;
-			return belowTreepart.getRadius(belowBlockState, world, below) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
+			return belowTreepart.getRadius(belowBlockState) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
 		}
 		return true;//Non-Tree parts below indicate the bottom of stack
 	}
@@ -492,7 +492,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				IBlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BlockBranch branch = TreeHelper.getBranch(state);
-					if(branch.getFamily() == leavesProperties.getTree() && branch.getRadius(state, access, pos) == 1) {
+					if(branch.getFamily() == leavesProperties.getTree() && branch.getRadius(state) == 1) {
 						branchList.add(dPos);
 					}
 				}
@@ -580,7 +580,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public int getRadius(IBlockState blockState) {
 		return 0;
 	}
 	

@@ -14,7 +14,7 @@ public class NodeNetVolume implements INodeInspector {
 	
 	@Override
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
-		int radius = TreeHelper.getTreePart(blockState).getRadius(blockState, world, pos);
+		int radius = TreeHelper.getTreePart(blockState).getRadius(blockState);
 		volume += radius * radius * 64;//Integrate volume of this tree part into the total volume calculation
 		return true;
 	}

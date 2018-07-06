@@ -694,7 +694,7 @@ protected ModelBlock modelBlock;
 	
 	protected int getRawRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
-		return ((BlockBranchCactus) blockState.getBlock()).getRawRadius(blockState);
+		return ((BlockBranchCactus) blockState.getBlock()).getRadius(blockState);
 	}
 	
 	/**

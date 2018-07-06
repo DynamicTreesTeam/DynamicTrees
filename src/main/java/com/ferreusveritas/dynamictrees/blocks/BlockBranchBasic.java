@@ -11,8 +11,8 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.SoundType;
@@ -110,7 +110,7 @@ public class BlockBranchBasic extends BlockBranch {
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;
-			int thisRadius = getRadius(state, world, pos);
+			int thisRadius = getRadius(state);
 			
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
@@ -162,7 +162,7 @@ public class BlockBranchBasic extends BlockBranch {
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
 				IBlockState neighState = world.getBlockState(neighPos);
 				if(neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, species, getRadius(neighState, world, neighPos), rand, 1.0f, true);
+					checkForRot(world, neighPos, species, getRadius(neighState), rand, 1.0f, true);
 				}
 			}
 		}
@@ -176,7 +176,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
-		int radius = getRadius(blockState, world, pos);
+		int radius = getRadius(blockState);
 		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
 	};
 	
@@ -187,7 +187,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		int radius = getRadius(world.getBlockState(pos), world, pos);
+		int radius = getRadius(world.getBlockState(pos));
 		return (fireSpreadSpeed * radius) / 8 ;
 	}
 	
@@ -213,7 +213,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
-		return getRadius(blockState, blockAccess, pos) != 8 || super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+		return getRadius(blockState) != 8 || super.shouldSideBeRendered(blockState, blockAccess, pos, side);
 	}
 	
 	///////////////////////////////////////////
@@ -232,8 +232,8 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-		return getRawRadius(blockState != null ? blockState : blockAccess.getBlockState(pos));
+	public int getRadius(IBlockState blockState) {
+		return getRawRadius(blockState);
 	}
 	
 	@Override
@@ -248,7 +248,7 @@ public class BlockBranchBasic extends BlockBranch {
 	// Directionless probability grabber
 	@Override
 	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameTree(from) ? getRadius(blockState, blockAccess, pos) + 2 : 0;
+		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
@@ -286,7 +286,7 @@ public class BlockBranchBasic extends BlockBranch {
 				if (treepart != TreeHelper.nullTreePart) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
 				} else if (world.isAirBlock(deltaPos)) {
-					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState, world, pos));
+					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}
 			
@@ -304,7 +304,7 @@ public class BlockBranchBasic extends BlockBranch {
 					IBlockState blockState = world.getBlockState(deltaPos);
 					ITreePart treepart = TreeHelper.getTreePart(blockState);
 					if (isSameTree(treepart)) {
-						int branchRadius = treepart.getRadius(blockState, world, deltaPos);
+						int branchRadius = treepart.getRadius(blockState);
 						areaAccum += branchRadius * branchRadius;
 					}
 				}
@@ -313,7 +313,7 @@ public class BlockBranchBasic extends BlockBranch {
 			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState, world, pos), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), 8);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius), null);
 		}
 		
@@ -338,7 +338,7 @@ public class BlockBranchBasic extends BlockBranch {
 			return NULL_AABB;
 		}
 		
-		int thisRadius = getRadius(state, blockAccess, pos);
+		int thisRadius = getRadius(state);
 		
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
@@ -358,7 +358,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-		int thisRadius = getRadius(state, world, pos);
+		int thisRadius = getRadius(state);
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
@@ -374,7 +374,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
-		return getRadius(blockState, world, pos);
+		return getRadius(blockState);
 	}
 	
 	protected int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
