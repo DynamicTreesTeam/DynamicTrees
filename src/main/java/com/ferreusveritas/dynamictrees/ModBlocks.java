@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.client.ColorProviders;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -26,7 +27,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -88,7 +88,7 @@ public class ModBlocks {
 					@Override
 					@SideOnly(Side.CLIENT)
 					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-						return ColorizerFoliage.getFoliageColorPine();
+						return ColorProviders.pineFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
 					}
 				};
 				
@@ -99,7 +99,7 @@ public class ModBlocks {
 			@Override
 			@SideOnly(Side.CLIENT)
 			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-				return ColorizerFoliage.getFoliageColorBirch();
+				return ColorProviders.birchFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
 			}
 		};
 		
