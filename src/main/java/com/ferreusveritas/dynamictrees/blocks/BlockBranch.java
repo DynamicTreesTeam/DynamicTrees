@@ -266,13 +266,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		NodeDestroyer destroyer = new NodeDestroyer(species);
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		
-		//Destroy all the leaves on the branch, store them in a map and convert endpoint the coordinates from absolute to relative
+		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
 		List<BlockPos> endPoints = destroyer.getEnds();
 		Map<BlockPos, IBlockState> destroyedLeaves = new HashMap<>();
 		List<BlockItemStack> leavesDropsList = new ArrayList<>();
 		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
-		
+				
 		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir);
 	}
 	
@@ -329,7 +329,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();
-					BlockPos relPos = pos.subtract(cutPos);
+					BlockPos relPos = imPos.subtract(cutPos);
 					world.destroyBlock(imPos, false);
 					if(ModConfigs.enableFallingTrees) {
 						destroyedLeaves.put(relPos, blockState);
@@ -399,9 +399,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		Species species = TreeHelper.getExactSpecies(state, world, cutPos);
 		int woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
-		List<ItemStack> woodItems = getLogDrops(world, cutPos, species, (int)(woodVolume * fortuneFactor));
+		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, (int)(woodVolume * fortuneFactor));
 		
 		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, 1.0f, false, player);

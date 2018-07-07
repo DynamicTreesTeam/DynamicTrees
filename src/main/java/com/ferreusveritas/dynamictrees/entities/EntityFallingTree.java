@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,12 +76,16 @@ public class EntityFallingTree extends Entity {
 		initMotion();
 	}
 	
+	public BranchDestructionData getDestroyData() {
+		return destroyData;
+	}
+	
 	public BlockPos getCutPos() {
-		return destroyData.cutPos;
+		return destroyData != null ? destroyData.cutPos : BlockPos.ORIGIN;
 	}
 	
 	public EnumFacing getCutDir() {
-		return destroyData.cutDir;
+		return destroyData != null ? destroyData.cutDir : EnumFacing.DOWN;
 	}
 	
 	public Vec3d getGeomCenter() {
@@ -92,7 +97,7 @@ public class EntityFallingTree extends Entity {
 	}
 	
 	public Map<BlockPos, IExtendedBlockState> getStateMap() {
-		return destroyData.destroyedBranches;
+		return destroyData != null ? destroyData.destroyedBranches : new HashMap<BlockPos, IExtendedBlockState>();
 	}
 	
 	@Override
@@ -112,13 +117,12 @@ public class EntityFallingTree extends Entity {
 	}
 
 	public void initMotion() {
-		
+		motionY = 0.5;
 	}
 	
 	public void handleMotion() {
-		//motionY = 0.0;
-		//motionY = 0.03;
 		motionY -= 0.03;//Gravity
+		//motionY = 0.0;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
@@ -126,13 +130,19 @@ public class EntityFallingTree extends Entity {
 	}
 	
 	public void dropPayLoad() {
-		BlockPos pos = new BlockPos(posX, posY, posZ);
-		payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
+		if(!world.isRemote) {
+			BlockPos pos = new BlockPos(posX, posY, posZ);
+			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
 		
-		for(BlockItemStack bis : destroyData.leavesDrops) {
-			BlockPos sPos = pos.add(bis.pos);
-			EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);
-			world.spawnEntity(itemEntity);
+			if(destroyData != null) {
+				for(BlockItemStack bis : destroyData.leavesDrops) {
+					BlockPos sPos = pos.add(bis.pos);
+					EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);
+					world.spawnEntity(itemEntity);
+				}
+			} else {
+				System.err.println("DestroyData is null");
+			}
 		}
 	}
 	
