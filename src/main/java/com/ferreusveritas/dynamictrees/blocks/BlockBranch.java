@@ -288,7 +288,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 */
 	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, IBlockState> destroyedLeaves, List<BlockItemStack> drops) {
 		
-		if (!world.isRemote && !endPoints.isEmpty()) { 
+		if (!world.isRemote && !endPoints.isEmpty()) {
 			
 			//Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius
 			BlockBounds bounds = new BlockBounds(endPoints).expand(3);
@@ -409,16 +409,16 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//Spawn the appropriate item entities into the world
-		if(ModConfigs.enableFallingTrees) {
-			EntityFallingTree fallingTree = new EntityFallingTree(world);
-			fallingTree.setData(destroyData, woodDropList);
-			FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-			MinecraftForge.EVENT_BUS.post(fallEvent);
-			if(!fallEvent.isCanceled()) {
-				world.spawnEntity(fallingTree);
-			}
-		} else {
-			if(!world.isRemote && !world.restoringBlockSnapshots) {// do not drop items while restoring blockstates, prevents item dupe
+		//if(!world.isRemote) {// Only spawn entities server side
+			if(ModConfigs.enableFallingTrees) {
+				EntityFallingTree fallingTree = new EntityFallingTree(world);
+				fallingTree.setData(destroyData, woodDropList);
+				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+				MinecraftForge.EVENT_BUS.post(fallEvent);
+				if(!fallEvent.isCanceled()) {
+					world.spawnEntity(fallingTree);
+				}
+			} else {
 				woodDropList.forEach(i -> spawnAsEntity(world, cutPos, i));
 				for(BlockItemStack bis : destroyData.leavesDrops) {
 					BlockPos itemPos = cutPos.add(bis.pos);
@@ -426,8 +426,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					world.spawnEntity(itemEntity);
 				}
 			}
-		}
-
+		//}
+		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		

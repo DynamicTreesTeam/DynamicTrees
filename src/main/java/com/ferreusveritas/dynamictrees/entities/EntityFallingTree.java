@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -27,13 +25,19 @@ public class EntityFallingTree extends Entity {
 	protected List<ItemStack> payload = new ArrayList<>();
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
+	private boolean activated = false;
 	
 	public EntityFallingTree(World worldIn) {
-		super(worldIn);
+		super(worldIn);		
 		setSize(1.0f, 1.0f);
 	}
 	
+	public boolean isActivated() {
+		return activated;
+	}
+	
 	public void setData(BranchDestructionData destroyData, List<ItemStack> payload) {
+		this.activated = true;
 		this.destroyData = destroyData;
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
@@ -80,14 +84,6 @@ public class EntityFallingTree extends Entity {
 		return destroyData;
 	}
 	
-	public BlockPos getCutPos() {
-		return destroyData != null ? destroyData.cutPos : BlockPos.ORIGIN;
-	}
-	
-	public EnumFacing getCutDir() {
-		return destroyData != null ? destroyData.cutDir : EnumFacing.DOWN;
-	}
-	
 	public Vec3d getGeomCenter() {
 		return geomCenter;
 	}
@@ -96,52 +92,77 @@ public class EntityFallingTree extends Entity {
 		return massCenter;
 	}
 	
-	public Map<BlockPos, IExtendedBlockState> getStateMap() {
-		return destroyData != null ? destroyData.destroyedBranches : new HashMap<BlockPos, IExtendedBlockState>();
+	@Override
+	public void setPosition(double x, double y, double z) {
+		//This comes to the client as a packet from the server.
+		double dx = x - this.posX;
+		double dy = y - this.posY;
+		double dz = z - this.posZ;
+        this.posX = x;
+        this.posY = y;
+        this.posZ = z;
+        this.setEntityBoundingBox(getEntityBoundingBox().offset(dx, dy, dz));
 	}
 	
 	@Override
 	public void onEntityUpdate() {
-		prevPosX = posX;
-		prevPosY = posY;
-		prevPosZ = posZ;
-		
-		handleMotion();
-		
-		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
-		
-		if(ticksExisted > 30) {
-			dropPayLoad();
-			setDead();
+		if(!isDead) {
+			if(!activated) {//This only happens on the client
+				transferEntityData();
+			}
+
+			prevPosX = posX;
+			prevPosY = posY;
+			prevPosZ = posZ;
+
+			handleMotion();
+			
+			setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
+
+			if(ticksExisted > 30000) {
+				dropPayLoad();
+				setDead();
+			}
 		}
 	}
-
+	
+	public void transferEntityData() {
+		List<EntityFallingTree> entities = world.getEntitiesWithinAABB(this.getClass(), new AxisAlignedBB(posX, posY, posZ, posX, posY, posZ).grow(0.5));
+		for(EntityFallingTree tree : entities) {
+			if(tree != this) {
+				this.destroyData = tree.destroyData;
+				this.payload = tree.payload;
+				this.geomCenter = tree.geomCenter;
+				this.massCenter = tree.massCenter;
+				this.activated = true;
+				this.setEntityBoundingBox(tree.getEntityBoundingBox());
+				tree.setDead();
+			}
+		}
+	}
+	
 	public void initMotion() {
 		motionY = 0.5;
 	}
 	
 	public void handleMotion() {
 		motionY -= 0.03;//Gravity
-		//motionY = 0.0;
+		motionY = 0.0;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
 		rotationYaw += 10;
 	}
 	
-	public void dropPayLoad() {
+	public void dropPayLoad() {		
 		if(!world.isRemote) {
 			BlockPos pos = new BlockPos(posX, posY, posZ);
 			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
 		
-			if(destroyData != null) {
-				for(BlockItemStack bis : destroyData.leavesDrops) {
-					BlockPos sPos = pos.add(bis.pos);
-					EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);
-					world.spawnEntity(itemEntity);
-				}
-			} else {
-				System.err.println("DestroyData is null");
+			for(BlockItemStack bis : destroyData.leavesDrops) {
+				BlockPos sPos = pos.add(bis.pos);
+				EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);
+				world.spawnEntity(itemEntity);
 			}
 		}
 	}

@@ -45,21 +45,27 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		
+		if(!entity.isActivated()) {
+			return;
+		}
+		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-		BlockPos cutPos = entity.getCutPos();
-		EnumFacing cutDir = entity.getCutDir();
+		BlockPos cutPos = entity.getDestroyData().cutPos;
+		EnumFacing cutDir = entity.getDestroyData().cutDir;
+		Map<BlockPos, IExtendedBlockState> stateMap = entity.getDestroyData().destroyedBranches;
 		World world = entity.getEntityWorld();
 		Vec3d mc = entity.getMassCenter();
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		
 		this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(mc.x + x, mc.y + y, mc.z + z);
-		GlStateManager.rotate(entityYaw, 0, 1, 0);
+		GlStateManager.rotate(-entityYaw, 0, 1, 0);
 		GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 		
-		IExtendedBlockState exState = entity.getStateMap().get(BlockPos.ORIGIN);
+		IExtendedBlockState exState = stateMap.get(BlockPos.ORIGIN);
 		
 		if(exState != null) {
 			bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
@@ -74,14 +80,14 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			renderBlockModel(world, model, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), brightnessIn, bufferbuilder, new EnumFacing[] { cutDir } );
 			
 			//Draw the rest of the tree/branch
-			for( Map.Entry<BlockPos, IExtendedBlockState> entry : entity.getStateMap().entrySet()) {
+			for( Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
 				exState = entry.getValue();
 				model = dispatcher.getModelForState(exState.getClean());
 				renderBlockModel(world, model, exState, new Vec3d(entry.getKey()), brightnessIn, bufferbuilder, everyFace);
 			}
 			
 			//Draw the leaves
-			/* for( Map.Entry<BlockPos, IBlockState> entry : entity.getDestroyData().destroyedLeaves.entrySet()) {
+			/*for( Map.Entry<BlockPos, IBlockState> entry : entity.getDestroyData().destroyedLeaves.entrySet()) {
 				IBlockState state = entry.getValue();
 				model = dispatcher.getModelForState(state);
 				renderBlockModel(world, model, state, new Vec3d(entry.getKey()), brightnessIn, bufferbuilder, everyFace);
