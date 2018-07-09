@@ -63,7 +63,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		GlStateManager.translate(x, y, z);
 		EntityFallingTree.animationHandler.renderTransform(entity, entityYaw, partialTicks);
 		
-		IExtendedBlockState exState = destructionData.getBranchBlockState(0);
+		IExtendedBlockState exState = destructionData.getNumBranches() > 0 ? destructionData.getBranchBlockState(0) : null;
 		
 		if(exState != null) {
 			bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);

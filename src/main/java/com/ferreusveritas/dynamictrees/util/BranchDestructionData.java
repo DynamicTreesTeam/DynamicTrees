@@ -33,6 +33,8 @@ public class BranchDestructionData {
 	public final EnumFacing cutDir;
 	public final BlockPos cutPos;
 	
+	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
+	
 	public BranchDestructionData() {
 		species = Species.NULLSPECIES;
 		destroyedBranchesConnections = new int[0];
@@ -102,7 +104,6 @@ public class BranchDestructionData {
 		}
 
 		//Encode the remaining blocks
-		BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
 		for(Entry<BlockPos, IExtendedBlockState> set : branchList.entrySet()) {
 			BlockPos relPos = set.getKey();
 			IExtendedBlockState exState = set.getValue();
@@ -181,7 +182,6 @@ public class BranchDestructionData {
 		int index = 0;
 		
 		//Encode the remaining blocks
-		BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
 		for(Entry<BlockPos, IBlockState> set : leavesList.entrySet()) {
 			BlockPos relPos = set.getKey();
 			IBlockState state = set.getValue();
@@ -227,9 +227,7 @@ public class BranchDestructionData {
 		int data[] = new int[endPoints.size()];
 		int index = 0;
 		
-		BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
 		for(BlockPos relPos : endPoints) {
-
 			if(bounds.inBounds(relPos)) { //Place comfortable limits on the system
 				data[index++] = encodeRelBlockPos(relPos);
 			}
