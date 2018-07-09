@@ -20,15 +20,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityFallingTree extends Entity {
+
+	public static final DataParameter<String> nameParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.STRING);
 	
 	protected BranchDestructionData destroyData;
 	protected List<ItemStack> payload = new ArrayList<>();
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
 	private boolean activated = false;
-	public String name = "";
-
-	DataParameter<String> nameParameter;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
@@ -45,8 +44,7 @@ public class EntityFallingTree extends Entity {
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
 		
-		this.name = "named";
-		setPooka(this.name);
+		setPooka("naneet");
 		
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
@@ -86,7 +84,7 @@ public class EntityFallingTree extends Entity {
 	
 	public void setPooka(String name) {
 		if(!world.isRemote) {
-			getDataManager().set(nameParameter, this.name);
+			getDataManager().set(nameParameter, name);
 		}
 	}
 	
@@ -179,7 +177,6 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	protected void entityInit() {
-		nameParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.STRING);
 		getDataManager().register(nameParameter, "kook");
 	}
 	
