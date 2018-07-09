@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.render;
 
-import java.util.Map;
-
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -49,10 +48,12 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			return;
 		}
 		
+		//System.out.println("Render: " + entity.getPooka());
+		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		EnumFacing cutDir = entity.getDestroyData().cutDir;
-		Map<BlockPos, IExtendedBlockState> stateMap = entity.getDestroyData().destroyedBranches;
+		BranchDestructionData destructionData = entity.getDestroyData();
 		World world = entity.getEntityWorld();
 		Vec3d mc = entity.getMassCenter();
 		Tessellator tessellator = Tessellator.getInstance();
@@ -65,7 +66,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		GlStateManager.rotate(-entityYaw, 0, 1, 0);
 		GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 		
-		IExtendedBlockState exState = stateMap.get(BlockPos.ORIGIN);
+		IExtendedBlockState exState = destructionData.getBranchBlockState(0);
 		
 		if(exState != null) {
 			bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
@@ -80,18 +81,20 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			renderBlockModel(world, model, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), brightnessIn, bufferbuilder, new EnumFacing[] { cutDir } );
 			
 			//Draw the rest of the tree/branch
-			for( Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
-				exState = entry.getValue();
+			for(int index = 0; index < destructionData.getNumBranches(); index++) {
+				exState = destructionData.getBranchBlockState(index);
+				BlockPos relPos = destructionData.getBranchRelPos(index);
 				model = dispatcher.getModelForState(exState.getClean());
-				renderBlockModel(world, model, exState, new Vec3d(entry.getKey()), brightnessIn, bufferbuilder, everyFace);
+				renderBlockModel(world, model, exState, new Vec3d(relPos), brightnessIn, bufferbuilder, everyFace);
 			}
 			
 			//Draw the leaves
-			/*for( Map.Entry<BlockPos, IBlockState> entry : entity.getDestroyData().destroyedLeaves.entrySet()) {
-				IBlockState state = entry.getValue();
+			IBlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
+			for(int index = 0; index < destructionData.getNumLeaves(); index++) {
+				BlockPos relPos = destructionData.getLeavesRelPos(index);
 				model = dispatcher.getModelForState(state);
-				renderBlockModel(world, model, state, new Vec3d(entry.getKey()), brightnessIn, bufferbuilder, everyFace);
-			}*/
+				renderBlockModel(world, model, state, new Vec3d(relPos), brightnessIn, bufferbuilder, everyFace);
+			}
 			
 			tessellator.draw();
 		}
@@ -104,20 +107,22 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 	
 	public void renderBlockModel(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, Vec3d offset, int brightnessIn, BufferBuilder buffer, EnumFacing[] sides) {
 		
-		for (EnumFacing enumfacing : sides) {
-			for(BakedQuad bakedquad: modelIn.getQuads(stateIn, enumfacing, 0)) {
-				buffer.addVertexData(bakedquad.getVertexData());
-				buffer.putBrightness4(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
-				
-				if(bakedquad.shouldApplyDiffuseLighting()) {
-					float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedquad.getFace());
-					buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
-					buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);
-					buffer.putColorMultiplier(diffuse, diffuse, diffuse, 2);
-					buffer.putColorMultiplier(diffuse, diffuse, diffuse, 1);
+		if(stateIn != null) {
+			for (EnumFacing enumfacing : sides) {
+				for(BakedQuad bakedquad: modelIn.getQuads(stateIn, enumfacing, 0)) {
+					buffer.addVertexData(bakedquad.getVertexData());
+					buffer.putBrightness4(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
+
+					if(bakedquad.shouldApplyDiffuseLighting()) {
+						float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedquad.getFace());
+						buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
+						buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);
+						buffer.putColorMultiplier(diffuse, diffuse, diffuse, 2);
+						buffer.putColorMultiplier(diffuse, diffuse, diffuse, 1);
+					}
+
+					buffer.putPosition(offset.x, offset.y, offset.z);
 				}
-				
-				buffer.putPosition(offset.x, offset.y, offset.z);
 			}
 		}
 		

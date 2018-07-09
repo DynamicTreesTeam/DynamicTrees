@@ -50,7 +50,7 @@ public class BlockBranchBasic extends BlockBranch {
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
 	};
 	
-	IBlockState branchStates[];
+	private IBlockState branchStates[];
 	
 	// Useful for more unique subclasses
 	protected BlockBranchBasic(Material material, String name) {
@@ -238,7 +238,11 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
-		world.setBlockState(pos, branchStates[MathHelper.clamp(radius, 0, 8)], flags);
+		world.setBlockState(pos, getStateForRadius(radius), flags);
+	}
+	
+	public IBlockState getStateForRadius(int radius) {
+		return branchStates[MathHelper.clamp(radius, 0, 8)];
 	}
 	
 	// Directionless probability grabber

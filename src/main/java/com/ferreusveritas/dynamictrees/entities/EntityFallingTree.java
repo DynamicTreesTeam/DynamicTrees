@@ -2,22 +2,22 @@ package com.ferreusveritas.dynamictrees.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BlockItemStack;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class EntityFallingTree extends Entity {
 	
@@ -26,9 +26,12 @@ public class EntityFallingTree extends Entity {
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
 	private boolean activated = false;
+	public String name = "";
+
+	DataParameter<String> nameParameter;
 	
 	public EntityFallingTree(World worldIn) {
-		super(worldIn);		
+		super(worldIn);
 		setSize(1.0f, 1.0f);
 	}
 	
@@ -41,30 +44,27 @@ public class EntityFallingTree extends Entity {
 		this.destroyData = destroyData;
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
-		Map<BlockPos, IExtendedBlockState> stateMap = destroyData.destroyedBranches;
-	
+		
+		this.name = "named";
+		setPooka(this.name);
+		
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
 		this.posZ = cutPos.getZ() + 0.5;
 
-		int numBlocks = stateMap.size();
+		int numBlocks = destroyData.getNumBranches();
 		geomCenter = new Vec3d(0, 0, 0);
 		AxisAlignedBB aabb = new AxisAlignedBB(cutPos);
 		double totalMass = 0;
 		
 		//Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
-		for(Map.Entry<BlockPos, IExtendedBlockState> entry : stateMap.entrySet()) {
-			BlockPos relPos = entry.getKey();
+		for(int index = 0; index < destroyData.getNumBranches(); index++) {
+			BlockPos relPos = destroyData.getBranchRelPos(index);
 			BlockPos absPos = cutPos.add(relPos);
 			
 			aabb = aabb.union(new AxisAlignedBB(absPos));
-
-			IExtendedBlockState exState = entry.getValue();
-			int radius = 1;
-			if(exState.getBlock() instanceof BlockBranch) {
-				BlockBranch bbb = (BlockBranch) exState.getBlock();
-				radius = bbb.getRadius(exState);
-			}
+			
+			int radius = destroyData.getBranchRadius(index);
 			float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
 			totalMass += mass;
 			
@@ -78,6 +78,16 @@ public class EntityFallingTree extends Entity {
 		massCenter = massCenter.scale(1.0 / totalMass);
 		
 		initMotion();
+	}
+	
+	public String getPooka() {
+		return getDataManager().get(nameParameter);
+	}
+	
+	public void setPooka(String name) {
+		if(!world.isRemote) {
+			getDataManager().set(nameParameter, this.name);
+		}
 	}
 	
 	public BranchDestructionData getDestroyData() {
@@ -119,7 +129,7 @@ public class EntityFallingTree extends Entity {
 			
 			setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
 
-			if(ticksExisted > 30000) {
+			if(ticksExisted > 30) {
 				dropPayLoad();
 				setDead();
 			}
@@ -147,7 +157,7 @@ public class EntityFallingTree extends Entity {
 	
 	public void handleMotion() {
 		motionY -= 0.03;//Gravity
-		motionY = 0.0;
+		//motionY = 0.0;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
@@ -168,12 +178,19 @@ public class EntityFallingTree extends Entity {
 	}
 	
 	@Override
-	protected void entityInit() { }
+	protected void entityInit() {
+		nameParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.STRING);
+		getDataManager().register(nameParameter, "kook");
+	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound compound) { }
+	protected void readEntityFromNBT(NBTTagCompound compound) {
+		//compound.setString("name", name);
+	}
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound compound) { }
+	protected void writeEntityToNBT(NBTTagCompound compound) {
+		//name = compound.getString("name");
+	}
 	
 }

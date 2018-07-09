@@ -22,7 +22,16 @@ public class BlockBounds {
 		minY = maxY = pos.getY();
 		minZ = maxZ = pos.getZ();
 	}
-
+	
+	public BlockBounds(BlockPos min, BlockPos max) {
+		minX = min.getX();
+		minY = min.getY();
+		minZ = min.getZ();
+		maxX = max.getX();
+		maxY = max.getY();
+		maxZ = max.getZ();
+	}
+	
 	public BlockBounds(ChunkPos cPos) {
 		minX = cPos.getXStart();
 		minY = 0;

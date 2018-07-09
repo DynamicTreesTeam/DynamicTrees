@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.event;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;

@@ -22,6 +22,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
@@ -47,7 +48,6 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
@@ -216,30 +216,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			this.pos = pos;
 		}
 	}
-	
-	public class BranchDestructionData {
-		public final Species species;
-		public final Map<BlockPos, IExtendedBlockState> destroyedBranches;
-		public final Map<BlockPos, IBlockState> destroyedLeaves;
-		public final List<BlockItemStack> leavesDrops;
-		public final List<BlockPos> endPoints;
-		public final int woodVolume;
-		public final EnumFacing cutDir;
-		public final BlockPos cutPos;
-		
-		public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir) {
-			this.species = species;
-			this.destroyedBranches = branches;
-			this.destroyedLeaves = leaves;
-			this.leavesDrops = leavesDrops;
-			this.endPoints = ends;
-			this.woodVolume = volume;
-			this.cutPos = cutPos;
-			this.cutDir = cutDir;
-		}
-		
-	}
-	
+
 	/**
 	 * Destroys all branches recursively not facing the branching direction with the root node
 	 * 
