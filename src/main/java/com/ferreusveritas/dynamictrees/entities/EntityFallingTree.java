@@ -27,7 +27,7 @@ public class EntityFallingTree extends Entity {
 	protected List<ItemStack> payload = new ArrayList<>();
 	
 	//Needed in client and server
-	protected BranchDestructionData destroyData;
+	protected BranchDestructionData destroyData = new BranchDestructionData();
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
 	protected boolean clientBuilt = false;
@@ -101,13 +101,27 @@ public class EntityFallingTree extends Entity {
 	}
 	
 	public void buildClient() {
+
 		NBTTagCompound tag = getVoxelData();
-		if(!tag.hasKey("species")) {
+		
+		if(tag.hasKey("species")) {
 			destroyData = new BranchDestructionData(tag);
 			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+			setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
 			clientBuilt = true;
 		}
+	}
+	
+	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
+		AxisAlignedBB aabb = new AxisAlignedBB(destroyData.cutPos);
+		
+		for(int i = 0; i < destroyData.getNumBranches(); i++) {
+			BlockPos relPos = destroyData.getBranchRelPos(i);
+			aabb = aabb.union(new AxisAlignedBB(destroyData.cutPos.add(relPos)));
+		}
+		
+		return aabb;
 	}
 	
 	public BranchDestructionData getDestroyData() {
@@ -141,10 +155,6 @@ public class EntityFallingTree extends Entity {
 				buildClient();
 			}
 			
-			/*if(!activated) {//This only happens on the client
-				transferEntityData();
-			}*/
-
 			prevPosX = posX;
 			prevPosY = posY;
 			prevPosZ = posZ;
@@ -159,21 +169,7 @@ public class EntityFallingTree extends Entity {
 			}
 		}
 	}
-	
-	/*public void transferEntityData() {
-		List<EntityFallingTree> entities = world.getEntitiesWithinAABB(this.getClass(), new AxisAlignedBB(posX, posY, posZ, posX, posY, posZ).grow(0.5));
-		for(EntityFallingTree tree : entities) {
-			if(tree != this) {
-				this.destroyData = tree.destroyData;
-				this.payload = tree.payload;
-				this.geomCenter = tree.geomCenter;
-				this.massCenter = tree.massCenter;
-				this.activated = true;
-				this.setEntityBoundingBox(tree.getEntityBoundingBox());
-				tree.setDead();
-			}
-		}
-	}*/
+
 	
 	public void initMotion() {
 		motionY = 0.5;
@@ -185,14 +181,14 @@ public class EntityFallingTree extends Entity {
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		rotationYaw += 10;
+		rotationYaw += 8;
 	}
 	
 	public void dropPayLoad() {		
 		if(!world.isRemote) {
 			BlockPos pos = new BlockPos(posX, posY, posZ);
 			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
-		
+
 			for(BlockItemStack bis : destroyData.leavesDrops) {
 				BlockPos sPos = pos.add(bis.pos);
 				EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);

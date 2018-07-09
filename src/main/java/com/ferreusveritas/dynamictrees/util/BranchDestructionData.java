@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BlockItemStack;
@@ -32,6 +33,18 @@ public class BranchDestructionData {
 	public final int woodVolume;
 	public final EnumFacing cutDir;
 	public final BlockPos cutPos;
+	
+	public BranchDestructionData() {
+		species = Species.NULLSPECIES;
+		destroyedBranchesConnections = new int[0];
+		destroyedBranchesRadiusPosition = new int[0];
+		destroyedLeaves = new int[0];
+		leavesDrops = new ArrayList<>();
+		endPoints = new int[0];
+		woodVolume = 0;
+		cutDir = EnumFacing.DOWN;
+		cutPos = BlockPos.ORIGIN;
+	}
 	
 	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir) {
 		this.species = species;
@@ -167,12 +180,6 @@ public class BranchDestructionData {
 	private int[] convertLeavesToIntArray(Map<BlockPos, IBlockState> leavesList) {
 		int data[] = new int[leavesList.size()];
 		int index = 0;
-
-		if(leavesList.isEmpty()) {
-			data = new int[16];
-			data[index++] = encodeLeaves(new BlockPos(0, 4, 0), (BlockDynamicLeaves) species.getLeavesProperties().getDynamicLeavesState().getBlock(), species.getLeavesProperties().getDynamicLeavesState());
-			return Arrays.copyOf(data, index);//Shrink down the array
-		}
 		
 		//Encode the remaining blocks
 		BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
