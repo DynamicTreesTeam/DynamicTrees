@@ -21,30 +21,36 @@ import net.minecraft.world.World;
 
 public class EntityFallingTree extends Entity {
 
-	public static final DataParameter<String> nameParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.STRING);
+	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
 	
-	protected BranchDestructionData destroyData;
+	//Not needed in client
 	protected List<ItemStack> payload = new ArrayList<>();
+	
+	//Needed in client and server
+	protected BranchDestructionData destroyData;
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
-	private boolean activated = false;
+	protected boolean clientBuilt = false;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
 		setSize(1.0f, 1.0f);
 	}
 	
-	public boolean isActivated() {
-		return activated;
+	public boolean isClientBuilt() {
+		return clientBuilt;
 	}
 	
+	/**
+	 * This is only run by the server to set up the object data
+	 * 
+	 * @param destroyData
+	 * @param payload
+	 */
 	public void setData(BranchDestructionData destroyData, List<ItemStack> payload) {
-		this.activated = true;
 		this.destroyData = destroyData;
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
-		
-		setPooka("naneet");
 		
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
@@ -76,15 +82,31 @@ public class EntityFallingTree extends Entity {
 		massCenter = massCenter.scale(1.0 / totalMass);
 		
 		initMotion();
+		
+		setVoxelData(buildVoxelData(destroyData));
+	}
+
+	public NBTTagCompound buildVoxelData(BranchDestructionData destroyData) {
+		NBTTagCompound tag = new NBTTagCompound();
+		destroyData.writeToNBT(tag);
+		
+		tag.setDouble("geomx", geomCenter.x);
+		tag.setDouble("geomy", geomCenter.y);
+		tag.setDouble("geomz", geomCenter.z);
+		tag.setDouble("massx", massCenter.x);
+		tag.setDouble("massy", massCenter.y);
+		tag.setDouble("massz", massCenter.z);
+		
+		return tag;
 	}
 	
-	public String getPooka() {
-		return getDataManager().get(nameParameter);
-	}
-	
-	public void setPooka(String name) {
-		if(!world.isRemote) {
-			getDataManager().set(nameParameter, name);
+	public void buildClient() {
+		NBTTagCompound tag = getVoxelData();
+		if(!tag.hasKey("species")) {
+			destroyData = new BranchDestructionData(tag);
+			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
+			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+			clientBuilt = true;
 		}
 	}
 	
@@ -115,9 +137,13 @@ public class EntityFallingTree extends Entity {
 	@Override
 	public void onEntityUpdate() {
 		if(!isDead) {
-			if(!activated) {//This only happens on the client
-				transferEntityData();
+			if(world.isRemote && !clientBuilt) {
+				buildClient();
 			}
+			
+			/*if(!activated) {//This only happens on the client
+				transferEntityData();
+			}*/
 
 			prevPosX = posX;
 			prevPosY = posY;
@@ -134,7 +160,7 @@ public class EntityFallingTree extends Entity {
 		}
 	}
 	
-	public void transferEntityData() {
+	/*public void transferEntityData() {
 		List<EntityFallingTree> entities = world.getEntitiesWithinAABB(this.getClass(), new AxisAlignedBB(posX, posY, posZ, posX, posY, posZ).grow(0.5));
 		for(EntityFallingTree tree : entities) {
 			if(tree != this) {
@@ -147,7 +173,7 @@ public class EntityFallingTree extends Entity {
 				tree.setDead();
 			}
 		}
-	}
+	}*/
 	
 	public void initMotion() {
 		motionY = 0.5;
@@ -177,7 +203,15 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	protected void entityInit() {
-		getDataManager().register(nameParameter, "kook");
+		getDataManager().register(voxelDataParameter, new NBTTagCompound());
+	}
+		
+	public void setVoxelData(NBTTagCompound tag) {
+		getDataManager().set(voxelDataParameter, tag);
+	}
+	
+	public NBTTagCompound getVoxelData() {
+		return getDataManager().get(voxelDataParameter);
 	}
 	
 	@Override

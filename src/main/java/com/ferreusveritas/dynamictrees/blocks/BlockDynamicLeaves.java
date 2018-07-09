@@ -559,16 +559,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return getProperties(blockState).getRadiusForConnection(blockState, blockAccess, pos, from, side, fromRadius);
 	}
 	
-	/*	FUTURE: Particle effects. Future leaves dropping from trees and wisps and stuff. Client side only
-	@Override
-	public void randomDisplayTick(World world, int x, int y, int z, Random random){
-		if(isBottom(world, x, y, z)){
-			EntityFX leaf = new EntityParticleLeaf(world, x + 0.5d, y - 0.5d, z + 0.5d, 0, -0.2, 0);
-			Minecraft.getMinecraft().effectRenderer.addEffect(leaf);
-		}
-	}
-	*/
-	
 	@Override
 	public boolean isPassable(IBlockAccess access, BlockPos pos) {
 		return passableLeavesModLoaded ? super.isPassable(access, pos) : ModConfigs.isLeavesPassable;

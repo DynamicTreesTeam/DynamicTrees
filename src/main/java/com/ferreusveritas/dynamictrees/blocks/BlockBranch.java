@@ -388,12 +388,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Spawn the appropriate item entities into the world
 		//if(!world.isRemote) {// Only spawn entities server side
 			if(ModConfigs.enableFallingTrees) {
-				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList);
-				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-				MinecraftForge.EVENT_BUS.post(fallEvent);
-				if(!fallEvent.isCanceled()) {
-					world.spawnEntity(fallingTree);
+				if(!world.isRemote) {
+					EntityFallingTree fallingTree = new EntityFallingTree(world);
+					fallingTree.setData(destroyData, woodDropList);
+					FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+					MinecraftForge.EVENT_BUS.post(fallEvent);
+					if(!fallEvent.isCanceled()) {
+						world.spawnEntity(fallEvent.getEntity());
+					}
 				}
 			} else {
 				woodDropList.forEach(i -> spawnAsEntity(world, cutPos, i));

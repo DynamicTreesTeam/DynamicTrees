@@ -44,16 +44,14 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		
-		if(!entity.isActivated()) {
+		if(!entity.isClientBuilt()) {
 			return;
 		}
 		
-		//System.out.println("Render: " + entity.getPooka());
-		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-		BlockPos cutPos = entity.getDestroyData().cutPos;
-		EnumFacing cutDir = entity.getDestroyData().cutDir;
 		BranchDestructionData destructionData = entity.getDestroyData();
+		BlockPos cutPos = destructionData.cutPos;
+		EnumFacing cutDir = destructionData.cutDir;
 		World world = entity.getEntityWorld();
 		Vec3d mc = entity.getMassCenter();
 		Tessellator tessellator = Tessellator.getInstance();
