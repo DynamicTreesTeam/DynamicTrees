@@ -53,16 +53,15 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		BlockPos cutPos = destructionData.cutPos;
 		EnumFacing cutDir = destructionData.cutDir;
 		World world = entity.getEntityWorld();
-		Vec3d mc = entity.getMassCenter();
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		
 		this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(mc.x + x, mc.y + y, mc.z + z);
-		GlStateManager.rotate(-entityYaw, 0, 1, 0);
-		GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
+		
+		GlStateManager.translate(x, y, z);
+		EntityFallingTree.animationHandler.renderTransform(entity, entityYaw, partialTicks);
 		
 		IExtendedBlockState exState = destructionData.getBranchBlockState(0);
 		

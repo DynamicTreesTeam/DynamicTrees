@@ -3,12 +3,11 @@ package com.ferreusveritas.dynamictrees.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BlockItemStack;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -18,6 +17,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityFallingTree extends Entity {
 
@@ -35,6 +36,7 @@ public class EntityFallingTree extends Entity {
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
 		setSize(1.0f, 1.0f);
+		initMotion();
 	}
 	
 	public boolean isClientBuilt() {
@@ -58,15 +60,11 @@ public class EntityFallingTree extends Entity {
 
 		int numBlocks = destroyData.getNumBranches();
 		geomCenter = new Vec3d(0, 0, 0);
-		AxisAlignedBB aabb = new AxisAlignedBB(cutPos);
 		double totalMass = 0;
 		
 		//Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
 		for(int index = 0; index < destroyData.getNumBranches(); index++) {
 			BlockPos relPos = destroyData.getBranchRelPos(index);
-			BlockPos absPos = cutPos.add(relPos);
-			
-			aabb = aabb.union(new AxisAlignedBB(absPos));
 			
 			int radius = destroyData.getBranchRadius(index);
 			float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
@@ -77,11 +75,10 @@ public class EntityFallingTree extends Entity {
 			massCenter = massCenter.add(relVec.scale(mass));
 		}
 
-		this.setEntityBoundingBox(aabb);
 		geomCenter = geomCenter.scale(1.0 / numBlocks);
 		massCenter = massCenter.scale(1.0 / totalMass);
-		
-		initMotion();
+
+		setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
 		
 		setVoxelData(buildVoxelData(destroyData));
 	}
@@ -117,8 +114,7 @@ public class EntityFallingTree extends Entity {
 		AxisAlignedBB aabb = new AxisAlignedBB(destroyData.cutPos);
 		
 		for(int i = 0; i < destroyData.getNumBranches(); i++) {
-			BlockPos relPos = destroyData.getBranchRelPos(i);
-			aabb = aabb.union(new AxisAlignedBB(destroyData.cutPos.add(relPos)));
+			aabb = aabb.union(new AxisAlignedBB(destroyData.cutPos.add(destroyData.getBranchRelPos(i))));
 		}
 		
 		return aabb;
@@ -138,7 +134,7 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	public void setPosition(double x, double y, double z) {
-		//This comes to the client as a packet from the server.
+		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
 		double dx = x - this.posX;
 		double dy = y - this.posY;
 		double dz = z - this.posZ;
@@ -150,58 +146,96 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	public void onEntityUpdate() {
-		if(!isDead) {
-			if(world.isRemote && !clientBuilt) {
-				buildClient();
-			}
-			
-			prevPosX = posX;
-			prevPosY = posY;
-			prevPosZ = posZ;
-
-			handleMotion();
-			
-			setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
-
-			if(ticksExisted > 30) {
-				dropPayLoad();
-				setDead();
-			}
+		super.onEntityUpdate();
+		
+		if(world.isRemote && !clientBuilt) {
+			buildClient();
+		}
+		
+		handleMotion();
+		
+		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
+		
+		if(shouldDie()) {
+			dropPayLoad();
+			setDead();
 		}
 	}
 
+	public interface AnimationHandler {
+		void initMotion(EntityFallingTree entity);
+		void handleMotion(EntityFallingTree entity);
+		void dropPayload(EntityFallingTree entity);
+		boolean shouldDie(EntityFallingTree entity);
+
+		@SideOnly(Side.CLIENT)
+		void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks);
+	}
+	
+	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
+		
+		@Override
+		public void initMotion(EntityFallingTree entity) {
+			entity.motionY = 0.5;
+		}
+		
+		@Override
+		public void handleMotion(EntityFallingTree entity) {
+			entity.motionY -= 0.03;//Gravity
+			//motionY = 0.0;
+			entity.posX += entity.motionX;
+			entity.posY += entity.motionY;
+			entity.posZ += entity.motionZ;
+			entity.rotationYaw += 8;
+		}
+		
+		@Override
+		public void dropPayload(EntityFallingTree entity) {
+			World world = entity.world;
+			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+			entity.payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
+			entity.destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.destroyData.cutPos.add(bis.pos), bis.stack));
+		}
+		
+		public boolean shouldDie(EntityFallingTree entity) {
+			return entity.ticksExisted > 30;
+		}
+		
+		@Override
+		@SideOnly(Side.CLIENT)
+		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+			Vec3d mc = entity.getMassCenter();
+			GlStateManager.translate(mc.x, mc.y, mc.z);
+			GlStateManager.rotate(-entityYaw, 0, 1, 0);
+			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
+		}
+	};
+
+	public static AnimationHandler animationHandler = defaultAnimationHandler;
 	
 	public void initMotion() {
-		motionY = 0.5;
+		animationHandler.initMotion(this);
 	}
 	
 	public void handleMotion() {
-		motionY -= 0.03;//Gravity
-		//motionY = 0.0;
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
-		rotationYaw += 8;
+		animationHandler.handleMotion(this);
 	}
 	
 	public void dropPayLoad() {		
 		if(!world.isRemote) {
-			BlockPos pos = new BlockPos(posX, posY, posZ);
-			payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
-
-			for(BlockItemStack bis : destroyData.leavesDrops) {
-				BlockPos sPos = pos.add(bis.pos);
-				EntityItem itemEntity = new EntityItem(world, sPos.getX() + 0.5, sPos.getY() + 0.5, sPos.getZ() + 0.5, bis.stack);
-				world.spawnEntity(itemEntity);
-			}
+			animationHandler.dropPayload(this);
 		}
+	}
+	
+	public boolean shouldDie() {
+		return animationHandler.shouldDie(this);
 	}
 	
 	@Override
 	protected void entityInit() {
 		getDataManager().register(voxelDataParameter, new NBTTagCompound());
 	}
-		
+	
 	public void setVoxelData(NBTTagCompound tag) {
 		getDataManager().set(voxelDataParameter, tag);
 	}
@@ -211,13 +245,9 @@ public class EntityFallingTree extends Entity {
 	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound compound) {
-		//compound.setString("name", name);
-	}
+	protected void readEntityFromNBT(NBTTagCompound compound) { }
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound compound) {
-		//name = compound.getString("name");
-	}
+	protected void writeEntityToNBT(NBTTagCompound compound) { }
 	
 }

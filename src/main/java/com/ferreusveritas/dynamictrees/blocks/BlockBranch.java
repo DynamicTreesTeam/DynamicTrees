@@ -33,7 +33,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
@@ -386,26 +385,20 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//Spawn the appropriate item entities into the world
-		//if(!world.isRemote) {// Only spawn entities server side
+		if(!world.isRemote) {// Only spawn entities server side
 			if(ModConfigs.enableFallingTrees) {
-				if(!world.isRemote) {
-					EntityFallingTree fallingTree = new EntityFallingTree(world);
-					fallingTree.setData(destroyData, woodDropList);
-					FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-					MinecraftForge.EVENT_BUS.post(fallEvent);
-					if(!fallEvent.isCanceled()) {
-						world.spawnEntity(fallEvent.getEntity());
-					}
+				EntityFallingTree fallingTree = new EntityFallingTree(world);
+				fallingTree.setData(destroyData, woodDropList);
+				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+				MinecraftForge.EVENT_BUS.post(fallEvent);
+				if(!fallEvent.isCanceled()) {
+					world.spawnEntity(fallEvent.getEntity());
 				}
 			} else {
 				woodDropList.forEach(i -> spawnAsEntity(world, cutPos, i));
-				for(BlockItemStack bis : destroyData.leavesDrops) {
-					BlockPos itemPos = cutPos.add(bis.pos);
-					EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, bis.stack);
-					world.spawnEntity(itemEntity);
-				}
+				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
 			}
-		//}
+		}
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, getRadius(state), woodVolume);
