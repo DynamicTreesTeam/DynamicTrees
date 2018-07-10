@@ -3,10 +3,12 @@ package com.ferreusveritas.dynamictrees.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.render.AnimationHandler;
+import com.ferreusveritas.dynamictrees.render.AnimationHandlers;
+import com.ferreusveritas.dynamictrees.render.FallingTreeModelCache;
+import com.ferreusveritas.dynamictrees.render.ModelTracker;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,7 +22,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityFallingTree extends Entity {
+public class EntityFallingTree extends Entity implements ModelTracker {
 
 	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
 	
@@ -42,7 +44,7 @@ public class EntityFallingTree extends Entity {
 	public boolean isClientBuilt() {
 		return clientBuilt;
 	}
-	
+
 	/**
 	 * This is only run by the server to set up the object data
 	 * 
@@ -124,6 +126,10 @@ public class EntityFallingTree extends Entity {
 		return destroyData;
 	}
 	
+	public List<ItemStack> getPayload() {
+		return payload;
+	}
+	
 	public Vec3d getGeomCenter() {
 		return geomCenter;
 	}
@@ -159,93 +165,17 @@ public class EntityFallingTree extends Entity {
 		if(shouldDie()) {
 			dropPayLoad();
 			setDead();
+			modelCleanup();
 		}
 	}
 
-	public interface AnimationHandler {
-		void initMotion(EntityFallingTree entity);
-		void handleMotion(EntityFallingTree entity);
-		void dropPayload(EntityFallingTree entity);
-		boolean shouldDie(EntityFallingTree entity);
-
-		@SideOnly(Side.CLIENT)
-		void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks);
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void modelCleanup() {
+		FallingTreeModelCache.cleanupModels(world, this);
 	}
-	
-	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
-		
-		@Override
-		public void initMotion(EntityFallingTree entity) {
-			//entity.motionY = 0.48;
-			//entity.motionX = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
-			//entity.motionZ = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
-		}
-		
-		@Override
-		public void handleMotion(EntityFallingTree entity) {
-			entity.motionY -= 0.03;//Gravity
-			entity.motionY = 0.0;
-			entity.posX += entity.motionX;
-			entity.posY += entity.motionY;
-			entity.posZ += entity.motionZ;
-			entity.rotationYaw += 8;
-			entity.rotationPitch += 2;
-			
-			if(entity.rotationPitch >= 180.0F) {
-				entity.rotationPitch -= 360.0F;
-				entity.prevRotationPitch -= 360.0F;
-			}
 
-			if(entity.rotationPitch < -180.0F) {
-				entity.rotationPitch += 360.0F;
-				entity.prevRotationPitch += 360.0F;
-			}
-
-			if(entity.rotationYaw >= 180.0F) {
-				//System.out.println("adjustment: " + entity.rotationYaw + ", " + entity.prevRotationYaw);
-				entity.rotationYaw -= 360.0F;
-				entity.prevRotationYaw -= 360.0F;
-				//System.out.println("after adjustment: " + entity.rotationYaw + ", " + entity.prevRotationYaw);
-			}
-			
-			if(entity.rotationYaw < -180.0F) {
-				entity.rotationYaw += 360.0F;
-				entity.prevRotationYaw += 360.0F;
-			}
-			
-	        while (entity.rotationPitch - entity.prevRotationPitch >= 180.0F) {
-	        	entity.prevRotationPitch += 360.0F;
-	        }
-			
-		}
-		
-		@Override
-		public void dropPayload(EntityFallingTree entity) {
-			World world = entity.world;
-			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-			entity.payload.forEach(i -> Block.spawnAsEntity(world, pos, i));
-			entity.destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.destroyData.cutPos.add(bis.pos), bis.stack));
-		}
-		
-		public boolean shouldDie(EntityFallingTree entity) {
-			return entity.ticksExisted > 90000;
-		}
-		
-		@Override
-		@SideOnly(Side.CLIENT)
-		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
-			
-			float pitch = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * partialTicks); 
-			
-			Vec3d mc = entity.getMassCenter();
-			GlStateManager.translate(mc.x, mc.y, mc.z);
-			GlStateManager.rotate(-entityYaw, 0, 1, 0);
-			GlStateManager.rotate(-pitch, 1, 0, 0);
-			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
-		}
-	};
-
-	public static AnimationHandler animationHandler = defaultAnimationHandler;
+	public static AnimationHandler animationHandler = AnimationHandlers.defaultAnimationHandler;
 	
 	public void initMotion() {
 		animationHandler.initMotion(this);
@@ -283,5 +213,5 @@ public class EntityFallingTree extends Entity {
 	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) { }
-	
+
 }

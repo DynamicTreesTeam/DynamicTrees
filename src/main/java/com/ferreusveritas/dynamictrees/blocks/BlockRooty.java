@@ -11,10 +11,9 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -37,6 +36,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
@@ -229,7 +229,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public void destroyTree(World world, BlockPos rootPos) {
 		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
-			branch.destroyBranchFromNode(world, rootPos.up(), true);
+			branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true);
 		}
 	}
 	

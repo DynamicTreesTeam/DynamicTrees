@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
-import com.ferreusveritas.dynamictrees.util.MathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
@@ -13,6 +12,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class BlockVerboseFire extends BlockFire {

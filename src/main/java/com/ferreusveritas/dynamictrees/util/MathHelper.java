@@ -11,22 +11,6 @@ import java.util.Random;
  *
  */
 public class MathHelper {
-
-	public static int clamp(int num, int min, int max) {
-		return net.minecraft.util.math.MathHelper.clamp(num, min, max);
-	}
-
-	public static float clamp(float num, float min, float max) {
-		return net.minecraft.util.math.MathHelper.clamp(num, min, max);
-	}
-
-	public static double clamp(double num, double min, double max) {
-		return net.minecraft.util.math.MathHelper.clamp(num, min, max);
-	}
-
-    public static int floor(double value) {
-    	return net.minecraft.util.math.MathHelper.floor(value);
-    }
     
 	/** Select a random direction weighted from the probability map **/ 
 	public static int selectRandomFromDistribution(Random random, int distMap[]) {
@@ -96,5 +80,15 @@ public class MathHelper {
 		double distance = phi > Math.PI ? (Math.PI * 2) - phi : phi;
 		return distance;
 	}
+	
+	public float shortDegreesDist(float ang1, float ang2) {
+	    float max = 360.0f;
+	    float da = (ang2 - ang1) % max;
+	    return 2 * da % max - da;
+	}
 
+	public float angleDegreesInterpolate(float ang1, float ang2, float t) {
+	    return ang1 + shortDegreesDist(ang1, ang2) * t;
+	}
+	
 }

@@ -23,15 +23,16 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import scala.actors.threadpool.Arrays;
 
 public class BranchDestructionData {
-	public final Species species;
+	public final Species species;//The species of the tree that was harvested
 	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
 	public final int[] destroyedBranchesConnections;//Encoded branch shapes
-	public final int[] destroyedLeaves;//Encoded leaves positions
-	public final List<BlockItemStack> leavesDrops;
-	public final int[] endPoints;
-	public final int woodVolume;
-	public final EnumFacing cutDir;
-	public final BlockPos cutPos;
+	public final int[] destroyedLeaves;//Encoded leaves relative positions
+	public final List<BlockItemStack> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
+	public final int[] endPoints;//Encoded endpoint relative positions
+	public final int woodVolume;//A summation of all of the wood voxels that was harvested
+	public final EnumFacing cutDir;//The face that was connected to the remaining body of the tree or the rooty block
+	public final EnumFacing toolDir;//The face that was pounded on when breaking the block at cutPos
+	public final BlockPos cutPos;//The absolute(world) position of the block that was cut
 	
 	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
 	
@@ -44,10 +45,11 @@ public class BranchDestructionData {
 		endPoints = new int[0];
 		woodVolume = 0;
 		cutDir = EnumFacing.DOWN;
+		toolDir = EnumFacing.DOWN;
 		cutPos = BlockPos.ORIGIN;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir) {
+	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir, EnumFacing toolDir) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -57,7 +59,8 @@ public class BranchDestructionData {
 		this.endPoints = convertEndPointsToIntArray(ends);
 		this.woodVolume = volume;
 		this.cutPos = cutPos;
-		this.cutDir = cutDir;
+		this.cutDir = EnumFacing.DOWN;
+		this.toolDir = toolDir;
 	}
 	
 	public BranchDestructionData(NBTTagCompound nbt) {
@@ -69,7 +72,8 @@ public class BranchDestructionData {
 		this.endPoints = nbt.getIntArray("ends");	
 		this.woodVolume = nbt.getInteger("volume");	
 		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );	
-		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];	
+		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];
+		this.toolDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("tooldir"), 0, EnumFacing.values().length - 1)];
 	}
 	
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
@@ -83,6 +87,7 @@ public class BranchDestructionData {
 		tag.setInteger("cuty", cutPos.getY());
 		tag.setInteger("cutz", cutPos.getZ());
 		tag.setInteger("cutdir", cutDir.getIndex());
+		tag.setInteger("tooldir", toolDir.getIndex());
 		return tag;
 	}
 	
@@ -102,19 +107,19 @@ public class BranchDestructionData {
 			data2[index++] = encodeBranchesConnections(origExState);
 			branchList.remove(BlockPos.ORIGIN);
 		}
-
+		
 		//Encode the remaining blocks
 		for(Entry<BlockPos, IExtendedBlockState> set : branchList.entrySet()) {
 			BlockPos relPos = set.getKey();
 			IExtendedBlockState exState = set.getValue();
 			Block block = exState.getBlock();
-
+			
 			if(block instanceof BlockBranchBasic && bounds.inBounds(relPos)) { //Place comfortable limits on the system
 				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranchBasic) block, exState);
 				data2[index++] = encodeBranchesConnections(exState);
 			}
 		}
-
+		
 		//Shrink down the arrays
 		data1 = Arrays.copyOf(data1, index);
 		data2 = Arrays.copyOf(data2, index);
@@ -151,7 +156,7 @@ public class BranchDestructionData {
 	private int decodeBranchRadius(int encoded) {
 		return (encoded >> 24) & 0x1F; 
 	}
-
+	
 	public IExtendedBlockState getBranchBlockState(int index) {
 		return decodeBranchBlockState(destroyedBranchesRadiusPosition[index], destroyedBranchesConnections[index]);
 	}
@@ -176,7 +181,7 @@ public class BranchDestructionData {
 	///////////////////////////////////////////////////////////
 	// Leaves
 	///////////////////////////////////////////////////////////
-
+	
 	private int[] convertLeavesToIntArray(Map<BlockPos, IBlockState> leavesList) {
 		int data[] = new int[leavesList.size()];
 		int index = 0;
@@ -186,7 +191,7 @@ public class BranchDestructionData {
 			BlockPos relPos = set.getKey();
 			IBlockState state = set.getValue();
 			Block block = state.getBlock();
-
+			
 			if(block instanceof BlockDynamicLeaves && bounds.inBounds(relPos)) { //Place comfortable limits on the system
 				data[index++] = encodeLeaves(relPos, (BlockDynamicLeaves) block, state);
 			}
@@ -253,7 +258,7 @@ public class BranchDestructionData {
 				(((relPos.getY() + 64) & 0xFF) << 8) |
 				(((relPos.getZ() + 64) & 0xFF) << 0) ;
 	}
-
+	
 	private BlockPos decodeRelPos(int encoded) {
 		return new BlockPos(
 			(((encoded >> 16) & 0xFF) - 64),
@@ -261,6 +266,5 @@ public class BranchDestructionData {
 			(((encoded >> 0) & 0xFF) - 64)
 		);
 	}
-
 	
 }

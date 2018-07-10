@@ -43,6 +43,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -224,7 +225,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, boolean wholeTree) {
+	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, EnumFacing toolDir, boolean wholeTree) {
 		IBlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
 		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
@@ -249,7 +250,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 				
-		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir);
+		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir, toolDir);
 	}
 	
 	/**
@@ -304,7 +305,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if( family.isCompatibleGenericLeaves(blockState, world, pos) ) {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
-					BlockPos imPos = pos.toImmutable();
+					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
 					world.destroyBlock(imPos, false);
 					if(ModConfigs.enableFallingTrees) {
@@ -362,15 +363,20 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
+		
+		//Try to get the face being pounded on
+		RayTraceResult rtResult = player.rayTrace(player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
+		EnumFacing toolDir = rtResult != null ? rtResult.sideHit : EnumFacing.DOWN;
+		
 		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, false);
-
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
+		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		IBlockState belowState = world.getBlockState(cutPos.down());
 		if(TreeHelper.isRooty(belowState)) {
 			belowState.getBlock().updateTick(world, cutPos.down(), state, world.rand);
 		}
-
+		
 		//Get all of the wood drops
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
@@ -485,11 +491,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		IBlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(state, world, pos);
-			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, false);
+			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false);
 			int woodVolume = destroyData.woodVolume;
-			for (ItemStack item : getLogDrops(world, pos, species, woodVolume)) {
-				spawnAsEntity(world, pos, item);
-			}
+			//TODO: Make awesome with FallingTree branches having velocity imparted from explosive force
+			getLogDrops(world, pos, species, woodVolume).forEach(item -> spawnAsEntity(world, pos, item) );
+			destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
 		}
 	}
 	

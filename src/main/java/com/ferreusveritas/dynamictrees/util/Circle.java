@@ -116,7 +116,7 @@ public class Circle extends Vec2i {
 	}
 	
 	public Circle setRadius(int radius) {
-		this.radius = MathHelper.clamp(radius, 2, 8);
+		this.radius = net.minecraft.util.math.MathHelper.clamp(radius, 2, 8);
 		return this;
 	}
 	

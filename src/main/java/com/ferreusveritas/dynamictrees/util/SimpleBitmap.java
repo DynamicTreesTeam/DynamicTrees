@@ -23,7 +23,7 @@ public class SimpleBitmap {
 	* @param h Height 
 	*/
 	public SimpleBitmap(int w, int h) {
-		this.w = MathHelper.clamp(w, 1, 32);
+		this.w = net.minecraft.util.math.MathHelper.clamp(w, 1, 32);
 		this.h = Math.max(1, h);
 		this.bits = new int[this.h];
 		touched = false;

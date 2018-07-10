@@ -8,7 +8,6 @@ import java.util.function.Function;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
-import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 
@@ -31,6 +30,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
