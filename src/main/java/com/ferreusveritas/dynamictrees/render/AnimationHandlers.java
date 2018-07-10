@@ -25,20 +25,20 @@ public class AnimationHandlers {
 		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
-			//entity.motionY = 0.48;
-			//entity.motionX = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
-			//entity.motionZ = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
+			entity.motionY = 0.48;
+			entity.motionX = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
+			entity.motionZ = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
 		}
 		
 		@Override
 		public void handleMotion(EntityFallingTree entity) {
 			entity.motionY -= 0.03;//Gravity
-			entity.motionY = 0.0;
+			//entity.motionY = 0.0;
 			entity.posX += entity.motionX;
 			entity.posY += entity.motionY;
 			entity.posZ += entity.motionZ;
-			entity.rotationYaw += 8;
-			entity.rotationPitch += 2;
+			entity.rotationYaw += 2;
+			entity.rotationPitch += 6;
 			
 			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
 			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
@@ -54,7 +54,7 @@ public class AnimationHandlers {
 		}
 		
 		public boolean shouldDie(EntityFallingTree entity) {
-			return entity.ticksExisted > 90000;
+			return entity.ticksExisted > 30;
 		}
 		
 		@Override
@@ -69,6 +69,46 @@ public class AnimationHandlers {
 			GlStateManager.rotate(-pitch, 1, 0, 0);
 			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 		}
+	};
+	
+	public static final AnimationHandler demoAnimationHandler = new AnimationHandler() {
+		
+		@Override
+		public void initMotion(EntityFallingTree entity) { }
+		
+		@Override
+		public void handleMotion(EntityFallingTree entity) {
+			entity.motionY = 0.0;
+			entity.posX += entity.motionX;
+			entity.posY += entity.motionY;
+			entity.posZ += entity.motionZ;
+			entity.rotationYaw += 2;
+			entity.rotationPitch += 6;
+			
+			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
+			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+		}
+		
+		@Override
+		public void dropPayload(EntityFallingTree entity) { }
+		
+		@Override
+		public boolean shouldDie(EntityFallingTree entity) {
+			return false;
+		}
+		
+		@Override
+		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+			
+			float pitch = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * partialTicks); 
+			
+			Vec3d mc = entity.getMassCenter();
+			GlStateManager.translate(mc.x, mc.y, mc.z);
+			GlStateManager.rotate(-entityYaw, 0, 1, 0);
+			GlStateManager.rotate(-pitch, 1, 0, 0);
+			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);			
+		}
+		
 	};
 	
 }

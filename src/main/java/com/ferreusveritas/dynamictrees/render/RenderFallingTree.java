@@ -38,13 +38,13 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		if(!entity.isClientBuilt()) {
 			return;
 		}
-
+		
 		bindEntityTexture(entity);
 		
 		FallingTreeModel treeModel = FallingTreeModelCache.getModel(entity);
-
+		
 		int brightnessIn = FallingTreeModel.getBrightness(entity);
-
+		
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);

@@ -59,7 +59,7 @@ public class BranchDestructionData {
 		this.endPoints = convertEndPointsToIntArray(ends);
 		this.woodVolume = volume;
 		this.cutPos = cutPos;
-		this.cutDir = EnumFacing.DOWN;
+		this.cutDir = cutDir;
 		this.toolDir = toolDir;
 	}
 	

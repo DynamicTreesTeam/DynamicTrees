@@ -216,7 +216,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			this.pos = pos;
 		}
 	}
-
+	
 	/**
 	 * Destroys all branches recursively not facing the branching direction with the root node
 	 * 
@@ -249,7 +249,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		List<BlockItemStack> leavesDropsList = new ArrayList<>();
 		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
-				
+		
 		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir, toolDir);
 	}
 	

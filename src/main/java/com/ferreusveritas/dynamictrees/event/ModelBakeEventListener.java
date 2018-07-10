@@ -19,9 +19,9 @@ public class ModelBakeEventListener {
 	public void onModelBakeEvent(ModelBakeEvent event) {
 				
 		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake};
-
+		
 		for(Block block: rootyBlocks) {
-			Object rootsObject =  event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
+			Object rootsObject = event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
 			if (rootsObject instanceof IBakedModel) {
 				IBakedModel rootsModel = (IBakedModel) rootsObject;
 				RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
@@ -29,11 +29,11 @@ public class ModelBakeEventListener {
 			}
 		}
 		
-		Object flowerPotObject =  event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
+		Object flowerPotObject = event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
 		if (flowerPotObject instanceof IBakedModel) {
-		      IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
-		      BonsaiCompositeModel bonsaiPotModel = new BonsaiCompositeModel(flowerPotModel);
-		      event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
+			IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
+			BonsaiCompositeModel bonsaiPotModel = new BonsaiCompositeModel(flowerPotModel);
+			event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
 		}
 	}
 	

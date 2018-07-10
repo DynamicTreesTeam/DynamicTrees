@@ -34,11 +34,11 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
 	protected boolean clientBuilt = false;
+	protected boolean firstUpdate = true;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
 		setSize(1.0f, 1.0f);
-		initMotion();
 	}
 	
 	public boolean isClientBuilt() {
@@ -157,6 +157,9 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		if(world.isRemote && !clientBuilt) {
 			buildClient();
 		}
+
+		//animationHandler = AnimationHandlers.defaultAnimationHandler;
+		animationHandler = AnimationHandlers.demoAnimationHandler;
 		
 		handleMotion();
 		
@@ -177,12 +180,13 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 
 	public static AnimationHandler animationHandler = AnimationHandlers.defaultAnimationHandler;
 	
-	public void initMotion() {
-		animationHandler.initMotion(this);
-	}
-	
 	public void handleMotion() {
-		animationHandler.handleMotion(this);
+		if(firstUpdate) {
+			animationHandler.initMotion(this);
+			firstUpdate = false;
+		} else {
+			animationHandler.handleMotion(this);
+		}
 	}
 	
 	public void dropPayLoad() {		
