@@ -176,17 +176,47 @@ public class EntityFallingTree extends Entity {
 		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
-			entity.motionY = 0.5;
+			//entity.motionY = 0.48;
+			//entity.motionX = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
+			//entity.motionZ = 0.3 * (entity.world.rand.nextFloat() - 0.5f);
 		}
 		
 		@Override
 		public void handleMotion(EntityFallingTree entity) {
 			entity.motionY -= 0.03;//Gravity
-			//motionY = 0.0;
+			entity.motionY = 0.0;
 			entity.posX += entity.motionX;
 			entity.posY += entity.motionY;
 			entity.posZ += entity.motionZ;
 			entity.rotationYaw += 8;
+			entity.rotationPitch += 2;
+			
+			if(entity.rotationPitch >= 180.0F) {
+				entity.rotationPitch -= 360.0F;
+				entity.prevRotationPitch -= 360.0F;
+			}
+
+			if(entity.rotationPitch < -180.0F) {
+				entity.rotationPitch += 360.0F;
+				entity.prevRotationPitch += 360.0F;
+			}
+
+			if(entity.rotationYaw >= 180.0F) {
+				//System.out.println("adjustment: " + entity.rotationYaw + ", " + entity.prevRotationYaw);
+				entity.rotationYaw -= 360.0F;
+				entity.prevRotationYaw -= 360.0F;
+				//System.out.println("after adjustment: " + entity.rotationYaw + ", " + entity.prevRotationYaw);
+			}
+			
+			if(entity.rotationYaw < -180.0F) {
+				entity.rotationYaw += 360.0F;
+				entity.prevRotationYaw += 360.0F;
+			}
+			
+	        while (entity.rotationPitch - entity.prevRotationPitch >= 180.0F) {
+	        	entity.prevRotationPitch += 360.0F;
+	        }
+			
 		}
 		
 		@Override
@@ -198,15 +228,19 @@ public class EntityFallingTree extends Entity {
 		}
 		
 		public boolean shouldDie(EntityFallingTree entity) {
-			return entity.ticksExisted > 30;
+			return entity.ticksExisted > 90000;
 		}
 		
 		@Override
 		@SideOnly(Side.CLIENT)
 		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+			
+			float pitch = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * partialTicks); 
+			
 			Vec3d mc = entity.getMassCenter();
 			GlStateManager.translate(mc.x, mc.y, mc.z);
 			GlStateManager.rotate(-entityYaw, 0, 1, 0);
+			GlStateManager.rotate(-pitch, 1, 0, 0);
 			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 		}
 	};
