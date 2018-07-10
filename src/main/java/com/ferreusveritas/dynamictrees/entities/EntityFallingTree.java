@@ -158,8 +158,8 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			buildClient();
 		}
 
-		//animationHandler = AnimationHandlers.defaultAnimationHandler;
-		animationHandler = AnimationHandlers.demoAnimationHandler;
+		animationHandler = AnimationHandlers.defaultAnimationHandler;
+		//animationHandler = AnimationHandlers.demoAnimationHandler;
 		
 		handleMotion();
 		
