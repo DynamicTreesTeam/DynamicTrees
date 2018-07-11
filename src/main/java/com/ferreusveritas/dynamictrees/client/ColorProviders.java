@@ -32,7 +32,7 @@ public class ColorProviders {
 			return ColorizerFoliage.getFoliageColorBirch();
 		}
 	};
-		
+	
 	public static IBlockColor pineFoliageColorProvider = new IBlockColor() {
 		@Override
 		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {

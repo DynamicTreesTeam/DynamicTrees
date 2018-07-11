@@ -32,7 +32,6 @@ import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
@@ -191,17 +190,6 @@ public class ClientProxy extends CommonProxy {
 			});
 		}
 		
-		//makePlantsBlue();
-	}
-	
-	public void makePlantsBlue() {
-		//Because blue is fukin' tight!    Toying with the idea of how to create seasonal color changes
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-				return 0x6622FF;
-			}
-		}, new Block[] {Blocks.GRASS, Blocks.TALLGRASS, Blocks.DOUBLE_PLANT, Blocks.LEAVES, Blocks.LEAVES2});
 	}
 	
 	public void registerClientEventHandlers() {
