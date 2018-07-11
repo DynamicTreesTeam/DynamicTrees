@@ -179,8 +179,10 @@ public class AnimationHandlers {
 			
 			//Vec3d mc = entity.getMassCenter();
 			
+			int radius = entity.getDestroyData().getBranchRadius(0);
+			
 			EnumFacing toolDir = entity.getDestroyData().toolDir;
-			Vec3d toolVec = new Vec3d(toolDir.getFrontOffsetX(), toolDir.getFrontOffsetY(), toolDir.getFrontOffsetZ()).scale(0.5);
+			Vec3d toolVec = new Vec3d(toolDir.getFrontOffsetX(), toolDir.getFrontOffsetY(), toolDir.getFrontOffsetZ()).scale(radius / 16.0f);
 			
 			GlStateManager.translate(-toolVec.x, -toolVec.y, -toolVec.z);
 			GlStateManager.rotate(-yaw, 0, 0, 1);
