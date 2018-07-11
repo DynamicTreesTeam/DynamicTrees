@@ -48,7 +48,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
-		EntityFallingTree.animationHandler.renderTransform(entity, entityYaw, partialTicks);
+		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
 		
 		drawBakedQuads(treeModel.getQuads(), brightnessIn, treeModel.getLeavesColor());
 		

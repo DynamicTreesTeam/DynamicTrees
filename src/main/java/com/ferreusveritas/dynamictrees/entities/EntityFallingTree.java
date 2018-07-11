@@ -15,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -35,6 +36,14 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected Vec3d massCenter = Vec3d.ZERO;
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
+	
+	
+	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
+	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
+	public static AnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
+	public static AnimationHandler AnimHandlerBlast = AnimationHandlers.defaultAnimationHandler;
+
+	public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
@@ -158,8 +167,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			buildClient();
 		}
 		
-		animationHandler = AnimationHandlers.defaultAnimationHandler;
-		//animationHandler = AnimationHandlers.demoAnimationHandler;
+		currentAnimationHandler = selectAnimationHandler();
 		
 		handleMotion();
 		
@@ -172,31 +180,46 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		}
 	}
 	
+	protected AnimationHandler selectAnimationHandler() {
+		if(currentAnimationHandler == AnimationHandlers.voidAnimationHandler) {
+			
+			if(getDestroyData().cutDir == EnumFacing.DOWN) {
+				if(getMassCenter().y >= 1.0) {
+					return AnimHandlerFall;
+				} else {
+					return AnimHandlerFling;
+				}
+			}
+
+			return AnimHandlerDrop;
+		}
+		
+		return currentAnimationHandler;
+	}
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void modelCleanup() {
 		FallingTreeModelCache.cleanupModels(world, this);
 	}
 	
-	public static AnimationHandler animationHandler = AnimationHandlers.defaultAnimationHandler;
-	
 	public void handleMotion() {
 		if(firstUpdate) {
-			animationHandler.initMotion(this);
+			currentAnimationHandler.initMotion(this);
 			firstUpdate = false;
 		} else {
-			animationHandler.handleMotion(this);
+			currentAnimationHandler.handleMotion(this);
 		}
 	}
 	
 	public void dropPayLoad() {		
 		if(!world.isRemote) {
-			animationHandler.dropPayload(this);
+			currentAnimationHandler.dropPayload(this);
 		}
 	}
 	
 	public boolean shouldDie() {
-		return animationHandler.shouldDie(this);
+		return currentAnimationHandler.shouldDie(this);
 	}
 	
 	@Override
