@@ -8,5 +8,5 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public interface IColorProvider {
-	int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex);
+	int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex);
 }

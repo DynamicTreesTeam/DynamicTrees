@@ -20,23 +20,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ColorProviders {
 	
-	public static IColorProvider basicFoliageProvider = new IColorProvider() {
+	public static IColorProvider basicFoliageColorProvider = new IColorProvider() {
 		@Override
-		public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
 		}
 	};
 	
-	public static IColorProvider birchFoliageProvider = new IColorProvider() {
+	public static IColorProvider birchFoliageColorProvider = new IColorProvider() {
 		@Override
-		public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return ColorizerFoliage.getFoliageColorBirch();
 		}
 	};
 		
-	public static IColorProvider pineFoliageProvider = new IColorProvider() {
+	public static IColorProvider pineFoliageColorProvider = new IColorProvider() {
 		@Override
-		public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
+		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return ColorizerFoliage.getFoliageColorPine();
 		}
 	};

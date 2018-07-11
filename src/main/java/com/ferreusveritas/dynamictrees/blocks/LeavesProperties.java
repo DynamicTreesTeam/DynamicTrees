@@ -133,7 +133,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@SideOnly(Side.CLIENT)
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return ColorProviders.basicFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
+		return ColorProviders.basicFoliageColorProvider.colorMultiplier(state, world, pos, 0);
 	}
 	
 	@Override

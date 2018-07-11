@@ -88,7 +88,7 @@ public class ModBlocks {
 					@Override
 					@SideOnly(Side.CLIENT)
 					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-						return ColorProviders.pineFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
+						return ColorProviders.pineFoliageColorProvider.colorMultiplier(state, world, pos, 0);
 					}
 				};
 				
@@ -99,7 +99,7 @@ public class ModBlocks {
 			@Override
 			@SideOnly(Side.CLIENT)
 			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-				return ColorProviders.birchFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
+				return ColorProviders.birchFoliageColorProvider.colorMultiplier(state, world, pos, 0);
 			}
 		};
 		
