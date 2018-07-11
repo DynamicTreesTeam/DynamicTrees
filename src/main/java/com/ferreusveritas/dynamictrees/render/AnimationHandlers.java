@@ -3,13 +3,10 @@ package com.ferreusveritas.dynamictrees.render;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -23,12 +20,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class AnimationHandlers {
 	
+	
 	public static final AnimationHandler voidAnimationHandler = new AnimationHandler() {
 		@Override public boolean shouldDie(EntityFallingTree entity) { return true; }
 		@Override public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) { }
 		@Override public void initMotion(EntityFallingTree entity) { }
 		@Override public void handleMotion(EntityFallingTree entity) { }
-		@Override public void dropPayload(EntityFallingTree entity) { }
+		@Override public void dropPayload(EntityFallingTree entity) { EntityFallingTree.standardDropPayload(entity); }
 	};
 	
 	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
@@ -68,10 +66,7 @@ public class AnimationHandlers {
 		
 		@Override
 		public void dropPayload(EntityFallingTree entity) {
-			World world = entity.world;
-			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-			entity.getPayload().forEach(i -> Block.spawnAsEntity(world, pos, i));
-			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.getDestroyData().cutPos.add(bis.pos), bis.stack));
+			EntityFallingTree.standardDropPayload(entity);
 		}
 		
 		public boolean shouldDie(EntityFallingTree entity) {
@@ -158,10 +153,7 @@ public class AnimationHandlers {
 		
 		@Override
 		public void dropPayload(EntityFallingTree entity) {
-			World world = entity.world;
-			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-			entity.getPayload().forEach(i -> Block.spawnAsEntity(world, pos, i));
-			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.getDestroyData().cutPos.add(bis.pos), bis.stack));
+			EntityFallingTree.standardDropPayload(entity);
 		}
 		
 		@Override

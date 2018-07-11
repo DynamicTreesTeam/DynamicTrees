@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.render.AnimationHandler;
+import com.ferreusveritas.dynamictrees.render.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.render.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.render.FallingTreeModelCache;
 import com.ferreusveritas.dynamictrees.render.ModelTracker;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -44,6 +46,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	public static AnimationHandler AnimHandlerBlast = AnimationHandlers.defaultAnimationHandler;
 
 	public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
+	public AnimationHandlerData animationHandlerData = null;
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
@@ -167,8 +170,6 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			buildClient();
 		}
 		
-		currentAnimationHandler = selectAnimationHandler();
-		
 		handleMotion();
 		
 		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
@@ -181,20 +182,15 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	}
 	
 	protected AnimationHandler selectAnimationHandler() {
-		if(currentAnimationHandler == AnimationHandlers.voidAnimationHandler) {
-			
-			if(getDestroyData().cutDir == EnumFacing.DOWN) {
-				if(getMassCenter().y >= 1.0) {
-					return AnimHandlerFall;
-				} else {
-					return AnimHandlerFling;
-				}
+		if(getDestroyData().cutDir == EnumFacing.DOWN) {
+			if(getMassCenter().y >= 1.0) {
+				return AnimHandlerFall;
+			} else {
+				return AnimHandlerFling;
 			}
-
-			return AnimHandlerDrop;
 		}
 		
-		return currentAnimationHandler;
+		return AnimHandlerDrop;
 	}
 	
 	@Override
@@ -205,6 +201,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	public void handleMotion() {
 		if(firstUpdate) {
+			currentAnimationHandler = selectAnimationHandler();
 			currentAnimationHandler.initMotion(this);
 			firstUpdate = false;
 		} else {
@@ -220,6 +217,22 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	public boolean shouldDie() {
 		return currentAnimationHandler.shouldDie(this);
+	}
+	
+	/**
+	 * Same style payload dropper that has always existed in Dynamic Trees.
+	 * 
+	 * Drops wood materials at the cut position
+	 * Leaves drops fall from their original location
+	 * 
+	 * @param entity
+	 */
+	public static void standardDropPayload(EntityFallingTree entity) {
+		World world = entity.world;
+		//BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+		BlockPos cutPos = entity.getDestroyData().cutPos;
+		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
+		entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
 	}
 	
 	@Override
