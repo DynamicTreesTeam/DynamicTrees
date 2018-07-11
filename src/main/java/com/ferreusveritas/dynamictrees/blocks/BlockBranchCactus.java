@@ -148,8 +148,8 @@ public class BlockBranchCactus extends BlockBranch {
 	
 	@Override
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-        entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
-    }
+		entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
+	}
 	
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
@@ -174,8 +174,8 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
-    
-    @Override
+	
+	@Override
 	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
 		return CellNull.NULLCELL;
 	}
@@ -194,22 +194,22 @@ public class BlockBranchCactus extends BlockBranch {
 	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
 	}
-    
-    public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-    	EnumFacing originDir = signal.dir.getOpposite(); // Direction this signal originated from
-    	boolean trunk = signal.isInTrunk();
-    	
-    	if (originDir.getAxis() != EnumFacing.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {
-    		signal.success = false;
-    		return signal;
-    	}
-    	
-    	signal.success = world.setBlockState(pos, this.blockState.getBaseState().withProperty(TRUNK, trunk).withProperty(ORIGIN, originDir), 2);
-    	signal.radius = (int) (trunk ? signal.getSpecies().getFamily().getPrimaryThickness(): signal.getSpecies().getFamily().getSecondaryThickness());
-    	return signal;
-    }
-    
-    @Override
+	
+	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
+		EnumFacing originDir = signal.dir.getOpposite(); // Direction this signal originated from
+		boolean trunk = signal.isInTrunk();
+		
+		if (originDir.getAxis() != EnumFacing.Axis.Y && (world.getBlockState(pos.up()).getBlock() == this || world.getBlockState(pos.down()).getBlock() == this)) {
+			signal.success = false;
+			return signal;
+		}
+		
+		signal.success = world.setBlockState(pos, this.blockState.getBaseState().withProperty(TRUNK, trunk).withProperty(ORIGIN, originDir), 2);
+		signal.radius = (int) (trunk ? signal.getSpecies().getFamily().getPrimaryThickness(): signal.getSpecies().getFamily().getSecondaryThickness());
+		return signal;
+	}
+	
+	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		
 		if (signal.step()) { // This is always placed at the beginning of every growSignal function
@@ -234,7 +234,7 @@ public class BlockBranchCactus extends BlockBranch {
 		
 		return signal;
 	}
-    
+	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
@@ -350,5 +350,5 @@ public class BlockBranchCactus extends BlockBranch {
 		signal.depth--;
 		return signal;
 	}
-    
+	
 }

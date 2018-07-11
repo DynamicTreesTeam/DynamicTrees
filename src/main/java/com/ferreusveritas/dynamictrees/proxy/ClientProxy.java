@@ -80,7 +80,7 @@ public class ClientProxy extends CommonProxy {
 		
 		//Register Woodland Staff Mesher
 		ModelHelper.regModel(ModItems.treeStaff);
-
+		
 		
 		//TREE PARTS
 		

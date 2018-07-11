@@ -9,7 +9,7 @@ import net.minecraft.world.World;
  *
  */
 public class SeasonProviderNull implements ISeasonProvider {
-
+	
 	protected float lockedSeasonValue;
 	
 	public SeasonProviderNull() {
@@ -24,7 +24,7 @@ public class SeasonProviderNull implements ISeasonProvider {
 	public float getSeasonValue() {
 		return lockedSeasonValue;
 	}
-
+	
 	@Override
 	public void updateTick(World world, long worldTicks) {
 	}

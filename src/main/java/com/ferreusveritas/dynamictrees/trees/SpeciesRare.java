@@ -18,7 +18,7 @@ import net.minecraft.world.World;
  *
  */
 public class SpeciesRare extends Species {
-
+	
 	public SpeciesRare(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		super(name, treeFamily, leavesProperties);
 	}

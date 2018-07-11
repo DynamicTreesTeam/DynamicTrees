@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockCactusSapling extends BlockDynamicSapling {
-
+	
 	public BlockCactusSapling(String name) {
 		super(name);
 		setSoundType(SoundType.CLOTH);

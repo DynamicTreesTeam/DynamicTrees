@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
  *
  */
 public class TileEntityBonsai extends TileEntity {
-
+	
 	Species species = Species.NULLSPECIES;
 	IBlockState potState = Blocks.FLOWER_POT.getDefaultState();
 	ResourceLocation speciesName = species.getRegistryName();

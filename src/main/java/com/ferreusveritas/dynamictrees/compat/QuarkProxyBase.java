@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraftforge.fml.common.Loader;
 
 public class QuarkProxyBase {
-
+	
 	public static final String QuarkModId = "quark";
 	
 	public static boolean hasQuark() {

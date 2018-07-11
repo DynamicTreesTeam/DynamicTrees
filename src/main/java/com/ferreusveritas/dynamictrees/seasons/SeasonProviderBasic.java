@@ -42,7 +42,7 @@ public class SeasonProviderBasic implements ISeasonProvider {
 		month = (int) ((worldTicks / (ticksPerDay * daysPerMonth)) % monthsPerYear); //month of the year
 		day = (int) ((worldTicks / ticksPerDay) % daysPerMonth); //day of the month
 		season = ((month * daysPerMonth) + day) / ((daysPerMonth * monthsPerYear) / 4.0f);
-
+		
 		if(currentDay != day) {
 			notifyPlayersOfDate(world);
 			currentDay = day;

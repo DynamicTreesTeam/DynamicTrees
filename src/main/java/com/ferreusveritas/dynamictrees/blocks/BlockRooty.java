@@ -72,7 +72,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
-
+	
 	///////////////////////////////////////////
 	// TILE ENTITY
 	///////////////////////////////////////////
@@ -328,14 +328,14 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? BlockBranch.setSupport(1, 1) : 0;
 	}
-
+	
 	@Override
 	public TreeFamily getFamily(IBlockState rootyState, IBlockAccess blockAccess, BlockPos rootPos) {
 		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
 		IBlockState treeState = blockAccess.getBlockState(treePos);
 		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULLFAMILY;
 	}
-
+	
 	private TileEntitySpecies getTileEntitySpecies(World world, BlockPos pos) {
 		return (TileEntitySpecies) world.getTileEntity(pos);
 	}
@@ -347,7 +347,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	 * {@link BlockBranch} says it is.
 	 */
 	public Species getSpecies(IBlockState blockState, World world, BlockPos rootPos) {
-
+		
 		TreeFamily tree = getFamily(blockState, world, rootPos);
 		
 		if(hasTileEntity) {
@@ -404,14 +404,14 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	 */
 	@Override
 	@SideOnly(Side.CLIENT)
-    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
 		IBlockState state = world.getBlockState(pos);
 		IBlockState mimicState = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(MimicProperty.MIMIC);
 		
 		manager.addBlockDestroyEffects(pos, mimicState);
 		
 		return true;
-    }
+	}
 	
 	/**
 	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.

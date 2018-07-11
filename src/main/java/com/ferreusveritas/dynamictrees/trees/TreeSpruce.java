@@ -28,7 +28,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeSpruce extends TreeFamily {
 	
 	public class SpeciesSpruce extends Species {
-
+		
 		FeatureGenPodzol podzolGen;
 		
 		SpeciesSpruce(TreeFamily treeFamily) {
@@ -42,7 +42,7 @@ public class TreeSpruce extends TreeFamily {
 			envFactor(Type.WET, 0.75f);
 			
 			setupStandardSeedDropping();
-
+			
 			podzolGen = new FeatureGenPodzol();
 		}
 		

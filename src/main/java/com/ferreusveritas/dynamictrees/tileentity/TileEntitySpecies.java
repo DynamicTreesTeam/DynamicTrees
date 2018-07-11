@@ -17,7 +17,7 @@ import net.minecraft.util.ResourceLocation;
  *
  */
 public class TileEntitySpecies extends TileEntity {
-
+	
 	Species species = Species.NULLSPECIES;
 	ResourceLocation speciesName = species.getRegistryName();
 	

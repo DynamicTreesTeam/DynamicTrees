@@ -118,7 +118,7 @@ public class BlockFruit extends Block implements IGrowable {
 			drops.add(new ItemStack(Items.APPLE));
 		}
 	}
-
+	
 	
 	///////////////////////////////////////////
 	// BOUNDARIES
@@ -127,18 +127,18 @@ public class BlockFruit extends Block implements IGrowable {
 	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
-
+	
 	/**
 	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
 	 */
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
-
+	
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return FRUIT_AABB[state.getValue(AGE)];
 	}
-
+	
 	
 	///////////////////////////////////////////
 	// BLOCKSTATE
@@ -150,14 +150,14 @@ public class BlockFruit extends Block implements IGrowable {
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(meta & 3));
 	}
-
+	
 	/**
 	 * Convert the BlockState into the correct metadata value
 	 */
 	public int getMetaFromState(IBlockState state) {
 		return state.getValue(AGE) & 3;
 	}
-
+	
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] {AGE});
 	}

@@ -16,7 +16,7 @@ public interface ISeasonProvider {
 	 * @return season value
 	 */
 	public float getSeasonValue();
-
+	
 	/**
 	 * A simple method for updating the handler every tick.
 	 * 

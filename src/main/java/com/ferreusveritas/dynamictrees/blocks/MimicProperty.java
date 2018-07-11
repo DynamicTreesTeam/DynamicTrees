@@ -40,11 +40,11 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 	
 	public static IBlockState getDirtMimic(IBlockAccess access, BlockPos pos) {
 		final int dMap[] = {0, -1, 1};//Y-Axis depth map
-
+		
 		IBlockState mimic = Blocks.DIRT.getDefaultState();//Default to dirt in case no dirt or grass is found
 		IBlockState cache[] = new IBlockState[12];//A cache so we don't need to pull the blocks from the world twice
 		int i = 0;
-
+		
 		//Prioritize Grass by searching for grass first
 		for (int depth : dMap) {
 			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
@@ -54,7 +54,7 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 				}
 			}
 		}
-
+		
 		//Settle for other kinds of dirt
 		for (i = 0; i < 12; i++) {
 			IBlockState ground = cache[i];
@@ -62,7 +62,7 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 				return ground;
 			}
 		}
-
+		
 		//If all else fails then just return plain ol' dirt
 		return mimic;
 	}

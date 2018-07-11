@@ -9,15 +9,15 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeAcacia extends TreeFamily {
-		
+	
 	public class SpeciesAcacia extends Species {
-
+		
 		SpeciesAcacia(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.acaciaLeavesProperties);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
-		
+			
 			envFactor(Type.COLD, 0.25f);
 			envFactor(Type.NETHER, 0.75f);
 			envFactor(Type.WET, 0.75f);
@@ -31,13 +31,13 @@ public class TreeAcacia extends TreeFamily {
 		}
 		
 	}
-		
+	
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
 		ModBlocks.acaciaLeavesProperties.setTree(this);
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.ACACIA); });
 	}
-
+	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesAcacia(this));

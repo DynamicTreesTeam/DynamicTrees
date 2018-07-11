@@ -54,7 +54,7 @@ public class QuarkProxyActiveClient extends QuarkProxyBase {
 	private void crackQuark() {
 		// Get some Quark
 		greenerGrass = (GreenerGrass) ModuleLoader.featureInstances.get(GreenerGrass.class);
-
+		
 		if(greenerGrass != null && greenerGrass.enabled) {// Does there Quark?
 			// Crack open Quark with Java hammer.
 			registrationMethod = ReflectionHelper.findMethod(GreenerGrass.class, "registerGreenerColor", null, new Class[]{ Block[].class });

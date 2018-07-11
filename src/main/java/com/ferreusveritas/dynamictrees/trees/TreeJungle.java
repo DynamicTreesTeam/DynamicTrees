@@ -31,13 +31,13 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeJungle extends TreeFamily {
 	
 	public class SpeciesJungle extends Species {
-
+		
 		FeatureGenVine vineGen;
 		FeatureGenUndergrowth underGen;
 		
 		SpeciesJungle(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
-
+			
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
 			
@@ -51,7 +51,7 @@ public class TreeJungle extends TreeFamily {
 			vineGen = new FeatureGenVine(this);
 			underGen = new FeatureGenUndergrowth(this);
 		}
-
+		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
@@ -102,17 +102,17 @@ public class TreeJungle extends TreeFamily {
 		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
-
+			
 			if(world.rand.nextInt() % 8 == 0) {
 				addCocoa(world, rootPos, true);
 			}
-
+			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 				BlockPos treePos = rootPos.up();
 				
 				//Generate Vines
 				vineGen.setQuantity(endPoints.size()).setMaxLength(20).gen(world, treePos, endPoints, safeBounds);
-
+				
 				//Generate undergrowth
 				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
 			}
@@ -128,7 +128,7 @@ public class TreeJungle extends TreeFamily {
 			
 			return true;
 		}
-
+		
 		private void addCocoa(World world, BlockPos rootPos, boolean worldGen) {
 			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa().setWorldGen(worldGen)));
 		}
@@ -141,7 +141,7 @@ public class TreeJungle extends TreeFamily {
 		canSupportCocoa = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE); });
 	}
-
+	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesJungle(this));

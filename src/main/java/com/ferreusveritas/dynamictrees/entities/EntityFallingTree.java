@@ -23,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityFallingTree extends Entity implements ModelTracker {
-
+	
 	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
 	
 	//Not needed in client
@@ -44,7 +44,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	public boolean isClientBuilt() {
 		return clientBuilt;
 	}
-
+	
 	/**
 	 * This is only run by the server to set up the object data
 	 * 
@@ -59,7 +59,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
 		this.posZ = cutPos.getZ() + 0.5;
-
+		
 		int numBlocks = destroyData.getNumBranches();
 		geomCenter = new Vec3d(0, 0, 0);
 		double totalMass = 0;
@@ -76,15 +76,15 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			geomCenter = geomCenter.add(relVec);
 			massCenter = massCenter.add(relVec.scale(mass));
 		}
-
+		
 		geomCenter = geomCenter.scale(1.0 / numBlocks);
 		massCenter = massCenter.scale(1.0 / totalMass);
-
+		
 		setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
 		
 		setVoxelData(buildVoxelData(destroyData));
 	}
-
+	
 	public NBTTagCompound buildVoxelData(BranchDestructionData destroyData) {
 		NBTTagCompound tag = new NBTTagCompound();
 		destroyData.writeToNBT(tag);
@@ -100,7 +100,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	}
 	
 	public void buildClient() {
-
+		
 		NBTTagCompound tag = getVoxelData();
 		
 		if(tag.hasKey("species")) {
@@ -144,10 +144,10 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		double dx = x - this.posX;
 		double dy = y - this.posY;
 		double dz = z - this.posZ;
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        this.setEntityBoundingBox(getEntityBoundingBox().offset(dx, dy, dz));
+		this.posX = x;
+		this.posY = y;
+		this.posZ = z;
+		this.setEntityBoundingBox(getEntityBoundingBox().offset(dx, dy, dz));
 	}
 	
 	@Override
@@ -157,7 +157,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		if(world.isRemote && !clientBuilt) {
 			buildClient();
 		}
-
+		
 		animationHandler = AnimationHandlers.defaultAnimationHandler;
 		//animationHandler = AnimationHandlers.demoAnimationHandler;
 		
@@ -171,13 +171,13 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			modelCleanup();
 		}
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void modelCleanup() {
 		FallingTreeModelCache.cleanupModels(world, this);
 	}
-
+	
 	public static AnimationHandler animationHandler = AnimationHandlers.defaultAnimationHandler;
 	
 	public void handleMotion() {
@@ -217,5 +217,5 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) { }
-
+	
 }

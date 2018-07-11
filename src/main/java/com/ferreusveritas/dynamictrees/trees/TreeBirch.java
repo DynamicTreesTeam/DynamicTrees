@@ -20,7 +20,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class TreeBirch extends TreeFamily {
-		
+	
 	public class SpeciesBirch extends Species {
 		
 		SpeciesBirch(TreeFamily treeFamily) {

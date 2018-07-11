@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class EntityLingeringEffector extends Entity {
-
+	
 	public BlockPos blockPos;
 	public ISubstanceEffect effect;
 	public boolean extended;
@@ -23,7 +23,7 @@ public class EntityLingeringEffector extends Entity {
 		noClip = true;
 		setBlockPos(pos);
 		setEffect(effect);
-
+		
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
 			for(EntityLingeringEffector effector : world.getEntitiesWithinAABB(EntityLingeringEffector.class, new AxisAlignedBB(pos))) {
@@ -33,7 +33,7 @@ public class EntityLingeringEffector extends Entity {
 			}
 		}
 	}
-
+	
 	public void setBlockPos(BlockPos pos) {
 		blockPos = pos;
 		setPosition(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
@@ -53,20 +53,20 @@ public class EntityLingeringEffector extends Entity {
 	
 	@Override
 	protected void entityInit() {}
-
+	
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound compound) {}
-
+	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) {}
-
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		
 		if(effect != null) {
 			IBlockState blockState = world.getBlockState(blockPos);
-
+			
 			if(blockState.getBlock() instanceof BlockRooty) {
 				if(!effect.update(world, blockPos, ticksExisted)) {
 					setDead();
@@ -75,9 +75,9 @@ public class EntityLingeringEffector extends Entity {
 				setDead();
 			}
 		}	
-
+		
 	}
-
+	
 	@Override
 	public boolean shouldRenderInPass(int pass) {
 		return false;//Effectively make this entity invisible

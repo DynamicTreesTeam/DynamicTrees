@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class Mushroom extends Species {
-
+	
 	protected static final IBlockState dirtState = Blocks.DIRT.getDefaultState();
 	
 	protected final boolean red;

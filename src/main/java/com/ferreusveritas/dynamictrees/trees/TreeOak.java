@@ -60,7 +60,7 @@ public class TreeOak extends TreeFamily {
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FOREST_HILLS);
 		}
-	
+		
 		@Override
 		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
 			if(super.rot(world, pos, neighborCount, radius, random)) {
@@ -151,12 +151,12 @@ public class TreeOak extends TreeFamily {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
 	public class SpeciesAppleOak extends SpeciesRare {
-
+		
 		FeatureGenFruit appleGen;
 		private static final String speciesName = "apple";
 		
@@ -173,7 +173,7 @@ public class TreeOak extends TreeFamily {
 			generateSeed();
 						
 			appleGen = new FeatureGenFruit(this, ModBlocks.blockFruit.getDefaultState()).setRayDistance(4);
-
+			
 			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
 		}
 		

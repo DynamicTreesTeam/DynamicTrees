@@ -24,7 +24,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeDarkOak extends TreeFamily {
 	
 	public class SpeciesDarkOak extends Species {
-
+		
 		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
@@ -37,14 +37,14 @@ public class TreeDarkOak extends TreeFamily {
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.25f);
 			envFactor(Type.MUSHROOM, 1.25f);
-
+			
 			if(ModConfigs.worldGen && !ModConfigs.enableAppleTrees) {
 				addDropCreator(new DropCreatorApple());
 			}
 			
 			setupStandardSeedDropping();
 		}
-
+		
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.ROOFED_FOREST);
@@ -64,7 +64,7 @@ public class TreeDarkOak extends TreeFamily {
 		public float getGrowthRate(World world, BlockPos pos) {
 			return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
 		}
-
+		
 		@Override
 		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
 			

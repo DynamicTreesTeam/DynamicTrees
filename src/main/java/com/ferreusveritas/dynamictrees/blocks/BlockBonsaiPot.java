@@ -38,13 +38,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBonsaiPot extends BlockContainer {
-
+	
 	public static final MimicProperty SPECIES = new MimicProperty("species");
 	public static final MimicProperty POT = new MimicProperty("pot");
 		
 	public static final String name = "bonsaipot";
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
-
+	
 	public BlockBonsaiPot() {
 		this(name);
 	}
@@ -54,7 +54,7 @@ public class BlockBonsaiPot extends BlockContainer {
 		setUnlocalizedName(name);
 		setRegistryName(name);
 	}
-
+	
 	//////////////////////////////
 	// SPECIES PROPERTIES
 	//////////////////////////////
@@ -76,12 +76,12 @@ public class BlockBonsaiPot extends BlockContainer {
 	public IBlockState getSaplingState(IBlockAccess access, BlockPos pos) {
 		return getSpecies(access, pos).getDynamicSapling();
 	}
-
+	
 	public IBlockState getPotState(IBlockAccess access, BlockPos pos) {
 		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(access, pos);
 		return bonsaiPotTE instanceof TileEntityBonsai ? bonsaiPotTE.getPot() : Blocks.FLOWER_POT.getDefaultState();
 	}
-
+	
 	public boolean setPotState(World world, IBlockState potState, BlockPos pos) {
 		TileEntityBonsai bonsaiPotTE = getTileEntityBonsai(world, pos);
 		if(bonsaiPotTE instanceof TileEntityBonsai) {
@@ -131,7 +131,7 @@ public class BlockBonsaiPot extends BlockContainer {
 		
 		return false;
 	}
-
+	
 	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
@@ -156,26 +156,26 @@ public class BlockBonsaiPot extends BlockContainer {
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Items.FLOWER_POT;
 	}
-
+	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);//Return the pot itself
 		ret.add(getSpecies(world, pos).getSeedStack(1));//Add the seed in the pot
 		return ret;
 	}
-
+	
 	@Override
 	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
 		if (!world.getBlockState(pos.down()).isSideSolid(world, pos, EnumFacing.UP)) {
 			this.dropBlockAsItem(world, pos, state, 0);
 			world.setBlockToAir(pos);
 		}
-    }
+	}
 	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
-
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SPECIES, POT});
@@ -189,12 +189,12 @@ public class BlockBonsaiPot extends BlockContainer {
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
-
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return FLOWER_POT_AABB;
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
@@ -208,7 +208,7 @@ public class BlockBonsaiPot extends BlockContainer {
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
@@ -217,7 +217,7 @@ public class BlockBonsaiPot extends BlockContainer {
 	
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
+		return EnumBlockRenderType.MODEL;
 	}
 	
 }

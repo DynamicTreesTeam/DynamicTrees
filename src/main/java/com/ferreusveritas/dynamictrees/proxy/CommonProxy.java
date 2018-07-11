@@ -22,19 +22,19 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
-
+	
 	public void registerTileEntities() {}
-
+	
 	public void preInit() {
 		registerCommonEventHandlers();
 	}
-
+	
 	public void init() {}
-
+	
 	public void registerModels() {}
 	
 	public void registerColorHandlers() {}
-
+	
 	public void registerCommonEventHandlers() {
 		//Common Events.. unused at the moment
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
@@ -62,18 +62,17 @@ public class CommonProxy {
 	public int getFoliageColor(ILeavesProperties leavesProperties, World world, IBlockState blockState, BlockPos pos) {
 		return 0x00FF00FF;//Magenta shading as error indicator
 	}
-
+	
 	///////////////////////////////////////////
 	// PARTICLES
 	///////////////////////////////////////////
-
+	
 	public void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, IBlockState blockState, float r, float g, float b) {}
 	
 	/**
 	 * Not strictly necessary. But adds a little more isolation to the server for particle effects
 	 */
 	public void spawnParticle(World world, EnumParticleTypes particleType, double x, double y, double z, double mx, double my, double mz) {}
-
 	
 	public void crushLeavesBlock(World world, BlockPos pos, IBlockState blockState, Entity entity) {}
 	

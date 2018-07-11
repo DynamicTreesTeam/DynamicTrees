@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LeavesProperties implements ILeavesProperties {
-
+	
 	public static final LeavesProperties NULLPROPERTIES = new LeavesProperties() {
 		@Override public ILeavesProperties setTree(TreeFamily tree) { return this; }
 		@Override public TreeFamily getTree() { return TreeFamily.NULLFAMILY; }
@@ -42,7 +42,7 @@ public class LeavesProperties implements ILeavesProperties {
 	private ICellKit cellKit;
 	private TreeFamily tree = TreeFamily.NULLFAMILY;
 	private IBlockState dynamicLeavesBlockHydroStates[] = new IBlockState[5];
-
+	
 	private LeavesProperties() {}
 	
 	public LeavesProperties(IBlockState primitiveLeaves) {
@@ -67,7 +67,7 @@ public class LeavesProperties implements ILeavesProperties {
 	public IBlockState getPrimitiveLeaves() {
 		return primitiveLeaves;
 	}
-
+	
 	@Override
 	public ItemStack getPrimitiveLeavesItemStack() {
 		return primitiveLeavesItemStack;
@@ -75,7 +75,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public ILeavesProperties setDynamicLeavesState(IBlockState state) {
-
+		
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.getDefaultState();
 		for(int i = 1; i <= 4; i++) {
@@ -105,12 +105,12 @@ public class LeavesProperties implements ILeavesProperties {
 	public TreeFamily getTree() {
 		return tree;
 	}
-
+	
 	@Override
 	public int getFlammability() {
 		return 60;// Mimic vanilla leaves
 	}
-
+	
 	@Override
 	public int getFireSpreadSpeed() {
 		return 30;// Mimic vanilla leaves
@@ -120,12 +120,12 @@ public class LeavesProperties implements ILeavesProperties {
 	public int getSmotherLeavesMax() {
 		return 4;
 	}
-
+	
 	@Override
 	public int getLightRequirement() {
 		return 13;
 	}
-
+	
 	@Override
 	public ICellKit getCellKit() {
 		return cellKit;
@@ -135,7 +135,7 @@ public class LeavesProperties implements ILeavesProperties {
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return ColorProviders.basicFoliageProvider.foliageColorMultiplier(state, world, pos, 0);
 	}
-
+	
 	@Override
 	public boolean appearanceChangesWithHydro() {
 		return false;
@@ -144,5 +144,6 @@ public class LeavesProperties implements ILeavesProperties {
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
-	}	
+	}
+	
 }

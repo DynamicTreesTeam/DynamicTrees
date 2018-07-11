@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.seasons;
 import net.minecraft.world.World;
 
 public class SeasonManager {
-
+	
 	//static protected ISeasonProvider seasonProvider = new SeasonProviderBasic();
 	static protected ISeasonProvider seasonProvider = new SeasonProviderNull();
 	
