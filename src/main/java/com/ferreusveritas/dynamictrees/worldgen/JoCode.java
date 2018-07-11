@@ -182,7 +182,9 @@ public class JoCode {
 			TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
 			
 			//Rot the unsupported branches
-			species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds);
+			if(species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
+				return;//The entire tree rotted away before it had a chance
+			}
 			
 			//Allow for special decorations by the tree itself
 			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
