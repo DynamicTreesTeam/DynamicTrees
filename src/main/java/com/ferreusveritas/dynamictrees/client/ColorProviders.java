@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import com.ferreusveritas.dynamictrees.api.client.IColorProvider;
-
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
@@ -20,21 +19,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ColorProviders {
 	
-	public static IColorProvider basicFoliageColorProvider = new IColorProvider() {
+	public static IBlockColor basicFoliageColorProvider = new IBlockColor() {
 		@Override
 		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return (world != null && pos != null) ? BiomeColorHelper.getFoliageColorAtPos(world, pos) : ColorizerFoliage.getFoliageColorBasic();
 		}
 	};
 	
-	public static IColorProvider birchFoliageColorProvider = new IColorProvider() {
+	public static IBlockColor birchFoliageColorProvider = new IBlockColor() {
 		@Override
 		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return ColorizerFoliage.getFoliageColorBirch();
 		}
 	};
 		
-	public static IColorProvider pineFoliageColorProvider = new IColorProvider() {
+	public static IBlockColor pineFoliageColorProvider = new IBlockColor() {
 		@Override
 		public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 			return ColorizerFoliage.getFoliageColorPine();
