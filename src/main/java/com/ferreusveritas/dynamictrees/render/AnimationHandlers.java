@@ -61,12 +61,13 @@ public class AnimationHandlers {
 		@SideOnly(Side.CLIENT)
 		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
 			
-			float pitch = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * partialTicks); 
+			float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
+			float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));			
 			
 			Vec3d mc = entity.getMassCenter();
 			GlStateManager.translate(mc.x, mc.y, mc.z);
-			GlStateManager.rotate(-entityYaw, 0, 1, 0);
-			GlStateManager.rotate(-pitch, 1, 0, 0);
+			GlStateManager.rotate(-yaw, 0, 1, 0);
+			GlStateManager.rotate(pit, 1, 0, 0);
 			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 		}
 	};
@@ -82,8 +83,8 @@ public class AnimationHandlers {
 			entity.posX += entity.motionX;
 			entity.posY += entity.motionY;
 			entity.posZ += entity.motionZ;
-			entity.rotationYaw += 2;
-			entity.rotationPitch += 6;
+			entity.rotationYaw += 6;
+			entity.rotationPitch += 2;
 			
 			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
 			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
@@ -100,12 +101,13 @@ public class AnimationHandlers {
 		@Override
 		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
 			
-			float pitch = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * partialTicks); 
+			float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
+			float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));			
 			
 			Vec3d mc = entity.getMassCenter();
 			GlStateManager.translate(mc.x, mc.y, mc.z);
-			GlStateManager.rotate(-entityYaw, 0, 1, 0);
-			GlStateManager.rotate(-pitch, 1, 0, 0);
+			GlStateManager.rotate(-yaw, 0, 1, 0);
+			GlStateManager.rotate(pit, 1, 0, 0);
 			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);			
 		}
 		

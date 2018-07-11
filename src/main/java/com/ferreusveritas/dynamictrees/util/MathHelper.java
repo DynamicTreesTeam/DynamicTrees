@@ -81,13 +81,13 @@ public class MathHelper {
 		return distance;
 	}
 	
-	public float shortDegreesDist(float ang1, float ang2) {
+	public static float shortDegreesDist(float ang1, float ang2) {
 	    float max = 360.0f;
 	    float da = (ang2 - ang1) % max;
 	    return 2 * da % max - da;
 	}
 
-	public float angleDegreesInterpolate(float ang1, float ang2, float t) {
+	public static float angleDegreesInterpolate(float ang1, float ang2, float t) {
 	    return ang1 + shortDegreesDist(ang1, ang2) * t;
 	}
 	
