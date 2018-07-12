@@ -363,7 +363,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
-		
+				
 		//Try to get the face being pounded on
 		RayTraceResult rtResult = player.rayTrace(player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
 		EnumFacing toolDir = rtResult != null ? rtResult.sideHit : EnumFacing.DOWN;
@@ -374,7 +374,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		IBlockState belowState = world.getBlockState(cutPos.down());
 		if(TreeHelper.isRooty(belowState)) {
-			belowState.getBlock().updateTick(world, cutPos.down(), state, world.rand);
+			belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
 		}
 		
 		//Get all of the wood drops
