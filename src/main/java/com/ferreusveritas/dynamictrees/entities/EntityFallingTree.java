@@ -23,6 +23,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -124,20 +125,19 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			clientBuilt = true;
 		}
 		
-		//So.. the leaves cause a block light update when removed.. which causes a redraw
 		for(int i = 0; i < destroyData.getNumBranches(); i++) {
 			BlockPos relPos = destroyData.getBranchRelPos(i);
 			BlockPos absPos = destroyData.cutPos.add(relPos);
-			//world.destroyBlock(absPos, false);
-			world.setBlockState(absPos, Blocks.AIR.getDefaultState(), 3);
+			world.setBlockState(absPos, Blocks.STONE.getDefaultState(), 0);//This forces the client to rerender the chunks
+			world.setBlockState(absPos, Blocks.AIR.getDefaultState(), 0);
 		}
 		
-		//that same redraw doesn't happen here because branches are 100% light passive
 		for(int i = 0; i < destroyData.getNumLeaves(); i++) {
 			BlockPos relPos = destroyData.getLeavesRelPos(i);
 			BlockPos absPos = destroyData.cutPos.add(relPos);
 			world.destroyBlock(absPos, false);
 		}
+		
 	}
 	
 	
