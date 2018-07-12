@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -122,7 +123,24 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
 			clientBuilt = true;
 		}
+		
+		//So.. the leaves cause a block light update when removed.. which causes a redraw
+		for(int i = 0; i < destroyData.getNumBranches(); i++) {
+			BlockPos relPos = destroyData.getBranchRelPos(i);
+			BlockPos absPos = destroyData.cutPos.add(relPos);
+			//world.destroyBlock(absPos, false);
+			world.setBlockState(absPos, Blocks.AIR.getDefaultState(), 3);
+		}
+		
+		//that same redraw doesn't happen here because branches are 100% light passive
+		for(int i = 0; i < destroyData.getNumLeaves(); i++) {
+			BlockPos relPos = destroyData.getLeavesRelPos(i);
+			BlockPos absPos = destroyData.cutPos.add(relPos);
+			world.destroyBlock(absPos, false);
+		}
 	}
+	
+	
 	
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
 		AxisAlignedBB aabb = new AxisAlignedBB(destroyData.cutPos);

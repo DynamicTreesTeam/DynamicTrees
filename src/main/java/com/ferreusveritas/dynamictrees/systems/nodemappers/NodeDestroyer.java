@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,10 +22,12 @@ public class NodeDestroyer implements INodeInspector {
 	
 	Species species;//Destroy any node that's made of the same kind of wood
 	private List<BlockPos> endPoints;//We always need to track endpoints during destruction
+	private boolean notifyClient = false;
 	
-	public NodeDestroyer(Species species) {
+	public NodeDestroyer(Species species, boolean notifyClient) {
 		this.endPoints = new ArrayList<BlockPos>(32);
 		this.species = species;
+		this.notifyClient = notifyClient;
 	}
 	
 	public List<BlockPos> getEnds() {
@@ -39,7 +42,7 @@ public class NodeDestroyer implements INodeInspector {
 			if(branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
 				endPoints.add(pos);
 			}
-			world.setBlockToAir(pos);//Destroy the branch
+			world.setBlockState(pos, Blocks.AIR.getDefaultState(), notifyClient ? 3 : 1);//Destroy the branch
 		}
 		
 		return true;

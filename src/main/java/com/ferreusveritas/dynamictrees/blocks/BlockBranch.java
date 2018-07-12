@@ -240,7 +240,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		NodeDestroyer destroyer = new NodeDestroyer(species);
+		NodeDestroyer destroyer = new NodeDestroyer(species, false);
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		
 		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
@@ -307,7 +307,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.destroyBlock(imPos, false);
+					world.setBlockState(pos, Blocks.AIR.getDefaultState(), 1);//Destroy the branch  TODO: notify client thingy
+					//world.destroyBlock(imPos, false);
 					if(ModConfigs.enableFallingTrees) {
 						destroyedLeaves.put(relPos, blockState);
 					}
@@ -374,7 +375,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		IBlockState belowState = world.getBlockState(cutPos.down());
 		if(TreeHelper.isRooty(belowState)) {
-			belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
+			//belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
 		}
 		
 		//Get all of the wood drops
@@ -509,7 +510,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if(TreeHelper.isBranch(neighState)) {
 					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
-						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies())));
+						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies(), true)));
 					}
 				}
 			}
