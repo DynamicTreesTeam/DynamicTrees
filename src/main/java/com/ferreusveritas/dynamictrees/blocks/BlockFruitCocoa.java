@@ -23,10 +23,11 @@ public class BlockFruitCocoa extends BlockCocoa {
 	* Can this block stay at this position.  Similar to canPlaceBlockAt except gets checked often with plants.
 	*/
 	@Override
-	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {		
+	public boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
 		pos = pos.offset(state.getValue(FACING));
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
-		return branch != null && branch.getRadius(state) == 8 && branch.getFamily().canSupportCocoa;
+		IBlockState branchState = world.getBlockState(pos);
+		BlockBranch branch = TreeHelper.getBranch(branchState);
+		return branch != null && branch.getRadius(branchState) == 8 && branch.getFamily().canSupportCocoa;
 	}
 
 }

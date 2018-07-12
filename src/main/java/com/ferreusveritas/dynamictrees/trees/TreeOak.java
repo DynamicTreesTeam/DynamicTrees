@@ -194,7 +194,7 @@ public class TreeOak extends TreeFamily {
 				IBlockState blockState = world.getBlockState(treePos);
 				BlockBranch branch = TreeHelper.getBranch(blockState);
 				
-				if(branch != null && branch.getRadius(blockState) >= 8 && !natural) {
+				if(branch != null && branch.getRadius(blockState) >= 8 && natural) {
 					NodeFindEnds endFinder = new NodeFindEnds();
 					TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 					appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds(), SafeChunkBounds.ANY);
