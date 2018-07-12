@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.render.AnimationHandler;
@@ -23,7 +24,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -188,6 +188,10 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			buildClient();
 		}
 		
+		if(!world.isRemote && firstUpdate) {
+			updateNeighbors();
+		}
+		
 		handleMotion();
 		
 		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
@@ -197,6 +201,41 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			setDead();
 			modelCleanup();
 		}
+
+		firstUpdate = false;
+	}
+	
+	/**
+	 * This is run server side to update all of the neighbors
+	 */
+	protected void updateNeighbors() {
+		HashSet<BlockPos> destroyed = new HashSet<>();
+		HashSet<BlockPos> toUpdate = new HashSet<>();
+		
+		//Gather a set of all of the block positions that were recently destroyed
+		final int numBranches = destroyData.getNumBranches();
+		for(int i = 0; i < numBranches; i++) {
+			destroyed.add(destroyData.cutPos.add(destroyData.getBranchRelPos(i)));
+		}
+
+		//Continue gathering a set of all of the block positions that were recently destroyed
+		final int numLeaves = destroyData.getNumLeaves();
+		for(int i = 0; i < numLeaves; i++) {
+			destroyed.add(destroyData.cutPos.add(destroyData.getLeavesRelPos(i)));
+		}
+		
+		//Gather a list of all of the non-destroyed blocks surrounding each destroyed block
+		for(BlockPos d: destroyed) {
+			for(EnumFacing dir: EnumFacing.values()) {
+				BlockPos dPos = d.offset(dir);
+				if(!destroyed.contains(dPos)) {
+					toUpdate.add(dPos);
+				}
+			}
+		}
+		
+		//Update each of the blocks that need to be updated
+		toUpdate.forEach(pos -> world.neighborChanged(pos, Blocks.AIR, pos));
 	}
 	
 	protected AnimationHandler selectAnimationHandler() {
@@ -221,7 +260,6 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		if(firstUpdate) {
 			currentAnimationHandler = selectAnimationHandler();
 			currentAnimationHandler.initMotion(this);
-			firstUpdate = false;
 		} else {
 			currentAnimationHandler.handleMotion(this);
 		}
