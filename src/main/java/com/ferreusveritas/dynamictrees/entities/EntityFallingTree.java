@@ -285,7 +285,6 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	 */
 	public static void standardDropPayload(EntityFallingTree entity) {
 		World world = entity.world;
-		//BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
 		entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));

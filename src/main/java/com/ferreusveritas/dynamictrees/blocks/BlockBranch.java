@@ -307,8 +307,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(pos, Blocks.AIR.getDefaultState(), 1);//Destroy the branch  TODO: notify client thingy
-					//world.destroyBlock(imPos, false);
+					world.setBlockState(imPos, Blocks.AIR.getDefaultState(), 0);//Covertly destroy the leaves on the server side
 					if(ModConfigs.enableFallingTrees) {
 						destroyedLeaves.put(relPos, blockState);
 					}
