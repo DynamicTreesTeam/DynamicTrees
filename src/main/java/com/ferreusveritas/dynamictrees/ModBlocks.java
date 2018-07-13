@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingRare;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
@@ -53,6 +54,8 @@ public class ModBlocks {
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
+		BlockDynamicLeaves.passableLeavesModLoaded = net.minecraftforge.fml.common.Loader.isModLoaded("passableleaves");
+		
 		blockStates = new CommonBlockStates();
 		
 		blockRootyDirt = new BlockRootyDirt(false);//Dirt
