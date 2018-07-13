@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.compat.CommonProxyCompat;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
@@ -66,10 +65,6 @@ public class DynamicTrees {
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
-	//This will provide us with a proxy for dealing with compatibility with other mods
-	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.compat.ClientProxyCompat", serverSide = "com.ferreusveritas.dynamictrees.compat.CommonProxyCompat")
-	public static CommonProxyCompat compatProxy;
-	
 	public static final CreativeTabs dynamicTreesTab = new CreativeTabs(ModConstants.MODID) {
         @SideOnly(Side.CLIENT)
 		@Override
@@ -94,7 +89,6 @@ public class DynamicTrees {
 		ModTrees.preInit();
 		
 		proxy.preInit();
-		compatProxy.preInit();
 	}
 
 	@Mod.EventHandler
@@ -106,7 +100,6 @@ public class DynamicTrees {
 		}
 		
 		proxy.init();
-		compatProxy.init();
 	}
 	
 	@Mod.EventBusSubscriber

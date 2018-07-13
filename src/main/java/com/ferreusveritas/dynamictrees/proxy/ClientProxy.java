@@ -29,6 +29,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.block.statemap.StateMap;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
@@ -40,7 +41,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -114,19 +114,17 @@ public class ClientProxy extends CommonProxy {
 		
 		//BLOCKS
 		
+		final BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
+		
 		//Register Rooty Colorizers
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(
+		blockColors.registerBlockColorHandler(
 		new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				if(world == null || pos == null) {
-					return white;
-				} else {
-					switch(tintIndex) {
-						case 0: return BiomeColorHelper.getGrassColorAtPos(world, pos);
-						case 1: return 0xFFF1AE;
-						default: return white;
-					}
+				switch(tintIndex) {
+					case 0: blockColors.colorMultiplier(ModBlocks.blockStates.grass, world, pos, tintIndex);
+					case 1: return 0xFFF1AE;//Root Color
+					default: return white;
 				}
 			}
 		},

@@ -5,10 +5,10 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.client.ColorProviders;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -133,7 +133,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@SideOnly(Side.CLIENT)
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return ColorProviders.basicFoliageColorProvider.colorMultiplier(state, world, pos, 0);
+		return Minecraft.getMinecraft().getBlockColors().colorMultiplier(getPrimitiveLeaves(), world, pos, 0);
 	}
 	
 	@Override

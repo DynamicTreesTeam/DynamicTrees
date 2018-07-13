@@ -11,7 +11,6 @@ public class ModConstants {
 	public static final String NEXT = ";";
 	
 	//Other Mods
-	public static final String QUARK = "quark";
 	public static final String DYNAMICTREESBOP = "dynamictreesbop";
 	public static final String DYNAMICTREESTC = "dynamictreestc";
 	
@@ -20,9 +19,7 @@ public class ModConstants {
 	public static final String DYNAMICTREESTC_VER = "@[1.0,)";
 	
 	public static final String DEPENDENCIES
-		= AFTER + QUARK
-		+ NEXT
-		+ BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
+		= BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
 		;

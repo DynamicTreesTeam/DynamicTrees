@@ -16,7 +16,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
-import com.ferreusveritas.dynamictrees.client.ColorProviders;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -26,10 +25,6 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -84,23 +79,12 @@ public class ModBlocks {
 					public int getSmotherLeavesMax() {
 						return 3;
 					}
-					
-					@Override
-					@SideOnly(Side.CLIENT)
-					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-						return ColorProviders.pineFoliageColorProvider.colorMultiplier(state, world, pos, 0);
-					}
 				};
 				
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
 				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous") ) {
-			@Override
-			@SideOnly(Side.CLIENT)
-			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-				return ColorProviders.birchFoliageColorProvider.colorMultiplier(state, world, pos, 0);
-			}
 		};
 		
 		jungleLeavesProperties = new LeavesProperties(
@@ -173,13 +157,12 @@ public class ModBlocks {
 			blockVerboseFire
 		);
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
-		
-		DynamicTrees.compatProxy.registerBlocks(registry);
 	}
 
 	public static class CommonBlockStates {
 		public final IBlockState air = Blocks.AIR.getDefaultState();
 		public final IBlockState dirt = Blocks.DIRT.getDefaultState();
+		public final IBlockState grass = Blocks.GRASS.getDefaultState();
 		public final IBlockState podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();

@@ -42,7 +42,6 @@ public class ModRecipes {
 			createDirtBucketExchangeRecipes(new ItemStack(Items.APPLE), TreeRegistry.findSpecies(new ResourceLocation(ModConstants.MODID, "apple")).getSeedStack(1), false);
 		}
 		
-		DynamicTrees.compatProxy.registerRecipes(registry);
 	}
 	
 	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling) {

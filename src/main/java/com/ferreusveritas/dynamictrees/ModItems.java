@@ -32,8 +32,6 @@ public class ModItems {
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
-		
-		DynamicTrees.compatProxy.registerItems(registry);
 	}
 	
 	public static Item makeItemBlock(Block block) {
