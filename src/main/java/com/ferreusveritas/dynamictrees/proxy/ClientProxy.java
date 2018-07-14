@@ -122,7 +122,7 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
 				switch(tintIndex) {
-					case 0: blockColors.colorMultiplier(ModBlocks.blockStates.grass, world, pos, tintIndex);
+					case 0: return blockColors.colorMultiplier(ModBlocks.blockStates.grass, world, pos, tintIndex);
 					case 1: return 0xFFF1AE;//Root Color
 					default: return white;
 				}
