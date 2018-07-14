@@ -40,6 +40,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected Vec3d massCenter = Vec3d.ZERO;
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
+	public boolean landed = false;
 	
 	
 	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;

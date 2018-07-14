@@ -38,19 +38,8 @@ public class AnimationHandlers {
 	
 	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
 		
-		class HandlerData extends AnimationHandlerData {
-			boolean landed = false;
-		}
-		
-		HandlerData getData(EntityFallingTree entity) {
-			return entity.animationHandlerData instanceof HandlerData ? (HandlerData) entity.animationHandlerData : new HandlerData();
-		}
-		
 		@Override
-		public void initMotion(EntityFallingTree entity) {
-			
-			entity.animationHandlerData = new HandlerData();
-			
+		public void initMotion(EntityFallingTree entity) {			
 			entity.motionY = 0.2;
 			entity.motionX = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
 			entity.motionZ = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
@@ -103,7 +92,7 @@ public class AnimationHandlers {
 						entity.motionY = 0;
 						entity.posY = collBox.maxY;
 						entity.prevPosY = entity.posY;
-						getData(entity).landed = true;
+						entity.landed = true;
 					}
 				}
 			}
@@ -118,7 +107,7 @@ public class AnimationHandlers {
 		}
 		
 		public boolean shouldDie(EntityFallingTree entity) {
-			return getData(entity).landed || entity.ticksExisted > 60;
+			return entity.landed || entity.ticksExisted > 60;
 		}
 		
 		@Override
@@ -176,21 +165,12 @@ public class AnimationHandlers {
 	
 	public static final AnimationHandler falloverAnimationHandler = new AnimationHandler() {
 		
-		class HandlerData extends AnimationHandlerData {
-			boolean landed = false;
-		}
-		
-		HandlerData getData(EntityFallingTree entity) {
-			return entity.animationHandlerData instanceof HandlerData ? (HandlerData) entity.animationHandlerData : new HandlerData();
-		}
-		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
-			entity.animationHandlerData = new HandlerData();
 			
 			BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 			if(entity.world.getBlockState(belowBlock).isSideSolid(entity.world, belowBlock, EnumFacing.UP)) {
-				getData(entity).landed = true;
+				entity.landed = true;
 				return;
 			}
 		}
@@ -200,7 +180,7 @@ public class AnimationHandlers {
 			
 			BranchDestructionData destroyData = entity.getDestroyData();
 			
-			if(getData(entity).landed) {
+			if(entity.landed) {
 				EnumFacing toolDir = destroyData.toolDir;
 				
 				float height = (float) entity.getMassCenter().y * 2;
@@ -238,7 +218,7 @@ public class AnimationHandlers {
 					entity.motionY = 0;
 					entity.posY = collBox.maxY;
 					entity.prevPosY = entity.posY;
-					getData(entity).landed = true;
+					entity.landed = true;
 				}
 			}
 			
