@@ -235,20 +235,22 @@ public class AnimationHandlers {
 			float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 			
 			int trunkHeight = entity.getDestroyData().trunkHeight;
-						
+			float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
+			
 			for(int segment = 0; segment < trunkHeight; segment++) {
 				float segX = xbase + h * segment * offsetX;
 				float segY = ybase + v * segment;
 				float segZ = zbase + h * segment * offsetZ;
 				float tex = 0.0625f;
-				float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, 0.5f);
+				
+				float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, maxRadius);
 				AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 				
 				/*if(segment == 2) {
 					entity.setEntityBoundingBox(testBB.offset(new Vec3d(0, 0, .5)));
 				}*/
 				
-				if(world.collidesWithAnyBlock(testBB)) {
+				if(!world.getCollisionBoxes(entity, testBB).isEmpty()) {
 					entity.landed = true;
 					break;
 				}
@@ -264,8 +266,8 @@ public class AnimationHandlers {
 		
 		@Override
 		public boolean shouldDie(EntityFallingTree entity) {
-			return Math.abs(entity.rotationPitch) >= 180 || 
-					Math.abs(entity.rotationYaw) >= 180 ||
+			return Math.abs(entity.rotationPitch) >= 160 || 
+					Math.abs(entity.rotationYaw) >= 160 ||
 					entity.landed ||
 					entity.ticksExisted > 120;
 		}

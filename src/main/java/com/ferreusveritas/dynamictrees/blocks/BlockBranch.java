@@ -250,6 +250,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 		
+		//Calculate main trunk height
 		int trunkHeight = 1;
 		for(BlockPos iter = new BlockPos(0, 1, 0); extStateMapper.getExtStateMap().containsKey(iter); iter = iter.up()) {
 			trunkHeight++;
@@ -371,7 +372,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				
 		//Try to get the face being pounded on
 		RayTraceResult rtResult = player.rayTrace(player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
-		EnumFacing toolDir = rtResult != null ? rtResult.sideHit : EnumFacing.DOWN;
+		EnumFacing toolDir = rtResult != null ? (player.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
 		
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
