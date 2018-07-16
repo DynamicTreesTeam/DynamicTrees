@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -191,7 +192,7 @@ public class AnimationHandlers {
 			
 			if(entity.onGround) {
 				float height = (float) entity.getMassCenter().y * 2;
-				fallSpeed = fallSpeed += (0.2 / height);
+				fallSpeed += (0.2 / height);
 				addRotation(entity, fallSpeed);
 			}				
 			
@@ -227,10 +228,15 @@ public class AnimationHandlers {
 				entity.landed = Math.abs(fallSpeed) < 0.01f;//The entity has landed if after a bounce it has little velocity
 			}
 			
+			//TODO: Add collision detection for living entities and produce damage from it
+			
 			getData(entity).fallSpeed = fallSpeed;
 		}
 		
 		/**
+		 * This tests a bounding box cube for each block of the trunk.
+		 * Processing is approximately equivalent to the same number of {@link EntityItem}s in the world. 
+		 * 
 		 * @param entity
 		 * @return true if collision is detected
 		 */
@@ -261,7 +267,6 @@ public class AnimationHandlers {
 				if(!entity.world.getCollisionBoxes(entity, testBB).isEmpty()) {
 					return true;
 				}
-				
 			}
 			
 			return false;
