@@ -1,17 +1,27 @@
 package com.ferreusveritas.dynamictrees.render;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -228,6 +238,10 @@ public class AnimationHandlers {
 				entity.landed = Math.abs(fallSpeed) < 0.01f;//The entity has landed if after a bounce it has little velocity
 			}
 			
+			World world = entity.world;
+			Entity e = testEntityCollision(entity);
+			System.out.println(e);
+			
 			//TODO: Add collision detection for living entities and produce damage from it
 			
 			getData(entity).fallSpeed = fallSpeed;
@@ -285,6 +299,62 @@ public class AnimationHandlers {
 			
 			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
 			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+		}
+		
+		public Entity testEntityCollision(EntityFallingTree entity) {
+			
+			World world = entity.world;
+			
+			EnumFacing toolDir = entity.getDestroyData().toolDir;
+			
+			float actingAngle = toolDir.getAxis() == EnumFacing.Axis.X ? entity.rotationYaw : entity.rotationPitch;
+			
+			int offsetX = toolDir.getFrontOffsetX();
+			int offsetZ = toolDir.getFrontOffsetZ();
+			float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
+			float v = MathHelper.cos((float) Math.toRadians(actingAngle));
+			float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+			float ybase = (float) (entity.posY - (h * 0.5f) + (v * 0.5f));
+			float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+			int trunkHeight = entity.getDestroyData().trunkHeight;
+			float segX = xbase + h * (trunkHeight - 1) * offsetX;
+			float segY = ybase + v * (trunkHeight - 1);
+			float segZ = zbase + h * (trunkHeight - 1) * offsetZ;
+				
+			Vec3d vec3d1 = new Vec3d(xbase, ybase, zbase);
+			Vec3d vec3d2 = new Vec3d(segX, segY, segZ);
+			
+			List<Entity> list = world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1, vec3d2), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
+				public boolean apply(@Nullable Entity apply) {
+					return apply != null && apply.canBeCollidedWith();
+				}
+			}));
+			
+			Entity pointedEntity = null;
+			
+			for (int j = 0; j < list.size(); ++j) {
+				Entity entity1 = list.get(j);
+				AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox();
+				RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3d1, vec3d2);
+				
+				if (axisalignedbb.contains(vec3d1)) {
+					pointedEntity = entity1;
+				}
+				else if (raytraceresult != null) {
+					if (entity1.getLowestRidingEntity() == entity.getLowestRidingEntity() && !entity1.canRiderInteract()) {
+						pointedEntity = entity1;
+					}
+					else {
+						pointedEntity = entity1;
+					}
+				}
+				
+				if(pointedEntity != null) {
+					return pointedEntity;
+				}
+			}
+			
+			return pointedEntity;
 		}
 		
 		@Override
