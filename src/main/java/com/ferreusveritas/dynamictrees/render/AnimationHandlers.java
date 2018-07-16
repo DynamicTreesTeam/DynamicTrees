@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.render;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -166,8 +165,17 @@ public class AnimationHandlers {
 	
 	public static final AnimationHandler falloverAnimationHandler = new AnimationHandler() {
 		
+		class HandlerData extends AnimationHandlerData {
+			float fallSpeed = 0;
+		}
+		
+		HandlerData getData(EntityFallingTree entity) {
+			return entity.animationHandlerData instanceof HandlerData ? (HandlerData) entity.animationHandlerData : new HandlerData();
+		}
+		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
+			entity.animationHandlerData = new HandlerData();
 			
 			BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 			if(entity.world.getBlockState(belowBlock).isSideSolid(entity.world, belowBlock, EnumFacing.UP)) {
@@ -179,57 +187,62 @@ public class AnimationHandlers {
 		@Override
 		public void handleMotion(EntityFallingTree entity) {
 			
-			BranchDestructionData destroyData = entity.getDestroyData();
+			float fallSpeed = getData(entity).fallSpeed;
 			
 			if(entity.onGround) {
-				EnumFacing toolDir = destroyData.toolDir;
-				
 				float height = (float) entity.getMassCenter().y * 2;
-				float fallSpeed = height >= 1.5f ? (float)Math.pow(entity.ticksExisted, 1.5) / (16.0f * height) : 3.0f;
-				
-				switch(toolDir) {
-					case NORTH: entity.rotationPitch += fallSpeed; break;
-					case SOUTH: entity.rotationPitch -= fallSpeed; break;
-					case WEST: entity.rotationYaw += fallSpeed; break;
-					case EAST: entity.rotationYaw -= fallSpeed; break;
-					default: break;
-				}
-				
-				entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
-				entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+				fallSpeed = fallSpeed += (0.2 / height);
+				addRotation(entity, fallSpeed);
 			}				
 			
 			entity.motionY -= 0.03f;
 			entity.posY += entity.motionY;
-			World world = entity.world;
 			
-			int radius = 8;
-			IBlockState state = entity.getDestroyData().getBranchBlockState(0);
-			if(TreeHelper.isBranch(state)) {
-				radius = ((BlockBranch)state.getBlock()).getRadius(state);
-			}
-			AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
-			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-			IBlockState collState = world.getBlockState(pos);
-			AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
-			
-			if(collBox != null) {
-				collBox = collBox.offset(pos);
-				if(fallBox.intersects(collBox)) {
-					entity.motionY = 0;
-					entity.posY = collBox.maxY;
-					entity.prevPosY = entity.posY;
-					entity.onGround = true;
+			{//Handle entire entity falling and collisions with it's base and the ground
+				World world = entity.world;
+				int radius = 8;
+				IBlockState state = entity.getDestroyData().getBranchBlockState(0);
+				if(TreeHelper.isBranch(state)) {
+					radius = ((BlockBranch)state.getBlock()).getRadius(state);
+				}
+				AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
+				BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+				IBlockState collState = world.getBlockState(pos);
+				AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
+				
+				if(collBox != null) {
+					collBox = collBox.offset(pos);
+					if(fallBox.intersects(collBox)) {
+						entity.motionY = 0;
+						entity.posY = collBox.maxY;
+						entity.prevPosY = entity.posY;
+						entity.onGround = true;
+					}
 				}
 			}
 			
+			if(fallSpeed > 0 && testCollision(entity)) {
+				addRotation(entity, -fallSpeed);//pull back to before the collision
+				fallSpeed *= -0.25f;//bounce with elasticity
+				entity.landed = Math.abs(fallSpeed) < 0.01f;//The entity has landed if after a bounce it has little velocity
+			}
+			
+			getData(entity).fallSpeed = fallSpeed;
+		}
+		
+		/**
+		 * @param entity
+		 * @return true if collision is detected
+		 */
+		private boolean testCollision(EntityFallingTree entity) {
 			EnumFacing toolDir = entity.getDestroyData().toolDir;
-			float actAngle = toolDir.getAxis() == EnumFacing.Axis.X ? entity.rotationYaw : entity.rotationPitch;
+			
+			float actingAngle = toolDir.getAxis() == EnumFacing.Axis.X ? entity.rotationYaw : entity.rotationPitch;
 
 			int offsetX = toolDir.getFrontOffsetX();
 			int offsetZ = toolDir.getFrontOffsetZ();
-			float h = MathHelper.sin((float) Math.toRadians(actAngle)) * (offsetX | offsetZ);
-			float v = MathHelper.cos((float) Math.toRadians(actAngle));
+			float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
+			float v = MathHelper.cos((float) Math.toRadians(actingAngle));
 			float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 			float ybase = (float) (entity.posY - (h * 0.5f) + (v * 0.5f));
 			float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
@@ -242,21 +255,31 @@ public class AnimationHandlers {
 				float segY = ybase + v * segment;
 				float segZ = zbase + h * segment * offsetZ;
 				float tex = 0.0625f;
-				
 				float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, maxRadius);
 				AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 				
-				/*if(segment == 2) {
-					entity.setEntityBoundingBox(testBB.offset(new Vec3d(0, 0, .5)));
-				}*/
-				
-				if(!world.getCollisionBoxes(entity, testBB).isEmpty()) {
-					entity.landed = true;
-					break;
+				if(!entity.world.getCollisionBoxes(entity, testBB).isEmpty()) {
+					return true;
 				}
 				
 			}
 			
+			return false;
+		}
+		
+		private void addRotation(EntityFallingTree entity, float delta) {
+			EnumFacing toolDir = entity.getDestroyData().toolDir;
+			
+			switch(toolDir) {
+				case NORTH: entity.rotationPitch += delta; break;
+				case SOUTH: entity.rotationPitch -= delta; break;
+				case WEST: entity.rotationYaw += delta; break;
+				case EAST: entity.rotationYaw -= delta; break;
+				default: break;
+			}
+			
+			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
+			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
 		}
 		
 		@Override
@@ -269,7 +292,7 @@ public class AnimationHandlers {
 			return Math.abs(entity.rotationPitch) >= 160 || 
 					Math.abs(entity.rotationYaw) >= 160 ||
 					entity.landed ||
-					entity.ticksExisted > 120;
+					entity.ticksExisted > 150 * 10;
 		}
 		
 		@Override
