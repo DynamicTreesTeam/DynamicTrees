@@ -250,7 +250,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 		
-		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir, toolDir);
+		int trunkHeight = 1;
+		for(BlockPos iter = new BlockPos(0, 1, 0); extStateMapper.getExtStateMap().containsKey(iter); iter = iter.up()) {
+			trunkHeight++;
+		}
+		
+		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir, toolDir, trunkHeight);
 	}
 	
 	/**

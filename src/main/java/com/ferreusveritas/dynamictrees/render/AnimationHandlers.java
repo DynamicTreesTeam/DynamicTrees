@@ -93,6 +93,7 @@ public class AnimationHandlers {
 						entity.posY = collBox.maxY;
 						entity.prevPosY = entity.posY;
 						entity.landed = true;
+						entity.onGround = true;
 					}
 				}
 			}
@@ -170,7 +171,7 @@ public class AnimationHandlers {
 			
 			BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 			if(entity.world.getBlockState(belowBlock).isSideSolid(entity.world, belowBlock, EnumFacing.UP)) {
-				entity.landed = true;
+				entity.onGround = true;
 				return;
 			}
 		}
@@ -180,7 +181,7 @@ public class AnimationHandlers {
 			
 			BranchDestructionData destroyData = entity.getDestroyData();
 			
-			if(entity.landed) {
+			if(entity.onGround) {
 				EnumFacing toolDir = destroyData.toolDir;
 				
 				float height = (float) entity.getMassCenter().y * 2;
@@ -218,8 +219,40 @@ public class AnimationHandlers {
 					entity.motionY = 0;
 					entity.posY = collBox.maxY;
 					entity.prevPosY = entity.posY;
-					entity.landed = true;
+					entity.onGround = true;
 				}
+			}
+			
+			EnumFacing toolDir = entity.getDestroyData().toolDir;
+			float actAngle = toolDir.getAxis() == EnumFacing.Axis.X ? entity.rotationYaw : entity.rotationPitch;
+
+			int offsetX = toolDir.getFrontOffsetX();
+			int offsetZ = toolDir.getFrontOffsetZ();
+			float h = MathHelper.sin((float) Math.toRadians(actAngle)) * (offsetX | offsetZ);
+			float v = MathHelper.cos((float) Math.toRadians(actAngle));
+			float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+			float ybase = (float) (entity.posY - (h * 0.5f) + (v * 0.5f));
+			float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+			
+			int trunkHeight = entity.getDestroyData().trunkHeight;
+						
+			for(int segment = 0; segment < trunkHeight; segment++) {
+				float segX = xbase + h * segment * offsetX;
+				float segY = ybase + v * segment;
+				float segZ = zbase + h * segment * offsetZ;
+				float tex = 0.0625f;
+				float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, 0.5f);
+				AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
+				
+				/*if(segment == 2) {
+					entity.setEntityBoundingBox(testBB.offset(new Vec3d(0, 0, .5)));
+				}*/
+				
+				if(world.collidesWithAnyBlock(testBB)) {
+					entity.landed = true;
+					break;
+				}
+				
 			}
 			
 		}
@@ -231,8 +264,9 @@ public class AnimationHandlers {
 		
 		@Override
 		public boolean shouldDie(EntityFallingTree entity) {
-			return Math.abs(entity.rotationPitch) >= 90 || 
-					Math.abs(entity.rotationYaw) >= 90 || 
+			return Math.abs(entity.rotationPitch) >= 180 || 
+					Math.abs(entity.rotationYaw) >= 180 ||
+					entity.landed ||
 					entity.ticksExisted > 120;
 		}
 		

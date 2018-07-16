@@ -33,6 +33,7 @@ public class BranchDestructionData {
 	public final EnumFacing cutDir;//The face that was connected to the remaining body of the tree or the rooty block
 	public final EnumFacing toolDir;//The face that was pounded on when breaking the block at cutPos
 	public final BlockPos cutPos;//The absolute(world) position of the block that was cut
+	public final int trunkHeight;
 	
 	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));		
 	
@@ -47,9 +48,10 @@ public class BranchDestructionData {
 		cutDir = EnumFacing.DOWN;
 		toolDir = EnumFacing.DOWN;
 		cutPos = BlockPos.ORIGIN;
+		trunkHeight = 0;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir, EnumFacing toolDir) {
+	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir, EnumFacing toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -61,6 +63,7 @@ public class BranchDestructionData {
 		this.cutPos = cutPos;
 		this.cutDir = cutDir;
 		this.toolDir = toolDir;
+		this.trunkHeight = trunkHeight; 
 	}
 	
 	public BranchDestructionData(NBTTagCompound nbt) {
@@ -74,6 +77,7 @@ public class BranchDestructionData {
 		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );	
 		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];
 		this.toolDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("tooldir"), 0, EnumFacing.values().length - 1)];
+		this.trunkHeight = nbt.getInteger("trunkheight");
 	}
 	
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
@@ -88,6 +92,7 @@ public class BranchDestructionData {
 		tag.setInteger("cutz", cutPos.getZ());
 		tag.setInteger("cutdir", cutDir.getIndex());
 		tag.setInteger("tooldir", toolDir.getIndex());
+		tag.setInteger("trunkheight", trunkHeight);
 		return tag;
 	}
 	

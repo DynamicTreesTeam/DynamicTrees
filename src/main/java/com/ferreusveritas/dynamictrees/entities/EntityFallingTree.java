@@ -42,7 +42,6 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected boolean firstUpdate = true;
 	public boolean landed = false;
 	
-	
 	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
 	public static AnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
@@ -305,7 +304,9 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	}
 	
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound compound) { }
+	protected void readEntityFromNBT(NBTTagCompound compound) {
+		setDead();
+	}
 	
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) { }
