@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.render;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -7,14 +9,15 @@ import javax.annotation.Nullable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.TreeDamageSource;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
@@ -37,6 +40,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class AnimationHandlers {
 	
+	public static final TreeDamageSource TREE_DAMAGE = new TreeDamageSource();
 	
 	public static final AnimationHandler voidAnimationHandler = new AnimationHandler() {
 		@Override public boolean shouldDie(EntityFallingTree entity) { return true; }
@@ -178,6 +182,8 @@ public class AnimationHandlers {
 		
 		class HandlerData extends AnimationHandlerData {
 			float fallSpeed = 0;
+			int bounces = 0;
+			HashSet<EntityLiving> entitiesHit = new HashSet<>();
 		}
 		
 		HandlerData getData(EntityFallingTree entity) {
@@ -234,15 +240,31 @@ public class AnimationHandlers {
 			
 			if(fallSpeed > 0 && testCollision(entity)) {
 				addRotation(entity, -fallSpeed);//pull back to before the collision
+				getData(entity).bounces++;
 				fallSpeed *= -0.25f;//bounce with elasticity
 				entity.landed = Math.abs(fallSpeed) < 0.01f;//The entity has landed if after a bounce it has little velocity
 			}
 			
+			//Crush living things with clumsy dead trees
 			World world = entity.world;
-			Entity e = testEntityCollision(entity);
-			System.out.println(e);
-			
-			//TODO: Add collision detection for living entities and produce damage from it
+			if(!world.isRemote) {
+				List<EntityLiving> elist = testEntityCollision(entity);
+				for(EntityLiving living: elist) {
+					if(!getData(entity).entitiesHit.contains(living)) {
+						getData(entity).entitiesHit.add(living);
+						float damage = entity.getDestroyData().woodVolume * Math.abs(fallSpeed) * 0.001f;
+						if(getData(entity).bounces == 0 && damage > 2) {
+							//System.out.println("damage: " + damage);
+							living.motionX += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getFrontOffsetX() * damage * 0.2f;
+							living.motionX += world.rand.nextFloat() - 0.5;
+							living.motionY += world.rand.nextFloat() * fallSpeed * 0.25f;
+							living.motionZ += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getFrontOffsetZ() * damage * 0.2f;
+							living.motionZ += world.rand.nextFloat() - 0.5;
+							living.attackEntityFrom(TREE_DAMAGE, damage);
+						}
+					}
+				}
+			}
 			
 			getData(entity).fallSpeed = fallSpeed;
 		}
@@ -301,7 +323,7 @@ public class AnimationHandlers {
 			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
 		}
 		
-		public Entity testEntityCollision(EntityFallingTree entity) {
+		public List<EntityLiving> testEntityCollision(EntityFallingTree entity) {
 			
 			World world = entity.world;
 			
@@ -320,7 +342,9 @@ public class AnimationHandlers {
 			float segX = xbase + h * (trunkHeight - 1) * offsetX;
 			float segY = ybase + v * (trunkHeight - 1);
 			float segZ = zbase + h * (trunkHeight - 1) * offsetZ;
-				
+			
+			float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
+			
 			Vec3d vec3d1 = new Vec3d(xbase, ybase, zbase);
 			Vec3d vec3d2 = new Vec3d(segX, segY, segZ);
 			
@@ -330,11 +354,12 @@ public class AnimationHandlers {
 				}
 			}));
 			
+			List<EntityLiving> entities = new ArrayList<>();
+					
 			Entity pointedEntity = null;
 			
-			for (int j = 0; j < list.size(); ++j) {
-				Entity entity1 = list.get(j);
-				AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox();
+			for(Entity entity1: list) {
+				AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(maxRadius);
 				RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3d1, vec3d2);
 				
 				if (axisalignedbb.contains(vec3d1)) {
@@ -349,12 +374,12 @@ public class AnimationHandlers {
 					}
 				}
 				
-				if(pointedEntity != null) {
-					return pointedEntity;
+				if(pointedEntity instanceof EntityLiving) {
+					entities.add((EntityLiving) pointedEntity);
 				}
 			}
 			
-			return pointedEntity;
+			return entities;
 		}
 		
 		@Override
@@ -367,7 +392,7 @@ public class AnimationHandlers {
 			return Math.abs(entity.rotationPitch) >= 160 || 
 					Math.abs(entity.rotationYaw) >= 160 ||
 					entity.landed ||
-					entity.ticksExisted > 150 * 10;
+					entity.ticksExisted > 120;
 		}
 		
 		@Override
