@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.render.AnimationHandler;
 import com.ferreusveritas.dynamictrees.render.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.render.AnimationHandlers;
@@ -32,7 +33,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
 	
 	//Not needed in client
-	protected List<ItemStack> payload = new ArrayList<>();
+	protected List<ItemStack> payload = new ArrayList<>(0);
 	
 	//Needed in client and server
 	protected BranchDestructionData destroyData = new BranchDestructionData();
@@ -41,6 +42,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
 	public boolean landed = false;
+	public DestroyType destroyType = DestroyType.HARVEST;
 	
 	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -49,6 +51,13 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 
 	public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	public AnimationHandlerData animationHandlerData = null;
+	
+	public enum DestroyType {
+		HARVEST,
+		BLAST,
+		FIRE,
+		ROOT
+	}
 	
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
@@ -65,10 +74,11 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	 * @param destroyData
 	 * @param payload
 	 */
-	public void setData(BranchDestructionData destroyData, List<ItemStack> payload) {
+	public void setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
 		this.destroyData = destroyData;
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
+		this.destroyType = destroyType;
 		
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
@@ -109,6 +119,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		tag.setDouble("massx", massCenter.x);
 		tag.setDouble("massy", massCenter.y);
 		tag.setDouble("massz", massCenter.z);
+		tag.setInteger("destroytype", destroyType.ordinal());
 		
 		return tag;
 	}
@@ -119,6 +130,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		
 		if(tag.hasKey("species")) {
 			destroyData = new BranchDestructionData(tag);
+			destroyType = DestroyType.values()[tag.getInteger("destroytype")];
 			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
 			setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
@@ -183,7 +195,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	@Override
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
-		
+				
 		if(world.isRemote && !clientBuilt) {
 			buildClient();
 		}
@@ -191,9 +203,9 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		if(!world.isRemote && firstUpdate) {
 			updateNeighbors();
 		}
-		
+				
 		handleMotion();
-		
+				
 		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
 		
 		if(shouldDie()) {
@@ -239,6 +251,18 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	}
 	
 	protected AnimationHandler selectAnimationHandler() {
+		if(!ModConfigs.enableFallingTrees) {
+			return AnimationHandlers.voidAnimationHandler;
+		}
+		
+		if(destroyType == DestroyType.BLAST) {
+			return AnimHandlerFling;
+		}
+		
+		if(destroyType == DestroyType.FIRE) {
+			return AnimHandlerDrop;
+		}
+		
 		if(getDestroyData().cutDir == EnumFacing.DOWN) {
 			if(getMassCenter().y >= 1.0) {
 				return AnimHandlerFall;

@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
@@ -225,7 +226,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, EnumFacing toolDir, boolean wholeTree) {
+	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, EnumFacing toolDir, boolean wholeTree, boolean notifyClient) {
 		IBlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
 		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
@@ -240,14 +241,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		NodeDestroyer destroyer = new NodeDestroyer(species, false);
+		NodeDestroyer destroyer = new NodeDestroyer(species, notifyClient);
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		
 		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
 		List<BlockPos> endPoints = destroyer.getEnds();
 		Map<BlockPos, IBlockState> destroyedLeaves = new HashMap<>();
 		List<BlockItemStack> leavesDropsList = new ArrayList<>();
-		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
+		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList, notifyClient);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 		
 		//Calculate main trunk height
@@ -256,7 +257,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			trunkHeight++;
 		}
 		
-		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, signal.localRootDir, toolDir, trunkHeight);
+		EnumFacing cutDir = signal.localRootDir;
+		if(cutDir == null) {
+			cutDir = EnumFacing.DOWN;
+		}
+		
+		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
 	}
 	
 	/**
@@ -269,7 +275,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @param destroyedLeaves A map for collecting the positions and blockstates for all of the leaves blocks that will be destroyed.
 	 * @param drops A list for collecting the ItemStacks and their positions relative to the cut position 
 	 */
-	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, IBlockState> destroyedLeaves, List<BlockItemStack> drops) {
+	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, IBlockState> destroyedLeaves, List<BlockItemStack> drops, boolean notifyClient) {
 		
 		if (!world.isRemote && !endPoints.isEmpty()) {
 			
@@ -313,7 +319,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, Blocks.AIR.getDefaultState(), 0);//Covertly destroy the leaves on the server side
+					world.setBlockState(imPos, Blocks.AIR.getDefaultState(), notifyClient ? 3 : 0);//Covertly destroy the leaves on the server side
 					if(ModConfigs.enableFallingTrees) {
 						destroyedLeaves.put(relPos, blockState);
 					}
@@ -375,11 +381,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		EnumFacing toolDir = rtResult != null ? (player.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
 		
 		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, !ModConfigs.enableFallingTrees);
 		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		IBlockState belowState = world.getBlockState(cutPos.down());
-		if(TreeHelper.isRooty(belowState)) {
+		if(TreeHelper.isRooty(belowState)) {//TODO: This can't go here
 			//belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
 		}
 		
@@ -400,7 +406,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		if(!world.isRemote) {// Only spawn entities server side
 			if(ModConfigs.enableFallingTrees) {
 				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList);
+				fallingTree.setData(destroyData, woodDropList, DestroyType.HARVEST);
 				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
 				MinecraftForge.EVENT_BUS.post(fallEvent);
 				if(!fallEvent.isCanceled()) {
@@ -497,16 +503,28 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		IBlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(state, world, pos);
-			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false);
+			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false, !ModConfigs.enableFallingTrees);
 			int woodVolume = destroyData.woodVolume;
+			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
+					
 			//TODO: Make awesome with FallingTree branches having velocity imparted from explosive force
-			getLogDrops(world, pos, species, woodVolume).forEach(item -> spawnAsEntity(world, pos, item) );
-			destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
+			if(ModConfigs.enableFallingTrees) {
+				EntityFallingTree fallingTree = new EntityFallingTree(world);
+				fallingTree.setData(destroyData, woodDropList, DestroyType.BLAST);
+				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+				MinecraftForge.EVENT_BUS.post(fallEvent);
+				if(!fallEvent.isCanceled()) {
+					world.spawnEntity(fallEvent.getEntity());
+				}
+			} else {
+				woodDropList.forEach(item -> spawnAsEntity(world, pos, item) );
+				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
+			}
 		}
 	}
 	
 	@Override
-	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos) {		
+	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos) {
 		//possible supporting branch was destroyed by fire.
 		if(oldState.getBlock() == this) {
 			for(EnumFacing dir: EnumFacing.VALUES) {
@@ -515,7 +533,19 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				if(TreeHelper.isBranch(neighState)) {
 					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
-						analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies(), true)));
+						BranchDestructionData destroyData = destroyBranchFromNode(world, neighPos, dir.getOpposite(), false, !ModConfigs.enableFallingTrees);
+						if(ModConfigs.enableFallingTrees) {
+							List<ItemStack> woodDropList = new ArrayList<ItemStack>(0);
+							EntityFallingTree fallingTree = new EntityFallingTree(world);
+							fallingTree.setData(destroyData, woodDropList, DestroyType.FIRE);
+							FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+							MinecraftForge.EVENT_BUS.post(fallEvent);
+							if(!fallEvent.isCanceled()) {
+								world.spawnEntity(fallEvent.getEntity());
+							}
+						} else {
+							analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies(), true)));
+						}
 					}
 				}
 			}

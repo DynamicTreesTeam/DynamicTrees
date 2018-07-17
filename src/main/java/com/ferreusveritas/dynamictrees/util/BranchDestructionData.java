@@ -42,7 +42,7 @@ public class BranchDestructionData {
 		destroyedBranchesConnections = new int[0];
 		destroyedBranchesRadiusPosition = new int[0];
 		destroyedLeaves = new int[0];
-		leavesDrops = new ArrayList<>();
+		leavesDrops = new ArrayList<>(0);
 		endPoints = new int[0];
 		woodVolume = 0;
 		cutDir = EnumFacing.DOWN;
@@ -74,7 +74,7 @@ public class BranchDestructionData {
 		this.leavesDrops = new ArrayList<BlockItemStack>();
 		this.endPoints = nbt.getIntArray("ends");	
 		this.woodVolume = nbt.getInteger("volume");	
-		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );	
+		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );
 		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];
 		this.toolDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("tooldir"), 0, EnumFacing.values().length - 1)];
 		this.trunkHeight = nbt.getInteger("trunkheight");

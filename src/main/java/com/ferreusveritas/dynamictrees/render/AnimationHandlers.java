@@ -43,6 +43,7 @@ public class AnimationHandlers {
 	public static final TreeDamageSource TREE_DAMAGE = new TreeDamageSource();
 	
 	public static final AnimationHandler voidAnimationHandler = new AnimationHandler() {
+		@Override public String getName() {return "void"; };
 		@Override public boolean shouldDie(EntityFallingTree entity) { return true; }
 		@Override public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) { }
 		@Override public void initMotion(EntityFallingTree entity) { }
@@ -51,9 +52,10 @@ public class AnimationHandlers {
 	};
 	
 	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
+		@Override public String getName() {return "default"; };
 		
 		@Override
-		public void initMotion(EntityFallingTree entity) {			
+		public void initMotion(EntityFallingTree entity) {
 			entity.motionY = 0.2;
 			entity.motionX = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
 			entity.motionZ = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
@@ -65,9 +67,11 @@ public class AnimationHandlers {
 			entity.motionY /= inertialMass;
 			entity.motionZ /= inertialMass;
 			
-			entity.motionX += entity.getDestroyData().cutDir.getOpposite().getFrontOffsetX() * 0.1;
-			entity.motionY += entity.getDestroyData().cutDir.getOpposite().getFrontOffsetY() * 0.1;
-			entity.motionZ += entity.getDestroyData().cutDir.getOpposite().getFrontOffsetZ() * 0.1;
+			EnumFacing cutDir = entity.getDestroyData().cutDir;
+			
+			entity.motionX += cutDir.getOpposite().getFrontOffsetX() * 0.1;
+			entity.motionY += cutDir.getOpposite().getFrontOffsetY() * 0.1;
+			entity.motionZ += cutDir.getOpposite().getFrontOffsetZ() * 0.1;
 		}
 		
 		@Override
@@ -141,7 +145,8 @@ public class AnimationHandlers {
 	};
 	
 	public static final AnimationHandler demoAnimationHandler = new AnimationHandler() {
-		
+		@Override public String getName() {return "demo"; };
+
 		@Override
 		public void initMotion(EntityFallingTree entity) { }
 		
@@ -179,6 +184,7 @@ public class AnimationHandlers {
 	};
 	
 	public static final AnimationHandler falloverAnimationHandler = new AnimationHandler() {
+		@Override public String getName() {return "fallover"; };
 		
 		class HandlerData extends AnimationHandlerData {
 			float fallSpeed = 0;

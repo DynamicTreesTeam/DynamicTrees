@@ -229,7 +229,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public void destroyTree(World world, BlockPos rootPos) {
 		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
-			branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true);
+			branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true, true);
 		}
 	}
 	
