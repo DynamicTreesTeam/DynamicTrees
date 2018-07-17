@@ -402,26 +402,34 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Build the final wood drop list taking chance into consideration
 		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
-		//Spawn the appropriate item entities into the world
-		if(!world.isRemote) {// Only spawn entities server side
-			if(ModConfigs.enableFallingTrees) {
-				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList, DestroyType.HARVEST);
-				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-				MinecraftForge.EVENT_BUS.post(fallEvent);
-				if(!fallEvent.isCanceled()) {
-					world.spawnEntity(fallEvent.getEntity());
-				}
-			} else {
-				woodDropList.forEach(i -> spawnAsEntity(world, cutPos, i));
-				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
-			}
-		}
+		//This will drop the EntityFallingTree into the world
+		dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		
 		return true;// Function returns true if Block was destroyed
+	}
+	
+	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
+		//Spawn the appropriate item entities into the world
+		if(!world.isRemote) {// Only spawn entities server side
+			if(ModConfigs.enableFallingTrees) {
+				EntityFallingTree fallingTree = new EntityFallingTree(world);
+				fallingTree.setData(destroyData, woodDropList, destroyType);
+				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+				MinecraftForge.EVENT_BUS.post(fallEvent);
+				if(!fallEvent.isCanceled()) {
+					world.spawnEntity(fallEvent.getEntity());
+					return fallEvent.getEntity();
+				}
+			} else {
+				woodDropList.forEach(i -> spawnAsEntity(world, destroyData.cutPos, i));
+				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
+			}
+		}
+		
+		return null;
 	}
 	
 	public enum EnumAxeDamage {
@@ -506,20 +514,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false, !ModConfigs.enableFallingTrees);
 			int woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
-					
-			//TODO: Make awesome with FallingTree branches having velocity imparted from explosive force
-			if(ModConfigs.enableFallingTrees) {
-				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList, DestroyType.BLAST);
-				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-				MinecraftForge.EVENT_BUS.post(fallEvent);
-				if(!fallEvent.isCanceled()) {
-					world.spawnEntity(fallEvent.getEntity());
-				}
-			} else {
-				woodDropList.forEach(item -> spawnAsEntity(world, pos, item) );
-				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
-			}
+			
+			dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 		}
 	}
 	
@@ -534,18 +530,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
 						BranchDestructionData destroyData = destroyBranchFromNode(world, neighPos, dir.getOpposite(), false, !ModConfigs.enableFallingTrees);
-						if(ModConfigs.enableFallingTrees) {
-							List<ItemStack> woodDropList = new ArrayList<ItemStack>(0);
-							EntityFallingTree fallingTree = new EntityFallingTree(world);
-							fallingTree.setData(destroyData, woodDropList, DestroyType.FIRE);
-							FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-							MinecraftForge.EVENT_BUS.post(fallEvent);
-							if(!fallEvent.isCanceled()) {
-								world.spawnEntity(fallEvent.getEntity());
-							}
-						} else {
-							analyse(neighState, world, neighPos, null, new MapSignal(new NodeDestroyer(getFamily().getCommonSpecies(), true)));
-						}
+						dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.FIRE);
 					}
 				}
 			}

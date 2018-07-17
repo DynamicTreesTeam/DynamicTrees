@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -9,10 +10,12 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.Block;
@@ -229,7 +232,8 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public void destroyTree(World world, BlockPos rootPos) {
 		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
-			branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true, true);
+			BranchDestructionData destroyData = branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true, true);
+			BlockBranch.dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.ROOT);
 		}
 	}
 	
