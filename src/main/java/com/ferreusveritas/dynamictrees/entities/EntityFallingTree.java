@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
 import com.ferreusveritas.dynamictrees.render.AnimationHandler;
 import com.ferreusveritas.dynamictrees.render.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.render.AnimationHandlers;
@@ -25,6 +26,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -335,4 +337,24 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) { }
 	
+	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
+		//Spawn the appropriate item entities into the world
+		if(!world.isRemote) {// Only spawn entities server side
+			if(ModConfigs.enableFallingTrees) {
+				EntityFallingTree fallingTree = new EntityFallingTree(world);
+				fallingTree.setData(destroyData, woodDropList, destroyType);
+				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
+				MinecraftForge.EVENT_BUS.post(fallEvent);
+				if(!fallEvent.isCanceled()) {
+					world.spawnEntity(fallEvent.getEntity());
+					return fallEvent.getEntity();
+				}
+			} else {
+				woodDropList.forEach(i -> Block.spawnAsEntity(world, destroyData.cutPos, i));
+				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
+			}
+		}
+		
+		return null;
+	}
 }

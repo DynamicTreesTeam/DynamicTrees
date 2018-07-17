@@ -15,7 +15,6 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
-import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
@@ -48,7 +47,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
@@ -403,33 +401,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//This will drop the EntityFallingTree into the world
-		dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
+		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		
 		return true;// Function returns true if Block was destroyed
-	}
-	
-	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
-		//Spawn the appropriate item entities into the world
-		if(!world.isRemote) {// Only spawn entities server side
-			if(ModConfigs.enableFallingTrees) {
-				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList, destroyType);
-				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-				MinecraftForge.EVENT_BUS.post(fallEvent);
-				if(!fallEvent.isCanceled()) {
-					world.spawnEntity(fallEvent.getEntity());
-					return fallEvent.getEntity();
-				}
-			} else {
-				woodDropList.forEach(i -> spawnAsEntity(world, destroyData.cutPos, i));
-				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
-			}
-		}
-		
-		return null;
 	}
 	
 	public enum EnumAxeDamage {
@@ -515,7 +492,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			int woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
 			
-			dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
+			EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 		}
 	}
 	
@@ -530,7 +507,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
 					if(rootPos == BlockPos.ORIGIN) {
 						BranchDestructionData destroyData = destroyBranchFromNode(world, neighPos, dir.getOpposite(), false, !ModConfigs.enableFallingTrees);
-						dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.FIRE);
+						EntityFallingTree.dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.FIRE);
 					}
 				}
 			}
