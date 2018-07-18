@@ -531,7 +531,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {		
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {
 		IBlockState neighBlockState = world.getBlockState(neighbor);
 		
 		if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {

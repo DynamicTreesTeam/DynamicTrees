@@ -58,24 +58,32 @@ public class AnimationHandlers {
 	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
 		@Override public String getName() { return "default"; };
 		
+		class HandlerData extends AnimationHandlerData {
+			float rotYaw = 0;
+			float rotPit = 0;
+		}
+		
+		HandlerData getData(EntityFallingTree entity) {
+			return entity.animationHandlerData instanceof HandlerData ? (HandlerData) entity.animationHandlerData : new HandlerData();
+		}
+		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
+			entity.animationHandlerData = new HandlerData();
+			
 			BlockPos cutPos = entity.getDestroyData().cutPos;
 			long seed = entity.world.rand.nextLong();
 			Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
-			entity.motionY = 0.2;
-			entity.motionX = 0.1 * (random.nextFloat() - 0.5f);
-			entity.motionZ = 0.1 * (random.nextFloat() - 0.5f);
-			
 			float mass = entity.getDestroyData().woodVolume;
 			float inertialMass = MathHelper.clamp(mass / TREE_PARTICLES_PER_LOG, 1, 3);
-			
 			entity.motionX /= inertialMass;
 			entity.motionY /= inertialMass;
 			entity.motionZ /= inertialMass;
 			
+			getData(entity).rotPit = (random.nextFloat() - 0.5f) * 4 / inertialMass;
+			getData(entity).rotYaw = (random.nextFloat() - 0.5f) * 4 / inertialMass;
+
 			EnumFacing cutDir = entity.getDestroyData().cutDir;
-			
 			entity.motionX += cutDir.getOpposite().getFrontOffsetX() * 0.1;
 			entity.motionY += cutDir.getOpposite().getFrontOffsetY() * 0.1;
 			entity.motionZ += cutDir.getOpposite().getFrontOffsetZ() * 0.1;
@@ -83,20 +91,21 @@ public class AnimationHandlers {
 		
 		@Override
 		public void handleMotion(EntityFallingTree entity) {
-			
-			//This will function as an inaccurate moment of inertia for the time being
-			float mass = entity.getDestroyData().woodVolume;
-			float inertialMass = MathHelper.clamp(mass / TREE_PARTICLES_PER_LOG, 1, 3);
-			
 			entity.motionY -= TREE_GRAVITY;
+			
+			//Create drag
+			entity.motionX *= 0.98f;
+			entity.motionY *= 0.98f;
+			entity.motionZ *= 0.98f;
+			getData(entity).rotYaw *= 0.98f;
+			getData(entity).rotPit *= 0.98f;
+			
+			//Apply motion
 			entity.posX += entity.motionX;
 			entity.posY += entity.motionY;
 			entity.posZ += entity.motionZ;
-			entity.rotationYaw += 1.25 / inertialMass;
-			entity.rotationPitch += 4 / inertialMass;
-			
-			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
-			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch + getData(entity).rotPit);
+			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw + getData(entity).rotYaw);
 			
 			int radius = 8;
 			IBlockState state = entity.getDestroyData().getBranchBlockState(0);
@@ -107,17 +116,30 @@ public class AnimationHandlers {
 			AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
 			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
 			IBlockState collState = world.getBlockState(pos);
-			if(!TreeHelper.isLeaves(collState)) {
-				AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
 			
-				if(collBox != null) {
-					collBox = collBox.offset(pos);
-					if(fallBox.intersects(collBox)) {
-						entity.motionY = 0;
-						entity.posY = collBox.maxY;
-						entity.prevPosY = entity.posY;
-						entity.landed = true;
-						entity.onGround = true;
+			if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState)) {
+				if(collState.getBlock() instanceof BlockLiquid) {
+					entity.motionY += TREE_GRAVITY;//Undo the gravity
+					//Create drag in liquid
+					entity.motionX *= 0.8f;
+					entity.motionY *= 0.8f;
+					entity.motionZ *= 0.8f;
+					getData(entity).rotYaw *= 0.8f;
+					getData(entity).rotPit *= 0.8f;
+					//Add a little buoyancy
+					entity.motionY += 0.01;
+				} else {
+					AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
+					
+					if(collBox != null) {
+						collBox = collBox.offset(pos);
+						if(fallBox.intersects(collBox)) {
+							entity.motionY = 0;
+							entity.posY = collBox.maxY;
+							entity.prevPosY = entity.posY;
+							entity.landed = true;
+							entity.onGround = true;
+						}
 					}
 				}
 			}
@@ -132,7 +154,7 @@ public class AnimationHandlers {
 		}
 		
 		public boolean shouldDie(EntityFallingTree entity) {
-			return entity.landed || entity.ticksExisted > 60;
+			return entity.landed || entity.ticksExisted > 120;
 		}
 		
 		@Override
@@ -206,7 +228,7 @@ public class AnimationHandlers {
 			AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
 			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
 			IBlockState collState = world.getBlockState(pos);
-			if(!TreeHelper.isTreePart(collState.getBlock())) {
+			if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState)) {
 				if(collState.getBlock() instanceof BlockLiquid) {
 					entity.motionY += TREE_GRAVITY;//Undo the gravity
 					//Create drag in liquid

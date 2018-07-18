@@ -32,9 +32,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * 
- * TODO:
- * [ ] Make pieces react to explosion force
- * 
  * @author ferreusveritas
  *
  */
@@ -49,10 +46,12 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	protected BranchDestructionData destroyData = new BranchDestructionData();
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
+	protected AxisAlignedBB normAABB = new AxisAlignedBB(BlockPos.ORIGIN);
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
 	public boolean landed = false;
 	public DestroyType destroyType = DestroyType.HARVEST;
+	
 	
 	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -115,7 +114,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		geomCenter = geomCenter.scale(1.0 / numBlocks);
 		massCenter = massCenter.scale(1.0 / totalMass);
 		
-		setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
+		setEntityBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
 		
 		setVoxelData(buildVoxelData(destroyData));
 	}
@@ -144,7 +143,8 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 			destroyType = DestroyType.values()[tag.getInteger("destroytype")];
 			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
-			setEntityBoundingBox(buildAABBFromDestroyData(destroyData));
+			buildAABBFromDestroyData(destroyData);
+			setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
 			clientBuilt = true;
 		}
 		
@@ -163,16 +163,14 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		
 	}
 	
-	
-	
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
-		AxisAlignedBB aabb = new AxisAlignedBB(destroyData.cutPos);
+		normAABB = new AxisAlignedBB(BlockPos.ORIGIN);
 		
 		for(int i = 0; i < destroyData.getNumBranches(); i++) {
-			aabb = aabb.union(new AxisAlignedBB(destroyData.cutPos.add(destroyData.getBranchRelPos(i))));
+			normAABB = normAABB.union(new AxisAlignedBB(destroyData.getBranchRelPos(i)));
 		}
 		
-		return aabb;
+		return normAABB;
 	}
 	
 	public BranchDestructionData getDestroyData() {
@@ -194,13 +192,11 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	@Override
 	public void setPosition(double x, double y, double z) {
 		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
-		double dx = x - this.posX;
-		double dy = y - this.posY;
-		double dz = z - this.posZ;
 		this.posX = x;
 		this.posY = y;
 		this.posZ = z;
-		this.setEntityBoundingBox(getEntityBoundingBox().offset(dx, dy, dz));
+		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
+		this.setEntityBoundingBox(normAABB != null ? normAABB.offset(posX, posY, posZ) : new AxisAlignedBB(BlockPos.ORIGIN));
 	}
 	
 	@Override
@@ -217,7 +213,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 				
 		handleMotion();
 				
-		setEntityBoundingBox(getEntityBoundingBox().offset(motionX, motionY, motionZ));
+		setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
 		
 		if(shouldDie()) {
 			dropPayLoad();
