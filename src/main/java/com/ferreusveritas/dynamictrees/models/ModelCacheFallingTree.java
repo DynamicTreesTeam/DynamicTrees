@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.render;
+package com.ferreusveritas.dynamictrees.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +11,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class FallingTreeModelCache {
+public class ModelCacheFallingTree {
 	
-	public static Map<Integer, FallingTreeModel> modelMap = new HashMap<>();
+	public static Map<Integer, ModelFallingTree> modelMap = new HashMap<>();
 	
-	public static FallingTreeModel getModel(EntityFallingTree entity) {
-		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new FallingTreeModel(entity) );
+	public static ModelFallingTree getModel(EntityFallingTree entity) {
+		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new ModelFallingTree(entity) );
 	}
 	
 	public static void cleanupModels(World world, EntityFallingTree entity) {

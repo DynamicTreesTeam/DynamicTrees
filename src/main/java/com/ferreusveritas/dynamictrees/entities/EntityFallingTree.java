@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
-import com.ferreusveritas.dynamictrees.render.AnimationHandler;
-import com.ferreusveritas.dynamictrees.render.AnimationHandlerData;
-import com.ferreusveritas.dynamictrees.render.AnimationHandlers;
-import com.ferreusveritas.dynamictrees.render.FallingTreeModelCache;
-import com.ferreusveritas.dynamictrees.render.ModelTracker;
+import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
+import com.ferreusveritas.dynamictrees.models.IModelTracker;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author ferreusveritas
  *
  */
-public class EntityFallingTree extends Entity implements ModelTracker {
+public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
 	
@@ -53,13 +53,13 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	public DestroyType destroyType = DestroyType.HARVEST;
 	
 	
-	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
-	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
-	public static AnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
-	public static AnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
-	public static AnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
+	public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
+	public static IAnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
+	public static IAnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
+	public static IAnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
+	public static IAnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
 
-	public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
+	public IAnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	public AnimationHandlerData animationHandlerData = null;
 	
 	public enum DestroyType {
@@ -257,7 +257,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		toUpdate.forEach(pos -> world.neighborChanged(pos, Blocks.AIR, pos));
 	}
 	
-	protected AnimationHandler selectAnimationHandler() {
+	protected IAnimationHandler selectAnimationHandler() {
 		if(!ModConfigs.enableFallingTrees) {
 			return AnimationHandlers.voidAnimationHandler;
 		}
@@ -284,7 +284,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void modelCleanup() {
-		FallingTreeModelCache.cleanupModels(world, this);
+		ModelCacheFallingTree.cleanupModels(world, this);
 	}
 	
 	public void handleMotion() {
@@ -326,6 +326,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		getDataManager().register(voxelDataParameter, new NBTTagCompound());
 	}
 	
+	//This is shipped off to the clients
 	public void setVoxelData(NBTTagCompound tag) {
 		getDataManager().set(voxelDataParameter, tag);
 	}
@@ -336,7 +337,7 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound compound) {
-		setDead();
+		setDead();//Falling Trees are never saved to disk.  In the event one is read from disk just kill it.
 	}
 	
 	@Override

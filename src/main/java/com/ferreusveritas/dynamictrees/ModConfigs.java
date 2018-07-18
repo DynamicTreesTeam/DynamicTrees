@@ -26,6 +26,7 @@ public class ModConfigs {
 	public static boolean canopyCrash;
 	public static EnumAxeDamage axeDamageMode;
 	public static boolean enableFallingTrees;
+	public static boolean enableFallingTreeDamage;
 	
 	public static boolean replaceVanillaSapling;
 	
@@ -62,6 +63,8 @@ public class ModConfigs {
 		canopyCrash = config.getBoolean("canopyCrash", "interaction", true, "If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction");
 		axeDamageMode = EnumAxeDamage.values()[config.getInt("axeDamageMode", "interaction", 1, 0, 2, "Modes: 0=Standard 1 Damage, 1=By Branch/Trunk Thickness, 2=By Tree Volume")];
 		enableFallingTrees = config.getBoolean("enableFallingTrees", "interaction", true, "If enabled then trees will fall over when harvested");
+		enableFallingTreeDamage = config.getBoolean("enableFallingTreeDamage", "interaction", true, "If enabled then trees will harm living entities when falling");
+
 		
 		//Vanilla
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");

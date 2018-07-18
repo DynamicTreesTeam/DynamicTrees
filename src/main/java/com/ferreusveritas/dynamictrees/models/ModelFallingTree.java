@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.render;
+package com.ferreusveritas.dynamictrees.models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +24,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class FallingTreeModel {
+public class ModelFallingTree {
 	
 	protected final List<BakedQuad> quads;
 	protected final int leavesColor;
 	protected final int entityId;
 	
-	public FallingTreeModel(EntityFallingTree entity) {
+	public ModelFallingTree(EntityFallingTree entity) {
 		World world = entity.getEntityWorld();
 		BranchDestructionData destructionData = entity.getDestroyData();
 		Species species = destructionData.species;

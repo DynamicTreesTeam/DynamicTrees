@@ -1,11 +1,11 @@
-package com.ferreusveritas.dynamictrees.render;
+package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 	
-public interface AnimationHandler {
+public interface IAnimationHandler {
 	String getName();
 	void initMotion(EntityFallingTree entity);
 	void handleMotion(EntityFallingTree entity);
