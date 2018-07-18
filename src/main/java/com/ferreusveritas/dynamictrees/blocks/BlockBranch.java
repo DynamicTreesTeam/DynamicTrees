@@ -33,6 +33,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
@@ -44,6 +46,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -491,8 +494,20 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false, !ModConfigs.enableFallingTrees);
 			int woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
+			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			
-			EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
+			if(treeEntity != null) {
+				Vec3d expPos = explosion.getPosition();
+				EntityLivingBase placer = explosion.getExplosivePlacedBy();
+				//Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
+				float size = (placer instanceof EntityCreeper) ? (((EntityCreeper)placer).getPowered() ? 6 : 3) : 4;
+				double distance = treeEntity.getDistance(expPos.x, expPos.y, expPos.z);
+				if (distance / size <= 1.0D && distance != 0.0D) {
+					treeEntity.motionX += (treeEntity.posX - expPos.x) / distance;
+					treeEntity.motionY += (treeEntity.posY - expPos.y) / distance;
+					treeEntity.motionZ += (treeEntity.posZ - expPos.z) / distance;
+				}
+			}
 		}
 	}
 	

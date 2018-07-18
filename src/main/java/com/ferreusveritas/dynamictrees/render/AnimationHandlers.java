@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.render;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -52,13 +53,16 @@ public class AnimationHandlers {
 	};
 	
 	public static final AnimationHandler defaultAnimationHandler = new AnimationHandler() {
-		@Override public String getName() {return "default"; };
+		@Override public String getName() { return "default"; };
 		
 		@Override
 		public void initMotion(EntityFallingTree entity) {
+			BlockPos cutPos = entity.getDestroyData().cutPos;
+			long seed = entity.world.rand.nextLong();
+			Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
 			entity.motionY = 0.2;
-			entity.motionX = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
-			entity.motionZ = 0.1 * (entity.world.rand.nextFloat() - 0.5f);
+			entity.motionX = 0.1 * (random.nextFloat() - 0.5f);
+			entity.motionZ = 0.1 * (random.nextFloat() - 0.5f);
 			
 			float mass = entity.getDestroyData().woodVolume;
 			float inertialMass = MathHelper.clamp(mass / 2048, 1, 3);
@@ -144,8 +148,90 @@ public class AnimationHandlers {
 		}
 	};
 	
+	
+	public static final AnimationHandler blastAnimationHandler = new AnimationHandler() {
+		@Override public String getName() { return "blast"; };
+		
+		@Override
+		public void initMotion(EntityFallingTree entity) {
+			float mass = entity.getDestroyData().woodVolume;
+			float inertialMass = MathHelper.clamp(mass / 2048, 1, 3);
+			entity.motionX /= inertialMass;
+			entity.motionY /= inertialMass;
+			entity.motionZ /= inertialMass;
+		}
+		
+		@Override
+		public void handleMotion(EntityFallingTree entity) {
+			
+			//This will function as an inaccurate moment of inertia for the time being
+			float mass = entity.getDestroyData().woodVolume;
+			float inertialMass = MathHelper.clamp(mass / 2048, 1, 3);
+			
+			entity.motionY -= 0.02;//Gravity
+			entity.posX += entity.motionX;
+			entity.posY += entity.motionY;
+			entity.posZ += entity.motionZ;
+			entity.rotationYaw += 1.25 / inertialMass;
+			entity.rotationPitch += 4 / inertialMass;
+			
+			entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
+			entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+			
+			int radius = 8;
+			IBlockState state = entity.getDestroyData().getBranchBlockState(0);
+			if(TreeHelper.isBranch(state)) {
+				radius = ((BlockBranch)state.getBlock()).getRadius(state);
+			}
+			World world = entity.world;
+			AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
+			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+			IBlockState collState = world.getBlockState(pos);
+			if(!TreeHelper.isLeaves(collState)) {
+				AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
+				
+				if(collBox != null) {
+					collBox = collBox.offset(pos);
+					if(fallBox.intersects(collBox)) {
+						entity.motionY = 0;
+						entity.posY = collBox.maxY;
+						entity.prevPosY = entity.posY;
+						entity.landed = true;
+						entity.onGround = true;
+					}
+				}
+			}
+			
+		}
+		
+		@Override
+		public void dropPayload(EntityFallingTree entity) {
+			World world = entity.world;
+			entity.getPayload().forEach(i -> Block.spawnAsEntity(world, new BlockPos(entity.posX, entity.posY, entity.posZ), i));
+			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.getDestroyData().cutPos.add(bis.pos), bis.stack));
+		}
+		
+		public boolean shouldDie(EntityFallingTree entity) {
+			return entity.landed || entity.ticksExisted > 60;
+		}
+		
+		@Override
+		@SideOnly(Side.CLIENT)
+		public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+			
+			float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
+			float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));			
+			
+			Vec3d mc = entity.getMassCenter();
+			GlStateManager.translate(mc.x, mc.y, mc.z);
+			GlStateManager.rotate(-yaw, 0, 1, 0);
+			GlStateManager.rotate(pit, 1, 0, 0);
+			GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
+		}
+	};
+	
 	public static final AnimationHandler demoAnimationHandler = new AnimationHandler() {
-		@Override public String getName() {return "demo"; };
+		@Override public String getName() { return "demo"; };
 
 		@Override
 		public void initMotion(EntityFallingTree entity) { }
@@ -184,7 +270,7 @@ public class AnimationHandlers {
 	};
 	
 	public static final AnimationHandler falloverAnimationHandler = new AnimationHandler() {
-		@Override public String getName() {return "fallover"; };
+		@Override public String getName() { return "fallover"; };
 		
 		class HandlerData extends AnimationHandlerData {
 			float fallSpeed = 0;

@@ -30,6 +30,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * 
+ * TODO:
+ * [ ] Make pieces react to explosion force
+ * 
+ * @author ferreusveritas
+ *
+ */
 public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	public static final DataParameter<NBTTagCompound> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_TAG);
@@ -48,8 +56,9 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 	
 	public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
+	public static AnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
 	public static AnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
-	public static AnimationHandler AnimHandlerBlast = AnimationHandlers.defaultAnimationHandler;
+	public static AnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
 
 	public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	public AnimationHandlerData animationHandlerData = null;
@@ -258,11 +267,11 @@ public class EntityFallingTree extends Entity implements ModelTracker {
 		}
 		
 		if(destroyType == DestroyType.BLAST) {
-			return AnimHandlerFling;
+			return AnimHandlerBlast;
 		}
 		
 		if(destroyType == DestroyType.FIRE) {
-			return AnimHandlerDrop;
+			return AnimHandlerBurn;
 		}
 		
 		if(getDestroyData().cutDir == EnumFacing.DOWN) {
