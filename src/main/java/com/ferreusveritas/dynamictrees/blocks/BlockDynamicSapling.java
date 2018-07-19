@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
@@ -17,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -114,20 +114,22 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	}
 	
 	protected void dropBlock(World world, Species tree, IBlockState state, BlockPos pos) {
-		world.setBlockToAir(pos);
 		dropBlockAsItem(world, pos, state, 0);
+		world.setBlockToAir(pos);
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-		dropped.add(getSpecies(world, pos, state).getSeedStack(1));
-		return dropped;
+	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		super.getDrops(drops, world, pos, state, fortune);
+		Species species = getSpecies(world, pos, state);
+		if(species != Species.NULLSPECIES) {
+			drops.add(species.getSeedStack(1));
+		}
 	}
 	
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return null;
+		return null;//The sapling block itself is not obtainable 
 	}
 	
 	@Override

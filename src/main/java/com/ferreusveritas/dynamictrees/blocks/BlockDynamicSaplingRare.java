@@ -1,10 +1,14 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -26,12 +30,8 @@ public class BlockDynamicSaplingRare extends BlockDynamicSapling implements ITil
 	
 	@Override
 	public Species getSpecies(IBlockAccess access, BlockPos pos, IBlockState state) {
-		TileEntity tileEntity = access.getTileEntity(pos);
-		if(tileEntity instanceof TileEntitySpecies) {
-			TileEntitySpecies tileEntitySpecies = (TileEntitySpecies) tileEntity;
-			return tileEntitySpecies.getSpecies();
-		}
-		return Species.NULLSPECIES;
+		TileEntitySpecies tileEntitySpecies = getTileEntity(access, pos);
+		return tileEntitySpecies != null ? tileEntitySpecies.getSpecies() : Species.NULLSPECIES;
 	}
 	
 	
@@ -44,11 +44,39 @@ public class BlockDynamicSaplingRare extends BlockDynamicSapling implements ITil
 		return new TileEntitySpecies();
 	}
 	
-	/** Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated */
-	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		super.breakBlock(worldIn, pos, state);
-		worldIn.removeTileEntity(pos);
-	}
+	/*
+	 * The following is modeled after the harvesting logic flow of flower pots since they too have a
+	 * tileEntity that holds items that should be dropped when the block is destroyed.
+	 */
+	
+    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
+        super.onBlockHarvested(worldIn, pos, state, player);
+
+        if (player.capabilities.isCreativeMode) {
+            TileEntitySpecies tileentityspecies = getTileEntity(worldIn, pos);
+    		if(tileentityspecies != null) {
+    			tileentityspecies.setSpecies(Species.NULLSPECIES);//Prevents dropping a seed in creative mode
+    		}
+        }
+    }
+
+    @Nullable
+    protected TileEntitySpecies getTileEntity(IBlockAccess access, BlockPos pos) {
+        TileEntity tileentity = access.getTileEntity(pos);
+        return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
+    }
+	
+    @Override
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
+    }
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack tool) {
+        super.harvestBlock(world, player, pos, state, te, tool);
+        world.setBlockToAir(pos);
+    }
 	
 	/**
 	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On

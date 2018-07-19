@@ -385,9 +385,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, !ModConfigs.enableFallingTrees);
 		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		IBlockState belowState = world.getBlockState(cutPos.down());
-		if(TreeHelper.isRooty(belowState)) {//TODO: This can't go here
-			//belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
+		if(!ModConfigs.enableFallingTrees) {
+			IBlockState belowState = world.getBlockState(cutPos.down());
+			if(TreeHelper.isRooty(belowState)) {
+				belowState.getBlock().randomTick(world, cutPos.down(), state, world.rand);
+			}
 		}
 		
 		//Get all of the wood drops
