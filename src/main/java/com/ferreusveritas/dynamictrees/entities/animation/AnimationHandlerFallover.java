@@ -94,7 +94,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			addRotation(entity, -fallSpeed);//pull back to before the collision
 			getData(entity).bounces++;
 			fallSpeed *= -AnimationConstants.TREE_ELASTICITY;//bounce with elasticity
-			entity.landed = Math.abs(fallSpeed) < 0.01f;//The entity has landed if after a bounce it has little velocity
+			entity.landed = Math.abs(fallSpeed) < 0.02f;//The entity has landed if after a bounce it has little velocity
 		}
 		
 		//Crush living things with clumsy dead trees
