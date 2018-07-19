@@ -200,7 +200,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		Vec3d vec3d1 = new Vec3d(xbase, ybase, zbase);
 		Vec3d vec3d2 = new Vec3d(segX, segY, segZ);
 		
-		List<Entity> list = world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1, vec3d2), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
+		List<Entity> list = world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
 			public boolean apply(@Nullable Entity apply) {
 				return apply != null && apply.canBeCollidedWith();
 			}
@@ -241,10 +241,21 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 	
 	@Override
 	public boolean shouldDie(EntityFallingTree entity) {
-		return Math.abs(entity.rotationPitch) >= 160 || 
-				Math.abs(entity.rotationYaw) >= 160 ||
-				entity.landed ||
-				entity.ticksExisted > 120;
+		
+		boolean dead = 
+			Math.abs(entity.rotationPitch) >= 160 || 
+			Math.abs(entity.rotationYaw) >= 160 ||
+			entity.landed ||
+			entity.ticksExisted > 120;
+		
+		if(dead && !entity.world.isRemote) {
+			IBlockState belowState = entity.world.getBlockState(entity.getDestroyData().cutPos.down());
+			if(TreeHelper.isRooty(belowState)) {
+				belowState.getBlock().randomTick(entity.world, entity.getDestroyData().cutPos.down(), belowState, entity.world.rand);
+			}
+		}
+		
+		return dead;
 	}
 	
 	@Override
