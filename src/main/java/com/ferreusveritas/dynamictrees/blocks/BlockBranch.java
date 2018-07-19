@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -378,7 +380,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
 				
 		//Try to get the face being pounded on
-		RayTraceResult rtResult = player.rayTrace(player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
+		RayTraceResult rtResult = playerRayTrace(player, player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
 		EnumFacing toolDir = rtResult != null ? (player.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
 		
 		//Do the actual destruction
@@ -413,6 +415,24 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		
 		return true;// Function returns true if Block was destroyed
 	}
+	
+	/**
+	 * This is a copy of Entity.rayTrace which is client side only.  There's no 
+	 * reason for this function to be client side only as all of it's calls are
+	 * client/server compatible.
+	 * 
+	 * @param player
+	 * @param blockReachDistance
+	 * @param partialTicks
+	 * @return
+	 */
+    @Nullable
+    public RayTraceResult playerRayTrace(EntityPlayer player, double blockReachDistance, float partialTicks) {
+        Vec3d vec3d = player.getPositionEyes(partialTicks);
+        Vec3d vec3d1 = player.getLook(partialTicks);
+        Vec3d vec3d2 = vec3d.addVector(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
+        return player.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
+    }
 	
 	public enum EnumAxeDamage {
 		VANILLA,
