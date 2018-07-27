@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +21,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import scala.actors.threadpool.Arrays;
 
 public class BranchDestructionData {
 	public final Species species;//The species of the tree that was harvested
