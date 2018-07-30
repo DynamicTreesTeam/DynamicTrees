@@ -26,6 +26,8 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -82,23 +84,36 @@ public class ModBlocks {
 					public int getSmotherLeavesMax() {
 						return 3;
 					}
+					
+					@Override
+					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+						int color = super.foliageColorMultiplier(state, world, pos);
+						return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Spruce can now be access by modded foliage multipliers
+					}
+					
 				};
-				
+		
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
 				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous") ) {
-		};
+				
+				@Override
+				public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
+					int color = super.foliageColorMultiplier(state, world, pos);
+					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Birch can now be access by modded foliage multipliers
+				}
+			};
 		
 		jungleLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
 				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
 				TreeRegistry.findCellKit("deciduous")) {
-			
-			@Override
-			public int getLightRequirement() {
-				return 12;//The jungle can be a dark place.  Give these trees a little advantage.
-			}
+				
+				@Override
+				public int getLightRequirement() {
+					return 12;//The jungle can be a dark place.  Give these trees a little advantage.
+				}
 		};
 		
 		acaciaLeavesProperties = new LeavesProperties(
