@@ -325,7 +325,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		
 		//Check to make sure there isn't too many leaves above this block.  Encourages forest canopy development.
 		if(smother != 0){
-			if(isBottom(world, pos, world.getBlockState(pos.down()).getBlock())) {//Only act on the bottom block of the Growable stack
+			if(isBottom(world, pos)) {//Only act on the bottom block of the Growable stack
 				//Prevent leaves from growing where they would be "smothered" from too much above foliage
 				int smotherLeaves = 0;
 				for(int i = 0; i < smother; i++) {
@@ -350,17 +350,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	/** Used to find if the leaf block is at the bottom of the stack */
 	public static boolean isBottom(World world, BlockPos pos) {
-		Block belowBlock = world.getBlockState(pos.down()).getBlock();
-		return isBottom(world, pos, belowBlock);
-	}
-	
-	/** Used to find if the leaf block is at the bottom of the stack */
-	public static boolean isBottom(World world, BlockPos pos, Block belowBlock) {
-		BlockPos below = pos.down();
-		IBlockState belowBlockState = world.getBlockState(below);
-		
-		if(TreeHelper.isTreePart(belowBlockState.getBlock())) {
-			ITreePart belowTreepart = (ITreePart) belowBlock;
+		IBlockState belowBlockState = world.getBlockState(pos.down());
+		ITreePart belowTreepart = TreeHelper.getTreePart(belowBlockState);
+		if(belowTreepart != TreeHelper.nullTreePart) {
 			return belowTreepart.getRadius(belowBlockState) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
 		}
 		return true;//Non-Tree parts below indicate the bottom of stack

@@ -241,6 +241,10 @@ public class TreeHelper {
 		return block instanceof ITreePart;
 	}
 	
+	public final static boolean isTreePart(IBlockState blockState) {
+		return isTreePart(blockState.getBlock());
+	}
+	
 	public final static boolean isTreePart(IBlockAccess blockAccess, BlockPos pos) {
 		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
