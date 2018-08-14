@@ -74,11 +74,12 @@ public class ModConfigs {
 		podzolGen = config.getBoolean("podzolGen", "world", true, "Randomly generate podzol under select trees.");
 		worldGen = config.getBoolean("worldGen", "world", true, "World Generation produces Dynamic Trees instead of Vanilla trees.");
 		vanillaCactusWorldGen = config.getBoolean("vanillaCactusWorldGen", "world", false, "World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.");
-		String[] dims = config.getStringList("dimensionsBlacklist", "world", new String[0], "Blacklist of dimension numbers for disabling Dynamic Tree worldgen");
-		
+		String[] dims = config.getStringList("dimensionsBlacklist", "world", new String[] {"7"}, "Blacklist of dimension numbers for disabling Dynamic Tree worldgen");
+				
 		for(String dim : dims) {
 			try {
-				dimensionBlacklist.add(Integer.decode(dim));
+				int dimValue = Integer.decode(dim);
+				dimensionBlacklist.add(dimValue);
 			} catch (NumberFormatException nfe) {}
 		}
 		

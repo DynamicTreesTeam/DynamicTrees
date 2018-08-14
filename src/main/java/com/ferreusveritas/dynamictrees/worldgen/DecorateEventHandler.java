@@ -8,6 +8,12 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+/**
+ * 
+ * This serves only to cancel select decoration events such as trees and cactus.
+ * 
+ * @author ferreusveritas
+ */
 public class DecorateEventHandler {
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)

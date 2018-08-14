@@ -92,12 +92,11 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		//We use this custom random number generator because despite what everyone says the Java Random class is not thread safe.
-		random.setXOR(new BlockPos(chunkX, 0, chunkZ));
-		
-		SafeChunkBounds safeBounds = new SafeChunkBounds(world, new ChunkPos(chunkX, chunkZ));//Area that is safe to place blocks during worldgen
-		
-		circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c, safeBounds));
+		if(!ModConfigs.dimensionBlacklist.contains(world.provider.getDimension())) {
+			random.setXOR(new BlockPos(chunkX, 0, chunkZ));
+			SafeChunkBounds safeBounds = new SafeChunkBounds(world, new ChunkPos(chunkX, chunkZ));//Area that is safe to place blocks during worldgen
+			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c, safeBounds));
+		}
 	}
 	
 	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
