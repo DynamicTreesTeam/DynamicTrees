@@ -61,12 +61,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		super(material); //Trees are made of wood. Brilliant.
 		setUnlocalizedName(name);
 		setRegistryName(name);
+		setHarvestLevel("axe", 0);
 	}
 	
 	public IProperty<?>[] getIgnorableProperties() {
 		return new IProperty<?>[]{};
 	}
-	
 	
 	///////////////////////////////////////////
 	// TREE INFORMATION
