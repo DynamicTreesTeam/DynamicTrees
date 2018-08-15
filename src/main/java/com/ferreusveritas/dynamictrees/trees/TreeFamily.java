@@ -97,10 +97,7 @@ public class TreeFamily {
 	/**
 	 * Constructor suitable for derivative mods
 	 * 
-	 * @param modid The MODID of the mod that is registering this tree
-	 * @param name The simple name of the tree e.g. "oak"
-	 * @param seq The registration sequence number for this MODID. Used for registering 4 leaves types per {@link BlockDynamicLeaves}.
-	 * Sequence numbers must be unique within each mod.  It's recommended to define the sequence consecutively and avoid later rearrangement. 
+	 * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
 	 */
 	public TreeFamily(ResourceLocation name) {
 		this.name = name;
@@ -217,6 +214,11 @@ public class TreeFamily {
 		return true;
 	}
 	
+	/**
+	 * Override this to use a custom branch for the tree family
+	 * 
+	 * @return the branch to be created
+	 */
 	public BlockBranch createBranch() {
 		return new BlockBranchBasic(name + "branch");
 	}
@@ -232,6 +234,12 @@ public class TreeFamily {
 		return dynamicBranch;
 	}
 	
+	/**
+	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
+	 * 
+	 * @param itemStack An itemstack of the stick
+	 * @return TreeFamily for chaining calls
+	 */
 	protected TreeFamily setStick(ItemStack itemStack) {
 		stick = itemStack;
 		return this;
@@ -249,20 +257,49 @@ public class TreeFamily {
 		return stack;
 	}
 	
+	/**
+	 * Used to set the type of log item that a tree drops when it's harvested.
+	 * Uses damageDropped() to automatically set the ItemStack metadata from a BlockState. 
+	 * 
+	 * @param primLog A blockstate of the log
+	 * @return TreeFamily for chaining calls
+	 */
 	protected TreeFamily setPrimitiveLog(IBlockState primLog) {
 		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock()), 1, primLog.getBlock().damageDropped(primLog)));
 	}
-	
+
+	/**
+	 * Used to set the type of log item that a tree drops when it's harvested.
+	 * Use this function to explicitly set the itemstack instead of having it 
+	 * done automatically.
+	 * 
+	 * @param primLog A blockstate of the log
+	 * @param primLogStack An itemStack of the log item
+	 * @return TreeFamily for chaining calls
+	 */
 	protected TreeFamily setPrimitiveLog(IBlockState primLog, ItemStack primLogStack) {
 		primitiveLog = primLog;
 		primitiveLogItemStack = primLogStack;
 		return this;
 	}
 	
+	/**
+	 * Gets the primitive full block (vanilla)log that represents this tree's 
+	 * material. Chiefly used to determine the wood hardness for harvesting
+	 * behavior.
+	 * 
+	 * @return BlockState of the primitive log.
+	 */
 	public IBlockState getPrimitiveLog() {
 		return primitiveLog;
 	}
 	
+	/**
+	 * Gets an itemStack of primitive logs of a requested quantity.
+	 * 
+	 * @param qty The quantity of logs requested
+	 * @return itemStack of requested logs.
+	 */
 	public ItemStack getPrimitiveLogItemStack(int qty) {
 		ItemStack stack = primitiveLogItemStack.copy();
 		stack.setCount(MathHelper.clamp(qty, 0, 64));
