@@ -33,6 +33,7 @@ import net.minecraft.block.BlockFire;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -165,6 +166,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return true;
 	}
 	
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		return BlockFaceShape.UNDEFINED;//This prevents fences and walls from attempting to connect to branches.
+	}
 	
 	///////////////////////////////////////////
 	// GROWTH
