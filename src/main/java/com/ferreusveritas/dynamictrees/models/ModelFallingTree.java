@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
@@ -83,11 +85,19 @@ public class ModelFallingTree {
 		}
 		
 		//Draw the leaves
-		IBlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
-		for(int index = 0; index < destructionData.getNumLeaves(); index++) {
-			BlockPos relPos = destructionData.getLeavesRelPos(index);
-			model = dispatcher.getModelForState(state);
-			treeQuads.addAll(QuadManipulator.getQuads(model, state, new Vec3d(relPos)));
+		HashMap<BlockPos, IBlockState> leavesClusters = destructionData.species.getFamily().getFellingLeavesClusters(destructionData);
+		if(leavesClusters != null) {
+			for(Entry<BlockPos, IBlockState> leafLoc : leavesClusters.entrySet()) {
+				model = dispatcher.getModelForState(leafLoc.getValue());
+				treeQuads.addAll(QuadManipulator.getQuads(model, leafLoc.getValue(), new Vec3d(leafLoc.getKey())));				
+			}
+		} else {
+			IBlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
+			for(int index = 0; index < destructionData.getNumLeaves(); index++) {
+				BlockPos relPos = destructionData.getLeavesRelPos(index);
+				model = dispatcher.getModelForState(state);
+				treeQuads.addAll(QuadManipulator.getQuads(model, state, new Vec3d(relPos)));
+			}
 		}
 		
 		treeQuads.trimToSize();
