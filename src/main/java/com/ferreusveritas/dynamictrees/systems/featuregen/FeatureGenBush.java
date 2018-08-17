@@ -61,7 +61,7 @@ public class FeatureGenBush implements IGenFeature {
 			IBlockState soilBlockState = world.getBlockState(pos);
 			
 			pos = pos.up();
-			if (species.isAcceptableSoil(world, pos, soilBlockState)) {
+			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
 				world.setBlockState(pos, logState);
 				
 				SimpleVoxmap leafMap = LeafClusters.bush;
