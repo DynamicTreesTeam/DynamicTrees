@@ -88,7 +88,11 @@ public class ModelFallingTree {
 		HashMap<BlockPos, IBlockState> leavesClusters = destructionData.species.getFamily().getFellingLeavesClusters(destructionData);
 		if(leavesClusters != null) {
 			for(Entry<BlockPos, IBlockState> leafLoc : leavesClusters.entrySet()) {
-				model = dispatcher.getModelForState(leafLoc.getValue());
+				if (leafLoc.getValue() instanceof IExtendedBlockState) {
+					model = dispatcher.getModelForState(((IExtendedBlockState) leafLoc.getValue()).getClean());
+				} else {
+					model = dispatcher.getModelForState(leafLoc.getValue());
+				}
 				treeQuads.addAll(QuadManipulator.getQuads(model, leafLoc.getValue(), new Vec3d(leafLoc.getKey())));				
 			}
 		} else {
