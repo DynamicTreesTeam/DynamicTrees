@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -651,7 +652,7 @@ protected ModelBlock modelBlock;
 	protected int[] pollConnections(int coreRadius, IExtendedBlockState extendedBlockState) {
 		int[] connections = new int[6];
 		for(EnumFacing dir: EnumFacing.VALUES) {
-			int connection = getConnectionRadius(extendedBlockState, BlockBranchCactus.CONNECTIONS[dir.getIndex()]);
+			int connection = getConnectionRadius(extendedBlockState, BlockBranch.CONNECTIONS[dir.getIndex()]);
 			connections[dir.getIndex()] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
 		}
 		return connections;

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -70,7 +69,7 @@ public class ModelFallingTree {
 		//Draw the ring texture cap on the cut block
 		IExtendedBlockState exState = destructionData.getNumBranches() > 0 ? destructionData.getBranchBlockState(0) : null;
 		for(EnumFacing face: EnumFacing.VALUES) {
-			exState = exState.withProperty(BlockBranchBasic.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
+			exState = exState.withProperty(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
 		}
 		float offset = (8 - ((BlockBranch) exState.getBlock()).getRadius(exState)) / 16f;
 		IBakedModel model = dispatcher.getModelForState(exState.getClean());

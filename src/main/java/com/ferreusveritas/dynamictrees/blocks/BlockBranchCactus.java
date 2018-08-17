@@ -20,7 +20,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -35,22 +34,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBranchCactus extends BlockBranch {
-	
-	public static final IUnlistedProperty CONNECTIONS[] = { 
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
-	};
-	
+
 	// The direction it grew from. Can't be up, since cacti can't grow down.
 	public static final PropertyEnum<EnumFacing> ORIGIN = PropertyEnum.<EnumFacing>create("origin", EnumFacing.class, new Predicate<EnumFacing>() {
 		@Override

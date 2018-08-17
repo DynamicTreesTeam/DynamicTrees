@@ -32,24 +32,12 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.common.property.Properties;
 
 public class BlockBranchBasic extends BlockBranch {
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
-	
-	// This is a nightmare
-	public static final IUnlistedProperty CONNECTIONS[] = { 
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
-	};
 	
 	private IBlockState branchStates[];
 	
@@ -132,6 +120,10 @@ public class BlockBranchBasic extends BlockBranch {
 		return isSameTree(branch) ? BlockBranchBasic.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
+	@Override
+	public boolean canFall() {
+		return true;
+	}
 	
 	///////////////////////////////////////////
 	// WORLD UPDATE

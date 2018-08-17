@@ -33,6 +33,7 @@ import net.minecraft.block.BlockFire;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -53,8 +54,19 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
+	
+	public static final IUnlistedProperty CONNECTIONS[] = { 
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
+		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
+	};
 	
 	private TreeFamily tree; //The tree this branch type creates
 	
@@ -338,6 +350,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		
 	}
 	
+	public boolean canFall() {
+		return false;
+	}
 	
 	///////////////////////////////////////////
 	// DROPS AND HARVESTING
@@ -392,7 +407,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, !ModConfigs.enableFallingTrees);
 		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		if(!ModConfigs.enableFallingTrees && !world.isRemote) {
+		if(!ModConfigs.enableFallingTrees && !world.isRemote && !destroyData.species.getFamily().getDynamicBranch().canFall()) {
 			IBlockState belowState = world.getBlockState(cutPos.down());
 			if(TreeHelper.isRooty(belowState)) {
 				belowState.getBlock().randomTick(world, cutPos.down(), belowState, world.rand);

@@ -108,7 +108,7 @@ public class BranchDestructionData {
 		//Ensure the origin block is at the first index
 		IExtendedBlockState origExState = branchList.get(BlockPos.ORIGIN);
 		if(origExState != null) {
-			data1[index] = encodeBranchesRadiusPos(BlockPos.ORIGIN, (BlockBranchBasic) origExState.getBlock(), origExState);
+			data1[index] = encodeBranchesRadiusPos(BlockPos.ORIGIN, (BlockBranch) origExState.getBlock(), origExState);
 			data2[index++] = encodeBranchesConnections(origExState);
 			branchList.remove(BlockPos.ORIGIN);
 		}
@@ -120,7 +120,7 @@ public class BranchDestructionData {
 			Block block = exState.getBlock();
 			
 			if(block instanceof BlockBranchBasic && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranchBasic) block, exState);
+				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranch) block, exState);
 				data2[index++] = encodeBranchesConnections(exState);
 			}
 		}
@@ -132,15 +132,15 @@ public class BranchDestructionData {
 		return new int[][] { data1, data2 };
 	}
 	
-	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranchBasic block, IBlockState state) {
-		return	((((BlockBranchBasic)block).getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
+	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch block, IBlockState state) {
+		return	((((BlockBranch)block).getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
 				encodeRelBlockPos(relPos);
 	}
 	
 	private int encodeBranchesConnections(IExtendedBlockState exState) {
 		int result = 0;
 		for(EnumFacing face : EnumFacing.values()) {
-			int rad = (int) exState.getValue(BlockBranchBasic.CONNECTIONS[face.getIndex()]);
+			int rad = (int) exState.getValue(BlockBranch.CONNECTIONS[face.getIndex()]);
 			result |= (rad & 0x1F) << (face.getIndex() * 5);//5 bits per face * 6 faces = 30bits
 		}
 		return result;
@@ -174,7 +174,7 @@ public class BranchDestructionData {
 				IExtendedBlockState exState = (IExtendedBlockState) state;
 				for(EnumFacing face : EnumFacing.values()) {
 					int rad = (int) (encodedConnections >> (face.getIndex() * 5) & 0x1F);
-					exState = exState.withProperty(BlockBranchBasic.CONNECTIONS[face.getIndex()], MathHelper.clamp(rad, 0, 8));
+					exState = exState.withProperty(BlockBranch.CONNECTIONS[face.getIndex()], MathHelper.clamp(rad, 0, 8));
 				}
 				return exState;
 			}

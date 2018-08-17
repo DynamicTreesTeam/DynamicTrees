@@ -5,12 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
-import com.ferreusveritas.dynamictrees.event.FallingTreeEvent;
-import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.models.IModelTracker;
+import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
@@ -26,7 +25,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -84,7 +82,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	 * @param destroyData
 	 * @param payload
 	 */
-	public void setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
+	public EntityFallingTree setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
 		this.destroyData = destroyData;
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
@@ -117,6 +115,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		setEntityBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
 		
 		setVoxelData(buildVoxelData(destroyData));
+		
+		return this;
 	}
 	
 	public NBTTagCompound buildVoxelData(BranchDestructionData destroyData) {
@@ -346,15 +346,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
-			if(ModConfigs.enableFallingTrees) {
-				EntityFallingTree fallingTree = new EntityFallingTree(world);
-				fallingTree.setData(destroyData, woodDropList, destroyType);
-				FallingTreeEvent fallEvent = new FallingTreeEvent(fallingTree, destroyData, woodDropList);
-				MinecraftForge.EVENT_BUS.post(fallEvent);
-				if(!fallEvent.isCanceled()) {
-					world.spawnEntity(fallEvent.getEntity());
-					return fallEvent.getEntity();
-				}
+			if(ModConfigs.enableFallingTrees && destroyData.species.getFamily().getDynamicBranch().canFall()) {
+				world.spawnEntity(new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType));
 			} else {
 				woodDropList.forEach(i -> Block.spawnAsEntity(world, destroyData.cutPos, i));
 				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
