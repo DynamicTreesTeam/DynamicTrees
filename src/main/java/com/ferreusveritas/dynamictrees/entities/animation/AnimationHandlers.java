@@ -14,6 +14,7 @@ import net.minecraft.util.EnumFacing;
  */
 public class AnimationHandlers {
 	
+	//This is what is run when the tree felling option is disabled
 	public static final IAnimationHandler voidAnimationHandler = new AnimationHandlerVoid();
 	
 	public static final IAnimationHandler defaultAnimationHandler = new AnimationHandlerPhysics() {

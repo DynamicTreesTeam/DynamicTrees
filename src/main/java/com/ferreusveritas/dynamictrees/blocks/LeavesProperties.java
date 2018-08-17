@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
@@ -58,8 +59,8 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 	
 	public LeavesProperties(IBlockState primitiveLeaves, ItemStack primitiveLeavesItemStack, ICellKit cellKit) {
-		this.primitiveLeaves = primitiveLeaves;
-		this.primitiveLeavesItemStack = primitiveLeavesItemStack;
+		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : ModBlocks.blockStates.air;
+		this.primitiveLeavesItemStack = primitiveLeavesItemStack != null ? primitiveLeavesItemStack : ItemStack.EMPTY;
 		this.cellKit = cellKit;
 	}
 	

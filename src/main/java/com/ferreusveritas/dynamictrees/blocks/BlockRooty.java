@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -234,7 +233,7 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public void destroyTree(World world, BlockPos rootPos) {
 		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
 		if(branch != null) {
-			BranchDestructionData destroyData = branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true, !ModConfigs.enableFallingTrees);
+			BranchDestructionData destroyData = branch.destroyBranchFromNode(world, rootPos.up(), EnumFacing.DOWN, true);
 			EntityFallingTree.dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.ROOT);
 		}
 	}

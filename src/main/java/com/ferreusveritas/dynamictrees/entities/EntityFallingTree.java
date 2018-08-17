@@ -70,6 +70,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
 		setSize(1.0f, 1.0f);
+		
+		ModConfigs.enableFallingTrees = true;
 	}
 	
 	public boolean isClientBuilt() {
@@ -346,12 +348,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
-			if(ModConfigs.enableFallingTrees && destroyData.species.getFamily().getDynamicBranch().canFall()) {
-				world.spawnEntity(new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType));
-			} else {
-				woodDropList.forEach(i -> Block.spawnAsEntity(world, destroyData.cutPos, i));
-				destroyData.leavesDrops.forEach(bis -> Block.spawnAsEntity(world, destroyData.cutPos.add(bis.pos), bis.stack));
-			}
+			EntityFallingTree entity = new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType);
+			world.spawnEntity(entity);
+			return entity;
 		}
 		
 		return null;

@@ -248,6 +248,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			entity.landed ||
 			entity.ticksExisted > 120;
 		
+		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		if(dead && !entity.world.isRemote) {
 			IBlockState belowState = entity.world.getBlockState(entity.getDestroyData().cutPos.down());
 			if(TreeHelper.isRooty(belowState)) {

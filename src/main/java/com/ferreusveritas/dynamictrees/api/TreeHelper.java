@@ -265,7 +265,7 @@ public class TreeHelper {
 	}
 	
 	public final static boolean isBranch(IBlockState state) {
-		return isBranch(state.getBlock());
+		return state != null ? isBranch(state.getBlock()) : false;
 	}
 	
 	public final static BlockBranch getBranch(Block block) {

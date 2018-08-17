@@ -22,12 +22,10 @@ public class NodeDestroyer implements INodeInspector {
 	
 	Species species;//Destroy any node that's made of the same kind of wood
 	private List<BlockPos> endPoints;//We always need to track endpoints during destruction
-	private boolean notifyClient = false;
 	
-	public NodeDestroyer(Species species, boolean notifyClient) {
+	public NodeDestroyer(Species species) {
 		this.endPoints = new ArrayList<BlockPos>(32);
 		this.species = species;
-		this.notifyClient = notifyClient;
 	}
 	
 	public List<BlockPos> getEnds() {
@@ -42,7 +40,7 @@ public class NodeDestroyer implements INodeInspector {
 			if(branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
 				endPoints.add(pos);
 			}
-			world.setBlockState(pos, Blocks.AIR.getDefaultState(), notifyClient ? 2 : 0);//Destroy the branch
+			world.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);//Destroy the branch without notifying the client
 		}
 		
 		return true;

@@ -167,9 +167,9 @@ public class BranchDestructionData {
 	}
 	
 	private IExtendedBlockState decodeBranchBlockState(int encodedRadPos, int encodedConnections) {
-		BlockBranch branch = (BlockBranchBasic)species.getFamily().getDynamicBranch();
-		if(branch instanceof BlockBranchBasic) {
-			IBlockState state = ((BlockBranchBasic)branch).getStateForRadius(decodeBranchRadius(encodedRadPos));
+		BlockBranch branch = (BlockBranch)species.getFamily().getDynamicBranch();
+		if(branch instanceof BlockBranch) {
+			IBlockState state = branch.getStateForRadius(decodeBranchRadius(encodedRadPos));
 			if(state instanceof IExtendedBlockState) {
 				IExtendedBlockState exState = (IExtendedBlockState) state;
 				for(EnumFacing face : EnumFacing.values()) {

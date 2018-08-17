@@ -234,6 +234,7 @@ public class BlockBranchBasic extends BlockBranch {
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 	}
 	
+	@Override
 	public IBlockState getStateForRadius(int radius) {
 		return branchStates[MathHelper.clamp(radius, 0, 8)];
 	}
