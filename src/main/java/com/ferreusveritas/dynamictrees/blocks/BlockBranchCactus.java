@@ -223,6 +223,11 @@ public class BlockBranchCactus extends BlockBranch {
 		return signal;
 	}
 	
+	@Override
+	public IBlockState getStateForRadius(int radius) {
+		return getDefaultState().withProperty(TRUNK, radius > 4);
+	}
+	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////

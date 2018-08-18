@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BlockItemStack;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -119,7 +118,7 @@ public class BranchDestructionData {
 			IExtendedBlockState exState = set.getValue();
 			Block block = exState.getBlock();
 			
-			if(block instanceof BlockBranchBasic && bounds.inBounds(relPos)) { //Place comfortable limits on the system
+			if(block instanceof BlockBranch && bounds.inBounds(relPos)) { //Place comfortable limits on the system
 				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranch) block, exState);
 				data2[index++] = encodeBranchesConnections(exState);
 			}
@@ -132,8 +131,8 @@ public class BranchDestructionData {
 		return new int[][] { data1, data2 };
 	}
 	
-	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch block, IBlockState state) {
-		return	((((BlockBranch)block).getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
+	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch branchBlock, IBlockState state) {
+		return	((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
 				encodeRelBlockPos(relPos);
 	}
 	
@@ -169,7 +168,8 @@ public class BranchDestructionData {
 	private IExtendedBlockState decodeBranchBlockState(int encodedRadPos, int encodedConnections) {
 		BlockBranch branch = (BlockBranch)species.getFamily().getDynamicBranch();
 		if(branch instanceof BlockBranch) {
-			IBlockState state = branch.getStateForRadius(decodeBranchRadius(encodedRadPos));
+			int radius = decodeBranchRadius(encodedRadPos);
+			IBlockState state = branch.getStateForRadius(radius);
 			if(state instanceof IExtendedBlockState) {
 				IExtendedBlockState exState = (IExtendedBlockState) state;
 				for(EnumFacing face : EnumFacing.values()) {

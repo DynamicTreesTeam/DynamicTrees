@@ -216,9 +216,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		setRadius(world, pos, radius, dir, 2);
 	}
 	
-	public IBlockState getStateForRadius(int radius) {
-		return ModBlocks.blockStates.air;
-	}
+	public abstract IBlockState getStateForRadius(int radius);
 	
 	///////////////////////////////////////////
 	// NODE ANALYSIS
