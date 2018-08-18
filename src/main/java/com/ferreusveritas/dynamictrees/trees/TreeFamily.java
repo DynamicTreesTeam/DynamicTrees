@@ -5,11 +5,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
@@ -325,6 +330,14 @@ public class TreeFamily {
 	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
 	public float getSecondaryThickness() {
 		return 2.0f;
+	}
+	
+	///////////////////////////////////////////
+	// FALL ANIMATION HANDLING
+	///////////////////////////////////////////
+	
+	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+		return fallingEntity.defaultAnimationHandler();
 	}
 	
 	///////////////////////////////////////////

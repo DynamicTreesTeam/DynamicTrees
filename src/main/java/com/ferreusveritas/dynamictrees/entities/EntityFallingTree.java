@@ -260,10 +260,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	protected IAnimationHandler selectAnimationHandler() {
-		if(!ModConfigs.enableFallingTrees) {
-			return AnimationHandlers.voidAnimationHandler;
-		}
-		
+		return ModConfigs.enableFallingTrees ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
+	}
+	
+	public IAnimationHandler defaultAnimationHandler() {
 		if(destroyType == DestroyType.BLAST) {
 			return AnimHandlerBlast;
 		}

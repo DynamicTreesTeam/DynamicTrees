@@ -29,7 +29,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -907,6 +909,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		} else {
 			heldItem.shrink(1);//Just a regular item like bonemeal
 		}
+	}
+
+	///////////////////////////////////////////
+	// FALL ANIMATION HANDLING
+	///////////////////////////////////////////
+	
+	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+		return getFamily().selectAnimationHandler(fallingEntity);
 	}
 	
 	//////////////////////////////
