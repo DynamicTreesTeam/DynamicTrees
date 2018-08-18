@@ -26,13 +26,11 @@ import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -578,7 +576,6 @@ protected ModelBlock modelBlock;
 	@Override
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
 		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
-		if (MinecraftForgeClient.getRenderLayer() != BlockRenderLayer.CUTOUT_MIPPED) return quadsList;
 		
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {
