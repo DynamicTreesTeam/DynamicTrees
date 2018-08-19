@@ -42,3 +42,5 @@ item.dendropotion.transform.name=Potion of Transformation
 item.dirtbucket.name=Dirt Bucket
 item.staff.name=Woodland Staff
 tile.bonsaipot.name=Bonsai Pot
+
+death.attack.fallingtree=%1$s was crushed by a falling tree

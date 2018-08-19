@@ -27,6 +27,7 @@ public class ModConfigs {
 	public static EnumAxeDamage axeDamageMode;
 	public static boolean enableFallingTrees;
 	public static boolean enableFallingTreeDamage;
+	public static float fallingTreeDamageMultiplier;
 	
 	public static boolean replaceVanillaSapling;
 	
@@ -64,7 +65,8 @@ public class ModConfigs {
 		axeDamageMode = EnumAxeDamage.values()[config.getInt("axeDamageMode", "interaction", 1, 0, 2, "Modes: 0=Standard 1 Damage, 1=By Branch/Trunk Thickness, 2=By Tree Volume")];
 		enableFallingTrees = config.getBoolean("enableFallingTrees", "interaction", true, "If enabled then trees will fall over when harvested");
 		enableFallingTreeDamage = config.getBoolean("enableFallingTreeDamage", "interaction", true, "If enabled then trees will harm living entities when falling");
-
+		fallingTreeDamageMultiplier = config.getFloat("fallingTreeDamageMultiplier", "interaction", 1.0f, 0.0f, 100.0f, "Multiplier for damage incurred by a falling tree");
+		
 		
 		//Vanilla
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
