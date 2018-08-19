@@ -25,7 +25,8 @@ public class AnimationHandlerVoid implements IAnimationHandler {
 	
 	@Override
 	public void dropPayload(EntityFallingTree entity) {
-		EntityFallingTree.standardDropPayload(entity);
+		EntityFallingTree.standardDropLogsPayload(entity);
+		EntityFallingTree.standardDropLeavesPayLoad(entity);
 	}
 	
 }

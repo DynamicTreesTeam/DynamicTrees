@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -44,6 +45,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 	@Override
 	public void initMotion(EntityFallingTree entity) {
 		entity.animationHandlerData = new HandlerData();
+		EntityFallingTree.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 		
 		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 		if(entity.world.getBlockState(belowBlock).isSideSolid(entity.world, belowBlock, EnumFacing.UP)) {
@@ -221,7 +223,9 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 	
 	@Override
 	public void dropPayload(EntityFallingTree entity) {
-		EntityFallingTree.standardDropPayload(entity);
+		World world = entity.world;
+		BlockPos cutPos = entity.getDestroyData().cutPos;
+		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
 	}
 	
 	@Override

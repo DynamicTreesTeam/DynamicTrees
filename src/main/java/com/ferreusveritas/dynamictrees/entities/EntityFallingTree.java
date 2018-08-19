@@ -313,18 +313,27 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	/**
-	 * Same style payload dropper that has always existed in Dynamic Trees.
+	 * Same style payload droppers that have always existed in Dynamic Trees.
 	 * 
 	 * Drops wood materials at the cut position
 	 * Leaves drops fall from their original location
 	 * 
 	 * @param entity
 	 */
-	public static void standardDropPayload(EntityFallingTree entity) {
+	public static void standardDropLogsPayload(EntityFallingTree entity) {
 		World world = entity.world;
-		BlockPos cutPos = entity.getDestroyData().cutPos;
-		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
-		entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
+		if(!world.isRemote) {
+			BlockPos cutPos = entity.getDestroyData().cutPos;
+			entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
+		}
+	}
+	
+	public static void standardDropLeavesPayLoad(EntityFallingTree entity) {
+		World world = entity.world;
+		if(!world.isRemote) {
+			BlockPos cutPos = entity.getDestroyData().cutPos;
+			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
+		}
 	}
 	
 	@Override

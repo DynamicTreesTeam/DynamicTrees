@@ -52,6 +52,8 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		entity.motionX += cutDir.getOpposite().getFrontOffsetX() * 0.1;
 		entity.motionY += cutDir.getOpposite().getFrontOffsetY() * 0.1;
 		entity.motionZ += cutDir.getOpposite().getFrontOffsetZ() * 0.1;
+		
+		EntityFallingTree.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 	}
 	
 	@Override
