@@ -4,18 +4,24 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.models.ModelFallingTree;
 import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
+import com.ferreusveritas.dynamictrees.models.ModelFallingTree;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.relauncher.Side;
@@ -50,12 +56,27 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
+		
+		if(entity.onFire) {
+			renderFire();
+		}
+		
 		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
 		
 		drawBakedQuads(treeModel.getQuads(), brightnessIn, treeModel.getLeavesColor());
 		
 		GlStateManager.popMatrix();
 		GlStateManager.enableLighting();
+	}
+	
+	private void renderFire() {
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(-0.5f, 0.0f, -0.5f);
+		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+		IBlockState fire = Blocks.FIRE.getDefaultState();
+		IBakedModel model = dispatcher.getModelForState(fire);
+		drawBakedQuads(QuadManipulator.getQuads(model, fire), 255, 0xFFFFFFFF);
+		GlStateManager.popMatrix();
 	}
 	
 	//TODO: Convert to IBakedModel and eliminate this mess

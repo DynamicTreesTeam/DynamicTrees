@@ -105,6 +105,8 @@ public class ModelFallingTree {
 				}
 			}
 			
+
+			
 			treeQuads.trimToSize();
 		}
 		

@@ -49,6 +49,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	protected boolean firstUpdate = true;
 	public boolean landed = false;
 	public DestroyType destroyType = DestroyType.HARVEST;
+	public boolean onFire = false;
 	
 	
 	public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
@@ -89,6 +90,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
 		this.destroyType = destroyType;
+		this.onFire = destroyType == DestroyType.FIRE;
 		
 		this.posX = cutPos.getX() + 0.5;
 		this.posY = cutPos.getY();
@@ -132,6 +134,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		tag.setDouble("massy", massCenter.y);
 		tag.setDouble("massz", massCenter.z);
 		tag.setInteger("destroytype", destroyType.ordinal());
+		tag.setBoolean("onfire", onFire);
 		
 		return tag;
 	}
@@ -147,6 +150,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
 			buildAABBFromDestroyData(destroyData);
 			setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
+			onFire = tag.getBoolean("onfire");
 			clientBuilt = true;
 		}
 		

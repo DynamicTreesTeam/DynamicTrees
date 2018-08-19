@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.entities.animation;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -92,6 +93,7 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 				getData(entity).rotPit *= 0.8f;
 				//Add a little buoyancy
 				entity.motionY += 0.01;
+				entity.onFire = false;
 			} else {
 				AxisAlignedBB collBox = collState.getCollisionBoundingBox(world, pos);
 				
@@ -103,6 +105,9 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 						entity.prevPosY = entity.posY;
 						entity.landed = true;
 						entity.onGround = true;
+						if(entity.onFire) {
+							entity.world.setBlockState(pos.up(), ModBlocks.blockVerboseFire.getDefaultState());
+						}
 					}
 				}
 			}
