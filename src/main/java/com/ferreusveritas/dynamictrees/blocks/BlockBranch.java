@@ -452,7 +452,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	
 	public void damageAxe(EntityPlayer player, ItemStack heldItem, int radius, int woodVolume) {
 		
-		if(heldItem.getItem() instanceof ItemAxe) {
+		if(heldItem != null && heldItem.getItem() instanceof ItemAxe) {
 			
 			int damage;
 			
