@@ -405,7 +405,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
 		
 		//Get all of the wood drops
-		ItemStack heldItem = player.getHeldItem(player.getActiveHand());
+		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		int woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
