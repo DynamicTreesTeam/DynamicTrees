@@ -339,7 +339,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, Blocks.AIR.getDefaultState(), 0);//Covertly destroy the leaves on the server side
+					world.setBlockState(imPos, ModBlocks.blockStates.air, 0);//Covertly destroy the leaves on the server side
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new BlockItemStack(i, relPos)) );
 				}

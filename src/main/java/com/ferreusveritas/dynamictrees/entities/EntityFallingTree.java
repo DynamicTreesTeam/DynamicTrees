@@ -11,7 +11,10 @@ import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.models.IModelTracker;
 import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData.PosType;
+import com.google.common.collect.Iterables;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -154,28 +157,22 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			onFire = tag.getBoolean("onfire");
 			clientBuilt = true;
 		}
+				
+		BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 		
-		for(int i = 0; i < destroyData.getNumBranches(); i++) {
-			BlockPos relPos = destroyData.getBranchRelPos(i);
-			BlockPos absPos = destroyData.cutPos.add(relPos);
-			world.setBlockState(absPos, Blocks.STONE.getDefaultState(), 0);//This forces the client to rerender the chunks
-			world.setBlockState(absPos, ModBlocks.blockStates.air, 0);
+		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(PosType.BRANCHES), destroyData.getPositions(PosType.LEAVES))) {
+			world.setBlockState(absPos, ModBlocks.blockStates.air, 0);////The client needs to set it's blocks to air
+			renderBounds.union(absPos);//Expand the re-render volume to include this block
 		}
 		
-		for(int i = 0; i < destroyData.getNumLeaves(); i++) {
-			BlockPos relPos = destroyData.getLeavesRelPos(i);
-			BlockPos absPos = destroyData.cutPos.add(relPos);
-			world.setBlockState(absPos, ModBlocks.blockStates.air, 0);
-			//world.destroyBlock(absPos, false);
-		}
-		
+		world.markBlockRangeForRenderUpdate(renderBounds.getMin(), renderBounds.getMax());//This forces the client to rerender the chunks
 	}
 	
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
 		normAABB = new AxisAlignedBB(BlockPos.ORIGIN);
 		
-		for(int i = 0; i < destroyData.getNumBranches(); i++) {
-			normAABB = normAABB.union(new AxisAlignedBB(destroyData.getBranchRelPos(i)));
+		for(BlockPos relPos: destroyData.getPositions(PosType.BRANCHES, false)) {
+			normAABB = normAABB.union(new AxisAlignedBB(relPos));
 		}
 		
 		return normAABB;
@@ -240,15 +237,13 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		HashSet<BlockPos> toUpdate = new HashSet<>();
 		
 		//Gather a set of all of the block positions that were recently destroyed
-		final int numBranches = destroyData.getNumBranches();
-		for(int i = 0; i < numBranches; i++) {
-			destroyed.add(destroyData.cutPos.add(destroyData.getBranchRelPos(i)));
+		for(BlockPos relPos: destroyData.getPositions(PosType.BRANCHES, false)) {
+			destroyed.add(destroyData.cutPos.add(relPos));
 		}
 
 		//Continue gathering a set of all of the block positions that were recently destroyed
-		final int numLeaves = destroyData.getNumLeaves();
-		for(int i = 0; i < numLeaves; i++) {
-			destroyed.add(destroyData.cutPos.add(destroyData.getLeavesRelPos(i)));
+		for(BlockPos relPos: destroyData.getPositions(PosType.LEAVES, false)) {
+			destroyed.add(destroyData.cutPos.add(relPos));
 		}
 		
 		//Gather a list of all of the non-destroyed blocks surrounding each destroyed block

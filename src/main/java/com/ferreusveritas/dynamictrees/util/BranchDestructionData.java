@@ -2,15 +2,18 @@ package com.ferreusveritas.dynamictrees.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch.BlockItemStack;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.google.common.collect.AbstractIterator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -253,6 +256,70 @@ public class BranchDestructionData {
 	public BlockPos getEndPointRelPos(int index) {
 		return decodeRelPos(endPoints[index]);
 	}
+
+	
+	///////////////////////////////////////////////////////////
+	// Position Iteration
+	///////////////////////////////////////////////////////////
+	
+	public static enum PosType {
+		BRANCHES,
+		LEAVES,
+		ENDPOINTS
+	}
+	
+	/**
+	 * Get absolute positions of a position type
+	 * 
+	 * @param posType
+	 * @return
+	 */
+	public Iterable<BlockPos> getPositions(PosType posType) {
+		return getPositions(posType, true);
+	}
+
+	/**
+	 * Get relative or absolute positions of a position type
+	 * 
+	 * @param posType
+	 * @param absolute
+	 * @return
+	 */
+	public Iterable<BlockPos> getPositions(PosType posType, boolean absolute) {
+		
+		final Function<Integer, BlockPos> getter;
+		final int limit;
+		
+		switch(posType) {
+			default:
+			case BRANCHES: 
+				getter = absolute ? i -> getBranchRelPos(i).add(cutPos) : i -> getBranchRelPos(i);
+				limit = getNumBranches();
+				break;
+			case ENDPOINTS:
+				getter = absolute ? i -> getEndPointRelPos(i).add(cutPos) : i -> getEndPointRelPos(i);
+				limit = getNumEndpoints();
+				break;
+			case LEAVES:
+				getter = absolute ? i -> getLeavesRelPos(i).add(cutPos) : i -> getLeavesRelPos(i);
+				limit = getNumLeaves();
+				break;
+		}
+				
+		return new Iterable<BlockPos>() {
+			@Override
+			public Iterator<BlockPos> iterator() {
+				return new AbstractIterator<BlockPos>() {
+					private int index = 0;
+					@Override
+					protected BlockPos computeNext() {
+						return index < limit ? getter.apply(index++) : this.endOfData();
+					}
+				};
+			}
+		};
+	}
+	
 	
 	///////////////////////////////////////////////////////////
 	// Generic

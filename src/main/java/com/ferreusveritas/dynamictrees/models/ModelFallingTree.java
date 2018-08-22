@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData.PosType;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -98,8 +99,7 @@ public class ModelFallingTree {
 				}
 			} else {
 				IBlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
-				for(int index = 0; index < destructionData.getNumLeaves(); index++) {
-					BlockPos relPos = destructionData.getLeavesRelPos(index);
+				for(BlockPos relPos : destructionData.getPositions(PosType.LEAVES, false)) {
 					model = dispatcher.getModelForState(state);
 					treeQuads.addAll(QuadManipulator.getQuads(model, state, new Vec3d(relPos)));
 				}
