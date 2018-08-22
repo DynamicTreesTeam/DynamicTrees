@@ -237,15 +237,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		HashSet<BlockPos> toUpdate = new HashSet<>();
 		
 		//Gather a set of all of the block positions that were recently destroyed
-		for(BlockPos relPos: destroyData.getPositions(PosType.BRANCHES, false)) {
-			destroyed.add(destroyData.cutPos.add(relPos));
-		}
-
-		//Continue gathering a set of all of the block positions that were recently destroyed
-		for(BlockPos relPos: destroyData.getPositions(PosType.LEAVES, false)) {
-			destroyed.add(destroyData.cutPos.add(relPos));
-		}
-		
+		Iterables.concat(destroyData.getPositions(PosType.BRANCHES), destroyData.getPositions(PosType.LEAVES)).forEach(pos -> destroyed.add(pos));
+	
 		//Gather a list of all of the non-destroyed blocks surrounding each destroyed block
 		for(BlockPos d: destroyed) {
 			for(EnumFacing dir: EnumFacing.values()) {

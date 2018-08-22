@@ -68,46 +68,40 @@ public class ModelFallingTree {
 		ArrayList<BakedQuad> treeQuads = new ArrayList<>();
 		
 		if(destructionData.getNumBranches() > 0) {
-
+			
 			//Draw the ring texture cap on the cut block
 			IExtendedBlockState exState = destructionData.getBranchBlockState(0);
 			for(EnumFacing face: EnumFacing.VALUES) {
 				exState = exState.withProperty(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
 			}
 			float offset = (8 - ((BlockBranch) exState.getBlock()).getRadius(exState)) / 16f;
-			IBakedModel model = dispatcher.getModelForState(exState.getClean());
-			treeQuads.addAll(QuadManipulator.getQuads(model, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }));
+			IBakedModel branchModel = dispatcher.getModelForState(exState.getClean());//Since we source the blockState from the destruction data it will always be the same
+			treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }));
 			
 			//Draw the rest of the tree/branch
 			for(int index = 0; index < destructionData.getNumBranches(); index++) {
 				exState = destructionData.getBranchBlockState(index);
 				BlockPos relPos = destructionData.getBranchRelPos(index);
-				model = dispatcher.getModelForState(exState.getClean());
-				treeQuads.addAll(QuadManipulator.getQuads(model, exState, new Vec3d(relPos)));
+				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(relPos)));
 			}
 			
 			//Draw the leaves
 			HashMap<BlockPos, IBlockState> leavesClusters = destructionData.species.getFamily().getFellingLeavesClusters(destructionData);
 			if(leavesClusters != null) {
 				for(Entry<BlockPos, IBlockState> leafLoc : leavesClusters.entrySet()) {
-					if (leafLoc.getValue() instanceof IExtendedBlockState) {
-						model = dispatcher.getModelForState(((IExtendedBlockState) leafLoc.getValue()).getClean());
-					} else {
-						model = dispatcher.getModelForState(leafLoc.getValue());
+					IBlockState leafState = leafLoc.getValue();
+					if (leafState instanceof IExtendedBlockState) {
+						leafState = ((IExtendedBlockState) leafState).getClean();
 					}
-					treeQuads.addAll(QuadManipulator.getQuads(model, leafLoc.getValue(), new Vec3d(leafLoc.getKey())));				
+					treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey())));				
 				}
 			} else {
 				IBlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
 				for(BlockPos relPos : destructionData.getPositions(PosType.LEAVES, false)) {
-					model = dispatcher.getModelForState(state);
-					treeQuads.addAll(QuadManipulator.getQuads(model, state, new Vec3d(relPos)));
+					treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vec3d(relPos)));
 				}
 			}
 			
-
-			
-			treeQuads.trimToSize();
 		}
 		
 		return treeQuads;
