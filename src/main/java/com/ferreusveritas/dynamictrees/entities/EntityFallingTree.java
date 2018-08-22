@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
@@ -143,7 +144,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		NBTTagCompound tag = getVoxelData();
 		
-		if(tag.hasKey("species")) {
+		if(tag.hasKey("species")) {			
 			destroyData = new BranchDestructionData(tag);
 			destroyType = DestroyType.values()[tag.getInteger("destroytype")];
 			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
@@ -158,13 +159,14 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			BlockPos relPos = destroyData.getBranchRelPos(i);
 			BlockPos absPos = destroyData.cutPos.add(relPos);
 			world.setBlockState(absPos, Blocks.STONE.getDefaultState(), 0);//This forces the client to rerender the chunks
-			world.setBlockState(absPos, Blocks.AIR.getDefaultState(), 0);
+			world.setBlockState(absPos, ModBlocks.blockStates.air, 0);
 		}
 		
 		for(int i = 0; i < destroyData.getNumLeaves(); i++) {
 			BlockPos relPos = destroyData.getLeavesRelPos(i);
 			BlockPos absPos = destroyData.cutPos.add(relPos);
-			world.destroyBlock(absPos, false);
+			world.setBlockState(absPos, ModBlocks.blockStates.air, 0);
+			//world.destroyBlock(absPos, false);
 		}
 		
 	}
