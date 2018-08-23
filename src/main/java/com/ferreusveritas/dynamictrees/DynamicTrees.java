@@ -56,9 +56,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * </p>
 *
 */
-@Mod(modid = ModConstants.MODID, version=ModConstants.VERSION,dependencies=ModConstants.DEPENDENCIES)
+@Mod(modid = ModConstants.MODID, version=ModConstants.VERSION, dependencies=ModConstants.DEPENDENCIES)
 public class DynamicTrees {
-
+	
 	@Mod.Instance(ModConstants.MODID)
 	public static DynamicTrees instance;
 	
@@ -66,13 +66,13 @@ public class DynamicTrees {
 	public static CommonProxy proxy;
 	
 	public static final CreativeTabs dynamicTreesTab = new CreativeTabs(ModConstants.MODID) {
-        @SideOnly(Side.CLIENT)
+		@SideOnly(Side.CLIENT)
 		@Override
 		public ItemStack getTabIconItem() {
 			return TreeRegistry.findSpeciesSloppy(BlockPlanks.EnumType.OAK.getName()).getSeedStack(1);
 		}
 	};
-
+	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		
@@ -82,7 +82,7 @@ public class DynamicTrees {
 		
 		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
 		GameRegistry.registerTileEntity(TileEntityBonsai.class, "bonsai_tile_entity");
-
+		
 		
 		ModBlocks.preInit();
 		ModItems.preInit();
@@ -90,7 +90,7 @@ public class DynamicTrees {
 		
 		proxy.preInit();
 	}
-
+	
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		
@@ -125,7 +125,7 @@ public class DynamicTrees {
 		public static void registerModels(ModelRegistryEvent event) {
 			ModModels.registerModels(event);
 		}
-
+		
 		@SubscribeEvent
 		public static void newRegistry(RegistryEvent.NewRegistry event) {
 			Species.newRegistry(event);

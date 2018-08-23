@@ -55,13 +55,12 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public DestroyType destroyType = DestroyType.HARVEST;
 	public boolean onFire = false;
 	
-	
 	public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static IAnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
 	public static IAnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
 	public static IAnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
 	public static IAnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
-
+	
 	public IAnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	public AnimationHandlerData animationHandlerData = null;
 	
@@ -358,4 +357,5 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		return null;
 	}
+	
 }
