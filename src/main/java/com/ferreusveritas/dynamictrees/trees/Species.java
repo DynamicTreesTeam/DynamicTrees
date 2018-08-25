@@ -18,7 +18,6 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -32,6 +31,7 @@ import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -65,6 +65,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -787,12 +788,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		Biome biome = world.getBiome(pos);
 		
 		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
-		if(TreeRegistry.isBiomeSuitabilityOverrideEnabled()) {
-			IBiomeSuitabilityDecider.Decision override = TreeRegistry.getBiomeSuitability(world, biome, this, pos);
-			
-			if(override.isHandled()) {
-				return override.getSuitability();
-			}
+		BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
+		MinecraftForge.EVENT_BUS.post(suitabilityEvent);
+		if(suitabilityEvent.isHandled()) {
+			return suitabilityEvent.getSuitability();
 		}
 		
 		float ugs = ModConfigs.scaleBiomeGrowthRate;//universal growth scalar

@@ -7,16 +7,12 @@ import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.api.treedata.IBiomeSuitabilityDecider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 /**
 * A registry for all of the dynamic trees. Use this for this mod or other mods.
@@ -25,7 +21,6 @@ import net.minecraft.world.biome.Biome;
 */
 public class TreeRegistry {
 
-	private static final ArrayList<IBiomeSuitabilityDecider> biomeSuitabilityDeciders = new ArrayList<IBiomeSuitabilityDecider>();
 	public static final IDropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
 	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>(); 
 	
@@ -121,36 +116,6 @@ public class TreeRegistry {
 	
 	public static ICellKit findCellKit(String name) {
 		return findCellKit(new ResourceLocation(ModConstants.MODID, name));
-	}
-	
-	//////////////////////////////
-	// BIOME HANDLING
-	//////////////////////////////
-	
-	/**
-	 * Mods should call this to register an {@link IBiomeSuitabilityDecider}
-	 * 
-	 * @param decider The decider being registered
-	 */
-	public static void registerBiomeSuitabilityDecider(IBiomeSuitabilityDecider decider) {
-		biomeSuitabilityDeciders.add(decider);
-	}
-	
-	private static final IBiomeSuitabilityDecider.Decision undecided = new IBiomeSuitabilityDecider.Decision();
-	
-	public static IBiomeSuitabilityDecider.Decision getBiomeSuitability(World world, Biome biome, Species species, BlockPos pos) {
-		for(IBiomeSuitabilityDecider decider: biomeSuitabilityDeciders) {
-			IBiomeSuitabilityDecider.Decision decision = decider.getBiomeSuitability(world, biome, species, pos);
-			if(decision.isHandled()) {
-				return decision;
-			}
-		}
-		
-		return undecided;
-	}
-	
-	public static boolean isBiomeSuitabilityOverrideEnabled() {
-		return !biomeSuitabilityDeciders.isEmpty();
 	}
 	
 }
