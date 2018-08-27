@@ -176,13 +176,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return treeFamily;
 	}
 	
-	protected Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
 		this.tapering = tapering;
 		this.signalEnergy = energy;
 		this.upProbability = upProbability;
 		this.lowestBranchHeight = lowestBranchHeight;
 		this.growthRate = growthRate;
-		return this;
 	}
 	
 	public float getEnergy(World world, BlockPos rootPos) {
