@@ -45,6 +45,10 @@ public class ModRecipes {
 	}
 	
 	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling) {
+		createDirtBucketExchangeRecipes(saplingStack, seedStack, seedIsSapling, "seed");
+	}
+	
+	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling, String suffix) {
 		if(!saplingStack.isEmpty() && !seedStack.isEmpty() && seedStack.getItem() instanceof Seed) {
 			
 			Seed seed = (Seed) seedStack.getItem();
@@ -53,7 +57,7 @@ public class ModRecipes {
 			
 			//Create a seed from a sapling and dirt bucket
 			GameRegistry.addShapelessRecipe(
-					new ResourceLocation(speciesDomain, speciesPath + "seed"),
+					new ResourceLocation(speciesDomain, speciesPath + suffix),
 					null,
 					seedStack,
 					new Ingredient[]{
