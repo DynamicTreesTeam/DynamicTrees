@@ -1,0 +1,46 @@
+itemGroup.dynamictrees=Dynamische Bomen
+
+tile.rootydirt.name=Wortelige Grond
+tile.rootysand.name=Wortelig Zand
+
+tile.leaves0.name=Dynamische Bladeren
+tile.leaves1.name=Dynamische Bladeren
+
+tile.oakbranch.name=Dynamische Eikenboom
+tile.sprucebranch.name=Dynamische Denneboom
+tile.birchbranch.name=Dynamische Berkenboom
+tile.junglebranch.name=Dynamische Jungle Boom
+tile.darkoakbranch.name=Dynamische Donkere Eikenboom
+tile.acaciabranch.name=Dynamische Acacia Boom
+tile.cactusbranch.name=Dynamische Cactus
+
+tile.dynamictrees:oakbranch.name=Dynamische Eikenboom
+tile.dynamictrees:sprucebranch.name=Dynamische Denneboom
+tile.dynamictrees:birchbranch.name=Dynamische Berkenboom
+tile.dynamictrees:junglebranch.name=Dynamische Jungel Boom
+tile.dynamictrees:darkoakbranch.name=Dynamische Donkere Eikenboom
+tile.dynamictrees:acaciabranch.name=Dynamische Acacia Boom
+tile.dynamictrees:cactusbranch.name=Dynamische Cactus
+
+item.oakseed.name=Eiken Eikel
+item.spruceseed.name=Spruce Cone
+item.birchseed.name=Berken Katje
+item.jungleseed.name=Jungel Doosvrucht
+item.darkoakseed.name=Donker Eiken Eikel
+item.acaciaseed.name=Acacia Zaad
+item.appleseed.name=Appelpit
+item.cactusseed.name=Cactus Zaad
+
+item.dendropotion.biochar.name=Biochar Basis Drank
+item.dendropotion.depletion.name=Drank van Uitputting
+item.dendropotion.defoliance.name=Drank van Ontbladering
+item.dendropotion.burgeoning.name=Drank van Ontluiken
+item.dendropotion.fertility.name=Drank van Vruchtbaarheid
+item.dendropotion.persistance.name=Drank van Volharding
+item.dendropotion.transform.name=Drank van Transformatie
+
+item.dirtbucket.name=Aarden Emmer
+item.staff.name=Bosland Staf
+tile.bonsaipot.name=Bonsai Pot
+
+death.attack.fallingtree=%1$s was verpletterd door een vallende boom
