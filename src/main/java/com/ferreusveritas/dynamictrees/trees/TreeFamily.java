@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -17,10 +16,6 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockNewLog;
-import net.minecraft.block.BlockOldLog;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -80,19 +75,6 @@ public class TreeFamily {
 	private ItemStack stick;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
-	
-	/** Get your Cheeto fingers off! Only the DynamicTrees mod should use this and only for vanilla trees */
-	public TreeFamily(BlockPlanks.EnumType wood) {
-		this(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
-		
-		//Setup tree references
-		boolean isOld = wood.getMetadata() < 4;
-		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
-				
-		//Setup common species
-		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
-		getCommonSpecies().generateSeed();
-	}
 	
 	public TreeFamily() {
 		this.name = new ResourceLocation(ModConstants.MODID, "null");

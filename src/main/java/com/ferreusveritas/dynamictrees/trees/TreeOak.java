@@ -34,7 +34,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class TreeOak extends TreeFamily {
+public class TreeOak extends TreeFamilyVanilla {
 	
 	public class SpeciesOak extends Species {
 		

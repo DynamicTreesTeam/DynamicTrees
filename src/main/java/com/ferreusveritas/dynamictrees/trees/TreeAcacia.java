@@ -8,7 +8,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeAcacia extends TreeFamily {
+public class TreeAcacia extends TreeFamilyVanilla {
 	
 	public class SpeciesAcacia extends Species {
 		

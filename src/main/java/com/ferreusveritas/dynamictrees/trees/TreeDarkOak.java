@@ -21,7 +21,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeDarkOak extends TreeFamily {
+public class TreeDarkOak extends TreeFamilyVanilla {
 	
 	public class SpeciesDarkOak extends Species {
 		

@@ -25,7 +25,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeSpruce extends TreeFamily {
+public class TreeSpruce extends TreeFamilyVanilla {
 	
 	public class SpeciesSpruce extends Species {
 		

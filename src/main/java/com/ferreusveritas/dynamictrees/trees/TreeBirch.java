@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeBirch extends TreeFamily {
+public class TreeBirch extends TreeFamilyVanilla {
 	
 	public class SpeciesBirch extends Species {
 		

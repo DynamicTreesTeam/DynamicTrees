@@ -3,22 +3,25 @@ package com.ferreusveritas.dynamictrees;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
 import com.ferreusveritas.dynamictrees.trees.TreeBirch;
 import com.ferreusveritas.dynamictrees.trees.TreeCactus;
 import com.ferreusveritas.dynamictrees.trees.TreeDarkOak;
+import com.ferreusveritas.dynamictrees.trees.TreeFamilyVanilla;
 import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 
+import net.minecraft.block.BlockSapling;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
 public class ModTrees {
 
-	public static ArrayList<TreeFamily> baseFamilies = new ArrayList<TreeFamily>();
+	public static ArrayList<TreeFamilyVanilla> baseFamilies = new ArrayList<>();
 	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
 	public static TreeCactus dynamicCactus;
 
@@ -37,6 +40,10 @@ public class ModTrees {
 		//Registers a fake species for generating mushrooms
 		Species.REGISTRY.register(new Mushroom(true));
 		Species.REGISTRY.register(new Mushroom(false));
+		
+		for(TreeFamilyVanilla vanillaFamily: baseFamilies) {
+			TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());
+		}
 	}
 	
 }

@@ -28,7 +28,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class TreeJungle extends TreeFamily {
+public class TreeJungle extends TreeFamilyVanilla {
 	
 	public class SpeciesJungle extends Species {
 		

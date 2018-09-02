@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -66,6 +67,17 @@ public class TreeRegistry {
 	public static List<ResourceLocation> getSpeciesDirectory() {
 		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
 	}
+	
+	//////////////////////////////
+	// SAPLING HANDLING
+	//////////////////////////////
+	
+	public static Map<IBlockState, Species> saplingReplacers = new HashMap<>();
+	
+	public static void registerSaplingReplacer(IBlockState state, Species species) {
+		saplingReplacers.put(state, species);
+	}
+	
 	
 	//////////////////////////////
 	// DROP HANDLING
