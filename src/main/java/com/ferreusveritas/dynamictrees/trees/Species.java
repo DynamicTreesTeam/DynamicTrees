@@ -417,6 +417,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return this;
 	}
 	
+	public Species setDynamicSapling(String speciesName) {
+		return setDynamicSapling(new BlockDynamicSapling(speciesName + "sapling").getDefaultState());
+	}
+	
 	public IBlockState getDynamicSapling() {
 		return saplingBlock;
 	}
