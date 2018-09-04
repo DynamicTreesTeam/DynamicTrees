@@ -257,6 +257,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	public IAnimationHandler defaultAnimationHandler() {
+		if(destroyType == DestroyType.ROOT) {
+			return AnimationHandlers.voidAnimationHandler;
+		}
+		
 		if(destroyType == DestroyType.BLAST) {
 			return AnimHandlerBlast;
 		}

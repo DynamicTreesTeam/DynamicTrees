@@ -28,6 +28,9 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
+import mcp.mobius.waila.api.IWailaDataProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.material.EnumPushReaction;
@@ -56,8 +59,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
+import net.minecraftforge.fml.common.Optional;
 
-public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
+@Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = "waila")
+public abstract class BlockBranch extends Block implements ITreePart, IBurningListener, IWailaDataProvider {
 	
 	public static final IUnlistedProperty CONNECTIONS[] = { 
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
@@ -576,6 +581,21 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.BRANCH;
+	}
+	
+	@Override
+	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
+		if(state.getBlock() instanceof BlockBranch) {
+			BlockBranch branch = (BlockBranch) state.getBlock();
+			Species species = TreeHelper.getExactSpecies(state, accessor.getWorld(), accessor.getPosition());
+			if(species == Species.NULLSPECIES) {
+				species = branch.getFamily().getCommonSpecies();
+			}
+			tooltip.add("Species: " + species.getRegistryName().getResourcePath());
+		}
+		
+		return tooltip;
 	}
 	
 }
