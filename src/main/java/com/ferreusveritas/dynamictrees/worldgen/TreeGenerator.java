@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -32,11 +34,16 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
 	
-	public BiomeDataBase biomeDataBase;
+	@Deprecated
+	public BiomeDataBase biomeDataBase; //This is only being kept for Rustic at the moment
+	
+	protected BiomeDataBase defaultBiomeDataBase; //Default biomeDataBase
+	public static final BiomeDataBase BLACKLISTED = new BiomeDataBase();
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public JoCodeStore codeStore;
 	protected ChunkCircleManager circleMan;
 	protected RandomXOR random;
+	protected Map<Integer, BiomeDataBase> dimensionMap = new HashMap<>();
 	
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
@@ -48,6 +55,20 @@ public class TreeGenerator implements IWorldGenerator {
 		}
 	}
 	
+	public BiomeDataBase getBiomeDataBase(int dimensionId) {
+		if(dimensionMap.containsKey(dimensionId)) {
+			return dimensionMap.get(dimensionId);
+		}
+		return getDefaultBiomeDataBase();
+	}
+	
+	public BiomeDataBase getDefaultBiomeDataBase() {
+		return defaultBiomeDataBase;
+	}
+	
+	public void BlackListDimension(int dimensionId) {
+		dimensionMap.put(dimensionId, BLACKLISTED);
+	}
 	
 	/**
 	 * This is for world debugging.
@@ -76,8 +97,9 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	public TreeGenerator() {
-		biomeDataBase = new BiomeDataBase();
-		radiusCoordinator = new BiomeRadiusCoordinator(biomeDataBase);
+		defaultBiomeDataBase = new BiomeDataBase();
+		biomeDataBase = defaultBiomeDataBase; //An alias for compatibility
+		radiusCoordinator = new BiomeRadiusCoordinator(defaultBiomeDataBase);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
@@ -92,10 +114,11 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if(!ModConfigs.dimensionBlacklist.contains(world.provider.getDimension())) {
+		BiomeDataBase dbase = getBiomeDataBase(world.provider.getDimension());
+		if(dbase != BLACKLISTED) {
 			random.setXOR(new BlockPos(chunkX, 0, chunkZ));
 			SafeChunkBounds safeBounds = new SafeChunkBounds(world, new ChunkPos(chunkX, chunkZ));//Area that is safe to place blocks during worldgen
-			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, c, safeBounds));
+			circleMan.getCircles(world, random, chunkX, chunkZ).forEach(c -> makeTree(world, dbase, c, safeBounds));
 		}
 	}
 	
@@ -141,7 +164,7 @@ public class TreeGenerator implements IWorldGenerator {
 		return layers;
 	}
 	
-	private EnumGeneratorResult makeTree(World world, Circle circle, SafeChunkBounds safeBounds) {
+	private EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, Circle circle, SafeChunkBounds safeBounds) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		

@@ -23,30 +23,24 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 
-	protected final BiomeDataBase dbase;
+	private static Species oak;
+	private static Species birch;
+	private static Species spruce;
+	private static Species acacia;
+	private static Species jungle;
+	private static Species darkoak;
+	private static Species oakswamp;
+	private static Species apple;
+	private static Species cactus;
+	private static Species mushroomred;
+	private static Species mushroombrn;
 	
-	private Species oak;
-	private Species birch;
-	private Species spruce;
-	private Species acacia;
-	private Species jungle;
-	private Species darkoak;
-	private Species oakswamp;
-	private Species apple;
-	private Species cactus;
-	private Species mushroomred;
-	private Species mushroombrn;
+	private static StaticSpeciesSelector staticOakDecision;
+	private static StaticSpeciesSelector staticSpruceDecision;
+	private static StaticSpeciesSelector staticBirchDecision;
+	private static RandomSpeciesSelector randomRoofedForestDecision;
 	
-	private StaticSpeciesSelector staticOakDecision;
-	private StaticSpeciesSelector staticSpruceDecision;
-	private StaticSpeciesSelector staticBirchDecision;
-	private RandomSpeciesSelector randomRoofedForestDecision;
-	
-	public DefaultBiomeDataBasePopulator(BiomeDataBase dbase) {
-		this.dbase = dbase;
-	}
-	
-	public void populate () {
+	private static void createStaticAliases() {
 		oak = TreeRegistry.findSpeciesSloppy("oak");
 		birch = TreeRegistry.findSpeciesSloppy("birch");
 		spruce = TreeRegistry.findSpeciesSloppy("spruce");
@@ -65,8 +59,14 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
 		staticBirchDecision = new StaticSpeciesSelector(new SpeciesSelection(birch));
 		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 20).add(mushroombrn, 1).add(mushroomred, 1);
-		
-		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().biomeDataBase;
+	}
+	
+	@Override
+	public void populate (BiomeDataBase dbase) {
+
+		if(oak == null) {
+			createStaticAliases();
+		}
 		
 		Biome.REGISTRY.forEach(biome -> {
 				dbase.setChanceSelector(biome, computeChance(biome), Operation.REPLACE);

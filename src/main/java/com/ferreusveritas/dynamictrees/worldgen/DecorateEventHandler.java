@@ -18,13 +18,15 @@ public class DecorateEventHandler {
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
-		if(!ModConfigs.dimensionBlacklist.contains(event.getWorld().provider.getDimension())) {
+		int dimensionId = event.getWorld().provider.getDimension();
+		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().getBiomeDataBase(dimensionId);
+		if(dbase != TreeGenerator.BLACKLISTED && !ModConfigs.dimensionBlacklist.contains(dimensionId)) {
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			switch(event.getType()) {
 				case CACTUS: if(ModConfigs.vanillaCactusWorldGen) { break; } 
 				case BIG_SHROOM:
 				case TREE:
-					if(TreeGenerator.getTreeGenerator().biomeDataBase.getEntry(biome).shouldCancelVanillaTreeGen()) {
+					if(dbase.getEntry(biome).shouldCancelVanillaTreeGen()) {
 						event.setResult(Result.DENY);
 					}
 				default: break;

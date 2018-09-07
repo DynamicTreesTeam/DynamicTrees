@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
-import com.ferreusveritas.dynamictrees.worldgen.JsonBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
@@ -24,6 +23,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -83,7 +83,6 @@ public class DynamicTrees {
 		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
 		GameRegistry.registerTileEntity(TileEntityBonsai.class, "bonsai_tile_entity");
 		
-		
 		ModBlocks.preInit();
 		ModItems.preInit();
 		ModTrees.preInit();
@@ -93,13 +92,15 @@ public class DynamicTrees {
 	
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			new DefaultBiomeDataBasePopulator(TreeGenerator.getTreeGenerator().biomeDataBase).populate();
-			new JsonBiomeDataBasePopulator(TreeGenerator.getTreeGenerator().biomeDataBase).populate();
-		}
+
+		WorldGenRegistry.registerBiomeDataBasePopulator(new DefaultBiomeDataBasePopulator());
 		
 		proxy.init();
+	}
+	
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		WorldGenRegistry.populateDataBase();
 	}
 	
 	@Mod.EventBusSubscriber
