@@ -37,7 +37,7 @@ public class TreeGenerator implements IWorldGenerator {
 	@Deprecated
 	public BiomeDataBase biomeDataBase; //This is only being kept for Rustic at the moment
 	
-	protected BiomeDataBase defaultBiomeDataBase; //Default biomeDataBase
+	protected BiomeDataBase defaultBiomeDataBase;
 	public static final BiomeDataBase BLACKLISTED = new BiomeDataBase();
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public JoCodeStore codeStore;
@@ -56,14 +56,15 @@ public class TreeGenerator implements IWorldGenerator {
 	}
 	
 	public BiomeDataBase getBiomeDataBase(int dimensionId) {
-		if(dimensionMap.containsKey(dimensionId)) {
-			return dimensionMap.get(dimensionId);
-		}
-		return getDefaultBiomeDataBase();
+		return dimensionMap.getOrDefault(dimensionId, getDefaultBiomeDataBase());
 	}
 	
 	public BiomeDataBase getDefaultBiomeDataBase() {
 		return defaultBiomeDataBase;
+	}
+	
+	public void linkDimensionToDataBase(int dimensionId, BiomeDataBase dBase) {
+		dimensionMap.put(dimensionId, dBase);
 	}
 	
 	public void BlackListDimension(int dimensionId) {
@@ -98,7 +99,7 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public TreeGenerator() {
 		defaultBiomeDataBase = new BiomeDataBase();
-		biomeDataBase = defaultBiomeDataBase; //An alias for compatibility
+		biomeDataBase = defaultBiomeDataBase; //An alias for interim compatibility
 		radiusCoordinator = new BiomeRadiusCoordinator(defaultBiomeDataBase);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
