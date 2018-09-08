@@ -92,6 +92,10 @@ public class BiomePropertySelectors {
 		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
 		int totalWeight;
 		
+		public int getSize() {
+			return decisionTable.size();
+		}
+		
 		public RandomSpeciesSelector add(Species species, int weight) {
 			decisionTable.add(new Entry(new SpeciesSelection(species), weight));
 			totalWeight += weight;
