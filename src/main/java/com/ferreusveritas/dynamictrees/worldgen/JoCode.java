@@ -343,7 +343,7 @@ public class JoCode {
 	 * @return resulting JoCode or nul" if no tree is found.
 	 */
 	public JoCode buildFromTree(World world, BlockPos pos) {
-		return buildFromTree(world, pos, EnumFacing.NORTH);
+		return buildFromTree(world, pos, EnumFacing.SOUTH);
 	}
 	
 	static public String encode(ArrayList<Byte> instructions) {
