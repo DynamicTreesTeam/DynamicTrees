@@ -77,11 +77,11 @@ public abstract class BlockRooty extends Block implements ITreePart, ITileEntity
 	public BlockRooty(String name, Material material, boolean isTileEntity) {
 		super(material);
 		this.hasTileEntity = isTileEntity;
+		setRegistryName(name);
+		setUnlocalizedName(getRegistryName().toString());
 		setSoundType(SoundType.GROUND);
 		setDefaultState(this.blockState.getBaseState().withProperty(LIFE, 15));
 		setTickRandomly(true);
-		setUnlocalizedName(name);
-		setRegistryName(name);
 	}
 	
 	///////////////////////////////////////////

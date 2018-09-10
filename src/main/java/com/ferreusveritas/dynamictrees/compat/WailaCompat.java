@@ -16,6 +16,7 @@ public class WailaCompat implements IWailaPlugin {
 	public void register(IWailaRegistrar registrar) {
 		BlockBranch oak = TreeRegistry.findSpeciesSloppy("oak").getFamily().getDynamicBranch();
 		registrar.registerBodyProvider(oak, BlockBranch.class);
+		registrar.registerNBTProvider(oak, BlockBranch.class);
 		registrar.registerBodyProvider(ModBlocks.blockRootyDirt, BlockRooty.class);
 	}
 	

@@ -26,7 +26,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 
 public class Seed extends Item {
-
+	
 	public final static Seed NULLSEED = new Seed("null") {
 		{ setCreativeTab(null); }
 		@Override public void setSpecies(Species species, ItemStack seedStack) {}
@@ -36,11 +36,11 @@ public class Seed extends Item {
 	};
 	
 	private Species species;//The tree this seed creates
-
+	
 	public Seed(String name) {
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
-		setUnlocalizedName(name);
 		setRegistryName(name);
+		setUnlocalizedName(getRegistryName().toString());
+		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	
 	public void setSpecies(Species species, ItemStack seedStack) {
@@ -53,7 +53,7 @@ public class Seed extends Item {
 	
 	@Override
 	public boolean onEntityItemUpdate(EntityItem entityItem) {
-
+		
 		if(entityItem.lifespan == 6000) { //6000(5 minutes) is the default lifespan for an entity item
 			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20;//override default lifespan with new value + 20 ticks(1 second)
 			if(entityItem.lifespan == 6000) {
@@ -75,7 +75,7 @@ public class Seed extends Item {
 			}
 			entityItem.setDead();
 		}
-
+		
 		return false;
 	}
 	
@@ -185,7 +185,7 @@ public class Seed extends Item {
 		if(onItemUsePlantSeed(player, world, pos, hand, seedStack, facing, hitX, hitY, hitZ) == EnumActionResult.SUCCESS) {
 			return EnumActionResult.SUCCESS;
 		}
-
+		
 		return EnumActionResult.FAIL;
 	}
 	

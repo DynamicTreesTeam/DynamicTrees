@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -83,8 +84,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	public DendroPotion(String name) {
-		setUnlocalizedName(name);
 		setRegistryName(name);
+		setUnlocalizedName(getRegistryName().toString());
 		setMaxStackSize(1);
 		setHasSubtypes(true);
 		setCreativeTab(DynamicTrees.dynamicTreesTab);

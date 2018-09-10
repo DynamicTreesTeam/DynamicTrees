@@ -49,7 +49,7 @@ public class TreeHelper {
 		int key = seq / 4;
 		String regname = "leaves" + key;
 		
-		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setRegistryName(modid, regname).setUnlocalizedName(regname));
+		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(modid, regname));
 	}
 	
 	/**

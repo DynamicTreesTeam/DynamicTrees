@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -45,10 +46,10 @@ public class Staff extends Item {
 	}
 	
 	public Staff(String name) {
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
-		setMaxStackSize(1);
-		setUnlocalizedName(name);
 		setRegistryName(name);
+		setUnlocalizedName(getRegistryName().toString());
+		setMaxStackSize(1);
+		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	
 	@Override

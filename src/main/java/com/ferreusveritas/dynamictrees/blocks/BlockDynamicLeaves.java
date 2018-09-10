@@ -69,6 +69,12 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
 	}
 	
+	public Block setDefaultNaming(String modid, String name) {
+		setRegistryName(modid, name);
+		setUnlocalizedName(getRegistryName().toString());
+		return this;
+	}
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE, DECAYABLE});

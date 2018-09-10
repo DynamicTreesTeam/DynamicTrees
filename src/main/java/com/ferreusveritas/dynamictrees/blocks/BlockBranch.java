@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
@@ -43,13 +44,17 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -583,19 +588,71 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return TreePartType.BRANCH;
 	}
 	
+	
+	///////////////////////////////////////////
+	// WAILA
+	///////////////////////////////////////////
+	
+	private BlockPos lastPos = BlockPos.ORIGIN;
+	private Species lastSpecies = Species.NULLSPECIES;
+	
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
-		if(state.getBlock() instanceof BlockBranch) {
-			BlockBranch branch = (BlockBranch) state.getBlock();
-			Species species = TreeHelper.getExactSpecies(state, accessor.getWorld(), accessor.getPosition());
-			if(species == Species.NULLSPECIES) {
-				species = branch.getFamily().getCommonSpecies();
-			}
-			tooltip.add("Species: " + species.getRegistryName().getResourcePath());
+		
+		NBTTagCompound nbtData = accessor.getNBTData();
+		BlockPos pos = accessor.getPosition();
+		Species species = Species.NULLSPECIES;
+		
+		//Attempt to get species from server via NBT data
+		if(nbtData.hasKey("species")) {
+			species = TreeRegistry.findSpecies(new ResourceLocation(nbtData.getString("species")));
+		}
+		
+		//Attempt to get species by checking if we're still looking at the same block
+		if(species == Species.NULLSPECIES && pos == lastPos) {
+			species = lastSpecies;
+		}
+		
+		//Attempt to get species from the world as a last resort as the operation can be rather expensive
+		if(species == Species.NULLSPECIES) {
+			species = getWailaSpecies(accessor.getWorld(), pos);			
+		}
+		
+		//Update the cached species and position
+		lastSpecies = species;
+		lastPos = pos;
+		
+		if(species != Species.NULLSPECIES) {
+			tooltip.add("Species: " + species.getRegistryName().getResourcePath());				
 		}
 		
 		return tooltip;
+	}
+	
+	@Override
+	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
+		Species species = getWailaSpecies(world, pos);
+		
+		if(species != Species.NULLSPECIES) {
+			tag.setString("species", species.getRegistryName().toString());
+		}
+		
+		return tag;
+	}
+	
+	private Species getWailaSpecies(World world, BlockPos pos) {
+		IBlockState state = world.getBlockState(pos);
+		
+		if(state.getBlock() instanceof BlockBranch) {
+			BlockBranch branch = (BlockBranch) state.getBlock();
+			Species species = TreeHelper.getExactSpecies(state, world, pos);
+			if(species == Species.NULLSPECIES) {
+				species = branch.getFamily().getCommonSpecies();
+			}
+			return species;
+		}
+		
+		return Species.NULLSPECIES;
 	}
 	
 }
