@@ -51,8 +51,8 @@ public class BlockBonsaiPot extends BlockContainer {
 	
 	public BlockBonsaiPot(String name) {
 		super(Blocks.FLOWER_POT.getMaterial(Blocks.FLOWER_POT.getDefaultState()));
-		setUnlocalizedName(name);
 		setRegistryName(name);
+		setUnlocalizedName(getRegistryName().toString());
 	}
 	
 	//////////////////////////////
@@ -144,9 +144,15 @@ public class BlockBonsaiPot extends BlockContainer {
 		}
 		
 		IBlockState potState = getPotState(world, pos);
+		
+		if(potState.getBlock() == Blocks.FLOWER_POT) {
+			return new ItemStack(Items.FLOWER_POT);			
+		}
+		
 		if(potState.getBlock() instanceof BlockFlowerPot) {
 			return new ItemStack(potState.getBlock(), 1, potState.getBlock().damageDropped(potState));
 		}
+		
 		return new ItemStack(Items.FLOWER_POT);
 	}
 	

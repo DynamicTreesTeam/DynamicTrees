@@ -1,0 +1,32 @@
+itemGroup.dynamictrees=Динамические деревья
+
+tile.dynamictrees:rootydirt.name=Корни
+
+tile.dynamictrees:leaves0.name=Динамическая листва
+tile.dynamictrees:leaves1.name=Динамическая листва
+
+tile.dynamictrees:oakbranch.name=Ствол дуба
+tile.dynamictrees:sprucebranch.name=Ствол ели
+tile.dynamictrees:birchbranch.name=Ствол березы
+tile.dynamictrees:junglebranch.name=Ствол тропического дерева
+tile.dynamictrees:darkoakbranch.name=Ствол темного дуба
+tile.dynamictrees:acaciabranch.name=Ствол акации
+
+item.dynamictrees:oakseed.name=Желудь
+item.dynamictrees:spruceseed.name=Еловая шишка
+item.dynamictrees:birchseed.name=Семя березы
+item.dynamictrees:jungleseed.name=Семя тропического дерева
+item.dynamictrees:darkoakseed.name=Темный желудь
+item.dynamictrees:acaciaseed.name=Семя акации
+
+item.dynamictrees:dendropotion.biochar.name=Основное зелье
+item.dynamictrees:dendropotion.depletion.name=Зелье истощения
+item.dynamictrees:dendropotion.defoliance.name=Губительное зелье
+item.dynamictrees:dendropotion.burgeoning.name=Зелье роста
+item.dynamictrees:dendropotion.fertility.name=Зелье плодородия
+item.dynamictrees:dendropotion.persistance.name=Зелье глубокого сна
+item.dynamictrees:dendropotion.transform.name=Зелье трансформации
+
+item.dynamictrees:dirtbucket.name=Ведро земли
+item.dynamictrees:staff.name=Жезл дендролога
+tile.dynamictrees:bonsaipot.name=Бонсай
