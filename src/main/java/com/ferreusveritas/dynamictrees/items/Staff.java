@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -40,7 +39,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 * /give @p dynamictrees:staff 1 0 tag:{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"birch",display:{Name:"Frog"}}
 */
 public class Staff extends Item {
-
+	
 	public Staff() {
 		this("staff");
 	}
@@ -54,7 +53,7 @@ public class Staff extends Item {
 	
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-
+		
 		ItemStack heldStack = player.getHeldItem(hand);
 		
 		IBlockState clickedBlock = world.getBlockState(pos);
@@ -70,7 +69,7 @@ public class Staff extends Item {
 				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
 			}
 		}
-
+		
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
 			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
@@ -84,7 +83,7 @@ public class Staff extends Item {
 				return EnumActionResult.SUCCESS;
 			}
 		}
-
+		
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
@@ -92,10 +91,10 @@ public class Staff extends Item {
 			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;
 		}
-
+		
 		return EnumActionResult.FAIL;
 	}
-
+	
 	/**
 	* Gets the NBT for the itemStack or creates a new one if it doesn't exist
 	* 
@@ -105,35 +104,35 @@ public class Staff extends Item {
 	public NBTTagCompound getNBT(ItemStack itemStack) {
 		return itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
 	}
-
+	
 	public boolean isReadOnly(ItemStack itemStack) {
 		return getNBT(itemStack).getBoolean("readonly");
 	}
-
+	
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		nbt.setBoolean("readonly", readonly);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
-
+	
 	public Staff setSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		nbt.setString("tree", species.toString());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
-
+	
 	public Staff setCode(ItemStack itemStack, String code) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		nbt.setString("code", code);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
-
+	
 	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
-
+		
 		if(nbt.hasKey("tree")) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
 		} else {
@@ -142,10 +141,10 @@ public class Staff extends Item {
 			return species;
 		}
 	}
-
+	
 	public int getColor(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
-
+		
 		int color = 0x0000FFFF;
 		
 		if(nbt.hasKey("color")) {
@@ -155,31 +154,31 @@ public class Staff extends Item {
 				nbt.removeTag("color");
 			}
 		}
-
+		
 		return color;
 	}
-
+	
 	public Staff setColor(ItemStack itemStack, String colStr) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		nbt.setString("color", colStr);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
-
+	
 	public String getCode(ItemStack itemStack) {
 		String code = "P";//Code of a sapling
 		NBTTagCompound nbt = getNBT(itemStack);
-
+		
 		if(nbt.hasKey("code")) {
 			code = nbt.getString("code");
 		} else {
 			nbt.setString("code", code);
 			itemStack.setTagCompound(nbt);
 		}
-
+		
 		return code;
 	}
-
+	
 	/**
 	* returns the action that specifies what animation to play when the items are being used
 	*/
@@ -187,7 +186,7 @@ public class Staff extends Item {
 	public EnumAction getItemUseAction(ItemStack itemStack) {
 		return EnumAction.BLOCK;
 	}
-
+	
 	/**
 	* Make the player hold the staff like a sword
 	*/
@@ -196,14 +195,14 @@ public class Staff extends Item {
 	public boolean isFull3D() {
 		return true;
 	}
-
+	
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
 		tooltip.add("Tree: " + ((species != null) ? species : "none"));
 		tooltip.add("Code: §6" + getCode(stack));
 	}
-
+	
 	/**
 	* Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
 	*/
@@ -216,9 +215,9 @@ public class Staff extends Item {
 		}
 		return multimap;
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 }

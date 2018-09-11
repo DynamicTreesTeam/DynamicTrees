@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -20,9 +19,6 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
-import mcp.mobius.waila.api.IWailaDataProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -52,7 +48,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -69,8 +64,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author ferreusveritas
  *
  */
-@Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = "waila")
-public class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic, IWailaDataProvider {
+public class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic {
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	
@@ -462,19 +456,4 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 		return true;
 	}
 	
-	///////////////////////////////////////////
-	// WAILA INTERACTION
-	///////////////////////////////////////////
-	
-	@Override
-	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
-		if(state.getBlock() instanceof BlockRooty) {
-			BlockRooty rooty = (BlockRooty) state.getBlock();
-			int life = rooty.getSoilLife(state, accessor.getWorld(), accessor.getPosition());
-			tooltip.add("Soil Life: " + MathHelper.floor(life / 16.0) + "%");
-		}
-		
-		return tooltip;
-	}
 }
