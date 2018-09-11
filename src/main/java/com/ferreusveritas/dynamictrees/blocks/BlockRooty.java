@@ -70,7 +70,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 @Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = "waila")
-public abstract class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic, IWailaDataProvider {
+public class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic, IWailaDataProvider {
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	
