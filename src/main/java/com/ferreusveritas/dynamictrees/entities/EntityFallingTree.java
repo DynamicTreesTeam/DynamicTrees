@@ -74,8 +74,6 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public EntityFallingTree(World worldIn) {
 		super(worldIn);
 		setSize(1.0f, 1.0f);
-		
-		ModConfigs.enableFallingTrees = true;
 	}
 	
 	public boolean isClientBuilt() {
