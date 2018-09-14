@@ -27,7 +27,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
-	
+
 	public BiomeTreeHandler biomeTreeHandler; //Provides forest properties for a biome
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
 	public TreeCodeStore codeStore;
@@ -137,8 +137,7 @@ public class TreeGenerator implements IWorldGenerator {
 			for (int zi = 0; zi < 4; ++zi) {
 				int posX = pos.getX() + xi * 4 + 1 + 8 + random.nextInt(3);
 				int posZ = pos.getZ() + zi * 4 + 1 + 8 + random.nextInt(3);
-				BlockPos blockpos = world.getHeight(pos.add(posX, 0, posZ));
-				blockpos = TreeHelper.findGround(world, blockpos).up();
+				BlockPos blockpos = world.getHeight(pos);
 				
 				if (random.nextInt(6) == 0) {
 					new WorldGenBigMushroom().generate(world.real(), random, blockpos.getX(), blockpos.getY(), blockpos.getZ());

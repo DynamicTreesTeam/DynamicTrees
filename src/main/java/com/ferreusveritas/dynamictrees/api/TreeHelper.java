@@ -138,14 +138,14 @@ public class TreeHelper {
 		}
 		return false;
 	}
-	
+
+	@Deprecated
 	public static BlockPos findGround(World world, BlockPos pos) {
 		//Rise up until we are no longer in a solid block
-		while(world.getBlockState(pos).isFullCube()) {
+		while(world.getBlockState(pos).isOpaqueCube()) {
 			pos = pos.up();
 		}
-		//Dive down until we are again
-		while(!world.getBlockState(pos).isFullCube() && pos.getY() > 50) {
+		while(!world.getBlockState(pos).isOpaqueCube() && pos.getY() > 50) {
 			pos = pos.down();
 		}
 		return pos;
