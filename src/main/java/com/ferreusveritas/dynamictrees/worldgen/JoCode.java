@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -41,20 +42,37 @@ public class JoCode {
 	static protected final byte forkCode = 6;
 	static protected final byte returnCode = 7;
 	
-	public ArrayList<Byte> instructions;
+	public byte[] instructions = new byte[0];
 	protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
 	
-	public JoCode() {
-		instructions = new ArrayList<Byte>();
+	/**
+	* @param world The world
+	* @param rootPos Block position of rootyDirt block
+	* @param facing A final rotation applied to the code after creation
+	*/
+	public JoCode(World world, BlockPos rootPos, EnumFacing facing) {
+		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
+		if(branch != null) {
+			NodeCoder coder = new NodeCoder();
+			//Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
+			branch.analyse(world.getBlockState(rootPos), world, rootPos, EnumFacing.DOWN, new MapSignal(coder));
+			instructions = coder.compile(this);
+			rotate(facing);
+		}
+	}
+	
+	/**
+	 * Build a JoCode instruction set from the tree found at pos.
+	 * 
+	 * @param world The world
+	 * @param pos Position of the rooty dirt block
+	 */
+	public JoCode(World world, BlockPos pos) {
+		this(world, pos, EnumFacing.SOUTH);
 	}
 	
 	public JoCode(String code) {
-		loadCode(code);
-	}
-	
-	public JoCode loadCode(String code) {
 		instructions = decode(code);
-		return this;
 	}
 	
 	public JoCode setCareful(boolean c) {
@@ -65,7 +83,7 @@ public class JoCode {
 	/**
 	 * A facing matrix for mapping instructions to different rotations
 	 */
-	private int dirmap[][] = {
+	private byte dirmap[][] = {
 		//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
@@ -76,8 +94,8 @@ public class JoCode {
 		};
 	
 	//"Pointers" to the current rotation direction.
-	private int facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
-	private int unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 	
 	/**
 	 * Get the instruction at a locus.  
@@ -87,7 +105,7 @@ public class JoCode {
 	 * @return
 	 */
 	protected int getCode(int pos) {
-		return unfacingMap[instructions.get(pos)];
+		return unfacingMap[instructions[pos]];
 	}
 	
 	/**
@@ -112,8 +130,8 @@ public class JoCode {
 	 */
 	public JoCode rotate(EnumFacing dir) {
 		setFacing(dir);
-		for(int c = 0; c < instructions.size(); c++) {
-			instructions.set(c, (byte) facingMap[instructions.get(c)]);
+		for(int c = 0; c < instructions.length; c++) {
+			instructions[c] = facingMap[instructions[c]];
 		}
 		return this;
 	}
@@ -211,19 +229,19 @@ public class JoCode {
 	 */
 	protected int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
 		
-		while(codePos < instructions.size()) {
+		while(codePos < instructions.length) {
 			int code = getCode(codePos);
-			if(code == forkCode) {
-				codePos = generateFork(world, species, codePos + 1, pos, disabled);
-			} else if(code == returnCode) {
-				return codePos + 1;
-			} else {
-				EnumFacing dir = EnumFacing.getFront(code);
-				pos = pos.offset(dir);
-				if(!disabled) {
-					disabled = setBlockForGeneration(world, species, pos, dir, careful);
-				}
-				codePos++;
+			switch(code) {
+				case forkCode: codePos = generateFork(world, species, codePos + 1, pos, disabled); break;
+				case returnCode: return codePos + 1;
+				default:
+					EnumFacing dir = EnumFacing.getFront(code);
+					pos = pos.offset(dir);
+					if(!disabled) {
+						disabled = setBlockForGeneration(world, species, pos, dir, careful);
+					}
+					codePos++;
+					break;
 			}
 		}
 		
@@ -318,35 +336,14 @@ public class JoCode {
 		
 	}
 	
-	/**
-	* @param world The world
-	* @param rootPos Block position of rootyDirt block
-	* @return JoCode for chaining
-	*/
-	public JoCode buildFromTree(World world, BlockPos rootPos, EnumFacing facing) {
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
-		if(branch != null) {
-			NodeCoder coder = new NodeCoder();
-			//Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
-			branch.analyse(world.getBlockState(rootPos), world, rootPos, EnumFacing.DOWN, new MapSignal(coder));
-			coder.compile(this, facing);
-			instructions.trimToSize();
+	static public String encode(byte[] array) {
+		
+		//Convert byte array to ArrayList of Byte
+		ArrayList<Byte> instructions = new ArrayList<>(array.length + (array.length & 1));
+		for(byte b : array) {
+			instructions.add(b);
 		}
-		return this;
-	}
-	
-	/**
-	 * Build a JoCode instruction set from the tree found at pos.
-	 * 
-	 * @param world The world
-	 * @param pos Position of the rooty dirt block
-	 * @return resulting JoCode or nul" if no tree is found.
-	 */
-	public JoCode buildFromTree(World world, BlockPos pos) {
-		return buildFromTree(world, pos, EnumFacing.SOUTH);
-	}
-	
-	static public String encode(ArrayList<Byte> instructions) {
+		
 		if((instructions.size() & 1) == 1) {//Check if odd
 			instructions.add(returnCode);//Add a return code to even up the series
 		}
@@ -360,38 +357,72 @@ public class JoCode {
 		return code;
 	}
 	
-	static public ArrayList<Byte> decode(String code) {
-		ArrayList<Byte> instructions = new ArrayList<Byte>(code.length() * 2);
-		
-		//Smallest Base64 decoder ever.
-		for(int i = 0; i < code.length(); i++) {
-			int sixbits = base64.indexOf(code.charAt(i));
-			if(sixbits != -1) {
-				instructions.add((byte) (sixbits >> 3));
-				instructions.add((byte) (sixbits & 7));
-			}
-		}
-		
-		return instructions;
-	}
-	
-	public void addDirection(byte dir) {
-		if(dir >= 0){
-			instructions.add((byte) (dir & 7));
-		}
-	}
-	
-	public void addReturn() {
-		instructions.add(returnCode);
-	}
-	
-	public void addFork() {
-		instructions.add(forkCode);
+	static public byte[] decode(String code) {
+		return new CodeCompiler(code).compile();
 	}
 	
 	@Override
 	public String toString() {
 		return encode(instructions);
+	}
+	
+	/**
+	 * A tidy class for handling byte code adding and conversion to byte array 
+	 */
+	public static class CodeCompiler {
+		
+		ArrayList<Byte> instructions;
+		
+		public CodeCompiler() {
+			instructions = new ArrayList<>();
+		}
+
+		public CodeCompiler(int size) {
+			instructions = new ArrayList<>(size);
+		}
+		
+		public CodeCompiler(String code) {
+			instructions = new ArrayList<>(code.length() * 2);
+			
+			//Smallest Base64 decoder ever.
+			for(int i = 0; i < code.length(); i++) {
+				int sixbits = base64.indexOf(code.charAt(i));
+				if(sixbits != -1) {
+					addInstruction((byte) (sixbits >> 3));
+					addInstruction((byte) (sixbits & 7));
+				}
+			}
+		}
+		
+		public void addDirection(byte dir) {
+			if(dir >= 0){
+				instructions.add((byte) (dir & 7));
+			}
+		}
+		
+		public void addInstruction(byte instruction) {
+			instructions.add(instruction);
+		}
+		
+		public void addReturn() {
+			instructions.add(returnCode);
+		}
+		
+		public void addFork() {
+			instructions.add(forkCode);
+		}
+		
+		public byte[] compile() {
+			byte array[] = new byte[instructions.size()];
+			Iterator<Byte> i = instructions.iterator();
+			
+			int pos = 0;
+			while(i.hasNext()) {
+				array[pos++] = i.next().byteValue();
+			}
+			
+			return array;
+		}
 	}
 	
 }

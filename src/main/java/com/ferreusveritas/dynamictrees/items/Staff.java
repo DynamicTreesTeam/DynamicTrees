@@ -75,7 +75,7 @@ public class Staff extends Item {
 			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
 			if(species != Species.NULLSPECIES) {
 				if(!player.isSneaking()) {
-					String code = new JoCode().buildFromTree(world, rootPos, player.getHorizontalFacing()).toString();
+					String code = new JoCode(world, rootPos, player.getHorizontalFacing()).toString();
 					setCode(heldStack, code);
 					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 				}

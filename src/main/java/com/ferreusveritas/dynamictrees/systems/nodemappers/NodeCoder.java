@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode.CodeCompiler;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -11,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NodeCoder implements INodeInspector {
-
+	
 	private class Link {
 		BlockPos pos;
 		int forks;
@@ -22,16 +23,16 @@ public class NodeCoder implements INodeInspector {
 			links = new Link[6];
 		}
 	}
-
+	
 	private ArrayList<Link> links;
-
+	
 	public NodeCoder() {
 		links = new ArrayList<Link>();
 	}
-
+	
 	@Override
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
-
+		
 		Link link = new Link(pos);
 		
 		//We've reached the end of a branch and we're starting again.
@@ -47,41 +48,43 @@ public class NodeCoder implements INodeInspector {
 				break;
 			}
 		}
-
+		
 		links.add(link);
 		
 		return false;
 	}
-
+	
 	@Override
 	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
 		return false;
 	}
 	
-	public void compile(JoCode joCode, EnumFacing facingDir) {
+	public byte[] compile(JoCode joCode) {
+		CodeCompiler cc = new CodeCompiler();
+				
 		if(links.size() > 0) {
-			nextLink(links.get(0), null, joCode);
+			nextLink(cc, links.get(0), null);
 		}
-	
-		joCode.rotate(facingDir);
+		
+		return cc.compile();
 	}
 	
-	private void nextLink(Link link, Link fromLink, JoCode joCode) {
+	private void nextLink(CodeCompiler cc, Link link, Link fromLink) {
 		
-		for(int i = 0; i < 6; i++) {
-			Link l = link.links[i];
+		for(int dir = 0; dir < 6; dir++) {
+			Link l = link.links[dir];
 			if(l != null && l != fromLink) {
 				if(link.forks > 0){
-					joCode.addFork();
+					cc.addFork();
 				}
-				joCode.addDirection((byte) i);
-				nextLink(l, link, joCode);
+				cc.addDirection((byte) dir);
+				nextLink(cc, l, link);
 				if(link.forks > 0) {
-					joCode.addReturn();
+					cc.addReturn();
 					link.forks--;
 				}
 			}
 		}
 	}
-
+	
 }
