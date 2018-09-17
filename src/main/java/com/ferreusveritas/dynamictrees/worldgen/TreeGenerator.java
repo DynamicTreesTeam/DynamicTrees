@@ -59,6 +59,10 @@ public class TreeGenerator implements IWorldGenerator {
 		return dimensionMap.getOrDefault(dimensionId, getDefaultBiomeDataBase());
 	}
 	
+	public BiomeDataBase getBiomeDataBase(World world) {
+		return getBiomeDataBase(world.provider.getDimension());
+	}
+	
 	public BiomeDataBase getDefaultBiomeDataBase() {
 		return defaultBiomeDataBase;
 	}
@@ -100,7 +104,7 @@ public class TreeGenerator implements IWorldGenerator {
 	public TreeGenerator() {
 		defaultBiomeDataBase = new BiomeDataBase();
 		biomeDataBase = defaultBiomeDataBase; //An alias for interim compatibility
-		radiusCoordinator = new BiomeRadiusCoordinator(defaultBiomeDataBase);
+		radiusCoordinator = new BiomeRadiusCoordinator(this);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
 	}
