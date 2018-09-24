@@ -19,7 +19,7 @@ public class WailaRootyHandler implements IWailaDataProvider {
 		if(state.getBlock() instanceof BlockRooty) {
 			BlockRooty rooty = (BlockRooty) state.getBlock();
 			int life = rooty.getSoilLife(state, accessor.getWorld(), accessor.getPosition());
-			tooltip.add("Soil Life: " + MathHelper.floor(life / 16.0) + "%");
+			tooltip.add("Soil Life: " + MathHelper.floor(life * 6.25f) + "%");
 		}
 		
 		return tooltip;
