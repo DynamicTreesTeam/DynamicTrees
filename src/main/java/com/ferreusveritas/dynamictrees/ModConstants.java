@@ -24,8 +24,8 @@ public class ModConstants {
 	public static final String DYNAMICTREESTC = "dynamictreestc";
 	
 	//Other Mod Versions
-	public static final String DYNAMICTREESBOP_VER = AT + "1.3.1b" + ORGREATER;
-	public static final String DYNAMICTREESTC_VER =  AT + "1.1.1a" + ORGREATER;
+	public static final String DYNAMICTREESBOP_VER = AT + "1.3.2" + ORGREATER;
+	public static final String DYNAMICTREESTC_VER =  AT + "1.1.2" + ORGREATER;
 	
 	public static final String DEPENDENCIES
 		= BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
