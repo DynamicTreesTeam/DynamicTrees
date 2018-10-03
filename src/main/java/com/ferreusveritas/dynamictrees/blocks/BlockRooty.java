@@ -155,9 +155,8 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	 * @param rootPos
 	 * @param random
 	 * @param natural
-	 * @return false if tree was not found
 	 */
-	public boolean updateTree(IBlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
+	public void updateTree(IBlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
 		
 		if(CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 			
@@ -175,12 +174,12 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 			}
 			
 			if(!viable) {
+				//TODO: Attempt to destroy what's left of the tree before setting rooty to dirt
 				world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
 			}
 			
 		}
 		
-		return true;
 	}
 	
 	/**
