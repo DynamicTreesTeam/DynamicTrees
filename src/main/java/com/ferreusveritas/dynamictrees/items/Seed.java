@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -166,6 +167,14 @@ public class Seed extends Item {
 	}
 	
 	public EnumActionResult onItemUsePlantSeed(EntityPlayer player, World world, BlockPos pos, EnumHand hand, ItemStack seedStack, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		
+		IBlockState iblockstate = world.getBlockState(pos);
+		Block block = iblockstate.getBlock();
+		
+		if(block.isReplaceable(world, pos)) {
+			pos = pos.down();
+			facing = EnumFacing.UP;
+		}
 		
 		if (facing == EnumFacing.UP) {//Ensure this seed is only used on the top side of a block
 			if (player.canPlayerEdit(pos, facing, seedStack) && player.canPlayerEdit(pos.up(), facing, seedStack)) {//Ensure permissions to edit block
