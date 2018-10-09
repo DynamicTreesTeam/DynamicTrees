@@ -13,6 +13,8 @@ public class ModConfigs {
 	public static float seedDropRate;
 	public static float seedPlantRate;
 	public static int seedTimeToLive;
+	public static boolean seedOnlyForest;
+	public static float seedMinForestness;
 	
 	public static float treeGrowthRateMultiplier;
 	public static float treeHarvestMultiplier;
@@ -47,8 +49,10 @@ public class ModConfigs {
 		
 		//Seeds
 		seedDropRate = config.getFloat("dropRate", "seeds", 1f/8f, 0, 1, "The rate at which seeds voluntarily drop from branches");
-		seedPlantRate = config.getFloat("plantRate", "seeds", 1f/8f, 0, 1, "The rate at which seeds plant themselves in their ideal biomes");
+		seedPlantRate = config.getFloat("plantRate", "seeds", 1f/8f, 0, 1, "The rate at which seeds voluntarily plant themselves in their ideal biomes");
 		seedTimeToLive = config.getInt("timeToLive", "seeds", 1200, 0, 6000, "Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute");
+		seedOnlyForest = config.getBoolean("onlyForest", "seeds", true, "If enabled then seeds will only voluntarily plant themselves in forest-like biomes");
+		seedMinForestness = config.getFloat("minForestness", "seeds", 0, 0, 1, "The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional");
 		
 		//Trees
 		treeGrowthRateMultiplier = config.getFloat("growthRateMultiplier", "trees", 1f, 0, 16f, "Factor that multiplies the rate at which trees grow. Use at own risk");

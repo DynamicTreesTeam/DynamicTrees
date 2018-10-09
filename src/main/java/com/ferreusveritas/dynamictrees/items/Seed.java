@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
@@ -102,7 +103,13 @@ public class Seed extends Item {
 			return false;
 		}
 		
-		float plantChance = getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate;		
+		float plantChance = getSpecies(seedStack).biomeSuitability(world, pos) * ModConfigs.seedPlantRate;
+		
+		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
+		if(ModConfigs.seedOnlyForest && treeGen != null) {
+			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
+		}
+		
 		float accum = 1.0f;
 		int count = seedStack.getCount();
 		while(count-- > 0) {

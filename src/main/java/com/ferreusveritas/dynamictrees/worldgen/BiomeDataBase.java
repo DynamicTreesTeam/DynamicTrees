@@ -13,7 +13,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.world.biome.Biome;
 
 public class BiomeDataBase {
-
+	
 	public static BiomeEntry BADENTRY = new BiomeEntry() {
 		@Override public void setChanceSelector(IChanceSelector chanceSelector) {}
 		@Override public void setDensitySelector(IDensitySelector densitySelector) {}
@@ -32,6 +32,7 @@ public class BiomeDataBase {
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
 		private boolean cancelVanillaTreeGen = false;
 		private boolean isSubterranean = false;
+		private float forestness = 0.0f; 
 		
 		public BiomeEntry() {
 			biome = Biomes.DEFAULT;
@@ -90,18 +91,27 @@ public class BiomeDataBase {
 		public boolean isSubterraneanBiome() {
 			return isSubterranean;
 		}
+		
+		public void setForestness(float forestness) {
+			this.forestness = forestness;
+		}
+		
+		public float getForestness() {
+			return forestness;
+		}
+		
 	}
 	
 	public BiomeEntry getEntry(Biome biome) {
 		int biomeId = Biome.getIdForBiome(biome);
 		if(biome != null && biomeId >= 0 && biomeId <= 255) {
 			BiomeEntry entry = table.get(biomeId);
-		
+			
 			if(entry == BADENTRY) {
 				entry = new BiomeEntry(biome, biomeId);
 				table.set(biomeId, entry);
 			}
-		
+			
 			return entry;
 		}
 		
@@ -115,13 +125,17 @@ public class BiomeDataBase {
 	public IChanceSelector getChance(Biome biome) {
 		return getEntry(biome).chanceSelector;
 	}
-
+	
 	public IDensitySelector getDensity(Biome biome) {
 		return getEntry(biome).densitySelector;
 	}
 	
 	public boolean shouldCancelVanillaTreeGen(Biome biome) {
 		return getEntry(biome).cancelVanillaTreeGen;
+	}
+	
+	public float getForestness(Biome biome) {
+		return getEntry(biome).getForestness();
 	}
 	
 	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
@@ -206,9 +220,15 @@ public class BiomeDataBase {
 		return this;
 	}
 	
+	public BiomeDataBase setForestness(Biome biome, float forestness) {
+		getEntry(biome).setForestness(forestness);
+		return this;
+	}
+	
 	public enum Operation {
 		REPLACE,
 		SPLICE_BEFORE,
 		SPLICE_AFTER
 	}
+	
 }

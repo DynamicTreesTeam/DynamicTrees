@@ -33,10 +33,7 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 public class TreeGenerator implements IWorldGenerator {
 	
 	private static TreeGenerator INSTANCE;
-	
-	@Deprecated
-	public BiomeDataBase biomeDataBase; //This is only being kept for Rustic at the moment
-	
+		
 	protected BiomeDataBase defaultBiomeDataBase;
 	public static final BiomeDataBase BLACKLISTED = new BiomeDataBase();
 	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
@@ -103,7 +100,6 @@ public class TreeGenerator implements IWorldGenerator {
 	
 	public TreeGenerator() {
 		defaultBiomeDataBase = new BiomeDataBase();
-		biomeDataBase = defaultBiomeDataBase; //An alias for interim compatibility
 		radiusCoordinator = new BiomeRadiusCoordinator(this);
 		circleMan = new ChunkCircleManager(radiusCoordinator);
 		random = new RandomXOR();
