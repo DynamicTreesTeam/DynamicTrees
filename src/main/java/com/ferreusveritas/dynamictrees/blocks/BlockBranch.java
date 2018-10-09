@@ -59,6 +59,8 @@ import net.minecraftforge.common.property.Properties;
 
 public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
 	
+	public static final int RADMAX_NORMAL = 8;
+	
 	public static final IUnlistedProperty CONNECTIONS[] = { 
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
@@ -199,6 +201,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	
 	public abstract IBlockState getStateForRadius(int radius);
+	
+	public int getMaxRadius() {
+		return RADMAX_NORMAL;
+	}
 	
 	///////////////////////////////////////////
 	// NODE ANALYSIS

@@ -37,9 +37,10 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
-	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, 8);
+	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, RADMAX_NORMAL);
+	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
 	
-	private IBlockState branchStates[];
+	protected IBlockState branchStates[];
 	
 	// Useful for more unique subclasses
 	protected BlockBranchBasic(Material material, String name) {
@@ -56,18 +57,19 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	public void cacheBranchStates() {
-		branchStates = new IBlockState[9];
+		branchStates = new IBlockState[RADMAX_NORMAL + 1];
 		
 		//Cache the branch blocks states for rapid lookup
 		branchStates[0] = Blocks.AIR.getDefaultState();
-		for(int radius = 1; radius <= 8; radius++) {
-				branchStates[radius] = getDefaultState().withProperty(BlockBranchBasic.RADIUS, radius);
+		for(int radius = 1; radius <= RADMAX_NORMAL; radius++) {
+			branchStates[radius] = getDefaultState().withProperty(BlockBranchBasic.RADIUS, radius);
 		}
 	}
 	
 	public IProperty<?>[] getIgnorableProperties() {
 		return new IProperty<?>[]{ RADIUS };
 	}
+	
 	
 	///////////////////////////////////////////
 	// BLOCKSTATES
@@ -125,6 +127,7 @@ public class BlockBranchBasic extends BlockBranch {
 		return true;
 	}
 	
+	
 	///////////////////////////////////////////
 	// WORLD UPDATE
 	///////////////////////////////////////////
@@ -162,6 +165,7 @@ public class BlockBranchBasic extends BlockBranch {
 		
 		return didRot;
 	}
+	
 	
 	///////////////////////////////////////////
 	// PHYSICAL PROPERTIES
@@ -201,13 +205,14 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
-		return getRadius(state) == 8;
+		return getRadius(state) == RADMAX_NORMAL;
 	}
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,	EnumFacing side) {
-		return getRadius(blockState) != 8 || super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+		return getRadius(blockState) != RADMAX_NORMAL || super.shouldSideBeRendered(blockState, blockAccess, pos, side);
 	}
+	
 	
 	///////////////////////////////////////////
 	// GROWTH
@@ -236,7 +241,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public IBlockState getStateForRadius(int radius) {
-		return branchStates[MathHelper.clamp(radius, 0, 8)];
+		return branchStates[MathHelper.clamp(radius, 0, getMaxRadius())];
 	}
 	
 	// Directionless probability grabber
@@ -307,12 +312,13 @@ public class BlockBranchBasic extends BlockBranch {
 			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), 8);// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), getMaxRadius());// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius), null);
 		}
 		
 		return signal;
 	}
+	
 	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
@@ -345,9 +351,10 @@ public class BlockBranchBasic extends BlockBranch {
 			}
 		}
 		if (connectionMade) {
-			return aabb.offset(0.5, 0.5, 0.5);
+			return aabb.offset(0.5, 0.5, 0.5).intersect(maxBranchBB);
 		}
-		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+		
+		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius).intersect(maxBranchBB);
 	}
 	
 	@Override
@@ -364,7 +371,7 @@ public class BlockBranchBasic extends BlockBranch {
 				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);
+				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5).intersect(maxBranchBB);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
 		}
@@ -380,6 +387,7 @@ public class BlockBranchBasic extends BlockBranch {
 		IBlockState blockState = blockAccess.getBlockState(deltaPos);
 		return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 	}
+	
 	
 	///////////////////////////////////////////
 	// NODE ANALYSIS
