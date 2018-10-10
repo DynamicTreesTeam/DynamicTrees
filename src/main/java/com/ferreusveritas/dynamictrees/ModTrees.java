@@ -7,7 +7,7 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
@@ -60,7 +60,7 @@ public class ModTrees {
 		testFamily = makeTestFamily();
 	}
 	
-	public static TreeFamily makeTestFamily() {
+	private static TreeFamily makeTestFamily() {
 		TreeFamily testFamily = new TreeFamily(new ResourceLocation(ModConstants.MODID, "test")) {
 			
 			@Override
@@ -69,6 +69,8 @@ public class ModTrees {
 					{
 						setBasicGrowingParameters(0.3f, 14.0f, 4, 4, 1.0f);
 						setupStandardSeedDropping();
+						setDynamicSapling(new BlockDynamicSapling("testsapling").getDefaultState());
+						generateSeed();
 					}
 				};
 				
@@ -84,11 +86,13 @@ public class ModTrees {
 			public List<Block> getRegisterableBlocks(List<Block> blockList) {
 				BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
 				for(int i = 0; i < 2; i++) {
-					boolean side = i != 0;
-					BlockBranchThick b = branch.getPairSide(side);
+					BlockBranchThick b = branch.getPairSide(i == 1);
 					blockList.add(b);
 					b.setCreativeTab(DynamicTrees.dynamicTreesTab);
 				}
+				
+				blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
+				
 				return blockList;
 			}
 			
@@ -98,12 +102,11 @@ public class ModTrees {
 				
 				//Register an itemBlock for the branch block
 				itemList.add(new ItemBlock(branch.getPairSide(false)).setRegistryName(branch.getPairSide(false).getRegistryName()));
-				itemList.add(new ItemBlock(branch.getPairSide(true)).setRegistryName(branch.getPairSide(true).getRegistryName()));
+				itemList.add(new ItemBlock(branch.getPairSide(true )).setRegistryName(branch.getPairSide(true ).getRegistryName()));
 				
-				Seed seed = getCommonSpecies().getSeed();
-				if(seed != Seed.NULLSEED) {
-					itemList.add(seed);
-				}
+				//Register seed item
+				itemList.add(getCommonSpecies().getSeed());
+				
 				return itemList;
 			}
 		};

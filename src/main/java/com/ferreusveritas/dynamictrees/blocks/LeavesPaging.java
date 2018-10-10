@@ -11,6 +11,14 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
+/**
+ * This class provides a mechanism for mapping leaves sub blocks to
+ * their corresponding leaves properties.  This is currently a 4:1 ratio.
+ * This method will be obsolete in MC 1.13 since each blockstate will
+ * be able to contain it's own leaves properties.
+ * 
+ * @author ferreusveritas
+ */
 public class LeavesPaging {
 	
 	///////////////////////////////////////////

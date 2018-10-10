@@ -235,7 +235,7 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
+	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 	}
 	
@@ -313,7 +313,7 @@ public class BlockBranchBasic extends BlockBranch {
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
 			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), getMaxRadius());// WOW!
-			setRadius(world, pos, (int) Math.floor(signal.radius), null);
+			setRadius(world, pos, (int) Math.floor(signal.radius), originDir);
 		}
 		
 		return signal;

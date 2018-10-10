@@ -24,10 +24,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * This class provides a means of holding individual properties
  * for leaves.  This is necessary since leaves can contain sub blocks
- * that may behave differently.  Each tree family must have a reference
- * to a single leaves properties object.  Each leaves properties object
- * must have a reference to a tree family.  This is a 1:1 ratio and the
- * two objects are linked.
+ * that may behave differently.  Each leaves properties object
+ * must have a reference to a tree family.
  * 
  * @author ferreusveritas
  */

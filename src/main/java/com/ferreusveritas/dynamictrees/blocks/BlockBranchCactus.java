@@ -173,7 +173,7 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir, int flags) {
+	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
 		// Do nothing
 	}
 	

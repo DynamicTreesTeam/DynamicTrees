@@ -57,7 +57,7 @@ public interface ILeavesProperties {
 	int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
 
 	///////////////////////////////////////////
-	//BLOCK PAGING
+	//BLOCK PAGING SHORTCUTS
 	///////////////////////////////////////////
 	
 	public default ILeavesProperties assign() {
