@@ -1,8 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
@@ -52,5 +55,28 @@ public interface ILeavesProperties {
 	boolean appearanceChangesWithHydro();
 	
 	int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
+
+	///////////////////////////////////////////
+	//BLOCK PAGING
+	///////////////////////////////////////////
+	
+	public default ILeavesProperties assign() {
+		return assign(null);
+	}
+	
+	public default ILeavesProperties assign(@Nullable String modid) {
+		LeavesPaging.getNextLeavesBlock(modid, this);
+        return this;
+	}
+	
+	public default ILeavesProperties assign(@Nullable String modid, int seq) {
+		LeavesPaging.getLeavesBlockForSequence(modid, seq, this);
+        return this;
+	}
+	
+	public default ILeavesProperties skip(@Nullable String modid) {
+		LeavesPaging.getNextSequenceNumber(modid);
+		return this;
+	}
 	
 }

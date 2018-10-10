@@ -33,7 +33,8 @@ public class ModTrees {
 	public static ArrayList<TreeFamilyVanilla> baseFamilies = new ArrayList<>();
 	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
 	public static TreeCactus dynamicCactus;
-
+	
+	//TODO: Temporary Code
 	public static TreeFamily testFamily;
 	
 	/**
@@ -64,8 +65,14 @@ public class ModTrees {
 			
 			@Override
 			public void createSpecies() {
-				// TODO Auto-generated method stub
-				super.createSpecies();
+				Species species = new Species(this.getName(), this, ModBlocks.testLeavesProperties) {
+					{
+						setBasicGrowingParameters(0.3f, 14.0f, 4, 4, 1.0f);
+						setupStandardSeedDropping();
+					}
+				};
+				
+				setCommonSpecies(species);
 			}
 			
 			@Override

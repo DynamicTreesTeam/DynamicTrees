@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 
 import net.minecraft.block.Block;
@@ -43,16 +44,18 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockVerboseFire blockVerboseFire;
 	
-	public static LeavesProperties oakLeavesProperties;
-	public static LeavesProperties spruceLeavesProperties;
-	public static LeavesProperties birchLeavesProperties;
-	public static LeavesProperties jungleLeavesProperties;
-	public static LeavesProperties acaciaLeavesProperties;
-	public static LeavesProperties darkOakLeavesProperties;
-	public static LeavesProperties[] vanillaLeavesProperties;
+	public static ILeavesProperties oakLeavesProperties;
+	public static ILeavesProperties spruceLeavesProperties;
+	public static ILeavesProperties birchLeavesProperties;
+	public static ILeavesProperties jungleLeavesProperties;
+	public static ILeavesProperties acaciaLeavesProperties;
+	public static ILeavesProperties darkOakLeavesProperties;
 	
-	public static LeavesProperties cactusLeavesProperties;
-		
+	public static ILeavesProperties cactusLeavesProperties;
+	
+	//TODO: Temporary Code
+	public static ILeavesProperties testLeavesProperties;
+	
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
@@ -71,10 +74,16 @@ public class ModBlocks {
 		blockFruit = new BlockFruit();//Apple
 		blockVerboseFire = new BlockVerboseFire();//Verbose Fire
 		
+		setupLeavesProperties();
+	}
+	
+	
+	public static void setupLeavesProperties() {
+		
 		oakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
 				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
-				TreeRegistry.findCellKit("deciduous"));
+				TreeRegistry.findCellKit("deciduous")).assign();
 		
 		spruceLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
@@ -91,7 +100,7 @@ public class ModBlocks {
 						return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Spruce can now be access by modded foliage multipliers
 					}
 					
-				};
+				}.assign();
 		
 		birchLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
@@ -103,7 +112,7 @@ public class ModBlocks {
 					int color = super.foliageColorMultiplier(state, world, pos);
 					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Birch can now be access by modded foliage multipliers
 				}
-			};
+			}.assign();
 		
 		jungleLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
@@ -114,7 +123,7 @@ public class ModBlocks {
 				public int getLightRequirement() {
 					return 12;//The jungle can be a dark place.  Give these trees a little advantage.
 				}
-		};
+		}.assign();
 		
 		acaciaLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
@@ -124,7 +133,7 @@ public class ModBlocks {
 					public int getSmotherLeavesMax() {
 						return 2;//very thin canopy
 					}
-				};
+				}.assign();
 		
 		darkOakLeavesProperties = new LeavesProperties(
 				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
@@ -134,25 +143,11 @@ public class ModBlocks {
 					public int getSmotherLeavesMax() {
 						return 3;//thin canopy
 					}
-				};
+				}.assign();
 		
-		vanillaLeavesProperties = new LeavesProperties[] {
-				oakLeavesProperties,
-				spruceLeavesProperties,
-				birchLeavesProperties,
-				jungleLeavesProperties,
-				acaciaLeavesProperties,
-				darkOakLeavesProperties
-		};
+		testLeavesProperties = new LeavesProperties(Blocks.BOOKSHELF.getDefaultState()).assign();
 		
-		int seq = 0;
-		
-		for(LeavesProperties lp : vanillaLeavesProperties) {
-			TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seq++, lp);
-		}
-		
-		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));
-		
+		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly not assigned
 	}
 	
 	public static void registerBlocks(IForgeRegistry<Block> registry) {
@@ -160,7 +155,7 @@ public class ModBlocks {
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
-		treeBlocks.addAll(TreeHelper.getLeavesMapForModId(ModConstants.MODID).values());
+		treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values());
 
 		registry.registerAll(
 			blockRootyDirt,

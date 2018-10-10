@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -25,43 +26,23 @@ import net.minecraft.world.World;
 
 public class TreeHelper {
 	
-	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<String, HashMap<Integer, BlockDynamicLeaves>>();
-	
 	public static final ITreePart nullTreePart = new NullTreePart();
 	
-	
+	/**	Use {@link LeavesPaging} instead */
+	@Deprecated
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
-		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq);
-		int tree = seq & 3;
-		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().withProperty(BlockDynamicLeaves.TREE, tree));
-		leaves.setProperties(tree, leavesProperties);
-		return leaves;
+		return LeavesPaging.getLeavesBlockForSequence(modid, seq, leavesProperties);
 	}
 	
-	/**
-	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
-	 * 
-	 * @param modid
-	 * @param seq
-	 * @return
-	 */
-	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq) {
-		int key = seq / 4;
-		String regname = "leaves" + key;
-		
-		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(modid, regname));
-	}
-	
-	/**
-	 * 	Get the map of leaves from for the appropriate modid.
-	 *  If the map does not exist then one is created.
-	 * 
-	 * @param modid The ModId of the mod accessing this
-	 * @return The map of {@link BlockDynamicLeaves}
-	 */
+	/**	Use {@link LeavesPaging} instead */
+	@Deprecated
 	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
-		return modLeavesArray.computeIfAbsent(modid, k -> new HashMap<Integer, BlockDynamicLeaves>());
+		return LeavesPaging.getLeavesMapForModId(modid);
 	}
+	
+	///////////////////////////////////////////
+	//CONVENIENCE METHODS
+	///////////////////////////////////////////
 	
 	/**
 	 * Convenience method to pulse a single growth cycle and age the cuboid volume.
