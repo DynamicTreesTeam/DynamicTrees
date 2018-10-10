@@ -52,7 +52,7 @@ public class ModBlocks {
 	public static LeavesProperties[] vanillaLeavesProperties;
 	
 	public static LeavesProperties cactusLeavesProperties;
-	
+		
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
@@ -174,6 +174,9 @@ public class ModBlocks {
 			blockFruit,
 			blockVerboseFire
 		);
+		
+		ModTrees.testFamily.getRegisterableBlocks(treeBlocks);
+		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 	}
 

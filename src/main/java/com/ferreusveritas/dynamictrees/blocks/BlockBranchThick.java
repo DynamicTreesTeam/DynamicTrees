@@ -19,7 +19,7 @@ public class BlockBranchThick extends BlockBranchBasic {
 	
 	public BlockBranchThick(Material material, String name) {
 		this(material, name, false);
-		otherBlock = new BlockBranchThick(material, name, true);
+		otherBlock = new BlockBranchThick(material, name + "x", true);
 		otherBlock.otherBlock = this;
 		
 		cacheBranchThickStates();
