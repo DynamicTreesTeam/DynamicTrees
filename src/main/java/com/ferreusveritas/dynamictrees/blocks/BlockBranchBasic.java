@@ -363,18 +363,28 @@ public class BlockBranchBasic extends BlockBranch {
 			return;
 		}
 		
+		boolean hasConnections = false;
 		int thisRadius = getRadius(state);
+		System.out.println(thisRadius);
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
 			if (connRadius > 0) {
+				hasConnections = true;
 				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5).intersect(maxBranchBB);
+				aabb = aabb.offset(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}
 		}
+		
+		if(!hasConnections) {
+			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
+			aabb = aabb.intersect(maxBranchBB);
+			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
+		}
+		
 	}
 	
 	@Override

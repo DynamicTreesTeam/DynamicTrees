@@ -5,8 +5,11 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class BlockBranchThick extends BlockBranchBasic {
@@ -49,6 +52,11 @@ public class BlockBranchThick extends BlockBranchBasic {
 				branchStates[radius] = getPairSide(radius > 16).getDefaultState().withProperty(BlockBranchThick.RADIUSNYBBLE, (radius - 1) & 0x0f);
 			}
 		}
+	}
+	
+	@Override
+	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
+		return false;
 	}
 	
 	///////////////////////////////////////////
