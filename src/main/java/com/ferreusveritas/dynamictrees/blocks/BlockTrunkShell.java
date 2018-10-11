@@ -5,11 +5,14 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +27,7 @@ public class BlockTrunkShell extends Block {
 	
 	public static final PropertyEnum<Surround> COREDIR = PropertyEnum.create("coredir", Surround.class);
 	
-	public static final String name = "shell";
+	public static final String name = "trunkshell";
 	
 	public static class ShellMuse {
 		public final IBlockState blockState;
@@ -43,11 +46,34 @@ public class BlockTrunkShell extends Block {
 		}
 	}
 	
-	public BlockTrunkShell(Material materialIn) {
+	public BlockTrunkShell() {
 		super(Material.WOOD);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(COREDIR, Surround.S));
 		setRegistryName(name);
 		setUnlocalizedName(name);
+		setCreativeTab(DynamicTrees.dynamicTreesTab);
+	}
+	
+	///////////////////////////////////////////
+	// BLOCKSTATE
+	///////////////////////////////////////////
+	
+	/**
+	 * Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState().withProperty(COREDIR, Surround.values()[meta & 0x07]);
+	}
+	
+	/**
+	 * Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(COREDIR).ordinal() & 0x07;
+	}
+	
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[] {COREDIR});
 	}
 	
 	@Override
@@ -56,6 +82,11 @@ public class BlockTrunkShell extends Block {
 			worldIn.setBlockToAir(pos);
 		}
 	}
+	
+	
+	///////////////////////////////////////////
+	// INTERACTION
+	///////////////////////////////////////////
 	
 	@Override
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {

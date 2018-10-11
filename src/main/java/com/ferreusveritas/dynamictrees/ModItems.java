@@ -34,6 +34,8 @@ public class ModItems {
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
+		
+		registerItemBlock(registry, ModBlocks.blockTrunkShell);
 	}
 	
 	public static Item makeItemBlock(Block block) {
@@ -41,7 +43,7 @@ public class ModItems {
 	}
 	
 	public static void registerItemBlock(final IForgeRegistry<Item> registry, Block block) {
-		registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
+		registry.register(makeItemBlock(block));
 	}
 	
 }

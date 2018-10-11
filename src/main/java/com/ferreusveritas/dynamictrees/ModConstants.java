@@ -6,7 +6,7 @@ public class ModConstants {
 	public static final String NAME = "Dynamic Trees";
 	public static final String VERSIONDEV = "1.12.2-9.9.9z";//Maxed out version to satisfy dependencies during dev
 	public static final String VERSIONAUTO = "@VERSION@";//Assigned from gradle during build
-	public static final String VERSION = VERSIONAUTO;//Change to VERSIONDEV in development, VERSIONAUTO for release
+	public static final String VERSION = VERSIONDEV;//Change to VERSIONDEV in development, VERSIONAUTO for release
 	
 	public static final String AFTER = "after:";
 	public static final String BEFORE = "before:";
