@@ -12,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
-public class BlockBranchThick extends BlockBranchBasic {
+public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
 	public static final int RADMAX_THICK = 24;
 	
@@ -91,6 +91,11 @@ public class BlockBranchThick extends BlockBranchBasic {
 	@Override
 	public int getMaxRadius() {
 		return RADMAX_THICK;
+	}
+
+	@Override
+	public boolean isMusable() {
+		return true;
 	}
 	
 }
