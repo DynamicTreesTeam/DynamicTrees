@@ -79,7 +79,7 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		if(getMuse(worldIn, state, pos) == null) {
-			worldIn.setBlockToAir(pos);
+			//worldIn.setBlockToAir(pos);
 		}
 	}
 	
@@ -157,7 +157,7 @@ public class BlockTrunkShell extends Block {
 
 	public void scheduleForClearing(IBlockAccess access, BlockPos pos) {
 		if(access instanceof World) {
-			((World) access).scheduleBlockUpdate(pos, this, 0, 3);
+			//((World) access).scheduleBlockUpdate(pos, this, 0, 3);
 		}
 	}
 	
@@ -174,11 +174,18 @@ public class BlockTrunkShell extends Block {
 		ShellMuse muse = getMuse(access, state, pos);
 		if(muse != null) {
 			AxisAlignedBB aabb = muse.blockState.getBoundingBox(access, muse.pos);
-			return aabb.offset(new BlockPos(muse.dir.getOpposite().getOffset())).intersect(FULL_BLOCK_AABB);
+			return aabb.offset(new BlockPos(muse.dir.getOffset())).intersect(FULL_BLOCK_AABB);
 		} else {
 			scheduleForClearing(access, pos);
-			return NULL_AABB;
+			return FULL_BLOCK_AABB;//NULL_AABB;
 		}
+		
+	}
+	
+	@Override
+	public boolean isAir(IBlockState state, IBlockAccess access, BlockPos pos) {
+		ShellMuse muse = getMuse(access, state, pos);
+		return muse == null;
 	}
 	
 	@Override
