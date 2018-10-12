@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -19,6 +20,7 @@ import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderThick;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -90,6 +92,13 @@ public class ClientProxy extends CommonProxy {
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		
+		TreeFamily thickFamily = ModTrees.thickTestFamily;
+		BlockBranchThick thickBranch = (BlockBranchThick) thickFamily.getDynamicBranch();
+		ModelHelper.regModel(thickBranch.getPairSide(false));
+		ModelHelper.regModel(thickBranch.getPairSide(true));
+		ModelHelper.regModel(thickFamily.getCommonSpecies().getSeed());
+		ModelHelper.regModel(thickFamily);
+		
 		//Register models for cactus
 		ModelLoader.setCustomStateMapper(ModTrees.dynamicCactus.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranchCactus.TRUNK, BlockBranchCactus.ORIGIN).build());
 		ModelHelper.regModel(ModTrees.dynamicCactus.getDynamicBranch());
@@ -105,6 +114,7 @@ public class ClientProxy extends CommonProxy {
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
 		ModelLoaderRegistry.registerLoader(new ModelLoaderCactus());
+		ModelLoaderRegistry.registerLoader(new ModelLoaderThick());
 	}
 	
 	public void registerColorHandlers() {

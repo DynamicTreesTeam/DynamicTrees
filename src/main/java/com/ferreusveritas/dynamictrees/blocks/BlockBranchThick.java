@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
@@ -69,6 +70,16 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 				branchStates[radius] = getPairSide(radius > 16).getDefaultState().withProperty(BlockBranchThick.RADIUSNYBBLE, (radius - 1) & 0x0f);
 			}
 		}
+	}
+	
+	public IProperty<?>[] getIgnorableProperties() {
+		return new IProperty<?>[]{ RADIUSNYBBLE };
+	}
+	
+	@Override
+	public void setFamily(TreeFamily tree) {
+		super.setFamily(tree);
+		otherBlock.setFamily(tree);
 	}
 	
 	@Override

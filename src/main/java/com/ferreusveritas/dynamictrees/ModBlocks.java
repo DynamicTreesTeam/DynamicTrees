@@ -174,7 +174,7 @@ public class ModBlocks {
 			blockTrunkShell
 		);
 		
-		ModTrees.testFamily.getRegisterableBlocks(treeBlocks);
+		ModTrees.thickTestFamily.getRegisterableBlocks(treeBlocks);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 	}

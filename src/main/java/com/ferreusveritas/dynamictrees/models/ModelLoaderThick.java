@@ -11,9 +11,9 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 
-public class ModelLoaderCactus extends ModelLoaderGeneric {
+public class ModelLoaderThick extends ModelLoaderGeneric {
 	
-	public ModelLoaderCactus() {
+	public ModelLoaderThick() {
 		super("dynamiccactus", new ResourceLocation("dynamictrees", "block/smartmodel/branch"));
 	}
 	
@@ -23,9 +23,9 @@ public class ModelLoaderCactus extends ModelLoaderGeneric {
 			@Override
 			public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 				try {
-					return new CompositeThickModel(barkTexture, ringsTexture, bakedTextureGetter);
+					return new CompositeCactusModel(barkTexture, ringsTexture, bakedTextureGetter);
 				} catch (Exception exception) {
-					System.err.println("ThickModel.bake() failed due to exception:" + exception);
+					System.err.println("CactusModel.bake() failed due to exception:" + exception);
 					return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
 				}
 			};

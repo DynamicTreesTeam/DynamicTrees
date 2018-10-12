@@ -30,7 +30,7 @@ public class ModItems {
 		ModTrees.dynamicCactus.getRegisterableItems(treeItems);
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
 
-		ModTrees.testFamily.getRegisterableItems(treeItems);
+		ModTrees.thickTestFamily.getRegisterableItems(treeItems);
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));

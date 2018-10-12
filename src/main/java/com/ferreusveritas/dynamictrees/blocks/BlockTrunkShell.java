@@ -9,16 +9,20 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -205,6 +209,16 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ShellMuse muse = getMuse(world, pos);
+		if(muse != null) {
+			return muse.state.getBlock().onBlockActivated(world, muse.pos, muse.state, playerIn, hand, facing, hitX, hitY, hitZ);
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		return false;//This is the simple solution to the problem.  Maybe I'll work it out later
 	}
@@ -213,4 +227,30 @@ public class BlockTrunkShell extends Block {
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
 		return 0;//This is the simple solution to the problem.  Maybe I'll work it out later
 	}
+	
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		return BlockFaceShape.UNDEFINED;
+	}
+	
+	@Override
+	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+		return null;
+	}
+	
+	@Override
+	public int quantityDropped(Random random) {
+		return 0;
+	}
+	
+	@Override
+	public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		return false;
+	}
+	
+	@Override
+	public EnumPushReaction getMobilityFlag(IBlockState state) {
+		return EnumPushReaction.BLOCK;
+	}
+	
 }
