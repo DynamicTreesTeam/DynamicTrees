@@ -379,7 +379,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	*/
 	
-	// We override the standard behaviour because we need to preserve the tree network structure to calculate
+	// We override the standard behavior because we need to preserve the tree network structure to calculate
 	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override

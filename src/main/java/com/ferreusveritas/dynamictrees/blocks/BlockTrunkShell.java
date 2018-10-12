@@ -30,19 +30,19 @@ public class BlockTrunkShell extends Block {
 	public static final String name = "trunkshell";
 	
 	public static class ShellMuse {
-		public final IBlockState blockState;
+		public final IBlockState state;
 		public final BlockPos pos;
 		public final Surround dir;
 		
-		public ShellMuse(IBlockState blockState, BlockPos pos, Surround dir) {
-			this.blockState = blockState;
+		public ShellMuse(IBlockState state, BlockPos pos, Surround dir) {
+			this.state = state;
 			this.pos = pos;
 			this.dir = dir;
 		}
 		
 		public int getRadius() {
-			Block block = blockState.getBlock();
-			return block instanceof BlockBranch ? ((BlockBranch)block).getRadius(blockState) : 0;
+			Block block = state.getBlock();
+			return block instanceof BlockBranch ? ((BlockBranch)block).getRadius(state) : 0;
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class BlockTrunkShell extends Block {
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if(getMuse(worldIn, state, pos) == null) {
+		if(getMuseUnchecked(worldIn, state, pos) == null) {
 			//worldIn.setBlockToAir(pos);
 		}
 	}
@@ -92,7 +92,7 @@ public class BlockTrunkShell extends Block {
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
 		ShellMuse muse = getMuse(world, state, pos);
 		if(muse != null) {
-			return muse.blockState.getBlock().removedByPlayer(muse.blockState, world, muse.pos, player, willHarvest);
+			return muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest);
 		}
 		
 		return true;
@@ -101,52 +101,34 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		ShellMuse muse = getMuse(world, blockState, pos);
-		if(muse != null) {
-			return muse.blockState.getBlock().getBlockHardness(muse.blockState, world, muse.pos);
-		} else {
-			scheduleForClearing(world, pos);
-		}
-		
-		return 0.0f;
+		return muse != null ? muse.state.getBlock().getBlockHardness(muse.state, world, muse.pos) : 0.0f;
 	}
 	
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
 		ShellMuse muse = getMuse(world, pos);
-		if(muse != null) {
-			return muse.blockState.getBlock().getExplosionResistance(world, muse.pos, exploder, explosion);
-		} else {
-			scheduleForClearing(world, pos);
-		}
-		
-		return 0.0f;
+		return muse != null ? muse.state.getBlock().getExplosionResistance(world, muse.pos, exploder, explosion) : 0.0f;
 	}
 	
 	@Override
 	public boolean isReplaceable(IBlockAccess access, BlockPos pos) {
-		ShellMuse muse = getMuse(access, pos);
-		if(muse == null) {
-			scheduleForClearing(access, pos);
-			return true;
-		}
-		
-		return false;
+		return getMuse(access, pos) == null;
 	}
 	
-	public Surround getMuseDir(@Nonnull IBlockState blockState, @Nonnull BlockPos pos) {
-		return blockState.getValue(COREDIR);
+	public Surround getMuseDir(@Nonnull IBlockState state, @Nonnull BlockPos pos) {
+		return state.getValue(COREDIR);
 	}
 	
 	@Nullable
-	public ShellMuse getMuse(IBlockAccess world, @Nonnull BlockPos pos) {
-		return getMuse(world, world.getBlockState(pos), pos);
+	public ShellMuse getMuseUnchecked(@Nonnull IBlockAccess access, @Nonnull BlockPos pos) {
+		return getMuseUnchecked(access, access.getBlockState(pos), pos);
 	}
 	
 	@Nullable
-	public ShellMuse getMuse(IBlockAccess world, @Nonnull IBlockState state, @Nonnull BlockPos pos) {
+	public ShellMuse getMuseUnchecked(@Nonnull IBlockAccess access, @Nonnull IBlockState state, @Nonnull BlockPos pos) {
 		Surround museDir = getMuseDir(state, pos);
 		BlockPos musePos = pos.add(museDir.getOffset());
-		IBlockState museState = world.getBlockState(musePos);
+		IBlockState museState = access.getBlockState(musePos);
 		Block block = museState.getBlock();
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir);
@@ -155,6 +137,23 @@ public class BlockTrunkShell extends Block {
 		return null;
 	}
 
+	@Nullable
+	public ShellMuse getMuse(@Nonnull IBlockAccess access, @Nonnull BlockPos pos) {
+		return getMuse(access, access.getBlockState(pos), pos);
+	}
+	
+	@Nullable
+	public ShellMuse getMuse(@Nonnull IBlockAccess access, @Nonnull IBlockState state, @Nonnull BlockPos pos) {
+		ShellMuse muse = getMuseUnchecked(access, state, pos);
+		
+		//Check the muse for validity
+		if(muse == null || muse.getRadius() <= 8) {
+			scheduleForClearing(access, pos);
+		}
+		
+		return muse;
+	}
+	
 	public void scheduleForClearing(IBlockAccess access, BlockPos pos) {
 		if(access instanceof World) {
 			//((World) access).scheduleBlockUpdate(pos, this, 0, 3);
@@ -163,20 +162,16 @@ public class BlockTrunkShell extends Block {
 	
 	@Override
 	public void onNeighborChange(IBlockAccess access, BlockPos pos, BlockPos neighbor) {
-		ShellMuse muse = getMuse(access, pos);
-		if(muse == null) {
-			scheduleForClearing(access, pos);
-		}
+		getMuse(access, pos);
 	}
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess access, BlockPos pos) {
 		ShellMuse muse = getMuse(access, state, pos);
 		if(muse != null) {
-			AxisAlignedBB aabb = muse.blockState.getBoundingBox(access, muse.pos);
+			AxisAlignedBB aabb = muse.state.getBoundingBox(access, muse.pos);
 			return aabb.offset(new BlockPos(muse.dir.getOffset())).intersect(FULL_BLOCK_AABB);
 		} else {
-			scheduleForClearing(access, pos);
 			return FULL_BLOCK_AABB;//NULL_AABB;
 		}
 		
@@ -184,8 +179,7 @@ public class BlockTrunkShell extends Block {
 	
 	@Override
 	public boolean isAir(IBlockState state, IBlockAccess access, BlockPos pos) {
-		ShellMuse muse = getMuse(access, state, pos);
-		return muse == null;
+		return getMuse(access, state, pos) == null;
 	}
 	
 	@Override

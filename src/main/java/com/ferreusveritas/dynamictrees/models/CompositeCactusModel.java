@@ -579,7 +579,7 @@ protected ModelBlock modelBlock;
 		
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {
-			int coreRadius = getRawRadius(blockState);
+			int coreRadius = getRadius(blockState);
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
 			//Count number of connections
@@ -690,7 +690,7 @@ protected ModelBlock modelBlock;
 		return dir.getIndex() >> 1;
 	}
 	
-	protected int getRawRadius(IBlockState blockState) {
+	protected int getRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
 		return ((BlockBranchCactus) blockState.getBlock()).getRadius(blockState);
 	}

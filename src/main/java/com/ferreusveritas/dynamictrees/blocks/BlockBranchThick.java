@@ -1,16 +1,29 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.Optional;
+
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableTable;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.BlockStateContainer.StateImplementation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
@@ -63,6 +76,32 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 	
+	//////////////////////////////////////////////////
+	//The following is highly experimental code
+	//////////////////////////////////////////////////
+	class StateImplementationCachedRadius extends StateImplementation {
+		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap < IProperty<?>, Comparable<? >> propertiesIn) { super(blockIn, propertiesIn); }
+		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap<IProperty<?>, Comparable<?>> propertiesIn, ImmutableTable<IProperty<?>, Comparable<?>, IBlockState> propertyValueTable) { super(blockIn, propertiesIn, propertyValueTable); }
+		
+		private int radius = -1;
+		int getRadius() {
+			return radius;
+		}
+	}
+	
+	class BlockStateContainerCustom extends BlockStateContainer {
+		public BlockStateContainerCustom(Block blockIn, IProperty<?>... properties) { this(blockIn, properties, null); }
+		protected BlockStateContainerCustom(Block blockIn, IProperty<?>[] properties, ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties) { super(blockIn, properties, unlistedProperties); }
+		
+		@Override
+		protected StateImplementation createState(Block block, ImmutableMap<IProperty<?>, Comparable<?>> properties, ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties) {
+			return new StateImplementationCachedRadius(block, properties);
+		}
+	}
+	//////////////////////////////////////////////////
+	//end highly experimental code
+	//////////////////////////////////////////////////
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		IProperty[] listedProperties = { RADIUSNYBBLE };
@@ -86,6 +125,72 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
 	public int getRadius(IBlockState blockState) {
 		return MathHelper.clamp(blockState.getValue(RADIUSNYBBLE) + (((BlockBranchThick)blockState.getBlock()).extended ? 17 : 1), 1, getMaxRadius());
+	}
+	
+	@Override
+	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
+		
+		//If the radius is <= 8 then we can just set the block as normal and move on
+		if(radius <= RADMAX_NORMAL) {
+			super.setRadius(world, pos, radius, originDir, flags);
+			return;
+		}
+		
+		ReplaceableState repStates[] = new ReplaceableState[8];
+		
+		boolean setable = true;
+		
+		for(Surround dir : Surround.values()) {
+			BlockPos dPos = pos.add(dir.getOffset());
+			ReplaceableState rep = getReplaceability(world, dPos);
+			repStates[dir.ordinal()] = rep;
+			if (rep == ReplaceableState.BLOCKING) {
+				setable = false;
+				break;
+			}
+		}
+		
+		if(setable) {
+			super.setRadius(world, pos, radius, originDir, flags);
+			
+			for(Surround dir : Surround.values()) {
+				BlockPos dPos = pos.add(dir.getOffset());
+				ReplaceableState rep = repStates[dir.ordinal()];
+				if(rep == ReplaceableState.REPLACEABLE) {
+					world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, dir.getOpposite()), flags);
+				}
+			}
+		} else {
+			super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
+		}
+		
+	}
+	
+	public ReplaceableState getReplaceability(World world, BlockPos pos) {
+		
+		IBlockState state = world.getBlockState(pos);
+		
+		if(state.getBlock().isReplaceable(world, pos)) {
+			return ReplaceableState.REPLACEABLE;
+		}
+		
+		Block block = state.getBlock();		
+		
+		if(TreeHelper.isTreePart(block)) {
+			return ReplaceableState.TREEPART;
+		}
+		
+		if(getFamily().getCommonSpecies().isAcceptableSoil(world, pos, state)) {
+			return ReplaceableState.REPLACEABLE;
+		}
+		
+		return ReplaceableState.BLOCKING;
+	}
+	
+	enum ReplaceableState {
+		REPLACEABLE,	//This indicates that the block is truly replaceable and will be erased
+		BLOCKING,		//This indicates that the block is not replaceable, will NOT be erased, and will prevent the tree from growing
+		TREEPART		//This indicates that the block is part of a tree, will NOT be erase, and will NOT prevent the tree from growing
 	}
 	
 	@Override
