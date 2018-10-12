@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
@@ -15,9 +16,11 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.BlockStateContainer.StateImplementation;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -27,6 +30,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
+	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
 	public static final int RADMAX_THICK = 24;
 	
 	protected static final PropertyInteger RADIUSNYBBLE = PropertyInteger.create("radius", 0, 15);
@@ -184,6 +188,8 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			return ReplaceableState.REPLACEABLE;
 		}
 		
+		//TODO: Possible configurable whitelist for destructable blocks 
+		
 		return ReplaceableState.BLOCKING;
 	}
 	
@@ -197,7 +203,34 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	public int getMaxRadius() {
 		return RADMAX_THICK;
 	}
-
+	
+	
+	///////////////////////////////////////////
+	// PHYSICAL BOUNDS
+	///////////////////////////////////////////
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
+		int thisRadius = getRadius(state);
+		if(thisRadius <= RADMAX_NORMAL) {
+			return super.getBoundingBox(state, blockAccess, pos);
+		}
+		
+		double radius = thisRadius / 16.0;
+		return new AxisAlignedBB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius);
+	}
+	
+	@Override
+	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
+		int radius = getRadius(state);
+		if(radius <= RADMAX_NORMAL) {
+			super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entityIn, p_185477_7_);
+			return;
+		}
+		
+		addCollisionBoxToList(pos, entityBox, collidingBoxes, getBoundingBox(state, world, pos));
+	}
+	
 	@Override
 	public boolean isMusable() {
 		return true;

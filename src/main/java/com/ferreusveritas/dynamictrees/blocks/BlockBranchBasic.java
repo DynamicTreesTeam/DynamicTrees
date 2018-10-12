@@ -38,7 +38,6 @@ public class BlockBranchBasic extends BlockBranch {
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, RADMAX_NORMAL);
-	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
 	
 	protected IBlockState branchStates[];
 	
@@ -351,10 +350,10 @@ public class BlockBranchBasic extends BlockBranch {
 			}
 		}
 		if (connectionMade) {
-			return aabb.offset(0.5, 0.5, 0.5).intersect(maxBranchBB);
+			return aabb.offset(0.5, 0.5, 0.5);
 		}
 		
-		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius).intersect(maxBranchBB);
+		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 	}
 	
 	@Override
@@ -365,7 +364,6 @@ public class BlockBranchBasic extends BlockBranch {
 		
 		boolean hasConnections = false;
 		int thisRadius = getRadius(state);
-		System.out.println(thisRadius);
 		
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
@@ -381,7 +379,6 @@ public class BlockBranchBasic extends BlockBranch {
 		
 		if(!hasConnections) {
 			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
-			aabb = aabb.intersect(maxBranchBB);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 		}
 		

@@ -16,9 +16,12 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -178,6 +181,12 @@ public class BlockTrunkShell extends Block {
 	}
 	
 	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		ShellMuse muse = getMuse(world, state, pos);
+		return muse != null ? muse.state.getBlock().getPickBlock(muse.state, target, world, muse.pos, player) : ItemStack.EMPTY;
+	}
+	
+	@Override
 	public boolean isAir(IBlockState state, IBlockAccess access, BlockPos pos) {
 		return getMuse(access, state, pos) == null;
 	}
@@ -187,4 +196,21 @@ public class BlockTrunkShell extends Block {
 		return EnumBlockRenderType.INVISIBLE;
 	}
 	
+	@Override
+	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
+		ShellMuse muse = getMuse(world, pos);
+		if(muse != null) {
+			muse.state.getBlock().onBlockExploded(world, muse.pos, explosion);
+		}
+	}
+
+	@Override
+	public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
+		return false;//This is the simple solution to the problem.  Maybe I'll work it out later
+	}
+	
+	@Override
+	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+		return 0;//This is the simple solution to the problem.  Maybe I'll work it out later
+	}
 }
