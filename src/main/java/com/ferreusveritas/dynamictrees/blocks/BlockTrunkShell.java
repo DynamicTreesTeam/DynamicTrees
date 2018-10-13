@@ -6,7 +6,6 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
@@ -59,7 +58,6 @@ public class BlockTrunkShell extends Block {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(COREDIR, Surround.S));
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	
 	///////////////////////////////////////////

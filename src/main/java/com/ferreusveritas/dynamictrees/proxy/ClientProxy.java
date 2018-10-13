@@ -96,7 +96,7 @@ public class ClientProxy extends CommonProxy {
 		TreeFamily thickFamily = ModTrees.thickTestFamily;
 		BlockBranchThick thickBranch = (BlockBranchThick) thickFamily.getDynamicBranch();
 		ModelHelper.regModel(thickBranch.getPairSide(false));
-		ModelHelper.regModel(thickBranch.getPairSide(true));
+		//ModelHelper.regModel(thickBranch.getPairSide(true));
 		ModelHelper.regModel(thickFamily.getCommonSpecies().getSeed());
 		ModelHelper.regModel(thickFamily);
 		ModelLoader.setCustomStateMapper(((BlockBranchThick) thickFamily.getDynamicBranch()).otherBlock, new StateMap.Builder().ignore(thickFamily.getDynamicBranch().getIgnorableProperties()).build());

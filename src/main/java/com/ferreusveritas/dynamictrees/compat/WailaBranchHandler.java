@@ -4,12 +4,18 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -23,6 +29,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	private BlockPos lastPos = BlockPos.ORIGIN;
 	private Species lastSpecies = Species.NULLSPECIES;
+	private int lastVolume = 0;
 	
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
@@ -37,7 +44,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		}
 		
 		//Attempt to get species by checking if we're still looking at the same block
-		if(species == Species.NULLSPECIES && pos == lastPos) {
+		if(species == Species.NULLSPECIES && lastPos.equals(pos)) {
 			species = lastSpecies;
 		}
 		
@@ -46,19 +53,60 @@ public class WailaBranchHandler implements IWailaDataProvider {
 			species = getWailaSpecies(accessor.getWorld(), pos);			
 		}
 		
+		if(!lastPos.equals(pos)) {
+			lastVolume = getTreeVolume(accessor.getWorld(), pos);
+		}
+		
 		//Update the cached species and position
 		lastSpecies = species;
 		lastPos = pos;
 		
 		if(species != Species.NULLSPECIES) {
-			tooltip.add("Species: " + species.getRegistryName().getResourcePath());				
+			tooltip.add("Species: " + species.getRegistryName().getResourcePath());
+			
+			if(lastVolume != 0) {
+				LogsAndSticks las = species.getLogsAndSticks(lastVolume);
+				
+				tooltip.add("Logs: " + las.logs);
+				if(las.sticks != 0) {
+					tooltip.add("Sticks: " + las.sticks);
+				}
+			}
 		}
 		
 		return tooltip;
 	}
 	
+	private int getTreeVolume(World world, BlockPos pos) {
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+		
+		//Dereference proxy trunk shell block
+		if(block instanceof BlockTrunkShell) {
+			ShellMuse muse = ((BlockTrunkShell)block).getMuse(world, pos);
+			if(muse != null) {
+				state = muse.state;
+				block = state.getBlock();
+				pos = muse.pos;
+			}
+		}
+		
+		if(block instanceof BlockBranch) {
+			BlockBranch branch = (BlockBranch) block;
+			
+			// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
+			NodeNetVolume volumeSum = new NodeNetVolume();
+			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
+			
+			return volumeSum.getVolume();
+		}
+		
+		return 0;
+	}
+	
 	@Override
 	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
+
 		Species species = getWailaSpecies(world, pos);
 		
 		if(species != Species.NULLSPECIES) {
@@ -70,8 +118,19 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	private Species getWailaSpecies(World world, BlockPos pos) {
 		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
 		
-		if(state.getBlock() instanceof BlockBranch) {
+		//Dereference proxy trunk shell block
+		if(block instanceof BlockTrunkShell) {
+			ShellMuse muse = ((BlockTrunkShell)block).getMuse(world, pos);
+			if(muse != null) {
+				state = muse.state;
+				block = state.getBlock();
+				pos = muse.pos;
+			}
+		}
+		
+		if(block instanceof BlockBranch) {
 			BlockBranch branch = (BlockBranch) state.getBlock();
 			Species species = TreeHelper.getExactSpecies(state, world, pos);
 			if(species == Species.NULLSPECIES) {

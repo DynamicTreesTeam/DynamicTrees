@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -19,12 +20,17 @@ public class DropCreatorLogs extends DropCreator {
 
 	@Override
 	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
-		int numLogs = volume / 4096;
+		LogsAndSticks las = species.getLogsAndSticks(volume);
+		
+		int numLogs = las.logs;
 		while(numLogs > 0) {
-			dropList.add(species.getFamily().getPrimitiveLogItemStack(numLogs >= 64 ? 64 : numLogs));// A log contains 4096 voxels of wood material(16x16x16 pixels) Drop vanilla logs or whatever
+			dropList.add(species.getFamily().getPrimitiveLogItemStack(numLogs >= 64 ? 64 : numLogs));
 			numLogs -= 64;
 		}
-		dropList.add(species.getFamily().getStick((volume % 4096) / 512));// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		int numSticks = las.sticks;
+		if(numSticks > 0) {
+			dropList.add(species.getFamily().getStick(numSticks));
+		}
 		return dropList;
 	}
 

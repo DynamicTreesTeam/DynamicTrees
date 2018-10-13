@@ -165,7 +165,7 @@ public class TreeFamily {
 	 * We intentionally leave out leaves since they are shared between trees 
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList.add(dynamicBranch);
+		blockList.add(getDynamicBranch());
 		return blockList;
 	}
 	
@@ -178,7 +178,8 @@ public class TreeFamily {
 	 */
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		//Register an itemBlock for the branch block
-		itemList.add(new ItemBlock(dynamicBranch).setRegistryName(dynamicBranch.getRegistryName()));
+		Block branch = getDynamicBranch();
+		itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
 		
 		Seed seed = getCommonSpecies().getSeed();
 		if(seed != Seed.NULLSEED) {

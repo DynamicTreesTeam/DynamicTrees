@@ -353,6 +353,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
 	
+	public class LogsAndSticks {
+		public final int logs;
+		public final int sticks;
+		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = sticks; };
+	}
+	
+	public LogsAndSticks getLogsAndSticks(int volume) {
+		int logs = volume / 4096;// A log contains 4096 voxels of wood material(16x16x16 pixels) Drop vanilla logs or whatever
+		int sticks = (volume % 4096) / 512;// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		return new LogsAndSticks(logs, sticks);
+	}
 	
 	/**
 	 * 

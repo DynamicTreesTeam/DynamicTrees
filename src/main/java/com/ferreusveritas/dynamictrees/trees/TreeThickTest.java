@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
@@ -12,8 +11,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 
 public class TreeThickTest extends TreeFamily {
@@ -53,9 +50,7 @@ public class TreeThickTest extends TreeFamily {
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
 		for(int i = 0; i < 2; i++) {
-			BlockBranchThick b = branch.getPairSide(i == 1);
-			blockList.add(b);
-			b.setCreativeTab(DynamicTrees.dynamicTreesTab);
+			blockList.add(branch.getPairSide(i == 1));
 		}
 		
 		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
@@ -63,18 +58,4 @@ public class TreeThickTest extends TreeFamily {
 		return blockList;
 	}
 	
-	@Override
-	public List<Item> getRegisterableItems(List<Item> itemList) {
-		BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
-		
-		//Register an itemBlock for the branch block
-		itemList.add(new ItemBlock(branch.getPairSide(false)).setRegistryName(branch.getPairSide(false).getRegistryName()));
-		itemList.add(new ItemBlock(branch.getPairSide(true )).setRegistryName(branch.getPairSide(true ).getRegistryName()));
-		
-		//Register seed item
-		itemList.add(getCommonSpecies().getSeed());
-		
-		return itemList;
-	}
-
 }

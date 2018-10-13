@@ -34,8 +34,6 @@ public class ModItems {
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
-		
-		registerItemBlock(registry, ModBlocks.blockTrunkShell);
 	}
 	
 	public static Item makeItemBlock(Block block) {
