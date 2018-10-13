@@ -86,7 +86,7 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		if(getMuseUnchecked(worldIn, state, pos) == null) {
-			//worldIn.setBlockToAir(pos);
+			worldIn.setBlockToAir(pos);
 		}
 	}
 	
@@ -163,13 +163,16 @@ public class BlockTrunkShell extends Block {
 	
 	public void scheduleForClearing(IBlockAccess access, BlockPos pos) {
 		if(access instanceof World) {
-			//((World) access).scheduleBlockUpdate(pos, this, 0, 3);
+			World world = (World) access;
+			if(!world.isRemote) {
+				world.scheduleBlockUpdate(pos, this, 0, 3);
+			}
 		}
 	}
 	
 	@Override
-	public void onNeighborChange(IBlockAccess access, BlockPos pos, BlockPos neighbor) {
-		getMuse(access, pos);
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		getMuse(world, pos);
 	}
 	
 	@Override

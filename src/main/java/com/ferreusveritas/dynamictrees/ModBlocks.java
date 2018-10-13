@@ -26,6 +26,7 @@ import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -148,7 +149,11 @@ public class ModBlocks {
 					}
 				}.assign();
 		
-		testLeavesProperties = new LeavesProperties(Blocks.BOOKSHELF.getDefaultState()).assign();
+		testLeavesProperties = new LeavesProperties(Blocks.BOOKSHELF.getDefaultState()) {
+			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos){
+				return Minecraft.getMinecraft().getBlockColors().colorMultiplier(Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK), world, pos, 0);
+			}
+		}.assign();
 		
 		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly not assigned
 	}

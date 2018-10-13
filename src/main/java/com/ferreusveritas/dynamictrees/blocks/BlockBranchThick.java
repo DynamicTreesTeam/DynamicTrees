@@ -27,7 +27,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
@@ -190,12 +189,15 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	public ReplaceableState getReplaceability(World world, BlockPos pos) {
 		
 		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
 		
-		if(state.getBlock().isReplaceable(world, pos)) {
-			return ReplaceableState.REPLACEABLE;
+		if(block == ModBlocks.blockTrunkShell) {
+			return ReplaceableState.SHELL;
 		}
 		
-		Block block = state.getBlock();		
+		if(block.isReplaceable(world, pos)) {
+			return ReplaceableState.REPLACEABLE;
+		}
 		
 		if(TreeHelper.isTreePart(block)) {
 			return ReplaceableState.TREEPART;
@@ -211,6 +213,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	}
 	
 	enum ReplaceableState {
+		SHELL,			//This indicates that the block is already a shell
 		REPLACEABLE,	//This indicates that the block is truly replaceable and will be erased
 		BLOCKING,		//This indicates that the block is not replaceable, will NOT be erased, and will prevent the tree from growing
 		TREEPART		//This indicates that the block is part of a tree, will NOT be erase, and will NOT prevent the tree from growing
