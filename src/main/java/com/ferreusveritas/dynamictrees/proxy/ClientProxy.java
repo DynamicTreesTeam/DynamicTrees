@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
@@ -98,6 +99,8 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(thickBranch.getPairSide(true));
 		ModelHelper.regModel(thickFamily.getCommonSpecies().getSeed());
 		ModelHelper.regModel(thickFamily);
+		ModelLoader.setCustomStateMapper(((BlockBranchThick) thickFamily.getDynamicBranch()).otherBlock, new StateMap.Builder().ignore(thickFamily.getDynamicBranch().getIgnorableProperties()).build());
+		ModelLoader.setCustomStateMapper(ModBlocks.blockTrunkShell, new StateMap.Builder().ignore(BlockTrunkShell.COREDIR).build());
 		
 		//Register models for cactus
 		ModelLoader.setCustomStateMapper(ModTrees.dynamicCactus.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranchCactus.TRUNK, BlockBranchCactus.ORIGIN).build());

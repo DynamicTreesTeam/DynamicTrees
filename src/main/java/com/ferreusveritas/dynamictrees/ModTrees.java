@@ -51,8 +51,8 @@ public class ModTrees {
 		}
 
 		//TODO: Temporary Code
-		TreeFamily testFamily = new TreeThickTest();
-		testFamily.registerSpecies(Species.REGISTRY);
+		thickTestFamily = new TreeThickTest();
+		thickTestFamily.registerSpecies(Species.REGISTRY);
 	}
 	
 }

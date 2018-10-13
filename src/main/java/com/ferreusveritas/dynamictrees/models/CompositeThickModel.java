@@ -73,7 +73,7 @@ public class CompositeThickModel extends CompositeBasicModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
-
+		System.out.println("awd");
 		int coreRadius = getRadius(blockState);
 		
 		if(coreRadius <= BlockBranch.RADMAX_NORMAL) {

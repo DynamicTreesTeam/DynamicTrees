@@ -36,7 +36,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
 	protected static final PropertyInteger RADIUSNYBBLE = PropertyInteger.create("radius", 0, 15);
 	protected final boolean extended;
-	protected BlockBranchThick otherBlock;
+	public BlockBranchThick otherBlock;
 	
 	public BlockBranchThick(Material material, String name) {
 		this(material, name, false);
@@ -79,7 +79,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	@Override
 	public void setFamily(TreeFamily tree) {
 		super.setFamily(tree);
-		otherBlock.setFamily(tree);
+		if (!extended) otherBlock.setFamily(tree);
 	}
 	
 	@Override
