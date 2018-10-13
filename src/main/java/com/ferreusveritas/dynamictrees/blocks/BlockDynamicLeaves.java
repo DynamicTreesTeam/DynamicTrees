@@ -116,7 +116,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if(ModConfigs.treeGrowthRateMultiplier < 1.0f && rand.nextFloat() < ModConfigs.treeGrowthRateMultiplier) {
+		if(ModConfigs.treeGrowthRateMultiplier >= 1.0f || rand.nextFloat() < ModConfigs.treeGrowthRateMultiplier) {
 			age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 		}
 	}
