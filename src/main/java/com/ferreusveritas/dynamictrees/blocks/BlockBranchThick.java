@@ -27,6 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
@@ -179,6 +180,11 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
 		}
 		
+	}
+	
+	@Override
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return Math.min(getRadius(blockState), RADMAX_NORMAL);
 	}
 	
 	public ReplaceableState getReplaceability(World world, BlockPos pos) {
