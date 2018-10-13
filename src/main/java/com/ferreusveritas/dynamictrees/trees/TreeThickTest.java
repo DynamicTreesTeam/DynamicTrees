@@ -30,7 +30,9 @@ public class TreeThickTest extends TreeFamily {
 	public void createSpecies() {
 		Species species = new Species(this.getName(), this, ModBlocks.testLeavesProperties) {
 			{
-				setBasicGrowingParameters(0.3f, 14.0f, 4, 4, 1.0f);
+				setBasicGrowingParameters(0.3f, 24.0f, 4, 4, 1.0f);
+				setSoilLongevity(16); // Grows for a long long time
+
 				setupStandardSeedDropping();
 				setDynamicSapling(new BlockDynamicSapling("testsapling").getDefaultState());
 				
