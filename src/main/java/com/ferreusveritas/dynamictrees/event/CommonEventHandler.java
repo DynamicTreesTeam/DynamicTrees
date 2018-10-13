@@ -21,7 +21,7 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		event.getWorld().addEventListener(new BurningEventListener());
+		event.getWorld().addEventListener(new WorldListener(event.getWorld(), event.getWorld().getMinecraftServer()));
 	}
 	
 }

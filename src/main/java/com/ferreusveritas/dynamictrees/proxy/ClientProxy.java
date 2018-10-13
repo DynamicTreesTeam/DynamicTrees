@@ -100,6 +100,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(thickFamily.getCommonSpecies().getSeed());
 		ModelHelper.regModel(thickFamily);
 		ModelLoader.setCustomStateMapper(((BlockBranchThick) thickFamily.getDynamicBranch()).otherBlock, new StateMap.Builder().ignore(thickFamily.getDynamicBranch().getIgnorableProperties()).build());
+		//Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getBlockStateMapper().registerBuiltInBlocks(ModBlocks.blockTrunkShell);
 		ModelLoader.setCustomStateMapper(ModBlocks.blockTrunkShell, new StateMap.Builder().ignore(BlockTrunkShell.COREDIR).build());
 		
 		//Register models for cactus
