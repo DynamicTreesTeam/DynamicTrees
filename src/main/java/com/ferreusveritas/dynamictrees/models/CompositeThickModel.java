@@ -52,7 +52,7 @@ public class CompositeThickModel extends CompositeBasicModel {
 		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 		
 		for(EnumFacing face: EnumFacing.VALUES) {
-			BlockFaceUV uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(Axis.Y, face));
+			BlockFaceUV uvface = new BlockFaceUV(new float[]{ 0, 0, 16, 16 }, getFaceAngle(Axis.Y, face));
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 		}
 		
@@ -73,9 +73,8 @@ public class CompositeThickModel extends CompositeBasicModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
-		System.out.println("awd");
 		int coreRadius = getRadius(blockState);
-		
+
 		if(coreRadius <= BlockBranch.RADMAX_NORMAL) {
 			return super.getQuads(blockState, side, rand);
 		}
