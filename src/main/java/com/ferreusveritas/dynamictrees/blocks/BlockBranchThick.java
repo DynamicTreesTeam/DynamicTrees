@@ -139,7 +139,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	///////////////////////////////////////////
 	
 	public int getRadius(IBlockState blockState) {
-		return MathHelper.clamp(blockState.getValue(RADIUSNYBBLE) + (((BlockBranchThick)blockState.getBlock()).extended ? 17 : 1), 1, getMaxRadius());
+		return blockState.getBlock() == this ? MathHelper.clamp(blockState.getValue(RADIUSNYBBLE) + (((BlockBranchThick)blockState.getBlock()).extended ? 17 : 1), 1, getMaxRadius()) : 0;
 	}
 	
 	@Override

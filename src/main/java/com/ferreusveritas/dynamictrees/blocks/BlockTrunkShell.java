@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
@@ -182,9 +183,20 @@ public class BlockTrunkShell extends Block {
 			AxisAlignedBB aabb = muse.state.getBoundingBox(access, muse.pos);
 			return aabb.offset(new BlockPos(muse.dir.getOffset())).intersect(FULL_BLOCK_AABB);
 		} else {
-			return FULL_BLOCK_AABB;//NULL_AABB;
+			return new AxisAlignedBB(0, 0, 0, 0, 0, 0);//NULL_AABB;
 		}
 		
+	}
+	
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+		AxisAlignedBB aabb = super.getCollisionBoundingBox(blockState, worldIn, pos);
+		return aabb == FULL_BLOCK_AABB ? NULL_AABB : aabb;
+	}
+	
+	@Override
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState) {
+		super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
 	}
 	
 	@Override

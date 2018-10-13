@@ -4,16 +4,20 @@ import java.awt.Color;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -53,17 +57,29 @@ public class Staff extends Item {
 	
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		
+				
 		ItemStack heldStack = player.getHeldItem(hand);
 		
-		IBlockState clickedBlock = world.getBlockState(pos);
+		IBlockState clickedBlockState = world.getBlockState(pos);
+		Block clickedBlock = clickedBlockState.getBlock();
+
+		//Dereference proxy trunk shell
+		if(clickedBlock == ModBlocks.blockTrunkShell) {
+			ShellMuse muse = ((BlockTrunkShell)clickedBlock).getMuse(world, clickedBlockState, pos);
+			if(muse != null) {
+				clickedBlockState = muse.state;
+				pos = muse.pos;
+				clickedBlock = clickedBlockState.getBlock();
+			}
+		}
+		
 		ITreePart treePart = TreeHelper.getTreePart(clickedBlock);
 		BlockPos rootPos = pos;
 		
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
-			MapSignal signal = branch.analyse(clickedBlock, world, pos, null, new MapSignal());//Analyze entire tree network to find root node
+			MapSignal signal = branch.analyse(clickedBlockState, world, pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
 				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
@@ -86,7 +102,7 @@ public class Staff extends Item {
 		
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
-		if(species != null && species.isAcceptableSoil(world, pos, clickedBlock)) {
+		if(species != null && species.isAcceptableSoil(world, pos, clickedBlockState)) {
 			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;

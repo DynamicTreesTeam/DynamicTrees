@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData.PosType;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
 
 import net.minecraft.block.Block;
@@ -162,7 +163,24 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			renderBounds.union(absPos);//Expand the re-render volume to include this block
 		}
 		
+		cleanupShellBlocks(destroyData);
+		
 		world.markBlockRangeForRenderUpdate(renderBounds.getMin(), renderBounds.getMax());//This forces the client to rerender the chunks
+	}
+	
+	protected void cleanupShellBlocks(BranchDestructionData destroyData) {
+		BlockPos cutPos = destroyData.cutPos;
+		for(int i = 0; i < destroyData.getNumBranches(); i++) {
+			if(destroyData.getBranchRadius(i) > 8) {
+				BlockPos pos = destroyData.getBranchRelPos(i).add(cutPos);
+				for(Surround dir: Surround.values()) {
+					BlockPos dPos = pos.add(dir.getOffset());
+					if(world.getBlockState(dPos).getBlock() == ModBlocks.blockTrunkShell) {
+						world.setBlockToAir(dPos);
+					}
+				}
+			}
+		}
 	}
 	
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
