@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
@@ -19,6 +20,10 @@ public class TreeThickTest extends TreeFamily {
 	
 	public TreeThickTest() {
 		super(new ResourceLocation(ModConstants.MODID, "test"));
+
+		setPrimitiveLog(Blocks.BOOKSHELF.getDefaultState());
+		
+		ModBlocks.testLeavesProperties.setTree(this);
 	}
 	
 	@Override
@@ -28,6 +33,8 @@ public class TreeThickTest extends TreeFamily {
 				setBasicGrowingParameters(0.3f, 14.0f, 4, 4, 1.0f);
 				setupStandardSeedDropping();
 				setDynamicSapling(new BlockDynamicSapling("testsapling").getDefaultState());
+				
+
 				generateSeed();
 			}
 		};
