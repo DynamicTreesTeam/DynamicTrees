@@ -47,7 +47,7 @@ public class CompositeThickModel extends CompositeBasicModel {
 	public IBakedModel bakeTrunk(int radius, TextureAtlasSprite bark, TextureAtlasSprite ring) {
 		
 		Vector3f posFrom = new Vector3f(8 - radius, 0, 8 - radius);
-		Vector3f posTo = new Vector3f(8 + radius, 8, 8 + radius);
+		Vector3f posTo = new Vector3f(8 + radius, 16, 8 + radius);
 		
 		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 		
