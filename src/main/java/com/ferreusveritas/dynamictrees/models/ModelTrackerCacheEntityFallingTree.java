@@ -11,12 +11,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ModelCacheFallingTree {
+public class ModelTrackerCacheEntityFallingTree {
 	
-	public static Map<Integer, ModelFallingTree> modelMap = new HashMap<>();
+	public static Map<Integer, ModelEntityFallingTree> modelMap = new HashMap<>();
 	
-	public static ModelFallingTree getModel(EntityFallingTree entity) {
-		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new ModelFallingTree(entity) );
+	public static ModelEntityFallingTree getModel(EntityFallingTree entity) {
+		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new ModelEntityFallingTree(entity) );
 	}
 	
 	public static void cleanupModels(World world, EntityFallingTree entity) {

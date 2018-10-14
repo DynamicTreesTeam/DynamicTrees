@@ -14,13 +14,13 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 
-public class BranchModel implements IModel {
+public class ModelBlockBranchBasic implements IModel {
 
 	public ResourceLocation barkTexture;
 	public ResourceLocation ringsTexture;
 
 	
-	public BranchModel(ModelBlock modelBlock) {
+	public ModelBlockBranchBasic(ModelBlock modelBlock) {
 		barkTexture = new ResourceLocation(modelBlock.resolveTextureName("bark"));
 		ringsTexture = new ResourceLocation(modelBlock.resolveTextureName("rings"));
 	}
@@ -41,7 +41,7 @@ public class BranchModel implements IModel {
 	@Override
 	public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		try {
-			return new CompositeBasicModel(barkTexture, ringsTexture, bakedTextureGetter);
+			return new BakedModelBlockBranchBasic(barkTexture, ringsTexture, bakedTextureGetter);
 		} catch (Exception exception) {
 			System.err.println("BranchModel.bake() failed due to exception:" + exception);
 			return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);

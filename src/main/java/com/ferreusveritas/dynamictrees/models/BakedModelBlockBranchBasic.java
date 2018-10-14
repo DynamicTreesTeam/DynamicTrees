@@ -32,7 +32,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class CompositeBasicModel implements IBakedModel {
+public class BakedModelBlockBranchBasic implements IBakedModel {
 
 	protected ModelBlock modelBlock;
 	
@@ -43,7 +43,7 @@ public class CompositeBasicModel implements IBakedModel {
 	private IBakedModel cores[][] = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel rings[] = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
-	public CompositeBasicModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
+	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
 		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);

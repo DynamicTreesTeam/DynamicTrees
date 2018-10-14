@@ -17,11 +17,11 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
-public class RootyCompositeModel implements IBakedModel {
+public class BakedModelBlockRooty implements IBakedModel {
 	
 	protected IBakedModel rootsModel;
 	
-	public RootyCompositeModel(IBakedModel rootsModel) {
+	public BakedModelBlockRooty(IBakedModel rootsModel) {
 		this.rootsModel = rootsModel;
 	}
 	

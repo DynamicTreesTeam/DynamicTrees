@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.models.BonsaiCompositeModel;
-import com.ferreusveritas.dynamictrees.models.RootyCompositeModel;
+import com.ferreusveritas.dynamictrees.models.BakedModelBlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.models.BakedModelBlockRooty;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -24,7 +24,7 @@ public class ModelBakeEventListener {
 			Object rootsObject = event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
 			if (rootsObject instanceof IBakedModel) {
 				IBakedModel rootsModel = (IBakedModel) rootsObject;
-				RootyCompositeModel rootyModel = new RootyCompositeModel(rootsModel);
+				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsModel);
 				event.getModelRegistry().putObject(new ModelResourceLocation(block.getRegistryName(), "normal"), rootyModel);
 			}
 		}
@@ -32,7 +32,7 @@ public class ModelBakeEventListener {
 		Object flowerPotObject = event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
 		if (flowerPotObject instanceof IBakedModel) {
 			IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
-			BonsaiCompositeModel bonsaiPotModel = new BonsaiCompositeModel(flowerPotModel);
+			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotModel);
 			event.getModelRegistry().putObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
 		}
 	}

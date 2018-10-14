@@ -34,7 +34,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class CompositeCactusModel implements IBakedModel {
+public class BakedModelBlockBranchCactus implements IBakedModel {
 
 protected ModelBlock modelBlock;
 	
@@ -47,7 +47,7 @@ protected ModelBlock modelBlock;
 	private IBakedModel coreSpikes[] = new IBakedModel[2]; // 2 cores with only the spikey edges
 	private IBakedModel sleeveTopSpikes;
 	
-	public CompositeCactusModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
+	public BakedModelBlockBranchCactus(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
 		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);

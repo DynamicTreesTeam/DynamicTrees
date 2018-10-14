@@ -26,13 +26,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ModelFallingTree {
+public class ModelEntityFallingTree {
 	
 	protected final List<BakedQuad> quads;
 	protected final int leavesColor;
 	protected final int entityId;
 	
-	public ModelFallingTree(EntityFallingTree entity) {
+	public ModelEntityFallingTree(EntityFallingTree entity) {
 		World world = entity.getEntityWorld();
 		BranchDestructionData destructionData = entity.getDestroyData();
 		Species species = destructionData.species;

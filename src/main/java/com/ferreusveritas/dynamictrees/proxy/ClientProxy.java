@@ -19,9 +19,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
-import com.ferreusveritas.dynamictrees.models.ModelLoaderBranch;
-import com.ferreusveritas.dynamictrees.models.ModelLoaderCactus;
-import com.ferreusveritas.dynamictrees.models.ModelLoaderThick;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchBasic;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchCactus;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchThick;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -116,9 +116,9 @@ public class ClientProxy extends CommonProxy {
 		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
 		
 		//Register the file loader for Branch models
-		ModelLoaderRegistry.registerLoader(new ModelLoaderBranch());
-		ModelLoaderRegistry.registerLoader(new ModelLoaderCactus());
-		ModelLoaderRegistry.registerLoader(new ModelLoaderThick());
+		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchBasic());
+		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchCactus());
+		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchThick());
 	}
 	
 	public void registerColorHandlers() {

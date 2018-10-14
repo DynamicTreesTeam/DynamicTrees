@@ -24,6 +24,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
@@ -490,6 +491,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public int getSoilLongevity(World world, BlockPos rootPos) {
 		return (int)(biomeSuitability(world, rootPos) * soilLongevity);
+	}
+	
+	public boolean isThick() {
+		return getFamily().isThick();
+	}
+	
+	public int maxBranchRadius() {
+		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
 	}
 	
 	public void addAcceptableSoil(Block ... soilBlocks) {

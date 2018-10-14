@@ -26,11 +26,11 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-public class CompositeThickModel extends CompositeBasicModel {
+public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	
 	private IBakedModel trunks[] = new IBakedModel[16];
 	
-	public CompositeThickModel(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+	public BakedModelBlockBranchThick(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		super(barkRes, ringsRes, bakedTextureGetter);
 		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);

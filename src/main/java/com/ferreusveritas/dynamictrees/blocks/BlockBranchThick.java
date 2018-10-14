@@ -38,6 +38,10 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	protected final boolean extended;
 	public BlockBranchThick otherBlock;
 	
+	public BlockBranchThick(String name) {
+		this(Material.WOOD, name);
+	}
+	
 	public BlockBranchThick(Material material, String name) {
 		this(material, name, false);
 		otherBlock = new BlockBranchThick(material, name + "x", true);

@@ -21,6 +21,7 @@ public class ModConfigs {
 	public static float scaleBiomeGrowthRate;
 	public static float diseaseChance;
 	public static boolean enableAppleTrees;
+	public static boolean enableThickTrees;
 
 	public static boolean isLeavesPassable;
 	public static boolean vanillaLeavesCollision;
@@ -60,6 +61,7 @@ public class ModConfigs {
 		scaleBiomeGrowthRate = config.getFloat("scaleBiomeGrowthRate", "trees", 0.5f, 0.0f, 1.0f, "Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
 		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
+		enableThickTrees = config.getBoolean("enableThickTrees", "trees", true, "If enabled then certain species trunks will be able to grow wider than a single block");
 		
 		//Interaction
 		isLeavesPassable = config.getBoolean("isLeavesPassable", "interaction", false, "If enabled all leaves will be passable");

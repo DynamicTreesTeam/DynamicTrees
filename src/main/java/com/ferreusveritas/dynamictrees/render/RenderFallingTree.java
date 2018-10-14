@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.models.ModelCacheFallingTree;
-import com.ferreusveritas.dynamictrees.models.ModelFallingTree;
+import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
+import com.ferreusveritas.dynamictrees.models.ModelEntityFallingTree;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -49,9 +49,9 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		
 		bindEntityTexture(entity);
 		
-		ModelFallingTree treeModel = ModelCacheFallingTree.getModel(entity);
+		ModelEntityFallingTree treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
 		
-		int brightnessIn = ModelFallingTree.getBrightness(entity);
+		int brightnessIn = ModelEntityFallingTree.getBrightness(entity);
 		
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();

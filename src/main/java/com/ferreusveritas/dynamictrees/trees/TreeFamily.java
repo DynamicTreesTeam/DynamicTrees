@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -207,7 +208,8 @@ public class TreeFamily {
 	 * @return the branch to be created
 	 */
 	public BlockBranch createBranch() {
-		return new BlockBranchBasic(name + "branch");
+		String branchName = name + "branch";
+		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
 	}
 	
 	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
@@ -219,6 +221,10 @@ public class TreeFamily {
 	
 	public BlockBranch getDynamicBranch() {
 		return dynamicBranch;
+	}
+	
+	public boolean isThick() {
+		return false;
 	}
 	
 	/**
