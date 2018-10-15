@@ -40,6 +40,8 @@ public class ModConfigs {
 	public static boolean vanillaCactusWorldGen;
 	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 	
+	public static boolean fancyThickRings;
+	
 	public static boolean worldGenDebug;
 	
 	public static boolean poissonDiscImageWrite = false;
@@ -73,7 +75,6 @@ public class ModConfigs {
 		enableFallingTreeDamage = config.getBoolean("enableFallingTreeDamage", "interaction", true, "If enabled then trees will harm living entities when falling");
 		fallingTreeDamageMultiplier = config.getFloat("fallingTreeDamageMultiplier", "interaction", 1.0f, 0.0f, 100.0f, "Multiplier for damage incurred by a falling tree");
 		
-		
 		//Vanilla
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
 		
@@ -90,6 +91,9 @@ public class ModConfigs {
 				dimensionBlacklist.add(dimValue);
 			} catch (NumberFormatException nfe) {}
 		}
+		
+		//Client
+		fancyThickRings = config.getBoolean("fancyThickRings", "client", true, "Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched");
 		
 		//Debug
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");

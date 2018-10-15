@@ -28,6 +28,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -159,6 +160,26 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		} else { //EAST/WEST
 			return (face == EnumFacing.NORTH) ? 270 : 90;
 		}
+	}
+	
+	public float[] getUVs(AxisAlignedBB box, EnumFacing face) {
+		switch(face) {
+			default:
+			case DOWN:  return new float[]{ (float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ };
+			case UP:    return new float[]{ (float) box.minX, (float) box.minZ, (float) box.maxX, (float) box.maxZ };
+			case NORTH: return new float[]{ 16f - (float) box.maxX, (float) box.minY, 16f - (float) box.minX, (float) box.maxY };
+			case SOUTH: return new float[]{ (float) box.minX, (float) box.minY, (float) box.maxX, (float) box.maxY };
+			case WEST:  return new float[]{ (float) box.minZ, (float) box.minY, (float) box.maxZ, (float) box.maxY };
+			case EAST:  return new float[]{ 16f - (float) box.maxZ, (float) box.minY, 16f - (float) box.minZ, (float) box.maxY };
+		}
+	}
+	
+	public float[] modUV(float[] uvs) {
+		uvs[0] = (int)uvs[0] & 0xf;
+		uvs[1] = (int)uvs[1] & 0xf;
+		uvs[2] = (((int)uvs[2] - 1) & 0xf) + 1;
+		uvs[3] = (((int)uvs[3] - 1) & 0xf) + 1;
+		return uvs;
 	}
 	
 	protected BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
