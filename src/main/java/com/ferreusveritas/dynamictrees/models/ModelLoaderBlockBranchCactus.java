@@ -23,7 +23,7 @@ public class ModelLoaderBlockBranchCactus extends ModelLoaderGeneric {
 			@Override
 			public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 				try {
-					return new BakedModelBlockBranchThick(barkTexture, ringsTexture, bakedTextureGetter);
+					return new BakedModelBlockBranchCactus(barkTexture, ringsTexture, bakedTextureGetter);
 				} catch (Exception exception) {
 					System.err.println("ThickModel.bake() failed due to exception:" + exception);
 					return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);

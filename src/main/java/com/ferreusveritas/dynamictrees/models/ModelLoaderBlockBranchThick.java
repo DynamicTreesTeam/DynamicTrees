@@ -19,17 +19,7 @@ public class ModelLoaderBlockBranchThick extends ModelLoaderGeneric {
 	
 	@Override
 	protected IModel loadModel(ResourceLocation resourceLocation, ModelBlock baseModelBlock) {
-		return new ModelBlockBranchBasic(baseModelBlock) {
-			@Override
-			public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-				try {
-					return new BakedModelBlockBranchThick(barkTexture, ringsTexture, bakedTextureGetter);
-				} catch (Exception exception) {
-					System.err.println("Bake failed due to exception:" + exception);
-					return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
-				}
-			};
-		};
+		return new ModelBlockBranchThick(baseModelBlock);
 	}
 
 }

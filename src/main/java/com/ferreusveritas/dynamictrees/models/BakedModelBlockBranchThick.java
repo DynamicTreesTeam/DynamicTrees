@@ -38,19 +38,20 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	private IBakedModel trunksTopRings[] = new IBakedModel[16];//The trunk will feature rings on it's top when there's not any tree on it's surface(cut)
 	private IBakedModel trunksBotRings[] = new IBakedModel[16];//The trunk will always feature rings on it's bottom surface(or nothing)
 	
-	public BakedModelBlockBranchThick(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+	public BakedModelBlockBranchThick(ResourceLocation barkRes, ResourceLocation ringsRes, ResourceLocation thickRingsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		super(barkRes, ringsRes, bakedTextureGetter);
 		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);
 		TextureAtlasSprite ringIcon = bakedTextureGetter.apply(ringsRes);
+		TextureAtlasSprite thickRingIcon = bakedTextureGetter.apply(thickRingsRes);
 		barkParticles = barkIcon;
 		
 		for(int i = 0; i < 16; i++) {
 			int radius = i + 9;
 			trunksBark[i] = bakeTrunkBark(radius, barkIcon, true);
 			trunksTopBark[i] = bakeTrunkBark(radius, barkIcon, false);
-			trunksTopRings[i] = bakeTrunkRings(radius, ringIcon, EnumFacing.UP);
-			trunksBotRings[i] = bakeTrunkRings(radius, ringIcon, EnumFacing.DOWN);
+			trunksTopRings[i] = bakeTrunkRings(radius, ModConfigs.fancyThickRings ? thickRingIcon : ringIcon, EnumFacing.UP);
+			trunksBotRings[i] = bakeTrunkRings(radius, ModConfigs.fancyThickRings ? thickRingIcon : ringIcon, EnumFacing.DOWN);
 		}
 		
 	}
