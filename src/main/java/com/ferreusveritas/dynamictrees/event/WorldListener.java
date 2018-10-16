@@ -83,7 +83,7 @@ public class WorldListener implements IWorldEventListener {
 
 	                if (d0 * d0 + d1 * d1 + d2 * d2 < 1024.0D) {
 	                	BlockPos centerPos = pos.add(state.getValue(BlockTrunkShell.COREDIR).getOffset());
-	                    entityplayermp.connection.sendPacket(new SPacketBlockBreakAnim(breakerId * -1, centerPos, progress));
+	                    entityplayermp.connection.sendPacket(new SPacketBlockBreakAnim((-breakerId) - 1, centerPos, progress));
 	                }
 	            }
 	        }
