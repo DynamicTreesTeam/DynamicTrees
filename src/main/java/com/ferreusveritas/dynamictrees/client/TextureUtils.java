@@ -121,6 +121,13 @@ public class TextureUtils {
 				pixels[i] = (a << 24) + (gray << 16) + (gray << 8) + gray;
 			}
 		}
+		
+		public void fill(int color) {
+			for(int i = 0; i < pixels.length; i++) {
+				pixels[i] = color;
+			}
+		}
+		
 	}
 	
 	public static int compose(int r, int g, int b, int a) {

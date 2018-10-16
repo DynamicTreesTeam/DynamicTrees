@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.client;
 import java.util.Collection;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -28,27 +29,23 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	@Override
 	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
 		TextureAtlasSprite baseTexture = textureGetter.apply(baseRingLocation);
-		int[][] baseTextureData = baseTexture.getFrameTextureData(0);
 		int srcWidth = baseTexture.getIconWidth();
 		int srcHeight = baseTexture.getIconHeight();
 		
 		this.width = srcWidth * 3;
 		this.height = srcHeight * 3;
 		
-		int[][] textureData = new int[baseTextureData.length][];
-		// only generate texture data for the first mipmap level, let the Minecraft handle the rest
-		textureData[0] = new int[width * height];
-		for (int pixelIndex = 0; pixelIndex < textureData[0].length; pixelIndex++) {
-			// TODO: generate texture
-			int x = pixelIndex % width;
-			int y = pixelIndex / width;
-			
-			int srcX = x % srcWidth;//(int) (x * ((double) srcSize / size));
-			int srcY = y % srcHeight;//(int) (y * ((double) srcSize / size));
-			int srcIndex = srcX + (srcY * srcWidth);
-			
-			textureData[0][pixelIndex] = baseTextureData[0][srcIndex];
+		PixelBuffer srcPixbuf = new PixelBuffer(baseTexture);
+		PixelBuffer dstPixbuf = new PixelBuffer(width, height);
+		
+		for(int i = 0; i < 9; i++) {
+			srcPixbuf.blit(dstPixbuf, (i % 3) * srcWidth, (i / 3) * srcHeight);
 		}
+				
+		//Load the pixels into the TextureAtlasSprite
+		int mipmapLevels = baseTexture.getFrameTextureData(0).length;
+		int[][] textureData = new int[mipmapLevels][];
+		textureData[0] = dstPixbuf.pixels;// only generate texture data for the first mipmap level, let Minecraft handle the rest
 		this.setFramesTextureData(Lists.<int[][]>newArrayList(textureData));
 		
 		return false;
