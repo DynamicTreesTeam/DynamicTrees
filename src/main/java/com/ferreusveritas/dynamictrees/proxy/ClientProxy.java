@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.client.StitchHandler;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
@@ -208,6 +209,7 @@ public class ClientProxy extends CommonProxy {
 	public void registerClientEventHandlers() {
 		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
 		MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
+	    MinecraftForge.EVENT_BUS.register(StitchHandler.INSTANCE);
 	}
 	
 	public void registerEntityRenderers() {
