@@ -200,6 +200,14 @@ public class BlockTrunkShell extends Block {
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+		ShellMuse muse = this.getMuseUnchecked(worldIn, state, pos);
+        return muse.state.getBoundingBox(worldIn, muse.pos).offset(muse.pos);
+		//return state.getBoundingBox(worldIn, pos).offset(pos);
+    }
+	
+	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		ShellMuse muse = getMuse(world, state, pos);
 		return muse != null ? muse.state.getBlock().getPickBlock(muse.state, target, world, muse.pos, player) : ItemStack.EMPTY;
