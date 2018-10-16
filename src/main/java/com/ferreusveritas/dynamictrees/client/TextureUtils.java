@@ -54,14 +54,15 @@ public class TextureUtils {
 		}
 		
 		public int getPixel(int offX, int offY) {
-			int pos = calcPos(offX, offY);
-			return pos < 0 ? 0 : (pos >= pixels.length ? 0 : pixels[pos]);
+			if(offX >= 0 && offX < w && offY >= 0 && offY < h) {
+				return pixels[calcPos(offX, offY)];
+			}
+			return 0;
 		}
-
+		
 		public void setPixel(int offX, int offY, int pixel) {
-			int pos = calcPos(offX, offY);
-			if(pos >= 0 && pos < pixels.length) {
-				pixels[pos] = pixel;
+			if(offX >= 0 && offX < w && offY >= 0 && offY < h) {
+				pixels[calcPos(offX, offY)] = pixel;
 			}
 		}
 		
