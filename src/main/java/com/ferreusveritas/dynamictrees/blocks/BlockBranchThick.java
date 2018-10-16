@@ -21,12 +21,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
@@ -137,6 +139,21 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		return state.getValue(RADIUSNYBBLE);
 	}
 	
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state instanceof IExtendedBlockState) {
+			IExtendedBlockState retval = (IExtendedBlockState) state;
+			int thisRadius = getRadius(state);
+			
+			for (EnumFacing dir : EnumFacing.VALUES) {
+				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+			}
+			return retval;
+		}
+		
+		return state;
+	}
+	
 	
 	///////////////////////////////////////////
 	// GROWTH
@@ -188,6 +205,24 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return Math.min(getRadius(blockState), RADMAX_NORMAL);
+	}
+	
+	@Override
+	protected int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {
+		BlockPos deltaPos = pos.offset(side);
+		IBlockState blockState = blockAccess.getBlockState(deltaPos);
+		
+		int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+		
+		if (radius > 8) {
+			if (side == EnumFacing.DOWN) {
+				return connectionRadius >= radius ? 1 : 0;
+			} else if (side == EnumFacing.UP) {
+				return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
+			}
+		}
+		
+		return connectionRadius;
 	}
 	
 	public ReplaceableState getReplaceability(World world, BlockPos pos) {

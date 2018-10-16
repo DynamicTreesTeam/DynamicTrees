@@ -30,6 +30,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	
@@ -131,8 +132,21 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 		
 		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
 		quadsList.addAll(trunksBark[coreRadius-9].getQuads(blockState, side, rand));
-		quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
-		quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(blockState, side, rand));
+		
+		if (blockState instanceof IExtendedBlockState) {
+			IExtendedBlockState extendedBlockState = (IExtendedBlockState) blockState;
+			int[] connections = pollConnections(coreRadius, extendedBlockState);
+			
+			if (connections[0] < 1) {
+				quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(blockState, side, rand));
+			}
+			if (connections[1] < 1) {
+				quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
+			} else if (connections[1] == 1) {
+				quadsList.addAll(trunksTopBark[coreRadius-9].getQuads(blockState, side, rand));
+			}
+				
+		}
 		
 		return quadsList;
 	}
