@@ -1,10 +1,13 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class TextureUtils {
 	
-	class PixelBuffer {
+	public static class PixelBuffer {
 		public final int[] pixels;
 		public final int w;
 		public final int h;
@@ -20,6 +23,30 @@ public class TextureUtils {
 			this.h = sprite.getIconHeight();
 			int data[][] = sprite.getFrameTextureData(0);
 			pixels = data[0];
+		}
+		
+		public PixelBuffer(TextureAtlasSprite sprite, boolean copy) {
+			this.w = sprite.getIconWidth();
+			this.h = sprite.getIconHeight();
+			int[][] original = sprite.getFrameTextureData(0);
+			pixels = Arrays.copyOf(original[0], original[0].length);
+		}
+		
+		public PixelBuffer(PixelBuffer other) {
+			this.w = other.w;
+			this.h = other.h;
+			this.pixels = Arrays.copyOf(other.pixels, other.pixels.length);
+		}
+		
+		public void apply(TextureAtlasSprite sprite) {
+			if(w == sprite.getIconWidth() && h == sprite.getIconHeight()) {
+				int[][] original = sprite.getFrameTextureData(0);
+				int[][] data = new int[original.length][];
+				data[0] = pixels;
+				ArrayList<int[][]> ftd = new ArrayList<>();
+				ftd.add(data);
+				sprite.setFramesTextureData(ftd);
+			}
 		}
 		
 		public int calcPos(int offX, int offY) {
@@ -82,6 +109,18 @@ public class TextureUtils {
 			}
 		}
 		
+		public void grayScale() {
+			for(int i = 0; i < pixels.length; i++) {
+				int a = (pixels[i] >> 24) & 0xff;
+				int r = (pixels[i] >> 16) & 0xff;
+				int g = (pixels[i] >> 8) & 0xff;
+				int b = (pixels[i] >> 0) & 0xff;
+				
+				int gray = ((r * 30) + (g * 59) + (b * 11)) / 100; 
+				
+				pixels[i] = (a << 24) + (gray << 16) + (gray << 8) + gray;
+			}
+		}
 	}
 	
 	public static int compose(int r, int g, int b, int a) {
