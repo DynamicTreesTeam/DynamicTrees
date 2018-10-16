@@ -131,7 +131,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 		
 		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
 		quadsList.addAll(trunksBark[coreRadius-9].getQuads(blockState, side, rand));
-		quadsList.addAll(trunksTopBark[coreRadius-9].getQuads(blockState, side, rand));
+		quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
 		quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(blockState, side, rand));
 		
 		return quadsList;
