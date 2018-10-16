@@ -36,32 +36,27 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
 		TextureAtlasSprite baseTexture = textureGetter.apply(baseRingLocation);
 		int[][] baseTextureData = baseTexture.getFrameTextureData(0);
+		int srcWidth = baseTexture.getIconWidth();
+		int srcHeight = baseTexture.getIconHeight();
 		
-		this.width = baseTexture.getIconWidth() * 3;
-		this.height = baseTexture.getIconHeight() * 3;
+		this.width = srcWidth * 3;
+		this.height = srcHeight * 3;
 		
-		int[][] textureData = new int[baseTextureData.length][this.width * this.height];
-		
-		for (int mipmapLvl = 0; mipmapLvl < textureData.length; mipmapLvl++) {
-			for (int pixelIndex = 0; pixelIndex < textureData[mipmapLvl].length; pixelIndex++) {
-				int size = (int) Math.sqrt(textureData[mipmapLvl].length);
-				int srcSize = (int) Math.sqrt(baseTextureData[mipmapLvl].length);
-				
-				int x = pixelIndex % size;
-				int y = pixelIndex / size;
-				
-				int srcX = x % srcSize;//(int) (x * ((double) srcSize / size));
-				int srcY = y % srcSize;//(int) (y * ((double) srcSize / size));
-				int srcIndex = srcX + (srcY * srcSize);
-				
-				textureData[mipmapLvl][pixelIndex] = baseTextureData[mipmapLvl][srcIndex];
-			}
+		int[][] textureData = new int[baseTextureData.length][];
+		// only generate texture data for the first mipmap level, let the Minecraft handle the rest
+		textureData[0] = new int[width * height];
+		for (int pixelIndex = 0; pixelIndex < textureData[0].length; pixelIndex++) {
+			// TODO: generate texture
+			int x = pixelIndex % width;
+			int y = pixelIndex / width;
+			
+			int srcX = x % srcWidth;//(int) (x * ((double) srcSize / size));
+			int srcY = y % srcHeight;//(int) (y * ((double) srcSize / size));
+			int srcIndex = srcX + (srcY * srcWidth);
+			
+			textureData[0][pixelIndex] = baseTextureData[0][srcIndex];
 		}
-		
 		this.setFramesTextureData(Lists.<int[][]>newArrayList(textureData));
-		
-		// TODO: copy animation data
-		// TODO: generate texture
 		
 		return false;
 	}
