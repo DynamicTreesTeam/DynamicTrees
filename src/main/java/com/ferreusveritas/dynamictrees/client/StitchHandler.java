@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -40,34 +41,25 @@ public class StitchHandler {
 			this.tickCounter = 0;
 			
 			this.copyFrom(oakSeed);
-			int[][] data;
+			
+			PixelBuffer src = new PixelBuffer(oakSeed, true);
+			PixelBuffer src2 = new PixelBuffer(oakSeed, true);
+
+			src.blit(src2, 0, 0, 3);
+			src.grayScale();
+			
 			int[][] original = oakSeed.getFrameTextureData(0);
-			data = new int[original.length][];
-			data[0] = Arrays.copyOf(original[0], original[0].length);
+			int[][] data = new int[original.length][];
+			data[0] = src.pixels;
 			
-			if(this.framesTextureData.isEmpty()) {
-				this.framesTextureData.add(data);
-			}
+			this.framesTextureData.add(data);
 			
-			int[][] frames = oakSeed.getFrameTextureData(0);
-			
-			int[] pixels = frames[0];
-			
-			for(int i = 0; i < pixels.length; i++) {
-				int a = (pixels[i] >> 24) & 0xff;
-				int r = (pixels[i] >> 16) & 0xff;
-				int g = (pixels[i] >> 8) & 0xff;
-				int b = (pixels[i] >> 0) & 0xff;
-				
-				int gray = ((r * 30) + (g * 59) + (b * 11)) / 100; 
-				
-				pixels[i] = (a << 24) + (gray << 16) + (gray << 8) + gray;
-			}
-			
-			ArrayList<int[][]> ff = new ArrayList<>();
-			ff.add(frames);
-			
-			oakSeed.setFramesTextureData(ff);
+			//src2.apply(oakSeed);
+			int[][] mmdata = oakSeed.getFrameTextureData(0);
+			mmdata[0] = src2.pixels;
+			ArrayList<int[][]> ftd = new ArrayList<>();
+			ftd.add(mmdata);
+			oakSeed.setFramesTextureData(ftd);
 			
 			System.out.println("**********************************************************");
 			
