@@ -95,14 +95,10 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	}
 	
 	public IBakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, EnumFacing face) {
-		return ModConfigs.fancyThickRings ? bakeTrunkRingsFancy(radius, ring, face) : bakeTrunkRingsStretched(radius, ring, face);
+		return bakeTrunkRings(radius, ring, face, ModConfigs.fancyThickRings);
 	}
 	
-	public IBakedModel bakeTrunkRingsFancy(int radius, TextureAtlasSprite ring, EnumFacing face) {
-		return bakeTrunkRingsStretched(radius, ring, face);//TODO: Create fancy ring texture
-	}
-	
-	public IBakedModel bakeTrunkRingsStretched(int radius, TextureAtlasSprite ring, EnumFacing face) {
+	public IBakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, EnumFacing face, boolean fancy) {
 		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(ring);
 		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 		
@@ -110,8 +106,9 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 		Vector3f posTo = new Vector3f((float)wholeVolume.maxX, (float)wholeVolume.maxY, (float)wholeVolume.maxZ);
 		
 		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
-				
-		BlockFaceUV uvface = new BlockFaceUV(new float[] {0, 0, 16, 16}, getFaceAngle(Axis.Y, face));
+		
+		float uvRad = fancy ? radius / 3f : 8;
+		BlockFaceUV uvface = new BlockFaceUV(new float[] {8 - uvRad, 8 - uvRad, 8 + uvRad, 8 + uvRad}, getFaceAngle(Axis.Y, face));
 		mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
