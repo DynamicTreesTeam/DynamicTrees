@@ -204,6 +204,10 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		if (from == this || from == this.otherBlock) {
+			return getRadius(blockState);
+		}
+		
 		return Math.min(getRadius(blockState), RADMAX_NORMAL);
 	}
 	
@@ -222,7 +226,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			}
 		}
 		
-		return connectionRadius;
+		return Math.min(RADMAX_NORMAL, connectionRadius);
 	}
 	
 	public ReplaceableState getReplaceability(World world, BlockPos pos) {
