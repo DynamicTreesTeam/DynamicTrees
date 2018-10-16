@@ -2,8 +2,12 @@ package com.ferreusveritas.dynamictrees.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import com.ferreusveritas.dynamictrees.client.ThickRingTextureAtlasSprite;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,12 +29,9 @@ public class TextureGenerationHandler {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-		System.out.println("\n\n\n\n");
-		for (ResourceLocation resloc : thickRingTextures.keySet()) {
-			System.out.println(resloc);
+		for (Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()) {
+			event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(entry.getValue(), entry.getKey()));
 		}
-		System.out.println("\n\n\n\n");
-		// TODO: add generated textures to texture atlas
 	}
 
 }
