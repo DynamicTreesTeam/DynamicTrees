@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.client.ThickRingTextureAtlasSprite;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

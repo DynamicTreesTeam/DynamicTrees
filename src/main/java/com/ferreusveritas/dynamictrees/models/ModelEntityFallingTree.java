@@ -74,7 +74,8 @@ public class ModelEntityFallingTree {
 			for(EnumFacing face: EnumFacing.VALUES) {
 				exState = exState.withProperty(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
 			}
-			float offset = (8 - ((BlockBranch) exState.getBlock()).getRadius(exState)) / 16f;
+			int radius = ((BlockBranch) exState.getBlock()).getRadius(exState);
+			float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;
 			IBakedModel branchModel = dispatcher.getModelForState(exState.getClean());//Since we source the blockState from the destruction data it will always be the same
 			treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }));
 			

@@ -137,9 +137,9 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 			IExtendedBlockState extendedBlockState = (IExtendedBlockState) blockState;
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
-			//if (connections[0] < 1) {
+			if (connections[0] < 1) {
 				quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(blockState, side, rand));
-			//}
+			}
 			if (connections[1] < 1) {
 				quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
 			} else if (connections[1] == 1) {

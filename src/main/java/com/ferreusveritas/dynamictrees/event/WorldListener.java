@@ -73,7 +73,7 @@ public class WorldListener implements IWorldEventListener {
 		
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof BlockTrunkShell) {
-			BlockTrunkShell shell = (BlockTrunkShell) state.getBlock();
+			//BlockTrunkShell shell = (BlockTrunkShell) state.getBlock();
 			
 			for (EntityPlayerMP entityplayermp : this.mcServer.getPlayerList().getPlayers()) {
 	            if (entityplayermp != null && entityplayermp.world == this.world) {

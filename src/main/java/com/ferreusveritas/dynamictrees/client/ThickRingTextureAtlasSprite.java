@@ -1,20 +1,13 @@
 package com.ferreusveritas.dynamictrees.client;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
-import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
-import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
