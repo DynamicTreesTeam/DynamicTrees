@@ -178,7 +178,7 @@ public class TreeGenerator implements IWorldGenerator {
 			mPos = new MutableBlockPos(world.getHeight(mPos)).move(EnumFacing.DOWN);
 			while(world.isAirBlock(mPos) || TreeHelper.isTreePart(world, mPos)) {//Skip down past the bits of generated tree and air
 				mPos.move(EnumFacing.DOWN);
-				if(mPos.getY() < 0) {
+				if(world.isOutsideBuildHeight(mPos)) {
 					return EnumGeneratorResult.NOGROUND;
 				}
 			}
