@@ -150,7 +150,7 @@ public class BlockBranchBasic extends BlockBranch {
 			}
 		}
 		
-		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand);// Unreinforced branches are destroyed
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid);// Unreinforced branches are destroyed
 		
 		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
 			for (EnumFacing dir : EnumFacing.VALUES) {// The logic here is that if this block rotted then

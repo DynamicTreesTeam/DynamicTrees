@@ -647,7 +647,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	* @param random Access to a random number generator
 	* @return true if the branch should rot
 	*/
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
+	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		
 		if(radius <= 1) {
 			BlockDynamicLeaves leaves = (BlockDynamicLeaves) getLeavesProperties().getDynamicLeavesState().getBlock();

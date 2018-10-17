@@ -86,8 +86,8 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random) {
-			if(super.rot(world, pos, neighborCount, radius, random)) {
+		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 2 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(EnumSkyBlock.SKY, pos) < 6) {
 					world.setBlockState(pos, ModBlocks.blockStates.redMushroom);//Change branch to a red mushroom
 					world.setBlockState(pos.down(), ModBlocks.blockStates.podzol);//Change rooty dirt to Podzol
