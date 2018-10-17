@@ -131,8 +131,8 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 			
 			//Generate Vines
 			vineGen.setQuantity(5).gen(world, rootPos.up(), endPoints, safeBounds);
@@ -183,8 +183,8 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 			appleGen.setQuantity(10).setEnableHash(false).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3)).gen(world, rootPos.up(), endPoints, safeBounds);
 		}
 		

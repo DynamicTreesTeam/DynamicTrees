@@ -207,9 +207,8 @@ public class JoCode {
 			}
 			
 			//Allow for special decorations by the tree itself
-			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
-			MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds));
-			species.postGenerationDirtRepair(world, rootPos, initialDirtState);
+			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+			MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 			
 			//Add snow to parts of the tree in chunks where snow was already placed
 			addSnow(leafMap, world, rootPos, biome);

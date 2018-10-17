@@ -100,8 +100,8 @@ public class TreeJungle extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 			
 			if(world.rand.nextInt() % 8 == 0) {
 				addCocoa(world, rootPos, true);

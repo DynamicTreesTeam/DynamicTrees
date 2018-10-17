@@ -184,7 +184,7 @@ public class TreeCactus extends TreeFamily {
 		
 		@Override
 		public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
-			IBlockState initialState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
+			IBlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
 			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 			
 			// A Tree generation boundary radius is at least 2 and at most 8
@@ -204,10 +204,10 @@ public class TreeCactus extends TreeFamily {
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself
-				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
-				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds));
+				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 			} else { // The growth failed.. turn the soil back to what it was
-				world.setBlockState(rootPos, initialState, careful ? 3 : 2);
+				world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
 			}
 		}
 		

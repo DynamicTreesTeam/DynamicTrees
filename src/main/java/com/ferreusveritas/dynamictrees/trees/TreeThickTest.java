@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 public class TreeThickTest extends TreeFamily {
 	
@@ -55,7 +56,9 @@ public class TreeThickTest extends TreeFamily {
 			}
 			
 			@Override
-			public void postGenerationDirtRepair(World world, BlockPos rootPos, IBlockState initialDirtState) {
+			public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+				super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				
 				//Place dirt blocks around rooty dirt block if tree has a > 8 radius
 				IBlockState branchState = world.getBlockState(rootPos.up());
 				if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
