@@ -270,6 +270,7 @@ public class BlockBranchBasic extends BlockBranch {
 			
 			IBlockState currBlockState = world.getBlockState(pos);
 			Species species = signal.getSpecies();
+			boolean inTrunk = signal.isInTrunk();
 			
 			EnumFacing originDir = signal.dir.getOpposite();// Direction this signal originated from
 			EnumFacing targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
@@ -308,10 +309,12 @@ public class BlockBranchBasic extends BlockBranch {
 				}
 			}
 
+			// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
+			int maxRadius = inTrunk ? species.maxBranchRadius() : Math.min(species.maxBranchRadius(), RADMAX_NORMAL);
 			
 			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), getMaxRadius());// WOW!
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
 			setRadius(world, pos, (int) Math.floor(signal.radius), originDir);
 		}
 		

@@ -166,7 +166,13 @@ public class TreeFamily {
 	 * We intentionally leave out leaves since they are shared between trees 
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList.add(getDynamicBranch());
+		if(isThick()) {
+			BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
+			blockList.add(branch.getPairSide(false));
+			blockList.add(branch.getPairSide(true));
+		} else {
+			blockList.add(getDynamicBranch());
+		}
 		return blockList;
 	}
 	

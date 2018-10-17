@@ -38,13 +38,6 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		this.height = srcHeight * 3;
 		
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
-		//PixelBuffer antPixbuf = createBarklessAntecedent(basePixbuf);
-		//PixelBuffer dstPixbuf = new PixelBuffer(width, height);
-		
-		//for(int i = 0; i < 9; i++) {
-		//	antPixbuf.blit(dstPixbuf, (i % 3) * srcWidth, (i / 3) * srcHeight);
-		//}
-		
 		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 		
 		//Load the pixels into the TextureAtlasSprite
@@ -59,9 +52,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	private PixelBuffer createMajorTexture(PixelBuffer baseBuffer) {
 		PixelBuffer antPixbuf = createBarklessAntecedent(baseBuffer);
 		PixelBuffer majPixbuf = new PixelBuffer(48, 48);
-		
-		System.out.println("#################### CREATE MAJOR TEXTURE ####################");
-		
+				
 		//Compile a set of texture component pieces from the antecedent
 		PixelBuffer corners[] = new PixelBuffer[4];
 		PixelBuffer edges[] = new PixelBuffer[4];
@@ -85,8 +76,8 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 				int offY = out.getFrontOffsetZ();
 				int compX = (offX == 1 ? -6 : 0) + (dir.getAxis() == Axis.Z ? -2 : 0);
 				int compY = (offY == 1 ? -6 : 0) + (dir.getAxis() == Axis.X ? -2 : 0);
-				int startX = offX * (14 + nesting * 6);// + ovr.getOpposite().getFrontOffsetX() * 6;
-				int startY = offY * (14 + nesting * 6);// + ovr.getOpposite().getFrontOffsetZ() * 6;
+				int startX = offX * (14 + nesting * 6);
+				int startY = offY * (14 + nesting * 6);
 				for(int way = -1; way <= 1; way+=2) {
 					for(int i = 0; i < 4 + nesting; i++) {
 						int rowX = ovr.getFrontOffsetX() * i * way * 4;

@@ -4,12 +4,9 @@ import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
@@ -42,19 +39,14 @@ public class TreeThickTest extends TreeFamily {
 	}
 	
 	@Override
-	public BlockBranch createBranch() {
-		return new BlockBranchThick(Material.WOOD, getName().getResourcePath() + "branch");
+	public boolean isThick() {
+		return true;
 	}
 	
 	@Override
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
-		for(int i = 0; i < 2; i++) {
-			blockList.add(branch.getPairSide(i == 1));
-		}
-		
+		super.getRegisterableBlocks(blockList);
 		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
-		
 		return blockList;
 	}
 	
