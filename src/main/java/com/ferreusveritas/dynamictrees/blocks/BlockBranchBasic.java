@@ -234,8 +234,9 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
+	public int setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
 		world.setBlockState(pos, getStateForRadius(radius), flags);
+		return radius;
 	}
 	
 	@Override
@@ -308,14 +309,20 @@ public class BlockBranchBasic extends BlockBranch {
 					}
 				}
 			}
-
-			// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-			int maxRadius = inTrunk ? species.maxBranchRadius() : Math.min(species.maxBranchRadius(), RADMAX_NORMAL);
 			
-			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
-			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
-			setRadius(world, pos, (int) Math.floor(signal.radius), originDir);
+			//Only continue to set radii if the tree growth isn't choked out
+			if(!signal.choked) {
+				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
+				int maxRadius = inTrunk ? species.maxBranchRadius() : Math.min(species.maxBranchRadius(), RADMAX_NORMAL);
+				
+				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
+				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
+				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
+				int setRad = setRadius(world, pos, (int) Math.floor(signal.radius), originDir);
+				if(setRad != signal.radius) { //We tried to set a radius but it didn't comply because something is in the way.
+					signal.choked = true; //If something is in the way then it means that the tree growth is choked
+				}
+			}
 		}
 		
 		return signal;

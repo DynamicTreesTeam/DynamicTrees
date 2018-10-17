@@ -173,8 +173,8 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
-		// Do nothing
+	public int setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
+		return radius;//Do nothing
 	}
 	
 	// Directionless probability grabber

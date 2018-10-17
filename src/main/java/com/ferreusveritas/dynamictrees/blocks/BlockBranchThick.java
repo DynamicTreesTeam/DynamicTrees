@@ -163,12 +163,11 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	}
 	
 	@Override
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
+	public int setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
 		
 		//If the radius is <= 8 then we can just set the block as normal and move on
 		if(radius <= RADMAX_NORMAL) {
-			super.setRadius(world, pos, radius, originDir, flags);
-			return;
+			return super.setRadius(world, pos, radius, originDir, flags);
 		}
 		
 		ReplaceableState repStates[] = new ReplaceableState[8];
@@ -186,7 +185,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		}
 		
 		if(setable) {
-			super.setRadius(world, pos, radius, originDir, flags);
+			int setRadius = super.setRadius(world, pos, radius, originDir, flags);
 			
 			for(Surround dir : Surround.values()) {
 				BlockPos dPos = pos.add(dir.getOffset());
@@ -195,8 +194,9 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 					world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, dir.getOpposite()), flags);
 				}
 			}
+			return setRadius;
 		} else {
-			super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
+			return super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
 		}
 		
 	}

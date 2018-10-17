@@ -194,10 +194,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return 1;
 	}
 	
-	public abstract void setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags);
+	public abstract int setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags);
 	
-	public void setRadius(World world, BlockPos pos, int radius, EnumFacing dir) {
-		setRadius(world, pos, radius, dir, 2);
+	public int setRadius(World world, BlockPos pos, int radius, EnumFacing dir) {
+		return setRadius(world, pos, radius, dir, 2);
 	}
 	
 	public abstract IBlockState getStateForRadius(int radius);

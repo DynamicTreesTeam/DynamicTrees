@@ -24,6 +24,8 @@ public class GrowSignal {
 	public float tapering;
 	public boolean success;
 	
+	public boolean choked;//This indicates that the tree could not establish the needed trunk space(girth) and should stop growing
+	
 	//Utility
 	public Random rand;
 	
@@ -37,6 +39,7 @@ public class GrowSignal {
 		tapering = 0.3f;
 		rand = new Random();
 		success = true;
+		choked = false;
 		
 		this.rootPos = rootPos;
 		delta = new BlockPos(0, 0, 0);

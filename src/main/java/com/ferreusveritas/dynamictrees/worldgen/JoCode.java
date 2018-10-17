@@ -147,7 +147,7 @@ public class JoCode {
 	* @param radius Constraint radius
 	*/
 	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
-		IBlockState initialState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
+		IBlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
 		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
 		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
@@ -156,9 +156,11 @@ public class JoCode {
 		radius = MathHelper.clamp(radius, 2, 8);
 		BlockPos treePos = rootPos.up();
 		
-		//Create tree
 		setFacing(facing);
-		generateFork(world, species, 0, rootPos, false);
+		if(species.preGeneration(world, rootPos, radius, facing, safeBounds, this, initialDirtState)) {
+			//Make the tree branch structure
+			generateFork(world, species, 0, rootPos, false);
+		}
 		
 		//Fix branch thicknesses and map out leaf locations
 		IBlockState treeState = world.getBlockState(treePos);
@@ -207,12 +209,13 @@ public class JoCode {
 			//Allow for special decorations by the tree itself
 			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds);
 			MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds));
+			species.postGenerationDirtRepair(world, rootPos, initialDirtState);
 			
 			//Add snow to parts of the tree in chunks where snow was already placed
 			addSnow(leafMap, world, rootPos, biome);
 			
 		} else { //The growth failed.. turn the soil back to what it was
-			world.setBlockState(rootPos, initialState, careful ? 3 : 2);
+			world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
 		}
 		
 	}
