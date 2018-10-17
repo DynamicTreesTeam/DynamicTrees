@@ -18,8 +18,10 @@ public class ModConfigs {
 	
 	public static float treeGrowthRateMultiplier;
 	public static float treeHarvestMultiplier;
+	public static boolean dropSticks;
 	public static float scaleBiomeGrowthRate;
 	public static float diseaseChance;
+	public static int maxBranchRotRadius;
 	public static boolean enableAppleTrees;
 	public static boolean enableThickTrees;
 
@@ -60,8 +62,10 @@ public class ModConfigs {
 		//Trees
 		treeGrowthRateMultiplier = config.getFloat("growthRateMultiplier", "trees", 1f, 0, 16f, "Factor that multiplies the rate at which trees grow. Use at own risk");
 		treeHarvestMultiplier = config.getFloat("harvestMultiplier", "trees", 1f, 0f, 128f, "Factor that multiplies the wood returned from harvesting a tree.  You cheat.");
+		dropSticks = config.getBoolean("dropSticks", "trees", true, "If enabled then sticks will be dropped for partial logs");
 		scaleBiomeGrowthRate = config.getFloat("scaleBiomeGrowthRate", "trees", 0.5f, 0.0f, 1.0f, "Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");
+		maxBranchRotRadius = config.getInt("maxBranchRotRadius", "trees", 8, 0, 24, "The maximum radius of a branch that is allowed to rot away. 8 = Full block size.  Set to 0 to prevent rotting");
 		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
 		enableThickTrees = config.getBoolean("enableThickTrees", "trees", true, "If enabled then certain species trunks will be able to grow wider than a single block");
 		

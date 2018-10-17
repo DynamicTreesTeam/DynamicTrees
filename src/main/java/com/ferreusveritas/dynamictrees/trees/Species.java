@@ -357,7 +357,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public class LogsAndSticks {
 		public final int logs;
 		public final int sticks;
-		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = sticks; };
+		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = ModConfigs.dropSticks ? sticks : 0; };
 	}
 	
 	public LogsAndSticks getLogsAndSticks(int volume) {
