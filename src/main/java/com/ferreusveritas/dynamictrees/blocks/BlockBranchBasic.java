@@ -266,7 +266,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
-		
+				
 		if (signal.step()) {// This is always placed at the beginning of every growSignal function
 			
 			IBlockState currBlockState = world.getBlockState(pos);
@@ -309,7 +309,7 @@ public class BlockBranchBasic extends BlockBranch {
 					}
 				}
 			}
-			
+						
 			//Only continue to set radii if the tree growth isn't choked out
 			if(!signal.choked) {
 				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
@@ -318,8 +318,9 @@ public class BlockBranchBasic extends BlockBranch {
 				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
 				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
-				int setRad = setRadius(world, pos, (int) Math.floor(signal.radius), originDir);
-				if(setRad != signal.radius) { //We tried to set a radius but it didn't comply because something is in the way.
+				int targetRadius = (int) Math.floor(signal.radius);
+				int setRad = setRadius(world, pos, targetRadius, originDir);
+				if(setRad != targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
 					signal.choked = true; //If something is in the way then it means that the tree growth is choked
 				}
 			}

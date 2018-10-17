@@ -84,7 +84,7 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
 		IBlockState collState = world.getBlockState(pos);
 		
-		if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState)) {
+		if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && collState.getBlock() != ModBlocks.blockTrunkShell) {
 			if(collState.getBlock() instanceof BlockLiquid) {
 				entity.motionY += AnimationConstants.TREE_GRAVITY;//Undo the gravity
 				//Create drag in liquid
