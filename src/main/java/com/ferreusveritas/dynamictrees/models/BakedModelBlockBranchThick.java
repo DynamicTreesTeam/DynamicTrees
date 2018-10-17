@@ -101,18 +101,44 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	public IBakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, EnumFacing face, boolean fancy) {
 		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(ring);
 		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
+		int wholeVolumeWidth = fancy ? 48 : radius * 2;
 		
-		Vector3f posFrom = new Vector3f((float)wholeVolume.minX, (float)wholeVolume.minY, (float)wholeVolume.minZ);
-		Vector3f posTo = new Vector3f((float)wholeVolume.maxX, (float)wholeVolume.maxY, (float)wholeVolume.maxZ);
+		ArrayList<Vec3i> offsets = new ArrayList<>();
 		
-		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
+		for (Surround dir: Surround.values()) {
+			offsets.add(dir.getOffset()); // 8 surrounding component pieces
+		}
+		offsets.add(new Vec3i(0, 0, 0)); // Center
 		
-		float uvRad = fancy ? radius / 3f : 8;
-		BlockFaceUV uvface = new BlockFaceUV(new float[] {8 - uvRad, 8 - uvRad, 8 + uvRad, 8 + uvRad}, getFaceAngle(Axis.Y, face));
-		mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
-		
-		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), ring, face, ModelRotation.X0_Y0, false));
+		for (Vec3i offset : offsets) {
+			Vec3d scaledOffset = new Vec3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16); // Scale the dimensions to match standard minecraft texels
+			AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
+			
+			Vector3f posFrom = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
+			Vector3f posTo = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
+			
+			Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
+			float textureOffsetX = fancy ? (float) (-16f) : (float) wholeVolume.minX;
+			float textureOffsetZ = fancy ? (float) (-16f) : (float) wholeVolume.minZ;
+			
+			float minX = ((float) ((partBoundary.minX - textureOffsetX) / wholeVolumeWidth)) * 16f;
+			float maxX = ((float) ((partBoundary.maxX - textureOffsetX) / wholeVolumeWidth)) * 16f;
+			float minZ = ((float) ((partBoundary.minZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
+			float maxZ = ((float) ((partBoundary.maxZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
+			
+			if (face == EnumFacing.DOWN) {
+				minZ = ((float) ((partBoundary.maxZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
+				maxZ = ((float) ((partBoundary.minZ - textureOffsetZ) / wholeVolumeWidth)) * 16f;
+			}
+			
+			float[] uvs = new float[]{ minX, minZ, maxX, maxZ };
+			
+			BlockFaceUV uvface = new BlockFaceUV(uvs, getFaceAngle(Axis.Y, face));
+			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+			
+			BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
+			builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), ring, face, ModelRotation.X0_Y0, false));
+		}
 		
 		return builder.makeBakedModel();
 	}
