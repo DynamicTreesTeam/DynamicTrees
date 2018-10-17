@@ -645,6 +645,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	* @param neighborCount Count of neighbors reinforcing this block
 	* @param radius The radius of the branch
 	* @param random Access to a random number generator
+	* @param rapid True if this rot is happening under a generation scenario as opposed to natural tree updates
 	* @return true if the branch should rot
 	*/
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
@@ -657,8 +658,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				}
 			}
 		}
-		world.setBlockToAir(pos);
-		return true;
+		
+		if(rapid || (ModConfigs.maxBranchRotRadius != 0 && radius <= ModConfigs.maxBranchRotRadius)) {
+			world.setBlockToAir(pos);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**

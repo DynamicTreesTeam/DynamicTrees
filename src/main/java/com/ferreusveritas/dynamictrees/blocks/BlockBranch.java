@@ -128,11 +128,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	
 	/**
 	 * 
-	 * @param world
-	 * @param pos
-	 * @param radius
-	 * @param rand 
-	 * @param rapid if true then unsupported branch rot will occur regardless of chance value.  will also rot the entire unsupported branch at once. True during whole tree generation.
+	 * @param world The world
+	 * @param pos The branch block position
+	 * @param radius The radius of the branch that's the subject of rotting
+	 * @param rand A random number generator for convenience
+	 * @param rapid If true then unsupported branch rot will occur regardless of chance value.
+	 * 		This will also rot the entire unsupported branch at once. 
+	 * 		True if this rot is happening under a generation scenario as opposed to natural tree updates
 	 * @return true if the branch was destroyed because of rot
 	 */
 	public abstract boolean checkForRot(World world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
