@@ -689,7 +689,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
-	 * @param natural Set this to true if this member is being used to grow the tree naturally(create drops or fruit)
+	 * @param natural 
+	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
+	 *      If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
 	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
