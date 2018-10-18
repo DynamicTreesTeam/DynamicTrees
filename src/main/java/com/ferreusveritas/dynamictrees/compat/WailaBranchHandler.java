@@ -29,7 +29,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	private BlockPos lastPos = BlockPos.ORIGIN;
 	private Species lastSpecies = Species.NULLSPECIES;
-	private int lastVolume = 0;
+	private float lastVolume = 0;
 	
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
@@ -77,7 +77,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		return tooltip;
 	}
 	
-	private int getTreeVolume(World world, BlockPos pos) {
+	private float getTreeVolume(World world, BlockPos pos) {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		

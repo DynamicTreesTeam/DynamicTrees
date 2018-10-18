@@ -105,7 +105,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			for(EntityLivingBase living: elist) {
 				if(!getData(entity).entitiesHit.contains(living)) {
 					getData(entity).entitiesHit.add(living);
-					float damage = entity.getDestroyData().woodVolume * Math.abs(fallSpeed) * 0.00075f;
+					float damage = entity.getDestroyData().woodVolume * Math.abs(fallSpeed) * 3f;
 					if(getData(entity).bounces == 0 && damage > 2) {
 						//System.out.println("damage: " + damage);
 						living.motionX += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getFrontOffsetX() * damage * 0.2f;

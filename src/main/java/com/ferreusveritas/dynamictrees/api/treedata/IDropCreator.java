@@ -73,6 +73,6 @@ public interface IDropCreator {
 	 * @param volume
 	 * @return
 	 */
-	List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume);
+	List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume);
 	
 }

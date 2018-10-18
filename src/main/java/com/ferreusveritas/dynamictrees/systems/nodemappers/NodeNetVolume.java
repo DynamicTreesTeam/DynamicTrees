@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 
 public class NodeNetVolume implements INodeInspector {
 	
+	public static final int VOXELSPERLOG = 4096; //A log contains 4096 voxels of wood material(16x16x16 pixels)
+	
 	private int volume;//number of voxels(1x1x1 pixels) of wood accumulated from network analysis
 	
 	@Override
@@ -26,8 +28,8 @@ public class NodeNetVolume implements INodeInspector {
 		return false;
 	}
 	
-	public int getVolume() {
-		return volume;
+	public float getVolume() {
+		return volume / (float)VOXELSPERLOG;
 	}
 	
 }

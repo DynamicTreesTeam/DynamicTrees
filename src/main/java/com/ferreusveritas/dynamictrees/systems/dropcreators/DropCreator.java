@@ -48,7 +48,7 @@ public class DropCreator implements IDropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
 		return dropList;
 	}
 	

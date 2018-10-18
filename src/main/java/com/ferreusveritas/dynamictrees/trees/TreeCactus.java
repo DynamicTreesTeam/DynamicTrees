@@ -52,8 +52,8 @@ public class TreeCactus extends TreeFamily {
 			
 			addDropCreator(new DropCreator(new ResourceLocation(ModConstants.MODID, "cactusseeds")) {
 				@Override
-				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
-					int numLogs = volume / 8192;
+				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
+					int numLogs = (int) (volume / 2);
 					while(numLogs > 0) {
 						dropList.add(species.getSeedStack(numLogs >= 64 ? 64 : numLogs));
 						numLogs -= 64;

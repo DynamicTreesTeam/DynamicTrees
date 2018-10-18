@@ -31,7 +31,7 @@ public class BranchDestructionData {
 	public final int[] destroyedLeaves;//Encoded leaves relative positions
 	public final List<BlockItemStack> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
-	public final int woodVolume;//A summation of all of the wood voxels that was harvested
+	public final float woodVolume;//A summation of all of the wood voxels that was harvested
 	public final EnumFacing cutDir;//The face that was connected to the remaining body of the tree or the rooty block
 	public final EnumFacing toolDir;//The face that was pounded on when breaking the block at cutPos
 	public final BlockPos cutPos;//The absolute(world) position of the block that was cut
@@ -53,7 +53,7 @@ public class BranchDestructionData {
 		trunkHeight = 0;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, int volume, BlockPos cutPos, EnumFacing cutDir, EnumFacing toolDir, int trunkHeight) {
+	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, EnumFacing cutDir, EnumFacing toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -75,7 +75,7 @@ public class BranchDestructionData {
 		this.destroyedLeaves = nbt.getIntArray("leaves");
 		this.leavesDrops = new ArrayList<BlockItemStack>();
 		this.endPoints = nbt.getIntArray("ends");	
-		this.woodVolume = nbt.getInteger("volume");	
+		this.woodVolume = nbt.getFloat("volume");	
 		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );
 		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];
 		this.toolDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("tooldir"), 0, EnumFacing.values().length - 1)];
@@ -88,7 +88,7 @@ public class BranchDestructionData {
 		tag.setIntArray("branchcon", destroyedBranchesConnections);
 		tag.setIntArray("leaves", destroyedLeaves);
 		tag.setIntArray("ends", endPoints);
-		tag.setInteger("volume", woodVolume);
+		tag.setFloat("volume", woodVolume);
 		tag.setInteger("cutx", cutPos.getX());
 		tag.setInteger("cuty", cutPos.getY());
 		tag.setInteger("cutz", cutPos.getZ());

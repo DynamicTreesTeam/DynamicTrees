@@ -40,7 +40,7 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		long seed = entity.world.rand.nextLong();
 		Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
 		float mass = entity.getDestroyData().woodVolume;
-		float inertialMass = MathHelper.clamp(mass / AnimationConstants.TREE_PARTICLES_PER_LOG, 1, 3);
+		float inertialMass = MathHelper.clamp(mass, 1, 3);
 		entity.motionX /= inertialMass;
 		entity.motionY /= inertialMass;
 		entity.motionZ /= inertialMass;
