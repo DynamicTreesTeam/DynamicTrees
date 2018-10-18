@@ -188,6 +188,12 @@ public class TreeFamily {
 		Block branch = getDynamicBranch();
 		itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
 		
+		if(isThick()) {
+			//An ItemBlock must be registered in order for Waila to work properly
+			branch = ((BlockBranchThick) branch).getPairSide(true);
+			itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
+		}
+		
 		Seed seed = getCommonSpecies().getSeed();
 		if(seed != Seed.NULLSEED) {
 			itemList.add(seed);

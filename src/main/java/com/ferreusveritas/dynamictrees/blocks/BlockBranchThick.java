@@ -19,11 +19,14 @@ import net.minecraft.block.state.BlockStateContainer.StateImplementation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -79,6 +82,15 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
 	public IProperty<?>[] getIgnorableProperties() {
 		return new IProperty<?>[]{ RADIUSNYBBLE };
+	}
+	
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		if(extended) {
+			return this.otherBlock.getPickBlock(otherBlock.getDefaultState(), target, world, pos, player);
+		}
+
+		return super.getPickBlock(state, target, world, pos, player);
 	}
 	
 	@Override

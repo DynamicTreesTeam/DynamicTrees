@@ -261,6 +261,11 @@ public class TreeHelper {
 		return getBranch(state.getBlock());
 	}
 	
+	public final static int getRadius(IBlockAccess access, BlockPos pos) {
+		IBlockState state = access.getBlockState(pos);
+		return getTreePart(state).getRadius(state);
+	}
+	
 	//Leaves
 	
 	public final static boolean isLeaves(Block block) {

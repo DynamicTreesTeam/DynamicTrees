@@ -33,7 +33,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-		
+				
 		NBTTagCompound nbtData = accessor.getNBTData();
 		BlockPos pos = accessor.getPosition();
 		Species species = Species.NULLSPECIES;

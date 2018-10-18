@@ -320,7 +320,7 @@ public class BlockBranchBasic extends BlockBranch {
 				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
 				int targetRadius = (int) Math.floor(signal.radius);
 				int setRad = setRadius(world, pos, targetRadius, originDir);
-				if(setRad != targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
+				if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
 					signal.choked = true; //If something is in the way then it means that the tree growth is choked
 				}
 			}

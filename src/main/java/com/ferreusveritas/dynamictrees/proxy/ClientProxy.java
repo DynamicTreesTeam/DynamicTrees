@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
@@ -94,14 +93,7 @@ public class ClientProxy extends CommonProxy {
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		
-		TreeFamily thickFamily = ModTrees.thickTestFamily;
-		BlockBranchThick thickBranch = (BlockBranchThick) thickFamily.getDynamicBranch();
-		ModelHelper.regModel(thickBranch.getPairSide(false));
-		//ModelHelper.regModel(thickBranch.getPairSide(true));
-		ModelHelper.regModel(thickFamily.getCommonSpecies().getSeed());
-		ModelHelper.regModel(thickFamily);
-		ModelLoader.setCustomStateMapper(((BlockBranchThick) thickFamily.getDynamicBranch()).otherBlock, new StateMap.Builder().ignore(thickFamily.getDynamicBranch().getIgnorableProperties()).build());
-		//Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getBlockStateMapper().registerBuiltInBlocks(ModBlocks.blockTrunkShell);
+		//Setup the state mapper for the trunk shell
 		ModelLoader.setCustomStateMapper(ModBlocks.blockTrunkShell, new StateMap.Builder().ignore(BlockTrunkShell.COREDIR).build());
 		
 		//Register models for cactus
