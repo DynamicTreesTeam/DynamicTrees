@@ -58,7 +58,7 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 		//Settle for other kinds of dirt
 		for (i = 0; i < 12; i++) {
 			IBlockState ground = cache[i];
-			if(ground != mimic && ground.getMaterial() == Material.GROUND && ground.isBlockNormalCube()){
+			if(ground != mimic && ground.getMaterial() == Material.GROUND && ground.isBlockNormalCube() && !(ground.getBlock() instanceof IMimic)) {
 				return ground;
 			}
 		}

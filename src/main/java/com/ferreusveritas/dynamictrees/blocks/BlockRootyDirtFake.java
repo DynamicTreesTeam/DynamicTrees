@@ -2,6 +2,9 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -36,10 +39,18 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 		setTickRandomly(true);
 		setUnlocalizedName(name);
 		setRegistryName(name);
+		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	
 	@Override
-	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {}
+	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
+		for(EnumFacing dir: EnumFacing.VALUES) {
+			if(TreeHelper.isBranch(world.getBlockState(pos.add(dir.getDirectionVec())))) {
+				return;
+			}
+		}
+		world.setBlockState(pos, ModBlocks.blockStates.dirt);
+	}
 	
 	///////////////////////////////////////////
 	// BLOCKSTATES
@@ -106,7 +117,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	
 	@Override
 	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return BlockBranch.setSupport(1, 0);
+		return BlockBranch.setSupport(1, 1);
 	}
 	
 	@Override
