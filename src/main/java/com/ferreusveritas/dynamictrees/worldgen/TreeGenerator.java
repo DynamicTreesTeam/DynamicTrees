@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.PoissonDisc;
+import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
@@ -22,14 +25,24 @@ import net.minecraft.world.biome.Biome;
 public class TreeGenerator {
 	
 	protected static TreeGenerator INSTANCE;
-		
-	protected BiomeDataBase defaultBiomeDataBase;
-	public static final BiomeDataBase BLACKLISTED = new BiomeDataBase();
-	public BiomeRadiusCoordinator radiusCoordinator; //Finds radius for coordinates
-	public JoCodeStore codeStore;
-	protected ChunkCircleManager circleMan;
-	protected RandomXOR random;
-	protected Map<Integer, BiomeDataBase> dimensionMap = new HashMap<>();
+	
+	protected final BiomeDataBase defaultBiomeDataBase;
+	public static final BiomeDataBase DIMENSIONBLACKLISTED = new BiomeDataBase();
+	protected final PoissonDiscProviderUniversal circleProvider;
+	protected final RandomXOR random = new RandomXOR();
+	protected final Map<Integer, BiomeDataBase> dimensionMap = new HashMap<>();
+	
+	public static void preInit() {
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			new TreeGenerator();
+		}
+	}
+	
+	public TreeGenerator() {
+		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
+		defaultBiomeDataBase = new BiomeDataBase();
+		circleProvider = new PoissonDiscProviderUniversal(this);
+	}
 	
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
@@ -52,7 +65,7 @@ public class TreeGenerator {
 	}
 	
 	public void BlackListDimension(int dimensionId) {
-		dimensionMap.put(dimensionId, BLACKLISTED);
+		dimensionMap.put(dimensionId, DIMENSIONBLACKLISTED);
 	}
 	
 	/**
@@ -81,26 +94,15 @@ public class TreeGenerator {
 	
 	}
 	
-	public TreeGenerator() {
-		defaultBiomeDataBase = new BiomeDataBase();
-		radiusCoordinator = new BiomeRadiusCoordinator(this);
-		circleMan = new ChunkCircleManager(radiusCoordinator);
-		random = new RandomXOR();
+	public PoissonDiscProviderUniversal getCircleProvider() {
+		return circleProvider;
 	}
 	
-	public void onWorldUnload() {
-		circleMan = new ChunkCircleManager(radiusCoordinator);//Clears the cached circles
-	}
-	
-	public ChunkCircleManager getChunkCircleManager() {
-		return circleMan;
-	}
-	
-	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType) {
+	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType) {
 		makeWoolCircle(world, circle, h, resultType, 0);
 	}
 	
-	public void makeWoolCircle(World world, Circle circle, int h, EnumGeneratorResult resultType, int flags) {
+	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, int flags) {
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
@@ -118,9 +120,7 @@ public class TreeGenerator {
 		}
 	}
 	
-	protected BlockPos findGround(BiomeEntry biomeEntry, World world, BlockPos start) { return BlockPos.ORIGIN; }
-	
-	protected EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, Circle circle, SafeChunkBounds safeBounds) {
+	protected EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
@@ -129,12 +129,14 @@ public class TreeGenerator {
 		Biome biome = world.getBiome(pos);
 		BiomeEntry biomeEntry = biomeDataBase.getEntry(biome);
 		
-		pos = findGround(biomeEntry, world, pos);
+		pos = groundFinder.findGround(biomeEntry, world, pos);
 		
 		if(pos == BlockPos.ORIGIN) {
 			return EnumGeneratorResult.NOGROUND;
 		}
-				
+		
+		random.setXOR(pos);
+		
 		IBlockState dirtState = world.getBlockState(pos);
 		
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;

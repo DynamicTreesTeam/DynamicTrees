@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
-import com.ferreusveritas.dynamictrees.worldgen.WorldTreeGenerator;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
@@ -78,7 +78,7 @@ public class DynamicTrees {
 		
 		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
 		CellKits.preInit();
-		WorldTreeGenerator.preInit();//Create the generator
+		TreeGenerator.preInit();//Create the generator
 		
 		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
 		GameRegistry.registerTileEntity(TileEntityBonsai.class, "bonsai_tile_entity");

@@ -71,6 +71,13 @@ public class SafeChunkBounds {
 		}
 	}
 	
+	/**
+	 * Tests if the position is in a valid area.
+	 * 
+	 * @param pos The position to test
+	 * @param gap Set to true if the edge blocks of the chunk are also off limits. (Prevents neighbor involvement in adjacent chunk)
+	 * @return True if it's safe to place a block at the position, False otherwise.
+	 */
 	public boolean inBounds(BlockPos pos, boolean gap) {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;

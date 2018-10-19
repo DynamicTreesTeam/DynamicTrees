@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.ferreusveritas.dynamictrees.util.Vec2i;
 
-public class CircleHelper {
+public class PoissonDiscHelper {
 
 	/**
 	* Creates a tangential circle to cA at a random angle with radius cBrad.
@@ -16,8 +16,8 @@ public class CircleHelper {
 	* @param onlyTight Only returns tightly fitting circles and reject loose fits.
 	* @return
 	*/
-	public static Circle findSecondCircle(Circle cA, int cBrad, boolean onlyTight) {
-		return findSecondCircle(cA, cBrad, cA.getFreeAngle(), onlyTight);
+	public static PoissonDisc findSecondDisc(PoissonDisc cA, int cBrad, boolean onlyTight) {
+		return findSecondDisc(cA, cBrad, cA.getFreeAngle(), onlyTight);
 	}
 
 	private static final int singleSearchOrder[] = new int[] {0, 1, -1};
@@ -31,7 +31,7 @@ public class CircleHelper {
  	* @param onlyTight Only returns tightly fitting circles and reject loose fits.
 	* @return
 	*/
-	public static Circle findSecondCircle(Circle cA, int cBrad, double angle, boolean onlyTight) {
+	public static PoissonDisc findSecondDisc(PoissonDisc cA, int cBrad, double angle, boolean onlyTight) {
 
 		CirclePairData pd = new CirclePairData(cA.radius, cBrad);
 		int sector = pd.getSector(angle);
@@ -40,12 +40,12 @@ public class CircleHelper {
 			for(int i : singleSearchOrder) {
 				Vec2i c = pd.getCoords(sector + i);
 				if(c.isTight()) {//Reject loose circles when finding 2nd circle
-					return (Circle) new Circle(c, cBrad).add(cA.x, cA.z);
+					return (PoissonDisc) new PoissonDisc(c, cBrad).add(cA.x, cA.z);
 				}
 			}
 		}
 
-		return (Circle) new Circle(pd.getCoords(sector), cBrad).add(cA.x, cA.z);
+		return (PoissonDisc) new PoissonDisc(pd.getCoords(sector), cBrad).add(cA.x, cA.z);
 	}
 
 	private static final int pairSearchOrder[] = new int[] {34, 33, 35, 18, 50, 17, 17, 19, 49, 51, 32, 36, 2, 66, 1, 3, 65, 67, 16, 20, 48, 52};
@@ -60,7 +60,7 @@ public class CircleHelper {
 	* @param cCrad
 	* @return
 	*/
-	public static Circle findThirdCircle(Circle cA, Circle cB, int cCrad) {
+	public static PoissonDisc findThirdDisc(PoissonDisc cA, PoissonDisc cB, int cCrad) {
 		if(cA == null || cB == null || cCrad < 2 || cCrad > 8) {
 			System.err.println("3rd circle condition: Radius out of bounds or null circles");
 			return null;
@@ -116,7 +116,7 @@ public class CircleHelper {
 			
 			if( (a.x == b.x) && (a.z == b.z) ) {//We've found a location where the new circle C is touching both circle A and circle B
 				if(a.tight && b.tight) {//both are tight(AND).. perfect fit
-					return new Circle(a, cCrad);//A perfect fit is ideally what we are looking for so we can leave with it now
+					return new PoissonDisc(a, cCrad);//A perfect fit is ideally what we are looking for so we can leave with it now
 				}
 				else
 				if(halftight == null) {
@@ -132,15 +132,15 @@ public class CircleHelper {
 		}
 
 		if(halftight != null) {
-			return new Circle(halftight, cCrad);
+			return new PoissonDisc(halftight, cCrad);
 		}
 		if(loose != null) {
-			return new Circle(loose, cCrad);
+			return new PoissonDisc(loose, cCrad);
 		}
 		
 		//If we've gotten this far the only possibility is that the circles are too far apart to make a new circle
 		//that is tangential to both. So we will simply create a tangent circle pointing at the circle that is too far away.
-		return findSecondCircle(cA, cCrad, angAB, true);
+		return findSecondDisc(cA, cCrad, angAB, true);
 		
 		/*if(ModConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
@@ -185,11 +185,11 @@ public class CircleHelper {
 		return null;*/
 	}
 	
-	public static void maskCircles(Circle c1, Circle c2) {
-		maskCircles(c1, c2, false);
+	public static void maskDiscs(PoissonDisc c1, PoissonDisc c2) {
+		maskDiscs(c1, c2, false);
 	}
 
-	public static void maskCircles(Circle c1, Circle c2, boolean force) {
+	public static void maskDiscs(PoissonDisc c1, PoissonDisc c2, boolean force) {
 
 		if(c1 == c2) {
 			return;
@@ -211,11 +211,11 @@ public class CircleHelper {
 		}
 	}
 
-	public static void solveCircles(ArrayList<Circle> unsolved, ArrayList<Circle> allCircles) {
+	public static void solveDiscs(List<PoissonDisc> unsolved, List<PoissonDisc> allDiscs) {
 		//Mask out circles against one another
-		for(Circle u: unsolved) {
-			for(Circle c: allCircles) {
-				CircleHelper.maskCircles(u, c);
+		for(PoissonDisc u: unsolved) {
+			for(PoissonDisc c: allDiscs) {
+				PoissonDiscHelper.maskDiscs(u, c);
 			}
 		}
 	}
@@ -223,15 +223,15 @@ public class CircleHelper {
 	/**
 	* Gather the unsolved circles into a list.  Eliminate solved unreal circles.
 	* @param unsolved
-	* @param allCircles
+	* @param allDiscs
 	* @return
 	*/
-	public static ArrayList<Circle> gatherUnsolved(ArrayList<Circle> unsolved, ArrayList<Circle> allCircles) {
+	public static List<PoissonDisc> gatherUnsolved(List<PoissonDisc> unsolved, List<PoissonDisc> allDiscs) {
 
 		unsolved.clear();//Prep the list for recreation
 
-		for(int ci = 0; ci < allCircles.size(); ci++) {
-			Circle c = allCircles.get(ci);
+		for(int ci = 0; ci < allDiscs.size(); ci++) {
+			PoissonDisc c = allDiscs.get(ci);
 			if(c.hasFreeAngles()) {
 				unsolved.add(c);
 			}
@@ -241,10 +241,10 @@ public class CircleHelper {
 	}
 
 	//Delete the circle. The order of the circles is unimportant
-	public static void fastRemove(ArrayList<Circle> circles, int index) {
-		Circle c = circles.remove(circles.size() - 1);//Pop the last element off
-		if(index < circles.size()) {
-			circles.set(index, c);//Place the popped element over the one we are deleting.
+	public static void fastRemove(List<PoissonDisc> discs, int index) {
+		PoissonDisc c = discs.remove(discs.size() - 1);//Pop the last element off
+		if(index < discs.size()) {
+			discs.set(index, c);//Place the popped element over the one we are deleting.
 		}
 	}
 
