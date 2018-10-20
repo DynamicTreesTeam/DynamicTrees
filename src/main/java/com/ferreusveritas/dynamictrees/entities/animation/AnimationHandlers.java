@@ -46,8 +46,6 @@ public class AnimationHandlers {
 		
 	};
 	
-	public static final IAnimationHandler demoAnimationHandler = new AnimationHandlerDemo();
-	
 	public static final IAnimationHandler falloverAnimationHandler = new AnimationHandlerFallover();
 	
 }
