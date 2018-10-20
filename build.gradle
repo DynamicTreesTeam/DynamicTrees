@@ -67,6 +67,13 @@ processResources {
 	}
 }
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+tasks.build.dependsOn deobfJar
+
 idea {
     module {
         inheritOutputDirs = true
@@ -78,4 +85,5 @@ idea {
 artifacts {
     archives jar
     archives sourceJar
+    archives deobfJar
 }
