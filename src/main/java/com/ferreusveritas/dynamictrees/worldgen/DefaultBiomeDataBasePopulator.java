@@ -58,7 +58,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
 		staticBirchDecision = new StaticSpeciesSelector(new SpeciesSelection(birch));
-		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 20).add(mushroombrn, 1).add(mushroomred, 1);
+		randomRoofedForestDecision = new RandomSpeciesSelector().add(darkoak, 20);//.add(mushroombrn, 1).add(mushroomred, 1);
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	
 	public IDensitySelector computeDensity(Biome biome) {
 		if(BiomeDictionary.hasType(biome, Type.SPOOKY)) { //Roofed Forest
-			return (rnd, nd) -> 0.4f + (nd / 3.0f);
+			return (rnd, nd) -> 0.0f + (nd / 3.0f);
 		}
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) { //Desert
 			return (rnd, nd) -> ( nd * 0.6) + 0.4;
