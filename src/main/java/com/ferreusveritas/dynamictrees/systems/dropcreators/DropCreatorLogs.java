@@ -19,7 +19,7 @@ public class DropCreatorLogs extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int volume) {
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
 		LogsAndSticks las = species.getLogsAndSticks(volume);
 		
 		int numLogs = las.logs;

@@ -346,7 +346,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 	
-	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, int volume) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume) {
 		List<ItemStack> ret = new java.util.ArrayList<ItemStack>();//A list for storing all the dead tree guts
 		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, ret, volume);
@@ -398,8 +398,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		ItemStack heldItem = player.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		int woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
-		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, (int)(woodVolume * fortuneFactor));
+		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
+		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor);
 		
 		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, 1.0f, false, player);
@@ -411,7 +411,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
-		damageAxe(player, heldItem, getRadius(state), woodVolume);
+		damageAxe(player, heldItem, getRadius(state), (int) woodVolume);
 		
 		return true;// Function returns true if Block was destroyed
 	}
@@ -514,7 +514,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(state, world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false);
-			int woodVolume = destroyData.woodVolume;
+			float woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
 			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.util;
 
 import java.util.Random;
 

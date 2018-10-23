@@ -8,12 +8,25 @@ buildscript {
 	}
 }
 
+repositories {
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
+    }
+}
+
+apply plugin: 'idea'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
 
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-
 version = "${mc_version}-${mod_version}"
+if (System.getenv()["Version"] != null)
+{
+    version = "${mc_version}-${System.getenv()["Version"]}"
+}
+
 group = package_group
 archivesBaseName = mod_name
 
@@ -36,7 +49,7 @@ minecraft {
 }
 
 dependencies {
-
+    compile "mcp.mobius.waila:Hwyla:+"
 }
 
 processResources {
@@ -60,3 +73,17 @@ task deobfJar(type: Jar) {
 }
 
 tasks.build.dependsOn deobfJar
+
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+    module.downloadJavadoc = true
+    module.downloadSources = true
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives deobfJar
+}

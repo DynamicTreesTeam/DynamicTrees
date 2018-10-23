@@ -10,12 +10,10 @@ import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
 import com.ferreusveritas.dynamictrees.trees.TreeBirch;
 import com.ferreusveritas.dynamictrees.trees.TreeCactus;
 import com.ferreusveritas.dynamictrees.trees.TreeDarkOak;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.TreeFamilyVanilla;
 import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
-import com.ferreusveritas.dynamictrees.trees.TreeThickTest;
 
 import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
@@ -26,10 +24,7 @@ public class ModTrees {
 	public static ArrayList<TreeFamilyVanilla> baseFamilies = new ArrayList<>();
 	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
 	public static TreeCactus dynamicCactus;
-	
-	//TODO: Temporary Code
-	public static TreeFamily thickTestFamily;
-	
+		
 	/**
 	 * Pay Attn! This should be run after the Dynamic Trees Mod
 	 * has created it's Blocks and Items.  These trees depend
@@ -50,9 +45,6 @@ public class ModTrees {
 			TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());
 		}
 
-		//TODO: Temporary Code
-		thickTestFamily = new TreeThickTest();
-		thickTestFamily.registerSpecies(Species.REGISTRY);
 	}
 	
 }

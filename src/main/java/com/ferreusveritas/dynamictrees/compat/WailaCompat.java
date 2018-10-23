@@ -19,6 +19,7 @@ public class WailaCompat implements IWailaPlugin {
 		registrar.registerBodyProvider(branchHandler, BlockBranch.class);
 		registrar.registerNBTProvider(branchHandler, BlockBranch.class);
 		registrar.registerBodyProvider(branchHandler, BlockTrunkShell.class);
+		registrar.registerNBTProvider(branchHandler, BlockTrunkShell.class);
 		registrar.registerBodyProvider(rootyHandler, BlockRooty.class);
 	}
 	

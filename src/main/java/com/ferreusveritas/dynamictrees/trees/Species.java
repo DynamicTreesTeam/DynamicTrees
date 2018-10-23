@@ -349,7 +349,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param volume
 	 * @return
 	 */
-	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, int volume) {
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, float volume) {
 		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
@@ -360,9 +360,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = ModConfigs.dropSticks ? sticks : 0; };
 	}
 	
-	public LogsAndSticks getLogsAndSticks(int volume) {
-		int logs = volume / 4096;// A log contains 4096 voxels of wood material(16x16x16 pixels) Drop vanilla logs or whatever
-		int sticks = (volume % 4096) / 512;// A stick contains 512 voxels of wood (1/8th log) (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+	public LogsAndSticks getLogsAndSticks(float volume) {
+		int logs = (int) volume; // Drop vanilla logs or whatever
+		int sticks = (int) ((volume - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
 		return new LogsAndSticks(logs, sticks);
 	}
 	

@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 
 /**
 * <h1>Chunk Circle Set</h1>
@@ -46,21 +46,21 @@ import com.ferreusveritas.dynamictrees.util.Circle;
 * @author ferreusveritas
 *
 */
-public class ChunkCircleSet {
+public class PoissonDiscChunkSet {
 
 	private byte[] circleData;
 	boolean generated = false;
 
-	ChunkCircleSet() {
+	PoissonDiscChunkSet() {
 		circleData = new byte[16];
 	}
 
-	ChunkCircleSet(byte data[]) {
+	PoissonDiscChunkSet(byte data[]) {
 		generated = true;
 		circleData = data != null && data.length == 16 ? Arrays.copyOf(data, 16) : new byte[16];
 	}
 
-	public ArrayList<Circle> getCircles(ArrayList<Circle> circles, int chunkX, int chunkZ) {
+	public List<PoissonDisc> getCircles(List<PoissonDisc> circles, int chunkX, int chunkZ) {
 		for(int tile = 0; tile < 16; tile++) {
 			byte cd = circleData[tile];
 			if(cd != 0) {//No data in the tile
@@ -80,34 +80,34 @@ public class ChunkCircleSet {
 		Arrays.fill(circleData, (byte)0);
 	}
 
-	public ArrayList<Circle> addCircles(ArrayList<Circle> circles) {
+	public List<PoissonDisc> addCircles(List<PoissonDisc> circles) {
 		clearCircles();
-		for(Circle c: circles) {
+		for(PoissonDisc c: circles) {
 			addCircle(c);
 		}
 		return circles;
 	}
 
-	private static final Circle unpackCircleData(int tile, int circleData, int chunkX, int chunkZ) {
+	private static final PoissonDisc unpackCircleData(int tile, int circleData, int chunkX, int chunkZ) {
 		int radius = getRadiusFromCircleData(circleData);
 		int x = ((tile << 2) & 12);
 		int z = (tile & 12);
-		return new Circle((chunkX << 4) | x | ((circleData >> 2) & 3), (chunkZ << 4) | z | (circleData & 3), radius, true);
+		return new PoissonDisc((chunkX << 4) | x | ((circleData >> 2) & 3), (chunkZ << 4) | z | (circleData & 3), radius, true);
 	}
 	
 	private static final int getRadiusFromCircleData(int circleData) {
 		return ((circleData >> 4) & 7) + 1;
 	}
 	
-	private static final byte buildCircleData(Circle c) {
+	private static final byte buildCircleData(PoissonDisc c) {
 		return (byte) ((((c.radius - 1) & 7) << 4) | (c.x & 3) << 2 | c.z & 3);
 	}
 	
-	private static final int calcTileNum(Circle c) {
+	private static final int calcTileNum(PoissonDisc c) {
 		return c.z & 12 | ((c.x & 12) >> 2);//Calculate which of the 16 tiles we are working in
 	}
 	
-	boolean addCircle(Circle c) {
+	boolean addCircle(PoissonDisc c) {
 		if(c.radius >=2 && c.radius <= 8) {
 			int tile = calcTileNum(c); //Calculate which of the 16 tiles we are working in
 			int cd = circleData[tile];

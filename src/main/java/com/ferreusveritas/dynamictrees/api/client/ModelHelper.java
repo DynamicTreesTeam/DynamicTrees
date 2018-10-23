@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
@@ -31,6 +32,17 @@ public class ModelHelper {
 	 */
 	public static void regModel(TreeFamily tree) {
 		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build());
+		
+		if(tree.isThick()) {
+			//BlockBranchThick thickBranch = (BlockBranchThick) tree.getDynamicBranch();
+			//ModelHelper.regModel(thickBranch.getPairSide(false));
+			//ModelHelper.regModel(thickBranch.getPairSide(true));
+			ModelLoader.setCustomStateMapper(
+				((BlockBranchThick) tree.getDynamicBranch()).otherBlock,
+				new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build()
+			);
+		}
+		
 	}	
 	
 	public static void regModel(Block block) {

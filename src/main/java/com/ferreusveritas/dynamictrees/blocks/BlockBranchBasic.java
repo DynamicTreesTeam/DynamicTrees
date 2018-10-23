@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.List;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -285,7 +286,7 @@ public class BlockBranchBasic extends BlockBranch {
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.nullTreePart) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isAirBlock(deltaPos)) {
+				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == ModBlocks.blockTrunkShell) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}
@@ -320,7 +321,7 @@ public class BlockBranchBasic extends BlockBranch {
 				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
 				int targetRadius = (int) Math.floor(signal.radius);
 				int setRad = setRadius(world, pos, targetRadius, originDir);
-				if(setRad != targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
+				if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
 					signal.choked = true; //If something is in the way then it means that the tree growth is choked
 				}
 			}

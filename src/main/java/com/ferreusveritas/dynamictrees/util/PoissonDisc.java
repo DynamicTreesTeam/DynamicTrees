@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import net.minecraft.util.math.BlockPos;
 
-public class Circle extends Vec2i {
+public class PoissonDisc extends Vec2i {
 	
 	public int radius;
 	public int arc;
@@ -79,43 +79,43 @@ public class Circle extends Vec2i {
 		return getCircleInteriorBitmap(radius);
 	}
 		
-	public Circle() {
+	public PoissonDisc() {
 		this(0, 0, 2);
 	}
 	
-	public Circle(BlockPos pos, int radius) {
+	public PoissonDisc(BlockPos pos, int radius) {
 		this(pos.getX(), pos.getZ(), radius);
 	}
 	
-	public Circle(int x, int z, int radius, boolean real) {
+	public PoissonDisc(int x, int z, int radius, boolean real) {
 		this(x, z, radius);
 		this.real = real;
 	}
 	
-	public Circle(int x, int z, int radius) {
+	public PoissonDisc(int x, int z, int radius) {
 		set(x, z, radius);
 	}
 	
-	public Circle(Vec2i c, int radius) {
+	public PoissonDisc(Vec2i c, int radius) {
 		set(c.x, c.z, radius);
 	}
 	
-	public Circle(Circle o) {
+	public PoissonDisc(PoissonDisc o) {
 		set(o.x, o.z, o.radius);
 		arc = o.arc;
 	}
 	
-	public Circle set(int x, int z, int radius) {
+	public PoissonDisc set(int x, int z, int radius) {
 		return set(x, z).setRadius(radius);
 	}
 	
 	@Override
-	public Circle set(int x, int z) {
+	public PoissonDisc set(int x, int z) {
 		super.set(x, z);
 		return this;
 	}
 	
-	public Circle setRadius(int radius) {
+	public PoissonDisc setRadius(int radius) {
 		this.radius = net.minecraft.util.math.MathHelper.clamp(radius, 2, 8);
 		return this;
 	}
@@ -161,7 +161,7 @@ public class Circle extends Vec2i {
 	* @param other The other circle to test against
 	* @return true if intersection detected, false otherwise.
 	*/
-	public boolean doCirclesIntersect(Circle other) {
+	public boolean doCirclesIntersect(PoissonDisc other) {
 		SimpleBitmap thisbm = getCircleBitmap();
 		SimpleBitmap otherbm = other.getCircleBitmap();
 
@@ -178,7 +178,7 @@ public class Circle extends Vec2i {
 	* @param other The other circle to test against
 	* @return true if padded intersection detected, false otherwise.
 	 */
-	public boolean doCirclesIntersectPadding(Circle other) {
+	public boolean doCirclesIntersectPadding(PoissonDisc other) {
 		SimpleBitmap thisbm = getCircleBitmap();
 		SimpleBitmap otherbm = other.getCircleInteriorBitmap();
 
@@ -319,7 +319,7 @@ public class Circle extends Vec2i {
 	* @param o Other circle
 	* @return penetration depth
 	*/
-	public double circlePenetration(Circle o) {
+	public double circlePenetration(PoissonDisc o) {
 		Vec2i delta = new Vec2i(x - o.x, z - o.z);
 		return delta.len() - (this.radius + o.radius + 1);
 	}

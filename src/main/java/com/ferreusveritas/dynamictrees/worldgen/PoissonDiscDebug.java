@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,15 +12,15 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.util.Circle;
+import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
-public class CircleDebug {
+public class PoissonDiscDebug {
 	
 	public static int scale = 8;
 	
-	public static void outputCirclesToPng(ArrayList<Circle> circles, int chunkX, int chunkZ, String name) {
+	public static void outputCirclesToPng(List<PoissonDisc> circles, int chunkX, int chunkZ, String name) {
 		int width = 48 * scale;
 		int height = 48 * scale;
 		
@@ -47,7 +47,7 @@ public class CircleDebug {
 		}
 		
 		//Draw circles
-		for(Circle c: circles) {
+		for(PoissonDisc c: circles) {
 			drawCircle(img, c, (chunkX - 1) * 16, (chunkZ - 1) * 16);
 		}
 		
@@ -73,7 +73,7 @@ public class CircleDebug {
 		}
 	}
 
-	public static void drawCircle(BufferedImage image, Circle circle, int xOffset, int zOffset) {
+	public static void drawCircle(BufferedImage image, PoissonDisc circle, int xOffset, int zOffset) {
 		Color green = new Color(115, 210, 22, circle.real ? 192 : 64);
 		Color red = new Color(204, 0, 0, circle.real ? 192 : 64);
 		Color col = circle.hasFreeAngles() ? red : green;

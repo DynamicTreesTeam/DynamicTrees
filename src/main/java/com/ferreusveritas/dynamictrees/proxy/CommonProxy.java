@@ -4,13 +4,13 @@ package com.ferreusveritas.dynamictrees.proxy;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.event.CircleEventHandler;
+import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
-import com.ferreusveritas.dynamictrees.worldgen.DecorateEventHandler;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenCancelEventHandler;
+import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -53,9 +53,9 @@ public class CommonProxy {
 		
 		//Conveniently accessible disaster(Optional World Generation)
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			GameRegistry.registerWorldGenerator(TreeGenerator.getTreeGenerator(), 20);
-			MinecraftForge.TERRAIN_GEN_BUS.register(new DecorateEventHandler());
-			MinecraftForge.EVENT_BUS.register(new CircleEventHandler());
+			GameRegistry.registerWorldGenerator(new WorldGeneratorTrees(), 20);
+			MinecraftForge.TERRAIN_GEN_BUS.register(new TreeGenCancelEventHandler());
+			MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 		}
 	}
 	

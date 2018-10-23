@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
@@ -8,13 +9,19 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -29,7 +36,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
-			setBasicGrowingParameters(0.35f, 18.0f, 6, 8, 0.8f);
+			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
 			
 			setSoilLongevity(14);//Grows for a long long time
 			
@@ -43,6 +50,28 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			}
 			
 			setupStandardSeedDropping();
+		}
+		
+		@Override
+		public boolean preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode, IBlockState initialDirtState) {
+			//Erase a volume of blocks that could potentially get in the way
+			for(MutableBlockPos pos : BlockPos.getAllInBoxMutable(rootPos.add(new Vec3i(-1,  1, -1)), rootPos.add(new Vec3i(1, 6, 1)))) {
+				world.setBlockToAir(pos);
+			}
+			return true;
+		}
+		
+		@Override
+		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+			
+			//Place dirt blocks around rooty dirt block if tree has a > 8 radius
+			IBlockState branchState = world.getBlockState(rootPos.up());
+			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
+				for(Surround dir: Surround.values()) {
+					world.setBlockState(rootPos.add(dir.getOffset()), initialDirtState);
+				}
+			}
 		}
 		
 		@Override
@@ -66,20 +95,55 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 			
-			if(signal.numTurns >= 1) {//Disallow up/down turns after having turned out of the trunk once.
-				probMap[EnumFacing.UP.getIndex()] = 0;
-				probMap[EnumFacing.DOWN.getIndex()] = 0;
+			//Put a cute little flare on the bottom of the dark oaks
+			int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
+			
+			if(radius3 > 6) {
+				getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, EnumFacing.UP);
+				getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, EnumFacing.UP);
 			}
 			
-			//Amplify cardinal directions to encourage spread(beware! this algorithm is wacked-out poo brain and should be redone)
-			float energyRatio = signal.delta.getY() / getEnergy(world, pos);
-			float spreadPush = energyRatio * energyRatio * energyRatio * 4;
-			spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
+			return super.postGrow(world, rootPos, treePos, soilLife, natural);
+		}
+		
+		@Override
+		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
 			
+			probMap[EnumFacing.UP.getIndex()] = 4;
+			
+			//Disallow up/down turns after having turned out of the trunk once.
+			if(!signal.isInTrunk()) {
+				probMap[EnumFacing.UP.getIndex()] = 0;
+				probMap[EnumFacing.DOWN.getIndex()] = 0;
+				probMap[signal.dir.ordinal()] *= 0.35;//Promotes the zag of the horizontal branches
+			}
+			
+			//Amplify cardinal directions to encourage spread the higher we get
+			float energyRatio = signal.delta.getY() / getEnergy(world, pos);
+			float spreadPush = energyRatio * 2;
+			spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
 			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 				probMap[dir.ordinal()] *= spreadPush;
+			}
+			
+			//Ensure that the branch gets out of the trunk at least two blocks so it won't interfere with new side branches at the same level 
+			if(signal.numTurns == 1 && signal.delta.distanceSq(0, signal.delta.getY(), 0) == 1.0 ) {
+				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+					if(signal.dir != dir) {
+						probMap[dir.ordinal()] = 0;;
+					}
+				}
+			}
+			
+			//If the side branches are too swole then give some other branches a chance
+			if(signal.isInTrunk()) {
+				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+					if(probMap[dir.ordinal()] >= 7) {
+						probMap[dir.ordinal()] = 2;
+					}
+				}
 			}
 			
 			return probMap;
@@ -111,6 +175,11 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	}
 	
 	@Override
+	public boolean isThick() {
+		return true;
+	}
+	
+	@Override
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		int radius = branch.getRadius(blockState);
 		if(radius == 1) {
@@ -121,4 +190,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		return radius;
 	}
 	
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		super.getRegisterableBlocks(blockList);
+		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
+		return blockList;
+	}
 }

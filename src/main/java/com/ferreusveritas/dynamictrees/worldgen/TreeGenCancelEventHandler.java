@@ -14,13 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  * 
  * @author ferreusveritas
  */
-public class DecorateEventHandler {
+public class TreeGenCancelEventHandler {
 	
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onEvent(DecorateBiomeEvent.Decorate event) {
 		int dimensionId = event.getWorld().provider.getDimension();
 		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().getBiomeDataBase(dimensionId);
-		if(dbase != TreeGenerator.BLACKLISTED && !ModConfigs.dimensionBlacklist.contains(dimensionId)) {
+		if(dbase != TreeGenerator.DIMENSIONBLACKLISTED && !ModConfigs.dimensionBlacklist.contains(dimensionId)) {
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			switch(event.getType()) {
 				case CACTUS: if(ModConfigs.vanillaCactusWorldGen) { break; } 

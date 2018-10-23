@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import net.minecraft.world.World;
 

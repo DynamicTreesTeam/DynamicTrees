@@ -22,7 +22,7 @@ public class MathHelper {
 		}
 		
 		if(distSize <= 0) {
-			System.err.println("Warning: Zero sized distribution");
+			//System.err.println("Warning: Zero sized distribution");
 			return -1;
 		}
 		
