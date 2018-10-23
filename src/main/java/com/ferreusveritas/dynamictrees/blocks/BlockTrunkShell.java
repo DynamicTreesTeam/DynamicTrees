@@ -17,6 +17,8 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleDigging;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -24,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -288,6 +291,61 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public EnumPushReaction getMobilityFlag(IBlockState state) {
 		return EnumPushReaction.BLOCK;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+		IBlockState state = world.getBlockState(pos);
+		if (state.getBlock() == this) {
+			ShellMuse muse = this.getMuseUnchecked(world, state, pos);
+			if (muse == null) return true;
+			
+			IBlockState museState = muse.state;
+			BlockPos musePos = muse.pos;
+			
+			manager.addBlockDestroyEffects(musePos, museState);
+		}
+		return true;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
+		BlockPos shellPos = target.getBlockPos();
+		if (state.getBlock() == this) {
+			ShellMuse muse = this.getMuseUnchecked(world, state, shellPos);
+			if (muse == null) return true;
+			
+			IBlockState museState = muse.state;
+			BlockPos musePos = muse.pos;
+			Random rand = world.rand;
+			
+			int x = musePos.getX();
+			int y = musePos.getY();
+			int z = musePos.getZ();
+			AxisAlignedBB axisalignedbb = museState.getBoundingBox(world, musePos);
+			double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
+			double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
+			double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
+			
+			switch(target.sideHit) {
+				case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
+				case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
+				case NORTH: d2 = z + axisalignedbb.minZ - 0.1D; break;
+				case SOUTH: d2 = z + axisalignedbb.maxZ + 0.1D; break;
+				case WEST:  d0 = x + axisalignedbb.minX - 0.1D; break;
+				case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
+			}
+			
+			// Safe to spawn particles here since this is a client side only member function
+			ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), d0, d1, d2, 0, 0, 0, new int[] { Block.getStateId(museState) });
+			if (particle != null) {
+				particle.setBlockPos(musePos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+			}
+		}
+		
+		return true;
 	}
 	
 }
