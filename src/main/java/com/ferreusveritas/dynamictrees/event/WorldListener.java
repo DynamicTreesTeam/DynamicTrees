@@ -30,7 +30,12 @@ public class WorldListener implements IWorldEventListener {
 	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
 
 		if(flags == 3 && oldState.getBlock() instanceof IBurningListener) { //The old block was a Burning Listener
-			if(newState.getMaterial() == Material.FIRE) { //The new block is made of fire.  It certainly burned.
+			Material newMaterial = newState.getMaterial();
+			if(
+				newMaterial == Material.FIRE ||	//The new block is made of fire.  It certainly burned.
+				newMaterial == Material.ROCK ||	//The new block is made of rock.  Likely destroyed by the Pyroclasm mod's volcanic lava
+				newMaterial == Material.LAVA 	//Adding this in case there's any surprises
+			) { 
 				((IBurningListener)oldState.getBlock()).onBurned(worldIn, oldState, pos);//Tell the block what happened
 			}
 		}
