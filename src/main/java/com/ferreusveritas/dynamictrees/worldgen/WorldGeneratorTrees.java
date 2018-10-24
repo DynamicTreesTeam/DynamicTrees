@@ -22,18 +22,22 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 	
 	public static class GroundFinder implements IGroundFinder {
 		
+		protected boolean inNetherRange(BlockPos pos) {
+	        return pos.getY() >= 0 && pos.getY() <= 128;
+		}
+		
 		protected ArrayList<Integer> findSubterraneanLayerHeights(World world, BlockPos start) {
 			
 			MutableBlockPos pos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
 			
 			ArrayList<Integer> layers = new ArrayList();
 			
-			while(pos.getY() < 256) {
-				while(!world.isAirBlock(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
-				while(world.isAirBlock(pos))  { pos.move(EnumFacing.DOWN);  } //Move down 1 block at a time until we hit not-air
+			while(inNetherRange(pos)) {
+				while(!world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
+				while(world.isAirBlock(pos) && inNetherRange(pos))  { pos.move(EnumFacing.DOWN); } //Move down 1 block at a time until we hit not-air
 				if (world.getBlockState(pos).getMaterial() != Material.LAVA) { layers.add(pos.getY()); } //Record this position
 				pos.move(EnumFacing.UP, 16); //Move up 16 blocks
-				while(world.isAirBlock(pos) && pos.getY() < 256) {  pos.move(EnumFacing.UP); } //Zip up 4 blocks at a time until we hit ground
+				while(world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit ground
 			}
 			
 			//Discard the last result as it's just the top of the biome(bedrock for nether)
