@@ -38,7 +38,7 @@ public class PoissonDiscProviderWorld implements IPoissonDiscProvider {
 	}
 	
 	@Override
-	public List<PoissonDisc> getPoissonDiscs(World world, int chunkX, int chunkY, int chunkZ) {
+	public synchronized List<PoissonDisc> getPoissonDiscs(World world, int chunkX, int chunkY, int chunkZ) {
 		random.setXOR(new BlockPos(chunkX, chunkY, chunkZ));
 		PoissonDiscChunkSet cSet = getChunkCircleSet(chunkX, chunkZ);
 		if(cSet.generated) {
