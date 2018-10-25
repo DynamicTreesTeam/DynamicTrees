@@ -120,7 +120,7 @@ public class TreeGenerator {
 		}
 	}
 	
-	protected EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
+	public EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 		
 		circle.add(8, 8);//Move the circle into the "stage"
 		
