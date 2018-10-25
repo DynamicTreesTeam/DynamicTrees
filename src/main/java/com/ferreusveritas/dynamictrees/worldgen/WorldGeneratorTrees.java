@@ -8,12 +8,16 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
@@ -58,15 +62,34 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 			return new BlockPos(start.getX(), y, start.getY());
 		}
 		
+		protected boolean inOverworldRange(BlockPos pos) {
+			return pos.getY() >= 0 && pos.getY() <= 128;
+		}
+		
 		protected BlockPos findOverworldGround(World world, BlockPos start) {
-			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
-			while(world.isAirBlock(mPos) || TreeHelper.isTreePart(world, mPos)) {//Skip down past the bits of generated tree and air
-				mPos.move(EnumFacing.DOWN);
-				if(world.isOutsideBuildHeight(mPos)) {
-					return BlockPos.ORIGIN;
+			
+			Chunk chunk = world.getChunkFromBlockCoords(start);//We'll use a chunk for the search so we don't have to keep looking up the chunk for every block
+			
+			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.UP, 2);//Mutable allows us to change the test position easily
+			while(inOverworldRange(mPos)) {
+				
+				IBlockState state = chunk.getBlockState(mPos);
+				Block testBlock = state.getBlock();
+				
+				if(testBlock != Blocks.AIR) {
+					Material material = state.getMaterial();
+					if( material == Material.GROUND || material == Material.WATER || //These will account for > 90% of blocks in the world so we can solve this early
+							(state.getMaterial().blocksMovement() &&
+							!testBlock.isLeaves(state, world, mPos) &&
+							!testBlock.isFoliage(world, mPos))) {
+						return mPos.toImmutable(); 
+					}
 				}
+				
+				mPos.move(EnumFacing.DOWN);
 			}
-			return mPos.toImmutable();
+			
+			return BlockPos.ORIGIN;
 		}
 		
 		@Override

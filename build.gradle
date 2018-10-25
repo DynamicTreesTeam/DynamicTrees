@@ -39,6 +39,7 @@ minecraft {
 	version = "${mc_version}-${forge_version}"
 	runDir = "run"
 	
+	//TODO: replace "private static final boolean IS_DEV = true;", "private static final boolean IS_DEV = false;"
 	replace "@VERSION@", project.version
 	replaceIn "ModConstants.java"
 	
