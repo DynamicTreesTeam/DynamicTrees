@@ -30,7 +30,7 @@ public interface IPoissonDebug {
 
 	void intersectingList(PoissonDisc slave, Map<Integer, PoissonDisc> intersecting, List<PoissonDisc> discs);
 
-	void findThirdDisc(PoissonDisc master1, PoissonDisc master2, PoissonDisc slave);
+	void findThirdDiscCandidate(PoissonDisc master1, PoissonDisc master2, PoissonDisc slave);
 
 	void findThirdDiscSolved(PoissonDisc slave);
 

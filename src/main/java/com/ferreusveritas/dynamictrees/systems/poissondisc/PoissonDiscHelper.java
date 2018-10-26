@@ -228,7 +228,7 @@ public class PoissonDiscHelper {
 
 		for(int ci = 0; ci < allDiscs.size(); ci++) {
 			PoissonDisc c = allDiscs.get(ci);
-			if(c.hasFreeAngles()) {
+			if(!c.isSolved()) {
 				unsolved.add(c);
 			}
 		}

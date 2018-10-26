@@ -51,24 +51,6 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		}
 	}
 	
-	/**
-	 * Use the disc and it's free arc angle to find the radius of the neighbor disc
-	 * 
-	 * @param world
-	 * @param cA
-	 * @return radius of the disc
-	 */
-	private int getRadiusAtDiscTangent(PoissonDisc cA) {
-		float angle = (float)cA.getFreeAngle();
-
-		double x = cA.x + (MathHelper.sin(angle) * cA.radius * 1.5);
-		double z = cA.z + (MathHelper.cos(angle) * cA.radius * 1.5);
-
-		int radius = radiusCoordinator.getRadiusAtCoords(x, z);
-		if(debug != null) { debug.getRadius(cA, radius); }
-		return radius;
-	}
-	
 	//A set of caches so we needn't create the lists from scratch for every chunk
 	private List<PoissonDisc> discCache1 = new ArrayList<PoissonDisc>(64);//64 is above the typical range to expect for 9 chunks
 	private List<PoissonDisc> discCache2 = new ArrayList<PoissonDisc>(64);
@@ -76,9 +58,9 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 	public List<PoissonDisc> generatePoissonDiscs(Random random, int chunkX, int chunkZ) {
 		
 		// Step 0.) Clear the temporary caches
-		List<PoissonDisc> discs = discCache1;
+		List<PoissonDisc> allDiscs = discCache1;
 		List<PoissonDisc> unsolvedDiscs = discCache2;
-		discs.clear();
+		allDiscs.clear();
 		unsolvedDiscs.clear();
 		if(debug != null) { debug.begin(chunkX, chunkZ); }
 		
@@ -86,58 +68,62 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		// Step 1.) Collect already solved discs from surrounding chunks
 		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
 			Vec3i dir = surr.getOffset();
-			getChunkPoissonDiscs(discs, chunkX + dir.getX(), chunkZ + dir.getZ());
+			getChunkPoissonDiscs(allDiscs, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
-		if(debug != null) { debug.collectSolved(discs); }
+		if(debug != null) { debug.collectSolved(allDiscs); }
 
 		
 		// Step 2.) Do edge masking
 		int chunkXStart = chunkX << 4;
 		int chunkZStart = chunkZ << 4;
 
-		for(PoissonDisc c: discs) {
+		for(PoissonDisc c: allDiscs) {
 			c.edgeMask(chunkXStart, chunkZStart);
 		}
-		if(debug != null) { debug.doEdgeMasking(discs); }
+		if(debug != null) { debug.doEdgeMasking(allDiscs); }
 		
 		
 		// Step 3.) Mask out circles against one another
-		for(int i = 0; i < discs.size() - 1; i++) {
-			for(int j = i + 1; j < discs.size(); j++) {
-				PoissonDiscHelper.maskDiscs(discs.get(i), discs.get(j));
+		for(int i = 0; i < allDiscs.size() - 1; i++) {
+			for(int j = i + 1; j < allDiscs.size(); j++) {
+				PoissonDiscHelper.maskDiscs(allDiscs.get(i), allDiscs.get(j));
 			}
 		}
-		if(debug != null) { debug.maskSolvedDiscs(discs); }
+		if(debug != null) { debug.maskSolvedDiscs(allDiscs); }
 		
 		
 		// Step 4.) Handle no existing circles by creating a single circle to build off of
-		if(discs.size() == 0) {
+		if(allDiscs.size() == 0) {
 			int x = chunkXStart + random.nextInt(16);
 			int z = chunkZStart + random.nextInt(16);
 			int radius = radiusCoordinator.getRadiusAtCoords(x, z);
 			PoissonDisc rootDisc = new PoissonDisc(x, z, radius);
 			rootDisc.real = true;
-			discs.add(rootDisc);
-			if(debug != null) { debug.createRootDisc(discs, rootDisc); }
+			allDiscs.add(rootDisc);
+			if(debug != null) { debug.createRootDisc(allDiscs, rootDisc); }
 		}
 		
 		
 		// Step 5.) Gather the unsolved circles into a list
-		PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, discs);
-		if(debug != null) { debug.gatherUnsolved(unsolvedDiscs, discs); }
+		PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, allDiscs);
+		if(debug != null) { debug.gatherUnsolved(unsolvedDiscs, allDiscs); }
 
 		
-		int count = 0;
+		int count = 0;//This counter is used to make sure we don't endlessly generate for an unsolvable set
 		
 		//Keep solving all unsolved disc until there aren't any more to solve.
 		while(!unsolvedDiscs.isEmpty()) {
 			
-			// Step 6.) Pick a random disc from the pool of unsolved discs
+			// Step 6.) Pick a random disc from the pool of unsolved discs this will be the master disc
 			PoissonDisc master = unsolvedDiscs.get(0);//Any circle will do.  May as well be the first.
 			if(debug != null) { debug.pickMasterDisc(master, unsolvedDiscs); }
 			
-			// Step 7.) Get the radius of the new tangential disc
-			int radius = getRadiusAtDiscTangent(master);
+			// Step 7.) Use the master disc and it's free arc angle to find the radius of the new tangential disc
+			float angle = (float)master.getFreeAngle();
+			double dx = master.x + (MathHelper.sin(angle) * master.radius * 1.5);
+			double dz = master.z + (MathHelper.cos(angle) * master.radius * 1.5);
+			int radius = radiusCoordinator.getRadiusAtCoords(dx, dz);
+			if(debug != null) { debug.getRadius(master, radius); }
 			
 			// Step 8.) Create a second disc tangential to the master disc.
 			PoissonDisc slave = PoissonDiscHelper.findSecondDisc(master, radius, true);
@@ -152,13 +138,13 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			// Step 10.) Create a list of existing circles that are intersecting with this circle.  List is ordered by penetration depth.
 			int i = 0;
 			Map<Integer, PoissonDisc> intersecting = new TreeMap<Integer, PoissonDisc>();
-			for(PoissonDisc c: discs) {
+			for(PoissonDisc c: allDiscs) {
 				if(slave.doCirclesIntersectPadding(c)) {
 					int depth = 16 + (int)c.discPenetration(slave);
 					intersecting.put(depth << 8 | i++, c);
 				}
 			}
-			if(debug != null) { debug.intersectingList(slave, intersecting, discs); }
+			if(debug != null) { debug.intersectingList(slave, intersecting, allDiscs); }
 
 			
 			//Run through all of the circles that were intersecting
@@ -175,16 +161,16 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				}
 				
 				slave = PoissonDiscHelper.findThirdDisc(master1, master2, radius);//Attempt to triangulate a circle position that is touching tangentially to both master circles
-				if(debug != null) { debug.findThirdDisc(master1, master2, slave); }
+				if(debug != null) { debug.findThirdDiscCandidate(master1, master2, slave); }
 				if(slave != null) {//Found a 3rd circle candidate
-					for(int ci = 0; ci < discs.size(); ci++) {
-						PoissonDisc c = discs.get(ci);
+					for(int ci = 0; ci < allDiscs.size(); ci++) {
+						PoissonDisc c = allDiscs.get(ci);
 						if(slave.doCirclesIntersect(c)){//See if this new circle intersects with any of the existing circles. If it does then..
 							if(c.real || (!c.real && !slave.isInCenterChunk(chunkXStart, chunkZStart)) ) {
 								slave = null;//Discard the circle because it's intersecting with an existing real circle
 								break;//We needn't continue since we've proven that the circle intersects with any circle
 							} else {//The overlapping circle is not real.. but the slave circle is.
-								PoissonDiscHelper.fastRemove(discs, ci--);//Delete the offending non-real circle. The order of the circles is unimportant
+								PoissonDiscHelper.fastRemove(allDiscs, ci--);//Delete the offending non-real circle. The order of the circles is unimportant
 							} 
 						}
 					}
@@ -200,17 +186,17 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				slave.edgeMask(chunkXStart, chunkZStart);//Set the proper mask for whatever chunk this circle resides.
 				slave.real = slave.isInCenterChunk(chunkXStart, chunkZStart);//Only circles created in the center chunk are real
 				unsolvedDiscs.add(slave);//The new circle is necessarily unsolved and we need it in this list for the next step.
-				PoissonDiscHelper.solveDiscs(unsolvedDiscs, discs);//run all of the unsolved circles again
-				discs.add(slave);//add the new circle to the full list
-				if(debug != null) { debug.solveDiscs(unsolvedDiscs, discs); }
+				PoissonDiscHelper.solveDiscs(unsolvedDiscs, allDiscs);//run all of the unsolved circles again
+				allDiscs.add(slave);//add the new circle to the full list
+				if(debug != null) { debug.solveDiscs(unsolvedDiscs, allDiscs); }
 			}
 			
-			PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, discs);//List up the remaining unsolved circles and try again
-			if(debug != null) { debug.gatherUnsolved2(unsolvedDiscs, discs); }
+			PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, allDiscs);//List up the remaining unsolved circles and try again
+			if(debug != null) { debug.gatherUnsolved2(unsolvedDiscs, allDiscs); }
 			
 			//For debug purposes
 			if(++count > 64 && !unsolvedDiscs.isEmpty()) {//It shouldn't over take 64 iterations to solve all of the circles
-				if(debug != null) { debug.unsolvable(chunkX, chunkZ, count, unsolvedDiscs, discs); }
+				if(debug != null) { debug.unsolvable(chunkX, chunkZ, count, unsolvedDiscs, allDiscs); }
 				break;//Something went terribly wrong and we shouldn't hang the system for it.
 			}
 			
@@ -220,14 +206,14 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		PoissonDiscChunkSet cSet = getChunkDiscSet(chunkX, chunkZ);
 		cSet.generated = true;
 		
-		for(PoissonDisc c: discs) {
+		for(PoissonDisc c: allDiscs) {
 			if(c.isInCenterChunk(chunkXStart, chunkZStart)) {
 				cSet.addDisc(c);
 			}
 		}
-		discs.clear();
+		allDiscs.clear();
 		
-		return cSet.getDiscs(discs, chunkX, chunkZ);
+		return cSet.getDiscs(allDiscs, chunkX, chunkZ);
 	}
 	
 	private PoissonDiscChunkSet getChunkDiscSet(int chunkX, int chunkZ) {

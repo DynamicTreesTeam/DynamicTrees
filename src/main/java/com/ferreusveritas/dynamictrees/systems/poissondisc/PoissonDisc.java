@@ -211,6 +211,13 @@ public class PoissonDisc extends Vec2i {
 	}
 	
 	/**
+	* Set the circle to a solved state
+	*/
+	public void setSolved() {
+		fillArc();
+	}
+	
+	/**
 	* Clear arc mask so all bit angles are free.
 	*/
 	public void clearArc() {
@@ -313,6 +320,15 @@ public class PoissonDisc extends Vec2i {
 	*/
 	public boolean hasFreeAngles() {
 		return arc != 0xFFFFFFFF;
+	}
+	
+	/**
+	* A circle with no free angles is considered solved in the circle packing algorithm.
+	* 
+	* @return False if circle has free angles(unsolved).  True if it does not(solved)
+	*/
+	public boolean isSolved() {
+		return !hasFreeAngles();
 	}
 	
 	/**
