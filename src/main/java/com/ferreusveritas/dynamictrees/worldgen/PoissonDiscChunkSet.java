@@ -6,14 +6,14 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 
 /**
-* <h1>Chunk Circle Set</h1>
+* <h1>Chunk Poison Disc Set</h1>
 * <p>
-* A class that handles a group of non-overlapping circles that exist within a single chunk.<br>
+* A class that handles a group of non-overlapping discs that exist within a single chunk.<br>
 * <ul>
-* <li>Each chunk circle set contains 16 4x4 block areas(tiles) that can contain either exactly one circle or nothing.</li>
-* <li>Circles can have a radius of 2 to 8 blocks.</li>
-* <li>Circles are not permitted to intersect with any other circle.</li>
-* <li>There are 16 circle positions per chunk but it's impossible to use them all because of crowding.</li>
+* <li>Each chunk disc set contains 16 4x4 block areas(tiles) that can contain either exactly one disc or nothing.</li>
+* <li>Discs can have a radius of 2 to 8 blocks.</li>
+* <li>Discs are not permitted to intersect with any other disc.</li>
+* <li>There are 16 disc positions per chunk but it's impossible to use them all because of crowding.</li>
 * </ul>
 * </p>
 * <p><pre><tt>
@@ -36,9 +36,9 @@ import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 * │Ex│ Radius │  X  │  Z  │</b>
 * └──┴────────┴─────┴─────┘</tt></pre>
 * <ul>
-* <li><b>X:</b> The X offset of the circle center within the tile. (0-3)</li>
-* <li><b>Z:</b> The Z offset of the circle center within the tile. (0-3)</li>
-* <li><b>Radius:</b> The radius of the circle - 1. (0-7) Zero means no circle, any other value will have 1 added to it before use.</li>
+* <li><b>X:</b> The X offset of the disc center within the tile. (0-3)</li>
+* <li><b>Z:</b> The Z offset of the disc center within the tile. (0-3)</li>
+* <li><b>Radius:</b> The radius of the disc - 1. (0-7) Zero means no disc, any other value will have 1 added to it before use.</li>
 * <li><b>Ex:</b>Extended bit.</li>
 * </ul>
 * </p>
@@ -48,58 +48,58 @@ import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 */
 public class PoissonDiscChunkSet {
 
-	private byte[] circleData;
+	private byte[] discData;
 	boolean generated = false;
 
 	PoissonDiscChunkSet() {
-		circleData = new byte[16];
+		discData = new byte[16];
 	}
 
 	PoissonDiscChunkSet(byte data[]) {
 		generated = true;
-		circleData = data != null && data.length == 16 ? Arrays.copyOf(data, 16) : new byte[16];
+		discData = data != null && data.length == 16 ? Arrays.copyOf(data, 16) : new byte[16];
 	}
 
-	public List<PoissonDisc> getCircles(List<PoissonDisc> circles, int chunkX, int chunkZ) {
+	public List<PoissonDisc> getDiscs(List<PoissonDisc> discs, int chunkX, int chunkZ) {
 		for(int tile = 0; tile < 16; tile++) {
-			byte cd = circleData[tile];
+			byte cd = discData[tile];
 			if(cd != 0) {//No data in the tile
 				if((cd & 0x80) != 0) {//Extended Bit
 					int flip = (cd | (cd << 1)) & 3;//0 or 3
-					circles.add(unpackCircleData(tile, 0x10 ^ flip, chunkX, chunkZ));//r2 @ 0,0 or 0,3
-					circles.add(unpackCircleData(tile, 0x1f ^ flip, chunkX, chunkZ));//r2 @ 3,3 or 3,0
+					discs.add(unpackDiscData(tile, 0x10 ^ flip, chunkX, chunkZ));//r2 @ 0,0 or 0,3
+					discs.add(unpackDiscData(tile, 0x1f ^ flip, chunkX, chunkZ));//r2 @ 3,3 or 3,0
 				} else if((cd & 0x70) != 0) {//has a radius
-					circles.add(unpackCircleData(tile, cd, chunkX, chunkZ));
+					discs.add(unpackDiscData(tile, cd, chunkX, chunkZ));
 				}
 			}
 		}
-		return circles;
+		return discs;
 	}
 
-	public void clearCircles() {
-		Arrays.fill(circleData, (byte)0);
+	public void clearDiscs() {
+		Arrays.fill(discData, (byte)0);
 	}
 
-	public List<PoissonDisc> addCircles(List<PoissonDisc> circles) {
-		clearCircles();
-		for(PoissonDisc c: circles) {
-			addCircle(c);
+	public List<PoissonDisc> addDiscs(List<PoissonDisc> discs) {
+		clearDiscs();
+		for(PoissonDisc d: discs) {
+			addDisc(d);
 		}
-		return circles;
+		return discs;
 	}
 
-	private static final PoissonDisc unpackCircleData(int tile, int circleData, int chunkX, int chunkZ) {
-		int radius = getRadiusFromCircleData(circleData);
+	private static final PoissonDisc unpackDiscData(int tile, int diskData, int chunkX, int chunkZ) {
+		int radius = getRadiusFromDiscData(diskData);
 		int x = ((tile << 2) & 12);
 		int z = (tile & 12);
-		return new PoissonDisc((chunkX << 4) | x | ((circleData >> 2) & 3), (chunkZ << 4) | z | (circleData & 3), radius, true);
+		return new PoissonDisc((chunkX << 4) | x | ((diskData >> 2) & 3), (chunkZ << 4) | z | (diskData & 3), radius, true);
 	}
 	
-	private static final int getRadiusFromCircleData(int circleData) {
-		return ((circleData >> 4) & 7) + 1;
+	private static final int getRadiusFromDiscData(int discData) {
+		return ((discData >> 4) & 7) + 1;
 	}
 	
-	private static final byte buildCircleData(PoissonDisc c) {
+	private static final byte buildDiscData(PoissonDisc c) {
 		return (byte) ((((c.radius - 1) & 7) << 4) | (c.x & 3) << 2 | c.z & 3);
 	}
 	
@@ -107,39 +107,39 @@ public class PoissonDiscChunkSet {
 		return c.z & 12 | ((c.x & 12) >> 2);//Calculate which of the 16 tiles we are working in
 	}
 	
-	boolean addCircle(PoissonDisc c) {
-		if(c.radius >=2 && c.radius <= 8) {
-			int tile = calcTileNum(c); //Calculate which of the 16 tiles we are working in
-			int cd = circleData[tile];
-			if(cd != 0) { //There's already a circle in this tile
-				if((c.radius == 2) && (getRadiusFromCircleData(cd) == 2) ) { //but we are adding a radius 2 circle to a tile with an exiting radius 2 circle.. it might still be possible to slip it in.
-					int oldCirclePos = cd & 15; //Get subtile position of old circle(lowest 4 bits)
-					int newCirclePos = ((c.x & 3) << 2) | (c.z & 3);//Get subtile position of new circle
-					switch(oldCirclePos << 4 | newCirclePos) {//Combine both subtile positions into a single value to expedite comparison
+	boolean addDisc(PoissonDisc d) {
+		if(d.radius >=2 && d.radius <= 8) {
+			int tile = calcTileNum(d); //Calculate which of the 16 tiles we are working in
+			int cd = discData[tile];
+			if(cd != 0) { //There's already a disc in this tile
+				if((d.radius == 2) && (getRadiusFromDiscData(cd) == 2) ) { //but we are adding a radius 2 disc to a tile with an exiting radius 2 disc.. it might still be possible to slip it in.
+					int oldDiscPos = cd & 15; //Get subtile position of old disc(lowest 4 bits)
+					int newDiscPos = ((d.x & 3) << 2) | (d.z & 3);//Get subtile position of new disc
+					switch(oldDiscPos << 4 | newDiscPos) {//Combine both subtile positions into a single value to expedite comparison
 						case 0x0F://0,0 and 3,3
 						case 0xF0://3,3 and 0,0
-							circleData[tile] = (byte) 0x80;//Extended bit
+							discData[tile] = (byte) 0x80;//Extended bit
 							return true;
 						case 0xC3://3,0 and 0,3
 						case 0x3C://0,3 and 3,0
-							circleData[tile] = (byte) 0x81;//Extended bit and rotate tile 90
+							discData[tile] = (byte) 0x81;//Extended bit and rotate tile 90
 							return true;
 					}
 				}
-			} else { //Add a single simple circle
-				circleData[tile] = buildCircleData(c);
+			} else { //Add a single simple disc
+				discData[tile] = buildDiscData(d);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public byte[] getCircleData() {
-		return circleData;
+	public byte[] getDiscData() {
+		return discData;
 	}
 
-	public void setCircleData(byte[] circleData) {
-		this.circleData = Arrays.copyOf(circleData, 16);
+	public void setDiscData(byte[] discData) {
+		this.discData = Arrays.copyOf(discData, 16);
 	}
 
 }

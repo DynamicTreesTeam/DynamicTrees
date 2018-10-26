@@ -41,7 +41,7 @@ public class TreeGenerator {
 	public TreeGenerator() {
 		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
 		defaultBiomeDataBase = new BiomeDataBase();
-		circleProvider = new PoissonDiscProviderUniversal(this);
+		circleProvider = new PoissonDiscProviderUniversal();
 	}
 	
 	public static TreeGenerator getTreeGenerator() {

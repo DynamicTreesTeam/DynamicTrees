@@ -319,7 +319,7 @@ public class PoissonDisc extends Vec2i {
 	* @param o Other circle
 	* @return penetration depth
 	*/
-	public double circlePenetration(PoissonDisc o) {
+	public double discPenetration(PoissonDisc o) {
 		Vec2i delta = new Vec2i(x - o.x, z - o.z);
 		return delta.len() - (this.radius + o.radius + 1);
 	}

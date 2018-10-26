@@ -29,7 +29,8 @@ public class PoissonDiscEventHandler {
 		World world = event.getWorld();
 		if(!world.isRemote) {
 			byte circleData[] = event.getData().getByteArray("GTCD");
-			TreeGenerator.getTreeGenerator().getCircleProvider().setChunkPoissonData(world, event.getChunk().x, 0, event.getChunk().z, circleData);
+			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
+			cp.setChunkPoissonData(world, event.getChunk().x, 0, event.getChunk().z, circleData);
 		}
 	}
 	

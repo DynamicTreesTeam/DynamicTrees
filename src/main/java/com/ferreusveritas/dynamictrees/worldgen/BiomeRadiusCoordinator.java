@@ -14,15 +14,16 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
 	public NoiseGeneratorPerlin noiseGenerator;
 	protected final TreeGenerator treeGenerator;
-
+	protected final World world;
 	
-	public BiomeRadiusCoordinator(TreeGenerator treeGenerator) {
+	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, World world) {
 		noiseGenerator = new NoiseGeneratorPerlin(new Random(96), 1);
+		this.world = world;
 		this.treeGenerator = treeGenerator;
 	}
 
 	@Override
-	public int getRadiusAtCoords(World world, double x, double z) {
+	public int getRadiusAtCoords(double x, double z) {
 		double scale = 128;//Effectively scales up the noisemap
 		Biome biome = world.getBiome(new BlockPos((int)x, 0, (int)z));
 		double noiseDensity = (noiseGenerator.getValue(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
