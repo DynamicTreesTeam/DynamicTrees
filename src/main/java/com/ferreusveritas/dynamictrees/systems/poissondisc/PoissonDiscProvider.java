@@ -114,6 +114,8 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		//Keep solving all unsolved disc until there aren't any more to solve.
 		while(!unsolvedDiscs.isEmpty()) {
 			
+			if(debug != null) { debug.updateCount(count); }
+			
 			// Step 6.) Pick a random disc from the pool of unsolved discs this will be the master disc
 			PoissonDisc master = unsolvedDiscs.get(0);//Any circle will do.  May as well be the first.
 			if(debug != null) { debug.pickMasterDisc(master, unsolvedDiscs); }
