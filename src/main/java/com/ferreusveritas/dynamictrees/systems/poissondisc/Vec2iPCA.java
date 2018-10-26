@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 /**
  * A variant of Vec2i that recomputes radial angle

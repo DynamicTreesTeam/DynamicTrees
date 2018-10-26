@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,7 +6,8 @@ import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscProviderCreateEvent;
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;

@@ -1,4 +1,6 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
+
+import com.ferreusveritas.dynamictrees.util.SimpleBitmap;
 
 import net.minecraft.util.math.BlockPos;
 
@@ -196,8 +198,8 @@ public class PoissonDisc extends Vec2i {
 	* @param endAngle starting angle in radians
 	*/
 	public void maskArc(double startAngle, double endAngle) {
-		int start = Math.round(MathHelper.radiansToTurns(startAngle) * 32.0f) & 31;
-		int end =   Math.round(MathHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
+		int start = Math.round(PoissonDiscMathHelper.radiansToTurns(startAngle) * 32.0f) & 31;
+		int end =   Math.round(PoissonDiscMathHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
 		arc |= bitRun(start, end);
 	}
 	

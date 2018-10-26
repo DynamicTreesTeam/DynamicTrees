@@ -1,10 +1,6 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import java.util.List;
-
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
-import com.ferreusveritas.dynamictrees.util.MathHelper;
-import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 public class PoissonDiscHelper {
 
@@ -33,7 +29,7 @@ public class PoissonDiscHelper {
 	*/
 	public static PoissonDisc findSecondDisc(PoissonDisc cA, int cBrad, double angle, boolean onlyTight) {
 
-		CirclePairData pd = new CirclePairData(cA.radius, cBrad);
+		PoissonDiscPairData pd = new PoissonDiscPairData(cA.radius, cBrad);
 		int sector = pd.getSector(angle);
 
 		if(onlyTight) {
@@ -79,11 +75,11 @@ public class PoissonDiscHelper {
 
 		//Get relative angle relationships for the 3 circles
 		double angAB = delta.angle();
-		double angBAC = MathHelper.wrapAngle(angAB - angA);
-		double angABC = MathHelper.wrapAngle(-Math.PI + angAB + angB);
+		double angBAC = PoissonDiscMathHelper.wrapAngle(angAB - angA);
+		double angABC = PoissonDiscMathHelper.wrapAngle(-Math.PI + angAB + angB);
 
-		CirclePairData pdAC = new CirclePairData(cA.radius, cCrad);
-		CirclePairData pdBC = new CirclePairData(cB.radius, cCrad);
+		PoissonDiscPairData pdAC = new PoissonDiscPairData(cA.radius, cCrad);
+		PoissonDiscPairData pdBC = new PoissonDiscPairData(cB.radius, cCrad);
 		
 		//The closest sectors for the given angles
 		int sectorAC = pdAC.getSector(angBAC);

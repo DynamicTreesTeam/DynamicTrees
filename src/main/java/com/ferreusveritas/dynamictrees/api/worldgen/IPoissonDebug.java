@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.List;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
-import com.ferreusveritas.dynamictrees.util.Vec2i;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.Vec2i;
 
 public interface IPoissonDebug {
 

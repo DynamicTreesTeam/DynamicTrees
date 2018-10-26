@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 
 public interface IPoissonDiscProvider {
 	

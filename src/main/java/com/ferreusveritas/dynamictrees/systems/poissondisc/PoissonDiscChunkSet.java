@@ -1,9 +1,7 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import java.util.Arrays;
 import java.util.List;
-
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 
 /**
 * <h1>Chunk Poison Disc Set</h1>
@@ -49,13 +47,13 @@ import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 public class PoissonDiscChunkSet {
 
 	private byte[] discData;
-	boolean generated = false;
+	public boolean generated = false;
 
-	PoissonDiscChunkSet() {
+	public PoissonDiscChunkSet() {
 		discData = new byte[16];
 	}
 
-	PoissonDiscChunkSet(byte data[]) {
+	public PoissonDiscChunkSet(byte data[]) {
 		generated = true;
 		discData = data != null && data.length == 16 ? Arrays.copyOf(data, 16) : new byte[16];
 	}
@@ -107,7 +105,7 @@ public class PoissonDiscChunkSet {
 		return c.z & 12 | ((c.x & 12) >> 2);//Calculate which of the 16 tiles we are working in
 	}
 	
-	boolean addDisc(PoissonDisc d) {
+	public boolean addDisc(PoissonDisc d) {
 		if(d.radius >=2 && d.radius <= 8) {
 			int tile = calcTileNum(d); //Calculate which of the 16 tiles we are working in
 			int cd = discData[tile];

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +12,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.PoissonDisc;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
-import com.ferreusveritas.dynamictrees.util.Vec2i;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;

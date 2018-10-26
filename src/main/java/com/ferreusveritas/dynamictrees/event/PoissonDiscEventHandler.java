@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.worldgen.PoissonDiscProviderUniversal;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.nbt.NBTTagByteArray;
