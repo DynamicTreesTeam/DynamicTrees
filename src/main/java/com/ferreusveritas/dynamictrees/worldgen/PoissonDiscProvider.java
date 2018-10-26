@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
@@ -178,6 +177,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				}
 				
 				slave = PoissonDiscHelper.findThirdDisc(master1, master2, radius);//Attempt to triangulate a circle position that is touching tangentially to both master circles
+				if(debug != null) { debug.findThirdDisc(master1, master2, slave); }
 				if(slave != null) {//Found a 3rd circle candidate
 					for(int ci = 0; ci < discs.size(); ci++) {
 						PoissonDisc c = discs.get(ci);
@@ -193,6 +193,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				}
 				
 				if(slave != null) {
+					if(debug != null) { debug.findThirdDiscSolved(slave); }
 					break;//We found a viable circle.. time to move on
 				}
 			}
@@ -203,21 +204,15 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				unsolvedDiscs.add(slave);//The new circle is necessarily unsolved and we need it in this list for the next step.
 				PoissonDiscHelper.solveDiscs(unsolvedDiscs, discs);//run all of the unsolved circles again
 				discs.add(slave);//add the new circle to the full list
+				if(debug != null) { debug.solveDiscs(unsolvedDiscs, discs); }
 			}
 			
 			PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, discs);//List up the remaining unsolved circles and try again
+			if(debug != null) { debug.gatherUnsolved2(unsolvedDiscs, discs); }
 			
 			//For debug purposes
 			if(++count > 64 && !unsolvedDiscs.isEmpty()) {//It shouldn't over take 64 iterations to solve all of the circles
-				System.err.println("-----" + unsolvedDiscs.size() + " unsolved circles-----");
-				System.err.println("@ chunk x:" + chunkX + ", z:" + chunkZ);
-				System.err.println("after " + count + " iterations" );
-				for(PoissonDisc c: discs) {
-					System.err.println((c.hasFreeAngles() ? "->" : "  ") +  c);
-				}
-				if(ModConfigs.poissonDiscImageWrite) {
-					PoissonDiscDebug.outputCirclesToPng(discs, chunkX, chunkZ, "");
-				}
+				if(debug != null) { debug.unsolvable(chunkX, chunkZ, count, unsolvedDiscs, discs); }
 				break;//Something went terribly wrong and we shouldn't hang the system for it.
 			}
 			

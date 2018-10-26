@@ -46,8 +46,6 @@ public class ModConfigs {
 	
 	public static boolean worldGenDebug;
 	
-	public static boolean poissonDiscImageWrite = false;
-	
 	public static void preInit(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
