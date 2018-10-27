@@ -28,12 +28,18 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 	
 	private final IRadiusCoordinator radiusCoordinator;
 	private final HashMap<ChunkPos, PoissonDiscChunkSet> chunkDiscs;
-	private final RandomXOR random = new RandomXOR();
+	private RandomXOR random = new RandomXOR();
 	private IPoissonDebug debug;
 	
 	public PoissonDiscProvider(IRadiusCoordinator radCoord) {
 		chunkDiscs = new HashMap<ChunkPos, PoissonDiscChunkSet>();
 		radiusCoordinator = radCoord;
+	}
+	
+	public void setSeed(Long seed) {
+		if(seed != null) {
+			random = new RandomXOR(seed);
+		}
 	}
 	
 	public void setDebug(IPoissonDebug debug) {
