@@ -189,11 +189,5 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		return radius;
 	}
-	
-	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		super.getRegisterableBlocks(blockList);
-		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
-		return blockList;
-	}
+
 }
