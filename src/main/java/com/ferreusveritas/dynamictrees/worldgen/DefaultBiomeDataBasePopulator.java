@@ -80,26 +80,24 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 				
 				//Identify the "forestness" of the biome.  Affects forest spread rate for biome.
 				dbase.setForestness(biome, identifyForestness(biome));
-
-				//Enable poisson disc multipass of roofed forests
-				if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {
-					dbase.setMultipass(biome,
-						pass -> {
-							switch(pass) {
-								case 0: return 0;//Zero means to run as normal
-								case 1: return 5;//Return only radius 5 on pass 1
-								case 2: return 3;//Return only radius 3 on pass 2
-								default: return -1;//A negative number means to terminate
-							}
-						}
-					);
-				}
 			}
 		);
 		
+		//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
+		//by filling in gaps in the generation with smaller trees 
+		dbase.setMultipass(Biomes.ROOFED_FOREST, pass -> {
+			switch(pass) {
+				case 0: return 0;//Zero means to run as normal
+				case 1: return 5;//Return only radius 5 on pass 1
+				case 2: return 3;//Return only radius 3 on pass 2
+				default: return -1;//A negative number means to terminate
+			}
+		});
+		
+		//Allow Mushroom Island biomes to generate normally
 		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND, false);
 		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND_SHORE, false);
-
+		
 		dbase.setIsSubterranean(Biomes.HELL, true);
 	}
 	
