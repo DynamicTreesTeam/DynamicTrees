@@ -53,7 +53,13 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		if(cSet.generated) {
 			return getChunkPoissonDiscs(chunkX, chunkZ);
 		} else {
-			return generatePoissonDiscs(random, chunkX, chunkZ);
+			int i = 0;
+			List<PoissonDisc> output = null;
+			while(radiusCoordinator.setPacking(chunkX, chunkZ, i++)) {
+				output = generatePoissonDiscs(random, chunkX, chunkZ);
+			}
+			
+			return output;
 		}
 	}
 	
@@ -72,6 +78,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		
 		
 		// Step 1.) Collect already solved discs from surrounding chunks
+		getChunkPoissonDiscs(allDiscs, chunkX, chunkZ);
 		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
 			Vec3i dir = surr.getOffset();
 			getChunkPoissonDiscs(allDiscs, chunkX + dir.getX(), chunkZ + dir.getZ());
@@ -138,7 +145,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				//System.out.println("dir: " + (CCW ? "CCW" : "CW") + ", angle: " + (angle * 180 / Math.PI));
 				double dx = master.x + (MathHelper.sin(angle) * master.radius * 1.5);
 				double dz = master.z + (MathHelper.cos(angle) * master.radius * 1.5);
-				radius = radiusCoordinator.getRadiusAtCoords(dx, dz);
+				radius = radiusCoordinator.getRadiusAtCoords((int)dx, (int)dz);
 				if(debug != null) { debug.getRadius(master, radius, unsolvedDiscs, allDiscs); }
 				
 				// Step 8.) Create a second disc tangential to the master disc.
