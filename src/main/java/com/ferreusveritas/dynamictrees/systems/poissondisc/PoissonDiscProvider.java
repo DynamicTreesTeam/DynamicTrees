@@ -55,7 +55,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		} else {
 			int i = 0;
 			List<PoissonDisc> output = null;
-			while(radiusCoordinator.setPacking(chunkX, chunkZ, i++)) {
+			while(radiusCoordinator.runPass(chunkX, chunkZ, i++)) {
 				output = generatePoissonDiscs(random, chunkX, chunkZ);
 			}
 			

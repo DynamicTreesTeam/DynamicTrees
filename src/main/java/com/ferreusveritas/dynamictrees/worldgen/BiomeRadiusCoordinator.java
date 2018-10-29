@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.Random;
+import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 
@@ -15,7 +16,8 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	public NoiseGeneratorPerlin noiseGenerator;
 	protected final TreeGenerator treeGenerator;
 	protected final World world;
-	protected int packing;
+	protected int pass;
+	protected Function<Integer, Integer> chunkMultipass;
 	
 	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, World world) {
 		noiseGenerator = new NoiseGeneratorPerlin(new Random(96), 1);
@@ -26,9 +28,9 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	@Override
 	public int getRadiusAtCoords(int x, int z) {
 		
-		switch(packing) {
-			case 1: return 5;
-			case 2: return 3;
+		int rad = chunkMultipass.apply(pass);
+		if(rad >= 2 && rad <= 8) {
+			return rad;
 		}
 		
 		double scale = 128;//Effectively scales up the noisemap
@@ -47,16 +49,15 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	}
 	
 	@Override
-	public boolean setPacking(int chunkX, int chunkZ, int iteration) {
-		packing = iteration;
+	public boolean runPass(int chunkX, int chunkZ, int pass) {
+		this.pass = pass;
 		
-		Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Aim at center of chunk
-
-		if(treeGenerator.getBiomeDataBase(world).isOverpacked(biome)) {
-			return packing < 3;
+		if(pass == 0) {
+			Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Aim at center of chunk
+			chunkMultipass = treeGenerator.getBiomeDataBase(world).getMultipass(biome);
 		}
 		
-		return packing == 0;
+		return chunkMultipass.apply(pass) >= 0;
 	}
 	
 }

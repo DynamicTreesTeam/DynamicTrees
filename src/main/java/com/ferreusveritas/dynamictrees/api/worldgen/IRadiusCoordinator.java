@@ -4,6 +4,6 @@ public interface IRadiusCoordinator {
 	
 	int getRadiusAtCoords(int x, int z);
 	
-	boolean setPacking(int chunkX, int chunkZ, int iteration);
+	boolean runPass(int chunkX, int chunkZ, int pass);
 	
 }

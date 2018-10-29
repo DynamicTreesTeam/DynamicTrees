@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IChanceSelector;
@@ -33,7 +34,8 @@ public class BiomeDataBase {
 		private boolean cancelVanillaTreeGen = false;
 		private boolean isSubterranean = false;
 		private float forestness = 0.0f;
-		private boolean overpacked = false;
+		private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
+		private Function<Integer, Integer> multipass = defaultMultipass;
 		
 		public BiomeEntry() {
 			biome = Biomes.DEFAULT;
@@ -101,12 +103,12 @@ public class BiomeDataBase {
 			return forestness;
 		}
 		
-		public void setOverpacked(boolean is) {
-			overpacked = is;
+		public void setMultipass(Function<Integer, Integer> multipass) {
+			this.multipass = multipass;
 		}
 		
-		public boolean isOverpacked() {
-			return overpacked;
+		public Function<Integer, Integer> getMultipass() {
+			return multipass;
 		}
 		
 	}
@@ -147,8 +149,8 @@ public class BiomeDataBase {
 		return getEntry(biome).getForestness();
 	}
 	
-	public boolean isOverpacked(Biome biome) {
-		return getEntry(biome).isOverpacked();
+	public Function<Integer, Integer> getMultipass(Biome biome) {
+		return getEntry(biome).getMultipass();
 	}
 	
 	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
@@ -238,8 +240,8 @@ public class BiomeDataBase {
 		return this;
 	}
 	
-	public BiomeDataBase setOverpacked(Biome biome, boolean overpacked) {
-		getEntry(biome).setOverpacked(overpacked);
+	public BiomeDataBase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
+		getEntry(biome).setMultipass(multipass);
 		return this;
 	}
 	
