@@ -63,6 +63,7 @@ public class ClientProxy extends CommonProxy {
 	public void init() {
 		super.init();
 		registerColorHandlers();
+		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 	}
 	
 	@Override
@@ -201,7 +202,6 @@ public class ClientProxy extends CommonProxy {
 	public void registerClientEventHandlers() {
 		MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
 		MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
-		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.class);
 	}
 	
 	public void registerEntityRenderers() {
