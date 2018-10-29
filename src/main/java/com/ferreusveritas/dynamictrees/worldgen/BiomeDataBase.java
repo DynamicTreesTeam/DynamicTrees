@@ -32,7 +32,8 @@ public class BiomeDataBase {
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
 		private boolean cancelVanillaTreeGen = false;
 		private boolean isSubterranean = false;
-		private float forestness = 0.0f; 
+		private float forestness = 0.0f;
+		private boolean overpacked = false;
 		
 		public BiomeEntry() {
 			biome = Biomes.DEFAULT;
@@ -100,6 +101,14 @@ public class BiomeDataBase {
 			return forestness;
 		}
 		
+		public void setOverpacked(boolean is) {
+			overpacked = is;
+		}
+		
+		public boolean isOverpacked() {
+			return overpacked;
+		}
+		
 	}
 	
 	public BiomeEntry getEntry(Biome biome) {
@@ -136,6 +145,10 @@ public class BiomeDataBase {
 	
 	public float getForestness(Biome biome) {
 		return getEntry(biome).getForestness();
+	}
+	
+	public boolean isOverpacked(Biome biome) {
+		return getEntry(biome).isOverpacked();
 	}
 	
 	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
@@ -222,6 +235,11 @@ public class BiomeDataBase {
 	
 	public BiomeDataBase setForestness(Biome biome, float forestness) {
 		getEntry(biome).setForestness(forestness);
+		return this;
+	}
+	
+	public BiomeDataBase setOverpacked(Biome biome, boolean overpacked) {
+		getEntry(biome).setOverpacked(overpacked);
 		return this;
 	}
 	

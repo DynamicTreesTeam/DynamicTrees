@@ -80,6 +80,11 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 				
 				//Identify the "forestness" of the biome.  Affects forest spread rate for biome.
 				dbase.setForestness(biome, identifyForestness(biome));
+
+				//Enable poisson disc overpacking of roofed forests
+				if(BiomeDictionary.hasType(biome, Type.SPOOKY)) {
+					dbase.setOverpacked(biome, true);
+				}
 			}
 		);
 		

@@ -4,7 +4,6 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 
-import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -51,8 +50,9 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	public boolean setPacking(int chunkX, int chunkZ, int iteration) {
 		packing = iteration;
 		
-		Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Placement is offset by +8,+8
-		if(biome == Biomes.ROOFED_FOREST) {
+		Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Aim at center of chunk
+
+		if(treeGenerator.getBiomeDataBase(world).isOverpacked(biome)) {
 			return packing < 3;
 		}
 		
