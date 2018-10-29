@@ -120,28 +120,41 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		//Keep solving all unsolved disc until there aren't any more to solve.
 		while(!unsolvedDiscs.isEmpty()) {
 			
-			if(debug != null) { debug.updateCount(count); }
+			if(debug != null) { debug.updateCount(count, unsolvedDiscs, allDiscs); }
 			
 			// Step 6.) Pick a random disc from the pool of unsolved discs this will be the master disc
 			PoissonDisc master = unsolvedDiscs.get(0);//Any circle will do.  May as well be the first.
-			if(debug != null) { debug.pickMasterDisc(master, unsolvedDiscs); }
+			if(debug != null) { debug.pickMasterDisc(master, unsolvedDiscs, allDiscs); }
 			
-			// Step 7.) Use the master disc and it's free arc angle to find the radius of the new tangential disc
-			float angle = (float)master.getFreeAngle();
-			double dx = master.x + (MathHelper.sin(angle) * master.radius * 1.5);
-			double dz = master.z + (MathHelper.cos(angle) * master.radius * 1.5);
-			int radius = radiusCoordinator.getRadiusAtCoords(dx, dz);
-			if(debug != null) { debug.getRadius(master, radius); }
-			
-			// Step 8.) Create a second disc tangential to the master disc.
-			PoissonDisc slave = PoissonDiscHelper.findSecondDisc(master, radius, true);
-			Vec2i slavePos = new Vec2i(slave);//Cache slave position
-			if(debug != null) { debug.findSecondDisc(master, slave); }
+			//The goal here is to try both directions and prefer the direction that creates an intersection with an existing disc
+			PoissonDisc slave = null; 
+			Vec2i slavePos = null;
+			int radius = 0;
+			for(int dir = 0; dir <= 1; dir++) {
+				boolean CCW = dir == 0;
+				
+				// Step 7.) Use the master disc and it's free arc angle to find the radius of the new tangential disc
+				float angle = CCW ? (float)master.getFreeAngleCCW() : (float)master.getFreeAngleCW();
+				//System.out.println("dir: " + (CCW ? "CCW" : "CW") + ", angle: " + (angle * 180 / Math.PI));
+				double dx = master.x + (MathHelper.sin(angle) * master.radius * 1.5);
+				double dz = master.z + (MathHelper.cos(angle) * master.radius * 1.5);
+				radius = radiusCoordinator.getRadiusAtCoords(dx, dz);
+				if(debug != null) { debug.getRadius(master, radius, unsolvedDiscs, allDiscs); }
+				
+				// Step 8.) Create a second disc tangential to the master disc.
+				slave = PoissonDiscHelper.findSecondDisc(master, radius, true, CCW);
+				slavePos = new Vec2i(slave);//Cache slave position
+				if(debug != null) { debug.findSecondDisc(master, slave, unsolvedDiscs, allDiscs); }
+				
+				if(doesDiscIntersectWith(slave, allDiscs)) {
+					break;
+				}
+			}
 			
 			// Step 9.) Mask off the master so it won't happen again.
-			master.arc |= 1 << master.getFreeBit();//Clear specific arc bit for good measure
+			master.arc |= 1 << master.getFreeBitCW();//Clear specific arc bit for good measure
 			PoissonDiscHelper.maskDiscs(master, slave, true);
-			if(debug != null) { debug.maskMasterSlave(master, slave); }
+			if(debug != null) { debug.maskMasterSlave(master, slave, unsolvedDiscs, allDiscs); }
 
 			// Step 10.) Create a list of existing circles that are intersecting with this circle.  List is ordered by penetration depth.
 			int i = 0;
@@ -169,15 +182,19 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				}
 				
 				slave = PoissonDiscHelper.findThirdDisc(master1, master2, radius);//Attempt to triangulate a circle position that is touching tangentially to both master circles
-				if(debug != null) { debug.findThirdDiscCandidate(master1, master2, slave); }
+				if(debug != null) { debug.findThirdDiscCandidate(master1, master2, slave, unsolvedDiscs, allDiscs); }
 				if(slave != null) {//Found a 3rd circle candidate
+					//System.out.println("slave is not null");
 					for(int ci = 0; ci < allDiscs.size(); ci++) {
 						PoissonDisc c = allDiscs.get(ci);
-						if(slave.doCirclesIntersect(c)){//See if this new circle intersects with any of the existing circles. If it does then..
+						if(slave.doCirclesIntersectPadding(c)){//See if this new circle intersects with any of the existing circles. If it does then..
+							if(debug != null) { debug.thirdCircleCandidateIntersects(master1, master2, slave, c, unsolvedDiscs, allDiscs); }
 							if(c.real || (!c.real && !slave.isInCenterChunk(chunkXStart, chunkZStart)) ) {
+								//System.out.println("Discard the slave because it's intersecting with an existing real circle");
 								slave = null;//Discard the circle because it's intersecting with an existing real circle
 								break;//We needn't continue since we've proven that the circle intersects with any circle
 							} else {//The overlapping circle is not real.. but the slave circle is.
+								//System.out.println("Delete the offending non-real circle.");
 								PoissonDiscHelper.fastRemove(allDiscs, ci--);//Delete the offending non-real circle. The order of the circles is unimportant
 							} 
 						}
@@ -185,7 +202,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				}
 				
 				if(slave != null) {
-					if(debug != null) { debug.findThirdDiscSolved(slave); }
+					if(debug != null) { debug.findThirdDiscSolved(slave, unsolvedDiscs, allDiscs); }
 					break;//We found a viable circle.. time to move on
 				}
 			}
@@ -222,6 +239,16 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		allDiscs.clear();
 		
 		return cSet.getDiscs(allDiscs, chunkX, chunkZ);
+	}
+	
+	private boolean doesDiscIntersectWith(PoissonDisc disc, List<PoissonDisc> others) {
+		for(PoissonDisc other  : others) {
+			if(disc.doCirclesIntersectPadding(other)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private PoissonDiscChunkSet getChunkDiscSet(int chunkX, int chunkZ) {

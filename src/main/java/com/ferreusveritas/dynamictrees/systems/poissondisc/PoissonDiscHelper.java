@@ -12,8 +12,8 @@ public class PoissonDiscHelper {
 	* @param onlyTight Only returns tightly fitting circles and reject loose fits.
 	* @return
 	*/
-	public static PoissonDisc findSecondDisc(PoissonDisc cA, int cBrad, boolean onlyTight) {
-		return findSecondDisc(cA, cBrad, cA.getFreeAngle(), onlyTight);
+	public static PoissonDisc findSecondDisc(PoissonDisc cA, int cBrad, boolean onlyTight, boolean CCW) {
+		return findSecondDisc(cA, cBrad, CCW ? cA.getFreeAngleCCW() : cA.getFreeAngleCW(), onlyTight);
 	}
 
 	private static final int singleSearchOrder[] = new int[] {0, 1, -1};
