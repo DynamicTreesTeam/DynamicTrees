@@ -3,17 +3,20 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
@@ -22,18 +25,22 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 	
 	public static class GroundFinder implements IGroundFinder {
 		
+		protected boolean inNetherRange(BlockPos pos) {
+	        return pos.getY() >= 0 && pos.getY() <= 128;
+		}
+		
 		protected ArrayList<Integer> findSubterraneanLayerHeights(World world, BlockPos start) {
 			
 			MutableBlockPos pos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
 			
 			ArrayList<Integer> layers = new ArrayList();
 			
-			while(pos.getY() < 256) {
-				while(!world.isAirBlock(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
-				while(world.isAirBlock(pos))  { pos.move(EnumFacing.DOWN);  } //Move down 1 block at a time until we hit not-air
+			while(inNetherRange(pos)) {
+				while(!world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
+				while(world.isAirBlock(pos) && inNetherRange(pos))  { pos.move(EnumFacing.DOWN); } //Move down 1 block at a time until we hit not-air
 				if (world.getBlockState(pos).getMaterial() != Material.LAVA) { layers.add(pos.getY()); } //Record this position
 				pos.move(EnumFacing.UP, 16); //Move up 16 blocks
-				while(world.isAirBlock(pos) && pos.getY() < 256) {  pos.move(EnumFacing.UP); } //Zip up 4 blocks at a time until we hit ground
+				while(world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit ground
 			}
 			
 			//Discard the last result as it's just the top of the biome(bedrock for nether)
@@ -54,15 +61,34 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 			return new BlockPos(start.getX(), y, start.getY());
 		}
 		
+		protected boolean inOverworldRange(BlockPos pos) {
+			return pos.getY() >= 0 && pos.getY() <= 128;
+		}
+		
 		protected BlockPos findOverworldGround(World world, BlockPos start) {
-			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
-			while(world.isAirBlock(mPos) || TreeHelper.isTreePart(world, mPos)) {//Skip down past the bits of generated tree and air
-				mPos.move(EnumFacing.DOWN);
-				if(world.isOutsideBuildHeight(mPos)) {
-					return BlockPos.ORIGIN;
+			
+			Chunk chunk = world.getChunkFromBlockCoords(start);//We'll use a chunk for the search so we don't have to keep looking up the chunk for every block
+			
+			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.UP, 2);//Mutable allows us to change the test position easily
+			while(inOverworldRange(mPos)) {
+				
+				IBlockState state = chunk.getBlockState(mPos);
+				Block testBlock = state.getBlock();
+				
+				if(testBlock != Blocks.AIR) {
+					Material material = state.getMaterial();
+					if( material == Material.GROUND || material == Material.WATER || //These will account for > 90% of blocks in the world so we can solve this early
+							(state.getMaterial().blocksMovement() &&
+							!testBlock.isLeaves(state, world, mPos) &&
+							!testBlock.isFoliage(world, mPos))) {
+						return mPos.toImmutable(); 
+					}
 				}
+				
+				mPos.move(EnumFacing.DOWN);
 			}
-			return mPos.toImmutable();
+			
+			return BlockPos.ORIGIN;
 		}
 		
 		@Override

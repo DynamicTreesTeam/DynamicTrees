@@ -1,10 +1,6 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.util.MathHelper;
-import com.ferreusveritas.dynamictrees.util.Vec2i;
-import com.ferreusveritas.dynamictrees.util.Vec2iPCA;
-
-public class CirclePairData {
+public class PoissonDiscPairData {
 	private Vec2i coordData[];
 	private int sectors;
 	
@@ -46,7 +42,7 @@ public class CirclePairData {
 		int idx2 = rad2 - 2;
 		int sectors = codeSize * 4;
 		Vec2i[] coord = coordTable[idx1][idx2] = coordTable[idx2][idx1] = new Vec2i[sectors];
-
+		
 		byte curveData[] = uncompressCurve(codeSize, curveCode);
 		
 		for(int sector = 0; sector < sectors; sector++) {
@@ -72,7 +68,7 @@ public class CirclePairData {
 		return wave;
 	}
 	
-	public CirclePairData(int rad1, int rad2) {
+	public PoissonDiscPairData(int rad1, int rad2) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 		this.coordData = coordTable[idx1][idx2];
@@ -80,23 +76,23 @@ public class CirclePairData {
 	}
 	
 	public Vec2i getCoords(int sector) {
-		return new Vec2i(coordData[MathHelper.wrap(sector, sectors)]);
+		return new Vec2i(coordData[PoissonDiscMathHelper.wrap(sector, sectors)]);
 	}
 	
 	public int getSector(double actualAngle) {
 		
-		int sector = (int)(MathHelper.radiansToTurns(actualAngle) * sectors);
-		double smallestDelta = MathHelper.deltaAngle(actualAngle, getCoords(sector).angle());
+		int sector = (int)(PoissonDiscMathHelper.radiansToTurns(actualAngle) * sectors);
+		double smallestDelta = PoissonDiscMathHelper.deltaAngle(actualAngle, getCoords(sector).angle());
 		boolean runNextDir = true;
 		
 		for(int dir = -1; runNextDir && dir <= 1; dir += 2) {//Search one direction and then the other
 			while(true) {
 				double ang = getCoords(sector + dir).angle();
-				double del = MathHelper.deltaAngle(actualAngle, ang);
+				double del = PoissonDiscMathHelper.deltaAngle(actualAngle, ang);
 				if(del < smallestDelta) {
 					smallestDelta = del;
 					sector += dir;
-					runNextDir = false;//If this direction lead to a decrease in the delta angle then the other direction can only make it larger.  
+					runNextDir = false;//If this direction leads to a decrease in the delta angle then the other direction can only make it larger.  
 				} else {
 					break;//Try the other direction
 				}
@@ -105,4 +101,5 @@ public class CirclePairData {
 		
 		return sector;
 	}
+	
 }

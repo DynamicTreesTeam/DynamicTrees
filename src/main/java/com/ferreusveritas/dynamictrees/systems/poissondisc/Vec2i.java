@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 public class Vec2i {
 

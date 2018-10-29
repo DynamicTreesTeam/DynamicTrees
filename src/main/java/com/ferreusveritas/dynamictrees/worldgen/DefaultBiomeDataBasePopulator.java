@@ -32,8 +32,8 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	private static Species oakswamp;
 	private static Species apple;
 	private static Species cactus;
-	private static Species mushroomred;
-	private static Species mushroombrn;
+	//private static Species mushroomred;
+	//private static Species mushroombrn;
 	
 	private static StaticSpeciesSelector staticOakDecision;
 	private static StaticSpeciesSelector staticSpruceDecision;
@@ -52,8 +52,8 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		
 		cactus = TreeRegistry.findSpeciesSloppy("cactus");
 		
-		mushroomred = TreeRegistry.findSpeciesSloppy("mushroomred");
-		mushroombrn = TreeRegistry.findSpeciesSloppy("mushroombrn");
+		//mushroomred = TreeRegistry.findSpeciesSloppy("mushroomred");
+		//mushroombrn = TreeRegistry.findSpeciesSloppy("mushroombrn");
 		
 		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));

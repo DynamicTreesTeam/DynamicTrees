@@ -38,7 +38,6 @@ public class SafeChunkBounds {
 	
 	private final ChunkPos center;
 	private BlockBounds chunkBounds[] = new BlockBounds[16];
-	//private Chunk chunk[] = new Chunk[16];
 	
 	protected SafeChunkBounds() {
 		center = null;
@@ -51,7 +50,6 @@ public class SafeChunkBounds {
 			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
 			Chunk c = world.getChunkProvider().getLoadedChunk(cp.x, cp.z);
 			chunkBounds[t.index] = c != null ? new BlockBounds(cp) : BlockBounds.INVALID;
-			//chunk[t.index] = c;
 		}
 
 		for(Tile t : tiles) {

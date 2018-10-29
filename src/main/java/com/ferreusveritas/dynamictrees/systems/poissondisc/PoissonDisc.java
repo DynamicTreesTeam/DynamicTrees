@@ -1,4 +1,6 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.systems.poissondisc;
+
+import com.ferreusveritas.dynamictrees.util.SimpleBitmap;
 
 import net.minecraft.util.math.BlockPos;
 
@@ -196,8 +198,8 @@ public class PoissonDisc extends Vec2i {
 	* @param endAngle starting angle in radians
 	*/
 	public void maskArc(double startAngle, double endAngle) {
-		int start = Math.round(MathHelper.radiansToTurns(startAngle) * 32.0f) & 31;
-		int end =   Math.round(MathHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
+		int start = Math.round(PoissonDiscMathHelper.radiansToTurns(startAngle) * 32.0f) & 31;
+		int end =   Math.round(PoissonDiscMathHelper.radiansToTurns(endAngle)   * 32.0f) & 31;
 		arc |= bitRun(start, end);
 	}
 	
@@ -206,6 +208,13 @@ public class PoissonDisc extends Vec2i {
 	*/
 	public void fillArc() {
 		arc = 0xFFFFFFFF;
+	}
+	
+	/**
+	* Set the circle to a solved state
+	*/
+	public void setSolved() {
+		fillArc();
 	}
 	
 	/**
@@ -268,20 +277,43 @@ public class PoissonDisc extends Vec2i {
 	* If the arc mask is completely empty then the function defaults to a psuedorandom bit from 0 - 31
 	* @return the next free bit angle for placing a circle 0 to 31
 	*/
-	public int getFreeBit() {
+	public int getFreeBitCW() {
 		if(arc == 0) {
 			return ((x ^ z) & 31);//Pseudorandom angle
 		}
 		
+		int arc = this.arc;
 		int pos = Integer.numberOfTrailingZeros(arc);
 		
 		if(pos == 0) {
 			pos = Integer.numberOfTrailingZeros(~arc);
 			pos += Integer.numberOfTrailingZeros(Integer.rotateRight(arc, pos));
-		} // 16
+		}
 		
 		return ((pos - 1) & 31);
+	}
+	
+	/**
+	* Detects the transition from 0 to 1 around the circle arc mask in the counter clockwise direction starting from 0 degrees.
+	* 
+	* If the arc mask is completely empty then the function defaults to a psuedorandom bit from 0 - 31
+	* @return the next free bit angle for placing a circle 0 to 31
+	*/
+	public int getFreeBitCCW() {
+
+		if(arc == 0) {
+			return ((x ^ z) & 31);//Pseudorandom angle
+		}
 		
+		int arc = Integer.rotateRight(this.arc, 1);
+		int pos = Integer.numberOfLeadingZeros(arc);
+		
+		if(pos == 0) {
+			pos = Integer.numberOfLeadingZeros(~arc);
+			pos += Integer.numberOfLeadingZeros(Integer.rotateLeft(arc, pos));
+		}
+		
+		return (33 - pos) & 31;
 	}
 	
 	/**
@@ -299,9 +331,19 @@ public class PoissonDisc extends Vec2i {
 	* 
 	* @return free angle in radians
 	*/
-	public double getFreeAngle() {
-		return bitToAngle(getFreeBit());
+	public double getFreeAngleCW() {
+		return bitToAngle(getFreeBitCW());
 	}
+
+	/**
+	* Gets the next free angle(in radians) for placing a new neighboring circle.
+	* 
+	* @return free angle in radians
+	*/
+	public double getFreeAngleCCW() {
+		return bitToAngle(getFreeBitCCW());
+	}
+	
 	
 	/**
 	* Test to see if the circle has any remaining free angles on its arc.
@@ -314,12 +356,21 @@ public class PoissonDisc extends Vec2i {
 	}
 	
 	/**
+	* A circle with no free angles is considered solved in the circle packing algorithm.
+	* 
+	* @return False if circle has free angles(unsolved).  True if it does not(solved)
+	*/
+	public boolean isSolved() {
+		return !hasFreeAngles();
+	}
+	
+	/**
 	* Measure how deeply a circle penetrates another circle.
 	* 
 	* @param o Other circle
 	* @return penetration depth
 	*/
-	public double circlePenetration(PoissonDisc o) {
+	public double discPenetration(PoissonDisc o) {
 		Vec2i delta = new Vec2i(x - o.x, z - o.z);
 		return delta.len() - (this.radius + o.radius + 1);
 	}
