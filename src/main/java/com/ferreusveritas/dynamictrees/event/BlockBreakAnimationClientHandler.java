@@ -1,28 +1,46 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
+import com.ferreusveritas.dynamictrees.models.BakedModelBlockBranchThick;
+import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuadRetextured;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -72,7 +90,7 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-		//this.drawBlockDamageTexture(Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getPartialTicks());
+		this.drawBlockDamageTexture(mc, textureManager, Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getPartialTicks());
 		textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		GlStateManager.disableBlend();
@@ -134,7 +152,77 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		GlStateManager.popMatrix();
 	}
 	
+	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, float partialTicks) {
+        double d3 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
+        double d4 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
+        double d5 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
+
+        if (mc.world.getWorldTime() % 20 == 0) {
+            this.cleanupExtraDamagedBlocks();
+        }
+        
+        if (!this.damagedBranches.isEmpty()) {
+            renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            this.preRenderDamagedBlocks();
+            bufferBuilderIn.begin(7, DefaultVertexFormats.BLOCK);
+            bufferBuilderIn.setTranslation(-d3, -d4, -d5);
+            bufferBuilderIn.noColor();
+
+            for (Entry<Integer, DestroyBlockProgress> entry : this.damagedBranches.entrySet()) {
+            	DestroyBlockProgress destroyblockprogress = entry.getValue();
+                BlockPos pos = destroyblockprogress.getPosition();
+            	double d6 = (double) pos.getX() - d3;
+            	double d7 = (double) pos.getY() - d4;
+            	double d8 = (double) pos.getZ() - d5;
+
+        		if (d6 * d6 + d7 * d7 + d8 * d8 > 16384) {
+        			this.damagedBranches.remove(entry.getKey());
+        		} else {
+        			IBlockState state = mc.world.getBlockState(pos);
+    				int k1 = destroyblockprogress.getPartialBlockDamage();
+    				TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
+    				BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
+    				if (state.getRenderType() == EnumBlockRenderType.MODEL) {
+    					state = state.getActualState(mc.world, pos);
+    					IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
+    					IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
+    					blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
+    				}
+        		}
+            }
+
+            tessellatorIn.draw();
+            bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
+            this.postRenderDamagedBlocks();
+        }
+    }
 	
+	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, IBlockState state, IBlockAccess world, BlockPos pos) {
+		state = state.getBlock().getExtendedState(state, world, pos);
+		
+		if (baseModel instanceof ICustomDamageModel) {
+			ICustomDamageModel customDamageModel = (ICustomDamageModel) baseModel;
+			long rand = MathHelper.getPositionRandom(pos);
+			
+			List<BakedQuad> generalQuads = Lists.<BakedQuad>newArrayList();
+			Map<EnumFacing, List<BakedQuad>> faceQuads = Maps.newEnumMap(EnumFacing.class);
+			
+			for (EnumFacing facing : EnumFacing.values()) {
+				List<BakedQuad> quadList = Lists.newArrayList();
+				for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, facing, rand)) {
+					quadList.add(new BakedQuadRetextured(quad, texture));
+				}
+				faceQuads.put(facing, quadList);
+			}
+			for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, null, rand)) {
+				generalQuads.add(new BakedQuadRetextured(quad, texture));
+			}
+			
+			return new SimpleBakedModel(generalQuads, faceQuads, baseModel.isAmbientOcclusion(state), baseModel.isGui3d(), baseModel.getParticleTexture(), baseModel.getItemCameraTransforms(), baseModel.getOverrides());
+		}
+		
+		return (new SimpleBakedModel.Builder(state, baseModel, texture, pos)).makeBakedModel();
+	}
 	
 	
 	private static class RenderGlobalWrapper implements IWorldEventListener {
@@ -207,7 +295,7 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {
 			IBlockState state = world.getBlockState(pos);
 			if (state.getBlock() instanceof BlockBranchThick) {
-				// TODO
+				BlockBreakAnimationClientHandler.instance.sendThickBranchBreakProgress(breakerId, pos, progress);
 			} else {
 				Minecraft.getMinecraft().renderGlobal.sendBlockBreakProgress(breakerId, pos, progress);
 			}

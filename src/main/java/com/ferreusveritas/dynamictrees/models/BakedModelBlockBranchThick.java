@@ -32,7 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
-public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
+public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic implements ICustomDamageModel {
 	
 	private IBakedModel trunksBark[] = new IBakedModel[16];//The trunk will always feature bark on it's sides
 	private IBakedModel trunksTopBark[] = new IBakedModel[16];//The trunk will feature bark on it's top when there's more tree on it's surface 
@@ -47,7 +47,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 		TextureAtlasSprite thickRingIcon = bakedTextureGetter.apply(thickRingsRes);
 		barkParticles = barkIcon;
 		
-		for(int i = 0; i < 16; i++) {
+		for (int i = 0; i < 16; i++) {
 			int radius = i + 9;
 			trunksBark[i] = bakeTrunkBark(radius, barkIcon, true);
 			trunksTopBark[i] = bakeTrunkBark(radius, barkIcon, false);
@@ -62,17 +62,17 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
 		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 		
-		final EnumFacing[] run = side ? EnumFacing.HORIZONTALS : new EnumFacing[] { EnumFacing.UP };
+		final EnumFacing[] run = side ? EnumFacing.HORIZONTALS : new EnumFacing[] { EnumFacing.UP, EnumFacing.DOWN };
 		ArrayList<Vec3i> offsets = new ArrayList<>();
 		
-		for(Surround dir: Surround.values()) {
+		for (Surround dir: Surround.values()) {
 			offsets.add(dir.getOffset());//8 surrounding component pieces
 		}
 		offsets.add(new Vec3i(0, 0, 0));//Center
 		
-		for(EnumFacing face: run) {
-			for(Vec3i offset : offsets) {
-				if(face == EnumFacing.UP || new Vec3d(face.getDirectionVec()).add(new Vec3d(offset)).lengthSquared() > 2.25) { //This means that the dir and face share a common direction
+		for (EnumFacing face: run) {
+			for (Vec3i offset : offsets) {
+				if (face.getAxis() == Axis.Y || new Vec3d(face.getDirectionVec()).add(new Vec3d(offset)).lengthSquared() > 2.25) { //This means that the dir and face share a common direction
 					Vec3d scaledOffset = new Vec3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
 					AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
 					
@@ -147,7 +147,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
 		int coreRadius = getRadius(blockState);
 
-		if(coreRadius <= BlockBranch.RADMAX_NORMAL) {
+		if (coreRadius <= BlockBranch.RADMAX_NORMAL) {
 			return super.getQuads(blockState, side, rand);
 		}
 		
@@ -170,6 +170,24 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic {
 			}
 				
 		}
+		
+		return quadsList;
+	}
+
+	@Override
+	public List<BakedQuad> getCustomDamageQuads(IBlockState blockState, EnumFacing side, long rand) {
+		int coreRadius = getRadius(blockState);
+
+		if (coreRadius <= BlockBranch.RADMAX_NORMAL) {
+			return super.getQuads(blockState, side, rand);
+		}
+		
+		coreRadius = MathHelper.clamp(coreRadius, 9, 24);
+		
+		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
+		
+		quadsList.addAll(trunksBark[coreRadius - 9].getQuads(blockState, side, rand));
+		quadsList.addAll(trunksTopBark[coreRadius - 9].getQuads(blockState, side, rand));
 		
 		return quadsList;
 	}
