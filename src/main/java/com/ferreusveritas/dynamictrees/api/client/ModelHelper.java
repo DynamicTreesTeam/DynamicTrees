@@ -49,6 +49,10 @@ public class ModelHelper {
 		if(block != Blocks.AIR) {
 			regModel(Item.getItemFromBlock(block));
 		}
+		if (block instanceof BlockBranchThick) {
+			Item item = Item.getItemFromBlock(((BlockBranchThick) block).otherBlock);
+			regModel(item, 0, block.getRegistryName());
+		}
 	}
 	
 	public static void regModel(Item item) {
