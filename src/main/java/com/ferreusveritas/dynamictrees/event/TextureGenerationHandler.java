@@ -1,11 +1,17 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.client.ThickRingTextureAtlasSprite;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,8 +33,23 @@ public class TextureGenerationHandler {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
+		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+		
 		for (Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()) {
-			event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(entry.getValue(), entry.getKey()));
+			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getResourceDomain(), String.format("%s/%s%s", event.getMap().getBasePath(), entry.getValue().getResourcePath(), ".png"));
+			
+			IResource resource;
+			try {
+				resource = resourceManager.getResource(textureLocation);
+			} catch (IOException e) {
+				resource = null;
+			}
+			
+			if (resource != null) {
+				event.getMap().registerSprite(entry.getValue());
+			} else {
+				event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(entry.getValue(), entry.getKey()));
+			}
 		}
 	}
 
