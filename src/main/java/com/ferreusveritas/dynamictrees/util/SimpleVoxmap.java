@@ -102,6 +102,16 @@ public class SimpleVoxmap {
 		return lenZ;
 	}
 	
+	public BlockBounds getBounds() {
+		int minX = center.getX() - lenX + 1;
+		int minY = center.getY() - lenY + 1;
+		int minZ = center.getZ() - lenZ + 1;
+		int maxX = minX + lenX - 1;
+		int maxY = minY + lenY - 1;
+		int maxZ = minZ + lenZ - 1;
+		return new BlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
+	}
+	
 	public interface IBlitOp {
 		byte getOp(byte srcValue, byte dstValue);
 	}

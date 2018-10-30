@@ -32,6 +32,15 @@ public class BlockBounds {
 		maxZ = max.getZ();
 	}
 	
+	public BlockBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+		this.minX = minX;
+		this.minY = minY;
+		this.minZ = minZ;
+		this.maxX = maxX;
+		this.maxY = maxY;
+		this.maxZ = maxZ;
+	}
+	
 	public BlockBounds(ChunkPos cPos) {
 		minX = cPos.getXStart();
 		minY = 0;
@@ -127,6 +136,10 @@ public class BlockBounds {
 		maxY += y;
 		maxZ += z;
 		return this;
+	}
+	
+	public BlockBounds move(BlockPos offset) {
+		return move(offset.getX(), offset.getY(), offset.getZ());
 	}
 	
 	public BlockBounds expand(int amount) {

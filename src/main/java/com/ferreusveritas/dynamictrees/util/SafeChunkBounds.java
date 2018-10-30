@@ -88,4 +88,9 @@ public class SafeChunkBounds {
 		return false;
 	}
 	
+	public boolean inBounds(BlockBounds bounds, boolean gap) {
+		BlockPos min = bounds.getMin();
+		BlockPos max = bounds.getMax();
+		return inBounds(min, gap) && inBounds(max, gap) && inBounds(new BlockPos(min.getX(), 0, max.getZ()), gap) && inBounds(new BlockPos(max.getX(), 0, min.getZ()), gap);
+	}
 }
