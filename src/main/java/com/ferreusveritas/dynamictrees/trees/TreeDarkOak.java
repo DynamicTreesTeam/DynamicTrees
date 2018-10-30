@@ -9,19 +9,18 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -36,7 +35,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
-			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
+			setBasicGrowingParameters(0.30f, 19.0f, 4, 6, 0.8f);
 			
 			setSoilLongevity(14);//Grows for a long long time
 			
@@ -143,6 +142,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 					if(probMap[dir.ordinal()] >= 7) {
 						probMap[dir.ordinal()] = 2;
 					}
+				}
+				if(signal.delta.getY() > getLowestBranchHeight() + 5) {
+					probMap[EnumFacing.UP.ordinal()] = 0;
+					signal.energy = 2;
 				}
 			}
 			
