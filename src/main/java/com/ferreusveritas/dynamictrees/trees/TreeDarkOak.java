@@ -10,16 +10,20 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.MushroomGenerator;
 
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -69,6 +73,31 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
 				for(Surround dir: Surround.values()) {
 					world.setBlockState(rootPos.add(dir.getOffset()), initialDirtState);
+				}
+			}
+			
+			//generateMushroom(world, rootPos, biome, radius, safeBounds);
+		}
+		
+		public void generateMushroom(World world, BlockPos rootPos, Biome biome, int radius, SafeChunkBounds safeBounds) {
+
+			Random rand = world.rand;
+			
+			if(radius >= 5) {
+				for(int tries = 0; tries < 4; tries++) {
+					
+					float angle = (float) (rand.nextFloat() * Math.PI * 2);
+					int xOff = (int) (MathHelper.sin(angle) * (radius - 1));
+					int zOff = (int) (MathHelper.cos(angle) * (radius - 1));
+					
+					BlockPos mushPos = rootPos.add(xOff, 0, zOff);
+					
+					mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).up();
+					
+					MushroomGenerator mushGen = new MushroomGenerator();
+					if(mushGen.generate(world, rand, mushPos, rand.nextInt(3) + 4)) {
+						return;
+					}
 				}
 			}
 		}

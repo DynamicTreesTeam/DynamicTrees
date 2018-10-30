@@ -27,7 +27,8 @@ public class MushroomGenerator {
 		Block mushroomBlock = this.mushroomType;
 		
 		if (mushroomBlock == null) {
-			mushroomBlock = rand.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
+			mushroomBlock = Blocks.RED_MUSHROOM_BLOCK;
+			//mushroomBlock = rand.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
 		}
 		
 		int stemLength = height - 1;
@@ -55,7 +56,7 @@ public class MushroomGenerator {
 						mutPos.setPos(xi, yi, zi);
 						IBlockState state = worldIn.getBlockState(mutPos);
 						//This logic implies that generation could be blocked by something as trivial as tall grass.
-						if(!state.getBlock().canBeReplacedByLeaves(state, worldIn, mutPos)) {
+						if(!state.getBlock().isReplaceable(worldIn, mutPos) || !state.getBlock().canBeReplacedByLeaves(state, worldIn, mutPos)) {
 							generatable = false;
 						}
 					}
@@ -68,6 +69,9 @@ public class MushroomGenerator {
 				if (soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM) {
 					//Red mushroom have a 4 block tall cap.  Brown mushrooms are a single block thick
 					int capBottomYPos = genPos.getY() + stemLength - ((mushroomBlock == Blocks.RED_MUSHROOM_BLOCK) ? 3 : 0);
+					if(stemLength == 3 && mushroomBlock == Blocks.RED_MUSHROOM_BLOCK) {
+						capBottomYPos++;
+					}
 					
 					for (int capYPos = capBottomYPos; capYPos <= genPos.getY() + stemLength; ++capYPos) {
 						int radius = 1;//Size for top of red mushroom
@@ -159,7 +163,7 @@ public class MushroomGenerator {
 									BlockPos blockpos = new BlockPos(xi, capYPos, zi);
 									IBlockState state = worldIn.getBlockState(blockpos);
 									
-									if (state.getBlock().canBeReplacedByLeaves(state, worldIn, blockpos)) {
+									if (state.getBlock().isReplaceable(worldIn, blockpos) || state.getBlock().canBeReplacedByLeaves(state, worldIn, blockpos)) {
 										worldIn.setBlockState(blockpos, mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, mushroomType));
 									}
 								}
@@ -171,7 +175,7 @@ public class MushroomGenerator {
 					for (int stemi = 0; stemi < stemLength; ++stemi) {
 						IBlockState iblockstate = worldIn.getBlockState(genPos.up(stemi));
 						
-						if (iblockstate.getBlock().canBeReplacedByLeaves(iblockstate, worldIn, genPos.up(stemi))) {
+						if (iblockstate.getBlock().isReplaceable(worldIn, genPos.up(stemi)) || iblockstate.getBlock().canBeReplacedByLeaves(iblockstate, worldIn, genPos.up(stemi))) {
 							worldIn.setBlockState(genPos.up(stemi), mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, BlockHugeMushroom.EnumType.STEM));
 						}
 					}
