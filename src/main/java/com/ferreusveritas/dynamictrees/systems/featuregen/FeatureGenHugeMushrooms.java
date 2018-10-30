@@ -46,12 +46,14 @@ public class FeatureGenHugeMushrooms implements IGenFeature {
 				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).up();
 				
 				if(safeBounds.inBounds(mushPos, true)) {
-					int maxHeight = lowest.getY() - mushPos.getY() - 1;
-					int height = MathHelper.clamp(rand.nextInt(maxHeight + 2), 2, maxHeight);
-					
-					if(mushGen.generate(world, rand, mushPos, height, safeBounds)) {
-						if(++success >= 2) {
-							return;
+					int maxHeight = lowest.getY() - mushPos.getY();
+					if(maxHeight >= 2) {
+						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
+						
+						if(mushGen.generate(world, rand, mushPos, height, safeBounds)) {
+							if(++success >= 2) {
+								return;
+							}
 						}
 					}
 				}

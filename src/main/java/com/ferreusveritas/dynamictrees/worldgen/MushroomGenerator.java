@@ -37,7 +37,7 @@ public class MushroomGenerator {
 		
 	static {
 		
-		brnCap = new SimpleVoxmap(7, 7, 1, new byte[] {
+		brnCap = new SimpleVoxmap(7, 1, 7, new byte[] {
 			0, 1, 2, 2, 2, 3, 0,
 			1, 5, 5, 5, 5, 5, 3,
 			4, 5, 5, 5, 5, 5, 6,
@@ -47,28 +47,28 @@ public class MushroomGenerator {
 			0, 7, 8, 8, 8, 9, 0
 		}).setCenter(new BlockPos(3, 0, 3));
 
-		brnCapMedium = new SimpleVoxmap(5, 5, 1, new byte[] {
+		brnCapMedium = new SimpleVoxmap(5, 1, 5, new byte[] {
 			0, 1, 2, 3, 0, 1, 5, 5, 5, 3, 4, 5, 5, 5, 6, 7, 5, 5, 5, 9, 0, 7, 8, 9, 0
 		}).setCenter(new BlockPos(2, 0, 2));
 		
-		brnCapSmall = new SimpleVoxmap(3, 3, 1, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }).setCenter(new BlockPos(1, 0, 1));
+		brnCapSmall = new SimpleVoxmap(3, 1, 3, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }).setCenter(new BlockPos(1, 0, 1));
 		
-		redCap = new SimpleVoxmap(5, 5, 4, new byte[] {
+		redCap = new SimpleVoxmap(5, 4, 5, new byte[] {
 			0, 1, 2, 3, 0, 1, 0, 0, 0, 3, 4, 0, 10,0, 6, 7, 0, 0, 0, 9, 0, 7, 8, 9, 0,//Bottom
 			0, 1, 2, 3, 0, 1, 0, 0, 0, 3, 4, 0, 10,0, 6, 7, 0, 0, 0, 9, 0, 7, 8, 9, 0,
 			0, 1, 2, 3, 0, 1, 0, 0, 0, 3, 4, 0, 10,0, 6, 7, 0, 0, 0, 9, 0, 7, 8, 9, 0,
 			0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 4, 5, 6, 0, 0, 7, 8, 9, 0, 0, 0, 0, 0, 0//Top
 		}).setCenter(new BlockPos(2, 3, 2));
 		
-		redCapShort = new SimpleVoxmap(5, 5, 3, new byte[] {
+		redCapShort = new SimpleVoxmap(5, 3, 5, new byte[] {
 			0, 1, 2, 3, 0, 1, 0, 0, 0, 3, 4, 0, 10,0, 6, 7, 0, 0, 0, 9, 0, 7, 8, 9, 0,//Bottom
 			0, 1, 2, 3, 0, 1, 0, 0, 0, 3, 4, 0, 10,0, 6, 7, 0, 0, 0, 9, 0, 7, 8, 9, 0,
 			0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 4, 5, 6, 0, 0, 7, 8, 9, 0, 0, 0, 0, 0, 0//Top
-		}).setCenter(new BlockPos(2, 3, 2));
+		}).setCenter(new BlockPos(2, 2, 2));
 
-		redCapSmall = new SimpleVoxmap(3, 3, 2, new byte[] {
-			1, 2, 3, 4, 5, 6, 7, 8, 9,//Bottom
-			1, 2, 3, 4, 10,6, 7, 8, 9//Top
+		redCapSmall = new SimpleVoxmap(3, 2, 3, new byte[] {
+			1, 2, 3, 4, 10,6, 7, 8, 9,//Bottom
+			1, 2, 3, 4, 5, 6, 7, 8, 9//Top
 		}).setCenter(new BlockPos(1, 1, 1));
 	
 	}
@@ -106,6 +106,7 @@ public class MushroomGenerator {
 		Block soilBlock = worldIn.getBlockState(genPos.down()).getBlock();
 		
 		if (soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM) {
+			
 			Block mushroomBlock = this.mushroomType;
 			
 			if (mushroomBlock == null) {
@@ -116,12 +117,15 @@ public class MushroomGenerator {
 			
 			BlockPos capPos = genPos.up(height - 1);//Determine the cap position(top block of mushroom cap)
 			BlockBounds capBounds = capMap.getBounds().move(capPos);//Get a bounding box for the entire cap
-			
+
 			if(safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
+				
 				//Check if there's room for a mushroom cap and stem
-				for(MutableBlockPos mutPos : Iterables.concat(BlockPos.getAllInBoxMutable(genPos, genPos.up(height - 2)), capMap.getAllNonZero())) {
-					IBlockState state = worldIn.getBlockState(mutPos);
-					if(!state.getBlock().canBeReplacedByLeaves(state, worldIn, mutPos) || !state.getBlock().isReplaceable(worldIn, mutPos)) {
+				for(MutableBlockPos mutPos : Iterables.concat(BlockPos.getAllInBoxMutable(BlockPos.ORIGIN.down(capMap.getLenY()), BlockPos.ORIGIN.down(height - 1)), capMap.getAllNonZero())) {
+					//System.out.println(mutPos);
+					BlockPos dPos = mutPos.add(capPos);
+					IBlockState state = worldIn.getBlockState(dPos);
+					if(!state.getBlock().canBeReplacedByLeaves(state, worldIn, dPos) || !state.getBlock().isReplaceable(worldIn, dPos)) {
 						return false;
 					}
 				}
@@ -138,6 +142,7 @@ public class MushroomGenerator {
 				for(int y = 0; y < stemLen; y++) {
 					worldIn.setBlockState(genPos.up(y), stemBlock);
 				}
+				
 				
 				return true;
 			}
