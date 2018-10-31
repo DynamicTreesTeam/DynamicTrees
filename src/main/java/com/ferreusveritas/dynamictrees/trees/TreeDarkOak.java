@@ -38,7 +38,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
-			setBasicGrowingParameters(0.30f, 19.0f, 4, 6, 0.8f);
+			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
 			
 			setSoilLongevity(14);//Grows for a long long time
 			

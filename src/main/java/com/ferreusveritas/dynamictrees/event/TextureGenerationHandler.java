@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import com.ferreusveritas.dynamictrees.client.ThickRingTextureAtlasSprite;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
