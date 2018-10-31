@@ -165,7 +165,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 			}
 			if (connections[1] < 1) {
 				quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
-			} else if (connections[1] == 1) {
+			} else if (connections[1] == 1 && side == EnumFacing.UP) {
 				quadsList.addAll(trunksTopBark[coreRadius-9].getQuads(blockState, side, rand));
 			}
 				
