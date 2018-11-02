@@ -401,6 +401,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor);
 		
+		if(player.getActiveHand() == null) {//What the hell man? I trusted you!
+			player.setActiveHand(EnumHand.MAIN_HAND);//Players do things with hands.
+		}
+		
 		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, 1.0f, false, player);
 		
