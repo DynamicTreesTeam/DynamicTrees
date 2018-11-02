@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
@@ -17,12 +18,15 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -243,10 +247,15 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			return false;
 		}
 	}
-		
+	
+	BlockSurfaceRoot surfaceRootBlock;
+	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		ModBlocks.darkOakLeavesProperties.setTree(this);
+		
+		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");
+		
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.DARK_OAK); });
 	}
 	
@@ -270,5 +279,19 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		return radius;
 	}
-
+	
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList = super.getRegisterableBlocks(blockList);
+		blockList.add(surfaceRootBlock);
+		return blockList;
+	}
+	
+	@Override
+	public List<Item> getRegisterableItems(List<Item> itemList) {
+		itemList = super.getRegisterableItems(itemList);
+		itemList.add(new ItemBlock(surfaceRootBlock).setRegistryName(surfaceRootBlock.getRegistryName()));
+		return itemList;
+	}
+	
 }

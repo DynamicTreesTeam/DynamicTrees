@@ -73,7 +73,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	private TreeFamily tree; //The tree this branch type creates
 	
 	public BlockBranch(Material material, String name) {
-		super(material); //Trees are made of wood. Brilliant.
+		super(material);
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		setHarvestLevel("axe", 0);

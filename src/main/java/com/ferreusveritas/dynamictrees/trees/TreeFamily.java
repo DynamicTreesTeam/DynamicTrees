@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -328,6 +329,14 @@ public class TreeFamily {
 	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
 	public float getSecondaryThickness() {
 		return 2.0f;
+	}
+	
+	///////////////////////////////////////////
+	// SURFACE ROOTS
+	///////////////////////////////////////////
+	
+	public BlockSurfaceRoot getSurfaceRoots() {
+		return null;
 	}
 	
 	///////////////////////////////////////////
