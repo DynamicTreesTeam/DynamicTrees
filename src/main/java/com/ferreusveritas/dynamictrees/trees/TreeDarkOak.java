@@ -294,4 +294,9 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		return itemList;
 	}
 	
+	@Override
+	public BlockSurfaceRoot getSurfaceRoots() {
+		return surfaceRootBlock;
+	}
+	
 }

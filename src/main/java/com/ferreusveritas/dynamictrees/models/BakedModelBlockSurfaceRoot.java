@@ -186,15 +186,18 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			EnumFacing coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
 			
 			//Get quads for core model
-			if(side == null || coreRadius != connections[side.getIndex()]) {
+			if(side == EnumFacing.UP || side == EnumFacing.DOWN) {
+				quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
+			}
+			else {//if(side == null || coreRadius != connections[side.getHorizontalIndex()]) {
 				if(coreRingDir == null || coreRingDir != side) {
 					quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
 				}
 			}
 			//Get quads for sleeves models
 			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-				for(EnumFacing connDir : EnumFacing.VALUES) {
-					int idx = connDir.getIndex();
+				for(EnumFacing connDir : EnumFacing.HORIZONTALS) {
+					int idx = connDir.getHorizontalIndex();
 					int connRadius = connections[idx];
 					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 					if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
@@ -264,7 +267,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 	
 	protected int getRadius(IBlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
-		return ((BlockBranchBasic) blockState.getBlock()).getRadius(blockState);
+		return ((BlockSurfaceRoot) blockState.getBlock()).getRadius(blockState);
 	}
 	
 	/**
