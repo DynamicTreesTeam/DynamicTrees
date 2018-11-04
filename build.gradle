@@ -18,16 +18,23 @@ repositories {
 apply plugin: 'idea'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
-version = "${mc_version}-${mod_version}"
-if (System.getenv()["Version"] != null)
-{
-    version = "${mc_version}-${System.getenv()["Version"]}"
+ext.configFile = file "build.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
 }
 
-group = package_group
-archivesBaseName = mod_name
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+version = "${config.mc_version}-${config.mod_version}"
+if (System.getenv()["Version"] != null)
+{
+    version = "${config.mc_version}-${System.getenv()["Version"]}"
+}
+
+group = config.package_group
+archivesBaseName = config.mod_name
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -35,7 +42,7 @@ compileJava {
 }
 
 minecraft {
-	version = "${mc_version}-${forge_version}"
+	version = "${config.mc_version}-${config.forge_version}"
 	runDir = "run"
 	
 	//TODO: replace "private static final boolean IS_DEV = true;", "private static final boolean IS_DEV = false;"
@@ -44,8 +51,8 @@ minecraft {
 	
 	makeObfSourceJar = false
 	
-	if (project.hasProperty('mappings_version'))
-		mappings = project.mappings_version
+	if (config.mappings_version)
+		mappings = config.mappings_version
 }
 
 dependencies {
