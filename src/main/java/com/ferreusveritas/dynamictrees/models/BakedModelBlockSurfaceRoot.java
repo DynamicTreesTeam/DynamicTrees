@@ -7,7 +7,6 @@ import java.util.function.Function;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.google.common.collect.Maps;
 
@@ -28,7 +27,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -67,11 +65,9 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		int dradius = radius * 2;
 		int halfSize = (16 - dradius) / 2;
 		int halfSizeX = dir.getFrontOffsetX() != 0 ? halfSize : dradius;
-		int halfSizeY = dir.getFrontOffsetY() != 0 ? halfSize : dradius;
 		int halfSizeZ = dir.getFrontOffsetZ() != 0 ? halfSize : dradius;
 		int move = 16 - halfSize;
 		int centerX = 16 + (dir.getFrontOffsetX() * move);
-		int centerY = 16 + (dir.getFrontOffsetY() * move);
 		int centerZ = 16 + (dir.getFrontOffsetZ() * move);
 	
 		Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, 0, (centerZ - halfSizeZ) / 2);
@@ -176,21 +172,12 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			int coreRadius = getRadius(blockState);
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
-			//Count number of connections
-			int numConnections = 0;
-			for(int i: connections) {
-				numConnections += (i != 0) ? 1: 0;
-			}
-			
 			//The source direction is the biggest connection from one of the 6 directions
 			EnumFacing sourceDir = getSourceDir(coreRadius, connections);
 			if(sourceDir == null) {
 				sourceDir = EnumFacing.DOWN;
 			}
 			int coreDir = resolveCoreDir(sourceDir);
-			
-			//This is for drawing the rings on a terminating branch
-			EnumFacing coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
 			
 			//Get quads for core model
 			quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
