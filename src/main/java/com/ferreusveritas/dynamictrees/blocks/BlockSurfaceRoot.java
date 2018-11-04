@@ -57,7 +57,7 @@ public class BlockSurfaceRoot extends Block {
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	
-	enum ConnectionLevel implements IStringSerializable {
+	public enum ConnectionLevel implements IStringSerializable {
 		
 		MID(0),
 		LOW(-1),
@@ -79,7 +79,7 @@ public class BlockSurfaceRoot extends Block {
 		}
 	}
 	
-	class RootConnection {
+	public class RootConnection {
 		public ConnectionLevel level;
 		public int radius;
 		

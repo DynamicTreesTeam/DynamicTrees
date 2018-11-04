@@ -27,6 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -39,6 +40,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 	
 	private IBakedModel sleeves[][] = new IBakedModel[4][7];
 	private IBakedModel cores[][] = new IBakedModel[2][8]; //8 Cores for 2 axis(X, Z) with the bark texture on all 6 sides rotated appropriately.
+	private IBakedModel verts[][] = new IBakedModel[4][8];
 	
 	public BakedModelBlockSurfaceRoot(ResourceLocation barkRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
@@ -52,12 +54,13 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 					int horIndex = dir.getHorizontalIndex();
 					sleeves[horIndex][r] = bakeSleeve(radius, dir, barkIcon);
+					verts[horIndex][r] = bakeVert(radius, dir, barkIcon);
 				}
 			}
 			cores[0][r] = bakeCore(radius, Axis.Z, barkIcon); //NORTH<->SOUTH
 			cores[1][r] = bakeCore(radius, Axis.X, barkIcon); //WEST<->EAST
 		}
-
+		
 	}
 
 	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark) {		
@@ -101,6 +104,31 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
 			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
+		}
+		
+		return builder.makeBakedModel();
+	}
+
+	private IBakedModel bakeVert(int radius, EnumFacing dir, TextureAtlasSprite bark) {
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
+		
+		AxisAlignedBB partBoundary = new AxisAlignedBB(8 - radius, radius + 1, 8 - radius, 8 + radius, 16 + radius + 1, 8 + radius)
+			.offset(dir.getFrontOffsetX() * 7, 0, dir.getFrontOffsetZ() * 7);
+		
+		for(int i = 0; i < 2; i++) {
+			AxisAlignedBB pieceBoundary = partBoundary.intersect(new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(0, 16 * i, 0));
+			
+			for (EnumFacing face: EnumFacing.VALUES) {
+				Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
+				
+				BlockFaceUV uvface = new BlockFaceUV(BakedModelBlockBranchBasic.modUV(BakedModelBlockBranchBasic.getUVs(pieceBoundary, face)), getFaceAngle(Axis.Y, face));
+				mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+				
+				Vector3f limits[] = BakedModelBlockBranchBasic.AABBLimits(pieceBoundary);
+				
+				BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
+				builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
+			}
 		}
 		
 		return builder.makeBakedModel();
@@ -190,11 +218,12 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 					if (connRadius > 0) {//  && (connRadius == 1 || side != connDir)) {
 						quadsList.addAll(sleeves[idx][connRadius-1].getQuads(extendedBlockState, side, rand));
+						if(extendedBlockState.getValue(BlockSurfaceRoot.LEVELS[idx]) == BlockSurfaceRoot.ConnectionLevel.HIGH) {
+							quadsList.addAll(verts[idx][connRadius-1].getQuads(extendedBlockState, side, rand));
+						}
 					}
 				}
 			}
-		} else {
-			//Not extended block state
 		}
 		
 		return quadsList;

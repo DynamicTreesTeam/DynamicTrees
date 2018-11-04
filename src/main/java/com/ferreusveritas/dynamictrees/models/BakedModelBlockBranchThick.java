@@ -76,15 +76,14 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 					Vec3d scaledOffset = new Vec3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
 					AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
 					
-					Vector3f posFrom = new Vector3f((float)partBoundary.minX, (float)partBoundary.minY, (float)partBoundary.minZ);
-					Vector3f posTo = new Vector3f((float)partBoundary.maxX, (float)partBoundary.maxY, (float)partBoundary.maxZ);
+					Vector3f limits[] = BakedModelBlockBranchBasic.AABBLimits(partBoundary);
 					
 					Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 					
 					BlockFaceUV uvface = new BlockFaceUV(modUV(getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
 					mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 					
-					BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
+					BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
 					builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
 				}
 				

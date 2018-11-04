@@ -162,7 +162,8 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		}
 	}
 	
-	public float[] getUVs(AxisAlignedBB box, EnumFacing face) {
+	//TODO: Move this to a model library
+	public static float[] getUVs(AxisAlignedBB box, EnumFacing face) {
 		switch(face) {
 			default:
 			case DOWN:  return new float[]{ (float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ };
@@ -173,13 +174,22 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 			case EAST:  return new float[]{ 16f - (float) box.maxZ, (float) box.minY, 16f - (float) box.minZ, (float) box.maxY };
 		}
 	}
-	
-	public float[] modUV(float[] uvs) {
+
+	//TODO: Move this to a model library
+	public static float[] modUV(float[] uvs) {
 		uvs[0] = (int)uvs[0] & 0xf;
 		uvs[1] = (int)uvs[1] & 0xf;
 		uvs[2] = (((int)uvs[2] - 1) & 0xf) + 1;
 		uvs[3] = (((int)uvs[3] - 1) & 0xf) + 1;
 		return uvs;
+	}
+	
+	//TODO: Move this to a model library
+	public static Vector3f[] AABBLimits(AxisAlignedBB aabb) {
+		return new Vector3f[] {
+				new Vector3f((float)aabb.minX, (float)aabb.minY, (float)aabb.minZ),
+				new Vector3f((float)aabb.maxX, (float)aabb.maxY, (float)aabb.maxZ),
+		};
 	}
 	
 	protected BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
