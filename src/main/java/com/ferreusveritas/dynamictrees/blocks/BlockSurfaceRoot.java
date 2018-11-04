@@ -124,23 +124,15 @@ public class BlockSurfaceRoot extends Block {
 		if (state instanceof IExtendedBlockState) {
 			IExtendedBlockState retval = (IExtendedBlockState) state;			
 			
-			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
-				BlockPos dPos = pos.offset(dir);
-				int radius = 0;
-				ConnectionLevel level = ConnectionLevel.MID;
-				for(int i = 0; i < 3 && radius == 0; i++) {
-					level = ConnectionLevel.values()[i];
-					IBlockState blockState = world.getBlockState(dPos.up(level.getYOffset()));
-					if(blockState.getBlock() instanceof BlockSurfaceRoot) {
-						radius = ((BlockSurfaceRoot)blockState.getBlock()).getRadius(blockState);
-					} else
-					if(level == ConnectionLevel.MID && TreeHelper.isBranch(blockState) && TreeHelper.getTreePart(blockState).getRadius(blockState) >= 8) {
-						radius = 8;
-					}
+			int thisRadius = getRadius(state);
+			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+				if(conn != null) {
+					int horIndex = dir.getHorizontalIndex();
+					retval = retval.withProperty(CONNECTIONS[horIndex], conn.radius).withProperty(LEVELS[horIndex], conn.level);
 				}
-				int horIndex = dir.getHorizontalIndex();
-				retval = retval.withProperty(CONNECTIONS[horIndex], radius).withProperty(LEVELS[horIndex], level);
 			}
+			
 			return retval;
 		}
 		
@@ -278,6 +270,32 @@ public class BlockSurfaceRoot extends Block {
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {
+		if(!canBlockStay(world, pos, state)) {
+			world.setBlockToAir(pos);
+		}
+	}
+
+	protected boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
+		
+		BlockPos below = pos.down();
+		IBlockState belowState = world.getBlockState(below);
+		
+		if(belowState.isNormalCube()) {
+			int thisRadius = getRadius(state);
+			for(EnumFacing dir : EnumFacing.HORIZONTALS) {
+				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+				if(conn != null && conn.radius > thisRadius) {
+					return true;
+				}
+			}
+			
+		}
+		
+		return false;
 	}
 	
 }
