@@ -6,7 +6,6 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import com.google.common.collect.AbstractIterator;
 
 import net.minecraft.block.Block;
