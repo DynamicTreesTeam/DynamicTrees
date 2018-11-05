@@ -17,6 +17,7 @@ repositories {
 
 apply plugin: 'idea'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
 
 ext.configFile = file "build.properties"
 configFile.withReader {
