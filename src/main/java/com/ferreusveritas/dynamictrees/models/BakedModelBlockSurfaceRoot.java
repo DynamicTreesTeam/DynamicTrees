@@ -8,6 +8,7 @@ import java.util.function.Function;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
@@ -15,7 +16,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.BlockPart;
 import net.minecraft.client.renderer.block.model.BlockPartFace;
-import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -88,9 +88,9 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 				BlockFaceUV uvface = null;
 					if(face.getAxis().isHorizontal()) {
 						boolean facePositive = face.getAxisDirection() == AxisDirection.POSITIVE;
-						uvface = new BlockFaceUV(new float[]{ facePositive ? 16 - (radius + 1) : 0, (sleeveNegative ? 16 - halfSize: 0), facePositive ? 16 : radius + 1, (sleeveNegative ? 16 : halfSize) }, getFaceAngle(dir.getAxis(), face));
+						uvface = new BlockFaceUV(new float[]{ facePositive ? 16 - (radius + 1) : 0, (sleeveNegative ? 16 - halfSize: 0), facePositive ? 16 : radius + 1, (sleeveNegative ? 16 : halfSize) }, ModelUtils.getFaceAngle(dir.getAxis(), face));
 					} else {
-						uvface = new BlockFaceUV(new float[]{ 8 - radius, sleeveNegative ? 16 - halfSize : 0, 8 + radius, sleeveNegative ? 16 : halfSize }, getFaceAngle(dir.getAxis(), face));
+						uvface = new BlockFaceUV(new float[]{ 8 - radius, sleeveNegative ? 16 - halfSize : 0, 8 + radius, sleeveNegative ? 16 : halfSize }, ModelUtils.getFaceAngle(dir.getAxis(), face));
 					}
 				if(uvface != null) {
 					mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
@@ -103,7 +103,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
 		}
 		
 		return builder.makeBakedModel();
@@ -121,13 +121,13 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			for (EnumFacing face: EnumFacing.VALUES) {
 				Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 				
-				BlockFaceUV uvface = new BlockFaceUV(BakedModelBlockBranchBasic.modUV(BakedModelBlockBranchBasic.getUVs(pieceBoundary, face)), getFaceAngle(Axis.Y, face));
+				BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(pieceBoundary, face)), ModelUtils.getFaceAngle(Axis.Y, face));
 				mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 				
-				Vector3f limits[] = BakedModelBlockBranchBasic.AABBLimits(pieceBoundary);
+				Vector3f limits[] = ModelUtils.AABBLimits(pieceBoundary);
 				
 				BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
-				builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
+				builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
 			}
 		}
 		
@@ -145,9 +145,9 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			BlockFaceUV uvface;
 			if(face.getAxis().isHorizontal()) {
 				boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
-				uvface = new BlockFaceUV(new float[]{ positive ? 16 - radius - 1 : 0 , 8 - radius, positive ? 16 : radius + 1, 8 + radius}, getFaceAngle(axis, face));
+				uvface = new BlockFaceUV(new float[]{ positive ? 16 - radius - 1 : 0 , 8 - radius, positive ? 16 : radius + 1, 8 + radius}, ModelUtils.getFaceAngle(axis, face));
 			} else {
-				uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, getFaceAngle(axis, face));
+				uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, ModelUtils.getFaceAngle(axis, face));
 			}
 			
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
@@ -158,38 +158,10 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
 
 		return builder.makeBakedModel();
-	}
-
-	/**
-	 * A Hack to determine the UV face angle for a block column on a certain axis
-	 * 
-	 * @param axis
-	 * @param face
-	 * @return
-	 */
-	public int getFaceAngle (Axis axis, EnumFacing face) {
-		if(axis == Axis.Y) { //UP / DOWN
-			return 0;
-		}
-		else if(axis == Axis.Z) {//NORTH / SOUTH
-			switch(face) {
-				case UP: return 0;
-				case WEST: return 270;
-				case DOWN: return 180;
-				case NORTH: return 270;
-				default: return 90;
-			}
-		} else { //EAST/WEST
-			return (face == EnumFacing.NORTH) ? 270 : 90;
-		}
-	}
-	
-	protected BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
-		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, transform, blockPart.partRotation, uvlocked, blockPart.shade);
 	}
 	
 	@Override

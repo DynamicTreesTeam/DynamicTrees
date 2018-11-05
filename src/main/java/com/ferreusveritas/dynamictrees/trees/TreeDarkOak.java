@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
@@ -130,6 +131,45 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		
 		protected void generateRoots(World world, BlockPos rootPos, int trunkRadius, SafeChunkBounds safeBounds) {
+			
+			SimpleVoxmap rootMap = new SimpleVoxmap(5, 1, 5, new byte[] {
+				2, 3, 4, 0, 2,
+				0, 0, 5, 0, 3,
+				4, 5, 0, 5, 4,
+				0, 0, 5, 0, 0,
+				2, 3, 4, 0, 0,
+			}).setCenter(new BlockPos(2, 0, 2));
+			
+			nextRoot(world, rootMap, rootPos.up(), BlockPos.ORIGIN, 0, null, 0);
+		}
+		
+		protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, BlockPos pos, int height, EnumFacing fromDir, int radius) {
+			
+			for(int i = 0; i < 2; i++) {
+				BlockPos currPos = trunkPos.add(pos).up(height - i);
+				IBlockState placeState = world.getBlockState(currPos);
+				IBlockState belowState = world.getBlockState(currPos.down());
+				
+				if(pos == BlockPos.ORIGIN || (placeState.getBlock() == ModBlocks.blockTrunkShell || placeState.getBlock().isReplaceable(world, currPos)) && belowState.isNormalCube()) {
+					if(radius > 0) {
+						getSurfaceRoots().setRadius(world, currPos, radius, fromDir, 3);
+					}
+					for(EnumFacing dir: EnumFacing.HORIZONTALS) {
+						if(dir != fromDir) {
+							BlockPos dPos = pos.offset(dir);
+							byte rad = rootMap.getVoxel(dPos);
+							if(rad != 0) {
+								nextRoot(world, rootMap, trunkPos, dPos, height - i, dir.getOpposite(), rad);
+							}
+						}
+					}
+					break;
+				}
+			}
+			
+		}
+		
+		protected void generateRootsOld(World world, BlockPos rootPos, int trunkRadius, SafeChunkBounds safeBounds) {
 			
 			int rootRadius = getRootRadius(trunkRadius);
 			BlockPos trunkPos = rootPos.up();

@@ -1,10 +1,13 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
+import com.google.common.collect.AbstractIterator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -32,7 +35,6 @@ public class CoordUtils {
 		SE("se", EnumFacing.SOUTH, EnumFacing.EAST),
 		E ("e" , EnumFacing.EAST),		
 		NE("ne", EnumFacing.NORTH, EnumFacing.EAST);
-
 		
 		final private String name;
 		final private Vec3i offset;
@@ -334,6 +336,34 @@ public class CoordUtils {
 	public static int coordHashCode(BlockPos pos, int readyMade) {
 		int factors[] = coordHashMap[readyMade & 3];
 		return coordHashCode(pos, factors[0], factors[1], factors[2]);
+	}
+	
+	public static Iterable<BlockPos> goHorSides(BlockPos pos) {
+		return goHorSides(pos, null);
+	}
+	
+	public static Iterable<BlockPos> goHorSides(BlockPos pos, EnumFacing ignore) {
+		return new Iterable<BlockPos>() {
+			@Override
+			public Iterator<BlockPos> iterator() {
+				 return new AbstractIterator<BlockPos>() {
+					private int currentDir = 0;
+					@Override
+					protected BlockPos computeNext() {
+						while(true) {
+							if(currentDir < EnumFacing.HORIZONTALS.length) {
+								EnumFacing face = EnumFacing.HORIZONTALS[currentDir++];
+								if(face != ignore) {
+									return pos.offset(face);
+								}
+							} else {
+								return this.endOfData();
+							}
+						}
+					}
+				 };
+			}
+		};
 	}
 	
 }
