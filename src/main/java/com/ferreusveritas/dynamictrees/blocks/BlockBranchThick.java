@@ -257,6 +257,10 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			return ReplaceableState.TREEPART;
 		}
 		
+		if(block instanceof BlockSurfaceRoot) {
+			return ReplaceableState.TREEPART;
+		}
+		
 		if(getFamily().getCommonSpecies().isAcceptableSoil(world, pos, state)) {
 			return ReplaceableState.REPLACEABLE;
 		}

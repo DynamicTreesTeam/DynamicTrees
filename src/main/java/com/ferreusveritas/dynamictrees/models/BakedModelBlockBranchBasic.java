@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
+import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
@@ -16,7 +17,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.BlockPart;
 import net.minecraft.client.renderer.block.model.BlockPartFace;
-import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -28,7 +28,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -110,7 +109,7 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
 		}
 		
 		return builder.makeBakedModel();
@@ -133,7 +132,7 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
 
 		return builder.makeBakedModel();
@@ -160,40 +159,6 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		} else { //EAST/WEST
 			return (face == EnumFacing.NORTH) ? 270 : 90;
 		}
-	}
-	
-	//TODO: Move this to a model library
-	public static float[] getUVs(AxisAlignedBB box, EnumFacing face) {
-		switch(face) {
-			default:
-			case DOWN:  return new float[]{ (float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ };
-			case UP:    return new float[]{ (float) box.minX, (float) box.minZ, (float) box.maxX, (float) box.maxZ };
-			case NORTH: return new float[]{ 16f - (float) box.maxX, (float) box.minY, 16f - (float) box.minX, (float) box.maxY };
-			case SOUTH: return new float[]{ (float) box.minX, (float) box.minY, (float) box.maxX, (float) box.maxY };
-			case WEST:  return new float[]{ (float) box.minZ, (float) box.minY, (float) box.maxZ, (float) box.maxY };
-			case EAST:  return new float[]{ 16f - (float) box.maxZ, (float) box.minY, 16f - (float) box.minZ, (float) box.maxY };
-		}
-	}
-
-	//TODO: Move this to a model library
-	public static float[] modUV(float[] uvs) {
-		uvs[0] = (int)uvs[0] & 0xf;
-		uvs[1] = (int)uvs[1] & 0xf;
-		uvs[2] = (((int)uvs[2] - 1) & 0xf) + 1;
-		uvs[3] = (((int)uvs[3] - 1) & 0xf) + 1;
-		return uvs;
-	}
-	
-	//TODO: Move this to a model library
-	public static Vector3f[] AABBLimits(AxisAlignedBB aabb) {
-		return new Vector3f[] {
-				new Vector3f((float)aabb.minX, (float)aabb.minY, (float)aabb.minZ),
-				new Vector3f((float)aabb.maxX, (float)aabb.maxY, (float)aabb.maxZ),
-		};
-	}
-	
-	protected BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
-		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, transform, blockPart.partRotation, uvlocked, blockPart.shade);
 	}
 	
 	@Override

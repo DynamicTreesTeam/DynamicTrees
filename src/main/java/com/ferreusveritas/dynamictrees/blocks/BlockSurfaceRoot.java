@@ -278,7 +278,7 @@ public class BlockSurfaceRoot extends Block {
 			world.setBlockToAir(pos);
 		}
 	}
-
+	
 	protected boolean canBlockStay(World world, BlockPos pos, IBlockState state) {
 		
 		BlockPos below = pos.down();

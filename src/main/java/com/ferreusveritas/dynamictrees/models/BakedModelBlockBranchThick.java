@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
 
@@ -76,15 +77,15 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 					Vec3d scaledOffset = new Vec3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
 					AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
 					
-					Vector3f limits[] = BakedModelBlockBranchBasic.AABBLimits(partBoundary);
+					Vector3f limits[] = ModelUtils.AABBLimits(partBoundary);
 					
 					Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 					
-					BlockFaceUV uvface = new BlockFaceUV(modUV(getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
+					BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
 					mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 					
 					BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
-					builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
+					builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, false));
 				}
 				
 			}
@@ -136,7 +137,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 			
 			BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-			builder.addFaceQuad(face, makeBakedQuad(part, part.mapFaces.get(face), ring, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), ring, face, ModelRotation.X0_Y0, false));
 		}
 		
 		return builder.makeBakedModel();

@@ -415,7 +415,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
-		damageAxe(player, heldItem, getRadius(state), (int) woodVolume);
+		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		
 		return true;// Function returns true if Block was destroyed
 	}
@@ -444,9 +444,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		VOLUME
 	}
 	
-	public void damageAxe(EntityPlayer player, ItemStack heldItem, int radius, int woodVolume) {
+	public void damageAxe(EntityPlayer player, ItemStack heldItem, int radius, float woodVolume) {
 		
-		if(heldItem != null && heldItem.getItem() instanceof ItemAxe) {
+		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || heldItem.getItem().getToolClasses(heldItem).contains("axe"))) {
 			
 			int damage;
 			
@@ -459,7 +459,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 					damage = Math.max(1, radius) / 2;
 					break;
 				case VOLUME:
-					damage = woodVolume / 4096;//There are 4096 "texel sized voxels" of wood in a log
+					damage = (int) woodVolume;
 					break;
 			}
 			

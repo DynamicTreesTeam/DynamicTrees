@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
+import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 
@@ -17,7 +18,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.BlockPart;
 import net.minecraft.client.renderer.block.model.BlockPartFace;
-import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -115,7 +115,7 @@ protected ModelBlock modelBlock;
 		
 		for (Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, false));
 		}
 		float minV = negative ? 16 - halfSize : 0;
 		float maxV = negative ? 16 : halfSize;
@@ -301,7 +301,7 @@ protected ModelBlock modelBlock;
 		
 		for(Map.Entry<EnumFacing, BlockPartFace> e : part.mapFaces.entrySet()) {
 			EnumFacing face = e.getKey();
-			builder.addFaceQuad(face, makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
 		
 		return builder.makeBakedModel();
@@ -558,10 +558,6 @@ protected ModelBlock modelBlock;
 		} else { //EAST/WEST
 			return (face == EnumFacing.NORTH) ? 270 : 90;
 		}
-	}
-	
-	protected BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
-		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, transform, blockPart.partRotation, uvlocked, blockPart.shade);
 	}
 	
 	protected int[] vertexToInts(float x, float y, float z, int color, TextureAtlasSprite texture, float u, float v) {
