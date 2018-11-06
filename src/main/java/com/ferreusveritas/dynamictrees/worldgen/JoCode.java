@@ -157,7 +157,9 @@ public class JoCode {
 		BlockPos treePos = rootPos.up();
 		
 		setFacing(facing);
-		if(species.preGeneration(world, rootPos, radius, facing, safeBounds, this, initialDirtState)) {
+		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this, initialDirtState);
+		
+		if(rootPos != BlockPos.ORIGIN) {
 			//Make the tree branch structure
 			generateFork(world, species, 0, rootPos, false);
 		}

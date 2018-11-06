@@ -156,6 +156,9 @@ public class BlockSurfaceRoot extends Block {
 		return RADMAX_NORMAL;
 	}
 	
+	public int getRadialHeight(int radius) {
+		return radius * 2;
+	}
 	
 	///////////////////////////////////////////
 	// RENDERING
@@ -201,16 +204,20 @@ public class BlockSurfaceRoot extends Block {
 		}
 		
 		int thisRadius = getRadius(state);
+		int radialHeight = getRadialHeight(thisRadius);
 		
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
-		AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radius + (1/16d), radius);
+		AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight / 16d, radius);
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			RootConnection conn = getSideConnectionRadius(blockAccess, pos, thisRadius, dir);
 			if (conn != null) {
 				connectionMade = true;
 				aabb = aabb.expand(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap);
+				if(conn.level == ConnectionLevel.HIGH) {
+					aabb = aabb.setMaxY(1.0 + (radialHeight / 16d));
+				}
 			}
 		}
 		if (connectionMade) {
@@ -233,9 +240,11 @@ public class BlockSurfaceRoot extends Block {
 			RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
 			if (conn != null) {
 				connectionMade = true;
-				double radius = MathHelper.clamp(conn.radius, 1, thisRadius) / 16.0;
+				int r = MathHelper.clamp(conn.radius, 1, thisRadius);
+				double radius = r / 16.0;
+				double radialHeight = getRadialHeight(r) / 16.0;
 				double gap = 0.5 - radius;
-				AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radius + (1/16d), radius);
+				AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight, radius);
 				aabb = aabb.expand(dir.getFrontOffsetX() * gap, 0, dir.getFrontOffsetZ() * gap).offset(0.5, 0.0, 0.5);
 				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 			}

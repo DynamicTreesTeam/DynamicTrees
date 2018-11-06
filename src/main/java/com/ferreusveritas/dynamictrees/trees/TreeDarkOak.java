@@ -11,9 +11,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
@@ -27,7 +27,6 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -40,6 +39,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	public class SpeciesDarkOak extends Species {
 		
 		FeatureGenHugeMushrooms underGen;
+		FeatureGenRoots rootGen;
 		
 		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
@@ -60,15 +60,16 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			setupStandardSeedDropping();
 			underGen = new FeatureGenHugeMushrooms(this);
+			rootGen = new FeatureGenRoots(this);
 		}
 		
 		@Override
-		public boolean preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode, IBlockState initialDirtState) {
+		public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode, IBlockState initialDirtState) {
 			//Erase a volume of blocks that could potentially get in the way
 			for(MutableBlockPos pos : BlockPos.getAllInBoxMutable(rootPos.add(new Vec3i(-1,  1, -1)), rootPos.add(new Vec3i(1, 6, 1)))) {
 				world.setBlockToAir(pos);
 			}
-			return true;
+			return rootPos;
 		}
 		
 		@Override
@@ -76,10 +77,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 
 			int trunkRadius = flareBottom(world, rootPos);
+
+			BlockPos treePos = rootPos.up();
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
-				
-				BlockPos treePos = rootPos.up();
 				
 				//Place dirt blocks around rooty dirt block if tree has a > 8 radius
 				IBlockState branchState = world.getBlockState(treePos);
@@ -92,9 +93,8 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 				//Generate huge mushroom undergrowth
 				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
 			}
-
-			generateRoots(world, rootPos, trunkRadius, safeBounds);
 			
+			rootGen.setTrunkRadius(trunkRadius).gen(world, treePos, endPoints, safeBounds);			
 		}
 		
 		/**
@@ -115,90 +115,6 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			}
 			
 			return TreeHelper.getRadius(world, rootPos.up(1));
-		}
-		
-		protected int getRootRadius(int trunkRadius) {
-			if(trunkRadius > 13) {
-				switch(trunkRadius) {
-					case 14: return 3;
-					case 15: return 4;
-					case 16: return 5;
-					case 17: return 6;
-					default: return 8;
-				}
-			}
-			return 0;
-		}
-		
-		protected void generateRoots(World world, BlockPos rootPos, int trunkRadius, SafeChunkBounds safeBounds) {
-			
-			SimpleVoxmap rootMap = new SimpleVoxmap(5, 1, 5, new byte[] {
-				2, 3, 4, 0, 2,
-				0, 0, 5, 0, 3,
-				4, 5, 0, 5, 4,
-				0, 0, 5, 0, 0,
-				2, 3, 4, 0, 0,
-			}).setCenter(new BlockPos(2, 0, 2));
-			
-			nextRoot(world, rootMap, rootPos.up(), BlockPos.ORIGIN, 0, null, 0);
-		}
-		
-		protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, BlockPos pos, int height, EnumFacing fromDir, int radius) {
-			
-			for(int i = 0; i < 2; i++) {
-				BlockPos currPos = trunkPos.add(pos).up(height - i);
-				IBlockState placeState = world.getBlockState(currPos);
-				IBlockState belowState = world.getBlockState(currPos.down());
-				
-				if(pos == BlockPos.ORIGIN || (placeState.getBlock() == ModBlocks.blockTrunkShell || placeState.getBlock().isReplaceable(world, currPos)) && belowState.isNormalCube()) {
-					if(radius > 0) {
-						getSurfaceRoots().setRadius(world, currPos, radius, fromDir, 3);
-					}
-					for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-						if(dir != fromDir) {
-							BlockPos dPos = pos.offset(dir);
-							byte rad = rootMap.getVoxel(dPos);
-							if(rad != 0) {
-								nextRoot(world, rootMap, trunkPos, dPos, height - i, dir.getOpposite(), rad);
-							}
-						}
-					}
-					break;
-				}
-			}
-			
-		}
-		
-		protected void generateRootsOld(World world, BlockPos rootPos, int trunkRadius, SafeChunkBounds safeBounds) {
-			
-			int rootRadius = getRootRadius(trunkRadius);
-			BlockPos trunkPos = rootPos.up();
-			
-			if(rootRadius > 0) {
-				around:	for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-					BlockPos dirtPos = rootPos.offset(dir);
-					int hash = ((dirtPos.hashCode() * 15391027) >> 2);
-					if((hash & 1) == 0) {
-						BlockPos airPos = dirtPos.up();
-						//Check to ensure there's a valid location for the root branch.  Check for an available replaceable block with valid soil below that.
-						IBlockState airState = world.getBlockState(airPos);
-						Block airBlock = airState.getBlock();
-						if( (airBlock == ModBlocks.blockTrunkShell || airBlock.isReplaceable(world, airPos)) && isAcceptableSoil(world, dirtPos, world.getBlockState(dirtPos))) {
-							//Check around the block for existing branches(except for the trunk of this tree)
-							for(EnumFacing checkDir: EnumFacing.VALUES) {
-								BlockPos checkPos = airPos.offset(checkDir);
-								if(!checkPos.equals(trunkPos) && TreeHelper.isBranch(world.getBlockState(checkPos)) ) { //Don't count the trunk but look for adjacent branches
-									continue around;
-								}
-							}
-							
-							world.setBlockState(dirtPos, ModBlocks.blockRootyDirtFake.getDefaultState());
-							getDynamicBranch().setRadius(world, airPos, MathHelper.clamp(rootRadius + ((hash & 2) >> 1), 1, 8), dir.getOpposite());
-						}
-					}
-				}
-			}
-			
 		}
 		
 		@Override

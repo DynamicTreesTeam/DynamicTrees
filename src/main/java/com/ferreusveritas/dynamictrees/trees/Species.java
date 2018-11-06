@@ -1023,9 +1023,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
 	 * @param joCode The joCode that will be used to grow the tree
 	 * @param initialDirtState The state of the dirt block before it became rooty
-	 * @return true to generate tree. false to cancel generation
+	 * @return new blockposition of root block.  BlockPos.ORIGIN to cancel generation
 	 */
-	public boolean preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode, IBlockState initialDirtState) { return true; }
+	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode, IBlockState initialDirtState) { return rootPos; }
 	
 	/**
 	 * Allows the tree to decorate itself after it has been generated.

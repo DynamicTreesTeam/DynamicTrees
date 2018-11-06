@@ -62,8 +62,15 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		}
 		
 	}
-
-	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark) {		
+	
+	public int getRadialHeight(int radius) {
+		return radius * 2;
+	}
+	
+	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark) {
+		
+		int radialHeight = getRadialHeight(radius);
+		
 		//Work in double units(*2)
 		int dradius = radius * 2;
 		int halfSize = (16 - dradius) / 2;
@@ -74,7 +81,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		int centerZ = 16 + (dir.getFrontOffsetZ() * move);
 	
 		Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, 0, (centerZ - halfSizeZ) / 2);
-		Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, radius + 1, (centerZ + halfSizeZ) / 2);
+		Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, radialHeight, (centerZ + halfSizeZ) / 2);
 
 		boolean sleeveNegative = dir.getAxisDirection() == AxisDirection.NEGATIVE;
 		if(dir.getAxis() == Axis.Z) {// North/South
@@ -88,7 +95,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 				BlockFaceUV uvface = null;
 					if(face.getAxis().isHorizontal()) {
 						boolean facePositive = face.getAxisDirection() == AxisDirection.POSITIVE;
-						uvface = new BlockFaceUV(new float[]{ facePositive ? 16 - (radius + 1) : 0, (sleeveNegative ? 16 - halfSize: 0), facePositive ? 16 : radius + 1, (sleeveNegative ? 16 : halfSize) }, ModelUtils.getFaceAngle(dir.getAxis(), face));
+						uvface = new BlockFaceUV(new float[]{ facePositive ? 16 - radialHeight : 0, (sleeveNegative ? 16 - halfSize: 0), facePositive ? 16 : radialHeight, (sleeveNegative ? 16 : halfSize) }, ModelUtils.getFaceAngle(dir.getAxis(), face));
 					} else {
 						uvface = new BlockFaceUV(new float[]{ 8 - radius, sleeveNegative ? 16 - halfSize : 0, 8 + radius, sleeveNegative ? 16 : halfSize }, ModelUtils.getFaceAngle(dir.getAxis(), face));
 					}
@@ -110,9 +117,10 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 	}
 
 	private IBakedModel bakeVert(int radius, EnumFacing dir, TextureAtlasSprite bark) {
+		int radialHeight = getRadialHeight(radius);
 		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
 		
-		AxisAlignedBB partBoundary = new AxisAlignedBB(8 - radius, radius + 1, 8 - radius, 8 + radius, 16 + radius + 1, 8 + radius)
+		AxisAlignedBB partBoundary = new AxisAlignedBB(8 - radius, radialHeight, 8 - radius, 8 + radius, 16 + radialHeight, 8 + radius)
 			.offset(dir.getFrontOffsetX() * 7, 0, dir.getFrontOffsetZ() * 7);
 		
 		for(int i = 0; i < 2; i++) {
@@ -136,8 +144,10 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 	
 	public IBakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
 		
+		int radialHeight = getRadialHeight(radius);
+		
 		Vector3f posFrom = new Vector3f(8 - radius, 0, 8 - radius);
-		Vector3f posTo = new Vector3f(8 + radius, radius + 1, 8 + radius);
+		Vector3f posTo = new Vector3f(8 + radius, radialHeight, 8 + radius);
 		
 		Map<EnumFacing, BlockPartFace> mapFacesIn = Maps.newEnumMap(EnumFacing.class);
 		
@@ -145,7 +155,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			BlockFaceUV uvface;
 			if(face.getAxis().isHorizontal()) {
 				boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
-				uvface = new BlockFaceUV(new float[]{ positive ? 16 - radius - 1 : 0 , 8 - radius, positive ? 16 : radius + 1, 8 + radius}, ModelUtils.getFaceAngle(axis, face));
+				uvface = new BlockFaceUV(new float[]{ positive ? 16 - radialHeight : 0 , 8 - radius, positive ? 16 : radialHeight, 8 + radius}, ModelUtils.getFaceAngle(axis, face));
 			} else {
 				uvface = new BlockFaceUV(new float[]{ 8 - radius, 8 - radius, 8 + radius, 8 + radius }, ModelUtils.getFaceAngle(axis, face));
 			}
