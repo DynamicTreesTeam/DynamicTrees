@@ -147,8 +147,6 @@ public class JoCode {
 	* @param radius Constraint radius
 	*/
 	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
-		IBlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
-		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
 		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
@@ -157,68 +155,71 @@ public class JoCode {
 		BlockPos treePos = rootPos.up();
 		
 		setFacing(facing);
-		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this, initialDirtState);
+		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this);
 		
 		if(rootPos != BlockPos.ORIGIN) {
+			IBlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
+			
+			species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
+			
 			//Make the tree branch structure
 			generateFork(world, species, 0, rootPos, false);
-		}
-		
-		//Fix branch thicknesses and map out leaf locations
-		IBlockState treeState = world.getBlockState(treePos);
-		BlockBranch branch = TreeHelper.getBranch(treeState);
-		if(branch != null) {//If a branch exists then the growth was successful
-			ILeavesProperties leavesProperties = species.getLeavesProperties();
-			SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
-			INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
-			NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
-			MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
-			branch.analyse(treeState, world, treePos, EnumFacing.DOWN, signal);
-			List<BlockPos> endPoints = endFinder.getEnds();
 			
-			smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
-						
-			//Place Growing Leaves Blocks from voxmap
-			for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
-				MutableBlockPos cellPos = cell.getPos();
-				if(safeBounds.inBounds(cellPos, false)) {
-					IBlockState testBlockState = world.getBlockState(cellPos);
-					Block testBlock = testBlockState.getBlock();
-					if(testBlock.isReplaceable(world, cellPos)) {
-						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
+			//Fix branch thicknesses and map out leaf locations
+			IBlockState treeState = world.getBlockState(treePos);
+			BlockBranch branch = TreeHelper.getBranch(treeState);
+			if(branch != null) {//If a branch exists then the growth was successful
+				ILeavesProperties leavesProperties = species.getLeavesProperties();
+				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
+				INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
+				NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
+				MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
+				branch.analyse(treeState, world, treePos, EnumFacing.DOWN, signal);
+				List<BlockPos> endPoints = endFinder.getEnds();
+				
+				smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
+				
+				//Place Growing Leaves Blocks from voxmap
+				for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
+					MutableBlockPos cellPos = cell.getPos();
+					if(safeBounds.inBounds(cellPos, false)) {
+						IBlockState testBlockState = world.getBlockState(cellPos);
+						Block testBlock = testBlockState.getBlock();
+						if(testBlock.isReplaceable(world, cellPos)) {
+							world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
+						}
+					} else {
+						leafMap.setVoxel(cellPos, (byte) 0);
 					}
-				} else {
-					leafMap.setVoxel(cellPos, (byte) 0);
 				}
-			}
-			
-			//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
-			for(Cell cell: leafMap.getAllNonZeroCells()) {
-				MutableBlockPos cellPos = cell.getPos();
-				if(!safeBounds.inBounds(cellPos, true)) {
-					leafMap.setVoxel(cellPos, (byte) 0);
+				
+				//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
+				for(Cell cell: leafMap.getAllNonZeroCells()) {
+					MutableBlockPos cellPos = cell.getPos();
+					if(!safeBounds.inBounds(cellPos, true)) {
+						leafMap.setVoxel(cellPos, (byte) 0);
+					}
 				}
+				
+				//Age volume for 3 cycles using a leafmap
+				TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
+				
+				//Rot the unsupported branches
+				if(species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
+					return;//The entire tree rotted away before it had a chance
+				}
+				
+				//Allow for special decorations by the tree itself
+				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
+				
+				//Add snow to parts of the tree in chunks where snow was already placed
+				addSnow(leafMap, world, rootPos, biome);
+				
+			} else { //The growth failed.. turn the soil back to what it was
+				world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
 			}
-			
-			//Age volume for 3 cycles using a leafmap
-			TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
-			
-			//Rot the unsupported branches
-			if(species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
-				return;//The entire tree rotted away before it had a chance
-			}
-			
-			//Allow for special decorations by the tree itself
-			species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
-			
-			//Add snow to parts of the tree in chunks where snow was already placed
-			addSnow(leafMap, world, rootPos, biome);
-			
-		} else { //The growth failed.. turn the soil back to what it was
-			world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
 		}
-		
 	}
 	
 	/**
