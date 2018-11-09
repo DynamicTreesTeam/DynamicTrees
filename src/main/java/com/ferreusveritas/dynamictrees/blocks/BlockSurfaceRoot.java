@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 
@@ -56,6 +57,7 @@ public class BlockSurfaceRoot extends Block {
 		super(material);
 		setUnlocalizedName(name);
 		setRegistryName(name);
+		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setHarvestLevel("axe", 0);
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
@@ -257,7 +259,9 @@ public class BlockSurfaceRoot extends Block {
 		}
 		
 		if(!connectionMade) {
-			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
+			double radius = thisRadius / 16.0;
+			double radialHeight = getRadialHeight(thisRadius) / 16.0;
+			AxisAlignedBB aabb = new AxisAlignedBB(0.5 - radius, 0, 0.5 - radius, 0.5 + radius, radialHeight, 0.5 + radius);
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 		}
 		
@@ -268,7 +272,8 @@ public class BlockSurfaceRoot extends Block {
 		if(side.getAxis().isHorizontal()) {
 			BlockPos dPos = pos.offset(side);
 			IBlockState blockState = blockAccess.getBlockState(dPos);
-			ConnectionLevel level = blockState.isNormalCube() ? ConnectionLevel.HIGH : (blockState.getBlock() == Blocks.AIR ? ConnectionLevel.LOW : ConnectionLevel.MID); 
+			IBlockState upState = blockAccess.getBlockState(pos.up());
+			ConnectionLevel level = (upState.getBlock() == Blocks.AIR && blockState.isNormalCube()) ? ConnectionLevel.HIGH : (blockState.getBlock() == Blocks.AIR ? ConnectionLevel.LOW : ConnectionLevel.MID); 
 			
 			if(level != ConnectionLevel.MID) {
 				dPos = dPos.up(level.yOffset);
@@ -285,6 +290,20 @@ public class BlockSurfaceRoot extends Block {
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		IBlockState upstate = worldIn.getBlockState(pos.up());
+		
+		if(upstate.getBlock() == ModBlocks.blockTrunkShell) {
+			worldIn.setBlockState(pos, upstate);
+		}
+		
+		for(EnumFacing dir : EnumFacing.HORIZONTALS) {
+			BlockPos dPos = pos.offset(dir).down();
+			worldIn.getBlockState(dPos).neighborChanged(worldIn, dPos, this, pos);
+		}
 	}
 	
 	@Override
