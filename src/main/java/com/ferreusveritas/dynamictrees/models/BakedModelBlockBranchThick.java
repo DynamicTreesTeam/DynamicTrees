@@ -146,7 +146,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 	@Override
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
 		int coreRadius = getRadius(blockState);
-
+		
 		if (coreRadius <= BlockBranch.RADMAX_NORMAL) {
 			return super.getQuads(blockState, side, rand);
 		}
@@ -173,11 +173,11 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 		
 		return quadsList;
 	}
-
+	
 	@Override
 	public List<BakedQuad> getCustomDamageQuads(IBlockState blockState, EnumFacing side, long rand) {
 		int coreRadius = getRadius(blockState);
-
+		
 		if (coreRadius <= BlockBranch.RADMAX_NORMAL) {
 			return super.getQuads(blockState, side, rand);
 		}

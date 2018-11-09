@@ -6,6 +6,7 @@ import java.util.function.Function;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -63,7 +64,8 @@ public class FeatureGenRoots implements IGenFeature {
 	@Override
 	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {		
 		if(scaler != null) {
-			SimpleVoxmap rootMap = rootMaps[world.rand.nextInt(rootMaps.length)];
+			int hash = CoordUtils.coordHashCode(treePos, 2);
+			SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
 			nextRoot(world, rootMap, treePos, BlockPos.ORIGIN, 0, -1, null, 0);
 		}
 	}

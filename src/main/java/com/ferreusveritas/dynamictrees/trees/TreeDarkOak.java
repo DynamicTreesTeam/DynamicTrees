@@ -8,11 +8,13 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
@@ -149,9 +151,19 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			int trunkRadius = flareBottom(world, rootPos);
-			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-			rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, null, SafeChunkBounds.ANY);
+			if(soilLife > 0) {
+				int trunkRadius = flareBottom(world, rootPos);
+				if(trunkRadius >= 13) {
+					Surround surr = Surround.values()[world.rand.nextInt(8)];
+					BlockPos dPos = treePos.add(surr.getOffset());
+					if(world.getBlockState(dPos).getBlock() instanceof BlockSurfaceRoot) {
+						world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
+					}
+					
+					float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
+					rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, null, SafeChunkBounds.ANY);
+				}
+			}
 			return super.postGrow(world, rootPos, treePos, soilLife, natural);
 		}
 		

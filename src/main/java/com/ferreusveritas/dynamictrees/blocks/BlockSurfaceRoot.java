@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -204,35 +205,45 @@ public class BlockSurfaceRoot extends Block {
 		return false;
 	}
 	
+	public static final Surround sidesFirst[] = new Surround[] { Surround.N, Surround.S, Surround.W, Surround.E, Surround.NW, Surround.NE, Surround.SW, Surround.SE };
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
 		
 		if (state.getBlock() != this) {
 			return NULL_AABB;
 		}
+
+		AxisAlignedBB trunkBB = null;
+		
+		for(Surround dir: sidesFirst ) {
+			BlockPos dPos = pos.add(dir.getOffset());
+			IBlockState testState  = blockAccess.getBlockState(dPos);
+			if(testState.getBlock() instanceof BlockBranchThick) {
+				BlockBranchThick trunk = (BlockBranchThick) testState.getBlock();
+				trunkBB = trunk.getBoundingBox(testState, blockAccess, dPos).offset(dir.getOffsetPos()).intersect(FULL_BLOCK_AABB);
+				break;//There should only be one trunk in proximity
+			}
+		}
 		
 		int thisRadius = getRadius(state);
 		int radialHeight = getRadialHeight(thisRadius);
 		
-		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
 		AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight / 16d, radius);
 		for (EnumFacing dir : EnumFacing.VALUES) {
 			RootConnection conn = getSideConnectionRadius(blockAccess, pos, thisRadius, dir);
 			if (conn != null) {
-				connectionMade = true;
 				aabb = aabb.expand(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap);
 				if(conn.level == ConnectionLevel.HIGH) {
 					aabb = aabb.setMaxY(1.0 + (radialHeight / 16d));
 				}
 			}
 		}
-		if (connectionMade) {
-			return aabb.offset(0.5, 0.0, 0.5);
-		}
 		
-		return new AxisAlignedBB(0.5 - radius, 0, 0.5 - radius, 0.5 + radius, radius, 0.5 + radius);
+		aabb = aabb.offset(0.5, 0.0, 0.5);
+		return trunkBB != null ? trunkBB.union(aabb) : aabb;
 	}
 	
 	@Override

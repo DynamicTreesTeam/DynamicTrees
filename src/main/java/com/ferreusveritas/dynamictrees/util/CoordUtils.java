@@ -55,6 +55,10 @@ public class CoordUtils {
 			return offset;
 		}
 		
+		public BlockPos getOffsetPos() {
+			return new BlockPos(offset);
+		}
+		
 		public Surround getOpposite() {
 			return values()[(ordinal() + 4) & 7];
 		}

@@ -32,42 +32,42 @@ public class BakedModelBlockRooty implements IBakedModel {
 		if (state != null && state.getBlock() instanceof IMimic && state instanceof IExtendedBlockState) {
 			IExtendedBlockState extendedState = ((IExtendedBlockState) state);
 			IBlockState mimicState = extendedState.getValue(MimicProperty.MIMIC);
-
+			
 			Minecraft mc = Minecraft.getMinecraft();
 			BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
 			BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
 			IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
-
+			
 			quads.addAll(mimicModel.getQuads(mimicState, side, rand));
 			quads.addAll(rootsModel.getQuads(state, side, rand));
 		}
 		
-    	return quads;
+		return quads;
 	}
-
+	
 	@Override
 	public boolean isAmbientOcclusion() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isGui3d() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isBuiltInRenderer() {
 		return true;
 	}
-
+	
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
 		return rootsModel.getParticleTexture();
 	}
-
+	
 	@Override
 	public ItemOverrideList getOverrides() {
 		return null;
 	}
-
+	
 }

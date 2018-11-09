@@ -115,7 +115,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		
 		return builder.makeBakedModel();
 	}
-
+	
 	private IBakedModel bakeVert(int radius, EnumFacing dir, TextureAtlasSprite bark) {
 		int radialHeight = getRadialHeight(radius);
 		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
@@ -170,7 +170,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 			EnumFacing face = e.getKey();
 			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
-
+		
 		return builder.makeBakedModel();
 	}
 	
@@ -188,7 +188,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 				sourceDir = EnumFacing.DOWN;
 			}
 			int coreDir = resolveCoreDir(sourceDir);
-
+			
 			boolean isGrounded = extendedBlockState.getValue(BlockSurfaceRoot.GROUNDED) == Boolean.TRUE;
 			
 			//Get quads for core model
@@ -216,7 +216,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		
 		return quadsList;
 	}
-
+	
 	/**
 	 * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
 	 * 
@@ -233,7 +233,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		}
 		return connections;
 	}
-
+	
 	/**
 	 * Locates the side with the largest neighbor radius that's equal to or greater than this branch block
 	 * 
@@ -291,31 +291,31 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 	public boolean isAmbientOcclusion() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isGui3d() {
 		return false;
 	}
-
+	
 	@Override
 	public boolean isBuiltInRenderer() {
 		return true;
 	}
-
+	
 	// used for block breaking shards
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
 		return barkParticles;
 	}
-
+	
 	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
 		return sleeves[0][0].getItemCameraTransforms();
 	}
-
+	
 	@Override
 	public ItemOverrideList getOverrides() {
 		return null;
 	}
-
+	
 }

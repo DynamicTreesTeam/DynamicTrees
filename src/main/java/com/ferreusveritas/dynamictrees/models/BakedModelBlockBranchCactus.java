@@ -468,8 +468,8 @@ protected ModelBlock modelBlock;
 					vertexToInts(posFrom.x / 16f - 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 0, maxV),
 					vertexToInts(posFrom.x / 16f + 0.0625f, posTo.y / 16f + 0.001f, posTo.z / 16f, 0xFFFFFFFF, bark, 2, maxV)
 			), 0, EnumFacing.UP, bark, true, DefaultVertexFormats.BLOCK));
-
-	
+			
+			
 		return builder.makeBakedModel();
 	}
 	
@@ -536,7 +536,7 @@ protected ModelBlock modelBlock;
 		
 		return builder.makeBakedModel();
 	}
-
+	
 	/**
 	 * A Hack to determine the UV face angle for a block column on a certain axis
 	 * 
@@ -634,7 +634,7 @@ protected ModelBlock modelBlock;
 		
 		return quadsList;
 	}
-
+	
 	/**
 	 * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
 	 * 
@@ -650,7 +650,7 @@ protected ModelBlock modelBlock;
 		}
 		return connections;
 	}
-
+	
 	/**
 	 * Locates the side with the largest neighbor radius that's equal to or greater than this branch block
 	 * 
@@ -707,31 +707,31 @@ protected ModelBlock modelBlock;
 	public boolean isAmbientOcclusion() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isGui3d() {
 		return false;
 	}
-
+	
 	@Override
 	public boolean isBuiltInRenderer() {
 		return true;
 	}
-
+	
 	// used for block breaking shards
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
 		return barkParticles;
 	}
-
+	
 	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
 		return sleeves[0][0].getItemCameraTransforms();
 	}
-
+	
 	@Override
 	public ItemOverrideList getOverrides() {
 		return null;
 	}
-
+	
 }
