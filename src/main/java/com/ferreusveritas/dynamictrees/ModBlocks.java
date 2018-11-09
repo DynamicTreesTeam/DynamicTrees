@@ -185,6 +185,7 @@ public class ModBlocks {
 	public static class CommonBlockStates {
 		public final IBlockState air = Blocks.AIR.getDefaultState();
 		public final IBlockState dirt = Blocks.DIRT.getDefaultState();
+		public final IBlockState sand = Blocks.SAND.getDefaultState();
 		public final IBlockState grass = Blocks.GRASS.getDefaultState();
 		public final IBlockState podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();

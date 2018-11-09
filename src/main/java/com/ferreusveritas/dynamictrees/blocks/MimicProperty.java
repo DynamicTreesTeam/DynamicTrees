@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModConfigs;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -39,6 +42,11 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 	}
 	
 	public static IBlockState getDirtMimic(IBlockAccess access, BlockPos pos) {
+		
+		if(!ModConfigs.rootyTextureMimicry) {
+			return ModBlocks.blockStates.grass;
+		}
+		
 		final int dMap[] = {0, -1, 1};//Y-Axis depth map
 		
 		IBlockState mimic = Blocks.DIRT.getDefaultState();//Default to dirt in case no dirt or grass is found
@@ -68,6 +76,11 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 	}
 	
 	public static IBlockState getSandMimic(IBlockAccess access, BlockPos pos) {
+
+		if(!ModConfigs.rootyTextureMimicry) {
+			return ModBlocks.blockStates.sand;
+		}
+		
 		final int dMap[] = {0, -1, 1};
 		
 		IBlockState mimic = Blocks.SAND.getDefaultState(); // Default to sand

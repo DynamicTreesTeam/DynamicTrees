@@ -57,7 +57,7 @@ public class FeatureGenMound {
 	/** 
 	 * Creates a 3x2x3 cube of dirt around the base of the tree using blocks derived from the
 	 * environment.  This is used to cleanup the overhanging trunk that happens when a thick
-	 * tree is generated next to a drop off.
+	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 * 
 	 * @param world The world
 	 * @param rootPos The position of the rooty dirt

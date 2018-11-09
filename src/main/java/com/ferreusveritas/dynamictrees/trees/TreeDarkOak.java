@@ -39,9 +39,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	
 	public class SpeciesDarkOak extends Species {
 		
-		FeatureGenHugeMushrooms underGen;
-		FeatureGenRoots rootGen;
-		FeatureGenMound moundGen;
+		protected FeatureGenHugeMushrooms underGen;
+		protected FeatureGenRoots rootGen;
+		protected FeatureGenMound moundGen;
+		protected int mountCutoffRadius = 5;
 		
 		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
@@ -75,7 +76,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			}
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
-				if(radius >= 5) {
+				if(radius >= mountCutoffRadius) {
 					rootPos = moundGen.preGen(world, rootPos, safeBounds);
 				}
 			}
@@ -93,7 +94,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 				
-				if(radius < 5) {//A mound was already generated in preGen if the radius is 5 or greater
+				if(radius < mountCutoffRadius) {//A mound was already generated in preGen if the radius is 5 or greater
 					moundGen.postGen(world, rootPos, safeBounds, initialDirtState);
 				}
 				
@@ -178,7 +179,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			if(signal.numTurns == 1 && signal.delta.distanceSq(0, signal.delta.getY(), 0) == 1.0 ) {
 				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 					if(signal.dir != dir) {
-						probMap[dir.ordinal()] = 0;;
+						probMap[dir.ordinal()] = 0;
 					}
 				}
 			}
