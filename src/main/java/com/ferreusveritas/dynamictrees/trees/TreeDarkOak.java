@@ -13,7 +13,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
@@ -77,7 +76,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 				if(radius >= 5) {
-					rootPos = moundGen.gen(world, rootPos, safeBounds);
+					rootPos = moundGen.preGen(world, rootPos, safeBounds);
 				}
 			}
 			
@@ -87,26 +86,22 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-
+			
 			int trunkRadius = flareBottom(world, rootPos);
-
+			
 			BlockPos treePos = rootPos.up();
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 				
-				//Place dirt blocks around rooty dirt block if tree has a > 8 radius
-				IBlockState branchState = world.getBlockState(treePos);
-				if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
-					for(Surround dir: Surround.values()) {
-						world.setBlockState(rootPos.add(dir.getOffset()), initialDirtState);
-					}
+				if(radius < 5) {//A mound was already generated in preGen if the radius is 5 or greater
+					moundGen.postGen(world, rootPos, safeBounds, initialDirtState);
 				}
-								
+				
 				//Generate huge mushroom undergrowth
 				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
 			}
 			
-			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) * 1f : 0, 0, 1);
+			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
 			
 			rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, endPoints, safeBounds);			
 		}
@@ -154,8 +149,8 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 			int trunkRadius = flareBottom(world, rootPos);
-			//generateRoots(world, rootPos, trunkRadius, SafeChunkBounds.ANY);
-
+			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
+			rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, null, SafeChunkBounds.ANY);
 			return super.postGrow(world, rootPos, treePos, soilLife, natural);
 		}
 		
