@@ -188,9 +188,13 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 				sourceDir = EnumFacing.DOWN;
 			}
 			int coreDir = resolveCoreDir(sourceDir);
+
+			boolean isGrounded = extendedBlockState.getValue(BlockSurfaceRoot.GROUNDED) == Boolean.TRUE;
 			
 			//Get quads for core model
-			quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
+			if(isGrounded) {
+				quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
+			}
 			
 			//Get quads for sleeves models
 			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
@@ -199,7 +203,9 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 					int connRadius = connections[idx];
 					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 					if (connRadius > 0) {//  && (connRadius == 1 || side != connDir)) {
-						quadsList.addAll(sleeves[idx][connRadius-1].getQuads(extendedBlockState, side, rand));
+						if(isGrounded) {
+							quadsList.addAll(sleeves[idx][connRadius-1].getQuads(extendedBlockState, side, rand));	
+						}
 						if(extendedBlockState.getValue(BlockSurfaceRoot.LEVELS[idx]) == BlockSurfaceRoot.ConnectionLevel.HIGH) {
 							quadsList.addAll(verts[idx][connRadius-1].getQuads(extendedBlockState, side, rand));
 						}

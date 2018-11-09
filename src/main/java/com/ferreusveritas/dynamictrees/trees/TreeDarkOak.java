@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -40,6 +42,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		
 		FeatureGenHugeMushrooms underGen;
 		FeatureGenRoots rootGen;
+		FeatureGenMound moundGen;
 		
 		SpeciesDarkOak(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.darkOakLeavesProperties);
@@ -61,14 +64,23 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			setupStandardSeedDropping();
 			underGen = new FeatureGenHugeMushrooms(this);
 			rootGen = new FeatureGenRoots(this);
+			moundGen = new FeatureGenMound(this);
 		}
 		
 		@Override
 		public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
+			
 			//Erase a volume of blocks that could potentially get in the way
 			for(MutableBlockPos pos : BlockPos.getAllInBoxMutable(rootPos.add(new Vec3i(-1,  1, -1)), rootPos.add(new Vec3i(1, 6, 1)))) {
 				world.setBlockToAir(pos);
 			}
+			
+			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
+				if(radius >= 5) {
+					rootPos = moundGen.gen(world, rootPos, safeBounds);
+				}
+			}
+			
 			return rootPos;
 		}
 		
@@ -94,7 +106,9 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
 			}
 			
-			rootGen.setTrunkRadius(trunkRadius).gen(world, treePos, endPoints, safeBounds);			
+			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) * 1f : 0, 0, 1);
+			
+			rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, endPoints, safeBounds);			
 		}
 		
 		/**

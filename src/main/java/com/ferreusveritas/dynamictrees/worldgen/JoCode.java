@@ -152,18 +152,20 @@ public class JoCode {
 		
 		//A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);
-		BlockPos treePos = rootPos.up();
 		
 		setFacing(facing);
 		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this);
+
 		
 		if(rootPos != BlockPos.ORIGIN) {
 			IBlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
-			
 			species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
 			
 			//Make the tree branch structure
 			generateFork(world, species, 0, rootPos, false);
+
+			//Establish a position for the bottom block of the trunk
+			BlockPos treePos = rootPos.up();
 			
 			//Fix branch thicknesses and map out leaf locations
 			IBlockState treeState = world.getBlockState(treePos);

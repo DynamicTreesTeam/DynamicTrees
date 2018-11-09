@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
@@ -34,6 +35,8 @@ public class BlockSurfaceRoot extends Block {
 	public static final int RADMAX_NORMAL = 8;
 	
 	protected static final PropertyInteger RADIUS = PropertyInteger.create("radius", 1, RADMAX_NORMAL);
+
+	public static final IUnlistedProperty GROUNDED = new Properties.PropertyAdapter<Boolean>(PropertyBool.create("grounded"));
 	
 	public static final IUnlistedProperty CONNECTIONS[] = {
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
@@ -99,7 +102,7 @@ public class BlockSurfaceRoot extends Block {
 		
 		IUnlistedProperty unlistedProperties[] = new IUnlistedProperty[] {
 			CONNECTIONS[0], CONNECTIONS[1], CONNECTIONS[2], CONNECTIONS[3],
-			LEVELS[0], LEVELS[1], LEVELS[2], LEVELS[3]
+			LEVELS[0], LEVELS[1], LEVELS[2], LEVELS[3], GROUNDED
 		};
 		
 		return new ExtendedBlockState(this, listedProperties, unlistedProperties);
@@ -125,6 +128,9 @@ public class BlockSurfaceRoot extends Block {
 			IExtendedBlockState retval = (IExtendedBlockState) state;			
 			
 			int thisRadius = getRadius(state);
+			
+			retval = retval.withProperty(GROUNDED, world.isSideSolid(pos.down(), EnumFacing.UP, false));
+			
 			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
 				if(conn != null) {
@@ -292,16 +298,30 @@ public class BlockSurfaceRoot extends Block {
 		
 		BlockPos below = pos.down();
 		IBlockState belowState = world.getBlockState(below);
+
+		int thisRadius = getRadius(state);
 		
-		if(belowState.isNormalCube()) {
-			int thisRadius = getRadius(state);
+		if(belowState.isNormalCube()) {//If a branch is sitting on a solid block
 			for(EnumFacing dir : EnumFacing.HORIZONTALS) {
 				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
 				if(conn != null && conn.radius > thisRadius) {
 					return true;
 				}
 			}
-			
+		} else {//If the branch has no solid block under it
+			boolean connections = false;
+			for(EnumFacing dir : EnumFacing.HORIZONTALS) {
+				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+				if(conn != null) {
+					if(conn.level == ConnectionLevel.MID) {
+						return false;
+					}
+					if(conn.radius > thisRadius) {
+						connections = true;
+					}
+				}
+			}
+			return connections;
 		}
 		
 		return false;
