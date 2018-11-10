@@ -150,6 +150,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
 	
+	protected IGenFeature genFeatureOverride;
 	protected List<IPreGenFeature> preGenFeatures;
 	protected List<IPostGenFeature> postGenFeatures;
 	protected List<IPostGrowFeature> postGrowFeatures;
@@ -1003,6 +1004,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if tree was generated. false otherwise.
 	 */
 	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+		
+		if(genFeatureOverride != null) {
+			return genFeatureOverride.generate(world, rootPos, biome, random, radius, safeBounds);
+		}
+		
 		EnumFacing facing = CoordUtils.getRandomDir(random);
 		if(getJoCodeStore() != null) {
 			JoCode code = getJoCodeStore().getRandomCode(radius, random);
@@ -1035,6 +1041,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	public void addGenFeature(IGenModule module, int allowableFlags) {
+
+		if(module instanceof IGenFeature && (allowableFlags & IGenModule.FULLGEN) != 0) {
+			genFeatureOverride = (IGenFeature) module;
+		}
 		
 		if(module instanceof IPreGenFeature && (allowableFlags & IGenModule.PREGEN) != 0) {
 			IPreGenFeature feature = (IPreGenFeature) module;
@@ -1042,10 +1052,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				preGenFeatures = new ArrayList<>(1);
 			}
 			preGenFeatures.add(feature);
-		}
-		
-		if(module instanceof IGenFeature && (allowableFlags & IGenModule.GEN) != 0) {
-			IGenFeature feature = (IGenFeature) module;//TODO
 		}
 		
 		if(module instanceof IPostGenFeature && (allowableFlags & IGenModule.POSTGEN) != 0) {

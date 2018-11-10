@@ -10,6 +10,6 @@ import net.minecraft.world.biome.Biome;
 
 public interface IGenFeature extends IGenModule {
 	
-	public void generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds);
+	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds);
 	
 }
