@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
@@ -24,11 +25,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class FeatureGenBush implements IGenFeature, IPostGenFeature {
-
+	
 	private Species species;
 	private IBlockState logState = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.OAK);
 	private IBlockState leavesState = Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK).withProperty(BlockOldLeaf.CHECK_DECAY, false);
 	private IBlockState secondaryLeavesState = null;
+	private Predicate<Biome> biomePredicate = i -> true;
 	
 	public FeatureGenBush(Species species) {
 		this.species = species;
@@ -49,14 +51,19 @@ public class FeatureGenBush implements IGenFeature, IPostGenFeature {
 		return this;
 	}
 	
+	public FeatureGenBush setBiomePredicate(Predicate<Biome> biomePredicate) {
+		this.biomePredicate = biomePredicate;
+		return this;
+	}
+	
 	@Override
 	public void generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		commonGen(world, rootPos, random, radius, safeBounds);
 	}
-
+	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		if(safeBounds != SafeChunkBounds.ANY) {
+		if(safeBounds != SafeChunkBounds.ANY && biomePredicate.test(biome)) {
 			commonGen(world, rootPos, world.rand, radius, safeBounds);
 			return true;
 		}
@@ -66,11 +73,11 @@ public class FeatureGenBush implements IGenFeature, IPostGenFeature {
 	protected void commonGen(World world, BlockPos rootPos, Random random, int radius, SafeChunkBounds safeBounds) {
 		
 		Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
-
+		
 		for (int i = 0; i < 2; i++) {
 			int rad = MathHelper.clamp(radius, 2, random.nextInt(radius - 1) + 2);
 			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
-
+			
 			BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
 			IBlockState soilBlockState = world.getBlockState(pos);
 			

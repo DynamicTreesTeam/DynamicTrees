@@ -1130,6 +1130,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return new NodeInflator(this, leafMap);
 	}
 	
+	/**
+	 * General purpose hashing algorithm using a {@link BlockPos} as an ingest.
+	 * 
+	 * @param pos 
+	 * @return hash for position
+	 */
+	public int coordHashCode(BlockPos pos) {
+		return CoordUtils.coordHashCode(pos, 2);
+	}
+	
 	@Override
 	public String toString() {
 		return getRegistryName().toString();

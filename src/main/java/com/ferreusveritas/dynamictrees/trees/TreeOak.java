@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
@@ -79,9 +78,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	 * and with vines hanging from their leaves.
 	 */
 	public class SpeciesSwampOak extends Species {
-		
-		FeatureGenVine vineGen;
-		
+				
 		SpeciesSwampOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily, ModBlocks.oakLeavesProperties);
 			
@@ -91,8 +88,9 @@ public class TreeOak extends TreeFamilyVanilla {
 			envFactor(Type.DRY, 0.50f);
 			
 			setupStandardSeedDropping();
-						
-			vineGen = new FeatureGenVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6);
+			
+			//Add species features
+			addGenFeature(new FeatureGenVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(5));//Generate Vines
 		}
 		
 		@Override
@@ -126,12 +124,6 @@ public class TreeOak extends TreeFamilyVanilla {
 		@Override
 		public Seed getSeed() {
 			return getCommonSpecies().getSeed();
-		}
-		
-		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			vineGen.setQuantity(5).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate Vines
 		}
 		
 		@Override

@@ -1,14 +1,11 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenConiferTopper;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
@@ -24,9 +21,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 public class TreeSpruce extends TreeFamilyVanilla {
 	
 	public class SpeciesSpruce extends Species {
-		
-		FeatureGenPodzol podzolGen;
-		
+				
 		SpeciesSpruce(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.spruceLeavesProperties);
 			
@@ -39,7 +34,9 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			
 			setupStandardSeedDropping();
 			
-			podzolGen = new FeatureGenPodzol();
+			//Add species features
+			addGenFeature(new FeatureGenConiferTopper(getLeavesProperties()));
+			addGenFeature(new FeatureGenPodzol());
 		}
 		
 		@Override
@@ -80,21 +77,6 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			int month = (int)day / 30;//Change the hashs every in-game month
 			
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 5);//Vary the height energy by a psuedorandom hash function
-		}
-		
-		@Override
-		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			podzolGen.postGrow(world, rootPos, treePos, soilLife, natural);
-			return true;
-		}
-		
-		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-			//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
-			BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
-			world.setBlockState(highest.up(1), leavesProperties.getDynamicLeavesState(4));
-			world.setBlockState(highest.up(2), leavesProperties.getDynamicLeavesState(3));
-			world.setBlockState(highest.up(3), leavesProperties.getDynamicLeavesState(1));
 		}
 		
 	}

@@ -41,6 +41,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			setupStandardSeedDropping();
 			
+			//Add species features
 			addGenFeature(new FeatureGenCocoa());
 			addGenFeature(new FeatureGenVine(this));
 			addGenFeature(new FeatureGenUndergrowth(this));
