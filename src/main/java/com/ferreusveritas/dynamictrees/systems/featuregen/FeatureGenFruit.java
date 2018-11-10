@@ -18,27 +18,19 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
-
+	
 	protected Species species;
-	protected IBlockState fruitState;
+	protected final IBlockState ripeFruitState;
+	protected final IBlockState unripeFruitState;
 	protected float verSpread = 30;
 	protected int qty = 4;
 	protected float rayDistance = 5;
-	protected boolean enableHash = true;
+	protected int fruitingRadius = 8;
 	
-	public FeatureGenFruit(Species species, IBlockState fruitState) {
+	public FeatureGenFruit(Species species, IBlockState unripeFruitState, IBlockState ripeFruitState) {
 		this.species = species;
-		setFruit(fruitState);
-	}
-	
-	public FeatureGenFruit setFruit(IBlockState fruitState) {
-		this.fruitState = fruitState;
-		return this;
-	}
-	
-	public FeatureGenFruit setQuantity(int qty) {
-		this.qty = qty;
-		return this;
+		this.ripeFruitState = ripeFruitState;
+		this.unripeFruitState = unripeFruitState;
 	}
 	
 	public FeatureGenFruit setRayDistance(float rayDistance) {
@@ -46,17 +38,22 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 		return this;
 	}
 	
-	public FeatureGenFruit setEnableHash(boolean doHash) {
-		this.enableHash = doHash;
+	public FeatureGenFruit setFruitingRadius(int fruitingRadius) {
+		this.fruitingRadius = fruitingRadius;
 		return this;
+	}
+	
+	public int getQuantity(boolean worldGen) {
+		return worldGen ? 10 : 1;
 	}
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(!endPoints.isEmpty()) {
+			int qty = getQuantity(true);
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-				addFruit(world, species, rootPos.up(), endPoint, safeBounds);
+				addFruit(world, species, rootPos.up(), endPoint, ripeFruitState, false, safeBounds);
 			}
 			return true;
 		}
@@ -68,22 +65,23 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 		IBlockState blockState = world.getBlockState(treePos);
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
-		if(branch != null && branch.getRadius(blockState) >= 8 && natural) {
+		if(branch != null && branch.getRadius(blockState) >= fruitingRadius && natural) {
 			NodeFindEnds endFinder = new NodeFindEnds();
 			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 			List<BlockPos> endPoints = endFinder.getEnds();
+			int qty = getQuantity(false);
 			if(!endPoints.isEmpty()) {
 				for(int i = 0; i < qty; i++) {
 					BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-					addFruit(world, species, rootPos.up(), endPoint, SafeChunkBounds.ANY);
+					addFruit(world, species, rootPos.up(), endPoint, unripeFruitState, true, SafeChunkBounds.ANY);
 				}
-			}		
+			}
 		}
 		
 		return true;
 	}
 	
-	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, IBlockState fruitState, boolean enableHash, SafeChunkBounds safeBounds) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ORIGIN) {
 			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {

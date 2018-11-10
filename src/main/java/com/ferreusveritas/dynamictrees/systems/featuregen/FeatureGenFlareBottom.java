@@ -25,13 +25,16 @@ public class FeatureGenFlareBottom implements IPostGenFeature, IPostGrowFeature{
 	
 	@Override
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-		flareBottom(world, rootPos, soilLife);
-		return true;
+		if(soilLife > 0) {
+			flareBottom(world, rootPos);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		flareBottom(world, rootPos, 1);
+		flareBottom(world, rootPos);
 		return true;
 	}
 	
@@ -42,19 +45,16 @@ public class FeatureGenFlareBottom implements IPostGenFeature, IPostGrowFeature{
 	 * @param rootPos The position of the rooty dirt block of the tree
 	 * @return The radius of the bottom trunk section after operation
 	 */
-	public void flareBottom(World world, BlockPos rootPos, int soilLife) {
+	public void flareBottom(World world, BlockPos rootPos) {
+		TreeFamily family = species.getFamily();
 		
-		if(soilLife > 0) {
-			TreeFamily family = species.getFamily();
-			
-			//Put a cute little flare on the bottom of the dark oaks
-			int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
-			
-			if(radius3 > 6) {
-				family.getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, EnumFacing.UP);
-				family.getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, EnumFacing.UP);
-			}
+		//Put a cute little flare on the bottom of the dark oaks
+		int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
+		
+		if(radius3 > 6) {
+			family.getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, EnumFacing.UP);
+			family.getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, EnumFacing.UP);
 		}
-		
 	}
+	
 }

@@ -153,7 +153,6 @@ public class TreeOak extends TreeFamilyVanilla {
 	 */
 	public class SpeciesAppleOak extends SpeciesRare {
 		
-		FeatureGenFruit appleGen;
 		private static final String speciesName = "apple";
 		public final IBlockState unripeFruit;
 		public final IBlockState ripeFruit;
@@ -172,7 +171,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			ripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3);
 			unripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0);
-			appleGen = new FeatureGenFruit(this, ModBlocks.blockFruit.getDefaultState()).setRayDistance(4);
+			addGenFeature(new FeatureGenFruit(this, unripeFruit, ripeFruit).setRayDistance(4));
 			
 			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
 		}
@@ -180,18 +179,6 @@ public class TreeOak extends TreeFamilyVanilla {
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
-		}
-		
-		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			appleGen.setQuantity(10).setEnableHash(false).setFruit(ripeFruit).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-		}
-		
-		@Override
-		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			appleGen.setQuantity(1).setEnableHash(true).setFruit(unripeFruit).postGrow(world, rootPos, treePos, soilLife, natural);
-			return true;
 		}
 		
 	}
