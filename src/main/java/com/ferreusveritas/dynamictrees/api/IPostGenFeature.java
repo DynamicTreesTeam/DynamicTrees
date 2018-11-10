@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-public interface IPostGenFeature extends IGenModule {
+public interface IPostGenFeature extends IGenFeature {
 	
 	/**
 	 * Do post generation operations

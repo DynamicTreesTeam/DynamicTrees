@@ -12,8 +12,8 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.api.IGenModule;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
@@ -150,7 +150,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
 	
-	protected IGenFeature genFeatureOverride;
+	protected IFullGenFeature genFeatureOverride;
 	protected List<IPreGenFeature> preGenFeatures;
 	protected List<IPostGenFeature> postGenFeatures;
 	protected List<IPostGrowFeature> postGrowFeatures;
@@ -1036,17 +1036,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
-	public void addGenFeature(IGenModule module) {
-		addGenFeature(module, IGenModule.ALL);
+	public void addGenFeature(IGenFeature module) {
+		addGenFeature(module, IGenFeature.ALL);
 	}
 	
-	public void addGenFeature(IGenModule module, int allowableFlags) {
+	public void addGenFeature(IGenFeature module, int allowableFlags) {
 
-		if(module instanceof IGenFeature && (allowableFlags & IGenModule.FULLGEN) != 0) {
-			genFeatureOverride = (IGenFeature) module;
+		if(module instanceof IFullGenFeature && (allowableFlags & IGenFeature.FULLGEN) != 0) {
+			genFeatureOverride = (IFullGenFeature) module;
 		}
 		
-		if(module instanceof IPreGenFeature && (allowableFlags & IGenModule.PREGEN) != 0) {
+		if(module instanceof IPreGenFeature && (allowableFlags & IGenFeature.PREGEN) != 0) {
 			IPreGenFeature feature = (IPreGenFeature) module;
 			if(preGenFeatures == null) {
 				preGenFeatures = new ArrayList<>(1);
@@ -1054,7 +1054,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			preGenFeatures.add(feature);
 		}
 		
-		if(module instanceof IPostGenFeature && (allowableFlags & IGenModule.POSTGEN) != 0) {
+		if(module instanceof IPostGenFeature && (allowableFlags & IGenFeature.POSTGEN) != 0) {
 			IPostGenFeature feature = (IPostGenFeature) module;
 			if(postGenFeatures == null) {
 				postGenFeatures = new ArrayList<>(1);
@@ -1062,7 +1062,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			postGenFeatures.add(feature);
 		}
 		
-		if(module instanceof IPostGrowFeature && (allowableFlags & IGenModule.POSTGROW) != 0) {
+		if(module instanceof IPostGrowFeature && (allowableFlags & IGenFeature.POSTGROW) != 0) {
 			IPostGrowFeature feature = (IPostGrowFeature) module;
 			if(postGrowFeatures == null) {
 				postGrowFeatures = new ArrayList<>(1);

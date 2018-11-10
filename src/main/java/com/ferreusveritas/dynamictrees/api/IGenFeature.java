@@ -1,15 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import java.util.Random;
-
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-
-public interface IGenFeature extends IGenModule {
-	
-	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds);
-	
+public interface IGenFeature {
+	public static final int FULLGEN	 = 1 << 0;
+	public static final int PREGEN 	 = 1 << 1;
+	public static final int POSTGEN  = 1 << 2;
+	public static final int POSTGROW = 1 << 3;
+	public static final int ALL = PREGEN | POSTGEN | POSTGROW;
 }

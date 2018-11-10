@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-public class FeatureGenBush implements IGenFeature, IPostGenFeature {
+public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 	
 	private Species species;
 	private IBlockState logState = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.OAK);
