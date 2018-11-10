@@ -16,6 +16,7 @@ public interface IPostGrowFeature extends IGenModule {
 	 * @param natural 
 	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
 	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
+	 * @return true if operation was successful. false otherwise
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural);
 	

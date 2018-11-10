@@ -22,8 +22,10 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		if (endPoints.isEmpty()) return false;
-
+		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+		
+		if (endPoints.isEmpty() && !worldGen) return false;
+	
 		BlockPos lowest = Collections.min(endPoints, (a, b) -> a.getY() - b.getY());
 		
 		Random rand = world.rand;

@@ -30,7 +30,11 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 			0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0
 		}).setCenter(new BlockPos(2, 3, 2));
 	
-	public FeatureGenMound(Species species) { }
+	private final int moundCutoffRadius;
+	
+	public FeatureGenMound(Species species, int moundCutoffRadius) {
+		this.moundCutoffRadius = moundCutoffRadius;
+	}
 	
 	/**
 	 * Used to create a 5x4x5 rounded mound that is one block higher than the ground surface.
@@ -44,19 +48,20 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 */
 	@Override
 	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
-		
-		IBlockState initialDirtState = world.getBlockState(rootPos);
-		IBlockState initialUnderState = world.getBlockState(rootPos.down());
-		
-		if(initialUnderState.getMaterial() != Material.GROUND || initialUnderState.getMaterial() != Material.ROCK) {
-			initialUnderState = ModBlocks.blockStates.dirt;
-		}
-		
-		rootPos = rootPos.up();
-		
-		for(Cell cell: moundMap.getAllNonZeroCells()) {
-			IBlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
-			world.setBlockState(rootPos.add(cell.getPos()), placeState);
+		if(radius >= moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//worldgen test
+			IBlockState initialDirtState = world.getBlockState(rootPos);
+			IBlockState initialUnderState = world.getBlockState(rootPos.down());
+			
+			if(initialUnderState.getMaterial() != Material.GROUND || initialUnderState.getMaterial() != Material.ROCK) {
+				initialUnderState = ModBlocks.blockStates.dirt;
+			}
+			
+			rootPos = rootPos.up();
+			
+			for(Cell cell: moundMap.getAllNonZeroCells()) {
+				IBlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
+				world.setBlockState(rootPos.add(cell.getPos()), placeState);
+			}
 		}
 		
 		return rootPos;
@@ -69,20 +74,22 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 */
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		
-		BlockPos treePos = rootPos.up();
-		IBlockState belowState = world.getBlockState(rootPos.down());
-		
-		//Place dirt blocks around rooty dirt block if tree has a > 8 radius
-		IBlockState branchState = world.getBlockState(treePos);
-		if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
-			for(Surround dir: Surround.values()) {
-				BlockPos dPos = rootPos.add(dir.getOffset());
-				world.setBlockState(dPos, initialDirtState);
-				world.setBlockState(dPos.down(), belowState);
+		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
+			BlockPos treePos = rootPos.up();
+			IBlockState belowState = world.getBlockState(rootPos.down());
+			
+			//Place dirt blocks around rooty dirt block if tree has a > 8 radius
+			IBlockState branchState = world.getBlockState(treePos);
+			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
+				for(Surround dir: Surround.values()) {
+					BlockPos dPos = rootPos.add(dir.getOffset());
+					world.setBlockState(dPos, initialDirtState);
+					world.setBlockState(dPos.down(), belowState);
+				}
+				return true;
 			}
-			return true;
 		}
+		
 		return false;
 	}
 	
