@@ -6,14 +6,12 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockOldLeaf;
@@ -133,9 +131,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			
-			//Generate Vines
-			vineGen.setQuantity(5).gen(world, rootPos.up(), endPoints, safeBounds);
+			vineGen.setQuantity(5).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate Vines
 		}
 		
 		@Override
@@ -159,6 +155,8 @@ public class TreeOak extends TreeFamilyVanilla {
 		
 		FeatureGenFruit appleGen;
 		private static final String speciesName = "apple";
+		public final IBlockState unripeFruit;
+		public final IBlockState ripeFruit;
 		
 		public SpeciesAppleOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily, ModBlocks.oakLeavesProperties);
@@ -171,7 +169,9 @@ public class TreeOak extends TreeFamilyVanilla {
 			envFactor(Type.DRY, 0.25f);
 			
 			generateSeed();
-						
+			
+			ripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3);
+			unripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0);
 			appleGen = new FeatureGenFruit(this, ModBlocks.blockFruit.getDefaultState()).setRayDistance(4);
 			
 			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
@@ -185,21 +185,12 @@ public class TreeOak extends TreeFamilyVanilla {
 		@Override
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			appleGen.setQuantity(10).setEnableHash(false).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3)).gen(world, rootPos.up(), endPoints, safeBounds);
+			appleGen.setQuantity(10).setEnableHash(false).setFruit(ripeFruit).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 		}
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			if(ModConfigs.enableAppleTrees) {
-				IBlockState blockState = world.getBlockState(treePos);
-				BlockBranch branch = TreeHelper.getBranch(blockState);
-				
-				if(branch != null && branch.getRadius(blockState) >= 8 && natural) {
-					NodeFindEnds endFinder = new NodeFindEnds();
-					TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-					appleGen.setQuantity(1).setEnableHash(true).setFruit(ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0)).gen(world, rootPos.up(), endFinder.getEnds(), SafeChunkBounds.ANY);
-				}
-			}
+			appleGen.setQuantity(1).setEnableHash(true).setFruit(unripeFruit).postGrow(world, rootPos, treePos, soilLife, natural);
 			return true;
 		}
 		

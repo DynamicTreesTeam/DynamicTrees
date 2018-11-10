@@ -775,13 +775,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * Allows a species to do things after a grow event just occured.  Currently used
+	 * Allows a species to do things after a grow event just occured.  Such as used
 	 * by Jungle trees to create cocoa pods on the trunk
 	 * 
-	 * @param world
-	 * @param rootPos
-	 * @param treePos
-	 * @param soilLife
+	 * @param world The world
+	 * @param rootPos The position of the rooty dirt block
+	 * @param treePos The position of the base trunk block of the tree(usually directly above the rooty dirt block)
+	 * @param soilLife The life of the soil block this tree is planted in
+	 * @param natural 
+	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
+	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 		return true;
@@ -984,12 +987,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		EnumFacing facing = CoordUtils.getRandomDir(random);
 		if(getJoCodeStore() != null) {
 			JoCode code = getJoCodeStore().getRandomCode(radius, random);
 			if(code != null) {
-				code.generate(world, this, pos, biome, facing, radius, safeBounds);
+				code.generate(world, this, rootPos, biome, facing, radius, safeBounds);
 				return true;
 			}
 		}

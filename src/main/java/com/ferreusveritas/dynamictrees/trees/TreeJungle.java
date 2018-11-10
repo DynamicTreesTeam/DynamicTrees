@@ -108,13 +108,8 @@ public class TreeJungle extends TreeFamilyVanilla {
 			}
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
-				BlockPos treePos = rootPos.up();
-				
-				//Generate Vines
-				vineGen.setQuantity(endPoints.size()).setMaxLength(20).gen(world, treePos, endPoints, safeBounds);
-				
-				//Generate undergrowth
-				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
+				vineGen.setQuantity(endPoints.size()).setMaxLength(20).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate Vines
+				underGen.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate undergrowth
 			}
 		}
 		

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -17,8 +17,9 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
-public class FeatureGenVine implements IGenFeature {
+public class FeatureGenVine implements IPostGenFeature {
 	
 	protected final PropertyBool vineMap[] = new PropertyBool[] {null, null, BlockVine.NORTH, BlockVine.SOUTH, BlockVine.WEST, BlockVine.EAST};
 	protected int qty = 4;
@@ -58,18 +59,21 @@ public class FeatureGenVine implements IGenFeature {
 	}
 	
 	@Override
-	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(!endPoints.isEmpty()) {
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-				addVine(world, species, treePos, endPoint, safeBounds);
+				addVine(world, species, rootPos, endPoint, safeBounds);
 			}
+			return true;
 		}
+		
+		return false;
 	}
 	
-	protected void addVine(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+	protected void addVine(World world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 		
-		RayTraceResult result = CoordUtils.branchRayTrace(world, species, treePos, branchPos, 90, verSpread, rayDistance, safeBounds);
+		RayTraceResult result = CoordUtils.branchRayTrace(world, species, rootPos, branchPos, 90, verSpread, rayDistance, safeBounds);
 		
 		if(result != null) {
 			BlockPos vinePos = result.getBlockPos().offset(result.sideHit);

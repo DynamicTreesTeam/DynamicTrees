@@ -4,13 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
@@ -88,11 +84,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			if(ModConfigs.podzolGen) {
-				NodeFindEnds endFinder = new NodeFindEnds();
-				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-				podzolGen.gen(world, treePos, endFinder.getEnds(), SafeChunkBounds.ANY);
-			}
+			podzolGen.postGrow(world, rootPos, treePos, soilLife, natural);
 			return true;
 		}
 		

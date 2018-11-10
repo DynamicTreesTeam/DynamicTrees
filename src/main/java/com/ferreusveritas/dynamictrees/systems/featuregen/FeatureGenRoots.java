@@ -1,12 +1,16 @@
 package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -17,17 +21,21 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
-public class FeatureGenRoots implements IGenFeature {
+public class FeatureGenRoots implements IPostGrowFeature, IPostGenFeature {
 	
 	private Species species;
 	private int levelLimit = 2;
-	private Function<Integer, Integer> scaler = i -> i;
+	private int trunkRadius = 0;
+	private final int minTrunkRadius;
+	private BiFunction<Integer, Integer, Integer> scaler = (i, j) -> i;
 	
 	private SimpleVoxmap rootMaps[];
 	
-	public FeatureGenRoots(Species species) {
+	public FeatureGenRoots(Species species, int minTrunkRadius) {
 		this.species = species;
+		this.minTrunkRadius = minTrunkRadius;
 		rootMaps = createRootMaps();
 	}
 	
@@ -56,18 +64,45 @@ public class FeatureGenRoots implements IGenFeature {
 		return this;
 	}
 	
-	public FeatureGenRoots setScaler(Function<Integer, Integer> scaler) {
+	public FeatureGenRoots setTrunkRadius(int trunkRadius) {
+		this.trunkRadius = trunkRadius;
+		return this;
+	}
+	
+	public FeatureGenRoots setScaler(BiFunction<Integer, Integer, Integer> scaler) {
 		this.scaler = scaler;
 		return this;
 	}
 	
 	@Override
-	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {		
-		if(scaler != null) {
-			int hash = CoordUtils.coordHashCode(treePos, 2);
-			SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-			nextRoot(world, rootMap, treePos, BlockPos.ORIGIN, 0, -1, null, 0);
+	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+		if(trunkRadius >= minTrunkRadius) {
+			return startRoots(world, rootPos.up());
 		}
+		return false;
+	}
+
+	
+	public boolean startRoots(World world, BlockPos treePos) {		
+		int hash = CoordUtils.coordHashCode(treePos, 2);
+		SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
+		nextRoot(world, rootMap, treePos, BlockPos.ORIGIN, 0, -1, null, 0);
+		return true;
+	}
+	
+	@Override
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+		if(soilLife > 0 && trunkRadius >= minTrunkRadius) {
+			Surround surr = Surround.values()[world.rand.nextInt(8)];
+			BlockPos dPos = treePos.add(surr.getOffset());
+			if(world.getBlockState(dPos).getBlock() instanceof BlockSurfaceRoot) {
+				world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
+			}
+			
+			startRoots(world, treePos);
+		}
+		
+		return true;
 	}
 	
 	protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, BlockPos pos, int height, int levelCount, EnumFacing fromDir, int radius) {
@@ -87,7 +122,7 @@ public class FeatureGenRoots implements IGenFeature {
 					for(EnumFacing dir: EnumFacing.HORIZONTALS) {
 						if(dir != fromDir) {
 							BlockPos dPos = pos.offset(dir);
-							int nextRad = scaler.apply((int) rootMap.getVoxel(dPos));
+							int nextRad = scaler.apply((int) rootMap.getVoxel(dPos), trunkRadius);
 							if(pos != BlockPos.ORIGIN && nextRad >= radius) {
 								nextRad = radius - 1;
 							}
@@ -114,4 +149,5 @@ public class FeatureGenRoots implements IGenFeature {
 		
 		return block.isReplaceable(world, pos) && material != Material.WATER && material != Material.LAVA;
 	}
+	
 }

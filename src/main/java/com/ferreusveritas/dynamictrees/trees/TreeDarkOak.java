@@ -2,19 +2,18 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
@@ -65,7 +64,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			setupStandardSeedDropping();
 			underGen = new FeatureGenHugeMushrooms(this);
-			rootGen = new FeatureGenRoots(this);
+			rootGen = new FeatureGenRoots(this, 13).setScaler(getRootScaler());
 			moundGen = new FeatureGenMound(this);
 		}
 		
@@ -79,7 +78,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 				if(radius >= mountCutoffRadius) {
-					rootPos = moundGen.preGen(world, rootPos, safeBounds);
+					rootPos = moundGen.preGeneration(world, rootPos, radius, facing, safeBounds, joCode);
 				}
 			}
 			
@@ -90,23 +89,25 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 			
-			int trunkRadius = flareBottom(world, rootPos);
-			
-			BlockPos treePos = rootPos.up();
-			
+			int trunkRadius = flareBottom(world, rootPos, 1);
+						
 			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
-				
 				if(radius < mountCutoffRadius) {//A mound was already generated in preGen if the radius is 5 or greater
-					moundGen.postGen(world, rootPos, safeBounds, initialDirtState);
+					moundGen.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 				}
 				
 				//Generate huge mushroom undergrowth
-				underGen.setRadius(radius).gen(world, treePos, endPoints, safeBounds);
+				underGen.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 			}
 			
-			float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-			
-			rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, endPoints, safeBounds);			
+			rootGen.setTrunkRadius(trunkRadius).postGeneration(world, rootPos, biome, trunkRadius, endPoints, safeBounds, initialDirtState);			
+		}
+		
+		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
+			return (inRadius, trunkRadius) -> {
+				float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
+				return (int) (inRadius * scale);
+			};
 		}
 		
 		/**
@@ -116,14 +117,16 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		 * @param rootPos The position of the rooty dirt block of the tree
 		 * @return The radius of the bottom trunk section after operation
 		 */
-		public int flareBottom(World world, BlockPos rootPos) {
+		public int flareBottom(World world, BlockPos rootPos, int soilLife) {
 			
-			//Put a cute little flare on the bottom of the dark oaks
-			int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
-			
-			if(radius3 > 6) {
-				getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, EnumFacing.UP);
-				return getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, EnumFacing.UP);
+			if(soilLife > 0) {
+				//Put a cute little flare on the bottom of the dark oaks
+				int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
+				
+				if(radius3 > 6) {
+					getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, EnumFacing.UP);
+					return getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, EnumFacing.UP);
+				}
 			}
 			
 			return TreeHelper.getRadius(world, rootPos.up(1));
@@ -151,19 +154,8 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		
 		@Override
 		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			if(soilLife > 0) {
-				int trunkRadius = flareBottom(world, rootPos);
-				if(trunkRadius >= 13) {
-					Surround surr = Surround.values()[world.rand.nextInt(8)];
-					BlockPos dPos = treePos.add(surr.getOffset());
-					if(world.getBlockState(dPos).getBlock() instanceof BlockSurfaceRoot) {
-						world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
-					}
-					
-					float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-					rootGen.setScaler(scale > 0.0f ? i -> (int)(i * scale) : null).gen(world, treePos, null, SafeChunkBounds.ANY);
-				}
-			}
+			int trunkRadius = flareBottom(world, rootPos, soilLife);
+			rootGen.setTrunkRadius(trunkRadius).postGrow(world, rootPos, treePos, soilLife, natural);
 			return super.postGrow(world, rootPos, treePos, soilLife, natural);
 		}
 		

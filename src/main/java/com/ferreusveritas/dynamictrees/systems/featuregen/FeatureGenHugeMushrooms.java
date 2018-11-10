@@ -4,29 +4,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.MushroomGenerator;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
-public class FeatureGenHugeMushrooms implements IGenFeature {
-
-	private int radius = 2;
+public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	
 	public FeatureGenHugeMushrooms(Species species) { }
 	
-	public FeatureGenHugeMushrooms setRadius(int radius) {
-		this.radius = radius;
-		return this;
-	}
-	
 	@Override
-	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+		if (endPoints.isEmpty()) return false;
+
 		BlockPos lowest = Collections.min(endPoints, (a, b) -> a.getY() - b.getY());
 		
 		Random rand = world.rand;
@@ -41,7 +38,7 @@ public class FeatureGenHugeMushrooms implements IGenFeature {
 				int xOff = (int) (MathHelper.sin(angle) * (radius - 1));
 				int zOff = (int) (MathHelper.cos(angle) * (radius - 1));
 				
-				BlockPos mushPos = treePos.add(xOff, 0, zOff);
+				BlockPos mushPos = rootPos.add(xOff, 0, zOff);
 				
 				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).up();
 				
@@ -52,7 +49,7 @@ public class FeatureGenHugeMushrooms implements IGenFeature {
 						
 						if(mushGen.generate(world, rand, mushPos, height, safeBounds)) {
 							if(++success >= 2) {
-								return;
+								return true;
 							}
 						}
 					}
@@ -60,6 +57,7 @@ public class FeatureGenHugeMushrooms implements IGenFeature {
 			}
 		}
 
+		return false;
 	}
 	
 }

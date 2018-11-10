@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -18,25 +18,20 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
-public class FeatureGenUndergrowth implements IGenFeature {
+public class FeatureGenUndergrowth implements IPostGenFeature {
 
 	private Species species;
-	private int radius = 2;
 	
 	public FeatureGenUndergrowth(Species species) {
 		this.species = species;
 	}
 	
-	public FeatureGenUndergrowth setRadius(int radius) {
-		this.radius = radius;
-		return this;
-	}
-	
 	@Override
-	public void gen(World world, BlockPos treePos, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
-
-		Vec3d vTree = new Vec3d(treePos).addVector(0.5, 0.5, 0.5);
+	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+		
+		Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
 
 		for(int i = 0; i < 2; i++) {
 
@@ -65,6 +60,8 @@ public class FeatureGenUndergrowth implements IGenFeature {
 					}
 			}
 		}
+		
+		return true;
 	}
 	
 }
