@@ -30,18 +30,19 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		
-		Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
-
-		for(int i = 0; i < 2; i++) {
-
-			int rad = MathHelper.clamp(radius, 2, world.rand.nextInt(radius - 1) + 2);
-			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
-
-			BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
-			IBlockState soilBlockState = world.getBlockState(pos);
-
-			if(species.isAcceptableSoil(world, pos, soilBlockState)) {
+		if(safeBounds != SafeChunkBounds.ANY) {//worldgen
+			
+			Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
+			
+			for(int i = 0; i < 2; i++) {
+				
+				int rad = MathHelper.clamp(radius, 2, world.rand.nextInt(radius - 1) + 2);
+				Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
+				
+				BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
+				IBlockState soilBlockState = world.getBlockState(pos);
+				
+				if(species.isAcceptableSoil(world, pos, soilBlockState)) {
 					int type = world.rand.nextInt(2);
 					world.setBlockState(pos, Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, type == 0 ? BlockPlanks.EnumType.OAK : BlockPlanks.EnumType.JUNGLE));
 					pos = pos.up(world.rand.nextInt(3));
@@ -58,10 +59,13 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 							world.setBlockState(leafPos, leavesState);
 						}
 					}
+				}
 			}
+			
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 }

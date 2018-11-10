@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IPostGrowFeature {
+public interface IPostGrowFeature extends IGenModule {
 	
 	/**
 	 * Allows a species to do things after a grow event just occured.  Such as used

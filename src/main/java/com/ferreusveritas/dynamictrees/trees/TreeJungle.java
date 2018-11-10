@@ -1,17 +1,13 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenCocoa;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockOldLeaf;
@@ -32,9 +28,6 @@ public class TreeJungle extends TreeFamilyVanilla {
 	
 	public class SpeciesJungle extends Species {
 		
-		FeatureGenVine vineGen;
-		FeatureGenUndergrowth underGen;
-		
 		SpeciesJungle(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
 			
@@ -48,8 +41,9 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			setupStandardSeedDropping();
 			
-			vineGen = new FeatureGenVine(this);
-			underGen = new FeatureGenUndergrowth(this);
+			addGenFeature(new FeatureGenCocoa());
+			addGenFeature(new FeatureGenVine(this));
+			addGenFeature(new FeatureGenUndergrowth(this));
 		}
 		
 		@Override
@@ -97,35 +91,6 @@ public class TreeJungle extends TreeFamilyVanilla {
 		@Override
 		public float getEnergy(World world, BlockPos pos) {
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos);
-		}
-		
-		@Override
-		public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-			super.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-			
-			if(world.rand.nextInt() % 8 == 0) {
-				addCocoa(world, rootPos, true);
-			}
-			
-			if(safeBounds != SafeChunkBounds.ANY) {//worldgen
-				vineGen.setQuantity(endPoints.size()).setMaxLength(20).postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate Vines
-				underGen.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);//Generate undergrowth
-			}
-		}
-		
-		@Override
-		public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-			super.postGrow(world, rootPos, treePos, soilLife, natural);
-			
-			if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-				addCocoa(world, rootPos, false);
-			}
-			
-			return true;
-		}
-		
-		private void addCocoa(World world, BlockPos rootPos, boolean worldGen) {
-			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa().setWorldGen(worldGen)));
 		}
 		
 	}

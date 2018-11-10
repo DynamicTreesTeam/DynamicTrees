@@ -60,12 +60,14 @@ public class FeatureGenVine implements IPostGenFeature {
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		if(!endPoints.isEmpty()) {
-			for(int i = 0; i < qty; i++) {
-				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-				addVine(world, species, rootPos, endPoint, safeBounds);
+		if(safeBounds != SafeChunkBounds.ANY) {//worldgen
+			if(!endPoints.isEmpty()) {
+				for(int i = 0; i < qty; i++) {
+					BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
+					addVine(world, species, rootPos, endPoint, safeBounds);
+				}
+				return true;
 			}
-			return true;
 		}
 		
 		return false;

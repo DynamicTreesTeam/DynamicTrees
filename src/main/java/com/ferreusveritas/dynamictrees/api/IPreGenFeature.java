@@ -7,7 +7,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IPreGenFeature {
+public interface IPreGenFeature extends IGenModule {
 	
 	/**
 	 * Do pre generation operations

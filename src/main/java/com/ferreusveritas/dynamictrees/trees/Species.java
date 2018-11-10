@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,11 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IGenModule;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
@@ -143,6 +149,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
+	
+	protected List<IPreGenFeature> preGenFeatures;
+	protected List<IPostGenFeature> postGenFeatures;
+	protected List<IPostGrowFeature> postGrowFeatures;
 	
 	/**
 	 * Constructor only used by NULLSPECIES
@@ -787,6 +797,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+		if(postGrowFeatures != null) {
+			for(IPostGrowFeature feature: postGrowFeatures) {
+				feature.postGrow(world, rootPos, treePos, soilLife, natural);
+			}
+		}
 		return true;
 	}
 	
@@ -1015,6 +1030,42 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
+	public void addGenFeature(IGenModule module) {
+		addGenFeature(module, IGenModule.ALL);
+	}
+	
+	public void addGenFeature(IGenModule module, int allowableFlags) {
+		
+		if(module instanceof IPreGenFeature && (allowableFlags & IGenModule.PREGEN) != 0) {
+			IPreGenFeature feature = (IPreGenFeature) module;
+			if(preGenFeatures == null) {
+				preGenFeatures = new ArrayList<>(1);
+			}
+			preGenFeatures.add(feature);
+		}
+		
+		if(module instanceof IGenFeature && (allowableFlags & IGenModule.GEN) != 0) {
+			IGenFeature feature = (IGenFeature) module;//TODO
+		}
+		
+		if(module instanceof IPostGenFeature && (allowableFlags & IGenModule.POSTGEN) != 0) {
+			IPostGenFeature feature = (IPostGenFeature) module;
+			if(postGenFeatures == null) {
+				postGenFeatures = new ArrayList<>(1);
+			}
+			postGenFeatures.add(feature);
+		}
+		
+		if(module instanceof IPostGrowFeature && (allowableFlags & IGenModule.POSTGROW) != 0) {
+			IPostGrowFeature feature = (IPostGrowFeature) module;
+			if(postGrowFeatures == null) {
+				postGrowFeatures = new ArrayList<>(1);
+			}
+			postGrowFeatures.add(feature);
+		}
+		
+	}
+	
 	/**
 	 * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the trunk that
 	 * could be in the way.
@@ -1028,7 +1079,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param initialDirtState The state of the dirt block before it became rooty
 	 * @return new blockposition of root block.  BlockPos.ORIGIN to cancel generation
 	 */
-	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) { return rootPos; }
+	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
+		if(preGenFeatures != null) {
+			for(IPreGenFeature feature: preGenFeatures) {
+				rootPos = feature.preGeneration(world, rootPos, radius, facing, safeBounds, joCode);
+			}
+		}
+		return rootPos;
+	}
 	
 	/**
 	 * Allows the tree to decorate itself after it has been generated.
@@ -1042,7 +1100,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
   	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
-	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {}
+	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+		if(postGenFeatures != null) {
+			for(IPostGenFeature feature: postGenFeatures) {
+				feature.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+			}
+		}
+	}
 	
 	/**
 	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
