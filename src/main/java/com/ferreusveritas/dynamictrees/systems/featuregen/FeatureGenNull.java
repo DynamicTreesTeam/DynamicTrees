@@ -12,6 +12,6 @@ import net.minecraft.world.biome.Biome;
 public class FeatureGenNull implements IGenFeature {
 
 	@Override
-	public void gen(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {}
+	public void generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {}
 
 }

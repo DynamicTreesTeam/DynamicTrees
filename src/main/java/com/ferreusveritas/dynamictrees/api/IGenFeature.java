@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public interface IGenFeature {
-
-	public void gen(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds);
+	
+	public void generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds);
 	
 }

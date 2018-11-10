@@ -50,7 +50,7 @@ public class FeatureGenBush implements IGenFeature, IPostGenFeature {
 	}
 	
 	@Override
-	public void gen(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public void generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		commonGen(world, rootPos, random, radius, safeBounds);
 	}
 
