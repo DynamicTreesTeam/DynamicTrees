@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.worldgen.MushroomGenerator;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -16,9 +15,25 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
+/**
+ * Used to add mushrooms under a tree canopy.  Currently used by dark oaks
+ * for roofed forests.
+ * 
+ * @author ferreusveritas
+ */
 public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	
-	public FeatureGenHugeMushrooms(Species species) { }
+	protected final FeatureGenHugeMushroom mushGen;
+	
+	/** Use this for a custom mushroom generator */
+	public FeatureGenHugeMushrooms(Species species, FeatureGenHugeMushroom mushGen) {
+		this.mushGen = mushGen;
+	}
+	
+	/** Use this for the default mushroom generator */
+	public FeatureGenHugeMushrooms(Species species) {
+		this(species, new FeatureGenHugeMushroom() );
+	}
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
@@ -29,7 +44,6 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 		BlockPos lowest = Collections.min(endPoints, (a, b) -> a.getY() - b.getY());
 		
 		Random rand = world.rand;
-		MushroomGenerator mushGen = new MushroomGenerator();
 		
 		int success = 0;
 		
@@ -49,7 +63,7 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 					if(maxHeight >= 2) {
 						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 						
-						if(mushGen.generate(world, rand, mushPos, height, safeBounds)) {
+						if(mushGen.setHeight(height).generate(world, mushPos.down(), biome, rand, radius, safeBounds)) {
 							if(++success >= 2) {
 								return true;
 							}

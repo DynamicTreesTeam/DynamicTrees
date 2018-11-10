@@ -308,7 +308,11 @@ public class CoordUtils {
         }
     }
 
-	
+	/**
+	 * @param world The world
+	 * @param startPos The starting position
+	 * @return The position of the top solid block
+	 */
 	public static BlockPos findGround(World world, BlockPos startPos) {
 		MutableBlockPos pos = new MutableBlockPos(startPos);
 		

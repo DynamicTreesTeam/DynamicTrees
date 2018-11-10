@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -93,4 +94,15 @@ public class SafeChunkBounds {
 		BlockPos max = bounds.getMax();
 		return inBounds(min, gap) && inBounds(max, gap) && inBounds(new BlockPos(min.getX(), 0, max.getZ()), gap) && inBounds(new BlockPos(max.getX(), 0, min.getZ()), gap);
 	}
+	
+	public void setBlockState(World world, BlockPos pos, IBlockState state, boolean gap) {
+		setBlockState(world, pos, state, 3, gap);
+	}
+	
+	public void setBlockState(World world, BlockPos pos, IBlockState state, int flags, boolean gap) {
+		if(inBounds(pos, gap)) {
+			world.setBlockState(pos, state, flags);
+		}
+	}
+	
 }

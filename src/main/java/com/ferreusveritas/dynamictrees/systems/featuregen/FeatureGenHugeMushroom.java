@@ -1,7 +1,8 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -15,16 +16,23 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
-public class MushroomGenerator {
+/**
+ * Generates a singular huge mushroom
+ * 
+ * @author ferreusveritas
+ */
+public class FeatureGenHugeMushroom implements IFullGenFeature {
 	
 	private final Block mushroomType;
+	private int height = -1;
 	
-	public MushroomGenerator(Block block) {
+	public FeatureGenHugeMushroom(Block block) {
 		this.mushroomType = block;
 	}
 	
-	public MushroomGenerator() {
+	public FeatureGenHugeMushroom() {
 		this.mushroomType = null;
 	}
 	
@@ -73,6 +81,11 @@ public class MushroomGenerator {
 	
 	}
 	
+	public FeatureGenHugeMushroom setHeight(int height) {
+		this.height = height;
+		return this;
+	}
+	
 	/**
 	 * Select the appropriate sized cap for a huge mushroom type
 	 * 
@@ -102,30 +115,41 @@ public class MushroomGenerator {
 		}
 	}
 	
-	public boolean generate(World worldIn, Random rand, BlockPos genPos, int height, SafeChunkBounds safeBounds) {
-		Block soilBlock = worldIn.getBlockState(genPos.down()).getBlock();
+	//Override this for custom mushroom heights
+	protected int getMushroomHeight(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+		return this.height > 0 ? this.height : random.nextInt(9) + 2;
+	}
+	
+	@Override
+	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+				
+		BlockPos genPos = rootPos.up();
+		
+		int height = getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
+		
+		Block soilBlock = world.getBlockState(rootPos).getBlock();
 		
 		if (soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM) {
 			
 			Block mushroomBlock = this.mushroomType;
 			
 			if (mushroomBlock == null) {
-				mushroomBlock = rand.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
+				mushroomBlock = random.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
 			}
 			
 			SimpleVoxmap capMap = getCapForHeight(mushroomBlock, height);
 			
 			BlockPos capPos = genPos.up(height - 1);//Determine the cap position(top block of mushroom cap)
 			BlockBounds capBounds = capMap.getBounds().move(capPos);//Get a bounding box for the entire cap
-
+			
 			if(safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
 				
 				//Check if there's room for a mushroom cap and stem
 				for(MutableBlockPos mutPos : Iterables.concat(BlockPos.getAllInBoxMutable(BlockPos.ORIGIN.down(capMap.getLenY()), BlockPos.ORIGIN.down(height - 1)), capMap.getAllNonZero())) {
 					//System.out.println(mutPos);
 					BlockPos dPos = mutPos.add(capPos);
-					IBlockState state = worldIn.getBlockState(dPos);
-					if(!state.getBlock().canBeReplacedByLeaves(state, worldIn, dPos) || !state.getBlock().isReplaceable(worldIn, dPos)) {
+					IBlockState state = world.getBlockState(dPos);
+					if(!state.getBlock().canBeReplacedByLeaves(state, world, dPos) || !state.getBlock().isReplaceable(world, dPos)) {
 						return false;
 					}
 				}
@@ -133,16 +157,15 @@ public class MushroomGenerator {
 				//Construct the mushroom cap from the voxel map
 				for(Cell cell: capMap.getAllNonZeroCells()) {
 					BlockHugeMushroom.EnumType mushroomType = BlockHugeMushroom.EnumType.byMetadata(cell.getValue());
-					worldIn.setBlockState(capPos.add(cell.getPos()), mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, mushroomType));
+					world.setBlockState(capPos.add(cell.getPos()), mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, mushroomType));
 				}
 				
 				//Construct the stem
 				int stemLen = height - capMap.getLenY();
 				IBlockState stemBlock = mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, BlockHugeMushroom.EnumType.STEM);
 				for(int y = 0; y < stemLen; y++) {
-					worldIn.setBlockState(genPos.up(y), stemBlock);
+					world.setBlockState(genPos.up(y), stemBlock);
 				}
-				
 				
 				return true;
 			}

@@ -32,8 +32,8 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	private static Species oakswamp;
 	private static Species apple;
 	private static Species cactus;
-	//private static Species mushroomred;
-	//private static Species mushroombrn;
+	private static Species mushroomred;
+	private static Species mushroombrn;
 	
 	private static StaticSpeciesSelector staticOakDecision;
 	private static StaticSpeciesSelector staticSpruceDecision;
@@ -52,8 +52,8 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		
 		cactus = TreeRegistry.findSpeciesSloppy("cactus");
 		
-		//mushroomred = TreeRegistry.findSpeciesSloppy("mushroomred");
-		//mushroombrn = TreeRegistry.findSpeciesSloppy("mushroombrn");
+		mushroomred = TreeRegistry.findSpeciesSloppy("mushroomred");
+		mushroombrn = TreeRegistry.findSpeciesSloppy("mushroombrn");
 		
 		staticOakDecision = new StaticSpeciesSelector(new SpeciesSelection(oak));
 		staticSpruceDecision = new StaticSpeciesSelector(new SpeciesSelection(spruce));
@@ -94,10 +94,6 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		//Allow Mushroom Island biomes to generate normally
-		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND, false);
-		dbase.setCancelVanillaTreeGen(Biomes.MUSHROOM_ISLAND_SHORE, false);
-		
 		dbase.setIsSubterranean(Biomes.HELL, true);
 	}
 	
@@ -107,6 +103,9 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		}
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) { //Desert
 			return (rnd, nd) -> ( nd * 0.6) + 0.4;
+		}
+		if(BiomeDictionary.hasType(biome, Type.MUSHROOM)) { //Mushroom Island
+			return (rnd, nd) -> (nd * 0.7) + 0.3;
 		}
 		final double treeDensity = MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return (rnd, nd) -> nd * treeDensity;
@@ -128,7 +127,10 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		if(BiomeDictionary.hasType(biome, Type.SANDY)) {//Deserts (for cacti)
 			return (rnd, spc, rad) -> rnd.nextFloat() < 0.075f ? EnumChance.OK : EnumChance.CANCEL;
 		}
-		else if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
+		if(BiomeDictionary.hasType(biome, Type.MUSHROOM)) {
+			return (rnd, spc, rad) -> rnd.nextFloat() < 0.8 ? EnumChance.OK : EnumChance.CANCEL;
+		}
+		if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 			return (rnd, spc, rad) -> EnumChance.CANCEL;
 		}
 		if (biome == Biomes.RIVER) {
@@ -146,11 +148,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return new RandomSpeciesSelector().add(spruce, 2).add(oak, 1);
 		}
 		if(biome instanceof BiomePlains) {
-			if(ModConfigs.enableAppleTrees) {
-				return new RandomSpeciesSelector().add(oak, 24).add(apple, 1);
-			} else {
-				return staticOakDecision;
-			}
+			return ModConfigs.enableAppleTrees ? new RandomSpeciesSelector().add(oak, 24).add(apple, 1) : staticOakDecision;
 		}
 		if(BiomeDictionary.hasType(biome, Type.FOREST)) {
 			if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
@@ -173,6 +171,9 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		}
 		if(biome == Biomes.MESA_ROCK) {
 			return staticOakDecision;
+		}
+		if(BiomeDictionary.hasType(biome, Type.MUSHROOM)) {
+			return new RandomSpeciesSelector().add(mushroomred, 4).add(mushroombrn, 3);
 		}
 		if(BiomeDictionary.hasType(biome, Type.JUNGLE)) {
 			return new StaticSpeciesSelector(new SpeciesSelection(jungle));

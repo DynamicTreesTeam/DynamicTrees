@@ -99,16 +99,16 @@ public class TreeGenerator {
 		return circleProvider;
 	}
 	
-	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType) {
-		makeWoolCircle(world, circle, h, resultType, 0);
+	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
+		makeWoolCircle(world, circle, h, resultType, safeBounds, 0);
 	}
 	
-	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, int flags) {
+	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
 		
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					world.setBlockState(new BlockPos(circle.x + ix, h, circle.z + iz), Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata((circle.x ^ circle.z) & 0xF)), flags);
+					safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata((circle.x ^ circle.z) & 0xF)), flags, true);
 				}
 			}
 		}
@@ -116,13 +116,13 @@ public class TreeGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			EnumDyeColor color = resultType.getColor();
-			world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, color));
-			world.setBlockState(pos.up(), Blocks.CARPET.getDefaultState().withProperty(BlockColored.COLOR, color));
+			safeBounds.setBlockState(world, pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, color), true);
+			safeBounds.setBlockState(world, pos.up(), Blocks.CARPET.getDefaultState().withProperty(BlockColored.COLOR, color), true);
 		}
 	}
-	
-	public EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 		
+	public EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
+				
 		circle.add(8, 8);//Move the circle into the "stage"
 		
 		BlockPos pos = new BlockPos(circle.x, 0, circle.z);
@@ -168,7 +168,7 @@ public class TreeGenerator {
 		
 		//Display wool circles for testing the circle growing algorithm
 		if(ModConfigs.worldGenDebug) {
-			makeWoolCircle(world, circle, pos.getY(), result);
+			makeWoolCircle(world, circle, pos.getY(), result, safeBounds);
 		}
 		
 		circle.add(-8, -8);//Move the circle back to normal coords
