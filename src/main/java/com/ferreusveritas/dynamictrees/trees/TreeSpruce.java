@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenConiferTopper;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
@@ -9,10 +8,8 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -84,23 +81,13 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		ModBlocks.spruceLeavesProperties.setTree(this);
+		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
 	}
 	
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesSpruce(this));
-	}
-	
-	@Override
-	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		int radius = branch.getRadius(blockState);
-		if(radius == 1) {
-			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				return 128;
-			}
-		}
-		return radius;
 	}
 	
 }

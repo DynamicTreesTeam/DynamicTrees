@@ -72,6 +72,10 @@ public class TreeFamily {
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
 	private ItemStack primitiveLogItemStack = ItemStack.EMPTY;
 	
+	//Leaves
+	/** Used to modify the getRadiusForCellKit call to create a special case */
+	protected boolean hasConiferVariants = false;
+	
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
 	private ItemStack stick;
@@ -318,7 +322,13 @@ public class TreeFamily {
 	///////////////////////////////////////////
 	
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		return branch.getRadius(blockState);
+		int radius = branch.getRadius(blockState);
+		if(hasConiferVariants && radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				return 128;
+			}
+		}
+		return radius;
 	}
 	
 	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */

@@ -7,7 +7,6 @@ import java.util.function.BiFunction;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
@@ -21,7 +20,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -29,7 +27,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -161,6 +158,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
 		ModBlocks.darkOakLeavesProperties.setTree(this);
+		hasConiferVariants = true;
 		
 		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");
 		
@@ -175,17 +173,6 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	@Override
 	public boolean isThick() {
 		return true;
-	}
-	
-	@Override
-	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
-		int radius = branch.getRadius(blockState);
-		if(radius == 1) {
-			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				return 128;
-			}
-		}
-		return radius;
 	}
 	
 	@Override
