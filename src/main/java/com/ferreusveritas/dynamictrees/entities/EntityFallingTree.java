@@ -192,7 +192,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		}
 		
 		//Adjust the bounding box to account for the tree falling over
-		double grow = Math.max(0, (normAABB.maxX - normAABB.minX) - (MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ) / 2) );
+		double height = normAABB.maxY - normAABB.minY;
+		double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
+		double grow = Math.max(0, height - (width / 2) ) + 2;
 		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
 		
 		return normAABB;
