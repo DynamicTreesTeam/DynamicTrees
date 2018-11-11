@@ -19,7 +19,6 @@ import mcp.mobius.waila.api.SpecialChars;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -87,7 +86,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 					renderString += SpecialChars.getRenderString("waila.stack", "1", stickName, String.valueOf(las.sticks), String.valueOf(stickStack.getItemDamage()));
 				}
 			}
-
+			
 			tooltip.add(renderString);
 		}
 		
@@ -123,7 +122,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	@Override
 	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-
+		
 		Species species = getWailaSpecies(world, pos);
 		
 		if(species != Species.NULLSPECIES) {
