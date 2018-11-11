@@ -15,9 +15,11 @@ import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
+import mcp.mobius.waila.api.SpecialChars;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -64,14 +66,29 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		if(species != Species.NULLSPECIES) {
 			tooltip.add("Species: " + species.getRegistryName().getResourcePath());
 			
-			if(lastVolume != 0) {
+			String renderString = "";
+			
+			ItemStack seedStack = species.getSeedStack(1);
+			String seedName = seedStack.getItem().getRegistryName().toString();
+			renderString += SpecialChars.getRenderString("waila.stack", "1", seedName, String.valueOf(1), String.valueOf(seedStack.getItemDamage()));
+			
+			if(lastVolume > 0) {
 				LogsAndSticks las = species.getLogsAndSticks(lastVolume);
 				
-				tooltip.add("Logs: " + las.logs);
-				if(las.sticks != 0) {
-					tooltip.add("Sticks: " + las.sticks);
+				if(las.logs > 0) {
+					ItemStack logStack = species.getFamily().getPrimitiveLogItemStack(1);
+					String logName = logStack.getItem().getRegistryName().toString();
+					renderString += SpecialChars.getRenderString("waila.stack", "1", logName, String.valueOf(las.logs), String.valueOf(logStack.getItemDamage()));
+				}
+				
+				if(las.sticks > 0) {
+					ItemStack stickStack = species.getFamily().getStick(1);
+					String stickName = stickStack.getItem().getRegistryName().toString();
+					renderString += SpecialChars.getRenderString("waila.stack", "1", stickName, String.valueOf(las.sticks), String.valueOf(stickStack.getItemDamage()));
 				}
 			}
+
+			tooltip.add(renderString);
 		}
 		
 		return tooltip;
