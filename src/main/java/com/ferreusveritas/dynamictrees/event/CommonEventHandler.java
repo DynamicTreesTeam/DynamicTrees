@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Type;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonEventHandler {
 	
@@ -14,6 +15,11 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void onWorldTick(WorldTickEvent event) {
+
+		if(event.side == Side.SERVER) {
+			FutureBreak.process(event.world);
+		}
+		
 		if(event.type == Type.WORLD && event.phase == Phase.START && event.world.provider.getDimension() == 0) {
 			seasonManager.updateTick(event.world, event.world.getWorldTime());
 		}

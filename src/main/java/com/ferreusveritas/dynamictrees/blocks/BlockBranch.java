@@ -11,12 +11,14 @@ import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
+import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
@@ -57,7 +59,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
-public abstract class BlockBranch extends Block implements ITreePart, IBurningListener {
+public abstract class BlockBranch extends Block implements ITreePart, IBurningListener, IFutureBreakable {
 	
 	public static final int RADMAX_NORMAL = 8;
 	
@@ -381,12 +383,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	}
 	*/
 	
-	// We override the standard behavior because we need to preserve the tree network structure to calculate
-	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
-	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
-	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
-				
+	public void futureBreak(IBlockState state, World world, BlockPos cutPos, EntityPlayer player) {
+		
 		//Try to get the face being pounded on
 		RayTraceResult rtResult = playerRayTrace(player, player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
 		EnumFacing toolDir = rtResult != null ? (player.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
@@ -417,7 +416,15 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		//Damage the axe by a prescribed amount
 		damageAxe(player, heldItem, getRadius(state), woodVolume);
 		
-		return true;// Function returns true if Block was destroyed
+	}
+	
+	// We override the standard behavior because we need to preserve the tree network structure to calculate
+	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
+	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
+		FutureBreak.add(new FutureBreak(state, world, cutPos, player, 0));
+		return false;
 	}
 	
 	/**
