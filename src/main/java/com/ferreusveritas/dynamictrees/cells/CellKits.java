@@ -19,7 +19,7 @@ public class CellKits {
 	
 	public static final ICellKit NULLCELLKIT = new ICellKit() {
 		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULLCELL; }
-		@Override public ICell getCellForBranch(int radius) { return CellNull.NULLCELL; }
+		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULLCELL; }
 		@Override public ICellSolver getCellSolver() { return NULLCELLSOLVER; }
 		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULLMAP; }
 		@Override public int getDefaultHydration() { return 0; }
@@ -62,8 +62,8 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
-			return radius == 1 || radius == 128 ? branchCell : CellNull.NULLCELL;
+		public ICell getCellForBranch(int radius, int meta) {
+			return radius == 1 ? branchCell : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -106,11 +106,12 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
-			if(radius == 1) {
-				return coniferBranch;
-			} else if(radius == 128) {
+		public ICell getCellForBranch(int radius, int meta) {
+			if(meta == CellMetadata.CONIFERTOP) {
 				return coniferTopBranch;
+			}
+			else if(radius == 1) {
+				return coniferBranch;
 			} else {
 				return CellNull.NULLCELL;
 			}
@@ -168,8 +169,8 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
-			return radius == 1 || radius == 128 ? acaciaBranch : CellNull.NULLCELL;
+		public ICell getCellForBranch(int radius, int meta) {
+			return radius == 1 ? acaciaBranch : CellNull.NULLCELL;
 		}
 		
 		@Override
@@ -211,8 +212,8 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
-			return radius == 1 || radius == 128 ? branchCell : CellNull.NULLCELL;
+		public ICell getCellForBranch(int radius, int meta) {
+			return radius == 1 ? branchCell : CellNull.NULLCELL;
 		}
 
 		@Override
@@ -243,7 +244,7 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
+		public ICell getCellForBranch(int radius, int meta) {
 			return CellNull.NULLCELL;
 		}
 		
@@ -295,7 +296,7 @@ public class CellKits {
 		}
 		
 		@Override
-		public ICell getCellForBranch(int radius) {
+		public ICell getCellForBranch(int radius, int meta) {
 			return palmBranch;
 		}
 		

@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.cells.CellMetadata;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -223,7 +224,10 @@ public class BlockBranchBasic extends BlockBranch {
 		TreeFamily thisTree = getFamily();
 		
 		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
-			return leavesProperties.getCellKit().getCellForBranch(thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this));
+			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
+			int radius = CellMetadata.getRadius(radiusAndMeta);
+			int metadata = CellMetadata.getMeta(radiusAndMeta);
+			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
 		} else {
 			return CellNull.NULLCELL;
 		}

@@ -6,7 +6,7 @@ public interface ICellKit {
 
 	ICell getCellForLeaves(int hydro);
 	
-	ICell getCellForBranch(int radius);
+	ICell getCellForBranch(int radius, int meta);
 	
 	ICellSolver getCellSolver();
 	

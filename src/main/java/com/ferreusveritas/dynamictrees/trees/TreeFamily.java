@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.cells.CellMetadata;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -323,12 +324,14 @@ public class TreeFamily {
 	
 	public int getRadiusForCellKit(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, BlockBranch branch) {
 		int radius = branch.getRadius(blockState);
+		int meta = CellMetadata.NONE;
 		if(hasConiferVariants && radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				return 128;
+				return meta = CellMetadata.CONIFERTOP;
 			}
 		}
-		return radius;
+		
+		return CellMetadata.radiusAndMeta(radius, meta);
 	}
 	
 	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
