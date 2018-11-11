@@ -28,6 +28,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -189,6 +190,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		for(BlockPos relPos: destroyData.getPositions(PosType.BRANCHES, false)) {
 			normAABB = normAABB.union(new AxisAlignedBB(relPos));
 		}
+		
+		//Adjust the bounding box to account for the tree falling over
+		double grow = Math.max(0, (normAABB.maxX - normAABB.minX) - (MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ) / 2) );
+		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
 		
 		return normAABB;
 	}
