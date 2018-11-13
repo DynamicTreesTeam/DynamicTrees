@@ -12,23 +12,32 @@ public class ModConstants {
 	public static final String REQBEFORE = "required-before:";
 	public static final String NEXT = ";";
 	public static final String AT = "@[";
+	public static final String GREATERTHAN = "@(";
 	public static final String ORGREATER = ",)";
 	
 	//Other mods can use this string to depend on the latest version of Dynamic Trees
 	public static final String DYNAMICTREES_LATEST = MODID + AT + VERSION + ORGREATER;
 	
-	//Other Mods
+	//Other Add-on Mods
 	public static final String DYNAMICTREESBOP = "dynamictreesbop";
 	public static final String DYNAMICTREESTC = "dynamictreestc";
+	public static final String DYNAMICTREESTRAVERSE = "dttraverse";
+	public static final String DYNAMICTREESHNC = "dynamictreeshnc";
 	
 	//Other Mod Versions
 	public static final String DYNAMICTREESBOP_VER = AT + "1.3.2" + ORGREATER;
 	public static final String DYNAMICTREESTC_VER =  AT + "1.1.2" + ORGREATER;
+	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.2" + ORGREATER;//Traverse Add-on has not be updated in a while and the latest 1.2 is not longer supported
+	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
 	
 	public static final String DEPENDENCIES
 		= BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
+		+ NEXT
+		+ BEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
+		+ NEXT
+		+ BEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
 		;
 	
 }
