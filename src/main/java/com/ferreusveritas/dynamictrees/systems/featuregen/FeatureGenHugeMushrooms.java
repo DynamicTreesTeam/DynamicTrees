@@ -33,8 +33,8 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	}
 	
 	/** Use this for the default mushroom generator */
-	public FeatureGenHugeMushrooms() {
-		this(new FeatureGenHugeMushroom());
+	public FeatureGenHugeMushrooms(Species species) {
+		this(new FeatureGenHugeMushroom(species));
 	}
 	
 	public FeatureGenHugeMushrooms setMaxShrooms(int max) {

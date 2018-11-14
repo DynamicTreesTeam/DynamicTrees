@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -25,14 +26,18 @@ import net.minecraft.world.biome.Biome;
  */
 public class FeatureGenHugeMushroom implements IFullGenFeature {
 	
+	protected final Species species;
+	
 	private final Block mushroomType;
 	private int height = -1;
 	
-	public FeatureGenHugeMushroom(Block block) {
+	public FeatureGenHugeMushroom(Species species, Block block) {
+		this.species = species;
 		this.mushroomType = block;
 	}
 	
-	public FeatureGenHugeMushroom() {
+	public FeatureGenHugeMushroom(Species species) {
+		this.species = species;
 		this.mushroomType = null;
 	}
 	
@@ -127,10 +132,10 @@ public class FeatureGenHugeMushroom implements IFullGenFeature {
 		
 		int height = getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
 		
-		Block soilBlock = world.getBlockState(rootPos).getBlock();
+		IBlockState soilState = world.getBlockState(rootPos);
+		Block soilBlock = soilState.getBlock();
 		
-		if (soilBlock == Blocks.DIRT || soilBlock == Blocks.GRASS || soilBlock == Blocks.MYCELIUM) {
-			
+		if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
 			Block mushroomBlock = this.mushroomType;
 			
 			if (mushroomBlock == null) {
