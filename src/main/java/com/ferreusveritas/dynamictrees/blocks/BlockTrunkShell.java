@@ -237,7 +237,27 @@ public class BlockTrunkShell extends Block {
 			muse.state.getBlock().onBlockExploded(world, muse.pos, explosion);
 		}
 	}
-
+	
+	//TODO: This may not even be necessary
+	protected Surround findDetachedMuse(World world, BlockPos pos) {
+		for(Surround s: Surround.values()) {
+			IBlockState state = world.getBlockState(pos.add(s.getOffset()));
+			if(state.getBlock() instanceof IMusable) {
+				return s;
+			}
+		}
+		return null;
+	}
+	
+	//TODO: This may not even be necessary
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		Surround surr = findDetachedMuse(world, pos);
+		if(surr != null) {
+			world.setBlockState(pos, getDefaultState().withProperty(COREDIR, surr));
+		}
+	}
+	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ShellMuse muse = getMuse(world, pos);

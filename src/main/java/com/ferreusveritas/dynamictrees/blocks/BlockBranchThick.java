@@ -188,7 +188,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		
 		for(Surround dir : Surround.values()) {
 			BlockPos dPos = pos.add(dir.getOffset());
-			ReplaceableState rep = getReplaceability(world, dPos);
+			ReplaceableState rep = getReplaceability(world, dPos, pos);
 			repStates[dir.ordinal()] = rep;
 			if (rep == ReplaceableState.BLOCKING) {
 				setable = false;
@@ -240,13 +240,15 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		return Math.min(RADMAX_NORMAL, connectionRadius);
 	}
 	
-	public ReplaceableState getReplaceability(World world, BlockPos pos) {
+	public ReplaceableState getReplaceability(World world, BlockPos pos, BlockPos corePos) {
 		
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
 		if(block == ModBlocks.blockTrunkShell) {
-			return ReplaceableState.SHELL;
+			//Determine if this shell belongs to the trunk.  Block otherwise.
+			Surround surr = state.getValue(BlockTrunkShell.COREDIR);
+			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING; 
 		}
 		
 		if(block.isReplaceable(world, pos)) {
