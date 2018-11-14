@@ -105,7 +105,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return (rnd, nd) -> ( nd * 0.6) + 0.4;
 		}
 		if(BiomeDictionary.hasType(biome, Type.MUSHROOM)) { //Mushroom Island
-			return (rnd, nd) -> (nd * 0.7) + 0.3;
+			return (rnd, nd) -> (nd * 0.25) + 0.25;
 		}
 		final double treeDensity = MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, 0.0f, 1.0f);//Gives 0.0 to 1.0
 		return (rnd, nd) -> nd * treeDensity;
@@ -128,7 +128,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return (rnd, spc, rad) -> rnd.nextFloat() < 0.075f ? EnumChance.OK : EnumChance.CANCEL;
 		}
 		if(BiomeDictionary.hasType(biome, Type.MUSHROOM)) {
-			return (rnd, spc, rad) -> rnd.nextFloat() < 0.8 ? EnumChance.OK : EnumChance.CANCEL;
+			return (rnd, spc, rad) -> rnd.nextFloat() < 0.66 ? EnumChance.OK : EnumChance.CANCEL;
 		}
 		if(biome.decorator.treesPerChunk < 0) {//Deserts, Mesas, Beaches(-999) Mushroom Island(-100)
 			return (rnd, spc, rad) -> EnumChance.CANCEL;

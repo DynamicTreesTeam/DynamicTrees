@@ -24,22 +24,34 @@ import net.minecraft.world.biome.Biome;
 public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	
 	protected final FeatureGenHugeMushroom mushGen;
+	protected int maxShrooms = 2;
+	protected int maxAttempts = 4;
 	
 	/** Use this for a custom mushroom generator */
-	public FeatureGenHugeMushrooms(Species species, FeatureGenHugeMushroom mushGen) {
+	public FeatureGenHugeMushrooms(FeatureGenHugeMushroom mushGen) {
 		this.mushGen = mushGen;
 	}
 	
 	/** Use this for the default mushroom generator */
-	public FeatureGenHugeMushrooms(Species species) {
-		this(species, new FeatureGenHugeMushroom() );
+	public FeatureGenHugeMushrooms() {
+		this(new FeatureGenHugeMushroom());
+	}
+	
+	public FeatureGenHugeMushrooms setMaxShrooms(int max) {
+		this.maxShrooms = max;
+		return this;
+	}
+	
+	public FeatureGenHugeMushrooms setMaxAttempts(int max) {
+		this.maxAttempts = max;
+		return this;
 	}
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
-		if (endPoints.isEmpty() && !worldGen) return false;
+		if (endPoints.isEmpty() || !worldGen) return false;
 	
 		BlockPos lowest = Collections.min(endPoints, (a, b) -> a.getY() - b.getY());
 		
@@ -48,7 +60,7 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 		int success = 0;
 		
 		if(radius >= 5) {
-			for(int tries = 0; tries < 4; tries++) {
+			for(int tries = 0; tries < maxAttempts; tries++) {
 				
 				float angle = (float) (rand.nextFloat() * Math.PI * 2);
 				int xOff = (int) (MathHelper.sin(angle) * (radius - 1));
@@ -64,7 +76,7 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 						
 						if(mushGen.setHeight(height).generate(world, mushPos.down(), biome, rand, radius, safeBounds)) {
-							if(++success >= 2) {
+							if(++success >= maxShrooms) {
 								return true;
 							}
 						}

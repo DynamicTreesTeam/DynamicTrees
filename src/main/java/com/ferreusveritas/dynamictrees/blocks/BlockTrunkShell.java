@@ -168,7 +168,6 @@ public class BlockTrunkShell extends Block {
 	
 	public void scheduleForClearing(IBlockAccess access, BlockPos pos) {
 		if(access instanceof World) {
-			System.out.println("h");
 			World world = (World) access;
 			if(!world.isRemote) {
 				world.scheduleBlockUpdate(pos, this, 0, 3);

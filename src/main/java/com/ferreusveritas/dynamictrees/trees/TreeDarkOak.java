@@ -63,7 +63,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			addGenFeature(new FeatureGenClearVolume(6));//Clear a spot for the thick tree trunk
 			addGenFeature(new FeatureGenFlareBottom(this));//Flare the bottom
 			addGenFeature(new FeatureGenMound(this, 5));//Establish mounds
-			addGenFeature(new FeatureGenHugeMushrooms(this));//Generate Huge Mushrooms
+			addGenFeature(new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3));//Generate Huge Mushrooms
 			addGenFeature(new FeatureGenRoots(this, 13).setScaler(getRootScaler()));//Finally Generate Roots
 		}
 		
