@@ -21,6 +21,7 @@ import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumBlockRenderType;
@@ -252,9 +253,12 @@ public class BlockTrunkShell extends Block {
 	//TODO: This may not even be necessary
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		Surround surr = findDetachedMuse(world, pos);
-		if(surr != null) {
-			world.setBlockState(pos, getDefaultState().withProperty(COREDIR, surr));
+		IBlockState newState = world.getBlockState(pos);
+		if(newState.getBlock() == Blocks.AIR) {
+			Surround surr = findDetachedMuse(world, pos);
+			if(surr != null) {
+				world.setBlockState(pos, getDefaultState().withProperty(COREDIR, surr));
+			}
 		}
 	}
 	
