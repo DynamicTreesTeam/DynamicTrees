@@ -30,13 +30,13 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 	
 	@Override
 	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		if(safeBounds != SafeChunkBounds.ANY) {//worldgen
+		if(safeBounds != SafeChunkBounds.ANY && radius > 2) {//worldgen
 			
 			Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
 			
 			for(int i = 0; i < 2; i++) {
 				
-				int rad = MathHelper.clamp(radius, 2, world.rand.nextInt(radius - 1) + 2);
+				int rad = MathHelper.clamp(world.rand.nextInt(radius - 2) + 2, 2, radius - 1);
 				Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
 				
 				BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
@@ -55,7 +55,7 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 					MutableBlockPos leafPos = new MutableBlockPos();
 					for(MutableBlockPos dPos : leafMap.getAllNonZero()) {
 						leafPos.setPos(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
-						if((CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+						if(safeBounds.inBounds(leafPos, false) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
 							world.setBlockState(leafPos, leavesState);
 						}
 					}
