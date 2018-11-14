@@ -38,8 +38,10 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 				
 				int rad = MathHelper.clamp(world.rand.nextInt(radius - 2) + 2, 2, radius - 1);
 				Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (world.rand.nextFloat() * Math.PI * 2)));
+				BlockPos vPos = new BlockPos(v);
+				if (!safeBounds.inBounds(vPos, true)) continue;
 				
-				BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
+				BlockPos pos = CoordUtils.findGround(world, vPos);
 				IBlockState soilBlockState = world.getBlockState(pos);
 				
 				if(species.isAcceptableSoil(world, pos, soilBlockState)) {
@@ -55,7 +57,7 @@ public class FeatureGenUndergrowth implements IPostGenFeature {
 					MutableBlockPos leafPos = new MutableBlockPos();
 					for(MutableBlockPos dPos : leafMap.getAllNonZero()) {
 						leafPos.setPos(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
-						if(safeBounds.inBounds(leafPos, false) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+						if(safeBounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
 							world.setBlockState(leafPos, leavesState);
 						}
 					}

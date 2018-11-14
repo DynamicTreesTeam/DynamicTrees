@@ -79,8 +79,10 @@ public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 		for (int i = 0; i < 2; i++) {
 			int rad = MathHelper.clamp(world.rand.nextInt(radius - 2) + 2, 2, radius - 1);
 			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
+			BlockPos vPos = new BlockPos(v);
+			if (!safeBounds.inBounds(vPos, true)) continue;
 			
-			BlockPos pos = CoordUtils.findGround(world, new BlockPos(v));
+			BlockPos pos = CoordUtils.findGround(world, vPos);
 			IBlockState soilBlockState = world.getBlockState(pos);
 			
 			pos = pos.up();
@@ -91,7 +93,7 @@ public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 				MutableBlockPos leafPos = new MutableBlockPos();
 				for (MutableBlockPos dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
-					if (safeBounds.inBounds(leafPos, false) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
+					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getBlock().isReplaceable(world, leafPos)) {
 						world.setBlockState(leafPos, (secondaryLeavesState == null || random.nextInt(4) != 0) ? leavesState : secondaryLeavesState);
 					}
 				}
