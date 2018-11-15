@@ -52,7 +52,7 @@ public class ModConfigs {
 		config.load();
 		
 		//Seeds
-		seedDropRate = config.getFloat("dropRate", "seeds", 1f/8f, 0, 1, "The rate at which seeds voluntarily drop from branches");
+		seedDropRate = config.getFloat("dropRate", "seeds", 0, 0, 1, "The rate at which seeds voluntarily drop from branches");
 		seedPlantRate = config.getFloat("plantRate", "seeds", 1f/8f, 0, 1, "The rate at which seeds voluntarily plant themselves in their ideal biomes");
 		seedTimeToLive = config.getInt("timeToLive", "seeds", 1200, 0, 6000, "Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute");
 		seedOnlyForest = config.getBoolean("onlyForest", "seeds", true, "If enabled then seeds will only voluntarily plant themselves in forest-like biomes");
