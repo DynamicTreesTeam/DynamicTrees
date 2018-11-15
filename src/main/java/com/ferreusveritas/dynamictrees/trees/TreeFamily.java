@@ -327,7 +327,7 @@ public class TreeFamily {
 		int meta = CellMetadata.NONE;
 		if(hasConiferVariants && radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				return meta = CellMetadata.CONIFERTOP;
+				meta = CellMetadata.CONIFERTOP;
 			}
 		}
 		
