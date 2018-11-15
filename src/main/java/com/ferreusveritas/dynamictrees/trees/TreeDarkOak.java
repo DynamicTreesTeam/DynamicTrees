@@ -21,8 +21,6 @@ import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Biomes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -180,13 +178,6 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		blockList = super.getRegisterableBlocks(blockList);
 		blockList.add(surfaceRootBlock);
 		return blockList;
-	}
-	
-	@Override
-	public List<Item> getRegisterableItems(List<Item> itemList) {
-		itemList = super.getRegisterableItems(itemList);
-		itemList.add(new ItemBlock(surfaceRootBlock).setRegistryName(surfaceRootBlock.getRegistryName()));
-		return itemList;
 	}
 	
 	@Override
