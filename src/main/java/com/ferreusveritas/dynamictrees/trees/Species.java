@@ -47,6 +47,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -723,6 +724,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 					if(signal.choked) {
 						soilLife = 0;
 						rootyDirt.setSoilLife(world, rootPos, soilLife);
+						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeShrinker(signal.getSpecies())));
 					}
 				}
 			}
@@ -1037,7 +1039,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	public void addGenFeature(IGenFeature module) {
-		addGenFeature(module, IGenFeature.ALL);
+		addGenFeature(module, IGenFeature.DEFAULTS);
 	}
 	
 	public void addGenFeature(IGenFeature module, int allowableFlags) {

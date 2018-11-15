@@ -127,13 +127,12 @@ public class FeatureGenHugeMushroom implements IFullGenFeature {
 	
 	@Override
 	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-				
+			
 		BlockPos genPos = rootPos.up();
 		
 		int height = getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
 		
 		IBlockState soilState = world.getBlockState(rootPos);
-		Block soilBlock = soilState.getBlock();
 		
 		if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
 			Block mushroomBlock = this.mushroomType;

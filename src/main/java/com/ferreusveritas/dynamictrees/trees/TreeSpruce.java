@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenConiferTopper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
@@ -104,6 +106,9 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
 			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
+			
+			addGenFeature(new FeatureGenClearVolume(8));//Clear a spot for the thick tree trunk
+			addGenFeature(new FeatureGenMound(this, 999));//Place a 3x3 of dirt under thick trees
 		}
 		
 		@Override

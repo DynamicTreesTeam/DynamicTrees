@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
@@ -251,7 +252,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING; 
 		}
 		
-		if(block.isReplaceable(world, pos)) {
+		if(block.isReplaceable(world, pos) || block instanceof BlockBush) {
 			return ReplaceableState.REPLACEABLE;
 		}
 		
