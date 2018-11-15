@@ -31,6 +31,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 	private static Species darkoak;
 	private static Species oakswamp;
 	private static Species apple;
+	private static Species megaspruce;
 	private static Species cactus;
 	private static Species mushroomred;
 	private static Species mushroombrn;
@@ -49,6 +50,7 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 		darkoak = TreeRegistry.findSpeciesSloppy("darkoak");
 		oakswamp = TreeRegistry.findSpeciesSloppy("oakswamp");
 		apple = TreeRegistry.findSpeciesSloppy("apple");
+		megaspruce = TreeRegistry.findSpeciesSloppy("megaspruce");
 		
 		cactus = TreeRegistry.findSpeciesSloppy("cactus");
 		
@@ -151,6 +153,9 @@ public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
 			return ModConfigs.enableAppleTrees ? new RandomSpeciesSelector().add(oak, 24).add(apple, 1) : staticOakDecision;
 		}
 		if(BiomeDictionary.hasType(biome, Type.FOREST)) {
+			if(Species.isOneOfBiomes(biome, Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS)) {
+				return new StaticSpeciesSelector(megaspruce);
+			}
 			if(biome == Biomes.MUTATED_REDWOOD_TAIGA || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS) {//BiomeDictionary does not accurately give these the CONIFEROUS type.
 				return staticSpruceDecision;
 			}

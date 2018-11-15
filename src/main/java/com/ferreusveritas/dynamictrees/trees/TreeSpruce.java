@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenConiferTopper;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
@@ -8,19 +9,23 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.init.Biomes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeSpruce extends TreeFamilyVanilla {
 	
-	public class SpeciesSpruce extends Species {
-				
-		SpeciesSpruce(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.spruceLeavesProperties);
+	public class SpeciesBaseSpruce extends Species {
+		
+		SpeciesBaseSpruce(ResourceLocation name, TreeFamily treeFamily) {
+			super(name, treeFamily, ModBlocks.spruceLeavesProperties);
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
@@ -77,17 +82,92 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		}
 		
 	}
+	
+	public class SpeciesSpruce extends SpeciesBaseSpruce {
 		
+		SpeciesSpruce(TreeFamily treeFamily) {
+			super(treeFamily.getName(), treeFamily);
+		}
+		
+		@Override
+		public boolean isThick() {
+			return false;
+		}
+		
+	}
+	
+	public class SpeciesMegaSpruce extends SpeciesBaseSpruce {
+		
+		private static final String speciesName = "megaspruce";
+		
+		SpeciesMegaSpruce(TreeFamily treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
+			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
+			setSoilLongevity(16);//Grows for a while so it can actually get tall
+		}
+		
+		@Override
+		protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
+			if(signal.isInTrunk() && newDir != EnumFacing.UP){//Turned out of trunk
+				signal.energy /= 5f;
+			}
+			return newDir;
+		}
+		
+		//Mega spruce are just spruce in a mega taiga..  So they have the same seeds
+		@Override
+		public ItemStack getSeedStack(int qty) {
+			return getCommonSpecies().getSeedStack(qty);
+		}
+		
+		//Mega spruce are just spruce in a mega taiga..  So they have the same seeds
+		@Override
+		public Seed getSeed() {
+			return getCommonSpecies().getSeed();
+		}
+		
+		@Override
+		public int maxBranchRadius() {
+			return 24;
+		}
+	}
+	
+	Species megaSpecies;
+	
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
 		ModBlocks.spruceLeavesProperties.setTree(this);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
+		
+		//This will cause the mega spruce to be planted if the player is in a mega taiga biome
+		addSpeciesLocationOverride(new ISpeciesLocationOverride() {
+			@Override
+			public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
+				if(Species.isOneOfBiomes(access.getBiome(trunkPos), Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS)) {
+					return megaSpecies;
+				}
+				return Species.NULLSPECIES;
+			}
+		});
+		
 	}
 	
 	@Override
 	public void createSpecies() {
+		megaSpecies = new SpeciesMegaSpruce(this);
 		setCommonSpecies(new SpeciesSpruce(this));
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		super.registerSpecies(speciesRegistry);
+		speciesRegistry.register(megaSpecies);
+	}
+	
+	@Override
+	public boolean isThick() {
+		return true;
 	}
 	
 }
