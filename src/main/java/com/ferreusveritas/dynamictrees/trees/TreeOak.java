@@ -68,6 +68,11 @@ public class TreeOak extends TreeFamilyVanilla {
 			return false;
 		}
 		
+		@Override
+		public boolean isThick() {
+			return false;
+		}
+		
 	}
 	
 	/**
@@ -135,6 +140,11 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			return false;
 		}
+		
+		@Override
+		public boolean isThick() {
+			return false;
+		}
 	}
 	
 	/**
@@ -168,6 +178,11 @@ public class TreeOak extends TreeFamilyVanilla {
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
+		}
+		
+		@Override
+		public boolean isThick() {
+			return false;
 		}
 		
 	}
@@ -213,6 +228,11 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		return super.getSpeciesForLocation(world, trunkPos);
+	}
+	
+	@Override
+	public boolean isThick() {
+		return true;
 	}
 	
 }
