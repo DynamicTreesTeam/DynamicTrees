@@ -75,7 +75,13 @@ public class NodeInflator implements INodeInspector {
 				//The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				radius = (float)Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 				
-				//Make sure that non-twig branches are at least radius 2
+				//Ensure the branch is never inflated past it's species maximum
+				int maxRadius = species.maxBranchRadius();
+				if(radius > maxRadius) {
+					radius = maxRadius;
+				}
+				
+				//Ensure non-twig branches are at least radius 2
 				float secondaryThickness = species.getFamily().getSecondaryThickness();
 				if(radius < secondaryThickness) {
 					radius = secondaryThickness;
