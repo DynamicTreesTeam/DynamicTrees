@@ -67,6 +67,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public AnimationHandlerData animationHandlerData = null;
 	
 	public enum DestroyType {
+		VOID,
 		HARVEST,
 		BLAST,
 		FIRE,
@@ -280,7 +281,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	public IAnimationHandler defaultAnimationHandler() {
-		if(destroyType == DestroyType.ROOT) {
+		if(destroyType == DestroyType.VOID || destroyType == DestroyType.ROOT) {
 			return AnimationHandlers.voidAnimationHandler;
 		}
 		

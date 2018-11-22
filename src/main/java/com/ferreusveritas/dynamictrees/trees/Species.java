@@ -672,7 +672,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		
 		if(rapid || (ModConfigs.maxBranchRotRadius != 0 && radius <= ModConfigs.maxBranchRotRadius)) {
-			world.setBlockToAir(pos);
+			BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
+			if(branch != null) {
+				branch.rot(world, pos);
+			}
 			return true;
 		}
 		

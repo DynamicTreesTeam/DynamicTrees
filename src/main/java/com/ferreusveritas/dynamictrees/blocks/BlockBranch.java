@@ -237,10 +237,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * 
 	 * @param world The world
 	 * @param cutPos The position of the branch being lobbed
+	 * @param toolDir The face that was pounded on when breaking the block at cutPos
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
 	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, EnumFacing toolDir, boolean wholeTree) {
+				
 		IBlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
 		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
@@ -254,7 +256,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NodeNetVolume volumeSum = new NodeNetVolume();
 		NodeDestroyer destroyer = new NodeDestroyer(species);
+		destroyMode = EnumDestroyMode.HARVEST;
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
+		destroyMode = EnumDestroyMode.SLOPPY;
 		
 		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
 		List<BlockPos> endPoints = destroyer.getEnds();
@@ -275,6 +279,18 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		}
 		
 		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+	}
+	
+	/**
+	 * Sets the branch block to air. To be used when the block rots
+	 * 
+	 * @param world
+	 * @param pos
+	 */
+	public void rot(World world, BlockPos pos) {
+		BlockBranch.destroyMode = EnumDestroyMode.ROT;
+		world.setBlockToAir(pos);
+		BlockBranch.destroyMode = EnumDestroyMode.SLOPPY;
 	}
 	
 	/**
@@ -427,6 +443,17 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return false;
 	}
 	
+	public void sloppyBreak(World world, BlockPos cutPos) {
+		//Do the actual destruction
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, EnumFacing.DOWN, false);
+		
+		//Get all of the wood drops
+		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
+		
+		//This will drop the EntityFallingTree into the world
+		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.VOID);
+	}
+	
 	/**
 	 * This is a copy of Entity.rayTrace which is client side only.  There's no 
 	 * reason for this function to be client side only as all of it's calls are
@@ -476,6 +503,24 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 			}
 		}
 		
+	}
+	
+	public static enum EnumDestroyMode {
+		SLOPPY,
+		HARVEST,
+		ROT
+	}
+	
+	public static EnumDestroyMode destroyMode = EnumDestroyMode.SLOPPY;
+	
+	@Override
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		IBlockState toBlock = world.getBlockState(pos);
+		if(toBlock.getBlock() == Blocks.AIR && destroyMode == EnumDestroyMode.SLOPPY) {
+			System.out.println("Sloppy break detected at: " + pos);
+			world.setBlockState(pos, state);//Set the block back and attempt a proper breaking
+			sloppyBreak(world, pos);
+		}
 	}
 	
 	// Super member also does nothing
