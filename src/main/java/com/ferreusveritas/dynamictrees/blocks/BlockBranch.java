@@ -517,7 +517,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
 		IBlockState toBlock = world.getBlockState(pos);
 		if(toBlock.getBlock() == Blocks.AIR && destroyMode == EnumDestroyMode.SLOPPY) {
-			System.out.println("Sloppy break detected at: " + pos);
+			//System.out.println("Sloppy break detected at: " + pos);
 			world.setBlockState(pos, state);//Set the block back and attempt a proper breaking
 			sloppyBreak(world, pos);
 		}
@@ -591,6 +591,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	
 	@Override
 	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos) {
+		
 		//possible supporting branch was destroyed by fire.
 		if(oldState.getBlock() == this) {
 			for(EnumFacing dir: EnumFacing.VALUES) {

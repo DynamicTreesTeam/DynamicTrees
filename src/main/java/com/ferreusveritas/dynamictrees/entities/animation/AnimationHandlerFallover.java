@@ -135,7 +135,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		EnumFacing toolDir = entity.getDestroyData().toolDir;
 		
 		float actingAngle = toolDir.getAxis() == EnumFacing.Axis.X ? entity.rotationYaw : entity.rotationPitch;
-
+		
 		int offsetX = toolDir.getFrontOffsetX();
 		int offsetZ = toolDir.getFrontOffsetZ();
 		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
@@ -146,6 +146,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		
 		int trunkHeight = entity.getDestroyData().trunkHeight;
 		float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
+		
+		trunkHeight = Math.min(trunkHeight, 24);
 		
 		for(int segment = 0; segment < trunkHeight; segment++) {
 			float segX = xbase + h * segment * offsetX;
@@ -235,7 +237,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			Math.abs(entity.rotationPitch) >= 160 || 
 			Math.abs(entity.rotationYaw) >= 160 ||
 			entity.landed ||
-			entity.ticksExisted > 120;
+			entity.ticksExisted > 120 + (entity.getDestroyData().trunkHeight);
 		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		if(dead && !entity.world.isRemote) {
@@ -269,4 +271,5 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		
 		GlStateManager.translate(-0.5, 0, -0.5);
 	}
+	
 }
