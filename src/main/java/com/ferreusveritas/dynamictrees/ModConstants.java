@@ -23,12 +23,14 @@ public class ModConstants {
 	public static final String DYNAMICTREESTC = "dynamictreestc";
 	public static final String DYNAMICTREESTRAVERSE = "dttraverse";
 	public static final String DYNAMICTREESHNC = "dynamictreeshnc";
+	public static final String RUSTIC = "rustic";
 	
 	//Other Mod Versions
 	public static final String DYNAMICTREESBOP_VER = AT + "1.4.1a" + ORGREATER;
 	public static final String DYNAMICTREESTC_VER =  AT + "1.4.1a" + ORGREATER;
 	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.2" + ORGREATER;//Traverse Add-on has not be updated in a while and the latest 1.2 is not longer supported
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
+	public static final String RUSTIC_VER = AT + "1.0.13" + ORGREATER;
 	
 	//Forge
 	private static final String FORGE = "forge";
@@ -37,6 +39,8 @@ public class ModConstants {
 	public static final String DEPENDENCIES
 		= REQAFTER + FORGE_VER
 		+ NEXT
+		+ BEFORE + RUSTIC_VER
+		+ NEXT
 		+ BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
@@ -44,6 +48,7 @@ public class ModConstants {
 		+ BEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
+		
 		;
 	
 }
