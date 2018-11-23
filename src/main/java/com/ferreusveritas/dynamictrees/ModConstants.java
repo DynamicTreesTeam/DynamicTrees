@@ -30,8 +30,14 @@ public class ModConstants {
 	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.2" + ORGREATER;//Traverse Add-on has not be updated in a while and the latest 1.2 is not longer supported
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
 	
+	//Forge
+	private static final String FORGE = "forge";
+	public static final String FORGE_VER = FORGE + AT + "14.23.5.2768" + ORGREATER;
+	
 	public static final String DEPENDENCIES
-		= BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
+		= REQAFTER + FORGE_VER
+		+ NEXT
+		+ BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
 		+ NEXT
