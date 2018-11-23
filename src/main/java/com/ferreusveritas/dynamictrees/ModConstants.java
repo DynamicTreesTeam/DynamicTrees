@@ -25,8 +25,8 @@ public class ModConstants {
 	public static final String DYNAMICTREESHNC = "dynamictreeshnc";
 	
 	//Other Mod Versions
-	public static final String DYNAMICTREESBOP_VER = AT + "1.3.2" + ORGREATER;
-	public static final String DYNAMICTREESTC_VER =  AT + "1.1.2" + ORGREATER;
+	public static final String DYNAMICTREESBOP_VER = AT + "1.4.1a" + ORGREATER;
+	public static final String DYNAMICTREESTC_VER =  AT + "1.4.1a" + ORGREATER;
 	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.2" + ORGREATER;//Traverse Add-on has not be updated in a while and the latest 1.2 is not longer supported
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
 	
