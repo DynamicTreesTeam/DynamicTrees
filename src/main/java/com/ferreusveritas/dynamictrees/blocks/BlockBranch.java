@@ -288,9 +288,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	 * @param pos
 	 */
 	public void rot(World world, BlockPos pos) {
-		BlockBranch.destroyMode = EnumDestroyMode.ROT;
-		world.setBlockToAir(pos);
-		BlockBranch.destroyMode = EnumDestroyMode.SLOPPY;
+		breakDeliberate(world, pos, EnumDestroyMode.ROT);
 	}
 	
 	/**
@@ -508,7 +506,8 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	public static enum EnumDestroyMode {
 		SLOPPY,
 		HARVEST,
-		ROT
+		ROT,
+		DELIBERATE
 	}
 	
 	public static EnumDestroyMode destroyMode = EnumDestroyMode.SLOPPY;
@@ -526,6 +525,18 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	// Super member also does nothing
 	@Override
 	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+	}
+	
+	/**
+	 * Sometimes you need to break the block deliberately.
+	 * 
+	 * @param world
+	 * @param pos
+	 */
+	public void breakDeliberate(World world, BlockPos pos, EnumDestroyMode mode) {
+		destroyMode = mode;
+		world.setBlockToAir(pos);
+		destroyMode = EnumDestroyMode.SLOPPY;
 	}
 	
 	// Since we already created drops in removedByPlayer() we must disable this.
