@@ -243,9 +243,8 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				cSet.addDisc(c);
 			}
 		}
-		allDiscs.clear();
 		
-		return cSet.getDiscs(allDiscs, chunkX, chunkZ);
+		return cSet.getDiscs(new ArrayList<PoissonDisc>(16), chunkX, chunkZ);
 	}
 	
 	private boolean doesDiscIntersectWith(PoissonDisc disc, List<PoissonDisc> others) {
