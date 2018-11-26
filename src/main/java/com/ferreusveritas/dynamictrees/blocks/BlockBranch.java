@@ -507,7 +507,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		SLOPPY,
 		HARVEST,
 		ROT,
-		DELIBERATE
+		OVERFLOW
 	}
 	
 	public static EnumDestroyMode destroyMode = EnumDestroyMode.SLOPPY;

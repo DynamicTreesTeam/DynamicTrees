@@ -337,7 +337,11 @@ public class BlockBranchCactus extends BlockBranch {
 			}
 			signal.returnRun(blockState, world, pos, fromDir);
 		} else {
-			world.setBlockToAir(pos);// Destroy one of the offending nodes
+			IBlockState state = world.getBlockState(pos);
+			if(state.getBlock() instanceof BlockBranch) {
+				BlockBranch branch = (BlockBranch) state.getBlock();
+				branch.breakDeliberate(world, pos, EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
+			}
 			signal.overflow = true;
 		}
 		signal.depth--;

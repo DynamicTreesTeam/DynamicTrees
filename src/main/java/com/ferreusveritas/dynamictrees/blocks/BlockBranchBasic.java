@@ -459,7 +459,7 @@ public class BlockBranchBasic extends BlockBranch {
 			IBlockState state = world.getBlockState(pos);
 			if(state.getBlock() instanceof BlockBranch) {
 				BlockBranch branch = (BlockBranch) state.getBlock();
-				branch.breakDeliberate(world, pos, EnumDestroyMode.DELIBERATE);// Destroy one of the offending nodes
+				branch.breakDeliberate(world, pos, EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
 			}
 			signal.overflow = true;
 		}
