@@ -416,13 +416,17 @@ public class BlockBranchBasic extends BlockBranch {
 	// NODE ANALYSIS
 	///////////////////////////////////////////
 	
+	protected int getMaxSignalDepth() {
+		return 32;
+	}
+	
 	/**
 	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out
 	 * and a returnRun() on the way back.
 	 * 
 	 * Okay so a little explanation here..  
 	 * I've been hit up by people who claim that recursion is a bad idea.  The reason why they think this is because java has to push values
-	 * on the stack for each level of recursion and then pop them off as the levels complete.  Many time this can lead to performance issues.
+	 * on the stack for each level of recursion and then pop them off as the levels complete.  Many times this can lead to performance issues.
 	 * Fine, I understand that.  The reason why it doesn't matter here is because of the object oriented nature of how the tree parts
 	 * function demand that a different analyze function be called for each object type.  Even if this were rewritten to be iterative the
 	 * same number of stack pushes and pops would need to be performed to run the custom function for each node in the network anyway.  The
@@ -435,7 +439,7 @@ public class BlockBranchBasic extends BlockBranch {
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
-		if (signal.depth++ < 32) {// Prevents going too deep into large networks, or worse, being caught in a network loop
+		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
