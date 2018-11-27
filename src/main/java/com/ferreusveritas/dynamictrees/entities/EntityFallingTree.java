@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -353,7 +354,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		World world = entity.world;
 		if(!world.isRemote) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
-			entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
+			entity.getPayload().forEach(i -> spawnItemAsEntity(world, cutPos, i));
 		}
 	}
 	
@@ -362,6 +363,20 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		if(!world.isRemote) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
 			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
+		}
+	}
+	
+	/**
+	 * Same as Block.spawnAsEntity only this arrests the entityItem's random motion. Useful for CC turtles to pick up the loot. 
+	 */
+	public static void spawnItemAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
+		if (!worldIn.isRemote && !stack.isEmpty() && worldIn.getGameRules().getBoolean("doTileDrops") && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+			EntityItem entityitem = new EntityItem(worldIn, (double)pos.getX() + 0.5F, (double)pos.getY() + 0.5F, (double)pos.getZ() + 0.5F, stack);
+			entityitem.motionX = 0;
+			entityitem.motionY = 0;
+			entityitem.motionZ = 0;
+			entityitem.setDefaultPickupDelay();
+			worldIn.spawnEntity(entityitem);
 		}
 	}
 	
