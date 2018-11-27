@@ -16,7 +16,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
-import com.ferreusveritas.dynamictrees.blocks.BlockVerboseFire;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 
@@ -44,7 +43,6 @@ public class ModBlocks {
 	public static BlockFruit blockFruit;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
-	public static BlockVerboseFire blockVerboseFire;
 	public static BlockTrunkShell blockTrunkShell;
 	
 	public static ILeavesProperties oakLeavesProperties;
@@ -75,7 +73,6 @@ public class ModBlocks {
 		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
 		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
 		blockFruit = new BlockFruit();//Apple
-		blockVerboseFire = new BlockVerboseFire();//Verbose Fire
 		blockTrunkShell = new BlockTrunkShell();
 		
 		setupLeavesProperties();
@@ -175,7 +172,6 @@ public class ModBlocks {
 			blockBonsaiPot,
 			blockFruitCocoa,
 			blockFruit,
-			blockVerboseFire,
 			blockTrunkShell
 		);
 		

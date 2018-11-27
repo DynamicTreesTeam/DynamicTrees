@@ -1,9 +1,7 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,20 +25,7 @@ public class WorldListener implements IWorldEventListener {
 	}
 	
 	@Override
-	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
-
-		if(flags == 3 && oldState.getBlock() instanceof IBurningListener) { //The old block was a Burning Listener
-			Material newMaterial = newState.getMaterial();
-			if(
-				newMaterial == Material.FIRE ||	//The new block is made of fire.  It certainly burned.
-				newMaterial == Material.ROCK ||	//The new block is made of rock.  Likely destroyed by the Pyroclasm mod's volcanic lava
-				newMaterial == Material.LAVA 	//Adding this in case there's any surprises
-			) { 
-				((IBurningListener)oldState.getBlock()).onBurned(worldIn, oldState, pos);//Tell the block what happened
-			}
-		}
-		
-	}
+	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {}
 	
 	@Override
 	public void notifyLightSet(BlockPos pos) {}

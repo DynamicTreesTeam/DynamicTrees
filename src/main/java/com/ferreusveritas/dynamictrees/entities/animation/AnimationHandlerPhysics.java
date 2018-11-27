@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -114,7 +115,9 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 						entity.landed = true;
 						entity.onGround = true;
 						if(entity.onFire) {
-							entity.world.setBlockState(pos.up(), ModBlocks.blockVerboseFire.getDefaultState());
+							if(entity.world.isAirBlock(pos.up())) {
+								entity.world.setBlockState(pos.up(), Blocks.FIRE.getDefaultState());
+							}
 						}
 					}
 				}

@@ -13,7 +13,6 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.IBurningListener;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -31,7 +30,6 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFire;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -59,7 +57,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
 
-public abstract class BlockBranch extends Block implements ITreePart, IBurningListener, IFutureBreakable {
+public abstract class BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	
 	public static final int RADMAX_NORMAL = 8;
 	
@@ -441,7 +439,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		return false;
 	}
 	
-	public void sloppyBreak(World world, BlockPos cutPos) {
+	protected void sloppyBreak(World world, BlockPos cutPos, DestroyType destroyType) {
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, EnumFacing.DOWN, false);
 		
@@ -449,7 +447,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
 		
 		//This will drop the EntityFallingTree into the world
-		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.VOID);
+		EntityFallingTree.dropTree(world, destroyData, woodDropList, destroyType);
 	}
 	
 	/**
@@ -514,12 +512,25 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 	
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		if(!world.isRemote) {
-			IBlockState toBlock = world.getBlockState(pos);
-			if(toBlock.getBlock() == Blocks.AIR && destroyMode == EnumDestroyMode.SLOPPY) {
-				//System.out.println("Sloppy break detected at: " + pos);
+		if(!world.isRemote && destroyMode == EnumDestroyMode.SLOPPY) {
+			//System.out.println("Sloppy break detected at: " + pos);
+			IBlockState toBlockState = world.getBlockState(pos);
+			Block toBlock = toBlockState.getBlock();
+			if(toBlock == Blocks.AIR) {
 				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
-				sloppyBreak(world, pos);
+				sloppyBreak(world, pos, DestroyType.VOID);
+			} else
+			if(toBlock == Blocks.FIRE) { //Block has burned
+				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+				sloppyBreak(world, pos, DestroyType.FIRE);
+				world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+			} else
+			if(toBlock == Blocks.STONE) { //Likely destroyed by the Pyroclasm mod's volcanic lava
+				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+				sloppyBreak(world, pos, DestroyType.VOID);
+				world.setBlockState(pos, toBlockState);//Set back to stone
+			} else {
+				System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
 			}
 		}
 	}
@@ -600,37 +611,6 @@ public abstract class BlockBranch extends Block implements ITreePart, IBurningLi
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void onBurned(World world, IBlockState oldState, BlockPos burnedPos) {
-		
-		//possible supporting branch was destroyed by fire.
-		if(oldState.getBlock() == this) {
-			for(EnumFacing dir: EnumFacing.VALUES) {
-				BlockPos neighPos = burnedPos.offset(dir);
-				IBlockState neighState = world.getBlockState(neighPos);
-				if(TreeHelper.isBranch(neighState)) {
-					BlockPos rootPos = TreeHelper.findRootNode(neighState, world, neighPos);
-					if(rootPos == BlockPos.ORIGIN) {
-						BranchDestructionData destroyData = destroyBranchFromNode(world, neighPos, dir.getOpposite(), false);
-						EntityFallingTree.dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.FIRE);
-					}
-				}
-			}
-		}
-		
-	}
-	
-	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos neighbor) {
-		IBlockState neighBlockState = world.getBlockState(neighbor);
-		
-		if(neighBlockState.getMaterial() == Material.FIRE && neighBlockState.getBlock() != ModBlocks.blockVerboseFire) {
-			int age = neighBlockState.getBlock() == Blocks.FIRE ? neighBlockState.getValue(BlockFire.AGE).intValue() : 0;
-			world.setBlockState(neighbor, ModBlocks.blockVerboseFire.getDefaultState().withProperty(BlockFire.AGE, age));
-		}
-		
 	}
 	
 	@Override
