@@ -399,8 +399,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	
 	@Override
 	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
-		IBlockState mimic = Blocks.DIRT.getDefaultState(); //Default to dirt
-		return mimic;
+		return Blocks.DIRT.getDefaultState(); //Default to dirt
 	}
 	
 	/**

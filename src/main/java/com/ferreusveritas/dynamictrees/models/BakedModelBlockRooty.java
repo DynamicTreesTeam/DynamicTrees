@@ -14,7 +14,9 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class BakedModelBlockRooty implements IBakedModel {
@@ -39,7 +41,10 @@ public class BakedModelBlockRooty implements IBakedModel {
 			IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
 			
 			quads.addAll(mimicModel.getQuads(mimicState, side, rand));
-			quads.addAll(rootsModel.getQuads(state, side, rand));
+			
+			if(MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.CUTOUT_MIPPED) {
+				quads.addAll(rootsModel.getQuads(state, side, rand));
+			}
 		}
 		
 		return quads;
