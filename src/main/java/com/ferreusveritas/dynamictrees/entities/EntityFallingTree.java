@@ -91,6 +91,12 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	 */
 	public EntityFallingTree setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
 		this.destroyData = destroyData;
+		if(destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
+			System.err.println("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
+			new Exception().printStackTrace();
+			setDead();
+			return this;
+		}
 		BlockPos cutPos = destroyData.cutPos;
 		this.payload = payload;
 		this.destroyType = destroyType;
@@ -149,6 +155,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		if(tag.hasKey("species")) {			
 			destroyData = new BranchDestructionData(tag);
+			if(destroyData.getNumBranches() == 0) {
+				setDead();
+			}
 			destroyType = DestroyType.values()[tag.getInteger("destroytype")];
 			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
@@ -233,6 +242,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 				
 		if(world.isRemote && !clientBuilt) {
 			buildClient();
+			if(isDead) {
+				return;
+			}
 		}
 		
 		if(!world.isRemote && firstUpdate) {
@@ -379,7 +391,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
 			EntityFallingTree entity = new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType);
-			world.spawnEntity(entity);
+			if(entity.isEntityAlive()) {
+				world.spawnEntity(entity);
+			}
 			return entity;
 		}
 		
