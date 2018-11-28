@@ -43,21 +43,23 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	protected IBlockState branchStates[];
 	
-	// Useful for more unique subclasses
-	protected BlockBranchBasic(Material material, String name) {
-		super(material, name);
+	// Trees are mostly made of wood
+	public BlockBranchBasic(String name) {
+		this(Material.WOOD, name);//Trees are made of wood. Brilliant.
 	}
 	
-	public BlockBranchBasic(String name) {
-		super(Material.WOOD, name); //Trees are made of wood. Brilliant.
+	// Useful for more unique subclasses
+	public BlockBranchBasic(Material material, String name) {
+		super(material, name);
 		setSoundType(SoundType.WOOD); //aaaaand they also sound like wood.
-		setHarvestLevel("axe", 0);
-		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
+		setHarvestLevel("axe", 0);//Default to axe harvest
 		
 		cacheBranchStates();
 	}
 	
 	public void cacheBranchStates() {
+		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
+		
 		branchStates = new IBlockState[RADMAX_NORMAL + 1];
 		
 		//Cache the branch blocks states for rapid lookup

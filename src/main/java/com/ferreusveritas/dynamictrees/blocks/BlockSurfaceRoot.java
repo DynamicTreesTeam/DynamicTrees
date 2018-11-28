@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -60,6 +61,9 @@ public class BlockSurfaceRoot extends Block {
 		setRegistryName(name);
 		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
 		setHarvestLevel("axe", 0);
+		setSoundType(SoundType.WOOD);
+		setHardness(2.5f);
+		setResistance(1.0f);
 		setCreativeTab(DynamicTrees.dynamicTreesTab);
 	}
 	

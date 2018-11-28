@@ -64,10 +64,13 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		return extended ^ ext ? otherBlock : this; 
 	}
 
+	//We can't override this function since the "otherBlock" will not have been created yet.
 	@Override
 	public void cacheBranchStates() { }
 	
 	public void cacheBranchThickStates() {
+		setDefaultState(this.blockState.getBaseState().withProperty(RADIUSNYBBLE, 0));
+		
 		if(!extended) {
 			branchStates = new IBlockState[RADMAX_THICK + 1];
 			otherBlock.branchStates = branchStates;

@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -115,6 +116,12 @@ public class BlockTrunkShell extends Block {
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		ShellMuse muse = getMuse(world, blockState, pos);
 		return muse != null ? muse.state.getBlock().getBlockHardness(muse.state, world, muse.pos) : 0.0f;
+	}
+	
+	@Override
+    public SoundType getSoundType(IBlockState state, World world, BlockPos pos, @Nullable Entity entity) {
+		ShellMuse muse = getMuse(world, state, pos);
+		return muse != null ? muse.state.getBlock().getSoundType(muse.state, world, muse.pos, entity) : SoundType.WOOD;
 	}
 	
 	@Override
