@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
@@ -8,14 +11,17 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
  * A {@link TreeFamily} builder class to ease in the creation of new trees for other mods.
@@ -25,7 +31,7 @@ import net.minecraft.util.ResourceLocation;
  *
  */
 public class TreeBuilder {
-
+	
 	private ResourceLocation name;
 	private int seqNum = -1;
 	
@@ -33,19 +39,23 @@ public class TreeBuilder {
 	private IBlockState primitiveLeavesBlockState = Blocks.LEAVES.getDefaultState();
 	private IBlockState primitiveLogBlockState = Blocks.LOG.getDefaultState();
 	private ItemStack stickItemStack;
-
+	
 	//Leaves
 	private ILeavesProperties dynamicLeavesProperties;
 	private int dynamicLeavesSmotherMax = 4;
 	private int dynamicLeavesLightRequirement = 13;
 	private ResourceLocation dynamicLeavesCellKit;
-
+	
 	//Common Species
 	private ISpeciesCreator speciesCreator;
 	private IBlockState speciesSaplingBlockState;
 	private Block speciesSaplingBlock;
 	private boolean speciesCreateSeed = true;
 	private boolean speciesCreateSapling = true;
+
+	//Extra Species
+	private List<ISpeciesCreator> extraSpeciesCreators = new ArrayList<>(0);
+	private Map<String, Species> extraSpecies = new HashMap<>();
 	
 	/**
 	 * Name your tree and give me that name.
@@ -63,7 +73,12 @@ public class TreeBuilder {
 		return this;
 	}
 	
-	//Convenience function for the above member
+	/**
+	 * Convenience function for {@link #setName(ResourceLocation) }
+	 * @param domain The domain of your mod e.g. the ModId
+	 * @param path The unique name of this resource
+	 * @return TreeBuilder for chaining
+	 */
 	public TreeBuilder setName(String domain, String path) {
 		return setName(new ResourceLocation(domain, path));
 	}
@@ -75,7 +90,7 @@ public class TreeBuilder {
 	 *  
 	 * Each {@link BlockDynamicLeaves} can handle 4 different trees by using metadata.  It's the mod authors
 	 * responsibility to assign and maintain an ordered set of numbers that each represent a tree.  The sequence
-	 * should start from 0 for each Mod and incremented for each {@link TreeFamily} that the mod creates.  Gaps in
+	 * should start from 0 for each mod and incremented for each {@link TreeFamily} that the mod creates.  Gaps in
 	 * the numbered list are okay(if a tree is removed for instance), duplicates will result in undefined behavior.
 	 * DynamicTrees internally maintains a mapping of {@link BlockDynamicLeaves} for each mod.  This is done to
 	 * reduce the number of registered blocks.
@@ -89,7 +104,7 @@ public class TreeBuilder {
 		}
 		return this;
 	}
-
+	
 	/**
 	 * Set a custom {@link BlockDynamicLeaves}
 	 * 
@@ -104,7 +119,6 @@ public class TreeBuilder {
 		dynamicLeavesProperties = leavesProperties;
 		return this;
 	}
-
 	
 	/**
 	 * RECOMMENDED
@@ -198,7 +212,20 @@ public class TreeBuilder {
 		this.speciesCreator = speciesCreator;
 		return this;
 	}
-
+	
+	/**
+	 * OPTIONAL
+	 * 
+	 * Provides a way to add extra custom species.
+	 * 
+	 * @param speciesCreator
+	 * @return TreeBuilder for chaining
+	 */
+	public TreeBuilder addExtraSpecies(ISpeciesCreator speciesCreator) {
+		extraSpeciesCreators.add(speciesCreator);
+		return this;
+	}
+	
 	/**
 	 * OPTIONAL
 	 * 
@@ -264,23 +291,23 @@ public class TreeBuilder {
 			{
 				
 				if(dynamicLeavesProperties == null) {
-
+					
 					dynamicLeavesProperties = new LeavesProperties(primitiveLeavesBlockState) {
 						@Override
 						public int getLightRequirement() {
 							return dynamicLeavesLightRequirement;
 						}
-
+						
 						public int getSmotherLeavesMax() {
 							return dynamicLeavesSmotherMax;
 						};
-
+						
 						@Override
 						public ICellKit getCellKit() {
 							return TreeRegistry.findCellKit(dynamicLeavesCellKit);
 						}
 					};
-
+					
 					TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seqNum, dynamicLeavesProperties);
 				}
 				
@@ -296,7 +323,7 @@ public class TreeBuilder {
 			
 			@Override
 			public void createSpecies() {
-	
+				
 				setCommonSpecies(speciesCreator != null ? speciesCreator.create(this) : new Species(name, this, dynamicLeavesProperties));
 				
 				if(speciesCreateSeed) {
@@ -312,6 +339,12 @@ public class TreeBuilder {
 				if(speciesSaplingBlockState != null) {
 					getCommonSpecies().setDynamicSapling(speciesSaplingBlockState);
 				}
+				
+				for(ISpeciesCreator creator: extraSpeciesCreators) {
+					Species species = creator.create(this);
+					extraSpecies.put(species.getRegistryName().getResourcePath(), species);
+				}
+
 			}
 			
 			@Override
@@ -319,9 +352,33 @@ public class TreeBuilder {
 				if(speciesCreateSapling) {
 					blockList.add(speciesSaplingBlock);
 				}
+				for(Species species: extraSpecies.values()) {
+					IBlockState state = species.getDynamicSapling();
+					Block block = state.getBlock();
+					if(block != Blocks.AIR) {
+						//TODO: Detect if sapling block hasn't been registered then register it
+						System.out.println("TODO Unregistered Dynamic Sapling: " + state.getBlock());
+					}
+				}
 				return super.getRegisterableBlocks(blockList);
 			}
 			
+			@Override
+			public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+				super.registerSpecies(speciesRegistry);
+				extraSpecies.values().forEach(s -> speciesRegistry.register(s));
+			}
+			
+			@Override
+			public List<Item> getRegisterableItems(List<Item> itemList) {
+				for(Species species: extraSpecies.values()) {
+					Seed seed = species.getSeed();//Since we generated the species internally we need to let the seed out to be registered.
+					if(seed != Seed.NULLSEED) {
+						itemList.add(seed);
+					}
+				}
+				return super.getRegisterableItems(itemList);
+			}
 		};
 		
 		return treeFamily;
