@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -278,12 +279,12 @@ public class TreeBuilder {
 	
 		if(name == null) {
 			System.err.println("Error: Attempted to build an nameless tree");
-			return null;
+			return TreeFamily.NULLFAMILY;
 		}
 		
 		if(seqNum == -1 && dynamicLeavesProperties == null) {
 			System.err.println("Error: Attempted to build an unsequenced tree(or a tree without dynamic leaves properties)");
-			return null;
+			return TreeFamily.NULLFAMILY;
 		}
 		
 		TreeFamily treeFamily = new TreeFamily(name) {
@@ -308,7 +309,7 @@ public class TreeBuilder {
 						}
 					};
 					
-					TreeHelper.getLeavesBlockForSequence(ModConstants.MODID, seqNum, dynamicLeavesProperties);
+					LeavesPaging.getLeavesBlockForSequence(ModConstants.MODID, seqNum, dynamicLeavesProperties);
 				}
 				
 				this.setPrimitiveLog(primitiveLogBlockState);
@@ -356,8 +357,7 @@ public class TreeBuilder {
 					IBlockState state = species.getDynamicSapling();
 					Block block = state.getBlock();
 					if(block != Blocks.AIR) {
-						//TODO: Detect if sapling block hasn't been registered then register it
-						System.out.println("TODO Unregistered Dynamic Sapling: " + state.getBlock());
+						blockList.add(block);
 					}
 				}
 				return super.getRegisterableBlocks(blockList);
