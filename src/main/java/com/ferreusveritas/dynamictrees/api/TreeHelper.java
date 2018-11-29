@@ -31,13 +31,14 @@ public class TreeHelper {
 	/**	Use {@link LeavesPaging} instead */
 	@Deprecated
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
+		System.err.println("Warning: Mod used deprecated call to getLeavesBlockForSequence");
 		return LeavesPaging.getLeavesBlockForSequence(modid, seq, leavesProperties);
 	}
 	
 	/**	Use {@link LeavesPaging} instead */
 	@Deprecated
 	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
-		return LeavesPaging.getLeavesMapForModId(modid);
+		return (HashMap<Integer, BlockDynamicLeaves>) LeavesPaging.getLeavesMapForModId(modid);
 	}
 	
 	///////////////////////////////////////////

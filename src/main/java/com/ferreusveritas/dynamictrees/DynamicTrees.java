@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
@@ -101,6 +102,7 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		WorldGenRegistry.populateDataBase();
+		LeavesPaging.postInit();
 	}
 	
 	@Mod.EventBusSubscriber

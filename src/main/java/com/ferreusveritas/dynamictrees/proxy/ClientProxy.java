@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
@@ -108,8 +109,8 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
-		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
-		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
+		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
+		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
 		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchBasic());
@@ -178,7 +179,7 @@ public class ClientProxy extends CommonProxy {
 		//TREE PARTS
 		
 		//Register GrowingLeavesBlocks Colorizers
-		for(BlockDynamicLeaves leaves: TreeHelper.getLeavesMapForModId(ModConstants.MODID).values()) {
+		for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values()) {
 			
 			ModelHelper.regColorHandler(leaves, new IBlockColor() {
 				@Override

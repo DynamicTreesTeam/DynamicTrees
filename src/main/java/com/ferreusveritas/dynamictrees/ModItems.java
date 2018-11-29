@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
@@ -28,7 +28,7 @@ public class ModItems {
 		ArrayList<Item> treeItems = new ArrayList<Item>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 		ModTrees.dynamicCactus.getRegisterableItems(treeItems);
-		TreeHelper.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
+		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
 				
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));

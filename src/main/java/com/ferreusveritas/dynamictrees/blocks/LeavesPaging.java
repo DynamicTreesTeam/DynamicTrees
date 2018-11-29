@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,6 +17,9 @@ import net.minecraftforge.fml.common.ModContainer;
  * their corresponding leaves properties.  This is currently a 4:1 ratio.
  * This method will be obsolete in MC 1.13 since each blockstate will
  * be able to contain it's own leaves properties.
+ * 
+ * The data is only used by mods for initialization purposes and all
+ * contained data will be erased during postInit().
  * 
  * @author ferreusveritas
  */
@@ -80,8 +84,15 @@ public class LeavesPaging {
 	 * @param modid The ModId of the mod accessing this
 	 * @return The map of {@link BlockDynamicLeaves}
 	 */
-	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(@Nullable String modid) {
+	public static Map<Integer, BlockDynamicLeaves> getLeavesMapForModId(@Nullable String modid) {
 		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
 	
+	/**
+	 * Frees up the memory since this is only used during startup 
+	 */
+	public static void postInit() {
+		modLeavesArray = null;
+		modLastSeq = null;
+	}
 }
