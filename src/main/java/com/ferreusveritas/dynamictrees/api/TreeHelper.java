@@ -31,7 +31,7 @@ public class TreeHelper {
 	/**	Use {@link LeavesPaging} instead */
 	@Deprecated
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
-		System.err.println("Warning: Mod used deprecated call to getLeavesBlockForSequence");
+		System.err.println("Warning: Mod used deprecated call to TreeHelper.getLeavesBlockForSequence(). Please notify the mod author of \"" + modid + "\" that this will be removed in future versions.");
 		return LeavesPaging.getLeavesBlockForSequence(modid, seq, leavesProperties);
 	}
 	
