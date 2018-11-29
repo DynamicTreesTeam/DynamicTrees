@@ -33,7 +33,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BakedModelBlockBranchBasic implements IBakedModel {
-
+	
 	protected ModelBlock modelBlock;
 	
 	TextureAtlasSprite barkParticles;
@@ -63,9 +63,9 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 			
 			rings[i] = bakeCore(radius, Axis.Y, ringIcon);
 		}
-
+		
 	}
-
+	
 	public IBakedModel bakeSleeve(int radius, EnumFacing dir, TextureAtlasSprite bark) {		
 		//Work in double units(*2)
 		int dradius = radius * 2;
@@ -77,10 +77,10 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		int centerX = 16 + (dir.getFrontOffsetX() * move);
 		int centerY = 16 + (dir.getFrontOffsetY() * move);
 		int centerZ = 16 + (dir.getFrontOffsetZ() * move);
-	
+		
 		Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, (centerY - halfSizeY) / 2, (centerZ - halfSizeZ) / 2);
 		Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, (centerY + halfSizeY) / 2, (centerZ + halfSizeZ) / 2);
-
+		
 		boolean negative = dir.getAxisDirection() == AxisDirection.NEGATIVE;
 		if(dir.getAxis() == Axis.Z) {//North/South
 			negative = !negative;
@@ -134,10 +134,10 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 			EnumFacing face = e.getKey();
 			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 		}
-
+		
 		return builder.makeBakedModel();
 	}
-
+	
 	/**
 	 * A Hack to determine the UV face angle for a block column on a certain axis
 	 * 
@@ -210,7 +210,7 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		
 		return quadsList;
 	}
-
+	
 	/**
 	 * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
 	 * 
@@ -226,7 +226,7 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		}
 		return connections;
 	}
-
+	
 	/**
 	 * Locates the side with the largest neighbor radius that's equal to or greater than this branch block
 	 * 
@@ -283,31 +283,31 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 	public boolean isAmbientOcclusion() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isGui3d() {
 		return false;
 	}
-
+	
 	@Override
 	public boolean isBuiltInRenderer() {
 		return true;
 	}
-
+	
 	// used for block breaking shards
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
 		return barkParticles;
 	}
-
+	
 	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
 		return sleeves[0][0].getItemCameraTransforms();
 	}
-
+	
 	@Override
 	public ItemOverrideList getOverrides() {
 		return null;
 	}
-
+	
 }

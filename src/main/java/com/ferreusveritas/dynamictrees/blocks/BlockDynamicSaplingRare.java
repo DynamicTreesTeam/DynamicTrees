@@ -49,34 +49,34 @@ public class BlockDynamicSaplingRare extends BlockDynamicSapling implements ITil
 	 * tileEntity that holds items that should be dropped when the block is destroyed.
 	 */
 	
-    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
-        super.onBlockHarvested(worldIn, pos, state, player);
-
-        if (player.capabilities.isCreativeMode) {
-            TileEntitySpecies tileentityspecies = getTileEntity(worldIn, pos);
-    		if(tileentityspecies != null) {
-    			tileentityspecies.setSpecies(Species.NULLSPECIES);//Prevents dropping a seed in creative mode
-    		}
-        }
-    }
-
-    @Nullable
-    protected TileEntitySpecies getTileEntity(IBlockAccess access, BlockPos pos) {
-        TileEntity tileentity = access.getTileEntity(pos);
-        return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
-    }
+	public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
+		super.onBlockHarvested(worldIn, pos, state, player);
+		
+		if (player.capabilities.isCreativeMode) {
+			TileEntitySpecies tileentityspecies = getTileEntity(worldIn, pos);
+			if(tileentityspecies != null) {
+				tileentityspecies.setSpecies(Species.NULLSPECIES);//Prevents dropping a seed in creative mode
+			}
+		}
+	}
 	
-    @Override
-    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-        if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
-        return super.removedByPlayer(state, world, pos, player, willHarvest);
-    }
-
-    @Override
-    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack tool) {
-        super.harvestBlock(world, player, pos, state, te, tool);
-        world.setBlockToAir(pos);
-    }
+	@Nullable
+	protected TileEntitySpecies getTileEntity(IBlockAccess access, BlockPos pos) {
+		TileEntity tileentity = access.getTileEntity(pos);
+		return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
+	}
+	
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+		if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
+		return super.removedByPlayer(state, world, pos, player, willHarvest);
+	}
+	
+	@Override
+	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack tool) {
+		super.harvestBlock(world, player, pos, state, te, tool);
+		world.setBlockToAir(pos);
+	}
 	
 	/**
 	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On

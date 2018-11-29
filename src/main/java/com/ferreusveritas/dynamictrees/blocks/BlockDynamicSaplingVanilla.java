@@ -53,7 +53,7 @@ public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.byMetadata(meta & 0xF));
 	}
-
+	
 	/**
 	 * Convert the BlockState into the correct metadata value
 	 */
@@ -61,10 +61,10 @@ public class BlockDynamicSaplingVanilla extends BlockDynamicSapling {
 	public int getMetaFromState(IBlockState state) {
 		return state.getValue(BlockSapling.TYPE).getMetadata();
 	}
-
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] {BlockSapling.TYPE});
 	}
-    
+	
 }
