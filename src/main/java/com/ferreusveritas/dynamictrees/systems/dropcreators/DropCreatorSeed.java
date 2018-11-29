@@ -18,16 +18,31 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class DropCreatorSeed implements IDropCreator {
 
-	private final float rarity;
+	protected final float rarity;
 	
 	public DropCreatorSeed() {
-		this.rarity = 1.0f;
+		this(1.0f);
 	}
 	
 	public DropCreatorSeed(float rarity) {
 		this.rarity = rarity;
 	}
 	
+	//Provided for customization via override
+	protected float getHarvestRarity() {
+		return rarity;
+	}
+	
+	//Provided for customization via override
+	protected float getVoluntaryRarity() {
+		return rarity;
+	}
+	
+	//Provided for customization via override
+	protected float getLeavesRarity() {
+		return rarity;
+	}
+
 	@Override
 	public ResourceLocation getName() {
 		return new ResourceLocation(ModConstants.MODID, "seed");
@@ -35,7 +50,7 @@ public class DropCreatorSeed implements IDropCreator {
 	
 	@Override
 	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		if(random.nextInt(64) == 0) {//1 in 64 chance to drop a seed on destruction..	
+		if((1 / 64f) * getHarvestRarity() > random.nextFloat()) {//1 in 64 chance to drop a seed on destruction..	
 			dropList.add(species.getSeedStack(1));
 		}
 		return dropList;
@@ -43,7 +58,7 @@ public class DropCreatorSeed implements IDropCreator {
 
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		if(rarity * ModConfigs.seedDropRate > random.nextFloat()) {
+		if(getVoluntaryRarity() * ModConfigs.seedDropRate > random.nextFloat()) {
 			dropList.add(species.getSeedStack(1));
 			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);
@@ -65,7 +80,7 @@ public class DropCreatorSeed implements IDropCreator {
 			}
 		}
 		
-		if(random.nextInt(chance) == 0) {
+		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
 			dropList.add(species.getSeedStack(1));
 		}
 		
