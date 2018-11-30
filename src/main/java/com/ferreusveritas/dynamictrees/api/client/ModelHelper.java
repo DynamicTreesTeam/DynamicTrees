@@ -2,12 +2,10 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
@@ -16,8 +14,6 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -70,16 +66,6 @@ public class ModelHelper {
 		if(item != null) {
 			ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(customResourceLocation, "inventory"));
 		}
-	}
-
-	//Register Sapling Colorizer
-	public static void regDynamicSaplingColorHandler(BlockDynamicSapling sapling) {
-		regColorHandler(sapling, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return access == null || pos == null ? -1 : sapling.getSpecies(access, pos, state).getLeavesProperties().foliageColorMultiplier(state, access, pos);
-			}
-		});
 	}
 	
 	public static void regColorHandler(Block block, IBlockColor blockColor) {

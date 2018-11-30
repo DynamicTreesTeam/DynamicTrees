@@ -25,6 +25,7 @@ import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchBasic;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchCactus;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockBranchThick;
 import com.ferreusveritas.dynamictrees.models.ModelLoaderBlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.models.ModelLoaderSapling;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -34,7 +35,9 @@ import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
+import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -97,6 +100,14 @@ public class ClientProxy extends CommonProxy {
 			ModelHelper.regModel(tree);//Register custom state mapper for branch
 		}
 		
+		//Sapling
+		ModelLoader.setCustomStateMapper(ModBlocks.blockDynamicSapling, new StateMapperBase() {
+			@Override
+			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
+				return new ModelResourceLocation(new ResourceLocation(ModConstants.MODID, "sapling"), "");
+			}}
+		);
+		
 		//Setup the state mapper for the trunk shell
 		ModelLoader.setCustomStateMapper(ModBlocks.blockTrunkShell, new StateMap.Builder().ignore(BlockTrunkShell.COREDIR).build());
 		
@@ -117,6 +128,8 @@ public class ClientProxy extends CommonProxy {
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchCactus());
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchThick());
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockSurfaceRoot());
+		
+		ModelLoaderRegistry.registerLoader(new ModelLoaderSapling());
 	}
 	
 	public void registerColorHandlers() {
@@ -142,9 +155,13 @@ public class ClientProxy extends CommonProxy {
 		},
 		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake});
 		
-		//Register Sapling Colorizers
-		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSapling);
-		ModelHelper.regDynamicSaplingColorHandler(ModBlocks.blockDynamicSaplingSpecies);
+		//Register Sapling Colorizer
+		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
+			@Override
+			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+				return access == null || pos == null ? -1 : ModBlocks.blockDynamicSapling.getSpecies(access, pos, state).getLeavesProperties().foliageColorMultiplier(state, access, pos);
+			}
+		});
 		
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {

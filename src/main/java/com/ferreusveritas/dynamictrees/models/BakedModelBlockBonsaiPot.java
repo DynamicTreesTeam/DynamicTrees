@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.SpeciesProperty;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
+import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +26,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 public class BakedModelBlockBonsaiPot implements IBakedModel {
 	
 	protected IBakedModel basePotModel;
-	protected Map<IBlockState, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
+	protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
 	
 	public BakedModelBlockBonsaiPot(IBakedModel basePotModel) {
 		this.basePotModel = basePotModel;
@@ -39,23 +41,23 @@ public class BakedModelBlockBonsaiPot implements IBakedModel {
 			return quads;
 		}
 		
-		IBlockState mimicState = null;
+		Species species = Species.NULLSPECIES;
 		IBlockState potState = null;
 		
 		if (state != null && state.getBlock() instanceof BlockBonsaiPot && state instanceof IExtendedBlockState) {
-			mimicState = ((IExtendedBlockState) state).getValue(BlockBonsaiPot.SPECIES);
+			species = ((IExtendedBlockState) state).getValue(SpeciesProperty.SPECIES);
 			potState = ((IExtendedBlockState) state).getValue(BlockBonsaiPot.POT);
 		}
-		if(mimicState == null || !(mimicState.getBlock() instanceof BlockDynamicSapling) || !(potState.getBlock() instanceof BlockFlowerPot)) {
+		if( species == null || species == Species.NULLSPECIES || !(potState.getBlock() instanceof BlockFlowerPot)) {
 			return quads;
 		}
 		
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		IBakedModel potModel = dispatcher.getModelForState(potState);
-		IBakedModel saplingModel = dispatcher.getModelForState(mimicState);
+		IBakedModel saplingModel = BakedModelSapling.getModelForSapling(species);
 		
 		quads.addAll(potModel.getQuads(potState, side, rand));
-		quads.addAll(cachedSaplingQuads.computeIfAbsent(mimicState, mimic -> QuadManipulator.getQuads(saplingModel, mimic, new Vec3d(0, 0.25, 0), rand)));
+		quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, ModBlocks.blockDynamicSapling.getDefaultState(), new Vec3d(0, 0.25, 0), rand)));
 		
 		return quads;
 	}

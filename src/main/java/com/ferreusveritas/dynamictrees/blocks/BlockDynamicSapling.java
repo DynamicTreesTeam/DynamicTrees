@@ -2,19 +2,26 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -23,18 +30,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-/**
- * A DynamicSapling block set up to contain a single species.
- * 
- * @author ferreusveritas
- *
- */
-public class BlockDynamicSapling extends Block implements IGrowable {
-	
-	public Species species = Species.NULLSPECIES;
+public class BlockDynamicSapling extends Block implements ITileEntityProvider, IGrowable {
 	
 	public BlockDynamicSapling(String name) {
 		super(Material.PLANTS);
@@ -43,6 +45,91 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		setTickRandomly(true);
 		setUnlocalizedName(name);
 		setRegistryName(name);
+		
+		hasTileEntity = true;
+	}
+	
+	
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new ExtendedBlockState(this, new IProperty[]{}, new IUnlistedProperty[] {SpeciesProperty.SPECIES});
+	}
+	
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SpeciesProperty.SPECIES, getSpecies(access, pos, state)) : state;
+	}
+	
+	///////////////////////////////////////////
+	// TREE INFORMATION
+	///////////////////////////////////////////
+	
+	public void setSpecies(World world, BlockPos pos, Species species) {
+		world.setBlockState(pos, getDefaultState());
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+			speciesTE.setSpecies(species);
+		}
+	}
+	
+	public Species getSpecies(IBlockAccess access, BlockPos pos, IBlockState state) {
+		TileEntitySpecies tileEntitySpecies = getTileEntity(access, pos);
+		return tileEntitySpecies != null ? tileEntitySpecies.getSpecies() : Species.NULLSPECIES;
+	}
+	
+	
+	///////////////////////////////////////////
+	// TILE ENTITY STUFF
+	///////////////////////////////////////////
+	
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileEntitySpecies();
+	}
+	
+	/*
+	 * The following is modeled after the harvesting logic flow of flower pots since they too have a
+	 * tileEntity that holds items that should be dropped when the block is destroyed.
+	 */
+	
+	public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
+		super.onBlockHarvested(worldIn, pos, state, player);
+		
+		if (player.capabilities.isCreativeMode) {
+			TileEntitySpecies tileentityspecies = getTileEntity(worldIn, pos);
+			if(tileentityspecies != null) {
+				tileentityspecies.setSpecies(Species.NULLSPECIES);//Prevents dropping a seed in creative mode
+			}
+		}
+	}
+	
+	@Nullable
+	protected TileEntitySpecies getTileEntity(IBlockAccess access, BlockPos pos) {
+		TileEntity tileentity = access.getTileEntity(pos);
+		return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
+	}
+	
+	@Override
+	public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+		if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
+		return super.removedByPlayer(state, world, pos, player, willHarvest);
+	}
+	
+	@Override
+	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack tool) {
+		super.harvestBlock(world, player, pos, state, te, tool);
+		world.setBlockToAir(pos);
+	}
+	
+	/**
+	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
+	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
+	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
+	 */
+	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 	}
 	
 	///////////////////////////////////////////
@@ -76,32 +163,16 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
 		Species species = getSpecies(world, pos, state);
 		if(canBlockStay(world, pos, state)) {
-			//Ensure planting conditions are right
-			TreeFamily family = species.getFamily();
-			if(world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-				family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
-				world.setBlockState(pos.up(), species.getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
-				species.placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
-			}
+			species.transitionToTree(world, pos);
 		} else {
 			dropBlock(world, species, state, pos);
 		}
 	}
 	
-	
-	///////////////////////////////////////////
-	// TREE INFORMATION
-	///////////////////////////////////////////
-	
-	public Species getSpecies(IBlockAccess access, BlockPos pos, IBlockState state) {
-		return this.species;
+	@Override
+	public SoundType getSoundType(IBlockState state, World world, BlockPos pos, Entity entity) {
+		return getSpecies(world, pos, state).getSaplingSound();
 	}
-	
-	public BlockDynamicSapling setSpecies(IBlockState state, Species species) {
-		this.species = species;
-		return this;
-	}
-	
 	
 	///////////////////////////////////////////
 	// DROPS
@@ -144,10 +215,9 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	///////////////////////////////////////////
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess access, BlockPos pos) {
+		return getSpecies(access, pos, state).getSaplingBoundingBox();
 	}
-	
 	
 	///////////////////////////////////////////
 	// RENDERING

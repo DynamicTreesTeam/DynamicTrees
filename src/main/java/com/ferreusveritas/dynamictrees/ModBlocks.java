@@ -7,8 +7,6 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingRare;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSaplingVanilla;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
@@ -39,7 +37,6 @@ public class ModBlocks {
 	public static BlockRooty blockRootyDirtSpecies;
 	public static Block blockRootyDirtFake;
 	public static BlockDynamicSapling blockDynamicSapling;
-	public static BlockDynamicSaplingRare blockDynamicSaplingSpecies;
 	public static BlockFruit blockFruit;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
@@ -68,8 +65,7 @@ public class ModBlocks {
 		blockRootySand = new BlockRootySand(false);//Sand
 		blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
 		blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
-		blockDynamicSapling = new BlockDynamicSaplingVanilla("sapling");//Dynamic version of a Vanilla sapling
-		blockDynamicSaplingSpecies = new BlockDynamicSaplingRare("saplingrare");//Species extended sapling(Apple)
+		blockDynamicSapling = new BlockDynamicSapling("sapling");//Dynamic version of a Vanilla sapling
 		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
 		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
 		blockFruit = new BlockFruit();//Apple
@@ -168,7 +164,6 @@ public class ModBlocks {
 			blockRootyDirtSpecies,
 			blockRootyDirtFake,
 			blockDynamicSapling,
-			blockDynamicSaplingSpecies,
 			blockBonsaiPot,
 			blockFruitCocoa,
 			blockFruit,

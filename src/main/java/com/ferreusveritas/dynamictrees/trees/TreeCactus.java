@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
-import com.ferreusveritas.dynamictrees.blocks.BlockCactusSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -20,7 +19,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Biomes;
@@ -29,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -45,8 +45,6 @@ public class TreeCactus extends TreeFamily {
 			super(treeFamily.getName(), treeFamily, ModBlocks.cactusLeavesProperties);
 			
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
-			
-			setDynamicSapling(new BlockCactusSapling("cactussapling").getDefaultState());
 			
 			this.setSoilLongevity(1);
 			
@@ -135,6 +133,27 @@ public class TreeCactus extends TreeFamily {
 			return false;
 		}
 		
+		@Override
+		public boolean transitionToTree(World world, BlockPos pos) {
+			//Ensure planting conditions are right
+			TreeFamily tree = getFamily();
+			if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+				world.setBlockState(pos, tree.getDynamicBranch().getDefaultState());//set to a single branch
+				placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty sand underneath
+				return true;
+			}
+			
+			return false;
+		}
+		
+		@Override
+		public AxisAlignedBB getSaplingBoundingBox() {
+			return new AxisAlignedBB(0.375f, 0.0f, 0.375f, 0.625f, 0.5f, 0.625f);
+		}
+		
+		public SoundType getSaplingSound() {
+			return SoundType.CLOTH;
+		}
 	}
 	
 	public TreeCactus() {
@@ -168,12 +187,6 @@ public class TreeCactus extends TreeFamily {
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
 		getCommonSpecies().generateSeed();
-	}
-	
-	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList.add(getCommonSpecies().getDynamicSapling().getBlock());
-		return super.getRegisterableBlocks(blockList);
 	}
 	
 	protected class JoCodeCactus extends JoCode {

@@ -56,6 +56,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -65,6 +66,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -85,8 +87,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
-		@Override public Species setDynamicSapling(net.minecraft.block.state.IBlockState sapling) { return this; }
-		@Override public IBlockState getDynamicSapling() { return Blocks.AIR.getDefaultState(); }
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
@@ -155,6 +155,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected List<IPreGenFeature> preGenFeatures;
 	protected List<IPostGenFeature> postGenFeatures;
 	protected List<IPostGrowFeature> postGrowFeatures;
+	
+	public int saplingModelId;
 	
 	/**
 	 * Constructor only used by NULLSPECIES
@@ -422,33 +424,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//SAPLING
 	///////////////////////////////////////////
 	
-	/** 
-	 * Sets the Dynamic Sapling for this tree type.  Also sets
-	 * the tree type in the dynamic sapling.
-	 * 
-	 * @param sapling
-	 * @return
-	 */
-	public Species setDynamicSapling(IBlockState sapling) {
-		saplingBlock = sapling;//Link the tree to the sapling
-		
-		//Link the sapling to the Species
-		if(saplingBlock.getBlock() instanceof BlockDynamicSapling) {
-			BlockDynamicSapling dynSap = (BlockDynamicSapling) saplingBlock.getBlock();
-			dynSap.setSpecies(saplingBlock, this);
-		}
-		
-		return this;
-	}
-	
-	public Species setDynamicSapling(String speciesName) {
-		return setDynamicSapling(new BlockDynamicSapling(speciesName + "sapling").getDefaultState());
-	}
-	
-	public IBlockState getDynamicSapling() {
-		return saplingBlock;
-	}
-	
 	/**
 	 * Checks surroundings and places a dynamic sapling block.
 	 * 
@@ -459,7 +434,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean plantSapling(World world, BlockPos pos) {
 		
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
-			world.setBlockState(pos, getDynamicSapling());
+			ModBlocks.blockDynamicSapling.setSpecies(world, pos, this);
 			return true;
 		}
 		
@@ -482,6 +457,32 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//This is for the tree itself.
 	public boolean canBoneMeal() {
 		return true;
+	}
+
+	public boolean transitionToTree(World world, BlockPos pos) {
+		//Ensure planting conditions are right
+		TreeFamily family = getFamily();
+		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
+			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
+			return true;
+		}
+
+		return false;
+	}
+	
+	public AxisAlignedBB getSaplingBoundingBox() {
+		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
+	}
+	
+	//This is used to load the sapling model
+	public ResourceLocation getSaplingName() {
+		return getRegistryName();
+	}
+	
+	public SoundType getSaplingSound() {
+		return SoundType.PLANT;
 	}
 	
 	///////////////////////////////////////////

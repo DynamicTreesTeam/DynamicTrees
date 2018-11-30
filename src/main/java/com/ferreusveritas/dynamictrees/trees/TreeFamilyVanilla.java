@@ -1,12 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 
 import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,7 +28,6 @@ public class TreeFamilyVanilla extends TreeFamily {
 		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
 				
 		//Setup common species
-		getCommonSpecies().setDynamicSapling(ModBlocks.blockDynamicSapling.getDefaultState().withProperty(BlockSapling.TYPE, wood));
 		getCommonSpecies().generateSeed();
 	}
 	

@@ -9,14 +9,12 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -49,10 +47,7 @@ public class TreeBuilder {
 	
 	//Common Species
 	private ISpeciesCreator speciesCreator;
-	private IBlockState speciesSaplingBlockState;
-	private Block speciesSaplingBlock;
 	private boolean speciesCreateSeed = true;
-	private boolean speciesCreateSapling = true;
 
 	//Extra Species
 	private List<ISpeciesCreator> extraSpeciesCreators = new ArrayList<>(0);
@@ -230,18 +225,6 @@ public class TreeBuilder {
 	/**
 	 * OPTIONAL
 	 * 
-	 * @param state A blockState that will turn into the common species of this tree
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setCommonSpeciesDynamicSapling(IBlockState state) {
-		speciesCreateSapling = false;
-		speciesSaplingBlockState = state;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
 	 * Can be used to turn off automatic seed creation.
 	 * When enabled a seed will automatically be created and
 	 * a standard seed dropper will be added to the common 
@@ -252,19 +235,6 @@ public class TreeBuilder {
 	 */
 	public TreeBuilder setCreateSeed(boolean isStandard) {
 		speciesCreateSeed = isStandard;
-		return this;
-	}
-	
-	/**
-	 * OPTIONAL
-	 * 
-	 * Can be used to turn off automatic dynamic sapling creation.
-	 * 
-	 * @param doCreate true to enable automatic sapling creation(default), false to disable
-	 * @return TreeBuilder for chaining
-	 */
-	public TreeBuilder setCreateSapling(boolean doCreate) {
-		speciesCreateSapling = doCreate && speciesSaplingBlockState == null;
 		return this;
 	}
 	
@@ -332,35 +302,11 @@ public class TreeBuilder {
 					getCommonSpecies().setupStandardSeedDropping();
 				}
 				
-				if(speciesCreateSapling) {
-					speciesSaplingBlock = new BlockDynamicSapling(name.getResourcePath() + "sapling");
-					speciesSaplingBlockState = speciesSaplingBlock.getDefaultState();
-				}
-				
-				if(speciesSaplingBlockState != null) {
-					getCommonSpecies().setDynamicSapling(speciesSaplingBlockState);
-				}
-				
 				for(ISpeciesCreator creator: extraSpeciesCreators) {
 					Species species = creator.create(this);
 					extraSpecies.put(species.getRegistryName().getResourcePath(), species);
 				}
 
-			}
-			
-			@Override
-			public List<Block> getRegisterableBlocks(List<Block> blockList) {
-				if(speciesCreateSapling) {
-					blockList.add(speciesSaplingBlock);
-				}
-				for(Species species: extraSpecies.values()) {
-					IBlockState state = species.getDynamicSapling();
-					Block block = state.getBlock();
-					if(block != Blocks.AIR) {
-						blockList.add(block);
-					}
-				}
-				return super.getRegisterableBlocks(blockList);
 			}
 			
 			@Override

@@ -171,8 +171,6 @@ public class TreeOak extends TreeFamilyVanilla {
 			ripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3);
 			unripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0);
 			addGenFeature(new FeatureGenFruit(this, unripeFruit, ripeFruit).setRayDistance(4));
-			
-			setDynamicSapling(ModBlocks.blockDynamicSaplingSpecies.getDefaultState());
 		}
 		
 		@Override

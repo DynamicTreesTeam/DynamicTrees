@@ -39,7 +39,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBonsaiPot extends BlockContainer {
 	
-	public static final MimicProperty SPECIES = new MimicProperty("species");
 	public static final MimicProperty POT = new MimicProperty("pot");
 		
 	public static final String name = "bonsaipot";
@@ -71,10 +70,6 @@ public class BlockBonsaiPot extends BlockContainer {
 			return true;
 		}
 		return false;
-	}
-	
-	public IBlockState getSaplingState(IBlockAccess access, BlockPos pos) {
-		return getSpecies(access, pos).getDynamicSapling();
 	}
 	
 	public IBlockState getPotState(IBlockAccess access, BlockPos pos) {
@@ -184,12 +179,14 @@ public class BlockBonsaiPot extends BlockContainer {
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SPECIES, POT});
+		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[] {SpeciesProperty.SPECIES, POT});
 	}
 	
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess access, BlockPos pos) {
-		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SPECIES, getSaplingState(access, pos)).withProperty(POT, getPotState(access, pos)) : state;
+		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state)
+			.withProperty(SpeciesProperty.SPECIES, getSpecies(access, pos))
+			.withProperty(POT, getPotState(access, pos)) : state;
 	}
 	
 	///////////////////////////////////////////
