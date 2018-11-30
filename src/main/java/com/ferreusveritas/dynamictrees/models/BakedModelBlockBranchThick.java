@@ -32,7 +32,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic implements ICustomDamageModel {
 	
 	private IBakedModel trunksBark[] = new IBakedModel[16];//The trunk will always feature bark on it's sides

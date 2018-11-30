@@ -3,7 +3,10 @@ package com.ferreusveritas.dynamictrees.models;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ModelLoaderBlockBranchBasic extends ModelLoaderGeneric {
 	
 	public ModelLoaderBlockBranchBasic() {

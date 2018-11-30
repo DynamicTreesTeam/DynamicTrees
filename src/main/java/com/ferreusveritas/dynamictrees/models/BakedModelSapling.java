@@ -23,16 +23,18 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 /**
  * TODO:
  * [ ]: Saplings have incorrect breaking particles
- * [ ]: Special Flowering Oak TintIndex
  * 
  * @author ferreusveritas
  *
  */
+@SideOnly(Side.CLIENT)
 public class BakedModelSapling implements IBakedModel {
 	
 	private static IBakedModel[] modelMap;
