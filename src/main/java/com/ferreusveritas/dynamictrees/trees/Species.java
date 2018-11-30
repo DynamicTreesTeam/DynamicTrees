@@ -481,6 +481,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return getRegistryName();
 	}
 	
+	public int saplingColorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
+		return getLeavesProperties().foliageColorMultiplier(state, access, pos);
+	}
+	
 	public SoundType getSaplingSound() {
 		return SoundType.PLANT;
 	}

@@ -159,7 +159,7 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return access == null || pos == null ? -1 : ModBlocks.blockDynamicSapling.getSpecies(access, pos, state).getLeavesProperties().foliageColorMultiplier(state, access, pos);
+				return access == null || pos == null ? -1 : ModBlocks.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex);
 			}
 		});
 		
@@ -169,7 +169,7 @@ public class ClientProxy extends CommonProxy {
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
 				return (access == null || pos == null || !(state.getBlock() instanceof BlockBonsaiPot))
 					? white
-					: ModBlocks.blockBonsaiPot.getSpecies(access, pos).getLeavesProperties().foliageColorMultiplier(state, access, pos);
+					: ModBlocks.blockBonsaiPot.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex);
 			}
 		});
 		
