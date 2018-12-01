@@ -115,10 +115,14 @@ public class BlockFruit extends Block implements IGrowable {
 		super.getDrops(drops, world, pos, state, fortune);
 		
 		if(state.getValue(AGE) >= 3) {
-			drops.add(new ItemStack(Items.APPLE));
+			drops.add(getFruitDrop());
 		}
 	}
 	
+	//Override this for a custom item drop
+	public ItemStack getFruitDrop() {
+		return new ItemStack(Items.APPLE);
+	}
 	
 	///////////////////////////////////////////
 	// BOUNDARIES
