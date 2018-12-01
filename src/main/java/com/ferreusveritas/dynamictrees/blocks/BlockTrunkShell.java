@@ -178,7 +178,7 @@ public class BlockTrunkShell extends Block {
 		if(access instanceof World) {
 			World world = (World) access;
 			if(!world.isRemote) {
-				world.scheduleBlockUpdate(pos, this, 0, 3);
+				world.scheduleBlockUpdate(pos.toImmutable(), this, 0, 3);
 			}
 		}
 	}
