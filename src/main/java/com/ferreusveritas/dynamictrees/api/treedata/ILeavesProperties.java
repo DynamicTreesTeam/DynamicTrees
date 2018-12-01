@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import javax.annotation.Nullable;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -52,31 +52,19 @@ public interface ILeavesProperties {
 	@SideOnly(Side.CLIENT)
 	int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos);
 	
+	/**
+	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update
+	 * 
+	 * @param worldIn
+	 * @param pos
+	 * @param state
+	 * @param rand
+	 * @return return true to allow the normal DynamicLeavesBlock update to occur
+	 */
+	boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand);
+	
 	boolean appearanceChangesWithHydro();
 	
 	int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius);
-
-	///////////////////////////////////////////
-	//BLOCK PAGING SHORTCUTS
-	///////////////////////////////////////////
-	
-	public default ILeavesProperties assign() {
-		return assign(null);
-	}
-	
-	public default ILeavesProperties assign(@Nullable String modid) {
-		LeavesPaging.getNextLeavesBlock(modid, this);
-        return this;
-	}
-	
-	public default ILeavesProperties assign(@Nullable String modid, int seq) {
-		LeavesPaging.getLeavesBlockForSequence(modid, seq, this);
-        return this;
-	}
-	
-	public default ILeavesProperties skip(@Nullable String modid) {
-		LeavesPaging.getNextSequenceNumber(modid);
-		return this;
-	}
 	
 }

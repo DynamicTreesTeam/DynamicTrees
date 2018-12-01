@@ -23,7 +23,6 @@ import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -77,77 +76,75 @@ public class ModBlocks {
 	
 	public static void setupLeavesProperties() {
 		
-		oakLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
-				TreeRegistry.findCellKit("deciduous")).assign();
-		
-		spruceLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata() & 3),
-				TreeRegistry.findCellKit("conifer")) {
-					@Override
-					public int getSmotherLeavesMax() {
-						return 3;
-					}
-					
-					@Override
+		LeavesPaging.build(
+				
+			oakLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
+					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
+					TreeRegistry.findCellKit("deciduous")
+					),
+				
+			spruceLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
+					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata() & 3),
+					TreeRegistry.findCellKit("conifer")) {
+				@Override
+				public int getSmotherLeavesMax() {
+					return 3;
+				}
+				
+				@Override
 					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-						int color = super.foliageColorMultiplier(state, world, pos);
-						return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Spruce can now be access by modded foliage multipliers
-					}
-					
-				}.assign();
-		
-		birchLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
-				TreeRegistry.findCellKit("deciduous") ) {
+					int color = super.foliageColorMultiplier(state, world, pos);
+					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Spruce can now be access by modded foliage multipliers
+				}
+			},
+			
+			birchLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
+					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
+					TreeRegistry.findCellKit("deciduous") ) {
 				
 				@Override
 				public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 					int color = super.foliageColorMultiplier(state, world, pos);
 					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Birch can now be access by modded foliage multipliers
 				}
-			}.assign();
-		
-		jungleLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
-				new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
-				TreeRegistry.findCellKit("deciduous")) {
+			},
+			
+			jungleLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
+					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
+					TreeRegistry.findCellKit("deciduous")) {
 				
 				@Override
 				public int getLightRequirement() {
 					return 12;//The jungle can be a dark place.  Give these trees a little advantage.
 				}
-		}.assign();
-		
-		acaciaLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata() & 3),
-				TreeRegistry.findCellKit("acacia")) {
-					@Override
-					public int getSmotherLeavesMax() {
-						return 2;//very thin canopy
-					}
-				}.assign();
-		
-		darkOakLeavesProperties = new LeavesProperties(
-				Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
-				new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() & 3),
-				TreeRegistry.findCellKit("darkoak")) {
-					@Override
-					public int getSmotherLeavesMax() {
-						return 3;//thin canopy
-					}
-				}.assign();
-		
-		testLeavesProperties = new LeavesProperties(Blocks.BOOKSHELF.getDefaultState()) {
-			public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos){
-				return Minecraft.getMinecraft().getBlockColors().colorMultiplier(Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK), world, pos, 0);
+			},
+			
+			acaciaLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
+					new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata() & 3),
+					TreeRegistry.findCellKit("acacia")) {
+				@Override
+				public int getSmotherLeavesMax() {
+					return 2;//very thin canopy
+				}
+			},
+			
+			darkOakLeavesProperties = new LeavesProperties(
+					Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
+					new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() & 3),
+					TreeRegistry.findCellKit("darkoak")) {
+				@Override
+				public int getSmotherLeavesMax() {
+					return 3;//thin canopy
+				}
 			}
-		}.assign();
-		
+			
+		);
+	
 		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly not assigned
 	}
 	

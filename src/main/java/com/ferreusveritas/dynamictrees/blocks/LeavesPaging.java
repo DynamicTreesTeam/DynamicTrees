@@ -88,6 +88,21 @@ public class LeavesPaging {
 		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
 	
+	public static void build(Object ... leavesProperties) {
+		buildForMod(autoModId(""), leavesProperties);
+	}
+	
+	public static void buildForMod(String modid, Object ... leavesProperties) {
+		for(Object obj : leavesProperties) {
+			if(obj == null) {
+				getNextLeavesBlock(modid, LeavesProperties.NULLPROPERTIES);
+			} else
+			if(obj instanceof ILeavesProperties) {
+				getNextLeavesBlock(modid, (ILeavesProperties) obj);
+			}
+		}
+	}
+	
 	/**
 	 * Frees up the memory since this is only used during startup 
 	 */
@@ -95,4 +110,5 @@ public class LeavesPaging {
 		modLeavesArray = null;
 		modLastSeq = null;
 	}
+	
 }

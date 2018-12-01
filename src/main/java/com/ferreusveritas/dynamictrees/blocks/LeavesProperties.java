@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -18,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -44,6 +47,7 @@ public class LeavesProperties implements ILeavesProperties {
 		@Override public int getFireSpreadSpeed() { return 0; }
 		@Override public int getSmotherLeavesMax() { return 0; }
 		@Override public int getLightRequirement() { return 15; }
+		@Override public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) { return false; }
 	};
 	
 	private IBlockState primitiveLeaves;
@@ -144,6 +148,9 @@ public class LeavesProperties implements ILeavesProperties {
 	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return Minecraft.getMinecraft().getBlockColors().colorMultiplier(getPrimitiveLeaves(), world, pos, 0);
 	}
+	
+	@Override
+	public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) { return true; }
 	
 	@Override
 	public boolean appearanceChangesWithHydro() {
