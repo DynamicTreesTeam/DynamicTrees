@@ -242,7 +242,9 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	@Override
 	public int setRadius(World world, BlockPos pos, int radius, EnumFacing originDir, int flags) {
+		destroyMode = EnumDestroyMode.SETRADIUS;
 		world.setBlockState(pos, getStateForRadius(radius), flags);
+		destroyMode = EnumDestroyMode.SLOPPY;
 		return radius;
 	}
 	

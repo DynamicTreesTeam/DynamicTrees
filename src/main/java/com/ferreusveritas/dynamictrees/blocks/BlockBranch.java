@@ -503,6 +503,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	
 	public static enum EnumDestroyMode {
 		SLOPPY,
+		SETRADIUS,
 		HARVEST,
 		ROT,
 		OVERFLOW
