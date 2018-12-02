@@ -3,12 +3,14 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,6 +30,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,20 +40,22 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private int lightRequirement = 13;
 	private int smotherLeavesMax = 4;
-	private final String jsonData;
+	private final JsonObject jsonObj;
 	
 	public LeavesPropertiesJson(String jsonData) {
+		this(getJsonObject(jsonData));
+	}
+	
+	public LeavesPropertiesJson(JsonObject jsonObj) {
 		super(ModBlocks.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
-		this.jsonData = jsonData.replace('`', '"');
-		
+		this.jsonObj = jsonObj;
 		resolutionList.add(this);
 	}
 	
 	public void resolve() {
-		JsonObject json = getJsonObject(jsonData);
 		
-		if(json != null) {
-			for(Entry<String, JsonElement> entry : json.entrySet()) {
+		if(jsonObj != null) {
+			for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {
 				String key = entry.getKey();
 				JsonPrimitive element = entry.getValue().getAsJsonPrimitive();
 				
@@ -111,17 +116,16 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 	
-	private JsonObject getJsonObject(String jsonData2) {
+	public static JsonObject getJsonObject(String jsonData) {
 		try {
-            JsonParser parser = new JsonParser();
-            JsonElement je = parser.parse(jsonData);
-            return je.getAsJsonObject();
-        }
-        catch (Exception e) {
-            System.err.println(e);
-        }
-		
-		return null;
+			JsonParser parser = new JsonParser();
+			JsonElement je = parser.parse(jsonData.replace('`', '"'));
+			return je.getAsJsonObject();
+		}
+		catch (Exception e) {
+			System.err.println(e);
+			return null;
+		}
 	}
 	
 	public static void postInit() {
@@ -143,7 +147,26 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	public int getSmotherLeavesMax() {
 		return smotherLeavesMax;
 	}
-
+	
+	///////////////////////////////////////////
+	//UPDATE INTERFACE
+	///////////////////////////////////////////
+	
+	protected ILeavesUpdate leavesUpdate = (w,p,s,r,l) -> true;
+	
+	public static interface ILeavesUpdate {
+		boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand, ILeavesProperties leavesProperties);
+	}
+	
+	public void setLeavesUpdate(ILeavesUpdate leavesUpdate) {
+		this.leavesUpdate = leavesUpdate;
+	}
+	
+	@Override
+	public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		return leavesUpdate.updateTick(worldIn, pos, state, rand, this);
+	}
+	
 	///////////////////////////////////////////
 	//BLOCK COLORING
 	///////////////////////////////////////////

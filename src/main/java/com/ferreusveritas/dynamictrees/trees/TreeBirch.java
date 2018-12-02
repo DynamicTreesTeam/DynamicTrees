@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 
 import net.minecraft.block.BlockOldLeaf;
@@ -20,7 +19,7 @@ public class TreeBirch extends TreeFamilyVanilla {
 	public class SpeciesBirch extends Species {
 		
 		SpeciesBirch(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("birch"));
+			super(treeFamily.getName(), treeFamily);
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
@@ -56,7 +55,6 @@ public class TreeBirch extends TreeFamilyVanilla {
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 		hasConiferVariants = true;
-		ModBlocks.leaves.get("birch").setTree(this);
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH); } );
 	}
 	

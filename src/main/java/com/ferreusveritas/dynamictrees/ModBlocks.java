@@ -24,6 +24,7 @@ import net.minecraft.block.BlockDirt;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -61,16 +62,7 @@ public class ModBlocks {
 	}
 	
 	public static void setupLeavesProperties() {
-		
-		leaves = LeavesPaging.build(
-			"oak", 		"{`leaves`:`minecraft:leaves variant=oak`}",
-			"spruce",	"{`leaves`:`minecraft:leaves variant=spruce`,`color`:`@biome`,`smother`:3,`cellkit`:`conifer`}",
-			"birch",	"{`leaves`:`minecraft:leaves variant=birch`,`color`:`@biome`}",
-			"jungle",	"{`leaves`:`minecraft:leaves variant=jungle`,`light`:12}",
-			"acacia",	"{`leaves`:`minecraft:leaves2 variant=acacia`,`cellkit`:`acacia`,`smother`:2}",
-			"darkoak",	"{`leaves`:`minecraft:leaves2 variant=dark_oak`,`cellkit`:`darkoak`,`smother`:3}"
-		);
-		
+		leaves = LeavesPaging.build(new ResourceLocation(ModConstants.MODID, "leaves/common.json"));
 		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
 	

@@ -165,12 +165,25 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		this.treeFamily = TreeFamily.NULLFAMILY;
 		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
 	}
+
+	/**
+	 * Constructor suitable for derivative mods that defaults
+	 * the leavesProperties to the common type for the family
+	 * 
+	 * @param modid The MODID of the mod that is registering this species
+	 * @param name The simple name of the species e.g. "oak"
+	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
+	 */
+	public Species(ResourceLocation name, TreeFamily treeFamily) {
+		this(name, treeFamily, treeFamily.getCommonLeaves());
+	}
 	
 	/**
 	 * Constructor suitable for derivative mods
 	 * 
 	 * @param modid The MODID of the mod that is registering this species
 	 * @param name The simple name of the species e.g. "oak"
+	 * @param leavesProperties The properties of the leaves to be used for this species
 	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
 	 */
 	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {

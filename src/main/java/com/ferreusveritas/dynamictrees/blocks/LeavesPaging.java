@@ -1,14 +1,24 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
@@ -88,11 +98,11 @@ public class LeavesPaging {
 		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
 	
-	public static Map<String, ILeavesProperties> build(Object ... leavesProperties) {
-		return buildForMod(autoModId(""), leavesProperties);
+	public static Map<String, ILeavesProperties> buildAll(Object ... leavesProperties) {
+		return buildAllForMod(autoModId(""), leavesProperties);
 	}
 	
-	public static Map<String, ILeavesProperties> buildForMod(String modid, Object ... leavesProperties) {
+	public static Map<String, ILeavesProperties> buildAllForMod(String modid, Object ... leavesProperties) {
 		Map<String, ILeavesProperties> leafMap = new HashMap<>();
 		
 		for(int i = 0; i < (leavesProperties.length & ~1); i+=2) {
@@ -113,6 +123,54 @@ public class LeavesPaging {
 		}
 		
 		return leafMap;
+	}
+	
+	public static Map<String, ILeavesProperties> build(String jsonData) {
+		return build(autoModId(""), jsonData);
+	}
+	
+	public static Map<String, ILeavesProperties> build(String modid, String jsonData) {
+		return build(modid, LeavesPropertiesJson.getJsonObject(jsonData));
+	}
+	
+	public static Map<String, ILeavesProperties> build(JsonObject root) {
+		return build(autoModId(""), root);
+	}
+	
+	public static Map<String, ILeavesProperties> build(String modid, JsonObject root) {
+		Map<String, ILeavesProperties> leafMap = new HashMap<>();
+		
+		if(root != null) {
+			for(Entry<String, JsonElement> entry : root.entrySet()) {
+				String label = entry.getKey();
+				ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
+				if(!label.startsWith("-")) { //A hyphen can be prepended to a label to create an unused gap
+					JsonObject jsonObj = entry.getValue().getAsJsonObject();
+					newLp = new LeavesPropertiesJson(jsonObj);
+				}
+				getNextLeavesBlock(modid, newLp);
+				leafMap.put(label, newLp);
+			}
+		}
+		
+		return leafMap;
+	}
+	
+	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
+		JsonObject root = null;
+		
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			Gson gson = new Gson();
+			JsonElement je = gson.fromJson(reader, JsonElement.class);
+			root = je.getAsJsonObject();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return build(root);
 	}
 	
 	/**

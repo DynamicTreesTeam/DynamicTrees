@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
-
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.world.biome.Biome;
@@ -13,7 +11,7 @@ public class TreeAcacia extends TreeFamilyVanilla {
 	public class SpeciesAcacia extends Species {
 		
 		SpeciesAcacia(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("acacia"));
+			super(treeFamily.getName(), treeFamily);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
@@ -34,7 +32,6 @@ public class TreeAcacia extends TreeFamilyVanilla {
 	
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
-		ModBlocks.leaves.get("acacia").setTree(this);
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.ACACIA); });
 	}
 	

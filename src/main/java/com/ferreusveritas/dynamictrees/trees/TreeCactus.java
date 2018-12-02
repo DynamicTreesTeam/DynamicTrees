@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
@@ -42,7 +43,7 @@ public class TreeCactus extends TreeFamily {
 	public class SpeciesCactus extends Species {
 		
 		public SpeciesCactus(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("cactus"));
+			super(treeFamily.getName(), treeFamily);
 			
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
 			
@@ -158,9 +159,14 @@ public class TreeCactus extends TreeFamily {
 	
 	public TreeCactus() {
 		super(new ResourceLocation(ModConstants.MODID, "cactus"));
-				
+		
 		setPrimitiveLog(Blocks.CACTUS.getDefaultState(), new ItemStack(Blocks.CACTUS));
 		setStick(ItemStack.EMPTY);
+	}
+	
+	@Override
+	public ILeavesProperties getCommonLeaves() {
+		return ModBlocks.leaves.get(getName().getResourcePath());
 	}
 	
 	@Override

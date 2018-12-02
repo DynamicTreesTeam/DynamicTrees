@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
@@ -27,7 +26,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	public class SpeciesBaseSpruce extends Species {
 		
 		SpeciesBaseSpruce(ResourceLocation name, TreeFamily treeFamily) {
-			super(name, treeFamily, ModBlocks.leaves.get("spruce"));
+			super(name, treeFamily);
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
@@ -141,7 +140,6 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
-		ModBlocks.leaves.get("spruce").setTree(this);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
 		

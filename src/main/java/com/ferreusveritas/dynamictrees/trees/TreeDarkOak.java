@@ -39,7 +39,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		protected FeatureGenMound moundGen;
 		
 		SpeciesDarkOak(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("darkoak"));
+			super(treeFamily.getName(), treeFamily);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
@@ -155,7 +155,6 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	
 	public TreeDarkOak() {
 		super(BlockPlanks.EnumType.DARK_OAK);
-		ModBlocks.leaves.get("darkoak").setTree(this);
 		hasConiferVariants = true;
 		
 		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");

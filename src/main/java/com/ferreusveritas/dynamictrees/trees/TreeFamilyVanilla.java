@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 
 import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockOldLog;
@@ -22,6 +24,7 @@ public class TreeFamilyVanilla extends TreeFamily {
 		super(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
 		
 		woodType = wood;
+		getCommonLeaves().setTree(this);
 		
 		//Setup tree references
 		boolean isOld = wood.getMetadata() < 4;
@@ -29,6 +32,11 @@ public class TreeFamilyVanilla extends TreeFamily {
 				
 		//Setup common species
 		getCommonSpecies().generateSeed();
+	}
+	
+	@Override
+	public ILeavesProperties getCommonLeaves() {
+		return ModBlocks.leaves.get(getName().getResourcePath());
 	}
 	
 }
