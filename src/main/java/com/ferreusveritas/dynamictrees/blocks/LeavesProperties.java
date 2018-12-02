@@ -50,11 +50,11 @@ public class LeavesProperties implements ILeavesProperties {
 		@Override public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) { return false; }
 	};
 	
-	private IBlockState primitiveLeaves;
-	private ItemStack primitiveLeavesItemStack;
-	private ICellKit cellKit;
-	private TreeFamily tree = TreeFamily.NULLFAMILY;
-	private IBlockState dynamicLeavesBlockHydroStates[] = new IBlockState[5];
+	protected IBlockState primitiveLeaves;
+	protected ItemStack primitiveLeavesItemStack;
+	protected ICellKit cellKit;
+	protected TreeFamily tree = TreeFamily.NULLFAMILY;
+	protected IBlockState dynamicLeavesBlockHydroStates[] = new IBlockState[5];
 	
 	private LeavesProperties() {}
 	

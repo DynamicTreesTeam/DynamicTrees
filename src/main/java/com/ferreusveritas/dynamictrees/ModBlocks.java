@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -19,14 +21,9 @@ import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockNewLeaf;
-import net.minecraft.block.BlockOldLeaf;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModBlocks {
@@ -41,24 +38,12 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
 	
-	public static ILeavesProperties oakLeavesProperties;
-	public static ILeavesProperties spruceLeavesProperties;
-	public static ILeavesProperties birchLeavesProperties;
-	public static ILeavesProperties jungleLeavesProperties;
-	public static ILeavesProperties acaciaLeavesProperties;
-	public static ILeavesProperties darkOakLeavesProperties;
-	
-	public static ILeavesProperties cactusLeavesProperties;
-	
-	//TODO: Temporary Code
-	public static ILeavesProperties testLeavesProperties;
+	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
 	public static CommonBlockStates blockStates;
 	
 	public static void preInit() {
 		BlockDynamicLeaves.passableLeavesModLoaded = net.minecraftforge.fml.common.Loader.isModLoaded("passableleaves");
-		
-		blockStates = new CommonBlockStates();
 		
 		blockRootyDirt = new BlockRootyDirt(false);//Dirt
 		blockRootySand = new BlockRootySand(false);//Sand
@@ -70,91 +55,32 @@ public class ModBlocks {
 		blockFruit = new BlockFruit();//Apple
 		blockTrunkShell = new BlockTrunkShell();
 		
+		blockStates = new CommonBlockStates();
+		
 		setupLeavesProperties();
 	}
 	
-	
 	public static void setupLeavesProperties() {
 		
-		LeavesPaging.build(
-				
-			oakLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK),
-					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.OAK.getMetadata() & 3),
-					TreeRegistry.findCellKit("deciduous")
-					),
-				
-			spruceLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE),
-					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.SPRUCE.getMetadata() & 3),
-					TreeRegistry.findCellKit("conifer")) {
-				@Override
-				public int getSmotherLeavesMax() {
-					return 3;
-				}
-				
-				@Override
-					public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-					int color = super.foliageColorMultiplier(state, world, pos);
-					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Spruce can now be access by modded foliage multipliers
-				}
-			},
-			
-			birchLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH),
-					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.BIRCH.getMetadata() & 3),
-					TreeRegistry.findCellKit("deciduous") ) {
-				
-				@Override
-				public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-					int color = super.foliageColorMultiplier(state, world, pos);
-					return world.getBiome(pos).getModdedBiomeFoliageColor(color);//Birch can now be access by modded foliage multipliers
-				}
-			},
-			
-			jungleLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE),
-					new ItemStack(Blocks.LEAVES, 1, BlockPlanks.EnumType.JUNGLE.getMetadata() & 3),
-					TreeRegistry.findCellKit("deciduous")) {
-				
-				@Override
-				public int getLightRequirement() {
-					return 12;//The jungle can be a dark place.  Give these trees a little advantage.
-				}
-			},
-			
-			acaciaLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA),
-					new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.ACACIA.getMetadata() & 3),
-					TreeRegistry.findCellKit("acacia")) {
-				@Override
-				public int getSmotherLeavesMax() {
-					return 2;//very thin canopy
-				}
-			},
-			
-			darkOakLeavesProperties = new LeavesProperties(
-					Blocks.LEAVES2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK),
-					new ItemStack(Blocks.LEAVES2, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() & 3),
-					TreeRegistry.findCellKit("darkoak")) {
-				@Override
-				public int getSmotherLeavesMax() {
-					return 3;//thin canopy
-				}
-			}
-			
+		leaves = LeavesPaging.build(
+			"oak", 		"{`leaves`:`minecraft:leaves variant=oak`}",
+			"spruce",	"{`leaves`:`minecraft:leaves variant=spruce`,`color`:`@biome`,`smother`:3,`cellkit`:`conifer`}",
+			"birch",	"{`leaves`:`minecraft:leaves variant=birch`,`color`:`@biome`}",
+			"jungle",	"{`leaves`:`minecraft:leaves variant=jungle`,`light`:12}",
+			"acacia",	"{`leaves`:`minecraft:leaves2 variant=acacia`,`cellkit`:`acacia`,`smother`:2}",
+			"darkoak",	"{`leaves`:`minecraft:leaves2 variant=dark_oak`,`cellkit`:`darkoak`,`smother`:3}"
 		);
-	
-		cactusLeavesProperties = new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly not assigned
+		
+		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
 	
-	public static void registerBlocks(IForgeRegistry<Block> registry) {
+	public static void register(IForgeRegistry<Block> registry) {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values());
-
+		
 		registry.registerAll(
 			blockRootyDirt,
 			blockRootySand,
@@ -169,7 +95,7 @@ public class ModBlocks {
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 	}
-
+	
 	public static class CommonBlockStates {
 		public final IBlockState air = Blocks.AIR.getDefaultState();
 		public final IBlockState dirt = Blocks.DIRT.getDefaultState();

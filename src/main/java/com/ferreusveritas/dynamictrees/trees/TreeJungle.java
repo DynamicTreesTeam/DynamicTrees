@@ -29,7 +29,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 	public class SpeciesJungle extends Species {
 		
 		SpeciesJungle(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.jungleLeavesProperties);
+			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("jungle"));
 			
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
@@ -98,7 +98,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
-		ModBlocks.jungleLeavesProperties.setTree(this);
+		ModBlocks.leaves.get("jungle").setTree(this);
 		canSupportCocoa = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE); });
 	}

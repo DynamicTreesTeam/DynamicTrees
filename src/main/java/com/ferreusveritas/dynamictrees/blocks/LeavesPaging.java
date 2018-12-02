@@ -88,25 +88,37 @@ public class LeavesPaging {
 		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
 	
-	public static void build(Object ... leavesProperties) {
-		buildForMod(autoModId(""), leavesProperties);
+	public static Map<String, ILeavesProperties> build(Object ... leavesProperties) {
+		return buildForMod(autoModId(""), leavesProperties);
 	}
 	
-	public static void buildForMod(String modid, Object ... leavesProperties) {
-		for(Object obj : leavesProperties) {
-			if(obj == null) {
-				getNextLeavesBlock(modid, LeavesProperties.NULLPROPERTIES);
-			} else
+	public static Map<String, ILeavesProperties> buildForMod(String modid, Object ... leavesProperties) {
+		Map<String, ILeavesProperties> leafMap = new HashMap<>();
+		
+		for(int i = 0; i < (leavesProperties.length & ~1); i+=2) {
+			String label = leavesProperties[i].toString();
+			Object obj = leavesProperties[i+1];
+			
+			ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
+			
 			if(obj instanceof ILeavesProperties) {
-				getNextLeavesBlock(modid, (ILeavesProperties) obj);
+				newLp = (ILeavesProperties) obj;
+			} else
+			if(obj instanceof String && !"".equals(obj)) {
+				newLp = new LeavesPropertiesJson((String) obj);
 			}
+			
+			getNextLeavesBlock(modid, newLp);
+			leafMap.put(label, newLp);
 		}
+		
+		return leafMap;
 	}
 	
 	/**
 	 * Frees up the memory since this is only used during startup 
 	 */
-	public static void postInit() {
+	public static void cleanUp() {
 		modLeavesArray = null;
 		modLastSeq = null;
 	}

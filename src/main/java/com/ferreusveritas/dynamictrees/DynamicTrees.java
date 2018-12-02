@@ -1,16 +1,9 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
-import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
@@ -29,7 +22,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -76,33 +68,18 @@ public class DynamicTrees {
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		
-		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
-		CellKits.preInit();
-		TreeGenerator.preInit();//Create the generator
-		
-		GameRegistry.registerTileEntity(TileEntitySpecies.class, "species_tile_entity");
-		GameRegistry.registerTileEntity(TileEntityBonsai.class, "bonsai_tile_entity");
-		
-		ModBlocks.preInit();
-		ModItems.preInit();
-		ModTrees.preInit();
-		
-		proxy.preInit();
+		proxy.preInit(event);
 	}
 	
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-
-		WorldGenRegistry.registerBiomeDataBasePopulator(new DefaultBiomeDataBasePopulator());
-		
 		proxy.init();
 	}
 	
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		WorldGenRegistry.populateDataBase();
-		LeavesPaging.postInit();
+		proxy.postInit();
+		proxy.cleanUp();
 	}
 	
 	@Mod.EventBusSubscriber
@@ -110,23 +87,23 @@ public class DynamicTrees {
 		
 		@SubscribeEvent
 		public static void registerBlocks(RegistryEvent.Register<Block> event) {
-			ModBlocks.registerBlocks(event.getRegistry());
+			ModBlocks.register(event.getRegistry());
 		}
 		
 		@SubscribeEvent
 		public static void registerItems(RegistryEvent.Register<Item> event) {
-			ModItems.registerItems(event.getRegistry());
+			ModItems.register(event.getRegistry());
 		}
 		
 		@SubscribeEvent
 		public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-			ModRecipes.registerRecipes(event.getRegistry());
+			ModRecipes.register(event.getRegistry());
 		}
 		
 		@SubscribeEvent
 		@SideOnly(Side.CLIENT)
 		public static void registerModels(ModelRegistryEvent event) {
-			ModModels.registerModels(event);
+			ModModels.register(event);
 		}
 		
 		@SubscribeEvent

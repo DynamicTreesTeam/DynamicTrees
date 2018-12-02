@@ -21,7 +21,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class ModRecipes {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void registerRecipes(IForgeRegistry<IRecipe> registry) {
+	public static void register(IForgeRegistry<IRecipe> registry) {
 
 		ModItems.dendroPotion.registerRecipes(registry);
 		

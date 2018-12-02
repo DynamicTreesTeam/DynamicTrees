@@ -33,7 +33,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	public class SpeciesOak extends Species {
 		
 		SpeciesOak(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.oakLeavesProperties);
+			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("oak"));
 			
 			//Oak trees are about as average as you can get
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
@@ -82,7 +82,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	public class SpeciesSwampOak extends Species {
 				
 		SpeciesSwampOak(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily, ModBlocks.oakLeavesProperties);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), treeFamily.getName().getResourcePath() + "swamp"), treeFamily, ModBlocks.leaves.get("oak"));
 			
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
@@ -157,7 +157,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		public final IBlockState ripeFruit;
 		
 		public SpeciesAppleOak(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily, ModBlocks.oakLeavesProperties);
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily, ModBlocks.leaves.get("oak"));
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
@@ -190,7 +190,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
-		ModBlocks.oakLeavesProperties.setTree(this);
+		ModBlocks.leaves.get("oak").setTree(this);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK); });
 	}

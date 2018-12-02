@@ -13,7 +13,7 @@ public class TreeAcacia extends TreeFamilyVanilla {
 	public class SpeciesAcacia extends Species {
 		
 		SpeciesAcacia(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.acaciaLeavesProperties);
+			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("acacia"));
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
@@ -34,7 +34,7 @@ public class TreeAcacia extends TreeFamilyVanilla {
 	
 	public TreeAcacia() {
 		super(BlockPlanks.EnumType.ACACIA);
-		ModBlocks.acaciaLeavesProperties.setTree(this);
+		ModBlocks.leaves.get("acacia").setTree(this);
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockNewLeaf && (state.getValue(BlockNewLeaf.VARIANT) == BlockPlanks.EnumType.ACACIA); });
 	}
 	

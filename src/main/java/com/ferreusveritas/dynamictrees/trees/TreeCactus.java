@@ -42,7 +42,7 @@ public class TreeCactus extends TreeFamily {
 	public class SpeciesCactus extends Species {
 		
 		public SpeciesCactus(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.cactusLeavesProperties);
+			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("cactus"));
 			
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
 			

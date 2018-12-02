@@ -27,7 +27,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	public class SpeciesBaseSpruce extends Species {
 		
 		SpeciesBaseSpruce(ResourceLocation name, TreeFamily treeFamily) {
-			super(name, treeFamily, ModBlocks.spruceLeavesProperties);
+			super(name, treeFamily, ModBlocks.leaves.get("spruce"));
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
@@ -141,7 +141,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	
 	public TreeSpruce() {
 		super(BlockPlanks.EnumType.SPRUCE);
-		ModBlocks.spruceLeavesProperties.setTree(this);
+		ModBlocks.leaves.get("spruce").setTree(this);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
 		

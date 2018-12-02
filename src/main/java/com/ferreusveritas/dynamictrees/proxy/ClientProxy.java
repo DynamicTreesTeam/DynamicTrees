@@ -16,6 +16,8 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
@@ -42,24 +44,23 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
 	
 	@Override
-	public void preInit() {
-		super.preInit();
+	public void preInit(FMLPreInitializationEvent event) {
+		super.preInit(event);
 		registerClientEventHandlers();
 		registerEntityRenderers();
 	}
@@ -69,6 +70,18 @@ public class ClientProxy extends CommonProxy {
 		super.init();
 		registerColorHandlers();
 		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
+	}
+	
+	@Override
+	public void postInit() {
+		super.postInit();
+		LeavesPropertiesJson.postInitClient();
+	}
+	
+	@Override
+	public void cleanUp() {
+		super.cleanUp();
+		BlockColorMultipliers.cleanUp();
 	}
 	
 	@Override
@@ -197,7 +210,6 @@ public class ClientProxy extends CommonProxy {
 		
 		//Register GrowingLeavesBlocks Colorizers
 		for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values()) {
-			
 			ModelHelper.regColorHandler(leaves, new IBlockColor() {
 				@Override
 				public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
@@ -206,13 +218,6 @@ public class ClientProxy extends CommonProxy {
 						return ((BlockDynamicLeaves) block).getProperties(state).foliageColorMultiplier(state, worldIn, pos);
 					}
 					return magenta;
-				}
-			});
-				
-			ModelHelper.regColorHandler(Item.getItemFromBlock(leaves), new IItemColor() {
-				@Override
-				public int colorMultiplier(ItemStack stack, int tintIndex) {
-					return ColorizerFoliage.getFoliageColorBasic();
 				}
 			});
 		}

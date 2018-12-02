@@ -20,7 +20,7 @@ public class TreeBirch extends TreeFamilyVanilla {
 	public class SpeciesBirch extends Species {
 		
 		SpeciesBirch(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily, ModBlocks.birchLeavesProperties);
+			super(treeFamily.getName(), treeFamily, ModBlocks.leaves.get("birch"));
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);
@@ -56,7 +56,7 @@ public class TreeBirch extends TreeFamilyVanilla {
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
 		hasConiferVariants = true;
-		ModBlocks.birchLeavesProperties.setTree(this);
+		ModBlocks.leaves.get("birch").setTree(this);
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH); } );
 	}
 	

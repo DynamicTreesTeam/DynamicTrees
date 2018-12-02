@@ -2,14 +2,11 @@ package com.ferreusveritas.dynamictrees;
 
 import java.util.ArrayList;
 
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModItems {
@@ -24,22 +21,13 @@ public class ModItems {
 		treeStaff = new Staff();//Creative Mode Staff
 	}
 	
-	public static void registerItems(IForgeRegistry<Item> registry) {
+	public static void register(IForgeRegistry<Item> registry) {
 		ArrayList<Item> treeItems = new ArrayList<Item>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 		ModTrees.dynamicCactus.getRegisterableItems(treeItems);
-		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key, block) -> treeItems.add(makeItemBlock(block)));
-				
+		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
-	}
-	
-	public static Item makeItemBlock(Block block) {
-		return new ItemBlock(block).setRegistryName(block.getRegistryName());
-	}
-	
-	public static void registerItemBlock(final IForgeRegistry<Item> registry, Block block) {
-		registry.register(makeItemBlock(block));
 	}
 	
 }

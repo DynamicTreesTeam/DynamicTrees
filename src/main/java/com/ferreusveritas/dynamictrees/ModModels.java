@@ -7,7 +7,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModModels {
 	
 	@SideOnly(Side.CLIENT)
-	public static void registerModels(ModelRegistryEvent event) {
+	public static void register(ModelRegistryEvent event) {
 		DynamicTrees.proxy.registerModels();
 	}
 	
