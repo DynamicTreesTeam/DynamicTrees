@@ -93,6 +93,7 @@ public class BlockDynamicSapling extends Block implements ITileEntityProvider, I
 	 * tileEntity that holds items that should be dropped when the block is destroyed.
 	 */
 	
+	@Override
 	public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
 		super.onBlockHarvested(worldIn, pos, state, player);
 		
@@ -127,6 +128,7 @@ public class BlockDynamicSapling extends Block implements ITileEntityProvider, I
 	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
 	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
 	 */
+	@Override
 	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
