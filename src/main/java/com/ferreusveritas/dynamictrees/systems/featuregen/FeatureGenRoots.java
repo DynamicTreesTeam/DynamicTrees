@@ -26,15 +26,13 @@ import net.minecraft.world.biome.Biome;
 
 public class FeatureGenRoots implements IPostGrowFeature, IPostGenFeature {
 	
-	private Species species;
 	private int levelLimit = 2;
 	private final int minTrunkRadius;
 	private BiFunction<Integer, Integer, Integer> scaler = (i, j) -> i;
 	
 	private SimpleVoxmap rootMaps[];
 	
-	public FeatureGenRoots(Species species, int minTrunkRadius) {
-		this.species = species;
+	public FeatureGenRoots(int minTrunkRadius) {
 		this.minTrunkRadius = minTrunkRadius;
 		rootMaps = createRootMaps();
 	}
@@ -70,27 +68,27 @@ public class FeatureGenRoots implements IPostGrowFeature, IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		
 		BlockPos treePos = rootPos.up();
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 		
 		if(trunkRadius >= minTrunkRadius) {
-			return startRoots(world, treePos, trunkRadius);
+			return startRoots(world, treePos, species, trunkRadius);
 		}
 		return false;
 	}
 
 	
-	public boolean startRoots(World world, BlockPos treePos, int trunkRadius) {		
+	public boolean startRoots(World world, BlockPos treePos, Species species, int trunkRadius) {		
 		int hash = CoordUtils.coordHashCode(treePos, 2);
 		SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-		nextRoot(world, rootMap, treePos, trunkRadius, BlockPos.ORIGIN, 0, -1, null, 0);
+		nextRoot(world, rootMap, treePos, species, trunkRadius, BlockPos.ORIGIN, 0, -1, null, 0);
 		return true;
 	}
 	
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 		
 		if(soilLife > 0 && trunkRadius >= minTrunkRadius) {
@@ -100,13 +98,13 @@ public class FeatureGenRoots implements IPostGrowFeature, IPostGenFeature {
 				world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
 			}
 			
-			startRoots(world, treePos, trunkRadius);
+			startRoots(world, treePos, species, trunkRadius);
 		}
 		
 		return true;
 	}
 	
-	protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, int trunkRadius, BlockPos pos, int height, int levelCount, EnumFacing fromDir, int radius) {
+	protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, BlockPos pos, int height, int levelCount, EnumFacing fromDir, int radius) {
 		
 		for(int depth = 0; depth < 2; depth++) {
 			BlockPos currPos = trunkPos.add(pos).up(height - depth);
@@ -129,7 +127,7 @@ public class FeatureGenRoots implements IPostGrowFeature, IPostGenFeature {
 							}
 							int thisLevelCount = depth == 1 ? 1 : levelCount + 1;
 							if(nextRad > 0 && thisLevelCount <= this.levelLimit) {//Don't go longer than 2 adjacent blocks on a single level
-								nextRoot(world, rootMap, trunkPos, trunkRadius, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad);//Recurse here
+								nextRoot(world, rootMap, trunkPos, species, trunkRadius, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad);//Recurse here
 							}
 						}
 					}

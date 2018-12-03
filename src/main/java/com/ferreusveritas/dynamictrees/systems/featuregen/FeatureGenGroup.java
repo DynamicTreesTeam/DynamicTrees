@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.state.IBlockState;
@@ -16,9 +17,9 @@ public class FeatureGenGroup implements IPostGenFeature {
 	private List<IPostGenFeature> features = new ArrayList<>();
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		for(IPostGenFeature feature : features) {
-			feature.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+			feature.postGeneration(world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState);
 		}
 		return true;
 	}

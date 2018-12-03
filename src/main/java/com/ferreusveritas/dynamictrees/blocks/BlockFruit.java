@@ -12,13 +12,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -35,6 +35,9 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	public static final String name = "fruit";
 	
+	protected ItemStack droppedFruit = ItemStack.EMPTY;
+	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
+	
 	public BlockFruit() {
 		this(name);
 	}
@@ -48,6 +51,11 @@ public class BlockFruit extends Block implements IGrowable {
 		this.setHardness(0.3f);
 	}
 	
+	public BlockFruit setBonemealable(boolean bonemealable) {
+		this.bonemealable = bonemealable;
+		return this;
+	}
+	
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		if (!this.canBlockStay(worldIn, pos, state)) {
 			this.dropBlock(worldIn, pos, state);
@@ -58,8 +66,26 @@ public class BlockFruit extends Block implements IGrowable {
 			if (age < 3 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextInt(5) == 0)) {
 				worldIn.setBlockState(pos, state.withProperty(AGE, age + 1), 2);
 				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(worldIn, pos, state, worldIn.getBlockState(pos));
+			} else
+			if (age == 3) {
+				if(matureAction(worldIn, pos, state, rand)) {
+					dropBlock(worldIn, pos, state);
+				}
 			}
 		}
+	}
+	
+	/**
+	 * Override this to make the fruit do something once it's mature.
+	 * 
+	 * @param world The world
+	 * @param pos The position of the fruit block
+	 * @param state The current blockstate of the fruit
+	 * @param rand A random number generator
+	 * @return true to drop the block. false will keep the fruit intact
+	 */
+	protected boolean matureAction(World world, BlockPos pos, IBlockState state, Random rand) {
+		return false;
 	}
 	
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
@@ -95,34 +121,57 @@ public class BlockFruit extends Block implements IGrowable {
 		return world.getBlockState(pos.up()).getBlock() instanceof BlockLeaves;
 	}
 	
+	
+	///////////////////////////////////////////
+	//BONEMEAL
+	///////////////////////////////////////////
+	
 	@Override
 	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-		return false;
+		return (Integer)state.getValue(AGE) < 3;
 	}
 	
 	@Override
 	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, IBlockState state) {
-		return false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
+		return bonemealable;
 	}
 	
 	@Override
 	public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
-		world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(((Integer)state.getValue(AGE)).intValue() + 1)), 2);
+		int age = (Integer)state.getValue(AGE);
+		int newAge = MathHelper.clamp(age + 1, 0, 3);
+		if(newAge != age) {
+			world.setBlockState(pos, state.withProperty(AGE, newAge), 2);
+		}
 	}
+	
+	
+	///////////////////////////////////////////
+	//DROPS
+	///////////////////////////////////////////
 	
 	@Override
 	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		super.getDrops(drops, world, pos, state, fortune);
 		
 		if(state.getValue(AGE) >= 3) {
-			drops.add(getFruitDrop());
+			ItemStack toDrop = getFruitDrop();
+			if(!toDrop.isEmpty()) {
+				drops.add(toDrop);
+			}
 		}
+	}
+	
+	public BlockFruit setDroppedItem(ItemStack stack) {
+		droppedFruit = stack;
+		return this;
 	}
 	
 	//Override this for a custom item drop
 	public ItemStack getFruitDrop() {
-		return new ItemStack(Items.APPLE);
+		return droppedFruit.copy();
 	}
+	
 	
 	///////////////////////////////////////////
 	// BOUNDARIES
@@ -164,6 +213,14 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] {AGE});
+	}
+	
+	public IBlockState getStateForAge(int age) {
+		return getDefaultState().withProperty(AGE, age);
+	}
+	
+	public int getAgeForWorldGen(World world, BlockPos pos) {
+		return 3;
 	}
 	
 }

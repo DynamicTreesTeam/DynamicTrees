@@ -26,12 +26,7 @@ public class FeatureGenVine implements IPostGenFeature {
 	protected int maxLength = 8;
 	protected float verSpread = 60;
 	protected float rayDistance = 5;
-	protected Species species;
 	protected Block vineBlock = Blocks.VINE;
-	
-	public FeatureGenVine(Species species) {
-		this.species = species;
-	}
 	
 	public FeatureGenVine setQuantity(int qty) {
 		this.qty = qty;
@@ -59,7 +54,7 @@ public class FeatureGenVine implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 			if(!endPoints.isEmpty()) {
 				for(int i = 0; i < qty; i++) {

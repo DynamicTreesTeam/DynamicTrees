@@ -33,8 +33,8 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	}
 	
 	/** Use this for the default mushroom generator */
-	public FeatureGenHugeMushrooms(Species species) {
-		this(new FeatureGenHugeMushroom(species));
+	public FeatureGenHugeMushrooms() {
+		this(new FeatureGenHugeMushroom());
 	}
 	
 	public FeatureGenHugeMushrooms setMaxShrooms(int max) {
@@ -48,7 +48,7 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
 		if (endPoints.isEmpty() || !worldGen) return false;
@@ -75,7 +75,7 @@ public class FeatureGenHugeMushrooms implements IPostGenFeature {
 					if(maxHeight >= 2) {
 						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 						
-						if(mushGen.setHeight(height).generate(world, mushPos.down(), biome, rand, radius, safeBounds)) {
+						if(mushGen.setHeight(height).generate(world, mushPos.down(), species, biome, rand, radius, safeBounds)) {
 							if(++success >= maxShrooms) {
 								return true;
 							}

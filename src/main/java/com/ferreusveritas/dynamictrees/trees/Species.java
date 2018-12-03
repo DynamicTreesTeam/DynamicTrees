@@ -40,6 +40,8 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
+import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
@@ -95,7 +97,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return new ItemStack(getSeed()); }
 		@Override public ItemStack getSeedStack(int qty) { return new ItemStack(getSeed()); }
-		@Override public void setupStandardSeedDropping() {}
+		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 	
@@ -119,6 +121,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
 	protected final TreeFamily treeFamily;
+
+	/** Logic kit for standardized extended growth behavior */
+	protected IGrowthLogicKit logicKit = GrowthLogicKits.nullLogic;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -206,16 +211,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return treeFamily;
 	}
 	
-	protected void setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
 		this.tapering = tapering;
 		this.signalEnergy = energy;
 		this.upProbability = upProbability;
 		this.lowestBranchHeight = lowestBranchHeight;
 		this.growthRate = growthRate;
+		return this;
 	}
 	
 	public float getEnergy(World world, BlockPos rootPos) {
-		return signalEnergy;
+		return getGrowthLogicKit().getEnergy(world, rootPos, this, signalEnergy);
 	}
 	
 	public float getGrowthRate(World world, BlockPos rootPos) {
@@ -253,8 +259,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	//LEAVES
 	///////////////////////////////////////////
 	
-	public void setLeavesProperties(ILeavesProperties leavesProperties) {
+	public Species setLeavesProperties(ILeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
+		return this;
 	}
 	
 	public ILeavesProperties getLeavesProperties() {
@@ -287,9 +294,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * Generate a seed. Developer is still required to register the item
 	 * in the appropriate registries.
 	 */
-	public ItemStack generateSeed() {
+	public Species generateSeed() {
 		Seed seed = new Seed(getRegistryName().getResourcePath() + "seed");
-		return setSeedStack(new ItemStack(seed));
+		setSeedStack(new ItemStack(seed));
+		return this;
 	}
 	
 	/**
@@ -320,8 +328,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * Typically called in the constructor
 	 */
-	public void setupStandardSeedDropping() {
+	public Species setupStandardSeedDropping() {
 		addDropCreator(new DropCreatorSeed());
+		return this;
 	}
 	
 	public boolean addDropCreator(IDropCreator dropCreator) {
@@ -532,8 +541,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return true;
 	}
 	
-	public void setSoilLongevity(int longevity) {
+	public Species setSoilLongevity(int longevity) {
 		soilLongevity = longevity;
+		return this;
 	}
 	
 	public int getSoilLongevity(World world, BlockPos rootPos) {
@@ -553,8 +563,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param soilBlocks
 	 */
-	public void addAcceptableSoil(Block ... soilBlocks) {
+	public Species addAcceptableSoil(Block ... soilBlocks) {
 		Collections.addAll(soilList, soilBlocks);
+		return this;
 	}
 	
 	/**
@@ -562,10 +573,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param soilBlock
 	 */
-	public void remAcceptableSoil(Block ... soilBlocks) {
+	public Species remAcceptableSoil(Block ... soilBlocks) {
 		for(Block block : soilBlocks) {
 			soilList.remove(block);
 		}
+		return this;
 	}
 	
 	/**
@@ -573,8 +585,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * making trees that can only be planted in abnormal
 	 * substrates.
 	 */
-	public void clearAcceptableSoils() {
+	public Species clearAcceptableSoils() {
 		soilList.clear();
+		return this;
 	}
 	
 	/**
@@ -592,7 +605,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * This is run by the Species class itself to set the standard
 	 * blocks available to be used as planting substrate. Developer
-	 * may override this entirely or just append to the list at a
+	 * may override this entirely or just modify the list at a
 	 * later time.
 	 */
 	protected final void setStandardSoils() {
@@ -807,6 +820,23 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
+	 * Set the logic kit used to determine how the tree branch network expands.
+	 * Provides an alternate and more modular method to override a trees 
+	 * growth logic.
+	 * 
+	 * @param logicKit A growth logic kit
+	 * @return this species for chaining
+	 */
+	public Species setGrowthLogicKit(IGrowthLogicKit logicKit) {
+		this.logicKit = logicKit;
+		return this;
+	}
+	
+	public IGrowthLogicKit getGrowthLogicKit() {
+		return logicKit;
+	}
+	
+	/**
 	* Selects a new direction for the branch(grow) signal to turn to.
 	* This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
 	* Can be overridden for different species but it's preferable to override customDirectionManipulation.
@@ -852,12 +882,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	/** Species can override the probability map here **/
 	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
-		return probMap;
+		return getGrowthLogicKit().directionManipulation(world, pos, this, radius, signal, probMap);
 	}
 	
 	/** Species can override to take action once a new direction is selected **/
 	protected EnumFacing newDirectionSelected(EnumFacing newDir, GrowSignal signal) {
-		return newDir;
+		return getGrowthLogicKit().newDirectionSelected(this, newDir, signal);
 	}
 	
 	/**
@@ -875,7 +905,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
 		if(postGrowFeatures != null) {
 			for(IPostGrowFeature feature: postGrowFeatures) {
-				feature.postGrow(world, rootPos, treePos, soilLife, natural);
+				feature.postGrow(world, rootPos, treePos, this, soilLife, natural);
 			}
 		}
 		return true;
@@ -1112,7 +1142,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		
 		if(genFeatureOverride != null) {
-			return genFeatureOverride.generate(world, rootPos, biome, random, radius, safeBounds);
+			return genFeatureOverride.generate(world, rootPos, this, biome, random, radius, safeBounds);
 		}
 		
 		EnumFacing facing = CoordUtils.getRandomDir(random);
@@ -1142,11 +1172,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/"+ getRegistryName().getResourcePath() + ".txt");
 	}
 	
-	public void addGenFeature(IGenFeature module) {
+	public Species addGenFeature(IGenFeature module) {
 		addGenFeature(module, IGenFeature.DEFAULTS);
+		return this;
 	}
 	
-	public void addGenFeature(IGenFeature module, int allowableFlags) {
+	public Species addGenFeature(IGenFeature module, int allowableFlags) {
 
 		if(module instanceof IFullGenFeature && (allowableFlags & IGenFeature.FULLGEN) != 0) {
 			genFeatureOverride = (IFullGenFeature) module;
@@ -1176,6 +1207,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			postGrowFeatures.add(feature);
 		}
 		
+		return this;
 	}
 	
 	/**
@@ -1194,7 +1226,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(preGenFeatures != null) {
 			for(IPreGenFeature feature: preGenFeatures) {
-				rootPos = feature.preGeneration(world, rootPos, radius, facing, safeBounds, joCode);
+				rootPos = feature.preGeneration(world, rootPos, this, radius, facing, safeBounds, joCode);
 			}
 		}
 		return rootPos;
@@ -1215,7 +1247,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(postGenFeatures != null) {
 			for(IPostGenFeature feature: postGenFeatures) {
-				feature.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState);
 			}
 		}
 	}

@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -34,7 +35,7 @@ public class ModBlocks {
 	public static BlockRooty blockRootyDirtSpecies;
 	public static Block blockRootyDirtFake;
 	public static BlockDynamicSapling blockDynamicSapling;
-	public static BlockFruit blockFruit;
+	public static BlockFruit blockApple;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
@@ -53,7 +54,7 @@ public class ModBlocks {
 		blockDynamicSapling = new BlockDynamicSapling("sapling");//Dynamic version of a Vanilla sapling
 		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
 		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
-		blockFruit = new BlockFruit();//Apple
+		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		blockTrunkShell = new BlockTrunkShell();
 		
 		blockStates = new CommonBlockStates();
@@ -81,7 +82,7 @@ public class ModBlocks {
 			blockDynamicSapling,
 			blockBonsaiPot,
 			blockFruitCocoa,
-			blockFruit,
+			blockApple,
 			blockTrunkShell
 		);
 		

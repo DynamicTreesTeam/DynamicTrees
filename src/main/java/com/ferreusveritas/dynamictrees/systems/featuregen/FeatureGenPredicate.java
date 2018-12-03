@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.state.IBlockState;
@@ -32,10 +33,10 @@ public class FeatureGenPredicate implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		if(!(onlyWorldGen && !worldGen) && biomePredicate.test(biome)) {
-			return feature.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+			return feature.postGeneration(world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState);
 		}
 		return false;
 	}

@@ -26,15 +26,10 @@ import net.minecraft.world.biome.Biome;
 
 public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 	
-	private Species species;
 	private IBlockState logState = Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.OAK);
 	private IBlockState leavesState = Blocks.LEAVES.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.OAK).withProperty(BlockOldLeaf.CHECK_DECAY, false);
 	private IBlockState secondaryLeavesState = null;
 	private Predicate<Biome> biomePredicate = i -> true;
-	
-	public FeatureGenBush(Species species) {
-		this.species = species;
-	}
 	
 	public FeatureGenBush setLogState(IBlockState logState) {
 		this.logState = logState;
@@ -57,21 +52,21 @@ public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 	}
 	
 	@Override
-	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		commonGen(world, rootPos, random, radius, safeBounds);
+	public boolean generate(World world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+		commonGen(world, rootPos, species, random, radius, safeBounds);
 		return true;
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(safeBounds != SafeChunkBounds.ANY && biomePredicate.test(biome)) {
-			commonGen(world, rootPos, world.rand, radius, safeBounds);
+			commonGen(world, rootPos, species, world.rand, radius, safeBounds);
 			return true;
 		}
 		return false;
 	}
 	
-	protected void commonGen(World world, BlockPos rootPos, Random random, int radius, SafeChunkBounds safeBounds) {
+	protected void commonGen(World world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
 		if (radius <= 2) return;
 		
 		Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);

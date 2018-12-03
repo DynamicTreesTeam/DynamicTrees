@@ -32,7 +32,7 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	
 	private final int moundCutoffRadius;
 	
-	public FeatureGenMound(Species species, int moundCutoffRadius) {
+	public FeatureGenMound(int moundCutoffRadius) {
 		this.moundCutoffRadius = moundCutoffRadius;
 	}
 	
@@ -47,7 +47,7 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 * @return The modified position of the rooty dirt that is one block higher
 	 */
 	@Override
-	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
+	public BlockPos preGeneration(World world, BlockPos rootPos, Species species, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(radius >= moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//worldgen test
 			IBlockState initialDirtState = world.getBlockState(rootPos);
 			IBlockState initialUnderState = world.getBlockState(rootPos.down());
@@ -73,7 +73,7 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 */
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
 			BlockPos treePos = rootPos.up();
 			IBlockState belowState = world.getBlockState(rootPos.down());

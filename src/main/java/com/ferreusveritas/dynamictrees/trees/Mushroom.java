@@ -16,7 +16,7 @@ public class Mushroom extends Species {
 		this.redcap = redcap;
 		setRegistryName(new ResourceLocation(ModConstants.MODID, "mushroom" + (redcap ? "red" : "brn")));
 		setStandardSoils();
-		addGenFeature(new FeatureGenHugeMushroom(this, redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
+		addGenFeature(new FeatureGenHugeMushroom(redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
 	}
 	
 }

@@ -6,7 +6,6 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
@@ -92,7 +91,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			setupStandardSeedDropping();
 			
 			//Add species features
-			addGenFeature(new FeatureGenVine(this).setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(5));//Generate Vines
+			addGenFeature(new FeatureGenVine().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(5));//Generate Vines
 		}
 		
 		@Override
@@ -153,8 +152,6 @@ public class TreeOak extends TreeFamilyVanilla {
 	public class SpeciesAppleOak extends SpeciesRare {
 		
 		private static final String speciesName = "apple";
-		public final IBlockState unripeFruit;
-		public final IBlockState ripeFruit;
 		
 		public SpeciesAppleOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
@@ -168,9 +165,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			generateSeed();
 			
-			ripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 3);
-			unripeFruit = ModBlocks.blockFruit.getDefaultState().withProperty(BlockFruit.AGE, 0);
-			addGenFeature(new FeatureGenFruit(this, unripeFruit, ripeFruit).setRayDistance(4));
+			addGenFeature(new FeatureGenFruit(ModBlocks.blockApple).setRayDistance(4));
 		}
 		
 		@Override

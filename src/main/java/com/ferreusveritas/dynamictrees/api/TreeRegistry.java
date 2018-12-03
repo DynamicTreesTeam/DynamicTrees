@@ -29,6 +29,10 @@ public class TreeRegistry {
 	// SPECIES REGISTRY
 	//////////////////////////////
 	
+	public static Species findSpecies(String name) {
+		return findSpecies(new ResourceLocation(name));
+	}
+	
 	public static Species findSpecies(ResourceLocation name) {
 		return Species.REGISTRY.getValue(name);
 	}

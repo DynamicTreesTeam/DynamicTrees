@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.state.IBlockState;
@@ -17,7 +18,7 @@ import net.minecraft.world.biome.Biome;
 public class FeatureGenCocoa implements IPostGenFeature, IPostGrowFeature {
 	
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
 			addCocoa(world, rootPos, false);
 		}
@@ -25,7 +26,7 @@ public class FeatureGenCocoa implements IPostGenFeature, IPostGrowFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(world.rand.nextInt() % 8 == 0) {
 			addCocoa(world, rootPos, true);
 			return true;

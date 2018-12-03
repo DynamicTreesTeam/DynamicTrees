@@ -17,24 +17,18 @@ import net.minecraft.world.biome.Biome;
 
 public class FeatureGenFlareBottom implements IPostGenFeature, IPostGrowFeature{
 	
-	private final Species species;
-	
-	public FeatureGenFlareBottom(Species species) {
-		this.species = species;
-	}
-	
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if(soilLife > 0) {
-			flareBottom(world, rootPos);
+			flareBottom(world, rootPos, species);
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
-		flareBottom(world, rootPos);
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+		flareBottom(world, rootPos, species);
 		return true;
 	}
 	
@@ -45,7 +39,7 @@ public class FeatureGenFlareBottom implements IPostGenFeature, IPostGrowFeature{
 	 * @param rootPos The position of the rooty dirt block of the tree
 	 * @return The radius of the bottom trunk section after operation
 	 */
-	public void flareBottom(World world, BlockPos rootPos) {
+	public void flareBottom(World world, BlockPos rootPos, Species species) {
 		TreeFamily family = species.getFamily();
 		
 		//Put a cute little flare on the bottom of the dark oaks

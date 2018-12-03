@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -19,7 +20,7 @@ import net.minecraft.world.biome.Biome;
 
 public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	
-	protected Species species;
+	protected final BlockFruit blockFruit;
 	protected final IBlockState ripeFruitState;
 	protected final IBlockState unripeFruitState;
 	protected float verSpread = 30;
@@ -27,10 +28,16 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	protected float rayDistance = 5;
 	protected int fruitingRadius = 8;
 	
-	public FeatureGenFruit(Species species, IBlockState unripeFruitState, IBlockState ripeFruitState) {
-		this.species = species;
+	public FeatureGenFruit(IBlockState unripeFruitState, IBlockState ripeFruitState) {
 		this.ripeFruitState = ripeFruitState;
 		this.unripeFruitState = unripeFruitState;
+		this.blockFruit = null;
+	}
+	
+	public FeatureGenFruit(BlockFruit fruit) {
+		this.ripeFruitState = null;
+		this.unripeFruitState = null;
+		this.blockFruit = fruit;
 	}
 	
 	public FeatureGenFruit setRayDistance(float rayDistance) {
@@ -48,12 +55,12 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(!endPoints.isEmpty()) {
 			int qty = getQuantity(true);
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-				addFruit(world, species, rootPos.up(), endPoint, ripeFruitState, false, safeBounds);
+				addFruit(world, species, rootPos.up(), endPoint, true, false, safeBounds);
 			}
 			return true;
 		}
@@ -61,7 +68,7 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		IBlockState blockState = world.getBlockState(treePos);
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
@@ -73,7 +80,7 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 			if(!endPoints.isEmpty()) {
 				for(int i = 0; i < qty; i++) {
 					BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-					addFruit(world, species, rootPos.up(), endPoint, unripeFruitState, true, SafeChunkBounds.ANY);
+					addFruit(world, species, rootPos.up(), endPoint, false, true, SafeChunkBounds.ANY);
 				}
 			}
 		}
@@ -81,11 +88,17 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 		return true;
 	}
 	
-	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, IBlockState fruitState, boolean enableHash, SafeChunkBounds safeBounds) {
+	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ORIGIN) {
 			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
-				world.setBlockState(fruitPos, fruitState);
+				IBlockState setState;
+				if(blockFruit != null) {
+					setState = blockFruit.getStateForAge(worldGen ? blockFruit.getAgeForWorldGen(world, fruitPos) : 0);
+				} else {
+					setState = worldGen ? ripeFruitState : unripeFruitState;
+				}
+				world.setBlockState(fruitPos, setState);
 			}
 		}
 	}

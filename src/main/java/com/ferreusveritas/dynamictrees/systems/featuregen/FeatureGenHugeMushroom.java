@@ -25,19 +25,15 @@ import net.minecraft.world.biome.Biome;
  * @author ferreusveritas
  */
 public class FeatureGenHugeMushroom implements IFullGenFeature {
-	
-	protected final Species species;
-	
+		
 	private final Block mushroomType;
 	private int height = -1;
 	
-	public FeatureGenHugeMushroom(Species species, Block block) {
-		this.species = species;
+	public FeatureGenHugeMushroom(Block block) {
 		this.mushroomType = block;
 	}
 	
-	public FeatureGenHugeMushroom(Species species) {
-		this.species = species;
+	public FeatureGenHugeMushroom() {
 		this.mushroomType = null;
 	}
 	
@@ -126,7 +122,7 @@ public class FeatureGenHugeMushroom implements IFullGenFeature {
 	}
 	
 	@Override
-	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(World world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 			
 		BlockPos genPos = rootPos.up();
 		

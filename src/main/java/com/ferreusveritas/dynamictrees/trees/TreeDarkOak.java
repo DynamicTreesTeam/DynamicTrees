@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFlareBottom;
@@ -21,7 +21,6 @@ import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Biomes;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
@@ -43,6 +42,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
+			setGrowthLogicKit(GrowthLogicKits.darkOakLogic);
 			
 			setSoilLongevity(14);//Grows for a long long time
 			
@@ -59,10 +59,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			//Add species features
 			addGenFeature(new FeatureGenClearVolume(6));//Clear a spot for the thick tree trunk
-			addGenFeature(new FeatureGenFlareBottom(this));//Flare the bottom
-			addGenFeature(new FeatureGenMound(this, 5));//Establish mounds
-			addGenFeature(new FeatureGenHugeMushrooms(this).setMaxShrooms(1).setMaxAttempts(3));//Generate Huge Mushrooms
-			addGenFeature(new FeatureGenRoots(this, 13).setScaler(getRootScaler()));//Finally Generate Roots
+			addGenFeature(new FeatureGenFlareBottom());//Flare the bottom
+			addGenFeature(new FeatureGenMound(5));//Establish mounds
+			addGenFeature(new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3));//Generate Huge Mushrooms
+			addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
 		}
 		
 		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
@@ -90,51 +90,6 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		@Override
 		public float getGrowthRate(World world, BlockPos pos) {
 			return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
-		}
-		
-		@Override
-		protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
-			
-			probMap[EnumFacing.UP.getIndex()] = 4;
-			
-			//Disallow up/down turns after having turned out of the trunk once.
-			if(!signal.isInTrunk()) {
-				probMap[EnumFacing.UP.getIndex()] = 0;
-				probMap[EnumFacing.DOWN.getIndex()] = 0;
-				probMap[signal.dir.ordinal()] *= 0.35;//Promotes the zag of the horizontal branches
-			}
-			
-			//Amplify cardinal directions to encourage spread the higher we get
-			float energyRatio = signal.delta.getY() / getEnergy(world, pos);
-			float spreadPush = energyRatio * 2;
-			spreadPush = spreadPush < 1.0f ? 1.0f : spreadPush;
-			for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-				probMap[dir.ordinal()] *= spreadPush;
-			}
-			
-			//Ensure that the branch gets out of the trunk at least two blocks so it won't interfere with new side branches at the same level 
-			if(signal.numTurns == 1 && signal.delta.distanceSq(0, signal.delta.getY(), 0) == 1.0 ) {
-				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-					if(signal.dir != dir) {
-						probMap[dir.ordinal()] = 0;
-					}
-				}
-			}
-			
-			//If the side branches are too swole then give some other branches a chance
-			if(signal.isInTrunk()) {
-				for(EnumFacing dir: EnumFacing.HORIZONTALS) {
-					if(probMap[dir.ordinal()] >= 7) {
-						probMap[dir.ordinal()] = 2;
-					}
-				}
-				if(signal.delta.getY() > getLowestBranchHeight() + 5) {
-					probMap[EnumFacing.UP.ordinal()] = 0;
-					signal.energy = 2;
-				}
-			}
-			
-			return probMap;
 		}
 		
 		@Override
