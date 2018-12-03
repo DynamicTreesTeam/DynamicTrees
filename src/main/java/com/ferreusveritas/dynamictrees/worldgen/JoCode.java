@@ -270,42 +270,49 @@ public class JoCode {
 	 * @param leavesProperties
 	 */
 	protected void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
-		BlockPos saveCenter = leafMap.getCenter();
-		leafMap.setCenter(new BlockPos(0, 0, 0));
 		
-		int startY;
+		int smotherMax = leavesProperties.getSmotherLeavesMax();
 		
-		//Find topmost block in build volume
-		for(startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
-			if(leafMap.isYTouched(startY)) {
-				break;
+		if(smotherMax != 0) { //Smothering is disabled if set to 0
+			
+			BlockPos saveCenter = leafMap.getCenter();
+			leafMap.setCenter(new BlockPos(0, 0, 0));
+			
+			int startY;
+			
+			//Find topmost block in build volume
+			for(startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
+				if(leafMap.isYTouched(startY)) {
+					break;
+				}
 			}
-		}
-		
-		//Precompute smothering
-		for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
-			for(int ix = 0; ix < leafMap.getLenX(); ix++) {
-				int count = 0;
-				for(int iy = startY; iy >= 0; iy--) {
-					int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-					if(v == 0) {//Air
-						count = 0;//Reset the count
-					} else
-					if((v & 0x0F) != 0) {//Leaves
-						count++;
-						if(count > leavesProperties.getSmotherLeavesMax()){//Smother value
-							leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
+			
+			//Precompute smothering
+			for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
+				for(int ix = 0; ix < leafMap.getLenX(); ix++) {
+					int count = 0;
+					for(int iy = startY; iy >= 0; iy--) {
+						int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
+						if(v == 0) {//Air
+							count = 0;//Reset the count
+						} else
+						if((v & 0x0F) != 0) {//Leaves
+							count++;
+							if(count > smotherMax){//Smother value
+								leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
+							}
+						} else
+						if((v & 0x10) != 0) {//Twig
+							count++;
+							leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
 						}
-					} else
-					if((v & 0x10) != 0) {//Twig
-						count++;
-						leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
 					}
 				}
 			}
+			
+			leafMap.setCenter(saveCenter);
 		}
 		
-		leafMap.setCenter(saveCenter);
 	}
 	
 	protected boolean isClearOfNearbyBranches(World world, BlockPos pos, EnumFacing except) {
