@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -62,6 +63,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -290,6 +292,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return setSeedStack(new ItemStack(seed));
 	}
 	
+	/**
+	 * Sets the {@link ItemStack} that is used for this Species.
+	 * The {@link ItemStack} must contain an {@link Item} of type {@link Seed}
+	 * or this will fail.
+	 * 
+	 * This links the {@link Seed} to the {@link Species} and vice versa.
+	 * 
+	 * @param newSeedStack The input {@link ItemStack} containing a {@link Seed} item.
+	 * @return The input {@link ItemStack} or an {@link ItemStack#EMPTY} on failure.
+	 */
 	public ItemStack setSeedStack(ItemStack newSeedStack) {
 		if(newSeedStack.getItem() instanceof Seed) {
 			seedStack = newSeedStack;
@@ -302,7 +314,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return ItemStack.EMPTY;
 	}
 	
-	//It's mostly for seeds.. mostly.
+	/**
+	 * Sets up a standardized drop system for
+	 * Harvest, Voluntary, and Leaves Drops.
+	 * 
+	 * Typically called in the constructor
+	 */
 	public void setupStandardSeedDropping() {
 		addDropCreator(new DropCreatorSeed());
 	}
@@ -531,18 +548,53 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
 	}
 	
+	/**
+	 * Adds blocks to the acceptable soil list.
+	 * 
+	 * @param soilBlocks
+	 */
 	public void addAcceptableSoil(Block ... soilBlocks) {
 		Collections.addAll(soilList, soilBlocks);
 	}
 	
-	public void remAcceptableSoil(Block soilBlock) {
-		soilList.remove(soilBlock);
+	/**
+	 * Removes blocks from the acceptable soil list.
+	 * 
+	 * @param soilBlock
+	 */
+	public void remAcceptableSoil(Block ... soilBlocks) {
+		for(Block block : soilBlocks) {
+			soilList.remove(block);
+		}
 	}
 	
+	/**
+	 * Will clear the acceptable soils list.  Useful for
+	 * making trees that can only be planted in abnormal
+	 * substrates.
+	 */
 	public void clearAcceptableSoils() {
 		soilList.clear();
 	}
 	
+	/**
+	 * Retrieve a clone of the acceptable soils list.
+	 * Editing this set will not affect the original list.
+	 * Should only be used for config purposes and is not
+	 * recommended for realtime gameplay operations.
+	 * 
+	 * @return A clone of the acceptable soils list.
+	 */
+	public Set<Block> getAcceptableSoils() {
+		return (Set<Block>) soilList.clone();
+	}
+	
+	/**
+	 * This is run by the Species class itself to set the standard
+	 * blocks available to be used as planting substrate. Developer
+	 * may override this entirely or just append to the list at a
+	 * later time.
+	 */
 	protected final void setStandardSoils() {
 		addAcceptableSoil(Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM);
 	}
@@ -892,6 +944,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return MathHelper.clamp(suit, 0.0f, 1.0f);
 	}
 	
+	/**
+	 * Used to determine if the provided {@link Biome} argument will yield
+	 * unhindered growth to Maximum potential. This has the affect of the
+	 * suitability being 100%(or 1.0f)
+	 * 
+	 * @param biome The biome being tested
+	 * @return True if biome is "perfect" false otherwise.
+	 */
 	public boolean isBiomePerfect(Biome biome) {
 		return false;
 	}
@@ -962,6 +1022,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
+	/**
+	 * Called when a player right clicks a {@link Species} of tree anywhere on it's branches.
+	 * 
+	 * @param world The world
+	 * @param rootPos The  {@link BlockPos} of the {@link BlockRooty} 
+	 * @param hitPos The {@link BlockPos} of the {@link Block} that was hit.
+	 * @param state The {@link IBlockState} of the hit {@link Block}.
+	 * @param player The {@link EntityPlayer} that hit the {@link Block}
+	 * @param hand Hand used to peform the action
+	 * @param heldItem The {@link ItemStack} the {@link EntityPlayer} hit the {@link Block} with.
+	 * @param side The side of the block that was hit.
+	 * @param hitX X axis of hit with hitPos
+	 * @param hitY Y axis of hit with hitPos
+	 * @param hitZ Z axis of hit with hitPos
+	 * @return True if action was handled, false otherwise.
+	 */
 	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (heldItem != null) {//Something in the hand
@@ -974,6 +1050,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
+	/**
+	 * A convenience function to decrement or otherwise consume an item in use.
+	 * 
+	 * @param player The player
+	 * @param hand Hand holding the item
+	 * @param heldItem The item to be consumed
+	 */
 	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
 		if(!player.capabilities.isCreativeMode) {
 			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
