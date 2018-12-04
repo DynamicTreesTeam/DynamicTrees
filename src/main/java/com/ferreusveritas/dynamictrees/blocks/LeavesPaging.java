@@ -157,6 +157,11 @@ public class LeavesPaging {
 	}
 	
 	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
+		return build(autoModId(""), jsonLocation);
+	}
+
+	public static Map<String, ILeavesProperties> build(String modid, ResourceLocation jsonLocation) {
+		
 		JsonObject root = null;
 		
 		try {
