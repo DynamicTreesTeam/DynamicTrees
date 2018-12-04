@@ -48,6 +48,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -222,6 +223,9 @@ public class ClientProxy extends CommonProxy {
 			});
 		}
 		
+		//Register programmable custom block color providers for LeavesPropertiesJson
+		BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> ColorizerFoliage.getFoliageColorBirch() );
+		BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> ColorizerFoliage.getFoliageColorPine() );
 	}
 	
 	public void registerClientEventHandlers() {

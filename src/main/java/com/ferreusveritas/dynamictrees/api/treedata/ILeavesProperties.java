@@ -40,7 +40,7 @@ public interface ILeavesProperties {
 	
 	int getFireSpreadSpeed();
 	
-	/** Maximum amount of leaves in a stack before the bottom-most leaf block dies [default = 4] **/
+	/** Maximum amount of leaves in a stack before the bottom-most leaf block dies. Set to zero to disable smothering. [default = 4] **/
 	int getSmotherLeavesMax();
 	
 	/** Minimum amount of light necessary for a leaves block to be created. [default = 13] **/

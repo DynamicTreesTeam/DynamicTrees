@@ -2,12 +2,14 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -26,6 +28,7 @@ import net.minecraft.command.NumberInvalidException;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -41,6 +44,9 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	private int lightRequirement = 13;
 	private int smotherLeavesMax = 4;
 	private final JsonObject jsonObj;
+	private boolean connectAnyRadius = false;
+	private int flammability = 60;// Mimic vanilla leaves
+	private int fireSpreadSpeed = 30;// Mimic vanilla leaves
 	
 	public LeavesPropertiesJson(String jsonData) {
 		this(getJsonObject(jsonData));
@@ -57,18 +63,23 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		if(jsonObj != null) {
 			for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {
 				String key = entry.getKey();
-				JsonPrimitive element = entry.getValue().getAsJsonPrimitive();
+				JsonElement element = entry.getValue();
 				
 				if("color".equals(key)) {
-					colorPrimitive = element;
+					if(element.isJsonPrimitive()) {
+						colorPrimitive = element.getAsJsonPrimitive();
+					}
 				} else
 				if("leaves".equals(key)) {
-					String leavesDesc = element.getAsString();
-					primitiveLeaves = getBlockState(leavesDesc);
+					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+						getPrimitiveLeaves(element.getAsString()).assignTo(this);
+					} else
+					if(element.isJsonObject()) {
+						getPrimitiveLeaves(element.getAsJsonObject()).assignTo(this);
+					}
 				} else
 				if("cellkit".equals(key)) {
-					String cellkitDesc = element.getAsString();
-					ICellKit kit = TreeRegistry.findCellKit(new ResourceLocation(ModConstants.MODID, cellkitDesc));
+					ICellKit kit = TreeRegistry.findCellKit(element.getAsString());
 					if(kit != null) {
 						cellKit = kit;
 					}
@@ -78,24 +89,74 @@ public class LeavesPropertiesJson extends LeavesProperties {
 				} else
 				if("light".equals(key)) {
 					lightRequirement = MathHelper.clamp(element.getAsInt(), 0, 15);
+				} else
+				if("connectAny".equals(key)) {
+					if(element.isJsonPrimitive()) {
+						connectAnyRadius = element.getAsBoolean();
+					}
+				} else
+				if("flammability".equals(key)) {
+					if(element.isJsonPrimitive()) {
+						flammability = element.getAsInt();
+					}
+				} else
+				if("fireSpreadSpeed".equals(key)) {
+					if(element.isJsonPrimitive()) {
+						fireSpreadSpeed = element.getAsInt();
+					}
 				}
-				
 			}
 		}
-        
-		if(primitiveLeaves.getBlock() == Blocks.AIR) {
-			primitiveLeaves = Blocks.LEAVES.getDefaultState();
-		}
 		
-		int meta = primitiveLeaves.getBlock().damageDropped(primitiveLeaves);
-		if(primitiveLeaves.getBlock() == Blocks.LEAVES2 && meta >= 4) {//Bug in minecraft where the damageDropped doesn't work for Leaves2
-			meta -= 4;
-		}
-		
-		primitiveLeavesItemStack = new ItemStack(Item.getItemFromBlock(primitiveLeaves.getBlock()), 1, meta);
 	}
 	
-	private IBlockState getBlockState(String blockStateDesc) {
+	public static class PrimitiveLeavesComponents {
+		public IBlockState state;
+		public ItemStack stack;
+		
+		public PrimitiveLeavesComponents(IBlockState state, ItemStack stack) {
+			this.state = state;
+			this.stack = stack;
+		}
+		
+		public void assignTo(LeavesPropertiesJson lpJson) {
+			lpJson.primitiveLeaves = state;
+			lpJson.primitiveLeavesItemStack = stack;
+		}
+	}
+	
+	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
+		IBlockState state = getBlockState(leavesDesc);
+		ItemStack stack = ItemStack.EMPTY;
+		
+		if(state.getBlock() != Blocks.AIR) {
+			int meta = state.getBlock().damageDropped(state);
+			
+			//Minecraft metadata logic for leaves is buggy and needs this work around
+			if(state.getBlock() == Blocks.LEAVES2 && meta >= 4) {//Bug in minecraft where the damageDropped doesn't work for Leaves2
+				meta -= 4;
+			}
+			
+			stack = new ItemStack(Item.getItemFromBlock(state.getBlock()), 1, meta);
+		}
+		
+		return new PrimitiveLeavesComponents(state, stack);
+	}
+	
+	private static PrimitiveLeavesComponents getPrimitiveLeaves(JsonObject jsonObj) {
+		
+		for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {
+			String name = entry.getKey();
+			PrimitiveLeavesComponents comp = findPrimitiveComponents(name, entry.getValue());
+			if(comp != null) {
+				return comp;
+			}
+		}
+		
+		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
+	}
+	
+	private static IBlockState getBlockState(String blockStateDesc) {
 		String blockString = blockStateDesc;
 		String argString = "default";
 		String[] args = blockStateDesc.split(" ");
@@ -135,7 +196,9 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 	
 	public static void cleanUp() {
-		resolutionList = null;//Free memory
+		//Free memory
+		resolutionList = null;
+		blockstateFinderMap = null;
 	}
 	
 	@Override
@@ -146,6 +209,21 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	@Override
 	public int getSmotherLeavesMax() {
 		return smotherLeavesMax;
+	}
+	
+	@Override
+	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return (fromRadius == 1 || connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+	}
+	
+	@Override
+	public int getFlammability() {
+		return flammability;
+	}
+	
+	@Override
+	public int getFireSpreadSpeed() {
+		return fireSpreadSpeed;
 	}
 	
 	///////////////////////////////////////////
@@ -165,6 +243,25 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	@Override
 	public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		return leavesUpdate.updateTick(worldIn, pos, state, rand, this);
+	}
+	
+	///////////////////////////////////////////
+	//PRIMITIVE LEAVES FINDING
+	///////////////////////////////////////////
+	
+	protected static Map<String, Function<JsonElement, PrimitiveLeavesComponents>> blockstateFinderMap = new HashMap<>();
+	
+	public static void addLeavesFinderFunction(String finderName, Function<JsonElement, PrimitiveLeavesComponents> function) {
+		blockstateFinderMap.put(finderName, function);
+	}
+	
+	public static PrimitiveLeavesComponents findPrimitiveComponents(String finderName, JsonElement jsonElement) {
+		Function<JsonElement, PrimitiveLeavesComponents> function = blockstateFinderMap.get(finderName);
+		if(function != null) {
+			return function.apply(jsonElement);
+		}
+		
+		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
 	}
 	
 	///////////////////////////////////////////

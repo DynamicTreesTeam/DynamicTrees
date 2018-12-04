@@ -131,7 +131,11 @@ public class TreeRegistry {
 	}
 	
 	public static ICellKit findCellKit(String name) {
-		return findCellKit(new ResourceLocation(ModConstants.MODID, name));
+		ResourceLocation kitLocation = new ResourceLocation(name);
+		if("minecraft".equals(kitLocation.getResourceDomain())) {//Minecraft doesn't register leaves properties
+			kitLocation = new ResourceLocation(ModConstants.MODID, kitLocation.getResourcePath());//Default to "dynamictrees" instead
+		}
+		return findCellKit(kitLocation);
 	}
 	
 }
