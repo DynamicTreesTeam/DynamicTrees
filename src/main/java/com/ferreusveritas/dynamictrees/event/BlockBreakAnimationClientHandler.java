@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -95,22 +96,24 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) {
 		TextureMap texturemap = Minecraft.getMinecraft().getTextureMapBlocks();
-
-        for (int i = 0; i < this.destroyBlockIcons.length; ++i) {
-            this.destroyBlockIcons[i] = texturemap.getAtlasSprite("minecraft:blocks/destroy_stage_" + i);
-        }
+		
+		for (int i = 0; i < this.destroyBlockIcons.length; ++i) {
+			this.destroyBlockIcons[i] = texturemap.getAtlasSprite("minecraft:blocks/destroy_stage_" + i);
+		}
 	}
 	
 	private void cleanupExtraDamagedBlocks() {
-        for (Entry<Integer, DestroyBlockProgress> entry : BlockBreakAnimationClientHandler.damagedBranches.entrySet()) {
-        	DestroyBlockProgress destroyblockprogress = entry.getValue();
-            int k1 = destroyblockprogress.getCreationCloudUpdateTick();
-            
-            if (Minecraft.getMinecraft().world.getWorldTime() - k1 > 400) {
-                BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
-            }
-        }
-    }
+		Iterator<Entry<Integer, DestroyBlockProgress>> iter = BlockBreakAnimationClientHandler.damagedBranches.entrySet().iterator();
+		
+		while(iter.hasNext()) {
+			DestroyBlockProgress destroyblockprogress = iter.next().getValue();//entry.getValue();
+			int tick = destroyblockprogress.getCreationCloudUpdateTick();
+			
+			if (Minecraft.getMinecraft().world.getWorldTime() - tick > 400) {
+				iter.remove();
+			}
+		}
+	}
 	
 	public void sendThickBranchBreakProgress(int breakerId, BlockPos pos, int progress) {
 		if (progress >= 0 && progress < 10) {
@@ -118,11 +121,11 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 			
 			if (destroyblockprogress == null || destroyblockprogress.getPosition().getX() != pos.getX() || destroyblockprogress.getPosition().getY() != pos.getY() || destroyblockprogress.getPosition().getZ() != pos.getZ()) {
 				destroyblockprogress = new DestroyBlockProgress(breakerId, pos);
-                BlockBreakAnimationClientHandler.damagedBranches.put(Integer.valueOf(breakerId), destroyblockprogress);
+				BlockBreakAnimationClientHandler.damagedBranches.put(Integer.valueOf(breakerId), destroyblockprogress);
 			}
 			
 			destroyblockprogress.setPartialBlockDamage(progress);
-            destroyblockprogress.setCloudUpdateTick((int) Minecraft.getMinecraft().world.getWorldTime());
+			destroyblockprogress.setCloudUpdateTick((int) Minecraft.getMinecraft().world.getWorldTime());
 		} else {
 			BlockBreakAnimationClientHandler.damagedBranches.remove(breakerId);
 		}
@@ -149,49 +152,49 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 	}
 	
 	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, float partialTicks) {
-        double d3 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
-        double d4 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
-        double d5 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
-
-        if (mc.world.getWorldTime() % 20 == 0) {
-            this.cleanupExtraDamagedBlocks();
-        }
-        
-        if (!BlockBreakAnimationClientHandler.damagedBranches.isEmpty()) {
-            renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-            this.preRenderDamagedBlocks();
-            bufferBuilderIn.begin(7, DefaultVertexFormats.BLOCK);
-            bufferBuilderIn.setTranslation(-d3, -d4, -d5);
-            bufferBuilderIn.noColor();
-
-            for (Entry<Integer, DestroyBlockProgress> entry : BlockBreakAnimationClientHandler.damagedBranches.entrySet()) {
-            	DestroyBlockProgress destroyblockprogress = entry.getValue();
-                BlockPos pos = destroyblockprogress.getPosition();
-            	double d6 = (double) pos.getX() - d3;
-            	double d7 = (double) pos.getY() - d4;
-            	double d8 = (double) pos.getZ() - d5;
-
-        		if (d6 * d6 + d7 * d7 + d8 * d8 > 16384) {
-        			BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
-        		} else {
-        			IBlockState state = mc.world.getBlockState(pos);
-    				int k1 = destroyblockprogress.getPartialBlockDamage();
-    				TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
-    				BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
-    				if (state.getRenderType() == EnumBlockRenderType.MODEL) {
-    					state = state.getActualState(mc.world, pos);
-    					IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
-    					IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
-    					blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
-    				}
-        		}
-            }
-
-            tessellatorIn.draw();
-            bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
-            this.postRenderDamagedBlocks();
-        }
-    }
+		double posX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
+		double posY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
+		double posZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
+		
+		if (mc.world.getWorldTime() % 20 == 0) {
+			this.cleanupExtraDamagedBlocks();
+		}
+		
+		if (!BlockBreakAnimationClientHandler.damagedBranches.isEmpty()) {
+			renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			this.preRenderDamagedBlocks();
+			bufferBuilderIn.begin(7, DefaultVertexFormats.BLOCK);
+			bufferBuilderIn.setTranslation(-posX, -posY, -posZ);
+			bufferBuilderIn.noColor();
+			
+			for (Entry<Integer, DestroyBlockProgress> entry : BlockBreakAnimationClientHandler.damagedBranches.entrySet()) {
+				DestroyBlockProgress destroyblockprogress = entry.getValue();
+				BlockPos pos = destroyblockprogress.getPosition();
+				double delX = (double) pos.getX() - posX;
+				double delY = (double) pos.getY() - posY;
+				double delZ = (double) pos.getZ() - posZ;
+				
+				if (delX * delX + delY * delY + delZ * delZ > 16384) {
+					BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
+				} else {
+					IBlockState state = mc.world.getBlockState(pos);
+					int k1 = destroyblockprogress.getPartialBlockDamage();
+					TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
+					BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
+					if (state.getRenderType() == EnumBlockRenderType.MODEL) {
+						state = state.getActualState(mc.world, pos);
+						IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
+						IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
+						blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
+					}
+				}
+			}
+			
+			tessellatorIn.draw();
+			bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
+			this.postRenderDamagedBlocks();
+		}
+	}
 	
 	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, IBlockState state, IBlockAccess world, BlockPos pos) {
 		state = state.getBlock().getExtendedState(state, world, pos);
@@ -233,60 +236,60 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
 			Minecraft.getMinecraft().renderGlobal.notifyBlockUpdate(worldIn, pos, oldState, newState, flags);
 		}
-
+		
 		@Override
 		public void notifyLightSet(BlockPos pos) {
 			Minecraft.getMinecraft().renderGlobal.notifyLightSet(pos);
 		}
-
+		
 		@Override
 		public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
 			Minecraft.getMinecraft().renderGlobal.markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
 		}
-
+		
 		@Override
 		public void playSoundToAllNearExcept(EntityPlayer player, SoundEvent soundIn, SoundCategory category, double x,
 				double y, double z, float volume, float pitch) {
 			Minecraft.getMinecraft().renderGlobal.playSoundToAllNearExcept(player, soundIn, category, x, y, z, volume, pitch);
 		}
-
+		
 		@Override
 		public void playRecord(SoundEvent soundIn, BlockPos pos) {
 			Minecraft.getMinecraft().renderGlobal.playRecord(soundIn, pos);
 		}
-
+		
 		@Override
 		public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord,
 				double xSpeed, double ySpeed, double zSpeed, int... parameters) {
 			Minecraft.getMinecraft().renderGlobal.spawnParticle(particleID, ignoreRange, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
 		}
-
+		
 		@Override
 		public void spawnParticle(int id, boolean ignoreRange, boolean p_190570_3_, double x, double y, double z,
 				double xSpeed, double ySpeed, double zSpeed, int... parameters) {
 			Minecraft.getMinecraft().renderGlobal.spawnParticle(id, ignoreRange, p_190570_3_, x, y, z, xSpeed, ySpeed, zSpeed, parameters);
 		}
-
+		
 		@Override
 		public void onEntityAdded(Entity entityIn) {
 			Minecraft.getMinecraft().renderGlobal.onEntityAdded(entityIn);
 		}
-
+		
 		@Override
 		public void onEntityRemoved(Entity entityIn) {
 			Minecraft.getMinecraft().renderGlobal.onEntityRemoved(entityIn);
 		}
-
+		
 		@Override
 		public void broadcastSound(int soundID, BlockPos pos, int data) {
 			Minecraft.getMinecraft().renderGlobal.broadcastSound(soundID, pos, data);
 		}
-
+		
 		@Override
 		public void playEvent(EntityPlayer player, int type, BlockPos blockPosIn, int data) {
 			Minecraft.getMinecraft().renderGlobal.playEvent(player, type, blockPosIn, data);
 		}
-
+		
 		@Override
 		public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {
 			IBlockState state = world.getBlockState(pos);
@@ -298,5 +301,5 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		}
 		
 	}
-
+	
 }
