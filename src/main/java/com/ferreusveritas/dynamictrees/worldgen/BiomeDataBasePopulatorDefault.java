@@ -196,7 +196,7 @@ public class BiomeDataBasePopulatorDefault implements IBiomeDataBasePopulator {
 			return new StaticSpeciesSelector(new SpeciesSelection());//Not handled, no tree
 		}
 		
-		return staticOakDecision;//Just default to oak for everything else
+		return BiomeDictionary.hasType(biome, Type.COLD) ? staticSpruceDecision : staticOakDecision;//Just default to spruce for cold biomes and oak for everything else
 	}
 	
 }
