@@ -16,7 +16,7 @@ import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
-import com.ferreusveritas.dynamictrees.worldgen.DefaultBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorDefault;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenCancelEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
@@ -50,7 +50,7 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-		WorldGenRegistry.registerBiomeDataBasePopulator(new DefaultBiomeDataBasePopulator());
+		WorldGenRegistry.registerBiomeDataBasePopulator(new BiomeDataBasePopulatorDefault());
 	}
 	
 	public void postInit() {

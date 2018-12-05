@@ -21,7 +21,7 @@ import net.minecraft.world.biome.BiomePlains;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class DefaultBiomeDataBasePopulator implements IBiomeDataBasePopulator {
+public class BiomeDataBasePopulatorDefault implements IBiomeDataBasePopulator {
 
 	private static Species oak;
 	private static Species birch;

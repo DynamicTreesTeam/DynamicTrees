@@ -167,8 +167,7 @@ public class LeavesPaging {
 		try {
 			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			Gson gson = new Gson();
-			JsonElement je = gson.fromJson(reader, JsonElement.class);
+			JsonElement je = new Gson().fromJson(reader, JsonElement.class);
 			root = je.getAsJsonObject();
 		}
 		catch (IOException e) {

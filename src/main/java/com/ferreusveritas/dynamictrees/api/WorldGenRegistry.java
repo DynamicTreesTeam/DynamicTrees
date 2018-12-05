@@ -45,6 +45,8 @@ public class WorldGenRegistry {
 			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent());
 			ModConfigs.dimensionBlacklist.forEach(d -> TreeGenerator.getTreeGenerator().BlackListDimension(d));
 		}
+		
+		biomePopulators = null;//Free up the populators since they are no long used.
 	}
 	
 }
