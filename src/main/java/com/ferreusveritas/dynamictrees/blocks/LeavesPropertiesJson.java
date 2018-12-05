@@ -43,7 +43,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private int lightRequirement = 13;
 	private int smotherLeavesMax = 4;
-	private final JsonObject jsonObj;
+	private JsonObject jsonObj = null;
 	private boolean connectAnyRadius = false;
 	private int flammability = 60;// Mimic vanilla leaves
 	private int fireSpreadSpeed = 30;// Mimic vanilla leaves
@@ -106,6 +106,8 @@ public class LeavesPropertiesJson extends LeavesProperties {
 					}
 				}
 			}
+			
+			jsonObj = null;//Free up json object since it is no longer used
 		}
 		
 	}
