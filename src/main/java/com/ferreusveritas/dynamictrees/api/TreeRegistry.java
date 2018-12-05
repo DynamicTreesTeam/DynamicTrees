@@ -46,14 +46,12 @@ public class TreeRegistry {
 	 */
 	public static Species findSpeciesSloppy(String name) {
 		
-		//Exact find
 		ResourceLocation resloc = new ResourceLocation(name);
-		if(Species.REGISTRY.containsKey(resloc)) {
-			return Species.REGISTRY.getValue(resloc);
+		if("minecraft".equals(resloc.getResourceDomain())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
+			resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());//Search DynamicTrees Domain instead
 		}
-
-		//Search DynamicTrees Domain
-		resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());
+		
+		//Search specific domain first
 		if(Species.REGISTRY.containsKey(resloc)) {
 			return Species.REGISTRY.getValue(resloc);
 		}
