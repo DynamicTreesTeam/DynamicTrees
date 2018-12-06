@@ -1,9 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenCocoa;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
@@ -32,7 +33,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
-			setGrowthLogicKit(GrowthLogicKits.jungleLogic);
+			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
 			
 			envFactor(Type.COLD, 0.15f);
 			envFactor(Type.DRY,  0.20f);

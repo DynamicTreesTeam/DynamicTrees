@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.ModTileEntities;
 import com.ferreusveritas.dynamictrees.ModTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictrees.event.DropEventHandler;
 import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorDefault;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenCancelEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
@@ -38,6 +40,7 @@ public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent event) {
 		ModConfigs.preInit(event);//Naturally this comes first so we can react to settings
 		CellKits.preInit();
+		GrowthLogicKits.preInit();
 		TreeGenerator.preInit();//Create the generator
 		
 		ModTileEntities.preInit();
@@ -61,6 +64,8 @@ public class CommonProxy {
 	public void cleanUp() {
 		LeavesPropertiesJson.cleanUp();
 		LeavesPaging.cleanUp();
+		TreeRegistry.cleanupCellKit();
+		TreeRegistry.cleanupGrowthLogicKit();
 	}
 	
 	public void registerModels() {}

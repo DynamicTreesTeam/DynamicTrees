@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
+import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -24,6 +25,7 @@ public class TreeRegistry {
 
 	public static final IDropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
 	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>(); 
+	private static HashMap<ResourceLocation, IGrowthLogicKit> growthLogicKitRegistry = new HashMap<>();
 	
 	//////////////////////////////
 	// SPECIES REGISTRY
@@ -134,6 +136,34 @@ public class TreeRegistry {
 			kitLocation = new ResourceLocation(ModConstants.MODID, kitLocation.getResourcePath());//Default to "dynamictrees" instead
 		}
 		return findCellKit(kitLocation);
+	}
+	
+	public static void cleanupCellKit() {
+		cellKitRegistry = null;
+	}
+	
+	//////////////////////////////
+	// GROWTHLOGICKIT HANDLING
+	//////////////////////////////
+	
+	public static IGrowthLogicKit registerGrowthLogicKit(ResourceLocation name, IGrowthLogicKit kit) {
+		return growthLogicKitRegistry.computeIfAbsent(name, k -> kit);
+	}
+	
+	public static IGrowthLogicKit findGrowthLogicKit(ResourceLocation name) {
+		return growthLogicKitRegistry.get(name);
+	}
+	
+	public static IGrowthLogicKit findGrowthLogicKit(String name) {
+		ResourceLocation kitLocation = new ResourceLocation(name);
+		if("minecraft".equals(kitLocation.getResourceDomain())) {//Minecraft doesn't register leaves properties
+			kitLocation = new ResourceLocation(ModConstants.MODID, kitLocation.getResourcePath());//Default to "dynamictrees" instead
+		}
+		return findGrowthLogicKit(kitLocation);
+	}
+	
+	public static void cleanupGrowthLogicKit() {
+		growthLogicKitRegistry = null;
 	}
 	
 }

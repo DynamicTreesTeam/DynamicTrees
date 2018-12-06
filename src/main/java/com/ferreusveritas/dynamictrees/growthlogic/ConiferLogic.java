@@ -11,13 +11,41 @@ import net.minecraft.world.World;
 public class ConiferLogic implements IGrowthLogicKit {
 	
 	private final float energyDivisor;
+	private float horizontalLimiter = 16.0f;
+	private int heightVariation = 5;
 	
 	public ConiferLogic() {
 		this(3.0f);//Default for normal spruce
 	}
 	
+	/**
+	 * @param energyDivisor The remaining energy a branch has will be determined by this divisor.  Affects the conical slope of the tree shape.
+	 */
 	public ConiferLogic(float energyDivisor) {
 		this.energyDivisor = energyDivisor;
+	}
+	
+	/**
+	 * Sets the maximum amount of energy a branch has left when leaving the trunk.  Helps to make a tree a more cylindrical shape.
+	 * 
+	 * @param energyLimiter
+	 * @return ConiferLogic for chaining
+	 */
+	public ConiferLogic setHorizontalLimiter(float energyLimiter) {
+		this.horizontalLimiter = energyLimiter;
+		return this;
+	}
+	
+	/**
+	 * Sets the amount of psuedorandom height variation added to a tree.  Helpful to prevent all trees
+	 * from turning out the same height.
+	 * 
+	 * @param heightVariation
+	 * @return ConiferLogic for chaining
+	 */
+	public ConiferLogic setHeightVariation(int heightVariation) {
+		this.heightVariation = heightVariation;
+		return this;
 	}
 	
 	@Override
@@ -40,6 +68,7 @@ public class ConiferLogic implements IGrowthLogicKit {
 	public EnumFacing newDirectionSelected(Species species, EnumFacing newDir, GrowSignal signal) {
 		if(signal.isInTrunk() && newDir != EnumFacing.UP){//Turned out of trunk
 			signal.energy /= energyDivisor;
+			if (signal.energy > horizontalLimiter) signal.energy = horizontalLimiter;
 		}
 		return newDir;
 	}
@@ -52,7 +81,7 @@ public class ConiferLogic implements IGrowthLogicKit {
 		long day = world.getTotalWorldTime() / 24000L;
 		int month = (int)day / 30;//Change the hashs every in-game month
 		
-		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 5);//Vary the height energy by a psuedorandom hash function
+		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
 	}
 	
 }

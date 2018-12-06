@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.ModTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.ConiferLogic;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenConiferTopper;
@@ -29,7 +30,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
-			setGrowthLogicKit(GrowthLogicKits.spruceLogic);
+			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.CONIFER));
 			
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.25f);

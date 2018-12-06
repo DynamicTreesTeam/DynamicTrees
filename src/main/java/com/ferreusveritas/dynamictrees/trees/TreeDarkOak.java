@@ -6,9 +6,10 @@ import java.util.function.BiFunction;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFlareBottom;
@@ -42,7 +43,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
-			setGrowthLogicKit(GrowthLogicKits.darkOakLogic);
+			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.DARKOAK));
 			
 			setSoilLongevity(14);//Grows for a long long time
 			
