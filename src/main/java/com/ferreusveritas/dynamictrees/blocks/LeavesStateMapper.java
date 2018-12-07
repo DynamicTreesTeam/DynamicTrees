@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWithState;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
@@ -68,7 +69,8 @@ public class LeavesStateMapper implements IStateMapper {
 				IBlockState primState = properties.getPrimitiveLeaves();
 				Map<IBlockState, ModelResourceLocation> variantMap = mapper.getVariants(primState.getBlock());
 				//ModelResourceLocation mrl = variantMap.get(primState);
-				ModelResourceLocation mrl = new ModelResourceLocation("xxxxxx");
+				//ModelResourceLocation mrl = new ModelResourceLocation("xxxxxx");
+				ModelResourceLocation mrl = new ModelResourceLocationWithState("xxxxxx");
 				
 				System.out.println("Primitive: " + primState);
 				

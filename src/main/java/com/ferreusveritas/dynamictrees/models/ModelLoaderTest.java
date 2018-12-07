@@ -22,6 +22,12 @@ public class ModelLoaderTest implements ICustomModelLoader {
 	@Override
 	public boolean accepts(ResourceLocation modelLocation) {
 		
+		if(modelLocation instanceof ModelResourceLocationWithState) {
+			System.out.println("@@@@@@@@@@@@@@@@@");
+			ModelResourceLocationWithState derp = (ModelResourceLocationWithState) modelLocation;
+			System.out.println("Payload: " + derp.payload);
+		}
+		
 		if(modelLocation.getResourcePath().equals("xxxxxx")) {
 			System.out.println("Found: " + modelLocation);
 			return true;
