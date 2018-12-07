@@ -17,7 +17,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
-import com.ferreusveritas.dynamictrees.blocks.LeavesStateMapper;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
@@ -62,6 +61,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(event);
+		registerJsonColorMultipliers();
 		registerClientEventHandlers();
 		registerEntityRenderers();
 	}
@@ -136,13 +136,7 @@ public class ClientProxy extends CommonProxy {
 		//Special seed for apple
 		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
-		//Register GrowingLeavesBlocks Meshers and Colorizers
-		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves)); //<-- Used to register item models for leaves
-		
-		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
-		
-		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new LeavesStateMapper()));
-		
+		//Set state mappers for all blocks created with the LeavesPaging object
 		LeavesPaging.setStateMappers();
 		
 		//Register the file loader for Branch models
@@ -231,6 +225,9 @@ public class ClientProxy extends CommonProxy {
 			});
 		}
 		
+	}
+	
+	public void registerJsonColorMultipliers() {
 		//Register programmable custom block color providers for LeavesPropertiesJson
 		BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> ColorizerFoliage.getFoliageColorBirch() );
 		BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> ColorizerFoliage.getFoliageColorPine() );

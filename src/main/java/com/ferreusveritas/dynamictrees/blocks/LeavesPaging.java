@@ -180,7 +180,6 @@ public class LeavesPaging {
 		return build(root);
 	}
 	
-
 	@SideOnly(Side.CLIENT)
 	public static void setStateMappers() {
 		for(String modId : modLeavesArray.keySet()) {

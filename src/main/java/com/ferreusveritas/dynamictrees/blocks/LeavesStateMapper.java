@@ -19,15 +19,33 @@ public class LeavesStateMapper implements IStateMapper {
 
 	private static BlockStateMapper mapper;
 	
+	/**
+	 * Although the modelManager is normally accessible through a legitimate getter it
+	 * is not assigned to the object it is gotten from when the putStateModelLocations
+	 * is run.
+	 */
 	private static BlockStateMapper getMapper() {
 		if(mapper == null) {
+			
+			Field modelManagerField = null;
+			
 			try {
-				Field modelManagerField = Minecraft.class.getDeclaredField("modelManager");
+				modelManagerField = Minecraft.class.getDeclaredField("field_175617_aL");
+			}
+			catch (Exception e) { }
+			
+			if(modelManagerField == null) {
+				try {
+					modelManagerField = Minecraft.class.getDeclaredField("modelManager");
+				} catch (Exception e) { }
+			}
+			
+			try {
 				modelManagerField.setAccessible(true);
 				ModelManager mm = (ModelManager) modelManagerField.get(Minecraft.getMinecraft());
 				mapper = mm.getBlockModelShapes().getBlockStateMapper();
 			}
-			catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}

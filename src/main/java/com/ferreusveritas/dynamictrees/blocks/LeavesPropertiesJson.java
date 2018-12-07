@@ -195,7 +195,6 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		for(LeavesPropertiesJson res: resolutionList) {
 			res.resolve();
 		}
-		resolutionList.clear();
 	}
 	
 	public static void cleanUp() {
