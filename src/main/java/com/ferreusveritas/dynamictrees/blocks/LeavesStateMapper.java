@@ -67,7 +67,10 @@ public class LeavesStateMapper implements IStateMapper {
 				ILeavesProperties properties = leaves.getProperties(state);
 				IBlockState primState = properties.getPrimitiveLeaves();
 				Map<IBlockState, ModelResourceLocation> variantMap = mapper.getVariants(primState.getBlock());
-				ModelResourceLocation mrl = variantMap.get(primState);
+				//ModelResourceLocation mrl = variantMap.get(primState);
+				ModelResourceLocation mrl = new ModelResourceLocation("xxxxxx");
+				
+				System.out.println("Primitive: " + primState);
 				
 				if(mrl != null) {
 					for(int iDecay = 0; iDecay < 2; iDecay++) {
