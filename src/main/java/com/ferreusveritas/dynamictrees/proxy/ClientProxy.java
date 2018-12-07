@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.blocks.LeavesStateMapper;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
@@ -33,7 +34,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -88,6 +88,9 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void registerModels() {
 		
+		//Resolve all leaves properties so the LeavesStateMapper can function properly
+		LeavesPropertiesJson.resolveAll();
+		
 		//BLOCKS
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirt, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
@@ -134,8 +137,13 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
 		//Register GrowingLeavesBlocks Meshers and Colorizers
-		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves));
-		LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
+		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelHelper.regModel(leaves)); //<-- Used to register item models for leaves
+		
+		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new StateMap.Builder().ignore(BlockLeaves.DECAYABLE).build()));
+		
+		//LeavesPaging.getLeavesMapForModId(ModConstants.MODID).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new LeavesStateMapper()));
+		
+		LeavesPaging.setStateMappers();
 		
 		//Register the file loader for Branch models
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockBranchBasic());

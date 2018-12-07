@@ -17,11 +17,11 @@ public class ModelBakeEventListener {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
-				
+		
 		Block[] rootyBlocks = new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake};
 		
 		for(Block block: rootyBlocks) {
-			Object rootsObject = event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
+			IBakedModel rootsObject = event.getModelRegistry().getObject(new ModelResourceLocation(block.getRegistryName(), "normal"));
 			if (rootsObject instanceof IBakedModel) {
 				IBakedModel rootsModel = (IBakedModel) rootsObject;
 				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsModel);
@@ -29,7 +29,7 @@ public class ModelBakeEventListener {
 			}
 		}
 		
-		Object flowerPotObject = event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
+		IBakedModel flowerPotObject = event.getModelRegistry().getObject(new ModelResourceLocation(ModBlocks.blockBonsaiPot.getRegistryName(), "normal"));
 		if (flowerPotObject instanceof IBakedModel) {
 			IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
 			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotModel);

@@ -53,12 +53,12 @@ public class CommonProxy {
 	}
 	
 	public void init() {
+		LeavesPropertiesJson.resolveAll();
 		WorldGenRegistry.registerBiomeDataBasePopulator(new BiomeDataBasePopulatorDefault());
 	}
 	
 	public void postInit() {
 		WorldGenRegistry.populateDataBase();
-		LeavesPropertiesJson.postInit();
 	}
 	
 	public void cleanUp() {

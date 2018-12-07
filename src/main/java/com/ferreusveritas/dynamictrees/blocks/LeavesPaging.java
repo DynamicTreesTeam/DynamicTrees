@@ -19,8 +19,11 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * This class provides a mechanism for mapping leaves sub blocks to
@@ -175,6 +178,14 @@ public class LeavesPaging {
 		}
 		
 		return build(root);
+	}
+	
+
+	@SideOnly(Side.CLIENT)
+	public static void setStateMappers() {
+		for(String modId : modLeavesArray.keySet()) {
+			LeavesPaging.getLeavesMapForModId(modId).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new LeavesStateMapper()));
+		}
 	}
 	
 	/**
