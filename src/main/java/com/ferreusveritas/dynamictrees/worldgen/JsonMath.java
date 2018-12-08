@@ -9,10 +9,14 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.biome.Biome;
+
 
 public class JsonMath {
 	
 	public MathOperator rootOp;
+	private Biome biome;
 	
 	public JsonMath(JsonElement mathElement) {
 		
@@ -26,6 +30,11 @@ public class JsonMath {
 				}
 			}
 		}
+	}
+	
+	public JsonMath setBiome(Biome biome) {
+		this.biome = biome;
+		return this;
 	}
 	
 	private MathOperator processElement(String key, JsonElement value) {
@@ -73,6 +82,8 @@ public class JsonMath {
 		switch(op) {
 			case NOISE: return new Noise();
 			case RAND: return new Rand();
+			case TREES: return new Trees(biome);
+			case RADIUS: return new Radius();
 			case ADD: return new Adder(paramArray);
 			case SUB: return new Subtractor(paramArray);
 			case MUL: return new Multiplier(paramArray);
@@ -81,6 +92,7 @@ public class JsonMath {
 			case MIN: return new Minimum(paramArray);
 			case IFGT: return new IfGreaterThan(paramArray);
 			case SPECIES: return speciesArg != Species.NULLSPECIES ? new IfSpecies(speciesArg, paramArray) : null;
+			case DEBUG: return new Debug(paramArray);
 			default: return null;
 		}
 		
@@ -152,6 +164,35 @@ public class JsonMath {
 		}
 		
 	}
+	
+	public static class Trees implements MathOperator {
+		
+		private final Biome biome;
+		
+		public Trees(Biome biome) {
+			this.biome = biome;
+		}
+
+		@Override
+		public float apply(MathContext mc) {
+			return MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, -1.0f, 1.0f);//Gives -1.0 to 1.0
+		}
+		
+	}
+	
+	public static class Radius implements MathOperator {
+
+		@Override
+		public float apply(MathContext mc) {
+			if(mc instanceof MathSpeciesContext) {
+				return ((MathSpeciesContext)mc).radius;
+			}
+
+			return 0;
+		}
+		
+	}
+
 	
 	public static class Adder implements MathOperator {
 		
@@ -377,10 +418,32 @@ public class JsonMath {
 		
 	}
 	
+	public static class Debug implements MathOperator {
+
+		private final MathOperator[] functions;
+		
+		public Debug(MathOperator[] functionArray) {
+			this.functions = functionArray;
+		}
+		
+		@Override
+		public float apply(MathContext mc) {
+			if(functions.length >= 1) {
+				float val = functions[0].apply(mc);
+				System.out.println("Json Debug Value: " + val);
+				return val;
+			}
+			return 0;
+		}
+		
+	}
+	
 	public enum EnumMathFunction {
 		CONST,
 		NOISE,
 		RAND,
+		TREES,
+		RADIUS,
 		ADD,
 		SUB,
 		MUL,
@@ -389,7 +452,8 @@ public class JsonMath {
 		MAX,
 		MIN,
 		IFGT,
-		SPECIES;
+		SPECIES,
+		DEBUG;
 		
 		public final String name;
 		

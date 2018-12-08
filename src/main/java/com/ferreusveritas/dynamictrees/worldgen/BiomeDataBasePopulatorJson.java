@@ -20,7 +20,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.StaticSpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -119,7 +118,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 					if(element.isJsonObject()) {
 						JsonObject object = element.getAsJsonObject();
 						Operation operation = readMethod(object);
-						IDensitySelector densitySelector = readDensitySelector(object);
+						IDensitySelector densitySelector = readDensitySelector(object, biome);
 						if(densitySelector != null) {
 							dbase.setDensitySelector(biome, densitySelector, operation);
 						}
@@ -135,6 +134,38 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 						}
 					}
 				}
+				else if("cancelvanilla".equals(entryName)) {
+					if(element.isJsonPrimitive()) {
+						boolean cancel = element.getAsBoolean();
+						dbase.setCancelVanillaTreeGen(biome, cancel);
+					}
+				}
+				else if("multipass".equals(entryName)) {
+					if(element.isJsonPrimitive()) {
+						boolean multipass = element.getAsBoolean();
+						
+						if(multipass) {
+							//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
+							//by filling in gaps in the generation with smaller trees 
+							dbase.setMultipass(biome, pass -> {
+								switch(pass) {
+									case 0: return 0;//Zero means to run as normal
+									case 1: return 5;//Return only radius 5 on pass 1
+									case 2: return 3;//Return only radius 3 on pass 2
+									default: return -1;//A negative number means to terminate
+								}
+							});
+						}
+					}
+				}
+				else if("subterranean".equals(entryName)) {
+					if(element.isJsonPrimitive()) {
+						boolean subterranean = element.getAsBoolean();
+						dbase.setIsSubterranean(biome, subterranean);
+					}
+				}
+				
+				
 			}
 		}
 	}
@@ -235,7 +266,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		return null;
 	}
 	
-	private IDensitySelector readDensitySelector(JsonObject mainObject) {
+	private IDensitySelector readDensitySelector(JsonObject mainObject, Biome biome) {
 		
 		JsonElement scaleElement = mainObject.get("scale");
 		if(scaleElement != null && scaleElement.isJsonArray()) {
@@ -261,7 +292,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		
 		JsonElement mathElement = mainObject.get("math");
 		if(mathElement != null) {
-			JsonMath m = new JsonMath(mathElement);
+			JsonMath m = new JsonMath(mathElement).setBiome(biome);
 			return (rnd, n) -> m.apply(rnd, (float) n);
 		}
 		

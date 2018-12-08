@@ -1,0 +1,116 @@
+[
+	{
+		"__comment" : "Start by making any vanilla minecraft biome default to oak",
+		"biome": "minecraft:.*",
+		"cancelvanilla": true,
+		"species" : { "method" : "replace", "static" : "oak" },
+		"density" : { "method" : "replace", "math" : { "mul": [ "trees", "noise" ] } },
+		"chance" : {
+			"__comment": "Start dropping tree spawn opportunities when the radius gets bigger than 3",
+			"method" : "replace", "math" : { "ifgt" : [ "radius", 3, { "div": [ 2.0, "radius" ] }, 1.0 ] } }
+	},
+	{
+		"__comment" : "Rivers have no chance of having trees",
+		"type": "river",
+		"chance": { "method": "replace", "static": 0 }
+	},
+	{
+		"__comment" : "Default for a Forest which generates a Birch Tree 1/5 of the time.",
+		"type": "forest",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "random" : { "oak" : 4, "birch" : 1 } }, 
+		"chance": { "method": "replace", "static": 1 }
+	},
+	{
+		"__comment" : "Anything cold will have spruce trees",
+		"type": "cold",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "spruce" } 
+	},
+	{
+		"__comment" : "Any wasteland will be treeless",
+		"type": "wasteland",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "..." }
+	},
+	{
+		"__comment" : "This applies to deserts",
+		"type": "sandy",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "cactus" },
+		"density" : { "method" : "replace", "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
+		"chance": { "method": "replace", "static": 0.075 }
+	},
+	{
+		"__comment" : "Generates an alternative oak style in swamps",
+		"type": "swamp",
+		"biome": "minecraft:.*",		
+		"species" : { "method" : "replace", "static" : "oakswamp" },
+		"chance": { "method": "replace", "static": 0.75 }
+	},
+	{
+		"type": "savanna",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "acacia" }
+	},
+	{
+		"type": "jungle",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "jungle" }
+	},
+	{
+		"__comment" : "Mushroom Islands",
+		"type": "mushroom",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "random" : { "mushroomred" : 4, "mushroombrn" : 3 } },
+		"density" : { "method" : "replace", "math": { "add" : [ { "mul" : [ "noise", 0.25 ] }, 0.25 ] } },
+		"chance": { "method": "replace", "static": 0.66 }
+	},
+	{
+		"type": "coniferous",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "spruce" }, 
+		"chance": { "method": "replace", "math": { "ifgt" : [ "radius", 6, 0.5, 1.0 ] } }
+	},
+	{
+		"__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
+		"type": "spooky",
+		"biome": "minecraft:.*",
+		"species" : { "method" : "replace", "static" : "darkoak" },
+		"density" : { "method" : "replace", "math": { "div" : [ "noise", 3.0 ] } },
+		"multipass" : true
+	},
+	{
+		"biome": "minecraft:.*mesa.*",
+		"chance": { "method": "replace", "static": 0 }
+	},
+	{
+		"biome": "minecraft:.*beach.*",
+		"chance": { "method": "replace", "static": 0 }
+	},
+	{
+		"__comment" : "Mesa Rock(Plateau) has a chance of generating oak.  But oaks don't grow in clay so occurence is rare",
+		"biome": "minecraft:mesa_rock",
+		"species" : { "method" : "replace", "static" : "oak" } 
+	},
+	{
+		"__comment": "Any biome with 'birch' in the name is 100% birch",
+		"biome": "minecraft:.*birch.*",
+		"species" : { "method" : "replace", "static" : "birch" } 
+	},
+	{
+		"__comment": "1/25 chance to spawn apple trees in any minecraft biome that ends in 'plains'",
+		"biome": "minecraft:.*plains",
+		"species" : { "method" : "replace", "random" : { "oak" : 24, "apple" : 1 } }
+	},
+	{
+		"__comment": "All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time",
+		"biome": "minecraft:.*extreme_hills.*",
+		"species" : { "method" : "replace", "random" : { "spruce" : 2, "oak" : 1 } }
+	},
+	{
+		"__comment": "Flag nether as being subterranean even though we don't generate there",
+		"type": "nether",
+		"subterranean": true
+	}
+]
