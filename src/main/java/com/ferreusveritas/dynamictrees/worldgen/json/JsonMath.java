@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.worldgen;
+package com.ferreusveritas.dynamictrees.worldgen.json;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
@@ -18,7 +18,9 @@ public class JsonMath {
 	public MathOperator rootOp;
 	private Biome biome;
 	
-	public JsonMath(JsonElement mathElement) {
+	public JsonMath(JsonElement mathElement, Biome biome) {
+		
+		this.biome = biome;
 		
 		if(mathElement.isJsonObject()) {
 			JsonObject mathObject = mathElement.getAsJsonObject();
@@ -32,9 +34,21 @@ public class JsonMath {
 		}
 	}
 	
-	public JsonMath setBiome(Biome biome) {
-		this.biome = biome;
-		return this;
+	private MathOperator getVariable(String name) {
+		if(EnumMathFunction.NOISE.name.equals(name)) {
+			return new Noise();
+		} else 
+		if(EnumMathFunction.RAND.name.equals(name)) {
+			return new Rand();
+		}
+		if(EnumMathFunction.TREES.name.equals(name)) {
+			return new Trees(biome);
+		} else 
+		if(EnumMathFunction.RADIUS.name.equals(name)) {
+			return new Radius();
+		}
+		
+		return null;
 	}
 	
 	private MathOperator processElement(String key, JsonElement value) {
@@ -58,13 +72,11 @@ public class JsonMath {
 					} else 
 					if(parameter.getAsJsonPrimitive().isString()) {
 						String name = parameter.getAsString();
-						if(EnumMathFunction.NOISE.name.equals(name)) {
-							m = new Noise();
-						} else 
-						if(EnumMathFunction.RAND.name.equals(name)) {
-							m = new Rand();
+						MathOperator var = getVariable(name);
+						if(var != null) {
+							m = var;
 						}
-						if(TreeRegistry.findSpeciesSloppy(name) != Species.NULLSPECIES) {
+						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULLSPECIES) {
 							speciesArg = TreeRegistry.findSpeciesSloppy(name);
 						}
 					}

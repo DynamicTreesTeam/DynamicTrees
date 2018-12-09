@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDataBaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
+import com.ferreusveritas.dynamictrees.worldgen.MultiDimensionalPopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 
 public class WorldGenRegistry {
@@ -41,12 +44,18 @@ public class WorldGenRegistry {
 	
 	public static void populateDataBase() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			populateAsDefaultDataBase(TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase());
-			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent());
+			BiomeDataBase database = populateAsDefaultDataBase(TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase());
+			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database));
+			
+			//Populate custom dimensions if available
+			new MultiDimensionalPopulator(new ResourceLocation(ModConstants.MODID, "worldgen/dimensions.json"));
+			
+			//Blacklist certain dimensions according to the base config
 			ModConfigs.dimensionBlacklist.forEach(d -> TreeGenerator.getTreeGenerator().BlackListDimension(d));
 		}
 		
 		biomePopulators = null;//Free up the populators since they are no long used.
 	}
+	
 	
 }

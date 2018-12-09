@@ -6,21 +6,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IChanceSelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IDensitySelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ISpeciesSelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.RandomSpeciesSelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.StaticSpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
+import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
+import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
+import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierChance;
+import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierDensity;
+import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierSpecies;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -34,8 +34,103 @@ import net.minecraftforge.common.BiomeDictionary;
 
 public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 
-	private final String DEFAULT = "...";
+	public static final String DEFAULT = "...";
+	
+	public static final String SPECIES = "species";
+	public static final String DENSITY = "density";
+	public static final String CHANCE = "chance";
+
+	public static final String CANCELVANILLA = "cancelvanilla";
+	public static final String MULTIPASS = "multipass";
+	public static final String SUBTERRANEAN = "subterranean";
+	
+	public static final String SELECT = "select";
+	public static final String APPLY = "apply";
+	public static final String NAME = "name";
+	public static final String TYPE = "type";
+	
 	private JsonElement jsonElement;
+	
+	private static Map<String, IJsonBiomeSelector> jsonBiomeSelectorMap = new HashMap<>();
+	private static Map<String, IJsonBiomeApplier> jsonBiomeApplierMap = new HashMap<>(); 
+	
+	static {
+		
+		jsonBiomeApplierMap.put(SPECIES, new JsonBiomePropertyApplierSpecies());
+		
+		jsonBiomeApplierMap.put(DENSITY, new JsonBiomePropertyApplierDensity());
+
+		jsonBiomeApplierMap.put(CHANCE, new JsonBiomePropertyApplierChance());
+		
+		jsonBiomeApplierMap.put(CANCELVANILLA, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean cancel = element.getAsBoolean();
+				dbase.setCancelVanillaTreeGen(biome, cancel);
+			}
+		});
+		
+		jsonBiomeApplierMap.put(MULTIPASS, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean multipass = element.getAsBoolean();
+				
+				if(multipass) {
+					//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
+					//by filling in gaps in the generation with smaller trees 
+					dbase.setMultipass(biome, pass -> {
+						switch(pass) {
+							case 0: return 0;//Zero means to run as normal
+							case 1: return 5;//Return only radius 5 on pass 1
+							case 2: return 3;//Return only radius 3 on pass 2
+							default: return -1;//A negative number means to terminate
+						}
+					});
+				}
+			}
+		});
+		
+		jsonBiomeApplierMap.put(SUBTERRANEAN,  (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean subterranean = element.getAsBoolean();
+				dbase.setIsSubterranean(biome, subterranean);
+			}
+		});
+		
+		
+		
+		jsonBiomeSelectorMap.put(NAME, jsonElement -> {
+			if(jsonElement != null && jsonElement.isJsonPrimitive()) {
+				JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
+				if(primitive.isString()) {
+					String biomeMatch = primitive.getAsString();
+					return b-> b.getRegistryName().toString().matches(biomeMatch);
+				}
+			}
+			
+			return b -> false;
+		});
+		
+		jsonBiomeSelectorMap.put(TYPE, jsonElement -> {
+			if(jsonElement != null) {
+				if (jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isString()) {
+					String typeMatch = jsonElement.getAsString();
+					List<BiomeDictionary.Type> types = Arrays.asList(typeMatch.split(",")).stream().map(BiomeDictionary.Type::getType).collect(Collectors.toList());
+					return b -> biomeHasTypes(b, types);
+				} else 
+				if (jsonElement.isJsonArray()) {
+					List<BiomeDictionary.Type> types = new ArrayList<>();
+					for(JsonElement element : jsonElement.getAsJsonArray()) {
+						if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+							types.add(BiomeDictionary.Type.getType(element.getAsString()));
+						}
+					}
+					return b -> biomeHasTypes(b, types);
+				}
+			}
+						
+			return b -> false;
+		});
+		
+	}
 	
 	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
 		try {
@@ -68,236 +163,97 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		return types.stream().allMatch(t -> BiomeDictionary.hasType(biome, t));
 	}
 	
+	private class JsonBiomeSelectorData {
+		final IJsonBiomeSelector selector;
+		final JsonElement elementData;
+		
+		JsonBiomeSelectorData(IJsonBiomeSelector selector, JsonElement elementData) {
+			this.selector = selector;
+			this.elementData = elementData;
+		}
+		
+		Predicate<Biome> getFilter() {
+			return this.selector.getFilter(elementData);
+		}
+	}
+
+	private class JsonBiomeApplierData {
+		IJsonBiomeApplier applier;
+		JsonElement elementData;
+		
+		JsonBiomeApplierData(IJsonBiomeApplier applier, JsonElement elementData) {
+			this.applier = applier;
+			this.elementData = elementData;
+		}
+		
+		void apply(BiomeDataBase dbase, Biome biome) {
+			this.applier.apply(dbase, elementData, biome);
+		}
+	}
+	
+	public static boolean isComment(String s) {
+		return s.startsWith("__");//Allow for comments.  Comments are anything starting with "__"
+	}
+	
 	private void readSection(JsonObject section, BiomeDataBase dbase) {
-
-		List<Biome> biomeList = Lists.newArrayList(Biome.REGISTRY);
 		
-		JsonElement biomeElement = section.get("biome");
-		if(biomeElement != null && biomeElement.isJsonPrimitive()) {
-			JsonPrimitive primitive = biomeElement.getAsJsonPrimitive();
-			if(primitive.isString()) {
-				String biomeMatch = primitive.getAsString();
-				biomeList = biomeList.stream().filter(b -> b.getRegistryName().toString().matches(biomeMatch)).collect(Collectors.toList());
-			}
-		}
-
-		JsonElement typeElement = section.get("type");
-		if(typeElement != null) {
-			if (typeElement.isJsonPrimitive() && typeElement.getAsJsonPrimitive().isString()) {
-				String typeMatch = typeElement.getAsString();
-				List<BiomeDictionary.Type> types = Arrays.asList(typeMatch.split(",")).stream().map(BiomeDictionary.Type::getType).collect(Collectors.toList());
-				biomeList = biomeList.stream().filter(b -> biomeHasTypes(b, types)).collect(Collectors.toList());
-			} else 
-			if (typeElement.isJsonArray()) {
-				List<BiomeDictionary.Type> types = new ArrayList<>();
-				for(JsonElement element : typeElement.getAsJsonArray()) {
-					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-						types.add(BiomeDictionary.Type.getType(element.getAsString()));
-					}
-				}
-				biomeList = biomeList.stream().filter(b -> biomeHasTypes(b, types)).collect(Collectors.toList());
-			}
-		}
+		List<JsonBiomeSelectorData> selectors = new LinkedList<>();
+		List<JsonBiomeApplierData> appliers = new LinkedList<>();
 		
-		for(Biome biome: biomeList) {
-			for(Entry<String, JsonElement> entry : section.entrySet()) {
-				String entryName = entry.getKey();
-				JsonElement element = entry.getValue();
-				
-				if("species".equals(entryName)) {
-					if(element.isJsonObject()) {
-						JsonObject object = element.getAsJsonObject();
-						Operation operation = readMethod(object);
-						ISpeciesSelector speciesSelector = readSpeciesSelector(object);
-						if(speciesSelector != null) {
-							dbase.setSpeciesSelector(biome, speciesSelector, operation);
-						}
-					}
-				}
-				else if("density".equals(entryName)) {
-					if(element.isJsonObject()) {
-						JsonObject object = element.getAsJsonObject();
-						Operation operation = readMethod(object);
-						IDensitySelector densitySelector = readDensitySelector(object, biome);
-						if(densitySelector != null) {
-							dbase.setDensitySelector(biome, densitySelector, operation);
-						}
-					}
-				}
-				else if("chance".equals(entryName)) {
-					if(element.isJsonObject()) {
-						JsonObject object = element.getAsJsonObject();
-						Operation operation = readMethod(object);
-						IChanceSelector chanceSelector = readChanceSelector(object);
-						if(chanceSelector != null) {
-							dbase.setChanceSelector(biome, chanceSelector, operation);
-						}
-					}
-				}
-				else if("cancelvanilla".equals(entryName)) {
-					if(element.isJsonPrimitive()) {
-						boolean cancel = element.getAsBoolean();
-						dbase.setCancelVanillaTreeGen(biome, cancel);
-					}
-				}
-				else if("multipass".equals(entryName)) {
-					if(element.isJsonPrimitive()) {
-						boolean multipass = element.getAsBoolean();
-						
-						if(multipass) {
-							//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
-							//by filling in gaps in the generation with smaller trees 
-							dbase.setMultipass(biome, pass -> {
-								switch(pass) {
-									case 0: return 0;//Zero means to run as normal
-									case 1: return 5;//Return only radius 5 on pass 1
-									case 2: return 3;//Return only radius 3 on pass 2
-									default: return -1;//A negative number means to terminate
-								}
-							});
-						}
-					}
-				}
-				else if("subterranean".equals(entryName)) {
-					if(element.isJsonPrimitive()) {
-						boolean subterranean = element.getAsBoolean();
-						dbase.setIsSubterranean(biome, subterranean);
-					}
-				}
-				
-				
-			}
-		}
-	}
-	
-
-
-	private Operation readMethod(JsonObject object) {
-		JsonElement method = object.get("method");
-		if(method.isJsonPrimitive() && method.getAsJsonPrimitive().isString()) {
-			String methodName = method.getAsJsonPrimitive().getAsString();
+		for(Entry<String, JsonElement> entry : section.entrySet()) {
 			
-			if("replace".equals(methodName)) {
-				return Operation.REPLACE;
-			}
-			if("before".equals(methodName)) {
-				return Operation.SPLICE_BEFORE;
-			}
-			if("after".equals(methodName)) {
-				return Operation.SPLICE_AFTER;
-			}
-		}
-		
-		return Operation.REPLACE;
-	}
-	
-	private ISpeciesSelector readSpeciesSelector(JsonObject mainObject) {
-		
-		JsonElement randomElement = mainObject.get("random");
-		if(randomElement != null && randomElement.isJsonObject()) {
-			RandomSpeciesSelector rand = new RandomSpeciesSelector();
-			for(Entry<String, JsonElement> entry : randomElement.getAsJsonObject().entrySet()) {
-				String speciesName = entry.getKey();
-				JsonElement speciesElement = entry.getValue();
-				int weight = 0;
-				if(speciesElement.isJsonPrimitive() && speciesElement.getAsJsonPrimitive().isNumber()) {
-					weight = speciesElement.getAsJsonPrimitive().getAsInt();
-					if(weight > 0) {
-						if(DEFAULT.equals(speciesName)) {
-							rand.add(weight);
-						} else {
-							Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-							if(species != Species.NULLSPECIES) {
-								rand.add(species, weight);
+			String key = entry.getKey();
+			JsonElement element = entry.getValue();
+			
+			if(!isComment(key)) {
+				if(SELECT.equals(key)) {
+					if(element.isJsonObject()) {
+						for(Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
+							String selectorName = selectElement.getKey();
+							if(!isComment(selectorName)) {
+								IJsonBiomeSelector selector = jsonBiomeSelectorMap.get(selectorName);
+								if(selector != null) {
+									selectors.add(new JsonBiomeSelectorData(selector, selectElement.getValue()));
+								} else {
+									System.err.println("Json Error: Undefined selector property \"" + selectorName + "\"");
+								}
 							}
 						}
 					}
 				}
+				else 
+				if(APPLY.equals(key)) {
+					if(element.isJsonObject()) {
+						for(Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
+							String applierName = selectElement.getKey();
+							if(!isComment(applierName)) {
+								IJsonBiomeApplier applier = jsonBiomeApplierMap.get(applierName);
+								if(applier != null) {
+									appliers.add(new JsonBiomeApplierData(applier, selectElement.getValue()));
+								} else {
+									System.err.println("Json Error: Undefined applier property \"" + applierName + "\"");
+								}
+							}
+						}
+					}
+				}
+				else {
+					System.err.println("Json Error: Undefined operation \"" + key + "\"");
+				}
 			}
 			
-			if(rand.getSize() > 0) {
-				return rand;
-			}
 		}
 		
-		JsonElement staticElement = mainObject.get("static");
-		if(staticElement != null && staticElement.isJsonPrimitive() && staticElement.getAsJsonPrimitive().isString()) {
-			String speciesName = staticElement.getAsJsonPrimitive().getAsString();
-			if(DEFAULT.equals(speciesName)) {
-				return new StaticSpeciesSelector();
-			}
-			Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-			if(species != Species.NULLSPECIES) {
-				return new StaticSpeciesSelector(new SpeciesSelection(species));
-			}
+		//Filter biomes by selector predicates
+		Stream<Biome> stream = Lists.newArrayList(Biome.REGISTRY).stream();
+		for(JsonBiomeSelectorData s : selectors) {
+			stream = stream.filter(s.getFilter());
 		}
-
-		return null;
+		
+		//Apply all of the applicator to the database
+		stream.forEach( biome -> {
+			appliers.forEach( a -> a.apply(dbase, biome) );
+		});
 	}
 	
-	private IChanceSelector readChanceSelector(JsonObject mainObject) {
-		
-		JsonElement staticElement = mainObject.get("static");
-		if(staticElement != null && staticElement.isJsonPrimitive()) {
-			if(staticElement.getAsJsonPrimitive().isNumber()) {
-				float value = staticElement.getAsJsonPrimitive().getAsFloat();
-				if(value <= 0) {
-					return (rnd, spc, rad) -> EnumChance.CANCEL;
-				}
-				if(value >= 1) {
-					return (rnd, spc, rad) -> EnumChance.OK;
-				}
-				return (rnd, spc, rad) -> rnd.nextFloat() < value ? EnumChance.OK : EnumChance.CANCEL;
-			}
-			if(staticElement.getAsJsonPrimitive().isString()) {
-				String value = staticElement.getAsString();
-				if(DEFAULT.equals(value)) {
-					return (rnd, spc, rad) -> EnumChance.UNHANDLED;
-				}
-			}
-		}
-		
-		JsonElement mathElement = mainObject.get("math");
-		if(mathElement != null) {
-			JsonMath m = new JsonMath(mathElement);
-			return (rnd, spc, rad) -> rnd.nextFloat() < m.apply(rnd, spc, rad) ? EnumChance.OK : EnumChance.CANCEL;
-		}
-		
-		return null;
-	}
-	
-	private IDensitySelector readDensitySelector(JsonObject mainObject, Biome biome) {
-		
-		JsonElement scaleElement = mainObject.get("scale");
-		if(scaleElement != null && scaleElement.isJsonArray()) {
-			List<Float> parameters = new ArrayList<>();
-			for(JsonElement element : scaleElement.getAsJsonArray()) {
-				if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
-					parameters.add(element.getAsJsonPrimitive().getAsFloat());
-				}
-			}
-			switch(parameters.size()) {
-				case 0: return (rnd, n) -> n;
-				case 1: return (rnd, n) -> n * parameters.get(0);
-				case 2: return (rnd, n) -> (n * parameters.get(0)) + parameters.get(1);
-				case 3: return (rnd, n) -> ((n * parameters.get(0)) + parameters.get(1)) * parameters.get(2);
-				default: return (rnd, n) -> 0.0f;
-			}
-		}
-		
-		JsonElement staticElement = mainObject.get("static");
-		if(staticElement != null && staticElement.isJsonPrimitive() && staticElement.getAsJsonPrimitive().isNumber()) {
-			return (rnd, n) -> staticElement.getAsJsonPrimitive().getAsFloat();
-		}
-		
-		JsonElement mathElement = mainObject.get("math");
-		if(mathElement != null) {
-			JsonMath m = new JsonMath(mathElement).setBiome(biome);
-			return (rnd, n) -> m.apply(rnd, (float) n);
-		}
-		
-		return null;
-	}
-	
-
 }
