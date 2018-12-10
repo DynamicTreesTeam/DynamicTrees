@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.proxy;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.ModTileEntities;
 import com.ferreusveritas.dynamictrees.ModTrees;
@@ -19,7 +18,6 @@ import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenCancelEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
@@ -27,7 +25,6 @@ import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -37,7 +34,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 	
-	public static final String RESOURCEPATH = "worldgen/default.json";
 	
 	public void registerTileEntities() {}
 	
@@ -58,7 +54,6 @@ public class CommonProxy {
 	
 	public void init() {
 		LeavesPropertiesJson.resolveAll();
-		WorldGenRegistry.registerBiomeDataBasePopulator(new BiomeDataBasePopulatorJson(new ResourceLocation(ModConstants.MODID, RESOURCEPATH)));
 	}
 	
 	public void postInit() {

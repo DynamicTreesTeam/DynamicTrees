@@ -71,6 +71,12 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		jsonBiomeApplierMap.put(name, applier);
 	}
 	
+	public static void cleanup() {
+		jsonBiomeApplierMap = new HashMap<>();
+		jsonBiomeSelectorMap = new HashMap<>();
+		blacklistedBiomes = new HashSet<>();
+	}
+	
 	static {
 		
 		addJsonBiomeSelector(NAME, jsonElement -> {

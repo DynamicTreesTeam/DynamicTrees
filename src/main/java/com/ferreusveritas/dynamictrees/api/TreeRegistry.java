@@ -139,7 +139,7 @@ public class TreeRegistry {
 	}
 	
 	public static void cleanupCellKit() {
-		cellKitRegistry = null;
+		cellKitRegistry = new HashMap<>();
 	}
 	
 	//////////////////////////////
@@ -163,7 +163,7 @@ public class TreeRegistry {
 	}
 	
 	public static void cleanupGrowthLogicKit() {
-		growthLogicKitRegistry = null;
+		growthLogicKitRegistry = new HashMap<>();
 	}
 	
 }

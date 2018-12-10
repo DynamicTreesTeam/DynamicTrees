@@ -6,8 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.api.events.PopulateDataBaseEvent;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -15,7 +14,6 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 
 /**
  * A simple loader that reads a JSON file and facilitates database population
@@ -30,7 +28,7 @@ public class MultiDimensionalPopulator {
 	public static final String ACTIVE = "active";
 	public static final String FILES = "files";
 	
-	public MultiDimensionalPopulator(ResourceLocation jsonLocation) {
+	public MultiDimensionalPopulator(ResourceLocation jsonLocation, IBiomeDataBasePopulator defaultPopulator) {
 		
 		JsonElement mainJsonElement = null;
 		
@@ -58,7 +56,9 @@ public class MultiDimensionalPopulator {
 						System.out.println("Loading custom populators for dimension: " + dim);
 						
 						//All new databases get a fresh coat of default population
-						BiomeDataBase database = WorldGenRegistry.populateAsDefaultDataBase(new BiomeDataBase());
+						BiomeDataBase database = new BiomeDataBase();
+						
+						defaultPopulator.populate(database);
 						
 						//This creates a link for the dimension id to this new database
 						TreeGenerator.getTreeGenerator().linkDimensionToDataBase(dim, database);
@@ -69,8 +69,6 @@ public class MultiDimensionalPopulator {
 							new BiomeDataBasePopulatorJson(new ResourceLocation(ModConstants.MODID, filename.getAsString())).populate(database);
 						}
 						
-						//Finally let everyone know what happened
-						MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database));
 					}
 				}
 			}
