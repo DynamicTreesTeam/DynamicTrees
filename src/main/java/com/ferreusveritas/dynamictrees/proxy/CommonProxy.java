@@ -37,6 +37,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 	
+	public static final String RESOURCEPATH = "worldgen/default.json";
+	
 	public void registerTileEntities() {}
 	
 	public void preInit(FMLPreInitializationEvent event) {
@@ -56,7 +58,7 @@ public class CommonProxy {
 	
 	public void init() {
 		LeavesPropertiesJson.resolveAll();
-		WorldGenRegistry.registerBiomeDataBasePopulator(new BiomeDataBasePopulatorJson(new ResourceLocation(ModConstants.MODID, "worldgen/default.json")));
+		WorldGenRegistry.registerBiomeDataBasePopulator(new BiomeDataBasePopulatorJson(new ResourceLocation(ModConstants.MODID, RESOURCEPATH)));
 	}
 	
 	public void postInit() {

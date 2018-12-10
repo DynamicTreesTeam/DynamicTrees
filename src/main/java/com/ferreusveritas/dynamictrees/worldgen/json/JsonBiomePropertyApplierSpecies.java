@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Stati
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -22,15 +21,31 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 	public void apply(BiomeDataBase dbase, JsonElement element, Biome biome) {
 		if(element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
-			Operation operation = readMethod(object);
-			ISpeciesSelector speciesSelector = readSpeciesSelector(object);
-			if(speciesSelector != null) {
-				dbase.setSpeciesSelector(biome, speciesSelector, operation);
-			}
+			dbase.setSpeciesSelector(biome, readSpeciesSelector(object), readMethod(object));
+		}
+		else if(element.isJsonPrimitive()) {
+			dbase.setSpeciesSelector(biome, createStaticSpeciesSelector(element.getAsString()), Operation.REPLACE);
 		}
 	};
 	
+	private ISpeciesSelector createStaticSpeciesSelector(String speciesName) {
+		if(isDefault(speciesName)) {
+			return new StaticSpeciesSelector();
+		}
+		Species species = TreeRegistry.findSpeciesSloppy(speciesName);
+		if(species != Species.NULLSPECIES) {
+			return new StaticSpeciesSelector(new SpeciesSelection(species));
+		}
+		
+		return null;
+	}
+	
 	private ISpeciesSelector readSpeciesSelector(JsonObject mainObject) {
+
+		JsonElement staticElement = mainObject.get("static");
+		if(staticElement != null && staticElement.isJsonPrimitive()) {
+			return createStaticSpeciesSelector(staticElement.getAsString());
+		}
 		
 		JsonElement randomElement = mainObject.get("random");
 		if(randomElement != null && randomElement.isJsonObject()) {
@@ -42,7 +57,7 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 				if(speciesElement.isJsonPrimitive() && speciesElement.getAsJsonPrimitive().isNumber()) {
 					weight = speciesElement.getAsJsonPrimitive().getAsInt();
 					if(weight > 0) {
-						if(BiomeDataBasePopulatorJson.DEFAULT.equals(speciesName)) {
+						if(isDefault(speciesName)) {
 							rand.add(weight);
 						} else {
 							Species species = TreeRegistry.findSpeciesSloppy(speciesName);
@@ -56,18 +71,6 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 			
 			if(rand.getSize() > 0) {
 				return rand;
-			}
-		}
-		
-		JsonElement staticElement = mainObject.get("static");
-		if(staticElement != null && staticElement.isJsonPrimitive() && staticElement.getAsJsonPrimitive().isString()) {
-			String speciesName = staticElement.getAsJsonPrimitive().getAsString();
-			if(BiomeDataBasePopulatorJson.DEFAULT.equals(speciesName)) {
-				return new StaticSpeciesSelector();
-			}
-			Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-			if(species != Species.NULLSPECIES) {
-				return new StaticSpeciesSelector(new SpeciesSelection(species));
 			}
 		}
 		

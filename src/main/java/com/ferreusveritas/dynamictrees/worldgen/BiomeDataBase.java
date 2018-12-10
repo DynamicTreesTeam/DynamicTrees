@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IChanceSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IDensitySelector;
@@ -154,30 +155,33 @@ public class BiomeDataBase {
 	}
 	
 	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
-		BiomeEntry entry = getEntry(biome);
-		ISpeciesSelector existing = entry.getSpeciesSelector();
-		
-		switch (op) {
-			case REPLACE:
-				entry.setSpeciesSelector( selector );
-				break;
-			case SPLICE_BEFORE:
-				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
-					SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
-					return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
-				} );
-				break;
-			case SPLICE_AFTER:
-				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
-					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
-					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
-				} );
-				break;
+		if(selector != null) {
+			BiomeEntry entry = getEntry(biome);
+			ISpeciesSelector existing = entry.getSpeciesSelector();
+			
+			switch (op) {
+				case REPLACE:
+					entry.setSpeciesSelector( selector );
+					break;
+				case SPLICE_BEFORE:
+					entry.setSpeciesSelector( (pos, dirt, rnd) -> {
+						SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
+						return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
+					} );
+					break;
+				case SPLICE_AFTER:
+					entry.setSpeciesSelector( (pos, dirt, rnd) -> {
+						SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
+						return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
+					} );
+					break;
+			}
 		}
 		return this;
 	}
 	
 	public BiomeDataBase setChanceSelector(Biome biome, IChanceSelector selector, Operation op) {
+		if(selector != null) {
 			BiomeEntry entry = getEntry(biome);
 			IChanceSelector existing = entry.getChanceSelector();
 			
@@ -198,10 +202,12 @@ public class BiomeDataBase {
 					} );
 					break;
 			}
+		}
 		return this;
 	}
 	
 	public BiomeDataBase setDensitySelector(Biome biome, IDensitySelector selector, Operation op) {
+		if(selector != null) {
 			BiomeEntry entry = getEntry(biome);
 			IDensitySelector existing = entry.getDensitySelector();
 			
@@ -222,6 +228,7 @@ public class BiomeDataBase {
 					} );
 					break;
 			}
+		}
 		return this;
 	}
 	
@@ -236,7 +243,7 @@ public class BiomeDataBase {
 	}
 	
 	public BiomeDataBase setForestness(Biome biome, float forestness) {
-		getEntry(biome).setForestness(forestness);
+		getEntry(biome).setForestness(Math.max(forestness, ModConfigs.seedMinForestness));
 		return this;
 	}
 	

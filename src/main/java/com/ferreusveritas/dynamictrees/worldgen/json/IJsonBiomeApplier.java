@@ -9,6 +9,11 @@ import net.minecraft.world.biome.Biome;
 
 public interface IJsonBiomeApplier {
 	
+	public static final String DEFAULT = "...";
+	public static final String REPLACE = "replace";
+	public static final String BEFORE = "before";
+	public static final String AFTER = "after";
+	
 	public void apply(BiomeDataBase dbase, JsonElement element, Biome biome);
 	
 	public default Operation readMethod(JsonObject object) {
@@ -16,13 +21,13 @@ public interface IJsonBiomeApplier {
 		if(method != null && method.isJsonPrimitive() && method.getAsJsonPrimitive().isString()) {
 			String methodName = method.getAsJsonPrimitive().getAsString();
 			
-			if("replace".equals(methodName)) {
+			if(REPLACE.equals(methodName)) {
 				return Operation.REPLACE;
 			}
-			if("before".equals(methodName)) {
+			if(BEFORE.equals(methodName)) {
 				return Operation.SPLICE_BEFORE;
 			}
-			if("after".equals(methodName)) {
+			if(AFTER.equals(methodName)) {
 				return Operation.SPLICE_AFTER;
 			}
 		}
@@ -30,5 +35,8 @@ public interface IJsonBiomeApplier {
 		return Operation.REPLACE;
 	}
 	
+	public default boolean isDefault(String candidate) {
+		return DEFAULT.equals(candidate);
+	}
 	
 }

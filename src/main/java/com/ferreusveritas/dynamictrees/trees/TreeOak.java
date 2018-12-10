@@ -215,6 +215,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	 */
 	@Override
 	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
+		//TODO: Move to location override mechanism
 		if(BiomeDictionary.hasType(world.getBiome(trunkPos), Type.SWAMP)) {
 			return swampSpecies;
 		}

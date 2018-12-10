@@ -7,10 +7,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,8 +35,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
-
-	public static final String DEFAULT = "...";
 	
 	public static final String SPECIES = "species";
 	public static final String DENSITY = "density";
@@ -43,6 +43,8 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static final String CANCELVANILLA = "cancelvanilla";
 	public static final String MULTIPASS = "multipass";
 	public static final String SUBTERRANEAN = "subterranean";
+	public static final String FORESTNESS = "forestness";
+	public static final String BLACKLIST = "blacklist";
 	
 	public static final String SELECT = "select";
 	public static final String APPLY = "apply";
@@ -54,50 +56,19 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	private static Map<String, IJsonBiomeSelector> jsonBiomeSelectorMap = new HashMap<>();
 	private static Map<String, IJsonBiomeApplier> jsonBiomeApplierMap = new HashMap<>(); 
 	
+	public static Set<Biome> blacklistedBiomes = new HashSet<>();
+	
+	public static void addJsonBiomeSelector(String name, IJsonBiomeSelector selector) {
+		jsonBiomeSelectorMap.put(name, selector);
+	}
+
+	public static void addJsonBiomeApplier(String name, IJsonBiomeApplier applier) {
+		jsonBiomeApplierMap.put(name, applier);
+	}
+	
 	static {
 		
-		jsonBiomeApplierMap.put(SPECIES, new JsonBiomePropertyApplierSpecies());
-		
-		jsonBiomeApplierMap.put(DENSITY, new JsonBiomePropertyApplierDensity());
-
-		jsonBiomeApplierMap.put(CHANCE, new JsonBiomePropertyApplierChance());
-		
-		jsonBiomeApplierMap.put(CANCELVANILLA, (dbase, element, biome) -> {
-			if(element.isJsonPrimitive()) {
-				boolean cancel = element.getAsBoolean();
-				dbase.setCancelVanillaTreeGen(biome, cancel);
-			}
-		});
-		
-		jsonBiomeApplierMap.put(MULTIPASS, (dbase, element, biome) -> {
-			if(element.isJsonPrimitive()) {
-				boolean multipass = element.getAsBoolean();
-				
-				if(multipass) {
-					//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
-					//by filling in gaps in the generation with smaller trees 
-					dbase.setMultipass(biome, pass -> {
-						switch(pass) {
-							case 0: return 0;//Zero means to run as normal
-							case 1: return 5;//Return only radius 5 on pass 1
-							case 2: return 3;//Return only radius 3 on pass 2
-							default: return -1;//A negative number means to terminate
-						}
-					});
-				}
-			}
-		});
-		
-		jsonBiomeApplierMap.put(SUBTERRANEAN,  (dbase, element, biome) -> {
-			if(element.isJsonPrimitive()) {
-				boolean subterranean = element.getAsBoolean();
-				dbase.setIsSubterranean(biome, subterranean);
-			}
-		});
-		
-		
-		
-		jsonBiomeSelectorMap.put(NAME, jsonElement -> {
+		addJsonBiomeSelector(NAME, jsonElement -> {
 			if(jsonElement != null && jsonElement.isJsonPrimitive()) {
 				JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
 				if(primitive.isString()) {
@@ -109,9 +80,9 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			return b -> false;
 		});
 		
-		jsonBiomeSelectorMap.put(TYPE, jsonElement -> {
+		addJsonBiomeSelector(TYPE, jsonElement -> {
 			if(jsonElement != null) {
-				if (jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isString()) {
+				if (jsonElement.isJsonPrimitive()) {
 					String typeMatch = jsonElement.getAsString();
 					List<BiomeDictionary.Type> types = Arrays.asList(typeMatch.split(",")).stream().map(BiomeDictionary.Type::getType).collect(Collectors.toList());
 					return b -> biomeHasTypes(b, types);
@@ -129,6 +100,71 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 						
 			return b -> false;
 		});
+		
+		addJsonBiomeApplier(SPECIES, new JsonBiomePropertyApplierSpecies());
+		
+		addJsonBiomeApplier(DENSITY, new JsonBiomePropertyApplierDensity());
+
+		addJsonBiomeApplier(CHANCE, new JsonBiomePropertyApplierChance());
+		
+		addJsonBiomeApplier(CANCELVANILLA, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean cancel = element.getAsBoolean();
+				System.out.println("Biome " + (cancel ? "cancelled" : "uncancelled") + " for vanilla: " + biome);
+				dbase.setCancelVanillaTreeGen(biome, cancel);
+			}
+		});
+		
+		addJsonBiomeApplier(MULTIPASS, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean multipass = element.getAsBoolean();
+				
+				if(multipass) {
+					System.out.println("Biome set for multipass: " + biome);
+
+					//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
+					//by filling in gaps in the generation with smaller trees 
+					dbase.setMultipass(biome, pass -> {
+						switch(pass) {
+							case 0: return 0;//Zero means to run as normal
+							case 1: return 5;//Return only radius 5 on pass 1
+							case 2: return 3;//Return only radius 3 on pass 2
+							default: return -1;//A negative number means to terminate
+						}
+					});
+				}
+			}
+		});
+		
+		addJsonBiomeApplier(SUBTERRANEAN,  (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean subterranean = element.getAsBoolean();
+				System.out.println("Biome set to subterranean: " + biome);
+				dbase.setIsSubterranean(biome, subterranean);
+			}
+		});
+		
+		addJsonBiomeApplier(FORESTNESS, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				float forestness = element.getAsFloat();
+				System.out.println("Forestness set for biome: " + biome + " at " + forestness);
+				dbase.setForestness(biome, forestness);
+			}
+		});
+		
+		addJsonBiomeApplier(BLACKLIST, (dbase, element, biome) -> {
+			if(element.isJsonPrimitive()) {
+				boolean blacklist = element.getAsBoolean();
+				if(blacklist) {
+					System.out.println("Blacklisted biome: " + biome);
+					blacklistedBiomes.add(biome);
+				} else {
+					blacklistedBiomes.remove(biome);
+				}
+			}
+		});
+		
+
 		
 	}
 	
@@ -250,7 +286,10 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			stream = stream.filter(s.getFilter());
 		}
 		
-		//Apply all of the applicator to the database
+		//Filter blacklisted biomes
+		stream = stream.filter(b -> !blacklistedBiomes.contains(b));
+		
+		//Apply all of the applicators to the database
 		stream.forEach( biome -> {
 			appliers.forEach( a -> a.apply(dbase, biome) );
 		});
