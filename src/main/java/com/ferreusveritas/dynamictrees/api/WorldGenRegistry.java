@@ -54,9 +54,12 @@ public class WorldGenRegistry {
 	
 	public static void populateDataBase() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			IBiomeDataBasePopulator biomePopulator = collectDataBasePopulators();
 			
+			TreeGenerator.getTreeGenerator().clearAllBiomeDataBases();
 			BiomeDataBase database = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
+			
+			//This collects all available populators and returns an aggregate populator for the lot
+			IBiomeDataBasePopulator biomePopulator = collectDataBasePopulators();
 			
 			//This is where the main population occurs
 			biomePopulator.populate(database);

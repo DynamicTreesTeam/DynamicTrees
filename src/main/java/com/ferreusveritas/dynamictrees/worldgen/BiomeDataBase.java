@@ -252,6 +252,12 @@ public class BiomeDataBase {
 		return this;
 	}
 	
+	public void clear() {
+		for(int i = 0; i < table.size(); i++) {
+			table.set(i, BADENTRY);
+		}
+	}
+	
 	public enum Operation {
 		REPLACE,
 		SPLICE_BEFORE,

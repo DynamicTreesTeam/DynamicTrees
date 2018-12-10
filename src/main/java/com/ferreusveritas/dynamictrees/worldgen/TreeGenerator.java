@@ -69,6 +69,11 @@ public class TreeGenerator {
 		dimensionMap.put(dimensionId, DIMENSIONBLACKLISTED);
 	}
 	
+	public void clearAllBiomeDataBases() {
+		dimensionMap.clear();
+		defaultBiomeDataBase.clear();
+	}
+	
 	/**
 	 * This is for world debugging.
 	 * The colors signify the different tree spawn failure modes.
