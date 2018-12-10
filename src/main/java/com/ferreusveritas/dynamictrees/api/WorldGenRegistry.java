@@ -80,10 +80,13 @@ public class WorldGenRegistry {
 	
 	private static void writeBlankJsonArrayToFile(File file) {
 		try {
+			new File(ModConfigs.configDirectory.getAbsolutePath() + CONFIGPATH).mkdirs();
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
 			writer.write("[]");//Write the minimal amount of data for the file to be a valid json array.
 			writer.close();
-		} catch (Exception e) { }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void populateDataBase() {
