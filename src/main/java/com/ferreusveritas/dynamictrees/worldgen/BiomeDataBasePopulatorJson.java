@@ -1,9 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +16,7 @@ import java.util.stream.Stream;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
@@ -27,12 +24,10 @@ import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierCha
 import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierDensity;
 import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierSpecies;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -188,14 +183,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	}
 	
 	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
-		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			jsonElement = new Gson().fromJson(reader, JsonElement.class);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+		this(JsonHelper.load(jsonLocation));
 	}
 	
 	public BiomeDataBasePopulatorJson(JsonElement jsonElement) {

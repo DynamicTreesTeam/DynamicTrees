@@ -1,18 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
-import com.google.gson.Gson;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -29,17 +25,14 @@ public class MultiDimensionalPopulator {
 	public static final String FILES = "files";
 	
 	public MultiDimensionalPopulator(ResourceLocation jsonLocation, IBiomeDataBasePopulator defaultPopulator) {
-		
-		JsonElement mainJsonElement = null;
-		
-		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			mainJsonElement = new Gson().fromJson(reader, JsonElement.class);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+		this(JsonHelper.load(jsonLocation), defaultPopulator);
+	}
+	
+	public MultiDimensionalPopulator(JsonElement mainJsonElement, IBiomeDataBasePopulator defaultPopulator) {
+		load(mainJsonElement, defaultPopulator);
+	}
+	
+	private void load(JsonElement mainJsonElement, IBiomeDataBasePopulator defaultPopulator) {
 		
 		if(mainJsonElement != null && mainJsonElement.isJsonArray()) {
 			for(JsonElement element : mainJsonElement.getAsJsonArray()) {
@@ -65,8 +58,11 @@ public class MultiDimensionalPopulator {
 						
 						//Apply all of the referred json files
 						for(JsonElement filename : files) {
-							//Each populator overwrites the results of the previous one in succession
-							new BiomeDataBasePopulatorJson(new ResourceLocation(ModConstants.MODID, filename.getAsString())).populate(database);
+							if(filename.isJsonPrimitive()) {
+								File file = new File(ModConfigs.configDirectory.getAbsolutePath() + "/" + filename.getAsString());
+								//Each populator overwrites the results of the previous one in succession
+								new BiomeDataBasePopulatorJson(JsonHelper.load(file)).populate(database);
+							}
 						}
 						
 					}

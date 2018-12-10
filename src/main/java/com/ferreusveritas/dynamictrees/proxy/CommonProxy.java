@@ -34,7 +34,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
 	
-	
 	public void registerTileEntities() {}
 	
 	public void preInit(FMLPreInitializationEvent event) {
@@ -42,7 +41,7 @@ public class CommonProxy {
 		CellKits.preInit();
 		GrowthLogicKits.preInit();
 		TreeGenerator.preInit();//Create the generator
-		
+				
 		ModTileEntities.preInit();
 		
 		ModBlocks.preInit();

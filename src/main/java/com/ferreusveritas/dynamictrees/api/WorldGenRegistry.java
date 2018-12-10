@@ -1,5 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +11,7 @@ import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDataBaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
 import com.ferreusveritas.dynamictrees.worldgen.MultiDimensionalPopulator;
@@ -22,7 +27,10 @@ public class WorldGenRegistry {
 	// BIOME HANDLING FOR WORLDGEN
 	//////////////////////////////
 	
-	public static final String RESOURCEPATH = "worldgen/default.json";
+	private static final String RESOURCEPATH = "worldgen/default.json";
+	private static final String CONFIGPATH = "/" + ModConstants.MODID;
+	private static final String WORLDGENCONFIGPATH = CONFIGPATH + "/worldgen.json";
+	private static final String DIMGENCONFIGPATH = CONFIGPATH + "/dimensions.json";
 	
 	/**
 	 * Mods should use this function to determine if worldgen is enabled for Dynamic Trees
@@ -49,7 +57,33 @@ public class WorldGenRegistry {
 	}
 	
 	private static void loadCustomDefaultPopulator(BiomeDataBasePopulatorRegistryEvent event) {
-		//TODO: Load custom default populator from config here
+		
+		File file = new File(ModConfigs.configDirectory.getAbsolutePath() + WORLDGENCONFIGPATH);
+		
+		if(!file.exists()) {
+			writeBlankJsonArrayToFile(file);
+		} else {
+			event.register(new BiomeDataBasePopulatorJson(JsonHelper.load(file)));
+		}
+	}
+	
+	private static void loadMultiDimensionalPopulator(IBiomeDataBasePopulator populator) {
+		
+		File file = new File(ModConfigs.configDirectory.getAbsolutePath() + DIMGENCONFIGPATH);
+		
+		if(!file.exists()) {
+			writeBlankJsonArrayToFile(file);
+		} else {
+			new MultiDimensionalPopulator(JsonHelper.load(file), populator);
+		}
+	}
+	
+	private static void writeBlankJsonArrayToFile(File file) {
+		try {
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
+			writer.write("[]");//Write the minimal amount of data for the file to be a valid json array.
+			writer.close();
+		} catch (Exception e) { }
 	}
 	
 	public static void populateDataBase() {
@@ -66,9 +100,9 @@ public class WorldGenRegistry {
 			
 			//Send out an event after the database has been populated
 			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database, biomePopulator));
-			
+
 			//Populate custom dimensions if available
-			new MultiDimensionalPopulator(new ResourceLocation(ModConstants.MODID, "worldgen/dimensions.json"), biomePopulator);
+			loadMultiDimensionalPopulator(biomePopulator);
 			
 			//Blacklist certain dimensions according to the base config
 			ModConfigs.dimensionBlacklist.forEach(d -> TreeGenerator.getTreeGenerator().BlackListDimension(d));
@@ -90,4 +124,5 @@ public class WorldGenRegistry {
 		};
 		
 	}
+	
 }

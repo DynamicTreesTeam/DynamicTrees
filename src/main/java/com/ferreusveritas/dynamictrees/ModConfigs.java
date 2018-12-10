@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 
+import java.io.File;
 import java.util.HashSet;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch.EnumAxeDamage;
@@ -10,6 +11,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ModConfigs {
 
+	public static File configDirectory;
+	
 	public static float seedDropRate;
 	public static float seedPlantRate;
 	public static int seedTimeToLive;
@@ -48,6 +51,9 @@ public class ModConfigs {
 	public static boolean worldGenDebug;
 	
 	public static void preInit(FMLPreInitializationEvent event) {
+		
+		configDirectory = event.getModConfigurationDirectory();
+		
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		
