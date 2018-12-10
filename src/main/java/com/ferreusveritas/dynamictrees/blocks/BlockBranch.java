@@ -531,7 +531,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 				sloppyBreak(world, pos, DestroyType.VOID);
 				world.setBlockState(pos, toBlockState);//Set back to stone
 			} else {
-				System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
+				if(ModConfigs.worldGenDebug) {
+					System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
+				}
 			}
 		}
 	}
