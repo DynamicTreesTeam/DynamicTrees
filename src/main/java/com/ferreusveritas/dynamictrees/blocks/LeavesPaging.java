@@ -1,23 +1,20 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.google.gson.Gson;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Loader;
@@ -164,20 +161,14 @@ public class LeavesPaging {
 	}
 
 	public static Map<String, ILeavesProperties> build(String modid, ResourceLocation jsonLocation) {
-		
-		JsonObject root = null;
-		
-		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			JsonElement je = new Gson().fromJson(reader, JsonElement.class);
-			root = je.getAsJsonObject();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+		JsonElement element = JsonHelper.load(jsonLocation);
+		if(element != null && element.isJsonObject()) {
+			return build(element.getAsJsonObject());
 		}
 		
-		return build(root);
+		Logger.getLogger(ModConstants.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + modid + " at " + jsonLocation);
+				
+		return null;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -191,8 +182,8 @@ public class LeavesPaging {
 	 * Frees up the memory since this is only used during startup 
 	 */
 	public static void cleanUp() {
-		modLeavesArray = null;
-		modLastSeq = null;
+		modLeavesArray = new HashMap<>();
+		modLastSeq = new HashMap<>();
 	}
 	
 }

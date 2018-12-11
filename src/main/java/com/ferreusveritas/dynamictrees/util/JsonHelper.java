@@ -3,33 +3,30 @@ package com.ferreusveritas.dynamictrees.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
 public class JsonHelper {
 	
 	public static JsonElement load(ResourceLocation jsonLocation) {
-		
-		JsonElement mainJsonElement = null;
-		
-		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(jsonLocation).getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			mainJsonElement = new Gson().fromJson(reader, JsonElement.class);
+		String filename = "assets/" + jsonLocation.getResourceDomain() + "/" + jsonLocation.getResourcePath();
+		InputStream in = new LeavesPaging().getClass().getClassLoader().getResourceAsStream(filename);
+		if(in == null) {
+			Logger.getLogger(ModConstants.MODID).log(Level.SEVERE, "Could not open resource " + filename);
+			return null;
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return mainJsonElement;
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		return new Gson().fromJson(reader, JsonElement.class);
 	}
 	
 	public static JsonElement load(File file) {
