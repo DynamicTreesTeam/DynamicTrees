@@ -63,7 +63,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			float height = (float) entity.getMassCenter().y * 2;
 			fallSpeed += (0.2 / height);
 			addRotation(entity, fallSpeed);
-		}				
+		}
 		
 		entity.motionY -= AnimationConstants.TREE_GRAVITY;
 		entity.posY += entity.motionY;
