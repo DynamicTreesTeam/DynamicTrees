@@ -29,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -51,7 +52,7 @@ public class CommonProxy {
 		registerCommonEventHandlers();
 	}
 	
-	public void init() {
+	public void init(FMLInitializationEvent event) {
 		LeavesPropertiesJson.resolveAll();
 	}
 	

@@ -55,6 +55,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
@@ -68,8 +69,8 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void init() {
-		super.init();
+	public void init(FMLInitializationEvent event) {
+		super.init(event);
 		registerColorHandlers();
 		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 	}
