@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry.BiomeDataBaseJsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
@@ -61,7 +62,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static void addJsonBiomeSelector(String name, IJsonBiomeSelector selector) {
 		jsonBiomeSelectorMap.put(name, selector);
 	}
-
+	
 	public static void addJsonBiomeApplier(String name, IJsonBiomeApplier applier) {
 		jsonBiomeApplierMap.put(name, applier);
 	}
@@ -72,9 +73,9 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		blacklistedBiomes = new HashSet<>();
 	}
 	
-	static {
+	public static void registerJsonCapabilities(BiomeDataBaseJsonCapabilityRegistryEvent event) {
 		
-		addJsonBiomeSelector(NAME, jsonElement -> {
+		event.register(NAME, jsonElement -> {
 			if(jsonElement != null && jsonElement.isJsonPrimitive()) {
 				JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
 				if(primitive.isString()) {
@@ -86,7 +87,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			return b -> false;
 		});
 		
-		addJsonBiomeSelector(TYPE, jsonElement -> {
+		event.register(TYPE, jsonElement -> {
 			if(jsonElement != null) {
 				if (jsonElement.isJsonPrimitive()) {
 					String typeMatch = jsonElement.getAsString();
@@ -107,13 +108,13 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			return b -> false;
 		});
 		
-		addJsonBiomeApplier(SPECIES, new JsonBiomePropertyApplierSpecies());
+		event.register(SPECIES, new JsonBiomePropertyApplierSpecies());
 		
-		addJsonBiomeApplier(DENSITY, new JsonBiomePropertyApplierDensity());
+		event.register(DENSITY, new JsonBiomePropertyApplierDensity());
 
-		addJsonBiomeApplier(CHANCE, new JsonBiomePropertyApplierChance());
+		event.register(CHANCE, new JsonBiomePropertyApplierChance());
 		
-		addJsonBiomeApplier(CANCELVANILLA, (dbase, element, biome) -> {
+		event.register(CANCELVANILLA, (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				boolean cancel = element.getAsBoolean();
 				//System.out.println("Biome " + (cancel ? "cancelled" : "uncancelled") + " for vanilla: " + biome);
@@ -121,7 +122,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		addJsonBiomeApplier(MULTIPASS, (dbase, element, biome) -> {
+		event.register(MULTIPASS, (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				boolean multipass = element.getAsBoolean();
 				
@@ -142,7 +143,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		addJsonBiomeApplier(SUBTERRANEAN,  (dbase, element, biome) -> {
+		event.register(SUBTERRANEAN,  (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				boolean subterranean = element.getAsBoolean();
 				//System.out.println("Biome set to subterranean: " + biome);
@@ -150,7 +151,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		addJsonBiomeApplier(FORESTNESS, (dbase, element, biome) -> {
+		event.register(FORESTNESS, (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				float forestness = element.getAsFloat();
 				//System.out.println("Forestness set for biome: " + biome + " at " + forestness);
@@ -158,7 +159,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		addJsonBiomeApplier(BLACKLIST, (dbase, element, biome) -> {
+		event.register(BLACKLIST, (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				boolean blacklist = element.getAsBoolean();
 				if(blacklist) {
@@ -170,7 +171,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			}
 		});
 		
-		addJsonBiomeApplier(RESET, (dbase, element, biome) -> {
+		event.register(RESET, (dbase, element, biome) -> {
 			dbase.setCancelVanillaTreeGen(biome, false);
 			dbase.setSpeciesSelector(biome, (pos, dirt, rnd) -> new SpeciesSelection(), Operation.REPLACE);
 			dbase.setDensitySelector(biome, (rnd, nd) -> -1, Operation.REPLACE);

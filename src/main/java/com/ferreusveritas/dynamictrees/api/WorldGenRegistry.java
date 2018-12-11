@@ -16,6 +16,8 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
 import com.ferreusveritas.dynamictrees.worldgen.MultiDimensionalPopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
+import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -92,6 +94,15 @@ public class WorldGenRegistry {
 	public static void populateDataBase() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
 			
+			BiomeDataBaseJsonCapabilityRegistryEvent capabilityEvent = new BiomeDataBaseJsonCapabilityRegistryEvent();
+			
+			//Register the main Json capabilities
+			BiomeDataBasePopulatorJson.registerJsonCapabilities(capabilityEvent);
+			
+			//Send out an event asking for Json Capabilities to be registered
+			MinecraftForge.EVENT_BUS.post(capabilityEvent);
+			
+			//Prep the databases by clearing them out
 			TreeGenerator.getTreeGenerator().clearAllBiomeDataBases();
 			BiomeDataBase database = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
 			
@@ -103,15 +114,28 @@ public class WorldGenRegistry {
 			
 			//Send out an event after the database has been populated
 			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database, biomePopulator));
-
+			
 			//Populate custom dimensions if available
 			loadMultiDimensionalPopulator(biomePopulator);
 			
 			//Blacklist certain dimensions according to the base config
 			ModConfigs.dimensionBlacklist.forEach(d -> TreeGenerator.getTreeGenerator().BlackListDimension(d));
 			
+			//Cleanup all of the unused static objects
 			BiomeDataBasePopulatorJson.cleanup();
 		}
+	}
+	
+	public static class BiomeDataBaseJsonCapabilityRegistryEvent extends Event {
+		
+		public void register(String name, IJsonBiomeSelector selector) {
+			BiomeDataBasePopulatorJson.addJsonBiomeSelector(name, selector);
+		}
+		
+		public void register(String name, IJsonBiomeApplier applier) {
+			BiomeDataBasePopulatorJson.addJsonBiomeApplier(name, applier);
+		}
+		
 	}
 	
 	public static class BiomeDataBasePopulatorRegistryEvent extends Event {
