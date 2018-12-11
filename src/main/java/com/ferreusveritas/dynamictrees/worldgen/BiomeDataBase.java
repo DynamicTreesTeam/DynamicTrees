@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -24,7 +22,30 @@ public class BiomeDataBase {
 		@Override public void setSubterraneanBiome(boolean is) {}
 	};
 	
-	private final ArrayList<BiomeEntry> table = new ArrayList<BiomeEntry>(Collections.nCopies(256, BADENTRY));
+	//A reasonably fast 16x16 sparse array 
+	private final BiomeEntry table[][] = new BiomeEntry[16][];
+	
+	public BiomeEntry getEntry(Biome biome) {
+		if(biome != null) {
+			int biomeId = Biome.getIdForBiome(biome);//This can only ever return 0 - 255 because of Minecraft limitations
+			BiomeEntry list[] = table[biomeId >> 4];
+			if(list == null) {
+				list = table[biomeId >> 4] = new BiomeEntry[16];
+				for(int i = 0; i < 16; i++) {
+					list[i] = BADENTRY;
+				}
+			}
+			BiomeEntry entry = list[biomeId & 0x0f];
+			return entry != BADENTRY ? entry : (list[biomeId & 0x0f] = new BiomeEntry(biome, biomeId));
+		}
+		return BADENTRY;
+	}
+	
+	public void clear() {
+		for(int i = 0; i < 16; i++) {
+			table[i] = null;
+		}
+	}
 	
 	public static class BiomeEntry {
 		private final Biome biome;
@@ -112,22 +133,6 @@ public class BiomeDataBase {
 			return multipass;
 		}
 		
-	}
-	
-	public BiomeEntry getEntry(Biome biome) {
-		int biomeId = Biome.getIdForBiome(biome);
-		if(biome != null && biomeId >= 0 && biomeId <= 255) {
-			BiomeEntry entry = table.get(biomeId);
-			
-			if(entry == BADENTRY) {
-				entry = new BiomeEntry(biome, biomeId);
-				table.set(biomeId, entry);
-			}
-			
-			return entry;
-		}
-		
-		return BADENTRY;
 	}
 	
 	public ISpeciesSelector getSpecies(Biome biome) {
@@ -250,12 +255,6 @@ public class BiomeDataBase {
 	public BiomeDataBase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
 		getEntry(biome).setMultipass(multipass);
 		return this;
-	}
-	
-	public void clear() {
-		for(int i = 0; i < table.size(); i++) {
-			table.set(i, BADENTRY);
-		}
 	}
 	
 	public enum Operation {
