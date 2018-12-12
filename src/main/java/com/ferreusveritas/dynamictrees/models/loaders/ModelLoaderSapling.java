@@ -1,8 +1,9 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.loaders;
 
 import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelSapling;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

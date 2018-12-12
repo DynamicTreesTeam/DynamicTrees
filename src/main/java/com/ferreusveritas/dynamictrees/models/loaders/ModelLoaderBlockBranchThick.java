@@ -1,4 +1,6 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.loaders;
+
+import com.ferreusveritas.dynamictrees.models.blockmodels.ModelBlockBranchThick;
 
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.util.ResourceLocation;

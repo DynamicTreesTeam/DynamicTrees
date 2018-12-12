@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,6 +11,7 @@ import org.lwjgl.util.vector.Vector3f;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
+import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
 

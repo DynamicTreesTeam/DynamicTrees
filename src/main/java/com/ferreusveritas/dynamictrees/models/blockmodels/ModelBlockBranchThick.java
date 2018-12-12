@@ -1,9 +1,10 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.blockmodels;
 
 import java.util.Collection;
 import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchThick;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;

@@ -1,6 +1,9 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.loaders;
 
 import java.util.function.Function;
+
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchCactus;
+import com.ferreusveritas.dynamictrees.models.blockmodels.ModelBlockBranchBasic;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.loaders;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -1,7 +1,9 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.loaders;
 
 import java.util.List;
 import java.util.function.Function;
+
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWithState;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

@@ -1,8 +1,9 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.blockmodels;
 
 import java.util.Collection;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -17,12 +18,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ModelBlockSurfaceRoot implements IModel {
+public class ModelBlockBranchBasic implements IModel {
 
 	public ResourceLocation barkTexture;
+	public ResourceLocation ringsTexture;
+
 	
-	public ModelBlockSurfaceRoot(ModelBlock modelBlock) {
+	public ModelBlockBranchBasic(ModelBlock modelBlock) {
 		barkTexture = new ResourceLocation(modelBlock.resolveTextureName("bark"));
+		ringsTexture = new ResourceLocation(modelBlock.resolveTextureName("rings"));
 	}
 	
 	// return all other resources used by this model
@@ -34,16 +38,16 @@ public class ModelBlockSurfaceRoot implements IModel {
 	// return all the textures used by this model
 	@Override
 	public Collection<ResourceLocation> getTextures() {
-		return ImmutableList.copyOf(new ResourceLocation[]{barkTexture});
+		return ImmutableList.copyOf(new ResourceLocation[]{barkTexture, ringsTexture});
 	}
 
 	// Bake the subcomponents into a CompositeModel
 	@Override
 	public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		try {
-			return new BakedModelBlockSurfaceRoot(barkTexture, bakedTextureGetter);
+			return new BakedModelBlockBranchBasic(barkTexture, ringsTexture, bakedTextureGetter);
 		} catch (Exception exception) {
-			System.err.println("BakedModelBlockSurfaceRoot.bake() failed due to exception:" + exception);
+			System.err.println("BranchModel.bake() failed due to exception:" + exception);
 			return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
 		}
 	}

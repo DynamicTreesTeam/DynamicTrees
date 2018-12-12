@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.models.BakedModelBlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.models.BakedModelBlockRooty;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockRooty;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
