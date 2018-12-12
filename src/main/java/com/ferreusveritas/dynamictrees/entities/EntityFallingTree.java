@@ -152,9 +152,6 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	public void buildClient() {
 		
-		clientBuildCount++;
-		System.out.println("Falling tree entity built on client: " + clientBuildCount);
-
 		NBTTagCompound tag = getVoxelData();
 		
 		if(tag.hasKey("species")) {			
@@ -241,7 +238,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
 		this.setEntityBoundingBox(normAABB != null ? normAABB.offset(posX, posY, posZ) : new AxisAlignedBB(BlockPos.ORIGIN));
 	}
-	
+		
 	@Override
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
@@ -412,9 +409,6 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		if(!world.isRemote) {// Only spawn entities server side
 			EntityFallingTree entity = new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType);
 			if(entity.isEntityAlive()) {
-				spawnCount++;
-				entity.forceSpawn = true;
-				System.out.println("Falling tree entity spawned on server: " + spawnCount);
 				world.spawnEntity(entity);
 			}
 			return entity;
@@ -422,24 +416,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		return null;
 	}
-
-	public static int spawnCount = 0;
-	public static int serverCount = 0;
-	public static int clientCount = 0;
-	public static int clientBuildCount = 0;
 	
 	@Override
 	public void onRemovedFromWorld() {
 		super.onRemovedFromWorld();
-		
-		if(world.isRemote) {
-			clientCount++;
-			System.out.println("Falling tree entity died on client: " + clientCount);
-		} else {
-			serverCount++;
-			System.out.println("Falling tree entity died on server: " + serverCount);
-		}
-
 		
 		if(world.isRemote && !clientBuilt) {
 			System.out.println("Warning!: Falling tree entity died before it's client info could be set!");

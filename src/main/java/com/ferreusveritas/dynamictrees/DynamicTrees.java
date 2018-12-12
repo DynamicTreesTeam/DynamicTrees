@@ -121,7 +121,7 @@ public class DynamicTrees {
 		@SubscribeEvent
 		public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
 			int id = 0;
-			EntityRegistry.registerModEntity(new ResourceLocation(ModConstants.MODID, "falling_tree"), EntityFallingTree.class, "falling_tree", id++, ModConstants.MODID, 32, 1, true);
+			EntityRegistry.registerModEntity(new ResourceLocation(ModConstants.MODID, "falling_tree"), EntityFallingTree.class, "falling_tree", id++, ModConstants.MODID, 512, Integer.MAX_VALUE, true);
 		}
 	}
 	

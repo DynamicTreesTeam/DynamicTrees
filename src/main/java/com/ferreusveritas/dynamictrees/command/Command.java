@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -26,13 +25,6 @@ public class Command extends CommandBase {
 			if("repop".equals(args[0])) {
 				System.out.println("Repopulating worldgen database");
 				WorldGenRegistry.populateDataBase();
-			}
-			else
-			if("debug".equals(args[0])) {
-				EntityFallingTree.spawnCount = 0;
-				EntityFallingTree.serverCount = 0;
-				EntityFallingTree.clientCount = 0;
-				EntityFallingTree.clientBuildCount = 0;
 			}
 		}
 	}
