@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -37,6 +38,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -186,7 +188,16 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean unknown) {
-		if(entityIn instanceof EntityFallingTree) {
+		if(entityIn instanceof EntityItem) {
+			EntityItem item = (EntityItem) entityIn;
+			if(item.getItem().getItem() instanceof Seed) {
+				return; //Let seeds fall through the canopy
+			} else {
+				super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, unknown);
+				return; //Items sit on top like a regular block
+			}
+		}
+		if(entityIn == null || entityIn instanceof EntityFallingTree) {
 			return;
 		}
 		if(passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
@@ -243,7 +254,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if(passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
+		if(entity instanceof EntityItem || passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
 			super.onEntityCollidedWithBlock(world, pos, state, entity);
 		} 
 		else {
