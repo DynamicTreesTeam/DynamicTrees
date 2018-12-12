@@ -65,6 +65,11 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 	
 	@Override
 	public void handleMotion(EntityFallingTree entity) {
+		
+		if(entity.landed) {
+			return;
+		}
+		
 		entity.motionY -= AnimationConstants.TREE_GRAVITY;
 		
 		//Create drag in air
