@@ -417,12 +417,4 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		return null;
 	}
 	
-	@Override
-	public void onRemovedFromWorld() {
-		super.onRemovedFromWorld();
-		
-		if(world.isRemote && !clientBuilt) {
-			System.out.println("Warning!: Falling tree entity died before it's client info could be set!");
-		}
-	}
 }
