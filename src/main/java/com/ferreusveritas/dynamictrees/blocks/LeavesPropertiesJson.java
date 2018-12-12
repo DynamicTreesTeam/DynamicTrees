@@ -273,7 +273,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	private JsonPrimitive colorPrimitive = null;
 	
 	@SideOnly(Side.CLIENT)
-	private IBlockColor colorMultiplier = (s,w,p,t) -> super.foliageColorMultiplier(s, w, p);
+	private IBlockColor colorMultiplier;
 	
 	@SideOnly(Side.CLIENT)
 	@Override
@@ -315,6 +315,8 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		if(colorPrimitive != null) {
 			colorMultiplier = processColor(colorPrimitive);
 			colorPrimitive = null;
+		} else {
+			colorMultiplier = (s,w,p,t) -> super.foliageColorMultiplier(s, w, p);
 		}
 	}
 
