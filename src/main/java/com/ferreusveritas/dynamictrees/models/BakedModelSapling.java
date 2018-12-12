@@ -28,8 +28,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 /**
- * TODO:
- * [ ]: Saplings have incorrect breaking particles
  * 
  * @author ferreusveritas
  *

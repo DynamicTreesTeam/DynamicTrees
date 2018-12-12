@@ -5,6 +5,7 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.models.BakedModelSapling;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -17,6 +18,9 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleDigging;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -24,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -254,6 +259,72 @@ public class BlockDynamicSapling extends Block implements ITileEntityProvider, I
 	@Override
 	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, IBlockState state) {
 		return getSpecies(world, pos, state).canUseBoneMealNow(world, rand, pos);
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+		IBlockState state = world.getBlockState(pos);
+		Species species = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
+		IBakedModel model = BakedModelSapling.getModelForSapling(species);
+		
+		if (!state.getBlock().isAir(state, world, pos)) {
+			int i = 4;
+            for (int j = 0; j < 4; ++j) {
+                for (int k = 0; k < 4; ++k) {
+                    for (int l = 0; l < 4; ++l) {
+                    	double d0 = ((double) j + 0.5D) / 4.0D;
+                        double d1 = ((double) k + 0.5D) / 4.0D;
+                        double d2 = ((double) l + 0.5D) / 4.0D;
+                    	
+                        ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), (double) pos.getX() + d0, (double) pos.getY() + d1, (double) pos.getZ() + d2, d0 - 0.5D, d1 - 0.5D, d2 - 0.5D, Block.getStateId(state));
+                    	if (particle != null) {
+                    		particle.setParticleTexture(model.getParticleTexture());
+            				particle.setBlockPos(pos);
+                    	}
+                    }
+                }
+            }
+		}
+		
+		return true;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
+		BlockPos pos = target.getBlockPos();
+		if (state instanceof IExtendedBlockState) {
+			Species species = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
+			IBakedModel model = BakedModelSapling.getModelForSapling(species);
+			Random rand = world.rand;
+			
+			int x = pos.getX();
+			int y = pos.getY();
+			int z = pos.getZ();
+			AxisAlignedBB axisalignedbb = state.getBoundingBox(world, pos);
+			double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
+			double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
+			double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
+			
+			switch(target.sideHit) {
+				case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
+				case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
+				case NORTH: d2 = z + axisalignedbb.minZ - 0.1D; break;
+				case SOUTH: d2 = z + axisalignedbb.maxZ + 0.1D; break;
+				case WEST:  d0 = x + axisalignedbb.minX - 0.1D; break;
+				case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
+			}
+			
+			//Safe to spawn particles here since this is a client side only member function
+			ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), d0, d1, d2, 0, 0, 0, Block.getStateId(state));
+			if (particle != null) {
+				particle.setParticleTexture(model.getParticleTexture());
+				particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+			}
+		}
+		
+		return true;
 	}
 	
 }
