@@ -341,7 +341,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	public boolean shouldDie() {
-		return ticksExisted > 40 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
+		return ticksExisted > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
 	}
 	
 	/**
