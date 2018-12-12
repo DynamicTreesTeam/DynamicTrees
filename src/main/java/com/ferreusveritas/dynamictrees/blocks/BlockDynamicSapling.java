@@ -269,7 +269,6 @@ public class BlockDynamicSapling extends Block implements ITileEntityProvider, I
 		IBakedModel model = BakedModelSapling.getModelForSapling(species);
 		
 		if (!state.getBlock().isAir(state, world, pos)) {
-			int i = 4;
             for (int j = 0; j < 4; ++j) {
                 for (int k = 0; k < 4; ++k) {
                     for (int l = 0; l < 4; ++l) {
