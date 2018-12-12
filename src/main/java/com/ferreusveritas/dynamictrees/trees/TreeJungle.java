@@ -44,7 +44,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			//Add species features
 			addGenFeature(new FeatureGenCocoa());
-			addGenFeature(new FeatureGenVine());
+			addGenFeature(new FeatureGenVine().setQuantity(16).setMaxLength(16));
 			addGenFeature(new FeatureGenUndergrowth());
 		}
 		
