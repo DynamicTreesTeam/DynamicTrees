@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.command.Command;
+import com.ferreusveritas.dynamictrees.command.DTCommand;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -86,7 +86,7 @@ public class DynamicTrees {
 	
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(new Command());
+		event.registerServerCommand(new DTCommand());
 	}
 	
 	@Mod.EventBusSubscriber
