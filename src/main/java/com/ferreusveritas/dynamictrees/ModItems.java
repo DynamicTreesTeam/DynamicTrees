@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModItems {
@@ -28,6 +29,8 @@ public class ModItems {
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
+		
+		registry.register(new ItemBlock(ModBlocks.experimental).setRegistryName(ModBlocks.experimental.getRegistryName()));
 	}
 	
 }

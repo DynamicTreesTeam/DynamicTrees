@@ -21,6 +21,7 @@ import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -40,6 +41,8 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
 	
+	public static Block experimental;
+	
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
 	public static CommonBlockStates blockStates;
@@ -58,6 +61,11 @@ public class ModBlocks {
 		blockTrunkShell = new BlockTrunkShell();
 		
 		blockStates = new CommonBlockStates();
+		
+		experimental = new Block(Material.WOOD)
+				.setCreativeTab(DynamicTrees.dynamicTreesTab)
+				.setRegistryName(new ResourceLocation(ModConstants.MODID, "experimental"))
+				.setUnlocalizedName("experimental");
 		
 		setupLeavesProperties();
 	}
@@ -83,7 +91,8 @@ public class ModBlocks {
 			blockBonsaiPot,
 			blockFruitCocoa,
 			blockApple,
-			blockTrunkShell
+			blockTrunkShell,
+			experimental
 		);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
@@ -23,6 +25,8 @@ import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
+import com.ferreusveritas.dynamictrees.models.experimental.ModelLoaderExperimental;
+import com.ferreusveritas.dynamictrees.models.experimental.ModelResourceLocationWithState2;
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockBranchBasic;
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockBranchCactus;
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockBranchThick;
@@ -44,6 +48,8 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
@@ -98,6 +104,13 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootyDirtSpecies, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		ModelLoader.setCustomStateMapper(ModBlocks.blockRootySand, new StateMap.Builder().ignore(BlockRooty.LIFE).build());
 		
+		ModelLoader.setCustomStateMapper(ModBlocks.experimental, blockIn -> {
+			Map<IBlockState, ModelResourceLocation> modelMap = new HashMap<>();
+			ModelResourceLocation mrl = new ModelResourceLocationWithState2(new ResourceLocation(ModConstants.MODID, "branch"), Blocks.LOG.getDefaultState());
+			blockIn.getBlockState().getValidStates().forEach(state -> modelMap.put(state, mrl));
+			return modelMap;
+		});
+		
 		//Register Potion Mesher
 		for(DendroPotion.DendroPotionType type: DendroPotion.DendroPotionType.values()) {
 			ModelHelper.regModel(ModItems.dendroPotion, type.getIndex());
@@ -135,6 +148,8 @@ public class ClientProxy extends CommonProxy {
 		ModelHelper.regModel(ModTrees.dynamicCactus.getDynamicBranch());
 		ModelHelper.regModel(ModTrees.dynamicCactus.getCommonSpecies().getSeed());
 		
+		ModelHelper.regModel(ItemBlock.getItemFromBlock(ModBlocks.experimental));
+		
 		//Special seed for apple
 		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
@@ -150,6 +165,8 @@ public class ClientProxy extends CommonProxy {
 		ModelLoaderRegistry.registerLoader(new ModelLoaderSapling());
 		
 		ModelLoaderRegistry.registerLoader(new ModelLoaderWrapper());
+		
+		ModelLoaderRegistry.registerLoader(new ModelLoaderExperimental());
 	}
 	
 	public void registerColorHandlers() {
