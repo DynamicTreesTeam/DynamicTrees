@@ -1,17 +1,17 @@
 package com.ferreusveritas.dynamictrees.models.experimental;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -29,6 +29,13 @@ public class ModelLoaderExperimental implements ICustomModelLoader {
 	
 	protected IResourceManager resourceManager;
 	
+	public static Map<String, Function<ModelResourceLocationWithState2, IModel>> modelCreatorMap = new HashMap<>();
+	
+	static {
+		modelCreatorMap.put( "branch", r -> loadModelBranch(r) );
+		modelCreatorMap.put( "leaves", r -> new ModelBlockExperimental(r) );
+	}
+	
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
@@ -36,86 +43,39 @@ public class ModelLoaderExperimental implements ICustomModelLoader {
 	
 	@Override
 	public boolean accepts(ResourceLocation modelLocation) {
-		return modelLocation instanceof ModelResourceLocationWithState2;
+		
+		if(modelLocation instanceof ModelResourceLocationWithState2) {
+			return modelCreatorMap.containsKey(modelLocation.getResourcePath());
+		}
+		
+		return false;
 	}
 	
 	@Override
 	public IModel loadModel(ResourceLocation modelLocation) throws Exception {
-		
-		if(modelLocation instanceof ModelResourceLocationWithState2) {
-			ModelResourceLocationWithState2 modelWithBlockState = (ModelResourceLocationWithState2) modelLocation;
-			IBlockState state = modelWithBlockState.getBlockState();
+		return accepts(modelLocation) ? modelCreatorMap.get(modelLocation.getResourcePath()).apply((ModelResourceLocationWithState2) modelLocation) : null;
+	}
 			
-			//return new ModelBlockExperimental(state);
-			
+	
+	public static IModel loadModelBranch(ModelResourceLocationWithState2 modelWithBlockState) {
+			IBlockState blockState = modelWithBlockState.getBlockState();
 			return new IModel() {
-				
-				private IBakedModel wrappedModel;
-				
-				public IBakedModel getWrappedModel(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-					//if(wrappedModel == null) {
-						//Block block = Block.REGISTRY.getObject(new ResourceLocation("thaumcraft", "log_silverwood"));
-						//Block block = Block.REGISTRY.getObject(new ResourceLocation("exampletrees", "ironlog"));
-						//Block block = Block.REGISTRY.getObject(new ResourceLocation("harvestcraft", "pamcinnamon"));
-						Block block = Block.REGISTRY.getObject(new ResourceLocation("thaumcraft", "taint_log"));
-						IBlockState state = block.getDefaultState();
-						
-						IModel model = getModelForState(state);
-						
-						ResourceLocation ringsRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
-						ResourceLocation barkRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.SOUTH);
-						
-						wrappedModel = new BakedModelBlockBranchBasic(barkRes, ringsRes, bakedTextureGetter);
-						//wrappedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-					//}
-					return wrappedModel;
-				}
 				
 				@Override
 				public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-					
-					//All requests are forwarded to the wrapped model
-					return new IBakedModel() {
-						
+					return new BakedModelWrapped() {
 						@Override
-						public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-							return getWrappedModel(bakedTextureGetter).getQuads(state, side, rand);
+						public IBakedModel createModel() {
+							IModel model = getModelForState(blockState);
+							ResourceLocation ringsRes = getModelTexture(model, bakedTextureGetter, blockState, EnumFacing.UP);
+							ResourceLocation barkRes = getModelTexture(model, bakedTextureGetter, blockState, EnumFacing.SOUTH);
+							return new BakedModelBlockBranchBasic(barkRes, ringsRes, bakedTextureGetter);
 						}
-						
-						@Override
-						public boolean isGui3d() {
-							return getWrappedModel(bakedTextureGetter).isGui3d();
-						}
-						
-						@Override
-						public boolean isBuiltInRenderer() {
-							return getWrappedModel(bakedTextureGetter).isBuiltInRenderer();
-						}
-						
-						@Override
-						public boolean isAmbientOcclusion() {
-							return getWrappedModel(bakedTextureGetter).isAmbientOcclusion();
-						}
-						
-						@Override
-						public TextureAtlasSprite getParticleTexture() {
-							return getWrappedModel(bakedTextureGetter).getParticleTexture();
-						}
-						
-						@Override
-						public ItemOverrideList getOverrides() {
-							return getWrappedModel(bakedTextureGetter).getOverrides();
-						}
-					};
-					
+					}; 
 				}
 				
 			};
 			
-			
-		}
-		
-		return null;
 	}
 	
 	public static IModel getModelForState(IBlockState state) {		
