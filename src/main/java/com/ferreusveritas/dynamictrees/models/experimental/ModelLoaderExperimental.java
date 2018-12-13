@@ -53,19 +53,21 @@ public class ModelLoaderExperimental implements ICustomModelLoader {
 				private IBakedModel wrappedModel;
 				
 				public IBakedModel getWrappedModel(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-					if(wrappedModel == null) {
-						Block block = Block.REGISTRY.getObject(new ResourceLocation("thaumcraft", "log_silverwood"));
+					//if(wrappedModel == null) {
+						//Block block = Block.REGISTRY.getObject(new ResourceLocation("thaumcraft", "log_silverwood"));
 						//Block block = Block.REGISTRY.getObject(new ResourceLocation("exampletrees", "ironlog"));
+						//Block block = Block.REGISTRY.getObject(new ResourceLocation("harvestcraft", "pamcinnamon"));
+						Block block = Block.REGISTRY.getObject(new ResourceLocation("thaumcraft", "taint_log"));
 						IBlockState state = block.getDefaultState();
 						
 						IModel model = getModelForState(state);
 						
-						ResourceLocation barkRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
-						ResourceLocation ringsRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.SOUTH);
+						ResourceLocation ringsRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
+						ResourceLocation barkRes = getModelTexture(model, bakedTextureGetter, state, EnumFacing.SOUTH);
 						
 						wrappedModel = new BakedModelBlockBranchBasic(barkRes, ringsRes, bakedTextureGetter);
 						//wrappedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-					}
+					//}
 					return wrappedModel;
 				}
 				
@@ -145,7 +147,7 @@ public class ModelLoaderExperimental implements ICustomModelLoader {
 			for(ResourceLocation tex : model.getTextures()) {
 				TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
 				float u = tas.getInterpolatedU(8);
-				float v = tas.getInterpolatedU(8);
+				float v = tas.getInterpolatedV(8);
 				sprites.add(tas);
 				float du = u - uvs[0];
 				float dv = v - uvs[1];
@@ -162,7 +164,7 @@ public class ModelLoaderExperimental implements ICustomModelLoader {
 	
 	public static float[] getSpriteUVFromBlockState(IBlockState state, EnumFacing side) {
 		IBakedModel bakedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-		List<BakedQuad> quads = bakedModel.getQuads(state, EnumFacing.UP, 0);
+		List<BakedQuad> quads = bakedModel.getQuads(state, side, 0);
 		BakedQuad quad = quads.get(0);
 		
 		float u = 0.0f;

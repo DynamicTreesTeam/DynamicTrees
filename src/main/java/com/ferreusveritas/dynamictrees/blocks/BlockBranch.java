@@ -70,7 +70,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
 	};
 	
-	private TreeFamily tree; //The tree this branch type creates
+	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
 	
 	public BlockBranch(Material material, String name) {
 		super(material);

@@ -7,6 +7,7 @@ import java.util.Map;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
@@ -18,6 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -41,7 +43,7 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
 	
-	public static Block experimental;
+	public static BlockBranchBasic experimental;
 	
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
@@ -62,10 +64,8 @@ public class ModBlocks {
 		
 		blockStates = new CommonBlockStates();
 		
-		experimental = new Block(Material.WOOD)
-				.setCreativeTab(DynamicTrees.dynamicTreesTab)
-				.setRegistryName(new ResourceLocation(ModConstants.MODID, "experimental"))
-				.setUnlocalizedName("experimental");
+		experimental = (BlockBranchBasic) new BlockBranchBasic("experimental").setCreativeTab(DynamicTrees.dynamicTreesTab);
+		
 		
 		setupLeavesProperties();
 	}
