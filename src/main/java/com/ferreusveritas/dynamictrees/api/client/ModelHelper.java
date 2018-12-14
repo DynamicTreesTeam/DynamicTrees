@@ -55,7 +55,7 @@ public class ModelHelper {
 	
 	public static void setBranchForAutoCreate(BlockBranch blockBranch) {
 		ModelLoader.setCustomStateMapper(blockBranch, state -> {
-			ModelResourceLocationWrapped resloc = new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getFamily().getPrimitiveLog());
+			ModelResourceLocationWrapped resloc = new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getDefaultState());
 			return blockBranch.getBlockState().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> resloc));
 		});
 	}

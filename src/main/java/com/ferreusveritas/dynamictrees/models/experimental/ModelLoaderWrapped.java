@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchThick;
@@ -55,9 +56,12 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 		return new ModelBlockWrapped(location) {
 			@Override
 			public IBakedModel createBakedModel(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-				IModel model = QuadManipulator.getModelForState(blockState);
-				ResourceLocation ringsRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, blockState, EnumFacing.UP);
-				ResourceLocation barkRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, blockState, EnumFacing.SOUTH);
+				BlockBranch branch = (BlockBranch) blockState.getBlock();
+				IBlockState primLog = branch.getFamily().getPrimitiveLog();
+				
+				IModel model = QuadManipulator.getModelForState(primLog);
+				ResourceLocation ringsRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, primLog, EnumFacing.UP);
+				ResourceLocation barkRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, primLog, EnumFacing.SOUTH);
 				return thick ? 
 					new BakedModelBlockBranchThick(barkRes, ringsRes, ringsRes, bakedTextureGetter) : //TODO: Work out thick ring texture
 					new BakedModelBlockBranchBasic(barkRes, ringsRes, bakedTextureGetter);
