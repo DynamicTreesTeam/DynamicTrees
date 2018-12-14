@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -8,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -106,8 +108,29 @@ public class QuadManipulator {
 		return model;
 	}
 	
+	private static ModelManager modelManager = null;
+	
+	public static ModelManager getModelManager() {
+		if(modelManager == null) {
+			try {
+				Field[] fields = Minecraft.class.getDeclaredFields();
+				for(Field f : fields) {
+					if(f.getType() == ModelManager.class) {
+						f.setAccessible(true);
+						return modelManager = (ModelManager) f.get(Minecraft.getMinecraft());
+					}
+				}
+			}
+			catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		return modelManager;
+	}
+	
 	public static ModelResourceLocation getModelLocation(IBlockState state) {
-		return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getBlockStateMapper().getVariants(state.getBlock()).get(state);
+		return getModelManager().getBlockModelShapes().getBlockStateMapper().getVariants(state.getBlock()).get(state);//This gives us earlier access
+		//return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getBlockStateMapper().getVariants(state.getBlock()).get(state);
 	}
 	
 	public static ResourceLocation getModelTexture(IModel model, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter, IBlockState state, EnumFacing dir) {
@@ -138,7 +161,7 @@ public class QuadManipulator {
 	}
 	
 	public static float[] getSpriteUVFromBlockState(IBlockState state, EnumFacing side) {
-		IBakedModel bakedModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+		IBakedModel bakedModel = getModelManager().getBlockModelShapes().getModelForState(state);
 		List<BakedQuad> quads = bakedModel.getQuads(state, side, 0);
 		BakedQuad quad = quads.get(0);
 		

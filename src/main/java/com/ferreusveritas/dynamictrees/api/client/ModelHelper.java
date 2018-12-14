@@ -33,18 +33,12 @@ public class ModelHelper {
 	 */
 	public static void regModel(TreeFamily tree) {
 		
-		if(tree.autoCreateBranch()) {
-			BlockBranch branch = tree.getDynamicBranch();
-			setBranchForAutoCreate(branch);
-			if(branch instanceof BlockBranchThick) {
-				setBranchForAutoCreate(((BlockBranchThick) branch).otherBlock);
-			}
-		} else {
-			BlockBranch branch = tree.getDynamicBranch();
-			setBranchForManualCreate(branch);
-			if(branch instanceof BlockBranchThick) {
-				setBranchForManualCreate(((BlockBranchThick) branch).otherBlock);
-			}
+		BlockBranch blockBranch = tree.getDynamicBranch();
+		ModelResourceLocation modelLocation = getCreateBranchModel(blockBranch, tree.autoCreateBranch());
+		
+		setGenericStateMapper(blockBranch, modelLocation);
+		if(blockBranch instanceof BlockBranchThick) {
+			setGenericStateMapper(((BlockBranchThick) blockBranch).otherBlock, modelLocation);
 		}
 		
 		BlockSurfaceRoot surfaceRoot = tree.getSurfaceRoots();
@@ -53,15 +47,24 @@ public class ModelHelper {
 		}
 	}
 	
-	public static void setBranchForAutoCreate(BlockBranch blockBranch) {
-		ModelLoader.setCustomStateMapper(blockBranch, state -> {
-			ModelResourceLocationWrapped resloc = new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getDefaultState());
-			return blockBranch.getBlockState().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> resloc));
-		});
+	private static ModelResourceLocation getCreateBranchModel(BlockBranch blockBranch, boolean automatic) {
+		return automatic ? getCreateBranchModelAuto(blockBranch) : getCreateBranchModelManual(blockBranch);
 	}
 	
-	public static void setBranchForManualCreate(BlockBranch blockBranch) {
-		ModelLoader.setCustomStateMapper( blockBranch, new StateMap.Builder().ignore(blockBranch.getIgnorableProperties()).build() );
+	private static ModelResourceLocation getCreateBranchModelAuto(BlockBranch blockBranch) {
+		return new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getDefaultState());
+	}
+	
+	private static ModelResourceLocation getCreateBranchModelManual(BlockBranch blockBranch) {
+		ResourceLocation family = blockBranch.getFamily().getName();
+		ResourceLocation resloc = new ResourceLocation(family.getResourceDomain(), family.getResourcePath() + "branch");
+		return new ModelResourceLocation(resloc , null);
+	}
+	
+	public static void setGenericStateMapper(Block block, ModelResourceLocation modelLocation) {
+		ModelLoader.setCustomStateMapper(block, state -> {
+			return block.getBlockState().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> modelLocation));
+		});
 	}
 	
 	public static void regModel(Block block) {

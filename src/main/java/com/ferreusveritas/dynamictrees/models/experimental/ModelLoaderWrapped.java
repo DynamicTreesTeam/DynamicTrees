@@ -1,11 +1,14 @@
 package com.ferreusveritas.dynamictrees.models.experimental;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
+import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchThick;
 
@@ -25,8 +28,7 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 	public static Map<String, Function<ModelResourceLocationWrapped, IModel>> modelCreatorMap = new HashMap<>();
 	
 	static {
-		modelCreatorMap.put( "branch", r -> loadModelBranch(r, false) );
-		modelCreatorMap.put( "thickbranch", r -> loadModelBranch(r, true) );
+		modelCreatorMap.put( "branch", r -> loadModelBranch(r) );
 		modelCreatorMap.put( "leaves", r -> loadModelLeaves(r) );
 	}
 	
@@ -50,8 +52,12 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 		return accepts(modelLocation) ? modelCreatorMap.get(modelLocation.getResourcePath()).apply((ModelResourceLocationWrapped) modelLocation) : null;
 	}
 	
-	public static IModel loadModelBranch(ModelResourceLocationWrapped location, boolean thick) {
+	public static IModel loadModelBranch(ModelResourceLocationWrapped location) {
+		
 		IBlockState blockState = location.getBlockState();
+		BlockBranch branch = (BlockBranch) blockState.getBlock();
+		boolean thick = branch instanceof BlockBranchThick;
+		ResourceLocation thickRingRes = thick ? injectThickRingTextures(location) : null;
 		
 		return new ModelBlockWrapped(location) {
 			@Override
@@ -63,10 +69,36 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 				ResourceLocation ringsRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, primLog, EnumFacing.UP);
 				ResourceLocation barkRes = QuadManipulator.getModelTexture(model, bakedTextureGetter, primLog, EnumFacing.SOUTH);
 				return thick ? 
-					new BakedModelBlockBranchThick(barkRes, ringsRes, ringsRes, bakedTextureGetter) : //TODO: Work out thick ring texture
+					new BakedModelBlockBranchThick(barkRes, ringsRes, thickRingRes != null ? thickRingRes : ringsRes, bakedTextureGetter) :
 					new BakedModelBlockBranchBasic(barkRes, ringsRes, bakedTextureGetter);
 			}
 		};
+	}
+	
+	private static ResourceLocation injectThickRingTextures(ModelResourceLocationWrapped location) {
+		IBlockState blockState = location.getBlockState();
+		BlockBranch branch = (BlockBranch) blockState.getBlock();
+		
+		ResourceLocation familyName = branch.getFamily().getName();
+		
+		IBlockState primLog = branch.getFamily().getPrimitiveLog();
+		IModel model = QuadManipulator.getModelForState(primLog);
+		
+		Iterator<ResourceLocation> iter = model.getTextures().iterator();
+		ResourceLocation candidate1 = iter.hasNext() ? iter.next() : null;
+		ResourceLocation candidate2 = iter.hasNext() ? iter.next() : null;
+		
+		if(candidate1 != null) {
+			if(candidate2 != null) {
+				if(candidate1.getResourceDomain().equals(candidate2.getResourceDomain())) { //The candidates must be from the same domain
+					ResourceLocation thickRingRes = new ResourceLocation(candidate1.getResourceDomain(), "blocks/log_" +  familyName.getResourcePath() + "_top_thick");
+					return TextureGenerationHandler.addDualTextureLocations(candidate1, candidate2, thickRingRes);
+				}
+			}
+			return TextureGenerationHandler.addRingTextureLocation(candidate1);
+		}
+		
+		return null;
 	}
 	
 	public static IModel loadModelLeaves(ModelResourceLocationWrapped location) {

@@ -15,22 +15,58 @@ import net.minecraft.util.ResourceLocation;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 
-	ResourceLocation baseRingLocation;
+	private final ResourceLocation baseRingLocation;
+	private final ResourceLocation baseRingLocationAlternate;
 	
 	public ThickRingTextureAtlasSprite(ResourceLocation spriteName, ResourceLocation baseRingLocation) {
 		super(spriteName.toString());
 		
 		this.baseRingLocation = baseRingLocation;
+		this.baseRingLocationAlternate = null;
+	}
+	
+	/**
+	 * Given these two resources attempt to figure out which is the ringed texture.
+	 * 
+	 * @param spriteName
+	 * @param baseRingLocation
+	 * @param baseRingLocationAlternate
+	 */
+	public ThickRingTextureAtlasSprite(ResourceLocation spriteName, ResourceLocation baseRingLocation, ResourceLocation baseRingLocationAlternate) {
+		super(spriteName.toString());
+		
+		this.baseRingLocation = baseRingLocation;
+		this.baseRingLocationAlternate = baseRingLocationAlternate;
 	}
 	
 	@Override
 	public boolean hasCustomLoader(net.minecraft.client.resources.IResourceManager manager, net.minecraft.util.ResourceLocation location) {
 		return true;
 	}
-
+	
+	public ResourceLocation solveRingTexture(Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+		
+		//If there's no alternative then obviously we must use the primary
+		if(this.baseRingLocationAlternate == null) {
+			return this.baseRingLocation;
+		}
+		
+		//A basic check that fits 80% of the time.  Usually the ringed texture's resource ends in "top" e.g. "log_oak_top"
+		if(baseRingLocation.getResourcePath().endsWith("top")) {
+			return baseRingLocation;
+		}
+		if(baseRingLocationAlternate.getResourcePath().endsWith("top")) {
+			return baseRingLocationAlternate;
+		}
+		
+		//TODO: More complex methods here
+		
+		return baseRingLocation;
+	}
+	
 	@Override
 	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-		TextureAtlasSprite baseTexture = textureGetter.apply(baseRingLocation);
+		TextureAtlasSprite baseTexture = textureGetter.apply(solveRingTexture(textureGetter));
 		int srcWidth = baseTexture.getIconWidth();
 		int srcHeight = baseTexture.getIconHeight();
 		
@@ -187,7 +223,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
-		return ImmutableList.of(baseRingLocation);
+		return baseRingLocationAlternate == null ?
+			ImmutableList.of(baseRingLocation) :
+			ImmutableList.of(baseRingLocation, baseRingLocationAlternate);
 	}
-
+	
 }

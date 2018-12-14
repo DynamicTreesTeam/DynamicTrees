@@ -20,12 +20,28 @@ public class TextureGenerationHandler {
 	
 	private static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<ResourceLocation, ResourceLocation>();
 	
+	public static class DualResourceLocation extends ResourceLocation {
+		private ResourceLocation alternate;
+		
+		public DualResourceLocation(ResourceLocation primary, ResourceLocation alternate) {
+			super(primary.getResourceDomain(), primary.getResourcePath());
+			this.alternate = alternate;
+		}
+		
+		public ResourceLocation getAlternate() {
+			return alternate;
+		}
+	}
+	
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
-		ResourceLocation thickRingsRes = new ResourceLocation(ringsRes.getResourceDomain(), ringsRes.getResourcePath() + "_thick");
-		
-		thickRingTextures.put(ringsRes, thickRingsRes);
-		
-		return thickRingsRes;
+		ResourceLocation outputRes = new ResourceLocation(ringsRes.getResourceDomain(), ringsRes.getResourcePath() + "_thick");
+		thickRingTextures.put(ringsRes, outputRes);
+		return outputRes;
+	}
+	
+	public static ResourceLocation addDualTextureLocations(ResourceLocation res1, ResourceLocation res2, ResourceLocation outputRes) {		
+		thickRingTextures.put(new DualResourceLocation(res1, res2), outputRes);
+		return outputRes;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -34,6 +50,12 @@ public class TextureGenerationHandler {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		
 		for (Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()) {
+			
+			if(entry.getKey() instanceof DualResourceLocation) {
+				dualStitch(event, (DualResourceLocation) entry.getKey(), entry.getValue());
+				continue;
+			}
+			
 			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getResourceDomain(), String.format("%s/%s%s", event.getMap().getBasePath(), entry.getValue().getResourcePath(), ".png"));
 			
 			IResource resource;
@@ -50,5 +72,11 @@ public class TextureGenerationHandler {
 			}
 		}
 	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void dualStitch(TextureStitchEvent.Pre event, DualResourceLocation key, ResourceLocation value) {
+		event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(value, key, key.getAlternate()));
+	}
 
+	
 }

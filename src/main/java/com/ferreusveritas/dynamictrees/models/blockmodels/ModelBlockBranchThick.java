@@ -33,7 +33,7 @@ public class ModelBlockBranchThick extends ModelBlockBranchBasic {
 	public Collection<ResourceLocation> getTextures() {
 		return ImmutableList.copyOf(new ResourceLocation[]{barkTexture, ringsTexture, thickRingsTexture});
 	}
-
+	
 	// Bake the subcomponents into a CompositeModel
 	@Override
 	public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
