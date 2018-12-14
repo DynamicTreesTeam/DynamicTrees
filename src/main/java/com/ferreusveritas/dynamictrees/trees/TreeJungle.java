@@ -67,6 +67,11 @@ public class TreeJungle extends TreeFamilyVanilla {
 	}
 	
 	@Override
+	public boolean autoCreateBranch() {
+		return true;
+	}
+	
+	@Override
 	public boolean onTreeActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 	
 		//Place Cocoa Pod if we are holding Cocoa Beans

@@ -7,7 +7,6 @@ import java.util.Map;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
@@ -19,11 +18,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -42,9 +39,7 @@ public class ModBlocks {
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
-	
-	public static BlockBranchBasic experimental;
-	
+		
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
 	public static CommonBlockStates blockStates;
@@ -62,10 +57,7 @@ public class ModBlocks {
 		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		blockTrunkShell = new BlockTrunkShell();
 		
-		blockStates = new CommonBlockStates();
-		
-		experimental = (BlockBranchBasic) new BlockBranchBasic("experimental").setCreativeTab(DynamicTrees.dynamicTreesTab);
-		
+		blockStates = new CommonBlockStates();		
 		
 		setupLeavesProperties();
 	}
@@ -91,8 +83,7 @@ public class ModBlocks {
 			blockBonsaiPot,
 			blockFruitCocoa,
 			blockApple,
-			blockTrunkShell,
-			experimental
+			blockTrunkShell
 		);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));

@@ -56,11 +56,6 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily);
 		}
 		
-		@Override
-		public boolean isThick() {
-			return false;
-		}
-		
 	}
 	
 	public class SpeciesMegaSpruce extends SpeciesBaseSpruce {
@@ -93,6 +88,11 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		@Override
 		public int maxBranchRadius() {
 			return 24;
+		}
+		
+		@Override
+		public boolean isThick() {
+			return true;
 		}
 	}
 	

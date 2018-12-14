@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models;
+package com.ferreusveritas.dynamictrees.models.experimental;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -13,11 +13,11 @@ import net.minecraftforge.client.model.ICustomModelLoader;
  * @author ferreusveritas
  * 
  */
-public class ModelResourceLocationWithState extends ModelResourceLocation {
+public class ModelResourceLocationWrapped extends ModelResourceLocation {
 	
 	private IBlockState state;
 	
-	public ModelResourceLocationWithState(ResourceLocation location, IBlockState state) {
+	public ModelResourceLocationWrapped(ResourceLocation location, IBlockState state) {
 		super(location, null);
 		this.state = state;
 	}
@@ -28,7 +28,7 @@ public class ModelResourceLocationWithState extends ModelResourceLocation {
 	
 	@Override
 	public boolean equals(Object other) {
-		return super.equals(other) && (other instanceof ModelResourceLocationWithState ? ((ModelResourceLocationWithState)other).getBlockState().equals(getBlockState()) : false );
+		return super.equals(other) && (other instanceof ModelResourceLocationWrapped ? ((ModelResourceLocationWrapped)other).getBlockState().equals(getBlockState()) : false );
 	}
 	
 	@Override

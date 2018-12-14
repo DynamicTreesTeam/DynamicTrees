@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWithState;
+import com.ferreusveritas.dynamictrees.models.experimental.ModelResourceLocationWrapped;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -21,9 +21,9 @@ public class LeavesStateMapper implements IStateMapper {
 		
 		if(blockIn instanceof BlockDynamicLeaves) {
 			BlockDynamicLeaves leaves = (BlockDynamicLeaves) blockIn;
-			ResourceLocation resloc = new ResourceLocation(ModConstants.MODID, "autoleaf");	
+			ResourceLocation resloc = new ResourceLocation(ModConstants.MODID, "leaves");
 			for(IBlockState iblockstate : blockIn.getBlockState().getValidStates()) {
-				modelMap.put(iblockstate, new ModelResourceLocationWithState(resloc, leaves.getProperties(iblockstate).getPrimitiveLeaves()));
+				modelMap.put(iblockstate, new ModelResourceLocationWrapped(resloc, leaves.getProperties(iblockstate).getPrimitiveLeaves()));
 			}
 		}
 		return modelMap;

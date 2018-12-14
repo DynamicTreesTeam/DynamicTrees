@@ -105,6 +105,12 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			
 			return false;
 		}
+		
+		@Override
+		public boolean isThick() {
+			return true;
+		}
+		
 	}
 	
 	BlockSurfaceRoot surfaceRootBlock;

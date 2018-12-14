@@ -11,23 +11,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.model.IModelState;
 
-public class ModelBlockExperimental implements IModel {
+public class ModelBlockWrapped implements IModel {
 	
 	private final IBlockState blockState;
 	
-	public ModelBlockExperimental(ModelResourceLocationWithState2 resourceLocation) {
+	public ModelBlockWrapped(ModelResourceLocationWrapped resourceLocation) {
 		this.blockState = resourceLocation.getBlockState();
+	}
+	
+	public IBakedModel createBakedModel(Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+		return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
 	}
 	
 	@Override
 	public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		return new BakedModelWrapped() {
-
 			@Override
 			public IBakedModel createModel() {
-				return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
+				return createBakedModel(bakedTextureGetter);
 			}
-			
 		};
 	}
 	

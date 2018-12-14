@@ -551,7 +551,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	public boolean isThick() {
-		return getFamily().isThick();
+		return false;
 	}
 	
 	public int maxBranchRadius() {

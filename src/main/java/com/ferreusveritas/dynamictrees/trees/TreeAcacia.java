@@ -40,4 +40,8 @@ public class TreeAcacia extends TreeFamilyVanilla {
 		setCommonSpecies(new SpeciesAcacia(this));
 	}
 	
+	@Override
+	public boolean autoCreateBranch() {
+		return true;
+	}
 }

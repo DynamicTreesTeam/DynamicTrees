@@ -247,6 +247,10 @@ public class TreeFamily {
 		return false;
 	}
 	
+	public boolean autoCreateBranch() {
+		return false;
+	}
+	
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 * 

@@ -1,8 +1,12 @@
 package com.ferreusveritas.dynamictrees.api.client;
 
+import java.util.stream.Collectors;
+
+import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.models.experimental.ModelResourceLocationWrapped;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
@@ -28,21 +32,37 @@ public class ModelHelper {
 	 * @param tree
 	 */
 	public static void regModel(TreeFamily tree) {
-		ModelLoader.setCustomStateMapper(tree.getDynamicBranch(), new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build());
 		
-		if(tree.isThick()) {
-			ModelLoader.setCustomStateMapper(
-				((BlockBranchThick) tree.getDynamicBranch()).otherBlock,
-				new StateMap.Builder().ignore(tree.getDynamicBranch().getIgnorableProperties()).build()
-			);
+		if(tree.autoCreateBranch()) {
+			BlockBranch branch = tree.getDynamicBranch();
+			setBranchForAutoCreate(branch);
+			if(branch instanceof BlockBranchThick) {
+				setBranchForAutoCreate(((BlockBranchThick) branch).otherBlock);
+			}
+		} else {
+			BlockBranch branch = tree.getDynamicBranch();
+			setBranchForManualCreate(branch);
+			if(branch instanceof BlockBranchThick) {
+				setBranchForManualCreate(((BlockBranchThick) branch).otherBlock);
+			}
 		}
 		
 		BlockSurfaceRoot surfaceRoot = tree.getSurfaceRoots();
 		if(surfaceRoot != null) {
 			ModelLoader.setCustomStateMapper(surfaceRoot, new StateMap.Builder().ignore(surfaceRoot.getIgnorableProperties()).build());
 		}
-		
-	}	
+	}
+	
+	public static void setBranchForAutoCreate(BlockBranch blockBranch) {
+		ModelLoader.setCustomStateMapper(blockBranch, state -> {
+			ModelResourceLocationWrapped resloc = new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getFamily().getPrimitiveLog());
+			return blockBranch.getBlockState().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> resloc));
+		});
+	}
+	
+	public static void setBranchForManualCreate(BlockBranch blockBranch) {
+		ModelLoader.setCustomStateMapper( blockBranch, new StateMap.Builder().ignore(blockBranch.getIgnorableProperties()).build() );
+	}
 	
 	public static void regModel(Block block) {
 		if(block != Blocks.AIR) {
