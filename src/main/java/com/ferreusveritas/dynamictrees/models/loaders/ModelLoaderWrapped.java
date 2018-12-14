@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.experimental;
+package com.ferreusveritas.dynamictrees.models.loaders;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,8 +9,10 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWrapped;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchThick;
+import com.ferreusveritas.dynamictrees.models.blockmodels.ModelBlockWrapped;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;

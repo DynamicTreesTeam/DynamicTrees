@@ -1,6 +1,9 @@
-package com.ferreusveritas.dynamictrees.models.experimental;
+package com.ferreusveritas.dynamictrees.models.blockmodels;
 
 import java.util.function.Function;
+
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWrapped;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelWrapped;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

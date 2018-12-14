@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.models.experimental.ModelResourceLocationWrapped;
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWrapped;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;

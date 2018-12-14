@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.experimental;
+package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import java.util.List;
 

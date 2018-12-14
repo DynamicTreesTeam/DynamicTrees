@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.models.experimental.ModelResourceLocationWrapped;
+import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWrapped;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

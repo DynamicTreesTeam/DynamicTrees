@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.experimental;
+package com.ferreusveritas.dynamictrees.models;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
