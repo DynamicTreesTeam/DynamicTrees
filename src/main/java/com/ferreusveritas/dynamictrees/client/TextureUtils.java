@@ -176,15 +176,21 @@ public class TextureUtils {
 		long gAccum = 0;
 		long bAccum = 0;
 		
+		int count = 0;
+		
 		for(int i = 0; i < pixels.length; i++) {
-			rAccum += red(pixels[i]);
-			gAccum += green(pixels[i]);
-			bAccum += blue(pixels[i]);
+			int alpha = alpha(pixels[i]); 
+			if(alpha >= 128) {
+				rAccum += red(pixels[i]);
+				gAccum += green(pixels[i]);
+				bAccum += blue(pixels[i]);
+				count++;
+			}
 		}
 		
-		int r = (int) (rAccum / pixels.length);
-		int g = (int) (gAccum / pixels.length);
-		int b = (int) (bAccum / pixels.length);
+		int r = (int) (rAccum / count);
+		int g = (int) (gAccum / count);
+		int b = (int) (bAccum / count);
 		
 		return compose(r, g, b, 255);
 	}
