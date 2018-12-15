@@ -86,7 +86,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			setupStandardSeedDropping();
 			
 			//Add species features
-			addGenFeature(new FeatureGenVine().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(5));//Generate Vines
+			addGenFeature(new FeatureGenVine().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(24));//Generate Vines
 		}
 		
 		@Override
