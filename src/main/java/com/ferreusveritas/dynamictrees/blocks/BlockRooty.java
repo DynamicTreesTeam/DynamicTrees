@@ -454,4 +454,9 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 		return true;
 	}
 	
+	@SideOnly(Side.CLIENT)
+	public int rootColor(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
+		return getFamily(state, blockAccess, pos).getWoodColor();
+	}
+	
 }

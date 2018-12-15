@@ -143,6 +143,10 @@ public class TextureUtils {
 		return rgb;
 	}
 	
+	public static int compose(int c[]) {
+		return c.length >= 4 ? compose(c[0], c[1], c[2], c[3]) : 0;
+	}
+	
 	/**
 	 * @param c input color
 	 * @return an array ordered r, g, b, a

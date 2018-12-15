@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.proxy;
 
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConstants;
@@ -18,6 +20,8 @@ import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.client.QuadManipulator;
+import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
@@ -41,16 +45,17 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -78,9 +83,34 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postInit() {
 		super.postInit();
+		discoverWoodColors();
 		LeavesPropertiesJson.postInitClient();
 	}
 	
+	private void discoverWoodColors() {
+		
+		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
+		
+		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(s -> s.getFamily()).distinct().collect(Collectors.toList())) {
+			if(family != TreeFamily.NULLFAMILY) {
+				IBlockState state = family.getPrimitiveLog();
+				if(state.getBlock() != Blocks.AIR) {
+					IModel model = QuadManipulator.getModelForState(state);
+					ResourceLocation resloc = QuadManipulator.getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
+					
+					TextureAtlasSprite sprite = bakedTextureGetter.apply(resloc);
+					PixelBuffer pixbuf = new PixelBuffer(sprite);
+					int u = pixbuf.w / 16;
+					PixelBuffer center = new PixelBuffer(u * 8, u * 8);
+					pixbuf.blit(center, u * -8, u * -8);
+					
+					family.woodColor = center.averageColor();
+				}
+			}
+		}
+		
+	}
+
 	@Override
 	public void cleanUp() {
 		super.cleanUp();
@@ -151,6 +181,10 @@ public class ClientProxy extends CommonProxy {
 		ModelLoaderRegistry.registerLoader(new ModelLoaderWrapped());
 	}
 	
+	private boolean isValid(IBlockAccess access, BlockPos pos) {
+		return access == null || pos == null;
+	}
+	
 	public void registerColorHandlers() {
 		
 		final int white = 0xFFFFFFFF;
@@ -161,71 +195,41 @@ public class ClientProxy extends CommonProxy {
 		final BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
 		
 		//Register Rooty Colorizers
-		blockColors.registerBlockColorHandler(
-		new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos, int tintIndex) {
-				switch(tintIndex) {
-					case 0: return blockColors.colorMultiplier(ModBlocks.blockStates.grass, world, pos, tintIndex);
-					case 1: return 0xFFF1AE;//Root Color
-					default: return white;
-				}
+		blockColors.registerBlockColorHandler((state, world, pos, tintIndex) -> {
+			switch(tintIndex) {
+				case 0: return blockColors.colorMultiplier(ModBlocks.blockStates.grass, world, pos, tintIndex);
+				case 1: return state.getBlock() instanceof BlockRooty ? ((BlockRooty) state.getBlock()).rootColor(state, world, pos) : white;
+				default: return white;
 			}
 		},
-		new Block[] {ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake});
+		new Block[] { ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake });
 		
 		//Register Sapling Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return access == null || pos == null ? -1 : ModBlocks.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex);
-			}
+		ModelHelper.regColorHandler(ModBlocks.blockDynamicSapling, (state, access, pos, tintIndex) -> {
+			return isValid(access, pos) ? ModBlocks.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex) : white;
 		});
 		
 		//Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, new IBlockColor() {
-			@Override
-			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-				return (access == null || pos == null || !(state.getBlock() instanceof BlockBonsaiPot))
-					? white
-					: ModBlocks.blockBonsaiPot.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex);
-			}
+		ModelHelper.regColorHandler(ModBlocks.blockBonsaiPot, (state, access, pos, tintIndex) -> {
+			return isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
+				? ModBlocks.blockBonsaiPot.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white;
 		});
-		
 		
 		//ITEMS
 		
 		//Register Potion Colorizer
-		ModelHelper.regColorHandler(ModItems.dendroPotion, new IItemColor() {
-			@Override
-			public int colorMultiplier(ItemStack stack, int tintIndex) {
-				return tintIndex == 0 ? ModItems.dendroPotion.getColor(stack) : white;
-			}
-		});
+		ModelHelper.regColorHandler(ModItems.dendroPotion, (stack, tint) -> ModItems.dendroPotion.getColor(stack, tint));
 		
 		//Register Woodland Staff Mesher and Colorizer
-		ModelHelper.regColorHandler(ModItems.treeStaff, new IItemColor() {
-			@Override
-			public int colorMultiplier(ItemStack stack, int tintIndex) {
-				return tintIndex == 1 ? ModItems.treeStaff.getColor(stack) : white;
-			}
-		});
-		
+		ModelHelper.regColorHandler(ModItems.treeStaff, (stack, tint) -> ModItems.treeStaff.getColor(stack, tint));
 		
 		//TREE PARTS
 		
 		//Register GrowingLeavesBlocks Colorizers
 		for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values()) {
-			ModelHelper.regColorHandler(leaves, new IBlockColor() {
-				@Override
-				public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-					Block block = state.getBlock();
-					if(TreeHelper.isLeaves(block)) {
-						return ((BlockDynamicLeaves) block).getProperties(state).foliageColorMultiplier(state, worldIn, pos);
-					}
-					return magenta;
-				}
-			});
+			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> 
+				TreeHelper.isLeaves(state.getBlock()) ? ((BlockDynamicLeaves) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
+			);
 		}
 		
 	}

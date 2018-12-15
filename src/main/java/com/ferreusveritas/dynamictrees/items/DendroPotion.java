@@ -213,8 +213,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		
 	}
 	
-	public int getColor(ItemStack stack) {
-		return getPotionType(stack).getColor();
+	public int getColor(ItemStack stack, int tint) {
+		return tint == 0 ? getPotionType(stack).getColor() : 0xFFFFFFFF;
 	}
 	
 	@Override

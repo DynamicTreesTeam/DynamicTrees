@@ -35,6 +35,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 /**
@@ -84,6 +86,9 @@ public class TreeFamily {
 	private ItemStack stick;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
+	
+	@SideOnly(Side.CLIENT)
+	public int woodColor = 0xFFF1AE;//For roots
 	
 	public TreeFamily() {
 		this.name = new ResourceLocation(ModConstants.MODID, "null");
@@ -249,6 +254,11 @@ public class TreeFamily {
 	
 	public boolean autoCreateBranch() {
 		return false;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public int getWoodColor() {
+		return woodColor;
 	}
 	
 	/**

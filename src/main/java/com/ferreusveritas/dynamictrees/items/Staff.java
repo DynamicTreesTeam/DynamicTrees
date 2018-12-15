@@ -158,20 +158,23 @@ public class Staff extends Item {
 		}
 	}
 	
-	public int getColor(ItemStack itemStack) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		
-		int color = 0x0000FFFF;
-		
-		if(nbt.hasKey("color")) {
-			try {
-				color = Color.decode(nbt.getString("color")).getRGB();
-			} catch (NumberFormatException e) {
-				nbt.removeTag("color");
+	public int getColor(ItemStack itemStack, int tint) {
+		if(tint == 1) {
+			NBTTagCompound nbt = getNBT(itemStack);
+			
+			int color = 0x0000FFFF;
+			
+			if(nbt.hasKey("color")) {
+				try {
+					color = Color.decode(nbt.getString("color")).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.removeTag("color");
+				}
 			}
+			
+			return color;
 		}
-		
-		return color;
+		return 0xFFFFFFFF;//white
 	}
 	
 	public Staff setColor(ItemStack itemStack, String colStr) {
