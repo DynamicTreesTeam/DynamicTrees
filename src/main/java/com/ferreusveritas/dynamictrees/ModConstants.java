@@ -6,8 +6,8 @@ public class ModConstants {
 	public static final String NAME = "Dynamic Trees";
 	public static final String VERSION = "1.12.2-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
 	
-	public static final String AFTER = "after:";
-	public static final String BEFORE = "before:";
+	public static final String OPTAFTER = "after:";
+	public static final String OPTBEFORE = "before:";
 	public static final String REQAFTER = "required-after:";
 	public static final String REQBEFORE = "required-before:";
 	public static final String NEXT = ";";
@@ -44,17 +44,17 @@ public class ModConstants {
 	public static final String DEPENDENCIES
 		= REQAFTER + FORGE_VER
 		+ NEXT
-		+ BEFORE + RUSTIC_VER
+		+ OPTBEFORE + RUSTIC_VER
 		+ NEXT
-		+ BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
+		+ OPTBEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
-		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
+		+ OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
 		+ NEXT
-		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESPHC_VER
+		+ OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESPHC_VER
 		+ NEXT
-		+ BEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
+		+ OPTBEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
 		+ NEXT
-		+ BEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
+		+ OPTBEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
 		;
 	
 }
