@@ -12,17 +12,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 
+@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModRecipes {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void register(IForgeRegistry<IRecipe> registry) {
-
+	public static void register(RegistryEvent.Register<IRecipe> event) {
+		IForgeRegistry<IRecipe> registry = event.getRegistry();
+		
 		ModItems.dendroPotion.registerRecipes(registry);
 		
 		//Create a dirt bucket from dirt and a bucket

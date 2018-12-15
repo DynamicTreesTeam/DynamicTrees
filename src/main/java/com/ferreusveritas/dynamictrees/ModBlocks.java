@@ -26,8 +26,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
+@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModBlocks {
 	
 	public static BlockRooty blockRootyDirt;
@@ -67,7 +71,9 @@ public class ModBlocks {
 		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
 	
-	public static void register(IForgeRegistry<Block> registry) {
+	@SubscribeEvent
+	public static void register(RegistryEvent.Register<Block> event) {
+		IForgeRegistry<Block> registry = event.getRegistry();
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));

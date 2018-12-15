@@ -14,7 +14,7 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.ResourceLocation;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
-
+	
 	private final ResourceLocation baseRingLocation;
 	private final ResourceLocation baseRingLocationAlternate;
 	
@@ -59,9 +59,61 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 			return baseRingLocationAlternate;
 		}
 		
-		//TODO: More complex methods here
+		//Sample the pixels themselves to determine which is the ringed texture
+		int deltaA = getDeltaBorderVsCenterColor(textureGetter.apply(baseRingLocation));
+		int deltaB = getDeltaBorderVsCenterColor(textureGetter.apply(baseRingLocationAlternate));
 		
-		return baseRingLocation;
+		return deltaA > deltaB ? baseRingLocation : baseRingLocationAlternate;
+	}
+	
+	/**
+	 * This compares the color of the sprite border with the color of the sprite middle
+	 * and returns a the RGB delta squared. 
+	 * 
+	 * @param sprite The sprite to generate the delta
+	 * @return RGB delta squared
+	 */
+	private int getDeltaBorderVsCenterColor(TextureAtlasSprite sprite) {
+		PixelBuffer pixbuf = new PixelBuffer(sprite);
+		int u = pixbuf.w / 16;
+		PixelBuffer wide = new PixelBuffer(u * 14, u *  1);
+		PixelBuffer tall = new PixelBuffer(u *  1, u * 14);
+		
+		int samples[] = new int[4];
+		
+		//Sample top and bottom border
+		pixbuf.blit(wide, u * -1, u * -0);
+		samples[0] = wide.averageColor();
+		pixbuf.blit(wide, u * -1, u * -15);
+		samples[1] = wide.averageColor();
+		
+		//Sample left and right border
+		pixbuf.blit(tall, u * -0, u * -1);
+		samples[2] = tall.averageColor();
+		pixbuf.blit(tall, u * -15, u * -1);
+		samples[3] = tall.averageColor();
+		
+		int borderColor = TextureUtils.avgColors(samples);
+		
+		//Sample 4 lines that don't contain the pixels on the left/right border
+		for(int i = 0; i < 4; i++) {
+			pixbuf.blit(wide, u * -1, u * -(i * 3 + 3)); //Lines 3, 6, 9, 12
+			samples[i] = wide.averageColor();
+		}
+		
+		int innerColor = TextureUtils.avgColors(samples);
+				
+		//Decompose pixels into an RGBA array
+		int cA[] = TextureUtils.decompose(borderColor);
+		int cB[] = TextureUtils.decompose(innerColor);
+		
+		//Find the delta of the rgb components between the border and the middle, ingore alpha channel
+		int delR = cB[0] - cA[0];
+		int delG = cB[1] - cA[1];
+		int delB = cB[2] - cA[2];
+		
+		//Get the distance squared of the 2 colors in RGB(3D) space
+		return delR * delR + delG * delG + delB * delB;
 	}
 	
 	@Override
@@ -156,7 +208,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 			baseBuffer.blit(corners[i], 0, 0, i);
 			baseBuffer.blit(edges[i], -1 * scale, 0, i);
 		}
-
+		
 		//Create bark border
 		int pixbufSel = 0;
 		for(int row = 0; row < 4; row++) {
@@ -182,7 +234,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		PixelBuffer antecedent = new PixelBuffer(baseBuffer);
 		
 		int scale = baseBuffer.w / 16;
-
+		
 		//Place the 4th pixel ring against the corners of the image.
 		//Rotate 90deg to break up the pattern
 		baseBuffer.blit(antecedent,  3 * scale,  3 * scale, 1);
@@ -201,7 +253,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		baseBuffer.blit(ringStrip, -5 * scale,-12 * scale);
 		ringStrip.blit(antecedent, 0 * scale, 8 * scale, 1);
 		ringStrip.blit(antecedent, 15 * scale, 2 * scale, -1);
-
+		
 		ringStrip = new PixelBuffer(1 * scale, 6 * scale);
 		baseBuffer.blit(ringStrip, -3 * scale,-5 * scale);
 		ringStrip.blit(antecedent, 2 * scale, 0 * scale, -1);

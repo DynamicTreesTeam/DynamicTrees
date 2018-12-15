@@ -18,7 +18,11 @@ import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModTrees {
 	
 	public static final String NULL = "null";
@@ -55,6 +59,11 @@ public class ModTrees {
 			TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());
 		}
 
+	}
+	
+	@SubscribeEvent
+	public static void newRegistry(RegistryEvent.NewRegistry event) {
+		Species.newRegistry(event);
 	}
 	
 }

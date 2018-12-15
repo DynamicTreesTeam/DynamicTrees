@@ -110,16 +110,20 @@ public class TextureUtils {
 			}
 		}
 		
+		public int averageColor() {
+			return avgColors(pixels);
+		}
+		
 		public void grayScale() {
 			for(int i = 0; i < pixels.length; i++) {
-				int a = (pixels[i] >> 24) & 0xff;
-				int r = (pixels[i] >> 16) & 0xff;
-				int g = (pixels[i] >> 8) & 0xff;
-				int b = (pixels[i] >> 0) & 0xff;
+				int a = alpha(pixels[i]);
+				int r = red(pixels[i]);
+				int g = green(pixels[i]);
+				int b = blue(pixels[i]);
 				
 				int gray = ((r * 30) + (g * 59) + (b * 11)) / 100; 
 				
-				pixels[i] = (a << 24) + (gray << 16) + (gray << 8) + gray;
+				pixels[i] = compose(gray, gray, gray, a);
 			}
 		}
 		
@@ -139,6 +143,14 @@ public class TextureUtils {
 		return rgb;
 	}
 	
+	/**
+	 * @param c input color
+	 * @return an array ordered r, g, b, a
+	 */
+	public static int[] decompose(int c) {
+		return new int[] { red(c), green(c), blue(c), alpha(c) };
+	}
+	
 	public static int alpha(int c) {
 		return (c >> 24) & 0xFF;
 	}
@@ -155,4 +167,21 @@ public class TextureUtils {
 		return (c) & 0xFF;
 	}
 	
+	public static int avgColors(int pixels[]) {
+		long rAccum = 0;
+		long gAccum = 0;
+		long bAccum = 0;
+		
+		for(int i = 0; i < pixels.length; i++) {
+			rAccum += red(pixels[i]);
+			gAccum += green(pixels[i]);
+			bAccum += blue(pixels[i]);
+		}
+		
+		int r = (int) (rAccum / pixels.length);
+		int g = (int) (gAccum / pixels.length);
+		int b = (int) (bAccum / pixels.length);
+		
+		return compose(r, g, b, 255);
+	}
 }

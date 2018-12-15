@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.items;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -42,7 +42,7 @@ public class Seed extends Item {
 	public Seed(String name) {
 		setRegistryName(name);
 		setUnlocalizedName(getRegistryName().toString());
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
+		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
 	
 	public void setSpecies(Species species, ItemStack seedStack) {

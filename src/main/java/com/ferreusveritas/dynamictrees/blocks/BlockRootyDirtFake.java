@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -39,7 +39,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 		setTickRandomly(true);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
+		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
 	
 	@Override

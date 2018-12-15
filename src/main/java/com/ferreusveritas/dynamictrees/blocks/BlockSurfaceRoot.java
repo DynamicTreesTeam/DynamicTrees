@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
+import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -64,7 +64,7 @@ public class BlockSurfaceRoot extends Block {
 		setSoundType(SoundType.WOOD);
 		setHardness(2.5f);
 		setResistance(1.0f);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
+		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
 	
 	public enum ConnectionLevel implements IStringSerializable {

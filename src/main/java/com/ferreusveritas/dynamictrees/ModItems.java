@@ -7,8 +7,12 @@ import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 
 import net.minecraft.item.Item;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
+@Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModItems {
 	
 	public static DendroPotion dendroPotion;
@@ -21,7 +25,10 @@ public class ModItems {
 		treeStaff = new Staff();//Creative Mode Staff
 	}
 	
-	public static void register(IForgeRegistry<Item> registry) {
+	@SubscribeEvent
+	public static void register(RegistryEvent.Register<Item> event) {
+		IForgeRegistry<Item> registry = event.getRegistry();
+		
 		ArrayList<Item> treeItems = new ArrayList<Item>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 		ModTrees.dynamicCactus.getRegisterableItems(treeItems);

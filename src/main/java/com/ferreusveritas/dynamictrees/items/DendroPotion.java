@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.items;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -14,8 +14,8 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -87,7 +87,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		setUnlocalizedName(getRegistryName().toString());
 		setMaxStackSize(1);
 		setHasSubtypes(true);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
+		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
 	
 	@Override

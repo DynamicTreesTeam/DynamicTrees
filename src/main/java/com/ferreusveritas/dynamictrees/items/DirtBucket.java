@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.items;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModTabs;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,7 +35,7 @@ public class DirtBucket extends Item {
 		setUnlocalizedName(getRegistryName().toString());
 		setMaxStackSize(1);
 		setContainerItem(this);
-		setCreativeTab(DynamicTrees.dynamicTreesTab);
+		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
 	
 	@Override
