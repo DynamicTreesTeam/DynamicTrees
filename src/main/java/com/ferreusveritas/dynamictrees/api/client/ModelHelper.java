@@ -24,7 +24,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ModelHelper {
-
+	
 	/**
 	 * Registers models associated with the tree.
 	 * At the moment this only deals with {@link BlockBranch} blocks 
@@ -94,9 +94,9 @@ public class ModelHelper {
 	public static void regColorHandler(Block block, IBlockColor blockColor) {
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(blockColor, new Block[] {block});
 	}
-
+	
 	public static void regColorHandler(Item item, IItemColor itemColor) {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(itemColor, new Item[] {item});
 	}
-
+	
 }

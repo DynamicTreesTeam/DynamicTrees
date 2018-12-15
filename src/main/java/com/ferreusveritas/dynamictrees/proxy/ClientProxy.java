@@ -43,7 +43,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
@@ -97,9 +96,7 @@ public class ClientProxy extends CommonProxy {
 				if(state.getBlock() != Blocks.AIR) {
 					IModel model = QuadManipulator.getModelForState(state);
 					ResourceLocation resloc = QuadManipulator.getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
-					
-					TextureAtlasSprite sprite = bakedTextureGetter.apply(resloc);
-					PixelBuffer pixbuf = new PixelBuffer(sprite);
+					PixelBuffer pixbuf = new PixelBuffer(bakedTextureGetter.apply(resloc));
 					int u = pixbuf.w / 16;
 					PixelBuffer center = new PixelBuffer(u * 8, u * 8);
 					pixbuf.blit(center, u * -8, u * -8);
@@ -110,7 +107,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 	}
-
+	
 	@Override
 	public void cleanUp() {
 		super.cleanUp();
@@ -150,12 +147,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		//Sapling
-		ModelLoader.setCustomStateMapper(ModBlocks.blockDynamicSapling, new StateMapperBase() {
-			@Override
-			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-				return new ModelResourceLocation(new ResourceLocation(ModConstants.MODID, "sapling"), "");
-			}}
-		);
+		ModelHelper.setGenericStateMapper(ModBlocks.blockDynamicSapling, new ModelResourceLocation(new ResourceLocation(ModConstants.MODID, "sapling"), ""));
 		
 		//Setup the state mapper for the trunk shell
 		ModelLoader.setCustomStateMapper(ModBlocks.blockTrunkShell, new StateMap.Builder().ignore(BlockTrunkShell.COREDIR).build());
@@ -164,7 +156,7 @@ public class ClientProxy extends CommonProxy {
 		ModelLoader.setCustomStateMapper(ModTrees.dynamicCactus.getDynamicBranch(), new StateMap.Builder().ignore(BlockBranchCactus.TRUNK, BlockBranchCactus.ORIGIN).build());
 		ModelHelper.regModel(ModTrees.dynamicCactus.getDynamicBranch());
 		ModelHelper.regModel(ModTrees.dynamicCactus.getCommonSpecies().getSeed());
-				
+		
 		//Special seed for apple
 		ModelHelper.regModel(Species.REGISTRY.getValue(new ResourceLocation(ModConstants.MODID, "apple")).getSeed());
 		
@@ -182,7 +174,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private boolean isValid(IBlockAccess access, BlockPos pos) {
-		return access == null || pos == null;
+		return access != null && pos != null;
 	}
 	
 	public void registerColorHandlers() {
