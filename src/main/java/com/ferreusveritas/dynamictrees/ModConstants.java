@@ -21,13 +21,18 @@ public class ModConstants {
 	//Other Add-on Mods
 	public static final String DYNAMICTREESBOP = "dynamictreesbop";
 	public static final String DYNAMICTREESTC = "dynamictreestc";
+	public static final String DYNAMICTREESPHC = "dynamictreesphc";
 	public static final String DYNAMICTREESTRAVERSE = "dttraverse";
 	public static final String DYNAMICTREESHNC = "dynamictreeshnc";
 	public static final String RUSTIC = "rustic";
 	
+	//A standardized mod version for team controlled "official" add-ons
+	public static final String STANDARD_ADDON_VER = "1.4.1e";
+	
 	//Other Mod Versions.. These have been added to avoid the whole "Duh.. How come my mod is crashing?" bullshit bug reports.
-	public static final String DYNAMICTREESBOP_VER = AT + "1.4.1e" + ORGREATER;
-	public static final String DYNAMICTREESTC_VER =  AT + "1.4.1e" + ORGREATER;
+	public static final String DYNAMICTREESBOP_VER = AT + STANDARD_ADDON_VER + ORGREATER;
+	public static final String DYNAMICTREESTC_VER =	 AT + STANDARD_ADDON_VER + ORGREATER;
+	public static final String DYNAMICTREESPHC_VER = AT + STANDARD_ADDON_VER + ORGREATER;
 	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.4" + ORGREATER;//Traverse will need a new build. Display an error rather than crash.
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
 	public static final String RUSTIC_VER = AT + "1.0.14" + ORGREATER;
@@ -44,6 +49,8 @@ public class ModConstants {
 		+ BEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
+		+ NEXT
+		+ BEFORE + DYNAMICTREESTC + DYNAMICTREESPHC_VER
 		+ NEXT
 		+ BEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
 		+ NEXT
