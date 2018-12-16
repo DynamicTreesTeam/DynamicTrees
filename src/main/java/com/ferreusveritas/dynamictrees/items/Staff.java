@@ -44,6 +44,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 */
 public class Staff extends Item {
 	
+	public final static String HANDLE = "handle";
+	public final static String COLOR = "color";
+	
 	public Staff() {
 		this("staff");
 	}
@@ -159,21 +162,42 @@ public class Staff extends Item {
 	}
 	
 	public int getColor(ItemStack itemStack, int tint) {
+		if(tint == 0) {
+			NBTTagCompound nbt = getNBT(itemStack);
+			
+			int color = 0x005b472f;//Original brown wood color
+			
+			if(nbt.hasKey(HANDLE)) {
+				try {
+					color = Color.decode(nbt.getString(HANDLE)).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.removeTag(HANDLE);
+				}
+			}
+			else {
+				color = getSpecies(itemStack).getFamily().getWoodColor();
+			}
+			
+			return color;
+		}
+		else
 		if(tint == 1) {
 			NBTTagCompound nbt = getNBT(itemStack);
 			
-			int color = 0x0000FFFF;
+			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
 			
-			if(nbt.hasKey("color")) {
+			if(nbt.hasKey(COLOR)) {
 				try {
-					color = Color.decode(nbt.getString("color")).getRGB();
+					color = Color.decode(nbt.getString(COLOR)).getRGB();
 				} catch (NumberFormatException e) {
-					nbt.removeTag("color");
+					nbt.removeTag(COLOR);
 				}
 			}
 			
 			return color;
 		}
+		
+		
 		return 0xFFFFFFFF;//white
 	}
 	
