@@ -149,7 +149,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 		
-		NewLeavesPropertiesHandler newLeavesHander = getNewLeavesPropertiesHandler(world, pos, state, newHydro, leavesProperties, safeBounds);
+		NewLeavesPropertiesHandler newLeavesHander = getNewLeavesPropertiesHandler(world, pos, state, newHydro, worldGen);
 		
 		//We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
 		for(EnumFacing dir: EnumFacing.VALUES) {//Go on all 6 sides of this block
@@ -167,11 +167,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return newHydro;//Leaves were not destroyed
 	}
 	
-	public NewLeavesPropertiesHandler getNewLeavesPropertiesHandler(World world, BlockPos pos, IBlockState state, int newHydro, ILeavesProperties leavesProperties, SafeChunkBounds safeBounds) {
+	public NewLeavesPropertiesHandler getNewLeavesPropertiesHandler(World world, BlockPos pos, IBlockState state, int newHydro, boolean worldGen) {
 		return (w, p, l) -> l;
 	}
 	
-	public static interface NewLeavesPropertiesHandler {
+	protected static interface NewLeavesPropertiesHandler {
 		IBlockState getLeaves(World world, BlockPos pos, IBlockState leavesStateWithHydro);
 	}
 	
