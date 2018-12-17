@@ -88,7 +88,7 @@ public class TreeFamily {
 	public boolean canSupportCocoa = false;
 	
 	@SideOnly(Side.CLIENT)
-	public int woodColor = 0xFFF1AE;//For roots
+	public int woodColor;//For roots
 	
 	public TreeFamily() {
 		this.name = new ResourceLocation(ModConstants.MODID, "null");
