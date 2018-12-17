@@ -413,7 +413,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	private Optional<IBlockState> getNeighborState(IBlockAccess access, BlockPos cPos, BlockPos dPos) {
 		
 		if ( cPos.getX() >> 4 == dPos.getX() >> 4 && cPos.getZ() >> 4 == dPos.getZ() >> 4 ) {
-			return Optional.of(access.getBlockState(cPos));//Blocks are in the same chunk. This will happen most of the time
+			return Optional.of(access.getBlockState(dPos));//Blocks are in the same chunk. This will happen most of the time
 		}
 		
 		if(access instanceof World) {
