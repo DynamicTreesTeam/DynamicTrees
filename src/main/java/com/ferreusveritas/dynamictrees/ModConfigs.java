@@ -19,8 +19,9 @@ public class ModConfigs {
 	public static boolean seedOnlyForest;
 	public static float seedMinForestness;
 	
-	public static float treeGrowthRateMultiplier;
+	public static float treeGrowthMultiplier;
 	public static float treeHarvestMultiplier;
+	public static int treeGrowthFolding;
 	public static boolean dropSticks;
 	public static float scaleBiomeGrowthRate;
 	public static float diseaseChance;
@@ -65,8 +66,9 @@ public class ModConfigs {
 		seedMinForestness = config.getFloat("minForestness", "seeds", 0, 0, 1, "The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional");
 		
 		//Trees
-		treeGrowthRateMultiplier = config.getFloat("growthRateMultiplier", "trees", 1f, 0, 16f, "Factor that multiplies the rate at which trees grow. Use at own risk");
+		treeGrowthMultiplier = config.getFloat("growthMultiplier", "trees", 0.5f, 0, 16f, "Factor that multiplies the rate at which trees grow. Use at own risk");
 		treeHarvestMultiplier = config.getFloat("harvestMultiplier", "trees", 1f, 0f, 128f, "Factor that multiplies the wood returned from harvesting a tree.  You cheat.");
+		treeGrowthFolding = config.getInt("growthFolding", "trees", 2, 1, 8, "Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.");
 		dropSticks = config.getBoolean("dropSticks", "trees", true, "If enabled then sticks will be dropped for partial logs");
 		scaleBiomeGrowthRate = config.getFloat("scaleBiomeGrowthRate", "trees", 0.5f, 0.0f, 1.0f, "Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome");
 		diseaseChance = config.getFloat("diseaseChance", "trees", 0.0f, 0.0f, 1.0f, "The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days");

@@ -794,7 +794,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
-		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthRateMultiplier;
+		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthMultiplier * ModConfigs.treeGrowthFolding;
 		do {
 			if(soilLife > 0){
 				if(growthRate > random.nextFloat()) {

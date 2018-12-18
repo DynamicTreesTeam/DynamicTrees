@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -142,7 +143,9 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	///////////////////////////////////////////
 	@Override
 	public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
-		updateTree(state, world, pos, random, true);
+		if(random.nextInt(ModConfigs.treeGrowthFolding) == 0) {
+			updateTree(state, world, pos, random, true);
+		}
 	}
 	
 	public EnumFacing getTrunkDirection(IBlockAccess access, BlockPos rootPos) {

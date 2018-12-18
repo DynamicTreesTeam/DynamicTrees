@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
@@ -119,8 +118,32 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if(getProperties(state).updateTick(worldIn, pos, state, rand)) {
-			if(ModConfigs.treeGrowthRateMultiplier >= 1.0f || rand.nextFloat() < ModConfigs.treeGrowthRateMultiplier) {
+		if(rand.nextInt(ModConfigs.treeGrowthFolding) == 0) {
+			float attempts = ModConfigs.treeGrowthFolding * ModConfigs.treeGrowthMultiplier;
+			
+			if(attempts >= 1.0f || rand.nextFloat() < attempts) {
+				doTick(worldIn, pos, state, rand);
+			}
+			
+			int start = rand.nextInt(26);
+			
+			while(--attempts > 0) {
+				if(attempts >= 1.0f || rand.nextFloat() < attempts) {
+					int r = (start++ % 26) + 14;//14 - 39
+					r = r > 26 ? r - 13 : r - 14;//0 - 26 but Skip 13
+					BlockPos dPos = pos.add((r % 3) - 1, ((r / 3) % 3) - 1, ((r / 9) % 3) - 1);// (-1, -1, -1) to (1, 1, 1) skipping (0, 0, 0)  
+					IBlockState dState = worldIn.getBlockState(dPos);
+					if(dState.getBlock() instanceof BlockDynamicLeaves) {
+						((BlockDynamicLeaves)dState.getBlock()).doTick(worldIn, dPos, dState, rand);
+					}
+				}
+			}
+		}
+	}
+	
+	protected void doTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		if((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
+			if(getProperties(state).updateTick(worldIn, pos, state, rand)) {
 				age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 			}
 		}
@@ -135,9 +158,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		//Check hydration level.  Dry leaves are dead leaves.
 		int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
 		
-		if(newHydro == -1) {//Leaves ticked adjacent to an unloaded block.  Rather than load the chunk just do nothing instead.
-			return oldHydro;
-		}
 		if(newHydro == 0 || (!worldGen && !hasAdequateLight(state, world, leavesProperties, pos))) { //Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			world.setBlockToAir(pos);//No water, no light .. no leaves
 			return -1;//Leaves were destroyed
@@ -167,8 +187,19 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return newHydro;//Leaves were not destroyed
 	}
 	
-	public NewLeavesPropertiesHandler getNewLeavesPropertiesHandler(World world, BlockPos pos, IBlockState state, int newHydro, boolean worldGen) {
-		return (w, p, l) -> l;
+	/**
+	 * Provides a method to add custom leaves properties besides the normal
+	 * hydro.  Currently used by flowering oak in the BoP add-on
+	 * 
+	 * @param world The world
+	 * @param pos Position of the new leaves blck
+	 * @param state The original state of the leaves block before aging occured
+	 * @param newHydro The new calculated hydration value of the leaves
+	 * @param worldGen true if this is happening during worldgen
+	 * @return A provider for adding more blockstate properties
+	 */
+	protected NewLeavesPropertiesHandler getNewLeavesPropertiesHandler(World world, BlockPos pos, IBlockState state, int newHydro, boolean worldGen) {
+		return (w, p, l) -> l; //By default just pass the blockState along
 	}
 	
 	protected static interface NewLeavesPropertiesHandler {
@@ -317,7 +348,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		if(block instanceof BlockDynamicLeaves) {
 			return false;
 		}
-				
+		
 		IBlockState belowBlockState = world.getBlockState(pos.down());
 		
 		//Prevent leaves from growing on the ground or above liquids
@@ -398,33 +429,12 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 				
 		for(EnumFacing dir: EnumFacing.VALUES) {
 			BlockPos deltaPos = pos.offset(dir);
-			Optional<IBlockState> state = getNeighborState(access, pos, deltaPos);
-			if(state.isPresent()) {
-				ITreePart part = TreeHelper.getTreePart(state.get());
-				cells[dir.ordinal()] = part.getHydrationCell(access, deltaPos, state.get(), dir, leavesProp);
-			} else {
-				return -1;//Cancel the process
-			}
+			IBlockState state = access.getBlockState(deltaPos);
+			ITreePart part = TreeHelper.getTreePart(state);
+			cells[dir.ordinal()] = part.getHydrationCell(access, deltaPos, state, dir, leavesProp);
 		}
 		
 		return leavesProp.getCellKit().getCellSolver().solve(cells);//Find center cell's value from neighbors		
-	}
-	
-	private Optional<IBlockState> getNeighborState(IBlockAccess access, BlockPos cPos, BlockPos dPos) {
-		
-		if ( cPos.getX() >> 4 == dPos.getX() >> 4 && cPos.getZ() >> 4 == dPos.getZ() >> 4 ) {
-			return Optional.of(access.getBlockState(dPos));//Blocks are in the same chunk. This will happen most of the time
-		}
-		
-		if(access instanceof World) {
-			World world = (World) access;
-			if(world.isBlockLoaded(dPos)) {
-				return Optional.of(access.getBlockState(dPos));//Blocks are in a loaded chunk
-			}
-			return Optional.empty();//Adjacent block is not in a loaded chunk
-		}
-		
-		return Optional.of(access.getBlockState(dPos));//Blocks are in some weird IBlockAccess that's not a world.  Just go with it.
 	}
 	
 	@Override

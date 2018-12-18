@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.entities.animation;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -243,7 +244,9 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		if(dead && !entity.world.isRemote) {
 			IBlockState belowState = entity.world.getBlockState(entity.getDestroyData().cutPos.down());
 			if(TreeHelper.isRooty(belowState)) {
-				belowState.getBlock().randomTick(entity.world, entity.getDestroyData().cutPos.down(), belowState, entity.world.rand);
+				@SuppressWarnings("serial")
+				Random rand = new Random() { public int nextInt(int bound) { return 0; } };//Special random generator that always returns 0.
+				belowState.getBlock().updateTick(entity.world, entity.getDestroyData().cutPos.down(), belowState, rand);
 			}
 		}
 		
