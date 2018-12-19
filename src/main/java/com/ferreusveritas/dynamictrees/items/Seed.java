@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.items;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModTabs;
@@ -51,6 +52,16 @@ public class Seed extends Item {
 	
 	public Species getSpecies(ItemStack seedStack) {
 		return species;
+	}
+	
+	public boolean isValid() {
+		return this != NULLSEED;
+	}
+	
+	public void ifValid(Consumer<Seed> c) {
+		if(isValid()) {
+			c.accept(this);
+		}
 	}
 	
 	@Override

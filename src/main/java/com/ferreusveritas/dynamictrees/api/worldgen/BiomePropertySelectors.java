@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -19,7 +21,7 @@ import net.minecraft.world.biome.Biome;
 public class BiomePropertySelectors {
 	
 	public interface IChanceSelector {
-		EnumChance getChance(Random random, Species species, int radius);
+		EnumChance getChance(Random random, @Nonnull Species species, int radius);
 	}
 
 	public interface IDensitySelector {
@@ -36,13 +38,14 @@ public class BiomePropertySelectors {
 	 */
 	public static class SpeciesSelection {
 		private boolean handled;
-		private Species species;
+		private final Species species;
 		
 		public SpeciesSelection() {
 			handled = false;
+			species = Species.NULLSPECIES;
 		}
 		
-		public SpeciesSelection(Species species) {
+		public SpeciesSelection(@Nonnull Species species) {
 			this.species = species;
 			handled = true;
 		}
@@ -63,7 +66,7 @@ public class BiomePropertySelectors {
 			this.decision = decision;
 		}
 
-		public StaticSpeciesSelector(Species species) {
+		public StaticSpeciesSelector(@Nonnull Species species) {
 			this(new SpeciesSelection(species));
 		}
 		
@@ -96,7 +99,7 @@ public class BiomePropertySelectors {
 			return decisionTable.size();
 		}
 		
-		public RandomSpeciesSelector add(Species species, int weight) {
+		public RandomSpeciesSelector add(@Nonnull Species species, int weight) {
 			decisionTable.add(new Entry(new SpeciesSelection(species), weight));
 			totalWeight += weight;
 			return this;

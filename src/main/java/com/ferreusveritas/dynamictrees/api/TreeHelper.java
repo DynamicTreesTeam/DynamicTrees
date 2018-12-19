@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -266,6 +267,19 @@ public class TreeHelper {
 		IBlockState state = access.getBlockState(pos);
 		return getTreePart(state).getRadius(state);
 	}
+	
+	public final static Optional<BlockBranch> getBranchOpt(Block block) {
+		return isBranch(block) ? Optional.of((BlockBranch)block) : Optional.empty();
+	}
+
+	public final static Optional<BlockBranch> getBranchOpt(IBlockState state) {
+		return isBranch(state.getBlock()) ? Optional.of((BlockBranch)state.getBlock()) : Optional.empty();
+	}
+
+	public final static Optional<BlockBranch> getBranchOpt(ITreePart treepart) {
+		return treepart instanceof BlockBranch ? Optional.of((BlockBranch)treepart) : Optional.empty();
+	}
+	
 	
 	//Leaves
 	

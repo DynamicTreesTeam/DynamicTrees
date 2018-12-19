@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -67,6 +69,7 @@ public class TreeFamily {
 	/** Simple name of the tree e.g. "oak" */
 	private final ResourceLocation name;
 	
+	@Nonnull
 	protected Species commonSpecies = Species.NULLSPECIES;
 	
 	//Branches
@@ -113,7 +116,7 @@ public class TreeFamily {
 		speciesRegistry.register(getCommonSpecies());
 	}
 	
-	public void setCommonSpecies(Species species) {
+	public void setCommonSpecies(@Nonnull Species species) {
 		commonSpecies = species;
 	}
 	
@@ -137,7 +140,7 @@ public class TreeFamily {
 	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
 		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
 			Species species = override.getSpeciesForLocation(access, trunkPos);
-			if(species != Species.NULLSPECIES) {
+			if(species.isValid()) {
 				return species;
 			}
 		}
@@ -207,10 +210,8 @@ public class TreeFamily {
 			itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
 		}
 		
-		Seed seed = getCommonSpecies().getSeed();
-		if(seed != Seed.NULLSEED) {
-			itemList.add(seed);
-		}
+		getCommonSpecies().getSeed().ifValid(s -> itemList.add(s));
+
 		return itemList;
 	}
 	

@@ -150,7 +150,7 @@ public class TreeGenerator {
 		SpeciesSelection speciesSelection = biomeEntry.getSpeciesSelector().getSpecies(pos, dirtState, random);
 		if(speciesSelection.isHandled()) {
 			Species species = speciesSelection.getSpecies();
-			if(species != null) {
+			if(species.isValid()) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
 						if(species.generate(world, pos, biome, random, circle.radius, safeBounds)) {

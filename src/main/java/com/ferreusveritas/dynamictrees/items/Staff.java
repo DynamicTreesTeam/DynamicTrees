@@ -92,7 +92,7 @@ public class Staff extends Item {
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
 			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
-			if(species != Species.NULLSPECIES) {
+			if(species.isValid()) {
 				if(!player.isSneaking()) {
 					String code = new JoCode(world, rootPos, player.getHorizontalFacing()).toString();
 					setCode(heldStack, code);
@@ -105,7 +105,7 @@ public class Staff extends Item {
 		
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
-		if(species != null && species.isAcceptableSoil(world, pos, clickedBlockState)) {
+		if(species.isValid() && species.isAcceptableSoil(world, pos, clickedBlockState)) {
 			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			heldStack.shrink(1);//If the player is in creative this will have no effect.
 			return EnumActionResult.SUCCESS;

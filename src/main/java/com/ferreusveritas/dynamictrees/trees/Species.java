@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -205,6 +206,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		//Add JoCode models for worldgen
 		addJoCodes();
 		addDropCreator(new DropCreatorLogs());
+	}
+	
+	public boolean isValid() {
+		return this != NULLSPECIES;
+	}
+	
+	public void ifValid(Consumer<Species> c) {
+		if(isValid()) {
+			c.accept(this);
+		}
 	}
 	
 	public TreeFamily getFamily() {

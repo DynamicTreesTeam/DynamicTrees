@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
@@ -51,11 +52,12 @@ public class JoCode {
 	* @param facing A final rotation applied to the code after creation
 	*/
 	public JoCode(World world, BlockPos rootPos, EnumFacing facing) {
-		BlockBranch branch = TreeHelper.getBranch(world.getBlockState(rootPos.up()));
-		if(branch != null) {
+		Optional<BlockBranch> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
+		
+		if(branch.isPresent()) {
 			NodeCoder coder = new NodeCoder();
 			//Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
-			branch.analyse(world.getBlockState(rootPos), world, rootPos, EnumFacing.DOWN, new MapSignal(coder));
+			branch.get().analyse(world.getBlockState(rootPos), world, rootPos, EnumFacing.DOWN, new MapSignal(coder));
 			instructions = coder.compile(this);
 			rotate(facing);
 		}
