@@ -173,8 +173,9 @@ public class LeavesPaging {
 	
 	@SideOnly(Side.CLIENT)
 	public static void setStateMappers() {
+		LeavesStateMapper mapper = new LeavesStateMapper();
 		for(String modId : modLeavesArray.keySet()) {
-			LeavesPaging.getLeavesMapForModId(modId).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, new LeavesStateMapper()));
+			LeavesPaging.getLeavesMapForModId(modId).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, mapper));
 		}
 	}
 	
