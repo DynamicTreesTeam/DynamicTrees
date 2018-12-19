@@ -31,7 +31,6 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 	
 	static {
 		modelCreatorMap.put( "branch", r -> loadModelBranch(r) );
-		modelCreatorMap.put( "leaves", r -> loadModelLeaves(r) );
 	}
 	
 	@Override
@@ -101,10 +100,6 @@ public class ModelLoaderWrapped implements ICustomModelLoader {
 		}
 		
 		return null;
-	}
-	
-	public static IModel loadModelLeaves(ModelResourceLocationWrapped location) {
-		return new ModelBlockWrapped(location);
 	}
 	
 }
