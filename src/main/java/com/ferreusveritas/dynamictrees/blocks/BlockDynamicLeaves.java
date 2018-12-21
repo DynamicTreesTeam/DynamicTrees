@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.Block;
@@ -57,7 +58,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable {
+public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable, IRayTraceCollision {
 	
 	public static boolean passableLeavesModLoaded = false;
 	
@@ -684,6 +685,11 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.LEAVES;
+	}
+
+	@Override
+	public boolean isRayTraceCollidable() {
+		return true;
 	}
 	
 }

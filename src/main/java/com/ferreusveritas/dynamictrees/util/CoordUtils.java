@@ -177,7 +177,10 @@ public class CoordUtils {
 
                 AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
                 
-                if ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && block.canCollideCheck(lookState, stopOnLiquid)) {
+                //This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
+                boolean specialRayTraceCollision = block instanceof IRayTraceCollision ? ((IRayTraceCollision) block).isRayTraceCollidable() : false;
+                
+                if (specialRayTraceCollision || ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && block.canCollideCheck(lookState, stopOnLiquid))) {
                     RayTraceResult raytraceresult = lookState.collisionRayTrace(world, lookPos, vantage, lookingAt);
 
                     if (raytraceresult != null) {
