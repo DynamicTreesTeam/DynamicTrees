@@ -161,156 +161,159 @@ public class CoordUtils {
 	 * @param returnLastUncollidableBlock
 	 * @return
 	 */
-    public static RayTraceResult rayTraceBlocks(World world, Vec3d vantage, Vec3d lookingAt, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, SafeChunkBounds safeBounds) {
-
-    	if (!Double.isNaN(vantage.x) && !Double.isNaN(vantage.y) && !Double.isNaN(vantage.z)) {
-            if (!Double.isNaN(lookingAt.x) && !Double.isNaN(lookingAt.y) && !Double.isNaN(lookingAt.z)) {
-                int vantX = MathHelper.floor(lookingAt.x);
-                int vantY = MathHelper.floor(lookingAt.y);
-                int vantZ = MathHelper.floor(lookingAt.z);
-                int lookX = MathHelper.floor(vantage.x);
-                int lookY = MathHelper.floor(vantage.y);
-                int lookZ = MathHelper.floor(vantage.z);
-                BlockPos lookPos = new BlockPos(lookX, lookY, lookZ);
-                IBlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
-                Block block = lookState.getBlock();
-
-                AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
-                
-                //This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
-                boolean specialRayTraceCollision = block instanceof IRayTraceCollision ? ((IRayTraceCollision) block).isRayTraceCollidable() : false;
-                
-                if (specialRayTraceCollision || ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && block.canCollideCheck(lookState, stopOnLiquid))) {
-                    RayTraceResult raytraceresult = lookState.collisionRayTrace(world, lookPos, vantage, lookingAt);
-
-                    if (raytraceresult != null) {
-                        return raytraceresult;
-                    }
-                }
-
-                RayTraceResult raytraceresult2 = null;
-                int ropeLen = 200;
-
-                while (ropeLen-- >= 0) {
-                    if (Double.isNaN(vantage.x) || Double.isNaN(vantage.y) || Double.isNaN(vantage.z)) {
-                        return null;
-                    }
-
-                    if (lookX == vantX && lookY == vantY && lookZ == vantZ) {
-                        return returnLastUncollidableBlock ? raytraceresult2 : null;
-                    }
-
-                    boolean flagX = true;
-                    boolean flagY = true;
-                    boolean flagZ = true;
-                    double modX = 999.0D;
-                    double modY = 999.0D;
-                    double modZ = 999.0D;
-
-                    if (vantX > lookX) {
-                        modX = (double)lookX + 1.0D;
-                    }
-                    else if (vantX < lookX) {
-                        modX = (double)lookX + 0.0D;
-                    }
-                    else {
-                        flagX = false;
-                    }
-
-                    if (vantY > lookY) {
-                        modY = (double)lookY + 1.0D;
-                    }
-                    else if (vantY < lookY) {
-                        modY = (double)lookY + 0.0D;
-                    }
-                    else {
-                        flagY = false;
-                    }
-
-                    if (vantZ > lookZ) {
-                        modZ = (double)lookZ + 1.0D;
-                    }
-                    else if (vantZ < lookZ) {
-                        modZ = (double)lookZ + 0.0D;
-                    }
-                    else {
-                        flagZ = false;
-                    }
-
-                    double unkX = 999.0D;
-                    double unkY = 999.0D;
-                    double unkZ = 999.0D;
-                    double deltaX = lookingAt.x - vantage.x;
-                    double deltaY = lookingAt.y - vantage.y;
-                    double deltaZ = lookingAt.z - vantage.z;
-
-                    if (flagX) {
-                        unkX = (modX - vantage.x) / deltaX;
-                    }
-                    if (flagY) {
-                        unkY = (modY - vantage.y) / deltaY;
-                    }
-                    if (flagZ) {
-                        unkZ = (modZ - vantage.z) / deltaZ;
-                    }
-                    if (unkX == -0.0D) {
-                        unkX = -1.0E-4D;
-                    }
-                    if (unkY == -0.0D) {
-                        unkY = -1.0E-4D;
-                    }
-                    if (unkZ == -0.0D) {
-                        unkZ = -1.0E-4D;
-                    }
-
-                    EnumFacing enumfacing;
-
-                    if (unkX < unkY && unkX < unkZ) {
-                        enumfacing = vantX > lookX ? EnumFacing.WEST : EnumFacing.EAST;
-                        vantage = new Vec3d(modX, vantage.y + deltaY * unkX, vantage.z + deltaZ * unkX);
-                    }
-                    else if (unkY < unkZ) {
-                        enumfacing = vantY > lookY ? EnumFacing.DOWN : EnumFacing.UP;
-                        vantage = new Vec3d(vantage.x + deltaX * unkY, modY, vantage.z + deltaZ * unkY);
-                    }
-                    else {
-                        enumfacing = vantZ > lookZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
-                        vantage = new Vec3d(vantage.x + deltaX * unkZ, vantage.y + deltaY * unkZ, modZ);
-                    }
-
-                    lookX = MathHelper.floor(vantage.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
-                    lookY = MathHelper.floor(vantage.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
-                    lookZ = MathHelper.floor(vantage.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
-                    lookPos = new BlockPos(lookX, lookY, lookZ);
-                    IBlockState iblockstate1 = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
-                    Block block1 = iblockstate1.getBlock();
-
-                    AxisAlignedBB colBB2 = safeBounds.inBounds(lookPos, false) ? iblockstate1.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
-                    
-                    if (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL || colBB2 != Block.NULL_AABB) {
-                        if (block1.canCollideCheck(iblockstate1, stopOnLiquid)) {
-                            RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(world, lookPos, vantage, lookingAt);
-                            if (raytraceresult1 != null) {
-                                return raytraceresult1;
-                            }
-                        }
-                        else {
-                            raytraceresult2 = new RayTraceResult(RayTraceResult.Type.MISS, vantage, enumfacing, lookPos);
-                        }
-                    }
-                }
-
-                return returnLastUncollidableBlock ? raytraceresult2 : null;
-            }
-            else {
-                return null;
-            }
-        }
-        else {
-            return null;
-        }
-    }
-
+	public static RayTraceResult rayTraceBlocks(World world, Vec3d vantage, Vec3d lookingAt, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, SafeChunkBounds safeBounds) {
+		
+		if (!Double.isNaN(vantage.x) && !Double.isNaN(vantage.y) && !Double.isNaN(vantage.z)) {
+			if (!Double.isNaN(lookingAt.x) && !Double.isNaN(lookingAt.y) && !Double.isNaN(lookingAt.z)) {
+				int vantX = MathHelper.floor(lookingAt.x);
+				int vantY = MathHelper.floor(lookingAt.y);
+				int vantZ = MathHelper.floor(lookingAt.z);
+				int lookX = MathHelper.floor(vantage.x);
+				int lookY = MathHelper.floor(vantage.y);
+				int lookZ = MathHelper.floor(vantage.z);
+				BlockPos lookPos = new BlockPos(lookX, lookY, lookZ);
+				IBlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
+				Block lookBlock = lookState.getBlock();
+				
+				AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
+				
+				//This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
+				boolean specialRayTraceCollision = lookBlock instanceof IRayTraceCollision ? ((IRayTraceCollision) lookBlock).isRayTraceCollidable() : false;
+				
+				if (specialRayTraceCollision || ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && lookBlock.canCollideCheck(lookState, stopOnLiquid))) {
+					RayTraceResult raytraceresult = lookState.collisionRayTrace(world, lookPos, vantage, lookingAt);
+					
+					if (raytraceresult != null) {
+						return raytraceresult;
+					}
+				}
+				
+				RayTraceResult raytraceresult2 = null;
+				int ropeLen = 200;
+				
+				while (ropeLen-- >= 0) {
+					if (Double.isNaN(vantage.x) || Double.isNaN(vantage.y) || Double.isNaN(vantage.z)) {
+						return null;
+					}
+					
+					if (lookX == vantX && lookY == vantY && lookZ == vantZ) {
+						return returnLastUncollidableBlock ? raytraceresult2 : null;
+					}
+					
+					boolean flagX = true;
+					boolean flagY = true;
+					boolean flagZ = true;
+					double modX = 999.0D;
+					double modY = 999.0D;
+					double modZ = 999.0D;
+					
+					if (vantX > lookX) {
+						modX = (double)lookX + 1.0D;
+					}
+					else if (vantX < lookX) {
+						modX = (double)lookX + 0.0D;
+					}
+					else {
+						flagX = false;
+					}
+					
+					if (vantY > lookY) {
+						modY = (double)lookY + 1.0D;
+					}
+					else if (vantY < lookY) {
+						modY = (double)lookY + 0.0D;
+					}
+					else {
+						flagY = false;
+					}
+					
+					if (vantZ > lookZ) {
+						modZ = (double)lookZ + 1.0D;
+					}
+					else if (vantZ < lookZ) {
+						modZ = (double)lookZ + 0.0D;
+					}
+					else {
+						flagZ = false;
+					}
+					
+					double unkX = 999.0D;
+					double unkY = 999.0D;
+					double unkZ = 999.0D;
+					double deltaX = lookingAt.x - vantage.x;
+					double deltaY = lookingAt.y - vantage.y;
+					double deltaZ = lookingAt.z - vantage.z;
+					
+					if (flagX) {
+						unkX = (modX - vantage.x) / deltaX;
+					}
+					if (flagY) {
+						unkY = (modY - vantage.y) / deltaY;
+					}
+					if (flagZ) {
+						unkZ = (modZ - vantage.z) / deltaZ;
+					}
+					if (unkX == -0.0D) {
+						unkX = -1.0E-4D;
+					}
+					if (unkY == -0.0D) {
+						unkY = -1.0E-4D;
+					}
+					if (unkZ == -0.0D) {
+						unkZ = -1.0E-4D;
+					}
+					
+					EnumFacing enumfacing;
+					
+					if (unkX < unkY && unkX < unkZ) {
+						enumfacing = vantX > lookX ? EnumFacing.WEST : EnumFacing.EAST;
+						vantage = new Vec3d(modX, vantage.y + deltaY * unkX, vantage.z + deltaZ * unkX);
+					}
+					else if (unkY < unkZ) {
+						enumfacing = vantY > lookY ? EnumFacing.DOWN : EnumFacing.UP;
+						vantage = new Vec3d(vantage.x + deltaX * unkY, modY, vantage.z + deltaZ * unkY);
+					}
+					else {
+						enumfacing = vantZ > lookZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
+						vantage = new Vec3d(vantage.x + deltaX * unkZ, vantage.y + deltaY * unkZ, modZ);
+					}
+					
+					lookX = MathHelper.floor(vantage.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+					lookY = MathHelper.floor(vantage.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
+					lookZ = MathHelper.floor(vantage.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+					lookPos = new BlockPos(lookX, lookY, lookZ);
+					IBlockState lookState2 = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
+					Block lookBlock2 = lookState2.getBlock();
+					
+					AxisAlignedBB colBB2 = safeBounds.inBounds(lookPos, false) ? lookState2.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
+					
+					//This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
+					specialRayTraceCollision = lookBlock2 instanceof IRayTraceCollision ? ((IRayTraceCollision) lookBlock2).isRayTraceCollidable() : false;
+					
+					if (specialRayTraceCollision || !ignoreBlockWithoutBoundingBox || lookState2.getMaterial() == Material.PORTAL || colBB2 != Block.NULL_AABB) {
+						if (specialRayTraceCollision || lookBlock2.canCollideCheck(lookState2, stopOnLiquid)) {
+							RayTraceResult raytraceresult1 = lookState2.collisionRayTrace(world, lookPos, vantage, lookingAt);
+							if (raytraceresult1 != null) {
+								return raytraceresult1;
+							}
+						}
+						else {
+							raytraceresult2 = new RayTraceResult(RayTraceResult.Type.MISS, vantage, enumfacing, lookPos);
+						}
+					}
+				}
+				
+				return returnLastUncollidableBlock ? raytraceresult2 : null;
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			return null;
+		}
+	}
+	
 	/**
 	 * @param world The world
 	 * @param startPos The starting position

@@ -686,7 +686,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public final TreePartType getTreePartType() {
 		return TreePartType.LEAVES;
 	}
-
+	
 	@Override
 	public boolean isRayTraceCollidable() {
 		return true;
