@@ -91,9 +91,9 @@ public class ClientProxy extends CommonProxy {
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
 		
 		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(s -> s.getFamily()).distinct().collect(Collectors.toList())) {
+			family.woodColor = 0xFFF1AE;//For roots
 			if(family != TreeFamily.NULLFAMILY) {
 				IBlockState state = family.getPrimitiveLog();
-				family.woodColor = 0xFFF1AE;//For roots
 				if(state.getBlock() != Blocks.AIR) {
 					IModel model = QuadManipulator.getModelForState(state);
 					ResourceLocation resloc = QuadManipulator.getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
