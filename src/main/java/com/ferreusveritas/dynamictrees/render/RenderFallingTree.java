@@ -43,7 +43,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		
-		if(!entity.isClientBuilt()) {
+		if(!entity.isClientBuilt() || !entity.shouldRender()) {
 			return;
 		}
 		

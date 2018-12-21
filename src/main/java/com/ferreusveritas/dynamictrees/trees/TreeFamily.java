@@ -262,6 +262,11 @@ public class TreeFamily {
 		return woodColor;
 	}
 	
+	@SideOnly(Side.CLIENT)
+	public int getRootColor(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
+		return getWoodColor();
+	}
+	
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 * 

@@ -39,11 +39,6 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		
-		World world = entity.getEntityWorld();
-		if(TreeHelper.isRooty(world.getBlockState(cutPos.down()))) {
-			world.setBlockState(cutPos.down(), ModBlocks.blockStates.dirt, 0);
-		}
-		
 		long seed = entity.world.rand.nextLong();
 		Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
 		float mass = entity.getDestroyData().woodVolume;
@@ -139,7 +134,13 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 	}
 	
 	public boolean shouldDie(EntityFallingTree entity) {
-		return entity.landed || entity.ticksExisted > 120;
+		boolean dead = entity.landed || entity.ticksExisted > 120;
+		
+		if(dead) {
+			entity.cleanupRootyDirt();
+		}
+		
+		return dead;
 	}
 	
 	@Override
@@ -153,5 +154,11 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		GlStateManager.rotate(-yaw, 0, 1, 0);
 		GlStateManager.rotate(pit, 1, 0, 0);
 		GlStateManager.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean shouldRender(EntityFallingTree entity) {
+		return true;
 	}
 }

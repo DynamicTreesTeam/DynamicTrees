@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.entities.animation;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -241,13 +240,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			entity.ticksExisted > 120 + (entity.getDestroyData().trunkHeight);
 		
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		if(dead && !entity.world.isRemote) {
-			IBlockState belowState = entity.world.getBlockState(entity.getDestroyData().cutPos.down());
-			if(TreeHelper.isRooty(belowState)) {
-				@SuppressWarnings("serial")
-				Random rand = new Random() { public int nextInt(int bound) { return 0; } };//Special random generator that always returns 0.
-				belowState.getBlock().updateTick(entity.world, entity.getDestroyData().cutPos.down(), belowState, rand);
-			}
+		if(dead) {
+			entity.cleanupRootyDirt();
 		}
 		
 		return dead;
@@ -273,6 +267,12 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		GlStateManager.translate(toolVec.x, toolVec.y, toolVec.z);
 		
 		GlStateManager.translate(-0.5, 0, -0.5);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean shouldRender(EntityFallingTree entity) {
+		return true;
 	}
 	
 }

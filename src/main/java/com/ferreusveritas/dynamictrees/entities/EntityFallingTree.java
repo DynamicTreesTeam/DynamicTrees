@@ -3,9 +3,11 @@ package com.ferreusveritas.dynamictrees.entities;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -18,6 +20,8 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
@@ -253,9 +257,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		if(!world.isRemote && firstUpdate) {
 			updateNeighbors();
 		}
-				
+		
 		handleMotion();
-				
+		
 		setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
 		
 		if(shouldDie()) {
@@ -344,6 +348,11 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		return ticksExisted > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
 	}
 	
+	@SideOnly(Side.CLIENT)
+	public boolean shouldRender() {
+		return currentAnimationHandler.shouldRender(this);
+	}
+	
 	/**
 	 * Same style payload droppers that have always existed in Dynamic Trees.
 	 * 
@@ -385,6 +394,49 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	@Override
 	protected void entityInit() {
 		getDataManager().register(voxelDataParameter, new NBTTagCompound());
+	}
+	
+	public void cleanupRootyDirt() {
+		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+		if(!world.isRemote) {
+			BlockPos rootPos = getDestroyData().cutPos.down();
+			IBlockState belowState = world.getBlockState(rootPos);
+
+			if(TreeHelper.isRooty(belowState)) {
+				@SuppressWarnings("serial")
+				Random rand = new Random() { public int nextInt(int bound) { return 0; } };//Special random generator that always returns 0.
+				belowState.getBlock().randomTick(world, getDestroyData().cutPos.down(), belowState, rand);//This will turn the rooty dirt back to it's default soil block. Usually dirt or sand
+				
+				//First compare the biome's top block and the default soil block for matching materials 
+				belowState = world.getBlockState(rootPos);
+				IBlockState biomeState = world.getBiome(rootPos).topBlock;
+				
+				Material belowMaterial = belowState.getMaterial();
+				Material biomeMaterial = biomeState.getMaterial();
+				
+				//GRASS is basically GROUND so will treat it as such
+				if(biomeMaterial == Material.GRASS) {
+					biomeMaterial = Material.GROUND;
+				}
+				if(belowMaterial == Material.GRASS) {
+					belowMaterial = Material.GROUND;
+				}
+				
+				//If the materials match and the species can be planted in the default soil for that biome then we'll look around
+				//the block for matching samples of the biome soil.  If we find one then we'll use it to replace the dirt block
+				if(biomeMaterial == belowMaterial && getDestroyData().species.getAcceptableSoils().contains(biomeState.getBlock())) {
+					for(EnumFacing dir : EnumFacing.HORIZONTALS) {
+						BlockPos dPos = rootPos.offset(dir);
+						IBlockState findState = world.getBlockState(dPos);
+						if(findState == biomeState) {
+							world.setBlockState(rootPos, world.getBiome(rootPos).topBlock);
+							return;
+						}
+					}
+
+				}
+			}
+		}
 	}
 	
 	//This is shipped off to the clients
