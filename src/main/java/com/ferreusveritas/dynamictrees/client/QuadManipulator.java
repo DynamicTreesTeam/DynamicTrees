@@ -137,52 +137,60 @@ public class QuadManipulator {
 		
 		float uvs[] = getSpriteUVFromBlockState(state, dir);
 		
-		List<TextureAtlasSprite> sprites = new ArrayList<>();
-		
-		float closest = Float.POSITIVE_INFINITY;
-		ResourceLocation closestTex = new ResourceLocation("missingno");
-		if(model != null) {
-			for(ResourceLocation tex : model.getTextures()) {
-				TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
-				float u = tas.getInterpolatedU(8);
-				float v = tas.getInterpolatedV(8);
-				sprites.add(tas);
-				float du = u - uvs[0];
-				float dv = v - uvs[1];
-				float distSq = du * du + dv * dv;
-				if(distSq < closest) {
-					closest = distSq;
-					closestTex = tex;
+		if(uvs != null) {
+			List<TextureAtlasSprite> sprites = new ArrayList<>();
+			
+			float closest = Float.POSITIVE_INFINITY;
+			ResourceLocation closestTex = new ResourceLocation("missingno");
+			if(model != null) {
+				for(ResourceLocation tex : model.getTextures()) {
+					TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
+					float u = tas.getInterpolatedU(8);
+					float v = tas.getInterpolatedV(8);
+					sprites.add(tas);
+					float du = u - uvs[0];
+					float dv = v - uvs[1];
+					float distSq = du * du + dv * dv;
+					if(distSq < closest) {
+						closest = distSq;
+						closestTex = tex;
+					}
 				}
 			}
+			
+			return closestTex;
 		}
 		
-		return closestTex;
+		return null;
 	}
 	
 	public static float[] getSpriteUVFromBlockState(IBlockState state, EnumFacing side) {
 		IBakedModel bakedModel = getModelManager().getBlockModelShapes().getModelForState(state);
 		List<BakedQuad> quads = bakedModel.getQuads(state, side, 0);
-		BakedQuad quad = quads.get(0);
 		
-		float u = 0.0f;
-		float v = 0.0f;
-		
-		int[] vertexData = quad.getVertexData();
-		int numVertices = 0;
-		for(int i = 0; i < vertexData.length; i += quad.getFormat().getIntegerSize()) {
-			int pos = 0;
-			for(VertexFormatElement vfe: quad.getFormat().getElements()) {
-				if(vfe.getUsage() == EnumUsage.UV) {
-					u += Float.intBitsToFloat(vertexData[i + pos + 0]);
-					v += Float.intBitsToFloat(vertexData[i + pos + 1]);
+		if(quads.size() != 0) { 
+			BakedQuad quad = quads.get(0);
+			
+			float u = 0.0f;
+			float v = 0.0f;
+			
+			int[] vertexData = quad.getVertexData();
+			int numVertices = 0;
+			for(int i = 0; i < vertexData.length; i += quad.getFormat().getIntegerSize()) {
+				int pos = 0;
+				for(VertexFormatElement vfe: quad.getFormat().getElements()) {
+					if(vfe.getUsage() == EnumUsage.UV) {
+						u += Float.intBitsToFloat(vertexData[i + pos + 0]);
+						v += Float.intBitsToFloat(vertexData[i + pos + 1]);
+					}
+					pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
 				}
-				pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
+				numVertices++;
 			}
-			numVertices++;
+			
+			return new float[] { u / numVertices, v / numVertices };
 		}
-		
-		return new float[] { u / numVertices, v / numVertices };
+		return null;
 	}
 	
 }

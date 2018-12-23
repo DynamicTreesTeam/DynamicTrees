@@ -46,7 +46,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 	
 	public BakedModelBlockBranchThick(ResourceLocation barkRes, ResourceLocation ringsRes, ResourceLocation thickRingsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		super(barkRes, ringsRes, bakedTextureGetter);
-				
+		
 		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);
 		TextureAtlasSprite ringIcon = bakedTextureGetter.apply(ringsRes);
 		TextureAtlasSprite thickRingIcon = bakedTextureGetter.apply(thickRingsRes);

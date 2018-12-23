@@ -97,12 +97,14 @@ public class ClientProxy extends CommonProxy {
 				if(state.getBlock() != Blocks.AIR) {
 					IModel model = QuadManipulator.getModelForState(state);
 					ResourceLocation resloc = QuadManipulator.getModelTexture(model, bakedTextureGetter, state, EnumFacing.UP);
-					PixelBuffer pixbuf = new PixelBuffer(bakedTextureGetter.apply(resloc));
-					int u = pixbuf.w / 16;
-					PixelBuffer center = new PixelBuffer(u * 8, u * 8);
-					pixbuf.blit(center, u * -8, u * -8);
-					
-					family.woodColor = center.averageColor();
+					if(resloc != null) {
+						PixelBuffer pixbuf = new PixelBuffer(bakedTextureGetter.apply(resloc));
+						int u = pixbuf.w / 16;
+						PixelBuffer center = new PixelBuffer(u * 8, u * 8);
+						pixbuf.blit(center, u * -8, u * -8);
+						
+						family.woodColor = center.averageColor();
+					}
 				}
 			}
 		}
