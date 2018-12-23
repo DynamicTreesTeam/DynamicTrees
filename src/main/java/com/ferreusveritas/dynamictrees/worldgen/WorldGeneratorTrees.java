@@ -18,6 +18,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkGeneratorFlat;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -100,6 +101,9 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+		if(chunkGenerator instanceof ChunkGeneratorFlat) {
+			return;
+		}
 		TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		BiomeDataBase dbase = treeGenerator.getBiomeDataBase(world);
 		if(dbase != TreeGenerator.DIMENSIONBLACKLISTED) {
