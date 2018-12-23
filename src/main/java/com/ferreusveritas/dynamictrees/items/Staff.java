@@ -21,6 +21,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,12 +41,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
 * Try the following in a command block to demonstrate the extra tag functionality.
-* /give @p dynamictrees:staff 1 0 tag:{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"birch",display:{Name:"Frog"}}
+* /give @p dynamictrees:staff 1 0 {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
 */
 public class Staff extends Item {
 	
 	public final static String HANDLE = "handle";
 	public final static String COLOR = "color";
+	
+	public final static String READONLY = "readonly";
+	public final static String TREE = "tree";
+	public final static String CODE = "code";
+	public final static String USES = "uses";
+	public final static String MAXUSES = "maxuses";
 	
 	public Staff() {
 		this("staff");
@@ -55,7 +62,27 @@ public class Staff extends Item {
 		setRegistryName(name);
 		setUnlocalizedName(getRegistryName().toString());
 		setMaxStackSize(1);
+		setHarvestLevel("axe", 3);
 		setCreativeTab(ModTabs.dynamicTreesTab);
+	}
+	
+	@Override
+	public float getDestroySpeed(ItemStack stack, IBlockState state) {
+		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+			return 64.0f;
+		}
+		return super.getDestroySpeed(stack, state);
+	}
+	
+	@Override
+	public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+			if(decUses(stack)) {
+				stack.shrink(1);
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -107,11 +134,33 @@ public class Staff extends Item {
 		Species species = getSpecies(heldStack);
 		if(species.isValid() && species.isAcceptableSoil(world, pos, clickedBlockState)) {
 			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
-			heldStack.shrink(1);//If the player is in creative this will have no effect.
+			if(hasMaxUses(heldStack)) {
+				if(decUses(heldStack)) {
+					heldStack.shrink(1);//If the player is in creative this will have no effect.
+				}
+			} else {
+				heldStack.shrink(1);//If the player is in creative this will have no effect.
+			}
 			return EnumActionResult.SUCCESS;
 		}
 		
 		return EnumActionResult.FAIL;
+	}
+	
+	@Override
+	public boolean showDurabilityBar(ItemStack stack) {
+		return hasMaxUses(stack);
+	}
+	
+	@Override
+	public int getMaxItemUseDuration(ItemStack stack) {
+		return super.getMaxItemUseDuration(stack);
+	}
+	
+	@Override
+	public double getDurabilityForDisplay(ItemStack stack) {
+		double damage = getUses(stack) / (double)getMaxUses(stack);
+		return 1 - damage;
 	}
 	
 	/**
@@ -125,26 +174,26 @@ public class Staff extends Item {
 	}
 	
 	public boolean isReadOnly(ItemStack itemStack) {
-		return getNBT(itemStack).getBoolean("readonly");
+		return getNBT(itemStack).getBoolean(READONLY);
 	}
 	
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setBoolean("readonly", readonly);
+		nbt.setBoolean(READONLY, readonly);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
 	
 	public Staff setSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("tree", species.toString());
+		nbt.setString(TREE, species.toString());
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
 	
 	public Staff setCode(ItemStack itemStack, String code) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("code", code);
+		nbt.setString(CODE, code);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -152,13 +201,50 @@ public class Staff extends Item {
 	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 		
-		if(nbt.hasKey("tree")) {
-			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("tree")));
+		if(nbt.hasKey(TREE)) {
+			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
 			Species species = TreeRegistry.findSpeciesSloppy("oak");
 			setSpecies(itemStack, species);
 			return species;
 		}
+	}
+	
+	public int getUses(ItemStack itemStack) {
+		NBTTagCompound nbt = getNBT(itemStack);
+		
+		if(nbt.hasKey(USES)) {
+			return nbt.getInteger(USES);
+		} else {
+			int uses = getMaxUses(itemStack);
+			setUses(itemStack, uses);
+			return uses;
+		}
+		
+	}
+	
+	public void setUses(ItemStack itemStack, int value) {
+		getNBT(itemStack).setInteger(USES, value);
+	}
+	
+	public int getMaxUses(ItemStack itemStack) {
+		NBTTagCompound nbt = getNBT(itemStack);
+		
+		if(nbt.hasKey(MAXUSES)) {
+			return nbt.getInteger(MAXUSES);
+		}
+		
+		return 0;
+	}
+	
+	public boolean hasMaxUses(ItemStack itemStack) {
+		return getNBT(itemStack).hasKey(MAXUSES);
+	}
+	
+	public boolean decUses(ItemStack itemStack) {
+		int uses = Math.max(0, getUses(itemStack) - 1);
+		setUses(itemStack, uses);
+		return uses <= 0;
 	}
 	
 	public int getColor(ItemStack itemStack, int tint) {
@@ -203,7 +289,7 @@ public class Staff extends Item {
 	
 	public Staff setColor(ItemStack itemStack, String colStr) {
 		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString("color", colStr);
+		nbt.setString(COLOR, colStr);
 		itemStack.setTagCompound(nbt);
 		return this;
 	}
@@ -212,10 +298,10 @@ public class Staff extends Item {
 		String code = "P";//Code of a sapling
 		NBTTagCompound nbt = getNBT(itemStack);
 		
-		if(nbt.hasKey("code")) {
-			code = nbt.getString("code");
+		if(nbt.hasKey(CODE)) {
+			code = nbt.getString(CODE);
 		} else {
-			nbt.setString("code", code);
+			nbt.setString(CODE, code);
 			itemStack.setTagCompound(nbt);
 		}
 		
