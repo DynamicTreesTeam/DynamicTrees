@@ -190,6 +190,9 @@ public class QuadManipulator {
 			
 			return new float[] { u / numVertices, v / numVertices };
 		}
+		
+		System.err.println("Warning: Could not get \"" + side + "\" side quads from blockstate: " + state);
+		
 		return null;
 	}
 	
