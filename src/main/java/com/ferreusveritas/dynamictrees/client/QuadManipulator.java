@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.client;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import net.minecraft.block.state.IBlockState;
@@ -167,18 +168,20 @@ public class QuadManipulator {
 	public static float[] getSpriteUVFromBlockState(IBlockState state, EnumFacing side) {
 		IBakedModel bakedModel = getModelManager().getBlockModelShapes().getModelForState(state);
 		List<BakedQuad> quads = bakedModel.getQuads(state, side, 0);
+		quads.addAll(bakedModel.getQuads(state, null, 0));
 		
-		if(quads.size() != 0) { 
-			BakedQuad quad = quads.get(0);
+		Optional<BakedQuad> quad = quads.stream().filter( q -> q.getFace() == side ).findFirst();
+		
+		if(quad.isPresent()) {
 			
 			float u = 0.0f;
 			float v = 0.0f;
 			
-			int[] vertexData = quad.getVertexData();
+			int[] vertexData = quad.get().getVertexData();
 			int numVertices = 0;
-			for(int i = 0; i < vertexData.length; i += quad.getFormat().getIntegerSize()) {
+			for(int i = 0; i < vertexData.length; i += quad.get().getFormat().getIntegerSize()) {
 				int pos = 0;
-				for(VertexFormatElement vfe: quad.getFormat().getElements()) {
+				for(VertexFormatElement vfe: quad.get().getFormat().getElements()) {
 					if(vfe.getUsage() == EnumUsage.UV) {
 						u += Float.intBitsToFloat(vertexData[i + pos + 0]);
 						v += Float.intBitsToFloat(vertexData[i + pos + 1]);
