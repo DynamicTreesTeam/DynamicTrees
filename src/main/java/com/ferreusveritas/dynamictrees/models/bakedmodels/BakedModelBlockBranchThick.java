@@ -157,7 +157,7 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 		
 		coreRadius = MathHelper.clamp(coreRadius, 9, 24);
 		
-		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
+		List<BakedQuad> quadsList = new ArrayList<>(30);
 		quadsList.addAll(trunksBark[coreRadius-9].getQuads(blockState, side, rand));
 		
 		if (blockState instanceof IExtendedBlockState) {

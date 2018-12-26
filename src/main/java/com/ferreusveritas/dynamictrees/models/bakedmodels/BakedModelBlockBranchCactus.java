@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -574,7 +574,7 @@ protected ModelBlock modelBlock;
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
-		List<BakedQuad> quadsList = new LinkedList<BakedQuad>();
+		List<BakedQuad> quadsList = new ArrayList<>(12);
 		
 		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
 		if (blockState instanceof IExtendedBlockState) {

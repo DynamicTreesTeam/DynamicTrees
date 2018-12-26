@@ -85,7 +85,7 @@ public class BakedModelSapling implements IBakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-		List<BakedQuad> quads = new ArrayList<BakedQuad>();
+		List<BakedQuad> quads = new ArrayList<>(12);
 		
 		if (state != null && state.getBlock() instanceof BlockDynamicSapling && state instanceof IExtendedBlockState) {
 			Species species = ((IExtendedBlockState) state).getValue(SpeciesProperty.SPECIES);

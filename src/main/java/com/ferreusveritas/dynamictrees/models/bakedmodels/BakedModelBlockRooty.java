@@ -32,7 +32,7 @@ public class BakedModelBlockRooty implements IBakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-		List<BakedQuad> quads = new ArrayList<BakedQuad>();
+		List<BakedQuad> quads = new ArrayList<>(16);
 		
 		if (state != null && state.getBlock() instanceof IMimic && state instanceof IExtendedBlockState) {
 			IExtendedBlockState extendedState = ((IExtendedBlockState) state);
