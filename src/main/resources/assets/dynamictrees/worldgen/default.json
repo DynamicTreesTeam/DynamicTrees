@@ -157,7 +157,7 @@
 	},
 	{
 		"__comment": "Redwood taiga, aka mega taiga has giant spruce trees",
-		"select": { "name": "minecraft:redwood_taiga.*" },
+		"select": { "name": "minecraft:.*redwood_taiga.*" },
 		"apply": {
 			"species" : "megaspruce"
 		}
