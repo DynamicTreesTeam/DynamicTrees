@@ -37,6 +37,7 @@ public class BakedModelSapling implements IBakedModel {
 	
 	private static IBakedModel[] modelMap;
 	private static IBakedModel errorSaplingModel;
+	private static TextureAtlasSprite particleTexture;
 	
 	public static IBakedModel getModelForSapling(Species species) {
 		int modelId = species.saplingModelId;
@@ -55,6 +56,8 @@ public class BakedModelSapling implements IBakedModel {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		particleTexture = bakedTextureGetter.apply(new ResourceLocation("blocks/dirt"));
 		
 		modelMap = new IBakedModel[Species.REGISTRY.getEntries().size()];
 		
@@ -109,7 +112,7 @@ public class BakedModelSapling implements IBakedModel {
 	
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
-		return null;
+		return particleTexture;
 	}
 	
 	@Override

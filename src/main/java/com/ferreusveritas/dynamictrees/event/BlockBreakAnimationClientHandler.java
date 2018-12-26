@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 import com.google.common.collect.Lists;
@@ -178,14 +179,16 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 					BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
 				} else {
 					IBlockState state = mc.world.getBlockState(pos);
-					int k1 = destroyblockprogress.getPartialBlockDamage();
-					TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
-					BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
-					if (state.getRenderType() == EnumBlockRenderType.MODEL) {
-						state = state.getActualState(mc.world, pos);
-						IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
-						IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
-						blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
+					if(state.getBlock() instanceof BlockBranch) {
+						int k1 = destroyblockprogress.getPartialBlockDamage();
+						TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
+						BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
+						if (state.getRenderType() == EnumBlockRenderType.MODEL) {
+							state = state.getActualState(mc.world, pos);
+							IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
+							IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
+							blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
+						}
 					}
 				}
 			}
