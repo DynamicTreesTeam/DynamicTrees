@@ -120,7 +120,8 @@
 		"__comment" : "Mesa Rock(Plateau) has a chance of generating oak.  But oaks don't grow in clay so occurence is rare",
 		"select": { "name": "minecraft:mesa_rock" },
 		"apply": {
-			"species" : "oak"
+			"species" : "oak",
+			"chance": 0.5
 		} 
 	},
 	{
@@ -152,6 +153,13 @@
 					"oak" : 1
 				}
 			}
+		}
+	},
+	{
+		"__comment": "Redwood taiga, aka mega taiga has giant spruce trees",
+		"select": { "name": "minecraft:redwood_taiga.*" },
+		"apply": {
+			"species" : "megaspruce"
 		}
 	},
 	{
