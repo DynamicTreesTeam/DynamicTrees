@@ -63,7 +63,7 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 		}
 		
 		protected boolean inOverworldRange(BlockPos pos) {
-			return pos.getY() >= 0 && pos.getY() <= 128;
+			return pos.getY() >= 0 && pos.getY() <= 255;
 		}
 		
 		protected BlockPos findOverworldGround(World world, BlockPos start) {
