@@ -16,9 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.ChunkGeneratorFlat;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
@@ -101,7 +101,7 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if(chunkGenerator instanceof ChunkGeneratorFlat) {
+		if(world.getWorldType() == WorldType.FLAT) {
 			return;
 		}
 		TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
