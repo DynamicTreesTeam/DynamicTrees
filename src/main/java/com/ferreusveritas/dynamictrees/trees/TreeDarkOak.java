@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFlareBottom;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushrooms;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPredicate;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
 
 import net.minecraft.block.Block;
@@ -62,7 +63,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			addGenFeature(new FeatureGenClearVolume(6));//Clear a spot for the thick tree trunk
 			addGenFeature(new FeatureGenFlareBottom());//Flare the bottom
 			addGenFeature(new FeatureGenMound(5));//Establish mounds
-			addGenFeature(new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3));//Generate Huge Mushrooms
+			addGenFeature(new FeatureGenPredicate(
+				new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3)//Generate Huge Mushrooms
+				).setBiomePredicate(biome -> biome == Biomes.ROOFED_FOREST)//Only allow this feature in roofed forests
+			);
 			addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
 		}
 		
