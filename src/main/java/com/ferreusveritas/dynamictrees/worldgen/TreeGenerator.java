@@ -74,6 +74,10 @@ public class TreeGenerator {
 		defaultBiomeDataBase.clear();
 	}
 	
+	public boolean validateBiomeDataBases() {
+		return defaultBiomeDataBase.isValid() && dimensionMap.values().stream().allMatch(db -> db.isValid());
+	}
+	
 	/**
 	 * This is for world debugging.
 	 * The colors signify the different tree spawn failure modes.

@@ -126,6 +126,10 @@ public class WorldGenRegistry {
 		}
 	}
 	
+	public static boolean validateBiomeDataBases() {
+		return TreeGenerator.getTreeGenerator().validateBiomeDataBases();
+	}
+	
 	public static class BiomeDataBaseJsonCapabilityRegistryEvent extends Event {
 		
 		public void register(String name, IJsonBiomeSelector selector) {

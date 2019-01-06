@@ -49,6 +49,17 @@ public class BiomeDataBase {
 		}
 	}
 	
+	public boolean isValid() {
+		for(Biome biome: Biome.REGISTRY) {
+			BiomeEntry entry = getEntry(biome);
+			if(entry.getBiome() != biome) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public static class BiomeEntry {
 		private final Biome biome;
 		private final int biomeId;
