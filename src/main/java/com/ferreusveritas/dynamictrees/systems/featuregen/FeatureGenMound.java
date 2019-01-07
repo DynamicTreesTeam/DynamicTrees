@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
