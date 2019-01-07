@@ -52,6 +52,11 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 			IBlockState initialDirtState = world.getBlockState(rootPos);
 			IBlockState initialUnderState = world.getBlockState(rootPos.down());
 			
+			if(initialUnderState.getMaterial() == Material.AIR) {
+				Biome biome = world.getBiome(rootPos);
+				initialUnderState = biome.fillerBlock;
+			}
+			
 			if(initialUnderState.getMaterial() != Material.GROUND && initialUnderState.getMaterial() != Material.ROCK) {
 				initialUnderState = ModBlocks.blockStates.dirt;
 			}
