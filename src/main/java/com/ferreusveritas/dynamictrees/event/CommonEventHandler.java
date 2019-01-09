@@ -28,7 +28,7 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		if(!event.getWorld().isRemote) {
+		if(WorldGenRegistry.isWorldGenEnabled() && !event.getWorld().isRemote) {
 			if(!WorldGenRegistry.validateBiomeDataBases()) {
 				WorldGenRegistry.populateDataBase();
 			}

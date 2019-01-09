@@ -127,7 +127,10 @@ public class WorldGenRegistry {
 	}
 	
 	public static boolean validateBiomeDataBases() {
-		return TreeGenerator.getTreeGenerator().validateBiomeDataBases();
+		if(WorldGenRegistry.isWorldGenEnabled()) {
+			return TreeGenerator.getTreeGenerator().validateBiomeDataBases();
+		}
+		return true;
 	}
 	
 	public static class BiomeDataBaseJsonCapabilityRegistryEvent extends Event {
