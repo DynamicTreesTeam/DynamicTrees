@@ -45,6 +45,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -65,7 +66,10 @@ public class BlockBreakAnimationClientHandler implements IResourceManagerReloadL
 		if (event.getEntity() instanceof EntityPlayerSP && Minecraft.getMinecraft().player != null) {
 			if (Minecraft.getMinecraft().player.getEntityId() == event.getEntity().getEntityId()) {
 				event.getWorld().removeEventListener(Minecraft.getMinecraft().renderGlobal);
-				event.getWorld().addEventListener(new RenderGlobalWrapper(event.getWorld()));
+				List<IWorldEventListener> listeners = ReflectionHelper.getPrivateValue(World.class, event.getWorld(), "eventListeners", "field_73021_x");
+				if (listeners.stream().noneMatch((el) -> el instanceof RenderGlobalWrapper)) {
+					event.getWorld().addEventListener(new RenderGlobalWrapper(event.getWorld()));
+				}
 			}
 		}
 	}
