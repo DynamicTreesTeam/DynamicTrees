@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.items;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.ModTabs;
+import com.ferreusveritas.dynamictrees.ModConfigs;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,33 +45,38 @@ public class DirtBucket extends Item {
 		ItemStack itemStack = player.getHeldItem(hand);
 		RayTraceResult raytraceresult = this.rayTrace(world, player, false);
 		
-		if (raytraceresult == null) {
-			return new ActionResult(EnumActionResult.PASS, itemStack);
-		}
-		else if (raytraceresult.typeOfHit != RayTraceResult.Type.BLOCK) {
-			return new ActionResult(EnumActionResult.PASS, itemStack);
-		}
-		else {
-			BlockPos blockpos = raytraceresult.getBlockPos();
-			
-			if (!world.isBlockModifiable(player, blockpos)) {
-				return new ActionResult(EnumActionResult.FAIL, itemStack);
+		if (ModConfigs.dirtBucketPlacesDirt) {
+			if (raytraceresult == null) {
+				return new ActionResult(EnumActionResult.PASS, itemStack);
+			}
+			else if (raytraceresult.typeOfHit != RayTraceResult.Type.BLOCK) {
+				return new ActionResult(EnumActionResult.PASS, itemStack);
 			}
 			else {
-				boolean isReplacable = world.getBlockState(blockpos).getBlock().isReplaceable(world, blockpos);
-				BlockPos workingBlockPos = isReplacable && raytraceresult.sideHit == EnumFacing.UP ? blockpos : blockpos.offset(raytraceresult.sideHit);
+				BlockPos blockpos = raytraceresult.getBlockPos();
 				
-				if (!player.canPlayerEdit(workingBlockPos, raytraceresult.sideHit, itemStack)) {
+				if (!world.isBlockModifiable(player, blockpos)) {
 					return new ActionResult(EnumActionResult.FAIL, itemStack);
-				}
-				else if (this.tryPlaceContainedDirt(player, world, workingBlockPos)) {
-					player.addStat(StatList.getObjectUseStats(this));
-					return !player.capabilities.isCreativeMode ? new ActionResult(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult(EnumActionResult.SUCCESS, itemStack);
 				}
 				else {
-					return new ActionResult(EnumActionResult.FAIL, itemStack);
+					boolean isReplacable = world.getBlockState(blockpos).getBlock().isReplaceable(world, blockpos);
+					BlockPos workingBlockPos = isReplacable && raytraceresult.sideHit == EnumFacing.UP ? blockpos : blockpos.offset(raytraceresult.sideHit);
+					
+					if (!player.canPlayerEdit(workingBlockPos, raytraceresult.sideHit, itemStack)) {
+						return new ActionResult(EnumActionResult.FAIL, itemStack);
+					}
+					else if (this.tryPlaceContainedDirt(player, world, workingBlockPos)) {
+						player.addStat(StatList.getObjectUseStats(this));
+						return !player.capabilities.isCreativeMode ? new ActionResult(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult(EnumActionResult.SUCCESS, itemStack);
+					}
+					else {
+						return new ActionResult(EnumActionResult.FAIL, itemStack);
+					}
 				}
 			}
+		}
+		else {
+			return new ActionResult(EnumActionResult.PASS, itemStack);
 		}
 	}
 	
