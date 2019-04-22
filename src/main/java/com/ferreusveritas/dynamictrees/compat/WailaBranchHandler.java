@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.compat;
 
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -114,7 +115,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 			NodeNetVolume volumeSum = new NodeNetVolume();
 			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
 			
-			return volumeSum.getVolume();
+			return volumeSum.getVolume() * ModConfigs.treeHarvestMultiplier;
 		}
 		
 		return 0;
