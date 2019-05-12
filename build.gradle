@@ -56,7 +56,7 @@ minecraft {
 }
 
 dependencies {
-    compile "mcp.mobius.waila:Hwyla:+"
+    compile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 }
 
 processResources {

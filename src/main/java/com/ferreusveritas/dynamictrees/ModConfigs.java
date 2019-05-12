@@ -37,7 +37,7 @@ public class ModConfigs {
 	public static boolean enableFallingTrees;
 	public static boolean enableFallingTreeDamage;
 	public static float fallingTreeDamageMultiplier;
-	
+	public static boolean dirtBucketPlacesDirt;
 	public static boolean replaceVanillaSapling;
 	
 	public static boolean podzolGen;
