@@ -40,6 +40,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
@@ -396,38 +397,43 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	*/
 	
 	@Override
-	public void futureBreak(IBlockState state, World world, BlockPos cutPos, EntityPlayer player) {
+	public void futureBreak(IBlockState state, World world, BlockPos cutPos, EntityLivingBase entity) {
 		
 		//Try to get the face being pounded on
-		RayTraceResult rtResult = playerRayTrace(player, player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue(), 1.0F);
-		EnumFacing toolDir = rtResult != null ? (player.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
+		final double reachDistance = entity instanceof EntityPlayerMP ? entity.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() : 5.0D;
+		RayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
+		EnumFacing toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
 		
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
 		
 		//Get all of the wood drops
-		ItemStack heldItem = player.getHeldItemMainhand();
+		ItemStack heldItem = entity.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor);
 		
-		if(player.getActiveHand() == null) {//What the hell man? I trusted you!
-			player.setActiveHand(EnumHand.MAIN_HAND);//Players do things with hands.
+		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
+			entity.setActiveHand(EnumHand.MAIN_HAND);//Players do things with hands.
 		}
 		
+		float chance = 1.0f;
 		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, 1.0f, false, player);
+		if (entity instanceof EntityPlayer)
+		{
+			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItems, world, cutPos, state, fortune, chance, false, (EntityPlayer) entity);
+		}
+		final float finalChance = chance;
 		
 		//Build the final wood drop list taking chance into consideration
-		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
+		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= finalChance).collect(Collectors.toList());
 		
 		//This will drop the EntityFallingTree into the world
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
-		damageAxe(player, heldItem, getRadius(state), woodVolume);
-		
+		damageAxe(entity, heldItem, getRadius(state), woodVolume);
 	}
 	
 	// We override the standard behavior because we need to preserve the tree network structure to calculate
@@ -435,7 +441,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
 	@Override
 	public boolean removedByPlayer(IBlockState state, World world, BlockPos cutPos, EntityPlayer player, boolean canHarvest) {
-		FutureBreak.add(new FutureBreak(state, world, cutPos, player, 0));
+		return removedByEntity(state, world, cutPos, player);
+	}
+	
+	public boolean removedByEntity(IBlockState state, World world, BlockPos cutPos, EntityLivingBase entity) {
+		FutureBreak.add(new FutureBreak(state, world, cutPos, entity, 0));
 		return false;
 	}
 	
@@ -455,17 +465,17 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	 * reason for this function to be client side only as all of it's calls are
 	 * client/server compatible.
 	 * 
-	 * @param player
+	 * @param entity
 	 * @param blockReachDistance
 	 * @param partialTicks
 	 * @return
 	 */
     @Nullable
-    public RayTraceResult playerRayTrace(EntityPlayer player, double blockReachDistance, float partialTicks) {
-        Vec3d vec3d = player.getPositionEyes(partialTicks);
-        Vec3d vec3d1 = player.getLook(partialTicks);
+    public RayTraceResult playerRayTrace(EntityLivingBase entity, double blockReachDistance, float partialTicks) {
+        Vec3d vec3d = entity.getPositionEyes(partialTicks);
+        Vec3d vec3d1 = entity.getLook(partialTicks);
         Vec3d vec3d2 = vec3d.addVector(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-        return player.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
+        return entity.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
     }
 	
 	public enum EnumAxeDamage {
@@ -474,7 +484,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		VOLUME
 	}
 	
-	public void damageAxe(EntityPlayer player, ItemStack heldItem, int radius, float woodVolume) {
+	public void damageAxe(EntityLivingBase entity, ItemStack heldItem, int radius, float woodVolume) {
 		
 		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || heldItem.getItem().getToolClasses(heldItem).contains("axe"))) {
 			
@@ -495,7 +505,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			
 			damage--;//Minecraft already damaged the tool by one unit
 			if(damage > 0) {
-				heldItem.damageItem(damage, player);
+				heldItem.damageItem(damage, entity);
 			}
 		}
 		
