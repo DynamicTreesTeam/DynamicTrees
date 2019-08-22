@@ -62,6 +62,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	public static boolean passableLeavesModLoaded = false;
 	
+	protected static Random backupRng = new Random();
+	
 	public static final PropertyInteger HYDRO = PropertyInteger.create("hydro", 1, 4);
 	public static final PropertyInteger TREE = PropertyInteger.create("tree", 0, 3);
 	
@@ -119,6 +121,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		if (rand == null) rand = backupRng;
 		if(rand.nextInt(ModConfigs.treeGrowthFolding) == 0) {
 			float attempts = ModConfigs.treeGrowthFolding * ModConfigs.treeGrowthMultiplier;
 			
