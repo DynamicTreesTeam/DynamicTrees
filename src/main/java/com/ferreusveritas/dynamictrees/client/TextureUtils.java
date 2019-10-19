@@ -188,9 +188,24 @@ public class TextureUtils {
 			}
 		}
 		
-		int r = (int) (rAccum / count);
-		int g = (int) (gAccum / count);
-		int b = (int) (bAccum / count);
+		int r;
+		int g;
+		int b;
+		try {
+		    r = (int) (rAccum / count);
+		} catch (ArithmeticException e) {
+			r = 0;
+		}
+		try {
+			g = (int) (gAccum / count);	
+		} catch (ArithmeticException e) {
+			g = 0;
+		}
+		try {
+			b = (int) (bAccum / count);
+		} catch (ArithmeticException e) {
+			b = 0;
+		}
 		
 		return compose(r, g, b, 255);
 	}
