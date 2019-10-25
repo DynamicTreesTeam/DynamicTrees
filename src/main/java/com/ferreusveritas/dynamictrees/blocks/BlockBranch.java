@@ -533,8 +533,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			} else
 			if(toBlock == Blocks.FIRE) { //Block has burned
 				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
-				sloppyBreak(world, pos, DestroyType.FIRE);
-				world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+				sloppyBreak(world, pos, DestroyType.VOID);
 			} else
 			if(toBlock == Blocks.STONE) { //Likely destroyed by the Pyroclasm mod's volcanic lava
 				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
