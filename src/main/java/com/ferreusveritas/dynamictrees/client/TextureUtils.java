@@ -188,6 +188,8 @@ public class TextureUtils {
 			}
 		}
 		
+		count = Math.min(1, count); // special thanks to ruudschouten
+		
 		int r = (int) (rAccum / count);
 		int g = (int) (gAccum / count);
 		int b = (int) (bAccum / count);
