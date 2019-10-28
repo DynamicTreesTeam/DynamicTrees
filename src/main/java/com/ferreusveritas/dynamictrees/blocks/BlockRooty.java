@@ -414,9 +414,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
-		IBlockState state = world.getBlockState(pos);
-		IBlockState mimicState = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(MimicProperty.MIMIC);
-		
+		IBlockState mimicState = getMimic(world, pos);
 		manager.addBlockDestroyEffects(pos, mimicState);
 		
 		return true;
