@@ -28,6 +28,7 @@ public class ModConfigs {
 	public static int maxBranchRotRadius;
 	public static boolean enableAppleTrees;
 	public static boolean enableThickTrees;
+	public static boolean enableOverflowFix;
 
 	public static boolean isLeavesPassable;
 	public static boolean vanillaLeavesCollision;
@@ -74,6 +75,7 @@ public class ModConfigs {
 		maxBranchRotRadius = config.getInt("maxBranchRotRadius", "trees", 8, 0, 24, "The maximum radius of a branch that is allowed to rot away. 8 = Full block size.  Set to 0 to prevent rotting");
 		enableAppleTrees = config.getBoolean("enableAppleTrees", "trees", true, "If enabled apple trees will be generated during worldgen and oak trees will not drop apples");
 		enableThickTrees = config.getBoolean("enableThickTrees", "trees", true, "If enabled then certain species trunks will be able to grow wider than a single block");
+		enableOverflowFix = config.getBoolean("enableOverflowFix", "trees", false, "If enabled removes normal breaking recursion for branches destroyed by fire, enable if you encounter StackOverflow from firetick");
 		
 		//Interaction
 		isLeavesPassable = config.getBoolean("isLeavesPassable", "interaction", false, "If enabled all leaves will be passable");
