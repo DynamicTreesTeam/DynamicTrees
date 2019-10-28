@@ -188,7 +188,7 @@ public class TextureUtils {
 			}
 		}
 		
-		count = Math.min(1, count); // special thanks to ruudschouten
+		count = Math.max(1, count); // special thanks to ruudschouten
 		
 		int r = (int) (rAccum / count);
 		int g = (int) (gAccum / count);
