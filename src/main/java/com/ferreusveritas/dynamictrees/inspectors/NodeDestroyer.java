@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.inspectors;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.backport.BlockPos;
@@ -23,9 +24,15 @@ import net.minecraft.item.ItemStack;
 public class NodeDestroyer implements INodeInspector {
 
 	Species species;//Destroy any node that's made of the same kind of wood
+	private List<BlockPos> endPoints;//We always need to track endpoints during destruction
 
 	public NodeDestroyer(Species species) {
+		this.endPoints = new ArrayList<BlockPos>(32);
 		this.species = species;
+	}
+
+	public List<BlockPos> getEnds() {
+		return endPoints;
 	}
 
 	@Override
@@ -34,7 +41,7 @@ public class NodeDestroyer implements INodeInspector {
 
 		if(branch != null && species.getTree() == branch.getTree()) {
 			if(branch.getRadius(world, pos) == 1) {
-				killSurroundingLeaves(world, pos);//Destroy the surrounding leaves
+				endPoints.add(pos);
 			}
 			world.setBlockToAir(pos);//Destroy the branch
 		}
