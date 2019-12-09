@@ -41,4 +41,4 @@ commands.dynamictrees.setree.specieserror=Не могу найти вид %s!
 commands.dynamictrees.repop.usage=/dt repop
 commands.dynamictrees.repop.run=Repopulating worldgen database
 
-death.attack.fallingtree=%1$s был раздавлен падающим деревом
+death.attack.fallingtree=%1$s раздавлен(а) падающим деревом
