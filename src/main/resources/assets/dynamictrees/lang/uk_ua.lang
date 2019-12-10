@@ -20,7 +20,7 @@ item.dynamictrees:birchseed.name=Насіння берези
 item.dynamictrees:jungleseed.name=Насіння тропічного дерева
 item.dynamictrees:darkoakseed.name=Темний жолудь
 item.dynamictrees:acaciaseed.name=Насіння акації
-item.dynamictrees:appleseed.name=Насіння яблука
+item.dynamictrees:appleseed.name=Насіння яблуні
 item.dynamictrees:cactusseed.name=Насіння кактусу
 
 item.dynamictrees:dendropotion.biochar.name=Основне зілля
@@ -39,6 +39,6 @@ commands.dynamictrees.usage=/dt <settree|repop> [args]
 commands.dynamictrees.setree.usage=/dt settree <x> <y> <z> <species> [joCode]
 commands.dynamictrees.setree.specieserror=Не можу знайти вид %s!
 commands.dynamictrees.repop.usage=/dt repop
-commands.dynamictrees.repop.run=Repopulating worldgen database
+commands.dynamictrees.repop.run=Перезаповнення бази даних генератора дерев
 
 death.attack.fallingtree=%1$s розтрощений(на) падаючим деревом
