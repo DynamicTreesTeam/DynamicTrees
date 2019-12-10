@@ -1,7 +1,7 @@
 itemGroup.dynamictrees=Динамические деревья
 
 tile.dynamictrees:rootydirt.name=Дёрн с корнями
-tile.dynamictrees:rootysand.name=песок с корнями
+tile.dynamictrees:rootysand.name=Песок с корнями
 
 tile.dynamictrees:leaves0.name=Динамическая листва
 tile.dynamictrees:leaves1.name=Динамическая листва
@@ -20,7 +20,7 @@ item.dynamictrees:birchseed.name=Семя березы
 item.dynamictrees:jungleseed.name=Семя тропического дерева
 item.dynamictrees:darkoakseed.name=Темный желудь
 item.dynamictrees:acaciaseed.name=Семя акации
-item.dynamictrees:appleseed.name=Семя яблока
+item.dynamictrees:appleseed.name=Семя яблони
 item.dynamictrees:cactusseed.name=Семя кактуса
 
 item.dynamictrees:dendropotion.biochar.name=Основное зелье
@@ -39,6 +39,6 @@ commands.dynamictrees.usage=/dt <settree|repop> [args]
 commands.dynamictrees.setree.usage=/dt settree <x> <y> <z> <species> [joCode]
 commands.dynamictrees.setree.specieserror=Не могу найти вид %s!
 commands.dynamictrees.repop.usage=/dt repop
-commands.dynamictrees.repop.run=Repopulating worldgen database
+commands.dynamictrees.repop.run=Перезаполнение базы данных генератора деревьев
 
 death.attack.fallingtree=%1$s раздавлен(а) падающим деревом
