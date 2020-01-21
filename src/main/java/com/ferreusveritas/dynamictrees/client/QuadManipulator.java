@@ -167,7 +167,8 @@ public class QuadManipulator {
 	
 	public static float[] getSpriteUVFromBlockState(IBlockState state, EnumFacing side) {
 		IBakedModel bakedModel = getModelManager().getBlockModelShapes().getModelForState(state);
-		List<BakedQuad> quads = bakedModel.getQuads(state, side, 0);
+		List<BakedQuad> quads = new ArrayList<BakedQuad>();
+		quads.addAll(bakedModel.getQuads(state, side, 0));
 		quads.addAll(bakedModel.getQuads(state, null, 0));
 		
 		Optional<BakedQuad> quad = quads.stream().filter( q -> q.getFace() == side ).findFirst();
