@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.entities;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -26,7 +27,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -130,9 +133,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		geomCenter = geomCenter.scale(1.0 / numBlocks);
 		massCenter = massCenter.scale(1.0 / totalMass);
-		
-		setEntityBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
-		
+	
 		setVoxelData(buildVoxelData(destroyData));
 		
 		return this;
@@ -154,21 +155,25 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		return tag;
 	}
 	
+	public void setupFromNBT(NBTTagCompound tag) {
+		destroyData = new BranchDestructionData(tag);
+		if(destroyData.getNumBranches() == 0) {
+			setDead();
+		}
+		destroyType = DestroyType.values()[tag.getInteger("destroytype")];
+		geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
+		massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+		buildAABBFromDestroyData(destroyData);
+		setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
+		onFire = tag.getBoolean("onfire");
+	}
+	
 	public void buildClient() {
 		
 		NBTTagCompound tag = getVoxelData();
 		
-		if(tag.hasKey("species")) {			
-			destroyData = new BranchDestructionData(tag);
-			if(destroyData.getNumBranches() == 0) {
-				setDead();
-			}
-			destroyType = DestroyType.values()[tag.getInteger("destroytype")];
-			geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
-			massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
-			buildAABBFromDestroyData(destroyData);
-			setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
-			onFire = tag.getBoolean("onfire");
+		if(tag.hasKey("species")) {
+			setupFromNBT(tag);
 			clientBuilt = true;
 		} else {
 			System.out.println("Error: No species tag has been set");
@@ -441,6 +446,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	//This is shipped off to the clients
 	public void setVoxelData(NBTTagCompound tag) {
+		setEntityBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
 		getDataManager().set(voxelDataParameter, tag);
 	}
 	
@@ -450,11 +456,39 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound compound) {
-		setDead();//Falling Trees are never saved to disk.  In the event one is read from disk just kill it.
+		NBTTagCompound vox = (NBTTagCompound) compound.getTag("vox");
+		setupFromNBT(vox);
+		setVoxelData(vox);
+		
+		if(compound.hasKey("payload")) {
+			NBTTagList list = (NBTTagList) compound.getTag("payload");
+				
+			Iterator<NBTBase> iter = list.iterator();
+			while(iter.hasNext()) {
+				NBTBase tag = iter.next();
+				if(tag instanceof NBTTagCompound) {
+					NBTTagCompound compTag = (NBTTagCompound) tag;
+					payload.add(new ItemStack(compTag));
+				}
+			}
+		}
+		
 	}
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound compound) { }
+	protected void writeEntityToNBT(NBTTagCompound compound) {
+		compound.setTag("vox", getVoxelData());
+
+		if(!payload.isEmpty()) {
+			NBTTagList list = new NBTTagList();
+
+			for(ItemStack stack : payload) {
+				list.appendTag(stack.serializeNBT());
+			}
+
+			compound.setTag("payload", list);
+		}
+	}
 	
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world

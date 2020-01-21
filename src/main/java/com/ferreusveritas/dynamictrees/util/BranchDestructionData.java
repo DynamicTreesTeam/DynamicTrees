@@ -70,12 +70,12 @@ public class BranchDestructionData {
 	
 	public BranchDestructionData(NBTTagCompound nbt) {
 		this.species = TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("species")));
-		this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos"); 
+		this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
 		this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
 		this.destroyedLeaves = nbt.getIntArray("leaves");
 		this.leavesDrops = new ArrayList<BlockItemStack>();
-		this.endPoints = nbt.getIntArray("ends");	
-		this.woodVolume = nbt.getFloat("volume");	
+		this.endPoints = nbt.getIntArray("ends");
+		this.woodVolume = nbt.getFloat("volume");
 		this.cutPos = new BlockPos(nbt.getInteger("cutx"), nbt.getInteger("cuty"), nbt.getInteger("cutz") );
 		this.cutDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("cutdir"), 0, EnumFacing.values().length - 1)];
 		this.toolDir = EnumFacing.values()[MathHelper.clamp(nbt.getInteger("tooldir"), 0, EnumFacing.values().length - 1)];
