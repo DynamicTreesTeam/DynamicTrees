@@ -1,6 +1,7 @@
 itemGroup.dynamictrees=Динамічні дерева
 
-tile.dynamictrees:rootydirt.name=Коріння
+tile.dynamictrees:rootydirt.name=Ґрунт з корінням
+tile.dynamictrees:rootysand.name=Пісок з корінням
 
 tile.dynamictrees:leaves0.name=Динамічне листя
 tile.dynamictrees:leaves1.name=Динамічне листя
@@ -11,6 +12,7 @@ tile.dynamictrees:birchbranch.name=Стовбур берези
 tile.dynamictrees:junglebranch.name=Стовбур тропічного дерева
 tile.dynamictrees:darkoakbranch.name=Стовбур темного дуба
 tile.dynamictrees:acaciabranch.name=Стовбур акації
+tile.dynamictrees:cactusbranch.name=Стовбур кактусу
 
 item.dynamictrees:oakseed.name=Жолудь
 item.dynamictrees:spruceseed.name=Ялинова шишка
@@ -18,6 +20,8 @@ item.dynamictrees:birchseed.name=Насіння берези
 item.dynamictrees:jungleseed.name=Насіння тропічного дерева
 item.dynamictrees:darkoakseed.name=Темний жолудь
 item.dynamictrees:acaciaseed.name=Насіння акації
+item.dynamictrees:appleseed.name=Насіння яблуні
+item.dynamictrees:cactusseed.name=Насіння кактусу
 
 item.dynamictrees:dendropotion.biochar.name=Основне зілля
 item.dynamictrees:dendropotion.depletion.name=Зілля виснаження
@@ -30,3 +34,11 @@ item.dynamictrees:dendropotion.transform.name=Зілля трансформац�
 item.dynamictrees:dirtbucket.name=Відро землі
 item.dynamictrees:staff.name=Жезл дендролога
 tile.dynamictrees:bonsaipot.name=Бонсай
+
+commands.dynamictrees.usage=/dt <settree|repop> [args]
+commands.dynamictrees.setree.usage=/dt settree <x> <y> <z> <species> [joCode]
+commands.dynamictrees.setree.specieserror=Не можу знайти вид %s!
+commands.dynamictrees.repop.usage=/dt repop
+commands.dynamictrees.repop.run=Перезаповнення бази даних генератора дерев
+
+death.attack.fallingtree=%1$s розтрощений(на) падаючим деревом
