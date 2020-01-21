@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ModelTrackerCacheEntityFallingTree {
 	
-	public static Map<Integer, ModelEntityFallingTree> modelMap = new HashMap<>();
+	public static Map<Integer, ModelEntityFallingTree> modelMap = new ConcurrentHashMap<>();
 	
 	public static ModelEntityFallingTree getModel(EntityFallingTree entity) {
 		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new ModelEntityFallingTree(entity) );
