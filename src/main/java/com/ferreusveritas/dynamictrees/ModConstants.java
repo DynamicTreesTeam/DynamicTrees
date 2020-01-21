@@ -33,6 +33,7 @@ public class ModConstants {
 	public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.4" + ORGREATER;//Traverse will need a new build. Display an error rather than crash.
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
 	public static final String RUSTIC_VER = GREATERTHAN + "1.0.14" + ORGREATER;
+	public static final String RECURRENT_COMPLEX = "reccomplex";//Load after recurrent complex to allow it to generate it's content first
 	
 	//Forge
 	private static final String FORGE = "forge";
@@ -52,6 +53,8 @@ public class ModConstants {
 		+ OPTBEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
 		+ NEXT
 		+ OPTBEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
+		+ NEXT
+		+ OPTAFTER + RECURRENT_COMPLEX
 		;
 	
 }
