@@ -123,7 +123,9 @@ public class Staff extends Item {
 				if(!player.isSneaking()) {
 					String code = new JoCode(world, rootPos, player.getHorizontalFacing()).toString();
 					setCode(heldStack, code);
-					GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
+					if(world.isRemote) {//Make sure this doesn't run on the server
+						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
+					}
 				}
 				setSpecies(heldStack, species);
 				return EnumActionResult.SUCCESS;
