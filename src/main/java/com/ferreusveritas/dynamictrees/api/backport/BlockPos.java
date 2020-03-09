@@ -188,5 +188,9 @@ public class BlockPos implements Comparable<BlockPos> {
         double d2 = (double)this.getZ() - toZ;
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
+
+	public static Iterable<BlockPos> getAllInBox(int i, int j, int k, int l, int m, int n) {
+		return getAllInBox(new BlockPos(i, j, k), new BlockPos(l, m, n));
+	}
     
 }

@@ -160,7 +160,7 @@ public class SimpleVoxmap {
 		z += center.getZ();
 		if(testBounds(x, y, z)) {
 			if(value != 0) {
-				setYTouched(y);
+				setYTouched(y - center.getY());
 			}
 			data[calcPos(x, y, z)] = value;
 		}

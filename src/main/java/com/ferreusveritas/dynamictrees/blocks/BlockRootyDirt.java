@@ -156,7 +156,7 @@ public class BlockRootyDirt extends BlockBackport implements ITreePart {
 	public void destroyTree(World world, BlockPos pos) {
 		BlockBranch branch = TreeHelper.getBranch(world, pos.up());
 		if(branch != null) {
-			branch.destroyEntireTree(world, pos.up());
+			branch.destroyBranchFromNode(world, pos.up(), true);
 		}
 	}
 	
