@@ -33,7 +33,7 @@ public class BlockRootyDirt extends BlockRooty {
 	
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-		return layer == BlockRenderLayer.CUTOUT_MIPPED || layer == BlockRenderLayer.SOLID;
+		return layer == BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	
 }
