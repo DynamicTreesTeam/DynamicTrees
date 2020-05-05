@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDeplete;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDisease;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
@@ -39,21 +38,23 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public static final String name = "dendropotion";
 	
 	public enum DendroPotionType {
-		BIOCHAR(    0, "biochar",     0x27231c, "Base tree potion for brewing"),
-		DEPLETION(  1, "depletion",	  0x76be6d, "Destroys tree soil fertility"),
-		DEFOLIANCE( 2, "defoliance",  0xe3901d, "Slowly destroy a tree"),
-		BURGEONING( 3, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
-		FERTILITY(  4, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
-		PERSISTANCE(5, "persistance", 0x389aff, "Stops tree from changing"),
-		TRANSFORM(  6, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
+		BIOCHAR(    0, true, "biochar",     0x27231c, "Base tree potion for brewing"),
+		DEPLETION(  1, true, "depletion",	  0x76be6d, "Destroys tree soil fertility"),
+		GIGAS( 2, false, "gigas",  0xe3901d, "Allows a tree to become mega size"),
+		BURGEONING( 3, true, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
+		FERTILITY(  4, true, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
+		PERSISTANCE(5, true, "persistance", 0x389aff, "Stops tree from changing"),
+		TRANSFORM(  6, true, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
 				
 		private final int index;
+		private final boolean active;
 		private final String name;
 		private final int color;
 		private final String lore;
 		
-		DendroPotionType(int index, String name, int color, String lore) {
+		DendroPotionType(int index, boolean active, String name, int color, String lore) {
 			this.index = index;
+			this.active = active;
 			this.name = name;
 			this.color = color;
 			this.lore = lore;
@@ -63,6 +64,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		
 		public int getIndex() {
 			return index;
+		}
+		
+		public boolean getActive() {
+			return active;
 		}
 		
 		public String getName() {
@@ -94,7 +99,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if(isInCreativeTab(tab)) {
 			for(DendroPotionType type : DendroPotionType.values()) {
-				subItems.add(new ItemStack(this, 1, type.getIndex()));
+				if(type.getActive()) {
+					subItems.add(new ItemStack(this, 1, type.getIndex()));
+				}
 			}
 		}
 	}
@@ -118,7 +125,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			default:
 			case BIOCHAR: return null;
 			case BURGEONING: return new SubstanceGrowth();
-			case DEFOLIANCE: return new SubstanceDisease();
+			case GIGAS: return null;
 			case DEPLETION: return new SubstanceDeplete().setAmount(15);
 			case FERTILITY: return new SubstanceFertilize().setAmount(15);
 			case PERSISTANCE: return new SubstanceFreeze();
@@ -161,10 +168,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.SLIME_BALL), //Slimeball
 				new ItemStack(this, 1, DendroPotionType.DEPLETION.getIndex()));
 		
-		BrewingRecipeRegistry.addRecipe(
+		/*BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
 				new ItemStack(Items.PUMPKIN_SEEDS), //Pumpkin seeds
-				new ItemStack(this, 1, DendroPotionType.DEFOLIANCE.getIndex()));
+				new ItemStack(this, 1, DendroPotionType.DEFOLIANCE.getIndex()));*/
 		
 		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),

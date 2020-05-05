@@ -5,7 +5,10 @@ import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenCocoa;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 
@@ -18,11 +21,13 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class TreeJungle extends TreeFamilyVanilla {
 	
@@ -55,6 +60,69 @@ public class TreeJungle extends TreeFamilyVanilla {
 		
 	}
 	
+	
+	public class SpeciesMegaJungle extends Species {
+		
+		private static final String speciesName = "megajungle";
+		
+		SpeciesMegaJungle(TreeFamily treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
+
+			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
+			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
+			
+			envFactor(Type.COLD, 0.15f);
+			envFactor(Type.DRY,  0.20f);
+			envFactor(Type.HOT, 1.1f);
+			envFactor(Type.WET, 1.1f);
+			
+			setSoilLongevity(16);//Grows for a while so it can actually get tall
+			
+			//Add species features
+			addGenFeature(new FeatureGenVine().setQuantity(16).setMaxLength(16));
+			addGenFeature(new FeatureGenClearVolume(8));//Clear a spot for the thick tree trunk
+			addGenFeature(new FeatureGenMound(999));//Place a 3x3 of dirt under thick trees
+			//addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
+		}
+		
+		@Override
+		public boolean isBiomePerfect(Biome biome) {
+			return BiomeDictionary.hasType(biome, Type.JUNGLE);
+		};
+		
+		/*protected BiFunction<Integer, Integer, Integer> getRootScaler() {
+			return (inRadius, trunkRadius) -> {
+				float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
+				return (int) (inRadius * scale);
+			};
+		}*/
+		
+		//Mega jungle are just jungle trees under special circumstances..  So they have the same seeds
+		@Override
+		public ItemStack getSeedStack(int qty) {
+			return getCommonSpecies().getSeedStack(qty);
+		}
+		
+		//Mega jungle are just jungle trees under special circumstances..  So they have the same seeds
+		@Override
+		public Seed getSeed() {
+			return getCommonSpecies().getSeed();
+		}
+		
+		@Override
+		public int maxBranchRadius() {
+			return 24;
+		}
+		
+		@Override
+		public boolean isThick() {
+			return true;
+		}
+		
+	}
+	
+	Species megaSpecies;
+	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
 		canSupportCocoa = true;
@@ -63,7 +131,19 @@ public class TreeJungle extends TreeFamilyVanilla {
 	
 	@Override
 	public void createSpecies() {
+		megaSpecies = new SpeciesMegaJungle(this);
 		setCommonSpecies(new SpeciesJungle(this));
+	}
+	
+	@Override
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		super.registerSpecies(speciesRegistry);
+		speciesRegistry.register(megaSpecies);
+	}
+	
+	@Override
+	public boolean isThick() {
+		return true;
 	}
 	
 	@Override
