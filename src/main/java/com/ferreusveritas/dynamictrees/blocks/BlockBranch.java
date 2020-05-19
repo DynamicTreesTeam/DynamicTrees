@@ -404,6 +404,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		RayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
 		EnumFacing toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.sideHit.getOpposite() : rtResult.sideHit) : EnumFacing.DOWN;
 		
+		if(toolDir == null) {//Some rayTracing results can theoretically produce a face hit with no side designation.
+			toolDir = EnumFacing.DOWN;//Make everything better
+		}
+		
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
 		
