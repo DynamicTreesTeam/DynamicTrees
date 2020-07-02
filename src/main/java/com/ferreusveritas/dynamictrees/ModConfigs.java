@@ -98,6 +98,7 @@ public class ModConfigs {
 		for(String dim : dims) {
 			try {
 				int dimValue = Integer.decode(dim);
+				System.out.println("DynamicTrees BlackListed DimValue: " + dimValue);
 				dimensionBlacklist.add(dimValue);
 			} catch (NumberFormatException nfe) {}
 		}
