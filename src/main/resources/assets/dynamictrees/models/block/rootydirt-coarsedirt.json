@@ -1,8 +1,0 @@
-{
-    "parent": "block/cube_bottom_top",
-    "textures": {
-        "bottom": "blocks/coarse_dirt",
-        "top": "blocks/coarse_dirt",
-        "side": "dynamictrees:blocks/rootydirt-dirt"
-    }
-}

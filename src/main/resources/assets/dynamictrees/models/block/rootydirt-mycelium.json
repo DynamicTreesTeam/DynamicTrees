@@ -1,7 +1,0 @@
-{
-    "parent": "block/mycelium",
-    "textures": {
-        "particle": "blocks/dirt",
-        "side": "dynamictrees:blocks/rootydirt-mycelium"
-    }
-}
