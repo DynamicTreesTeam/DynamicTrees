@@ -22,42 +22,78 @@ import java.util.stream.Collectors;
 @Mod("dynamictrees")
 public class DynamicTrees
 {
-    // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String MODID = "dynamictrees";
+    public static final String NAME = "Dynamic Trees";
+    public static final String VERSION = "1.12.2-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
+
+    public static final String OPTAFTER = "after:";
+    public static final String OPTBEFORE = "before:";
+    public static final String REQAFTER = "required-after:";
+    public static final String REQBEFORE = "required-before:";
+    public static final String NEXT = ";";
+    public static final String AT = "@[";
+    public static final String GREATERTHAN = "@(";
+    public static final String ORGREATER = ",)";
+
+    //Other mods can use this string to depend on the latest version of Dynamic Trees
+    public static final String DYNAMICTREES_LATEST = MODID + AT + VERSION + ORGREATER;
+
+    //Other Add-on Mods
+    public static final String DYNAMICTREESBOP = "dynamictreesbop";
+    public static final String DYNAMICTREESTC = "dynamictreestc";
+    public static final String DYNAMICTREESPHC = "dynamictreesphc";
+    public static final String DYNAMICTREESTRAVERSE = "dttraverse";
+    public static final String DYNAMICTREESHNC = "dynamictreeshnc";
+    public static final String RUSTIC = "rustic";
+
+    //Other Mod Versions.. These have been added to avoid the whole "Duh.. How come my mod is crashing?" bullshit bug reports.
+    public static final String DYNAMICTREESBOP_VER = GREATERTHAN + "1.4.1d" + ORGREATER;
+    public static final String DYNAMICTREESTC_VER =	 GREATERTHAN + "1.4.1d" + ORGREATER;
+    public static final String DYNAMICTREESPHC_VER = GREATERTHAN + "1.4.1e" + ORGREATER;
+    public static final String DYNAMICTREESTRAVERSE_VER =  GREATERTHAN + "1.4" + ORGREATER;//Traverse will need a new build. Display an error rather than crash.
+    public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is not longer supported
+    public static final String RUSTIC_VER = GREATERTHAN + "1.0.14" + ORGREATER;
+    public static final String RECURRENT_COMPLEX = "reccomplex";//Load after recurrent complex to allow it to generate it's content first
+
+    //Forge
+    private static final String FORGE = "forge";
+    public static final String FORGE_VER = FORGE + AT + "14.23.5.2768" + ORGREATER;
+
+    public static final String DEPENDENCIES
+            = REQAFTER + FORGE_VER
+            + NEXT
+            + OPTBEFORE + RUSTIC + RUSTIC_VER
+            + NEXT
+            + OPTBEFORE + DYNAMICTREESBOP + DYNAMICTREESBOP_VER
+            + NEXT
+            + OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
+            + NEXT
+            + OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESPHC_VER
+            + NEXT
+            + OPTBEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
+            + NEXT
+            + OPTBEFORE + DYNAMICTREESHNC + DYNAMICTREESHNC_VER
+            + NEXT
+            + OPTAFTER + RECURRENT_COMPLEX
+            ;
+
 
     public DynamicTrees() {
-        // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        // Register the enqueueIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-        // Register the processIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
-        // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
-        // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setup(final FMLCommonSetupEvent event) { //PREINIT
+        ModRegistries.preInit();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT
     }
 
-    private void enqueueIMC(final InterModEnqueueEvent event) {}
-    private void processIMC(final InterModProcessEvent event) {}
-
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) { //SERVER INIT
-
-    }
-
-    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-
-        }
     }
 }

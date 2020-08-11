@@ -1,0 +1,38 @@
+{
+  "itemGroup.dynamictrees":"Dynamic Trees",
+
+  "block.dynamictrees.rootydirt":"Rooty Dirt",
+  "block.dynamictrees.rootysand":"Rooty Sand",
+
+  "block.dynamictrees.leaves0":"Dynamic Leaves",
+  "block.dynamictrees.leaves1":"Dynamic Leaves",
+
+  "block.dynamictrees.oakbranch":"Dynamic Oak Tree",
+  "block.dynamictrees.sprucebranch":"Dynamic Spruce Tree",
+  "block.dynamictrees.birchbranch":"Dynamic Birch Tree",
+  "block.dynamictrees.junglebranch":"Dynamic Jungle Tree",
+  "block.dynamictrees.darkoakbranch":"Dynamic Dark Oak Tree",
+  "block.dynamictrees.acaciabranch":"Dynamic Acacia Tree",
+  "block.dynamictrees.cactusbranch":"Dynamic Cactus",
+
+  "item.dynamictrees.oakseed":"Oak Acorn",
+  "item.dynamictrees.spruceseed":"Spruce Cone",
+  "item.dynamictrees.birchseed":"Birch Catkin",
+  "item.dynamictrees.jungleseed":"Jungle Pod",
+  "item.dynamictrees.darkoakseed":"Dark Oak Acorn",
+  "item.dynamictrees.acaciaseed":"Acacia Seed",
+  "item.dynamictrees.appleseed":"Apple Pip",
+  "item.dynamictrees.cactusseed":"Cactus Seed",
+
+  "item.dynamictrees.dendropotion.biochar":"Biochar Base Potion",
+  "item.dynamictrees.dendropotion.depletion":"Potion of Depletion",
+  "item.dynamictrees.dendropotion.defoliance":"Potion of Defoliance",
+  "item.dynamictrees.dendropotion.burgeoning":"Potion of Burgeoning",
+  "item.dynamictrees.dendropotion.fertility":"Potion of Fertility",
+  "item.dynamictrees.dendropotion.persistance":"Potion of Persistance",
+  "item.dynamictrees.dendropotion.transform":"Potion of Transformation",
+
+  "item.dynamictrees.dirtbucket":"Dirt Bucket",
+  "item.dynamictrees.staff":"Woodland Staff",
+  "item.dynamictrees.bonsaipot":"Bonsai Pot"
+}
