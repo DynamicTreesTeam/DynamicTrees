@@ -1,0 +1,14 @@
+[
+	{
+		"__comment":"This is just a demo",
+		"dim": 9,
+		"active": false,
+		"files": ["worldgen/something_for_dim_9.json"]
+	},
+	{
+		"__comment":"Overworld override",
+		"dim": 0,
+		"active": false,
+		"files": ["worldgen/world_1.json", "worldgen/world_2.json"]
+	}
+]

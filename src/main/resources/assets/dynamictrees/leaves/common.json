@@ -1,0 +1,8 @@
+{
+	"oak":		{"leaves":"minecraft:leaves variant=oak" },
+	"spruce":	{"leaves":"minecraft:leaves variant=spruce", "color":"@biome", "smother":3, "cellkit":"conifer" },
+	"birch":	{"leaves":"minecraft:leaves variant=birch", "color":"@biome" },
+	"jungle":	{"leaves":"minecraft:leaves variant=jungle", "light":12 },
+	"acacia":	{"leaves":"minecraft:leaves2 variant=acacia", "cellkit":"acacia", "smother":2 },
+	"darkoak":	{"leaves":"minecraft:leaves2 variant=dark_oak", "cellkit":"darkoak", "smother":3 }
+}

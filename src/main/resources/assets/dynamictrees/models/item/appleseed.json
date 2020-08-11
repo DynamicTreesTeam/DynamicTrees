@@ -1,0 +1,6 @@
+{
+    "parent":"dynamictrees:item/standardseed",
+    "textures": {
+        "layer0":"dynamictrees:items/appleseed"
+    }
+}

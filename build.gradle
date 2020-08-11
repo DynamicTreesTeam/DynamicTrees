@@ -43,7 +43,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                dynamictrees {
                     source sourceSets.main
                 }
             }

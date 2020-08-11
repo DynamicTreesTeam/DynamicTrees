@@ -1,0 +1,36 @@
+itemGroup.dynamictrees=다이나믹 트리
+
+tile.dynamictrees:rootydirt.name=뿌리내려진 흙
+tile.dynamictrees:rootysand.name=뿌리내려진 모래
+
+tile.dynamictrees:leaves0.name=역동적인 나뭇잎
+tile.dynamictrees:leaves1.name=역동적인 나뭇잎
+
+tile.dynamictrees:oakbranch.name=역동적인 참나무
+tile.dynamictrees:sprucebranch.name=역동적인 가문비나무
+tile.dynamictrees:birchbranch.name=역동적인 자작나무
+tile.dynamictrees:junglebranch.name=역동적인 정글 나무
+tile.dynamictrees:darkoakbranch.name=역동적인 검은 참나무
+tile.dynamictrees:acaciabranch.name=역동적인 아카시아 나무
+tile.dynamictrees:cactusbranch.name=역동적인 선인장
+
+item.dynamictrees:oakseed.name=참나무 도토리
+item.dynamictrees:spruceseed.name=가문비나무 구과
+item.dynamictrees:birchseed.name=자작나무 꽃차례
+item.dynamictrees:jungleseed.name=정글 나무 꼬투리
+item.dynamictrees:darkoakseed.name=검은 참나무 도토리
+item.dynamictrees:acaciaseed.name=아카시아 나무 씨앗
+item.dynamictrees:appleseed.name=사과 씨앗
+item.dynamictrees:cactusseed.name=선인장 씨앗
+
+item.dynamictrees:dendropotion.biochar.name=바이오숯 포션
+item.dynamictrees:dendropotion.depletion.name=고갈의 포션
+item.dynamictrees:dendropotion.defoliance.name=적엽의 포션
+item.dynamictrees:dendropotion.burgeoning.name=급성장의 포션
+item.dynamictrees:dendropotion.fertility.name=풍요의 포션
+item.dynamictrees:dendropotion.persistance.name=잔존의 포션
+item.dynamictrees:dendropotion.transform.name=변화의 포션
+
+item.dynamictrees:dirtbucket.name=흙 양동이
+item.dynamictrees:staff.name=자연의 지팡이
+tile.dynamictrees:bonsaipot.name=분재 화분
