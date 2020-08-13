@@ -126,8 +126,8 @@ public class BlockBranchBasic extends BlockBranch {
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-//		if (state instanceof IExtendedBlockState) {
-//			IExtendedBlockState retval = (IExtendedBlockState) state;
+//		if (state instanceof BlockState) {
+//			BlockState retval = (BlockState) state;
 //			int thisRadius = getRadius(state);
 //
 //			for (Direction dir : Direction.VALUES) {
@@ -370,8 +370,8 @@ public class BlockBranchBasic extends BlockBranch {
 //	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
 //	// The result is that only thin branches and trunks can be climbed
 //	@Override
-//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, EntityLivingBase entity) {
-//		return ModConfigs.enableBranchClimbling;
+//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, LivingEntity entity) {
+//		return DTConfigs.enableBranchClimbling;
 //	}
 //
 //	@Override

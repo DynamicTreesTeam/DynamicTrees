@@ -103,7 +103,7 @@ public class TileEntityBonsai extends TileEntity {
 //
 //	@Override
 //	public SPacketUpdateTileEntity getUpdatePacket() {
-//		NBTTagCompound syncData = new NBTTagCompound();
+//		CompoundNBT syncData = new CompoundNBT();
 //		this.write(syncData);
 //		return new SPacketUpdateTileEntity(this.pos, 1, syncData);
 //	}

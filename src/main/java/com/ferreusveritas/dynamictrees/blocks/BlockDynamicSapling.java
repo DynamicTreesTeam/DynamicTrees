@@ -3,11 +3,15 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.Block;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -29,28 +33,28 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader access, BlockPos pos) {
-//		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state).withProperty(SpeciesProperty.SPECIES, getSpecies(access, pos, state)) : state;
+//		return state instanceof BlockState ? ((BlockState)state).withProperty(SpeciesProperty.SPECIES, getSpecies(access, pos, state)) : state;
 //	}
-//
-//	///////////////////////////////////////////
-//	// TREE INFORMATION
-//	///////////////////////////////////////////
-//
-//	public void setSpecies(World world, BlockPos pos, Species species) {
-//		world.setBlockState(pos, getDefaultState());
-//		TileEntity tileEntity = world.getTileEntity(pos);
-//		if(tileEntity instanceof TileEntitySpecies) {
-//			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
-//			speciesTE.setSpecies(species);
-//		}
-//	}
-//
-//	public Species getSpecies(IBlockReader access, BlockPos pos, BlockState state) {
-//		TileEntitySpecies tileEntitySpecies = getTileEntity(access, pos);
-//		return tileEntitySpecies != null ? tileEntitySpecies.getSpecies() : Species.NULLSPECIES;
-//	}
-//
-//
+
+	///////////////////////////////////////////
+	// TREE INFORMATION
+	///////////////////////////////////////////
+
+	public void setSpecies(IWorld world, BlockPos pos, Species species) {
+		world.setBlockState(pos, getDefaultState(), 1);
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+			speciesTE.setSpecies(species);
+		}
+	}
+
+	public Species getSpecies(IBlockReader access, BlockPos pos, BlockState state) {
+		TileEntitySpecies tileEntitySpecies = getTileEntity(access, pos);
+		return tileEntitySpecies != null ? tileEntitySpecies.getSpecies() : Species.NULLSPECIES;
+	}
+
+
 //	///////////////////////////////////////////
 //	// TILE ENTITY STUFF
 //	///////////////////////////////////////////
@@ -77,11 +81,11 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //		}
 //	}
 //
-//	@Nullable
-//	protected TileEntitySpecies getTileEntity(IBlockReader access, BlockPos pos) {
-//		TileEntity tileentity = access.getTileEntity(pos);
-//		return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
-//	}
+	@Nullable
+	protected TileEntitySpecies getTileEntity(IBlockReader access, BlockPos pos) {
+		TileEntity tileentity = access.getTileEntity(pos);
+		return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
+	}
 //
 //	@Override
 //	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
@@ -114,25 +118,25 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	public void updateTick(World world, BlockPos pos, BlockState state, Random rand) {
 //		grow(world, rand, pos, state);
 //	}
-//
-//	public static boolean canSaplingStay(World world, Species species, BlockPos pos) {
-//		//Ensure there are no adjacent branches or other saplings
-//		for(Direction dir: Direction.HORIZONTALS) {
-//			BlockState blockState = world.getBlockState(pos.offset(dir));
-//			Block block = blockState.getBlock();
-//			if(TreeHelper.isBranch(block) || block instanceof BlockDynamicSapling) {
-//				return false;
-//			}
-//		}
-//
-//		//Air above and acceptable soil below
-//		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
-//	}
-//
-//	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
-//		return canSaplingStay(world, getSpecies(world, pos, state), pos);
-//	}
-//
+
+	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
+		//Ensure there are no adjacent branches or other saplings
+		for(Direction dir: CoordUtils.HORIZONTALS) {
+			BlockState blockState = world.getBlockState(pos.offset(dir));
+			Block block = blockState.getBlock();
+			if(TreeHelper.isBranch(block) || block instanceof BlockDynamicSapling) {
+				return false;
+			}
+		}
+
+		//Air above and acceptable soil below
+		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
+	}
+
+	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
+		return canSaplingStay(world, getSpecies(world, pos, state), pos);
+	}
+
 //	@Override
 //	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
 //		Species species = getSpecies(world, pos, state);
@@ -213,7 +217,7 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public BlockRenderLayer getBlockLayer() {
 //		return BlockRenderLayer.CUTOUT_MIPPED;
 //	}
@@ -229,10 +233,10 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
 //		BlockState state = world.getBlockState(pos);
-//		Species species = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
+//		Species species = ((BlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
 //		IBakedModel model = BakedModelSapling.getModelForSapling(species);
 //
 //		if (!state.getBlock().isAir(state, world, pos)) {
@@ -257,11 +261,11 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
 //		BlockPos pos = target.getBlockPos();
-//		if (state instanceof IExtendedBlockState) {
-//			Species species = ((IExtendedBlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
+//		if (state instanceof BlockState) {
+//			Species species = ((BlockState) getExtendedState(state, world, pos)).getValue(SpeciesProperty.SPECIES);
 //			IBakedModel model = BakedModelSapling.getModelForSapling(species);
 //			Random rand = world.rand;
 //

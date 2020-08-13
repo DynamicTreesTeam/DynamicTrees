@@ -9,7 +9,7 @@ public class FeatureGenPodzol implements IPostGrowFeature {
 	
 	@Override
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-//		if(ModConfigs.podzolGen.get()) {
+//		if(DTConfigs.podzolGen.get()) {
 //			NodeFindEnds endFinder = new NodeFindEnds();
 //			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 //			List<BlockPos> endPoints = endFinder.getEnds();
@@ -43,7 +43,7 @@ public class FeatureGenPodzol implements IPostGrowFeature {
 //							else
 //								if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
 //									if(world.getLightFor(EnumSkyBlock.SKY, offPos.up()) <= darkThreshold) {
-//										world.setBlockState(offPos, ModBlocks.blockStates.podzol);
+//										world.setBlockState(offPos, DTRegistries.blockStates.podzol);
 //									} else {
 //										spreadPodzol(world, pos);
 //									}

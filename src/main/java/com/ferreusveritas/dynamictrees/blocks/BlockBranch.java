@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-//import com.ferreusveritas.dynamictrees.ModBlocks;
-//import com.ferreusveritas.dynamictrees.ModConfigs;
+//import com.ferreusveritas.dynamictrees.DTRegistries.
+//import com.ferreusveritas.dynamictrees.DTConfigs.
 //import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
 //import com.ferreusveritas.dynamictrees.api.TreeHelper;
 //import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -27,7 +27,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 //import net.minecraft.block.state.BlockFaceShape;
 //import net.minecraft.block.BlockState;
 //import net.minecraft.enchantment.EnchantmentHelper;
-//import net.minecraft.entity.EntityLivingBase;
+//import net.minecraft.entity.LivingEntity;
 //import net.minecraft.entity.monster.EntityCreeper;
 //import net.minecraft.entity.player.EntityPlayer;
 //import net.minecraft.entity.player.EntityPlayerMP;
@@ -59,6 +59,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.Property;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -74,14 +75,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 
-//	public static final IUnlistedProperty CONNECTIONS[] = {
+	public static final Property[] CONNECTIONS = {
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiusd", 0, 8)),
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiusu", 0, 8)),
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiusn", 0, 8)),
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiuss", 0, 8)),
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiusw", 0, 8)),
 //		new net.minecraftforge.common.property.Properties.PropertyAdapter<Integer>(IntegerProperty.create("radiuse", 0, 8))
-//	};
+	};
 
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
 
@@ -236,11 +237,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		return true;
 	}
 //
-//	public class BlockItemStack {
+//	public class ItemStack {
 //		public final ItemStack stack;
 //		public final BlockPos pos;
 //
-//		public BlockItemStack(ItemStack stack, BlockPos pos) {
+//		public ItemStack(ItemStack stack, BlockPos pos) {
 //			this.stack = stack;
 //			this.pos = pos;
 //		}
@@ -277,7 +278,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
 //		List<BlockPos> endPoints = destroyer.getEnds();
 //		Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
-//		List<BlockItemStack> leavesDropsList = new ArrayList<>();
+//		List<ItemStack> leavesDropsList = new ArrayList<>();
 //		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 //		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 //
@@ -315,7 +316,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //	 * @param destroyedLeaves A map for collecting the positions and blockstates for all of the leaves blocks that will be destroyed.
 //	 * @param drops A list for collecting the ItemStacks and their positions relative to the cut position
 //	 */
-//	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, BlockState> destroyedLeaves, List<BlockItemStack> drops) {
+//	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, BlockState> destroyedLeaves, List<ItemStack> drops) {
 //
 //		if (!world.isRemote && !endPoints.isEmpty()) {
 //
@@ -359,9 +360,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 //					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 //					BlockPos relPos = imPos.subtract(cutPos);
-//					world.setBlockState(imPos, ModBlocks.blockStates.air, 0);//Covertly destroy the leaves on the server side
+//					world.setBlockState(imPos, DTRegistries.blockStates.air, 0);//Covertly destroy the leaves on the server side
 //					destroyedLeaves.put(relPos, blockState);
-//					dropList.forEach(i -> drops.add(new BlockItemStack(i, relPos)) );
+//					dropList.forEach(i -> drops.add(new ItemStack(i, relPos)) );
 //				}
 //			}
 //		}
@@ -378,7 +379,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //
 //	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume) {
 //		List<ItemStack> ret = new ArrayList<ItemStack>();//A list for storing all the dead tree guts
-//		volume *= ModConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
+//		volume *= DTConfigs.treeHarvestMultiplier;// For cheaters.. you know who you are.
 //		return species.getLogsDrops(world, pos, ret, volume);
 //	}
 //
@@ -412,7 +413,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //	*/
 //
 //	@Override
-//	public void futureBreak(BlockState state, World world, BlockPos cutPos, EntityLivingBase entity) {
+//	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 //
 //		//Try to get the face being pounded on
 //		final double reachDistance = entity instanceof EntityPlayerMP ? entity.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() : 5.0D;
@@ -463,7 +464,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //		return removedByEntity(state, world, cutPos, player);
 //	}
 //
-//	public boolean removedByEntity(BlockState state, World world, BlockPos cutPos, EntityLivingBase entity) {
+//	public boolean removedByEntity(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 //		FutureBreak.add(new FutureBreak(state, world, cutPos, entity, 0));
 //		return false;
 //	}
@@ -490,7 +491,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //	 * @return
 //	 */
 //    @Nullable
-//    public RayTraceResult playerRayTrace(EntityLivingBase entity, double blockReachDistance, float partialTicks) {
+//    public RayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
 //        Vec3d vec3d = entity.getPositionEyes(partialTicks);
 //        Vec3d vec3d1 = entity.getLook(partialTicks);
 //        Vec3d vec3d2 = vec3d.addVector(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
@@ -503,13 +504,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //		VOLUME
 //	}
 //
-//	public void damageAxe(EntityLivingBase entity, ItemStack heldItem, int radius, float woodVolume) {
+//	public void damageAxe(LivingEntity entity, ItemStack heldItem, int radius, float woodVolume) {
 //
 //		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || heldItem.getItem().getToolClasses(heldItem).contains("axe"))) {
 //
 //			int damage;
 //
-//			switch(ModConfigs.axeDamageMode) {
+//			switch(DTConfigs.axeDamageMode) {
 //				default:
 //				case VANILLA:
 //					damage = 1;
@@ -553,7 +554,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //				sloppyBreak(world, pos, DestroyType.VOID);
 //				world.setBlockState(pos, toBlockState);//Set back to stone
 //			} else {
-//				if(ModConfigs.worldGenDebug) {
+//				if(DTConfigs.worldGenDebug) {
 //					System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
 //				}
 //			}
@@ -625,7 +626,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 //
 //			if(treeEntity != null) {
 //				Vec3d expPos = explosion.getPosition();
-//				EntityLivingBase placer = explosion.getExplosivePlacedBy();
+//				LivingEntity placer = explosion.getExplosivePlacedBy();
 //				//Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
 //				float size = (placer instanceof EntityCreeper) ? (((EntityCreeper)placer).getPowered() ? 6 : 3) : 4;
 //				double distance = treeEntity.getDistance(expPos.x, expPos.y, expPos.z);

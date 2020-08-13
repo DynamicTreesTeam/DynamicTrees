@@ -46,7 +46,7 @@ public interface ILeavesProperties {
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	int foliageColorMultiplier(BlockState state, World world, BlockPos pos);
 
 	/**

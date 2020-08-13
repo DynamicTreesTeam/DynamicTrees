@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -12,16 +13,16 @@ import java.util.logging.Logger;
 
 public class JsonHelper {
 	
-//	public static JsonElement load(ResourceLocation jsonLocation) {
-//		String filename = "assets/" + jsonLocation.getNamespace() + "/" + jsonLocation.getPath();
-//		InputStream in = new LeavesPaging().getClass().getClassLoader().getResourceAsStream(filename);
-//		if(in == null) {
-//			Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Could not open resource " + filename);
-//			return null;
-//		}
-//		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//		return new Gson().fromJson(reader, JsonElement.class);
-//	}
+	public static JsonElement load(ResourceLocation jsonLocation) {
+		String filename = "assets/" + jsonLocation.getNamespace() + "/" + jsonLocation.getPath();
+		InputStream in = new LeavesPaging().getClass().getClassLoader().getResourceAsStream(filename);
+		if(in == null) {
+			Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Could not open resource " + filename);
+			return null;
+		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		return new Gson().fromJson(reader, JsonElement.class);
+	}
 	
 	public static JsonElement load(File file) {
 		

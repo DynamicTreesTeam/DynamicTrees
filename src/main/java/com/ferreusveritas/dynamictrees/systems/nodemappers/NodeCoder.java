@@ -58,32 +58,32 @@ public class NodeCoder implements INodeInspector {
 		return false;
 	}
 
-//	public byte[] compile(JoCode joCode) {
-//		CodeCompiler cc = new CodeCompiler();
-//
-//		if(links.size() > 0) {
-//			nextLink(cc, links.get(0), null);
-//		}
-//
-//		return cc.compile();
-//	}
+	public byte[] compile(JoCode joCode) {
+		JoCode.CodeCompiler cc = new JoCode.CodeCompiler();
+
+		if(links.size() > 0) {
+			nextLink(cc, links.get(0), null);
+		}
+
+		return cc.compile();
+	}
 	
-//	private void nextLink(CodeCompiler cc, Link link, Link fromLink) {
-//
-//		for(int dir = 0; dir < 6; dir++) {
-//			Link l = link.links[dir];
-//			if(l != null && l != fromLink) {
-//				if(link.forks > 0){
-//					cc.addFork();
-//				}
-//				cc.addDirection((byte) dir);
-//				nextLink(cc, l, link);
-//				if(link.forks > 0) {
-//					cc.addReturn();
-//					link.forks--;
-//				}
-//			}
-//		}
-//	}
+	private void nextLink(JoCode.CodeCompiler cc, Link link, Link fromLink) {
+
+		for(int dir = 0; dir < 6; dir++) {
+			Link l = link.links[dir];
+			if(l != null && l != fromLink) {
+				if(link.forks > 0){
+					cc.addFork();
+				}
+				cc.addDirection((byte) dir);
+				nextLink(cc, l, link);
+				if(link.forks > 0) {
+					cc.addReturn();
+					link.forks--;
+				}
+			}
+		}
+	}
 	
 }

@@ -19,8 +19,8 @@ public class TileEntitySpecies extends TileEntity {
 	Species species = Species.NULLSPECIES;
 	ResourceLocation speciesName = species.getRegistryName();
 
-	public TileEntitySpecies(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntitySpecies() {
+		super(TileEntityType.BARREL);
 	}
 
 	public Species getSpecies() {
@@ -49,13 +49,13 @@ public class TileEntitySpecies extends TileEntity {
 	}
 	
 //	@Override
-//	public void readFromNBT(NBTTagCompound tag) {
+//	public void readFromNBT(CompoundNBT tag) {
 //		super.readFromNBT(tag);
 //		read(tag);
 //	}
 //
 //	@Override
-//	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+//	public CompoundNBT writeToNBT(CompoundNBT tag) {
 //		super.writeToNBT(tag);
 //		write(tag);
 //
@@ -64,7 +64,7 @@ public class TileEntitySpecies extends TileEntity {
 //
 //	@Override
 //	public SPacketUpdateTileEntity getUpdatePacket() {
-//		NBTTagCompound syncData = new NBTTagCompound();
+//		CompoundNBT syncData = new CompoundNBT();
 //		this.write(syncData);
 //		return new SPacketUpdateTileEntity(this.pos, 1, syncData);
 //	}
@@ -75,8 +75,8 @@ public class TileEntitySpecies extends TileEntity {
 //	}
 //
 //	//Packages up the data on the server to send to the client.  Client handles it with handleUpdateTag() which reads it with readFromNBT()
-//	public NBTTagCompound getUpdateTag() {
-//		return this.writeToNBT(new NBTTagCompound());
+//	public CompoundNBT getUpdateTag() {
+//		return this.writeToNBT(new CompoundNBT());
 //	}
 //
 }

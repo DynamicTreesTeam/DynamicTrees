@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -36,56 +37,56 @@ public class TreeRegistry {
 	public static Species findSpecies(ResourceLocation name) {
 		return Species.REGISTRY.getValue(name);
 	}
-//
-//	/**
-//	 * Searches first for the full tree name.  If that fails then it
-//	 * will find the first tree matching the simple name and return it instead otherwise null
-//	 *
-//	 * @param name The name of the tree.  Either the simple name or the full name
-//	 * @return The tree that was found or null if not found
-//	 */
-//	public static Species findSpeciesSloppy(String name) {
-//
-//		ResourceLocation resloc = new ResourceLocation(name);
-//		if("minecraft".equals(resloc.getResourceDomain())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
-//			resloc = new ResourceLocation(ModConstants.MODID, resloc.getResourcePath());//Search DynamicTrees Domain instead
-//		}
-//
-//		//Search specific domain first
-//		if(Species.REGISTRY.containsKey(resloc)) {
-//			return Species.REGISTRY.getValue(resloc);
-//		}
-//
-//		//Search all domains
-//		for(Species species : Species.REGISTRY) {
-//			if(species.getRegistryName().getResourcePath().equals(resloc.getResourcePath())) {
-//				return species;
-//			}
-//		}
-//
-//		return Species.NULLSPECIES;
-//	}
-//
-//	public static List<ResourceLocation> getSpeciesDirectory() {
-//		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
-//	}
-//
-//	//////////////////////////////
-//	// SAPLING HANDLING
-//	//////////////////////////////
-//
-//	public static Map<BlockState, Species> saplingReplacers = new HashMap<>();
-//
-//	public static void registerSaplingReplacer(BlockState state, Species species) {
-//		saplingReplacers.put(state, species);
-//	}
-//
-//
+
+	/**
+	 * Searches first for the full tree name.  If that fails then it
+	 * will find the first tree matching the simple name and return it instead otherwise null
+	 *
+	 * @param name The name of the tree.  Either the simple name or the full name
+	 * @return The tree that was found or null if not found
+	 */
+	public static Species findSpeciesSloppy(String name) {
+
+		ResourceLocation resloc = new ResourceLocation(name);
+		if("minecraft".equals(resloc.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
+			resloc = new ResourceLocation(DynamicTrees.MODID, resloc.getPath());//Search DynamicTrees Domain instead
+		}
+
+		//Search specific domain first
+		if(Species.REGISTRY.containsKey(resloc)) {
+			return Species.REGISTRY.getValue(resloc);
+		}
+
+		//Search all domains
+		for(Species species : Species.REGISTRY) {
+			if(species.getRegistryName().getPath().equals(resloc.getPath())) {
+				return species;
+			}
+		}
+
+		return Species.NULLSPECIES;
+	}
+
+	public static List<ResourceLocation> getSpeciesDirectory() {
+		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
+	}
+
+	//////////////////////////////
+	// SAPLING HANDLING
+	//////////////////////////////
+
+	public static Map<BlockState, Species> saplingReplacers = new HashMap<>();
+
+	public static void registerSaplingReplacer(BlockState state, Species species) {
+		saplingReplacers.put(state, species);
+	}
+
+
 //	//////////////////////////////
 //	// DROP HANDLING
 //	//////////////////////////////
 //
-//	public static final ResourceLocation globalName = new ResourceLocation(ModConstants.MODID, "global");
+//	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MODID, "global");
 //
 //	/**
 //	 * This exists so that mods not interested in making Dynamic Trees can still add drops to

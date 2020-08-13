@@ -262,16 +262,16 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private JsonPrimitive colorPrimitive = null;
 	
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	private IBlockColor colorMultiplier;
 	
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int foliageColorMultiplier(BlockState state, World world, BlockPos pos) {
 		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	private IBlockColor processColor(JsonPrimitive primitive) {
 //		int color = -1;
 //		if(primitive.isNumber()) {
@@ -301,7 +301,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		return null;
 	}
 	
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public void resolveClient() {
 		if(colorPrimitive != null) {
 			colorMultiplier = processColor(colorPrimitive);
@@ -311,7 +311,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public static void postInitClient() {
 		for(LeavesPropertiesJson res: resolutionList) {
 			res.resolveClient();

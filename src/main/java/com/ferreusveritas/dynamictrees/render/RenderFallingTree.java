@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
-//@SideOnly(Side.CLIENT)
+//@OnlyIn(Dist.CLIENT)
 //public class RenderFallingTree extends Render<EntityFallingTree>{
 //
 //	protected RenderFallingTree(RenderManager renderManager) {
@@ -55,7 +55,7 @@ import java.util.List;
 //	private void renderFire() {
 //		GlStateManager.pushMatrix();
 //		GlStateManager.translate(-0.5f, 0.0f, -0.5f);
-//		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+//		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 //		BlockState fire = Blocks.FIRE.getDefaultState();
 //		IBakedModel model = dispatcher.getModelForState(fire);
 //		drawBakedQuads(QuadManipulator.getQuads(model, fire), 255, 0xFFFFFFFF);

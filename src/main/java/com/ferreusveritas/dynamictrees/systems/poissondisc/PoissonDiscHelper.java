@@ -138,7 +138,7 @@ public class PoissonDiscHelper {
 		//that is tangential to both. So we will simply create a tangent circle pointing at the circle that is too far away.
 		return findSecondDisc(cA, cCrad, angAB, true);
 		
-		/*if(ModConfigs.worldGenDebug) {
+		/*if(DTConfigs.worldGenDebug) {
 			ArrayList<Circle> circles = new ArrayList<Circle>();
 			Circle cAtemp = new Circle(cA);
 			Circle cBtemp = new Circle(cB);
@@ -162,7 +162,7 @@ public class PoissonDiscHelper {
 			circles.add(cAtemp);
 			circles.add(cBtemp);
 			circles.add(new Circle(24, 24, cCrad));
-			if(ModConfigs.poissonDiscImageWrite) {
+			if(DTConfigs.poissonDiscImageWrite) {
 				CircleDebug.outputCirclesToPng(circles, 0, 0, "NSF:" + System.currentTimeMillis());
 			}
 			System.err.println("------------------------------------");

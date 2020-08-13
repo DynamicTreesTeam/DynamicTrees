@@ -120,7 +120,7 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}

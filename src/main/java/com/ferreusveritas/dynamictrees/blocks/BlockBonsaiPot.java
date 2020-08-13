@@ -185,7 +185,7 @@ public class BlockBonsaiPot extends ContainerBlock {
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader access, BlockPos pos) {
-//		return state instanceof IExtendedBlockState ? ((IExtendedBlockState)state)
+//		return state instanceof BlockState ? ((BlockState)state)
 //			.withProperty(SpeciesProperty.SPECIES, getSpecies(access, pos))
 //			.withProperty(POT, getPotState(access, pos)) : state;
 //	}
@@ -214,7 +214,7 @@ public class BlockBonsaiPot extends ContainerBlock {
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public BlockRenderLayer getBlockLayer() {
 //		return BlockRenderLayer.CUTOUT;
 //	}

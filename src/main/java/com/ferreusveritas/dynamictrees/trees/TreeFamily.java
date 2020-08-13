@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -14,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -76,7 +78,7 @@ public class TreeFamily {
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public int woodColor;//For roots
 
 	public TreeFamily() {
@@ -114,92 +116,92 @@ public class TreeFamily {
 	// SPECIES LOCATION OVERRIDES
 	///////////////////////////////////////////
 
-//	/**
-//	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
-//	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
-//	 * are in a swamp.
-//	 *
-//	 * @param access
-//	 * @param trunkPos
-//	 * @return
-//	 */
-//	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
-//		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
-//			Species species = override.getSpeciesForLocation(access, trunkPos);
-//			if(species.isValid()) {
-//				return species;
-//			}
-//		}
-//		return getCommonSpecies();
-//	}
-//
-//	public void addSpeciesLocationOverride(ISpeciesLocationOverride override) {
-//		speciesLocationOverrides.add(override);
-//	}
-//
-//	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
-//
-//	public interface ISpeciesLocationOverride {
-//		Species getSpeciesForLocation(World access, BlockPos trunkPos);
-//	}
-//
-//	///////////////////////////////////////////
-//	// INTERACTION
-//	///////////////////////////////////////////
-//
-//	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
-//
-//		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
-//
-//		if(rootPos != BlockPos.ZERO) {
-//			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
-//		}
-//
-//		return false;
-//	}
-//
-//
-//	///////////////////////////////////////////
-//	// REGISTRATION
-//	///////////////////////////////////////////
-//
-//	/**
-//	 * Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch}
-//	 * We intentionally leave out leaves since they are shared between trees
-//	 * */
-//	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-//		if(isThick()) {
-//			BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
-//			blockList.add(branch.getPairSide(false));
-//			blockList.add(branch.getPairSide(true));
-//		} else {
-//			blockList.add(getDynamicBranch());
-//		}
-//		return blockList;
-//	}
-//
-//	/**
-//	 * Used to register items the tree creates. Mostly for the {@link Seed}
-//	 * If the developer provides the seed externally instead of having it
-//	 * generated internally then the seed should be allowed to register here.
-//	 * If this can't be the case then override this member function with a
-//	 * dummy one.
-//	 */
-//	public List<Item> getRegisterableItems(List<Item> itemList) {
-//		//Register an itemBlock for the branch block
-//		Block branch = getDynamicBranch();
-//		itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
-//
-//		if(isThick()) {
-//			//An ItemBlock must be registered in order for Waila to work properly
-//			branch = ((BlockBranchThick) branch).getPairSide(true);
-//			itemList.add(new ItemBlock(branch).setRegistryName(branch.getRegistryName()));
-//		}
-//
-//		getCommonSpecies().getSeed().ifValid(s -> itemList.add(s));
-//
-//		return itemList;
-//	}
+	/**
+	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
+	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
+	 * are in a swamp.
+	 *
+	 * @param access
+	 * @param trunkPos
+	 * @return
+	 */
+	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
+		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
+			Species species = override.getSpeciesForLocation(access, trunkPos);
+			if(species.isValid()) {
+				return species;
+			}
+		}
+		return getCommonSpecies();
+	}
+
+	public void addSpeciesLocationOverride(ISpeciesLocationOverride override) {
+		speciesLocationOverrides.add(override);
+	}
+
+	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
+
+	public interface ISpeciesLocationOverride {
+		Species getSpeciesForLocation(World access, BlockPos trunkPos);
+	}
+
+	///////////////////////////////////////////
+	// INTERACTION
+	///////////////////////////////////////////
+
+	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
+
+		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
+
+		if(rootPos != BlockPos.ZERO) {
+			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+		}
+
+		return false;
+	}
+
+
+	///////////////////////////////////////////
+	// REGISTRATION
+	///////////////////////////////////////////
+
+	/**
+	 * Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch}
+	 * We intentionally leave out leaves since they are shared between trees
+	 * */
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		if(isThick()) {
+			BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
+			blockList.add(branch.getPairSide(false));
+			blockList.add(branch.getPairSide(true));
+		} else {
+			blockList.add(getDynamicBranch());
+		}
+		return blockList;
+	}
+
+	/**
+	 * Used to register items the tree creates. Mostly for the {@link Seed}
+	 * If the developer provides the seed externally instead of having it
+	 * generated internally then the seed should be allowed to register here.
+	 * If this can't be the case then override this member function with a
+	 * dummy one.
+	 */
+	public List<Item> getRegisterableItems(List<Item> itemList) {
+		//Register an itemBlock for the branch block
+		Block branch = getDynamicBranch();
+		itemList.add(Item.BLOCK_TO_ITEM.get(branch).setRegistryName(branch.getRegistryName()));
+
+		if(isThick()) {
+			//An ItemBlock must be registered in order for Waila to work properly
+			branch = ((BlockBranchThick) branch).getPairSide(true);
+			itemList.add(Item.BLOCK_TO_ITEM.get(branch).setRegistryName(branch.getRegistryName()));
+		}
+
+		getCommonSpecies().getSeed().ifValid(s -> itemList.add(s));
+
+		return itemList;
+	}
 
 
 	///////////////////////////////////////////
@@ -243,12 +245,12 @@ public class TreeFamily {
 		return false;
 	}
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public int getWoodColor() {
 		return woodColor;
 	}
 
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public int getRootColor(BlockState state, World blockAccess, BlockPos pos) {
 		return getWoodColor();
 	}
@@ -356,14 +358,14 @@ public class TreeFamily {
 	// SURFACE ROOTS
 	///////////////////////////////////////////
 
-//	public BlockSurfaceRoot getSurfaceRoots() {
-//		return null;
-//	}
-//
-//	///////////////////////////////////////////
-//	// FALL ANIMATION HANDLING
-//	///////////////////////////////////////////
-//
+	public BlockSurfaceRoot getSurfaceRoots() {
+		return null;
+	}
+
+	///////////////////////////////////////////
+	// FALL ANIMATION HANDLING
+	///////////////////////////////////////////
+
 //	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
 //		return fallingEntity.defaultAnimationHandler();
 //	}

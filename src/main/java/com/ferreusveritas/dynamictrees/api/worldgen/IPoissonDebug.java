@@ -50,7 +50,7 @@ public interface IPoissonDebug {
 		}
 
 		//This has been moved to the debugging program
-		/*if(ModConfigs.poissonDiscImageWrite) {
+		/*if(DTConfigs.poissonDiscImageWrite) {
 			PoissonDiscDebug.outputCirclesToPng(discs, chunkX, chunkZ, "");
 		}*/
 	}

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.featuregen;
 
-//import com.ferreusveritas.dynamictrees.ModBlocks;
+//import com.ferreusveritas.dynamictrees.DTRegistries.
 //import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 //import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 //import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -94,7 +94,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 //			Surround surr = Surround.values()[world.rand.nextInt(8)];
 //			BlockPos dPos = treePos.add(surr.getOffset());
 //			if(world.getBlockState(dPos).getBlock() instanceof BlockSurfaceRoot) {
-//				world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
+//				world.setBlockState(dPos, DTRegistries.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, surr.getOpposite()));
 //			}
 //
 //			startRoots(world, treePos, species, trunkRadius);
@@ -139,7 +139,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 //
 //	protected boolean isReplaceableWithRoots(World world, BlockState placeState, BlockPos pos) {
 //		Block block = placeState.getBlock();
-//		if(block == Blocks.AIR || block == ModBlocks.blockTrunkShell) {
+//		if(block == Blocks.AIR || block == DTRegistries.blockTrunkShell) {
 //			return true;
 //		}
 //

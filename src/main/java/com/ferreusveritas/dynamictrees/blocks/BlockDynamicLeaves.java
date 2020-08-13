@@ -125,11 +125,11 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	public int getMetaFromState(BlockState state) {
 //		return (state.getValue(HYDRO) - 1) | (state.getValue(TREE) << 2);
 //	}
-//
-//	public void setProperties(int tree, ILeavesProperties properties) {
-//		this.properties[tree & 3] = properties;
-//	}
-//
+
+	public void setProperties(int tree, ILeavesProperties properties) {
+		this.properties[tree & 3] = properties;
+	}
+
 	public ILeavesProperties getProperties(BlockState blockState) {
 		return properties[blockState.get(TREE) & 3];
 	}
@@ -154,8 +154,8 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	@Override
 //	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 //		if (rand == null) rand = backupRng;
-//		if(rand.nextInt(ModConfigs.treeGrowthFolding) == 0) {
-//			float attempts = ModConfigs.treeGrowthFolding * ModConfigs.treeGrowthMultiplier;
+//		if(rand.nextInt(DTConfigs.treeGrowthFolding) == 0) {
+//			float attempts = DTConfigs.treeGrowthFolding * DTConfigs.treeGrowthMultiplier;
 //
 //			if(attempts >= 1.0f || rand.nextFloat() < attempts) {
 //				doTick(worldIn, pos, state, rand);
@@ -259,7 +259,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	 * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
 //	 */
 //	@Override
-//	public boolean addLandingEffects(BlockState state, WorldServer worldObj, BlockPos blockPosition, BlockState iblockstate, EntityLivingBase entity, int numberOfParticles) {
+//	public boolean addLandingEffects(BlockState state, WorldServer worldObj, BlockPos blockPosition, BlockState iblockstate, LivingEntity entity, int numberOfParticles) {
 //		return true;
 //	}
 //
@@ -282,10 +282,10 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //		if(entityIn == null || entityIn instanceof EntityFallingTree) {
 //			return;
 //		}
-//		if(passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
+//		if(passableLeavesModLoaded || DTConfigs.vanillaLeavesCollision) {
 //			super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, unknown);
 //		}
-//		else if (!ModConfigs.isLeavesPassable) {
+//		else if (!DTConfigs.isLeavesPassable) {
 //			AxisAlignedBB aabb = new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875);
 //			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 //		}
@@ -294,7 +294,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	@Override
 //	public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
 //
-//		if(ModConfigs.canopyCrash && entity instanceof EntityLivingBase) { //We are only interested in Living things crashing through the canopy.
+//		if(DTConfigs.canopyCrash && entity instanceof LivingEntity) { //We are only interested in Living things crashing through the canopy.
 //			entity.fallDistance--;
 //
 //			AxisAlignedBB aabb = entity.getEntityBoundingBox();
@@ -336,7 +336,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //
 //	@Override
 //	public void onEntityCollidedWithBlock(World world, BlockPos pos, BlockState state, Entity entity) {
-//		if(entity instanceof EntityItem || passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
+//		if(entity instanceof EntityItem || passableLeavesModLoaded || DTConfigs.vanillaLeavesCollision) {
 //			super.onEntityCollidedWithBlock(world, pos, state, entity);
 //		}
 //		else {
@@ -655,7 +655,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //
 //	@Override
 //	public boolean isPassable(World access, BlockPos pos) {
-//		return passableLeavesModLoaded ? super.isPassable(access, pos) : ModConfigs.isLeavesPassable;
+//		return passableLeavesModLoaded ? super.isPassable(access, pos) : DTConfigs.isLeavesPassable;
 //	}
 //
 //	@Override
@@ -703,13 +703,13 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public BlockRenderLayer getBlockLayer() {
 //		return Blocks.LEAVES.getBlockLayer();
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public boolean shouldSideBeRendered(BlockState blockState, World blockAccess, BlockPos pos, Direction side) {
 //		setGraphicsLevel(!Blocks.LEAVES.isOpaqueCube(blockState));
 //		return super.shouldSideBeRendered(blockState, blockAccess, pos, side);

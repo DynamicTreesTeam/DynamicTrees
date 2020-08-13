@@ -140,7 +140,7 @@ public class LeavesProperties implements ILeavesProperties {
 		return 0;
 	}
 
-	//	@SideOnly(Side.CLIENT)
+	//	@OnlyIn(Dist.CLIENT)
 	public int foliageColorMultiplier(BlockState state, IBlockReader world, BlockPos pos) {
 //		return Minecraft.getInstance().getBlockColors().colorMultiplier(getPrimitiveLeaves(), world, pos, 0);
 		return 0;

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.systems.*;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -139,8 +139,8 @@ public class BlockBranchCactus extends BlockBranch {
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader blockAcess, BlockPos pos) {
-//		if (state instanceof IExtendedBlockState) {
-//			IExtendedBlockState retval = (IExtendedBlockState) state;
+//		if (state instanceof BlockState) {
+//			BlockState retval = (BlockState) state;
 //			int thisRadius = getRadius(state);
 //
 //			for (Direction dir : Direction.VALUES) {
@@ -189,7 +189,7 @@ public class BlockBranchCactus extends BlockBranch {
 //	}
 //
 //	@Override
-//	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+//	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 //		BlockState returnState = this.getDefaultState();
 //
 //		BlockState adjState = world.getBlockState(pos.offset(facing.getOpposite()));
@@ -203,7 +203,7 @@ public class BlockBranchCactus extends BlockBranch {
 //	///////////////////////////////////////////
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public BlockRenderLayer getBlockLayer() {
 //		return BlockRenderLayer.CUTOUT_MIPPED;
 //	}

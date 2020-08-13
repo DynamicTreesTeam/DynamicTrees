@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-* Makes a BlockPos -> IExtendedBlockState map for all of the branches
+* Makes a BlockPos -> BlockState map for all of the branches
 * @author ferreusveritas
 */
 public class NodeExtState implements INodeInspector {
@@ -24,7 +24,7 @@ public class NodeExtState implements INodeInspector {
 		this.origin = origin;
 	}
 
-//	public Map<BlockPos, IExtendedBlockState> getExtStateMap() {
+//	public Map<BlockPos, BlockState> getExtStateMap() {
 //		return map;
 //	}
 
@@ -33,7 +33,7 @@ public class NodeExtState implements INodeInspector {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 
 //		if(branch != null) {
-//			map.put(pos.subtract(origin), (IExtendedBlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
+//			map.put(pos.subtract(origin), (BlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
 //		}
 
 		return true;

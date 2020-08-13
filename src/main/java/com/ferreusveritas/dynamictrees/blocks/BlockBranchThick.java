@@ -90,7 +90,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 //	}
 //
 //	@Override
-//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, EntityLivingBase entity) {
+//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, LivingEntity entity) {
 //		return false;
 //	}
 //
@@ -142,8 +142,8 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-//		if (state instanceof IExtendedBlockState) {
-//			IExtendedBlockState retval = (IExtendedBlockState) state;
+//		if (state instanceof BlockState) {
+//			BlockState retval = (BlockState) state;
 //			int thisRadius = getRadius(state);
 //
 //			for (Direction dir : Direction.VALUES) {
@@ -193,7 +193,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 //				BlockPos dPos = pos.add(dir.getOffset());
 //				ReplaceableState rep = repStates[dir.ordinal()];
 //				if(rep == ReplaceableState.REPLACEABLE) {
-//					world.setBlockState(dPos, ModBlocks.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, dir.getOpposite()), flags);
+//					world.setBlockState(dPos, DTRegistries.blockTrunkShell.getDefaultState().withProperty(BlockTrunkShell.COREDIR, dir.getOpposite()), flags);
 //				}
 //			}
 //			return setRadius;
@@ -235,7 +235,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 //		BlockState state = world.getBlockState(pos);
 //		Block block = state.getBlock();
 //
-//		if(block == ModBlocks.blockTrunkShell) {
+//		if(block == DTRegistries.blockTrunkShell) {
 //			//Determine if this shell belongs to the trunk.  Block otherwise.
 //			Surround surr = state.getValue(BlockTrunkShell.COREDIR);
 //			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;

@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -27,50 +29,49 @@ public class ModelHelper {
 	 * @param tree
 	 */
 	public static void regModel(TreeFamily tree) {
+		BlockBranch blockBranch = tree.getDynamicBranch();
+		ModelResourceLocation modelLocation = getCreateBranchModel(blockBranch, tree.autoCreateBranch());
 
-//		BlockBranch blockBranch = tree.getDynamicBranch();
-//		ModelResourceLocation modelLocation = getCreateBranchModel(blockBranch, tree.autoCreateBranch());
-//
-//		setGenericStateMapper(blockBranch, modelLocation);
-//		if(blockBranch instanceof BlockBranchThick) {
-//			setGenericStateMapper(((BlockBranchThick) blockBranch).otherBlock, modelLocation);
-//		}
-//
-//		BlockSurfaceRoot surfaceRoot = tree.getSurfaceRoots();
-//		if(surfaceRoot != null) {
-//			ModelLoader.setCustomStateMapper(surfaceRoot, new StateMap.Builder().ignore(surfaceRoot.getIgnorableProperties()).build());
-//		}
+		setGenericStateMapper(blockBranch, modelLocation);
+		if(blockBranch instanceof BlockBranchThick) {
+			setGenericStateMapper(((BlockBranchThick) blockBranch).otherBlock, modelLocation);
+		}
+
+		BlockSurfaceRoot surfaceRoot = tree.getSurfaceRoots();
+		if(surfaceRoot != null) {
+	//		ModelLoader.setCustomStateMapper(surfaceRoot, new StateMap.Builder().ignore(surfaceRoot.getIgnorableProperties()).build());
+		}
 	}
 
-//	private static ModelResourceLocation getCreateBranchModel(BlockBranch blockBranch, boolean automatic) {
-//		return automatic ? getCreateBranchModelAuto(blockBranch) : getCreateBranchModelManual(blockBranch);
-//	}
-//
-//	private static ModelResourceLocation getCreateBranchModelAuto(BlockBranch blockBranch) {
-//		return new ModelResourceLocation(new ResourceLocation(DynamicTrees.MODID, "branch"), blockBranch.getDefaultState());
-//	}
-//
-//	private static ModelResourceLocation getCreateBranchModelManual(BlockBranch blockBranch) {
-//		ResourceLocation family = blockBranch.getFamily().getName();
-//		ResourceLocation resloc = new ResourceLocation(family.getResourceDomain(), family.getResourcePath() + "branch");
-//		return new ModelResourceLocation(resloc , null);
-//	}
+	private static ModelResourceLocation getCreateBranchModel(BlockBranch blockBranch, boolean automatic) {
+		return automatic ? getCreateBranchModelAuto(blockBranch) : getCreateBranchModelManual(blockBranch);
+	}
 
-//	public static void setGenericStateMapper(Block block, ModelResourceLocation modelLocation) {
+	private static ModelResourceLocation getCreateBranchModelAuto(BlockBranch blockBranch) {
+		return new ModelResourceLocation(new ResourceLocation(DynamicTrees.MODID, "branch"), "");
+	}
+
+	private static ModelResourceLocation getCreateBranchModelManual(BlockBranch blockBranch) {
+		ResourceLocation family = blockBranch.getFamily().getName();
+		ResourceLocation resloc = new ResourceLocation(family.getNamespace(), family.getPath() + "branch");
+		return new ModelResourceLocation(resloc , null);
+	}
+
+	public static void setGenericStateMapper(Block block, ModelResourceLocation modelLocation) {
 //		ModelLoader.setCustomStateMapper(block, state -> {
-//			return block.getBlockState().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> modelLocation));
+//			return block.getStateContainer().getValidStates().stream().collect(Collectors.toMap(b -> b, b -> modelLocation));
 //		});
-//	}
+	}
 
-//	public static void regModel(Block block) {
-//		if(block != Blocks.AIR) {
-//			regModel(Item.getItemFromBlock(block));
-//		}
-//		if (block instanceof BlockBranchThick) {
-//			Item item = Item.getItemFromBlock(((BlockBranchThick) block).otherBlock);
-//			regModel(item, 0, block.getRegistryName());
-//		}
-//	}
+	public static void regModel(Block block) {
+		if(block != Blocks.AIR) {
+			regModel(Item.getItemFromBlock(block));
+		}
+		if (block instanceof BlockBranchThick) {
+			Item item = Item.BLOCK_TO_ITEM.get(((BlockBranchThick) block).otherBlock);
+			regModel(item, 0, block.getRegistryName());
+		}
+	}
 
 	public static void regModel(Item item) {
 		regModel(item, 0);

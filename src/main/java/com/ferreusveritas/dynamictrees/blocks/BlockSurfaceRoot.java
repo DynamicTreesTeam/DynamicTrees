@@ -114,8 +114,8 @@ public class BlockSurfaceRoot extends Block {
 //
 //	@Override
 //	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-//		if (state instanceof IExtendedBlockState) {
-//			IExtendedBlockState retval = (IExtendedBlockState) state;
+//		if (state instanceof BlockState) {
+//			BlockState retval = (BlockState) state;
 //
 //			int thisRadius = getRadius(state);
 //
@@ -188,7 +188,7 @@ public class BlockSurfaceRoot extends Block {
 //	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
 //	// The result is that only thin branches and trunks can be climbed
 //	@Override
-//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, EntityLivingBase entity) {
+//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, LivingEntity entity) {
 //		return false;
 //	}
 //
@@ -294,7 +294,7 @@ public class BlockSurfaceRoot extends Block {
 //	public void breakBlock(World worldIn, BlockPos pos, BlockState state) {
 //		BlockState upstate = worldIn.getBlockState(pos.up());
 //
-//		if(upstate.getBlock() == ModBlocks.blockTrunkShell) {
+//		if(upstate.getBlock() == DTRegistries.blockTrunkShell) {
 //			worldIn.setBlockState(pos, upstate);
 //		}
 //

@@ -5,6 +5,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
@@ -13,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
@@ -87,15 +90,15 @@ public class BlockTrunkShell extends Block {
 //	///////////////////////////////////////////
 //
 //	@Override
-//	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+//	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
 //		ShellMuse muse = getMuse(world, state, pos);
 //		if(muse != null) {
-//			return muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest);
+//			return muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest, world.getFluidState(pos));
 //		}
 //
 //		return false;
 //	}
-//
+
 //	@Override
 //	public float getBlockHardness(BlockState blockState, World world, BlockPos pos) {
 //		ShellMuse muse = getMuse(world, blockState, pos);
@@ -111,62 +114,62 @@ public class BlockTrunkShell extends Block {
 //	@Override
 //	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
 //		ShellMuse muse = getMuse(world, pos);
-//		return muse != null ? muse.state.getBlock().getExplosionResistance(world, muse.pos, exploder, explosion) : 0.0f;
+//		return muse != null ? muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, exploder, explosion) : 0.0f;
 //	}
 //
 //	@Override
 //	public boolean isReplaceable(IBlockReader access, BlockPos pos) {
 //		return getMuse(access, pos) == null;
 //	}
-//
-//	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {
-//		return state.getValue(COREDIR);
-//	}
-//
-//	@Nullable
-//	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
-//		return getMuseUnchecked(access, access.getBlockState(pos), pos);
-//	}
-//
-//	@Nullable
-//	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
-//		Surround museDir = getMuseDir(state, pos);
-//		BlockPos musePos = pos.add(museDir.getOffset());
-//		BlockState museState = access.getBlockState(musePos);
-//		Block block = museState.getBlock();
-//		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
-//			return new ShellMuse(museState, musePos, museDir);
-//		}
-//
-//		return null;
-//	}
-//
-//	@Nullable
-//	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
-//		return getMuse(access, access.getBlockState(pos), pos);
-//	}
-//
-//	@Nullable
-//	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
-//		ShellMuse muse = getMuseUnchecked(access, state, pos);
-//
-//		//Check the muse for validity
-//		if(muse == null || muse.getRadius() <= 8) {
-//			scheduleForClearing(access, pos);
-//		}
-//
-//		return muse;
-//	}
-//
-//	public void scheduleForClearing(IBlockReader access, BlockPos pos) {
-//		if(access instanceof World) {
-//			World world = (World) access;
-//			if(!world.isRemote) {
-//				world.scheduleBlockUpdate(pos.toImmutable(), this, 0, 3);
-//			}
-//		}
-//	}
-//
+
+	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {
+		return state.get(COREDIR);
+	}
+
+	@Nullable
+	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
+		return getMuseUnchecked(access, access.getBlockState(pos), pos);
+	}
+
+	@Nullable
+	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
+		Surround museDir = getMuseDir(state, pos);
+		BlockPos musePos = pos.add(museDir.getOffset());
+		BlockState museState = access.getBlockState(musePos);
+		Block block = museState.getBlock();
+		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
+			return new ShellMuse(museState, musePos, museDir);
+		}
+
+		return null;
+	}
+
+	@Nullable
+	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
+		return getMuse(access, access.getBlockState(pos), pos);
+	}
+
+	@Nullable
+	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
+		ShellMuse muse = getMuseUnchecked(access, state, pos);
+
+		//Check the muse for validity
+		if(muse == null || muse.getRadius() <= 8) {
+			scheduleForClearing(access, pos);
+		}
+
+		return muse;
+	}
+
+	public void scheduleForClearing(IBlockReader access, BlockPos pos) {
+		if(access instanceof World) {
+			World world = (World) access;
+			if(!world.isRemote) {
+				world.getPendingBlockTicks().scheduleTick(pos.toImmutable(), this, 0, TickPriority.HIGH);
+			}
+		}
+	}
+
 //	@Override
 //	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
 //		getMuse(world, pos);
@@ -199,7 +202,7 @@ public class BlockTrunkShell extends Block {
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //    public AxisAlignedBB getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos) {
 //		ShellMuse muse = this.getMuseUnchecked(worldIn, state, pos);
 //        return muse.state.getBoundingBox(worldIn, muse.pos).offset(muse.pos);
@@ -309,7 +312,7 @@ public class BlockTrunkShell extends Block {
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
 //		BlockState state = world.getBlockState(pos);
 //		if (state.getBlock() == this) {
@@ -325,7 +328,7 @@ public class BlockTrunkShell extends Block {
 //	}
 //
 //	@Override
-//	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 //	public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
 //		BlockPos shellPos = target.getBlockPos();
 //		if (state.getBlock() == this) {

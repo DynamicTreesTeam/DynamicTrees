@@ -53,7 +53,7 @@ public class DropCreatorSeed implements IDropCreator {
 
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-//		if(getVoluntaryRarity() * ModConfigs.seedDropRate.get() > random.nextFloat()) {
+//		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() > random.nextFloat()) {
 //			dropList.add(species.getSeedStack(1));
 //			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
 //			MinecraftForge.EVENT_BUS.post(seedDropEvent);

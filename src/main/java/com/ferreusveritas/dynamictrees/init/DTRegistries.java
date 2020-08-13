@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.items.DirtBucket;
+import com.ferreusveritas.dynamictrees.items.Staff;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -14,6 +16,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,15 +63,23 @@ public class DTRegistries {
     //ITEMS
     ///////////////////////////////////////////
 
-    public static void setupItems() {
+    public static DirtBucket dirtBucket;
+    public static Staff staff;
 
+    public static void setupItems() {
+        dirtBucket = new DirtBucket();
+        staff = new Staff();
     }
 
     @SubscribeEvent
     public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
+        IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
+
+        registry.register(dirtBucket);
+        registry.register(staff);
+
         Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
-        itemRegistryEvent.getRegistry().register(new BlockItem(test, properties)
-                .setRegistryName(Objects.requireNonNull(test.getRegistryName())));
+        registry.register(new BlockItem(test, properties).setRegistryName(Objects.requireNonNull(test.getRegistryName())));
     }
 
     ///////////////////////////////////////////
