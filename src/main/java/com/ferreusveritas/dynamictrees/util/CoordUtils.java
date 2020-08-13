@@ -80,7 +80,7 @@ public class CoordUtils {
 	 * @param world The world
 	 * @param treePos The block position of the {@link TreeFamily} trunk base.
 	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
-	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ORIGIN}
+	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is {@link BlockPos.ZERO}
 	 */
 //	public static BlockPos getRayTraceFruitPos(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 //
@@ -88,7 +88,7 @@ public class CoordUtils {
 //
 //		if(result != null) {
 //			BlockPos hitPos = result.getBlockPos();
-//			if(hitPos != BlockPos.ORIGIN) {
+//			if(hitPos != BlockPos.ZERO) {
 //				do { //Run straight down until we hit a block that's non compatible leaves.
 //					hitPos = hitPos.down();
 //				} while(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
@@ -129,7 +129,7 @@ public class CoordUtils {
 //			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
 //			if(result != null) {
 //				BlockPos hitPos = result.getBlockPos();
-//				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ORIGIN) {//We found a block
+//				if(result.typeOfHit == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ZERO) {//We found a block
 //					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 //						return result;
 //					}
@@ -167,7 +167,7 @@ public class CoordUtils {
 //				int lookY = MathHelper.floor(vantage.y);
 //				int lookZ = MathHelper.floor(vantage.z);
 //				BlockPos lookPos = new BlockPos(lookX, lookY, lookZ);
-//				IBlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
+//				BlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
 //				Block lookBlock = lookState.getBlock();
 //
 //				AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;

@@ -56,7 +56,7 @@ import java.util.List;
 //		GlStateManager.pushMatrix();
 //		GlStateManager.translate(-0.5f, 0.0f, -0.5f);
 //		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-//		IBlockState fire = Blocks.FIRE.getDefaultState();
+//		BlockState fire = Blocks.FIRE.getDefaultState();
 //		IBakedModel model = dispatcher.getModelForState(fire);
 //		drawBakedQuads(QuadManipulator.getQuads(model, fire), 255, 0xFFFFFFFF);
 //		GlStateManager.popMatrix();

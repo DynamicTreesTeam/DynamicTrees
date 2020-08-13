@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-//public class BranchDestructionData {
+public class BranchDestructionData {
 //	public final Species species;//The species of the tree that was harvested
 //	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
 //	public final int[] destroyedBranchesConnections;//Encoded branch shapes
@@ -35,11 +35,11 @@ import java.util.function.Function;
 //		woodVolume = 0;
 //		cutDir = Direction.DOWN;
 //		toolDir = Direction.DOWN;
-//		cutPos = BlockPos.ORIGIN;
+//		cutPos = BlockPos.ZERO;
 //		trunkHeight = 0;
 //	}
 //
-//	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, IBlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
+//	public BranchDestructionData(Species species, Map<BlockPos, IExtendedBlockState> branches, Map<BlockPos, BlockState> leaves, List<BlockItemStack> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
 //		this.species = species;
 //		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 //		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -94,11 +94,11 @@ import java.util.function.Function;
 //		int index = 0;
 //
 //		//Ensure the origin block is at the first index
-//		IExtendedBlockState origExState = branchList.get(BlockPos.ORIGIN);
+//		IExtendedBlockState origExState = branchList.get(BlockPos.ZERO);
 //		if(origExState != null) {
-//			data1[index] = encodeBranchesRadiusPos(BlockPos.ORIGIN, (BlockBranch) origExState.getBlock(), origExState);
+//			data1[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BlockBranch) origExState.getBlock(), origExState);
 //			data2[index++] = encodeBranchesConnections(origExState);
-//			branchList.remove(BlockPos.ORIGIN);
+//			branchList.remove(BlockPos.ZERO);
 //		}
 //
 //		//Encode the remaining blocks
@@ -120,7 +120,7 @@ import java.util.function.Function;
 //		return new int[][] { data1, data2 };
 //	}
 //
-//	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch branchBlock, IBlockState state) {
+//	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch branchBlock, BlockState state) {
 //		return	((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
 //				encodeRelBlockPos(relPos);
 //	}
@@ -158,7 +158,7 @@ import java.util.function.Function;
 //		BlockBranch branch = (BlockBranch)species.getFamily().getDynamicBranch();
 //		if(branch instanceof BlockBranch) {
 //			int radius = decodeBranchRadius(encodedRadPos);
-//			IBlockState state = branch.getStateForRadius(radius);
+//			BlockState state = branch.getStateForRadius(radius);
 //			if(state instanceof IExtendedBlockState) {
 //				IExtendedBlockState exState = (IExtendedBlockState) state;
 //				for(Direction face : Direction.values()) {
@@ -176,14 +176,14 @@ import java.util.function.Function;
 //	// Leaves
 //	///////////////////////////////////////////////////////////
 //
-//	private int[] convertLeavesToIntArray(Map<BlockPos, IBlockState> leavesList) {
+//	private int[] convertLeavesToIntArray(Map<BlockPos, BlockState> leavesList) {
 //		int data[] = new int[leavesList.size()];
 //		int index = 0;
 //
 //		//Encode the remaining blocks
-//		for(Entry<BlockPos, IBlockState> set : leavesList.entrySet()) {
+//		for(Entry<BlockPos, BlockState> set : leavesList.entrySet()) {
 //			BlockPos relPos = set.getKey();
-//			IBlockState state = set.getValue();
+//			BlockState state = set.getValue();
 //			Block block = state.getBlock();
 //
 //			if(block instanceof BlockDynamicLeaves && bounds.inBounds(relPos)) { //Place comfortable limits on the system
@@ -194,7 +194,7 @@ import java.util.function.Function;
 //		return Arrays.copyOf(data, index);//Shrink down the array
 //	}
 //
-//	private int encodeLeaves(BlockPos relPos, BlockDynamicLeaves block, IBlockState state) {
+//	private int encodeLeaves(BlockPos relPos, BlockDynamicLeaves block, BlockState state) {
 //		return	(state.getValue(BlockDynamicLeaves.HYDRO) << 24) | encodeRelBlockPos(relPos);
 //	}
 //
@@ -325,4 +325,4 @@ import java.util.function.Function;
 //		);
 //	}
 //
-//}
+}

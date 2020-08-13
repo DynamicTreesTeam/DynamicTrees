@@ -32,18 +32,17 @@ displayName="Dynamic Trees" #mandatory
 displayURL="http://minecraft.curseforge.com/projects/dynamictrees" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="examplemod.png" #optional
+logoFile="logo.png" #optional
 
 # A text field displayed in the mod UI
-credits="Thanks for this example mod goes to Java" #optional
+credits="MaxHyper/supermassimo for the 1.14.4 Port" #optional
 
 # A text field displayed in the mod UI
-authors="Love, Cheese and small house plants" #optional
+authors="Ferreusveritas" #optional
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Progressively growing trees.. forests that spread
-'''
+Progressively growing trees.. forests that spread'''
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.dynamictrees]] #optional
