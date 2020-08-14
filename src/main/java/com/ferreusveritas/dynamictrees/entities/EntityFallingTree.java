@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.models.IModelTracker;
-import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
