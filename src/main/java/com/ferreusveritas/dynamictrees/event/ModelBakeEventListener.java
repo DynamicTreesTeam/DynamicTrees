@@ -21,17 +21,15 @@ public class ModelBakeEventListener {
 		
 		for(Block block: rootyBlocks) {
 			IBakedModel rootsObject = event.getModelRegistry().get(new ModelResourceLocation(block.getRegistryName(), "normal"));
-			if (rootsObject instanceof IBakedModel) {
-				IBakedModel rootsModel = (IBakedModel) rootsObject;
-				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsModel);
+			if (rootsObject != null) {
+				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsObject);
 				event.getModelRegistry().put(new ModelResourceLocation(block.getRegistryName(), "normal"), rootyModel);
 			}
 		}
 		
 		IBakedModel flowerPotObject = event.getModelRegistry().get(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"));
-		if (flowerPotObject instanceof IBakedModel) {
-			IBakedModel flowerPotModel = (IBakedModel) flowerPotObject;
-			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotModel);
+		if (flowerPotObject != null) {
+			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotObject);
 			event.getModelRegistry().put(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
 		}
 	}

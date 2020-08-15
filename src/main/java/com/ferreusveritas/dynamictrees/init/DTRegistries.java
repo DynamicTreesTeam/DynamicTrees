@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import net.minecraft.block.Block;
@@ -29,6 +30,7 @@ public class DTRegistries {
 	//BLOCKS
 	///////////////////////////////////////////
     public static Block test;
+    public static BlockBranchBasic testBranch;
 
     public static BlockRooty blockRootyDirt;
     public static BlockRooty blockRootySand;
@@ -46,7 +48,7 @@ public class DTRegistries {
 
     public static void setupBlocks() {
         test = new TESTBLOCK();
-
+        testBranch = new BlockBranchBasic("testbranch");
     }
 
     public static void setupLeavesProperties() {
@@ -56,19 +58,23 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-        blockRegistryEvent.getRegistry().register(test);
+        IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
+
+        registry.register(test);
+        registry.register(testBranch);
     }
 
     ///////////////////////////////////////////
     //ITEMS
     ///////////////////////////////////////////
 
+    public static DendroPotion dendroPotion;
     public static DirtBucket dirtBucket;
-    public static Staff staff;
+    public static Staff treeStaff;
 
     public static void setupItems() {
         dirtBucket = new DirtBucket();
-        staff = new Staff();
+        treeStaff = new Staff();
     }
 
     @SubscribeEvent
@@ -76,7 +82,7 @@ public class DTRegistries {
         IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 
         registry.register(dirtBucket);
-        registry.register(staff);
+        registry.register(treeStaff);
 
         Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
         registry.register(new BlockItem(test, properties).setRegistryName(Objects.requireNonNull(test.getRegistryName())));

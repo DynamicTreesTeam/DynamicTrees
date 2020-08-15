@@ -19,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 
 import java.awt.*;
@@ -267,7 +268,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 //	@OnlyIn(Dist.CLIENT)
 	@Override
-	public int foliageColorMultiplier(BlockState state, World world, BlockPos pos) {
+	public int foliageColorMultiplier(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
 		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 

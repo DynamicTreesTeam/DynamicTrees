@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -23,7 +22,7 @@ public class BranchDestructionData {
 	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
 	public final int[] destroyedBranchesConnections;//Encoded branch shapes
 	public final int[] destroyedLeaves;//Encoded leaves relative positions
-	public final List<ItemStack> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
+	public final List<BlockBranch.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
 	public final float woodVolume;//A summation of all of the wood voxels that was harvested
 	public final Direction cutDir;//The face that was connected to the remaining body of the tree or the rooty block
@@ -47,7 +46,7 @@ public class BranchDestructionData {
 		trunkHeight = 0;
 	}
 
-	public BranchDestructionData(Species species, Map<BlockPos, BlockState> branches, Map<BlockPos, BlockState> leaves, List<ItemStack> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
+	public BranchDestructionData(Species species, Map<BlockPos, BlockState> branches, Map<BlockPos, BlockState> leaves, List<BlockBranch.ItemStackPos> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -67,7 +66,7 @@ public class BranchDestructionData {
 		this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
 		this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
 		this.destroyedLeaves = nbt.getIntArray("leaves");
-		this.leavesDrops = new ArrayList<ItemStack>();
+		this.leavesDrops = new ArrayList<>();
 		this.endPoints = nbt.getIntArray("ends");
 		this.woodVolume = nbt.getFloat("volume");
 		this.cutPos = new BlockPos(nbt.getInt("cutx"), nbt.getInt("cuty"), nbt.getInt("cutz") );

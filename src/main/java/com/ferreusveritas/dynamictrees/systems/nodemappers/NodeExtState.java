@@ -17,24 +17,24 @@ import java.util.Map;
 */
 public class NodeExtState implements INodeInspector {
 	
-//	private final Map<BlockPos, ExtendedBlockState> map = new HashMap<>();
+	private final Map<BlockPos, BlockState> map = new HashMap<>();
 	private final BlockPos origin;
 
 	public NodeExtState(BlockPos origin) {
 		this.origin = origin;
 	}
 
-//	public Map<BlockPos, BlockState> getExtStateMap() {
-//		return map;
-//	}
+	public Map<BlockPos, BlockState> getExtStateMap() {
+		return map;
+	}
 
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 
-//		if(branch != null) {
-//			map.put(pos.subtract(origin), (BlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
-//		}
+		if(branch != null) {
+			map.put(pos.subtract(origin), (BlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
+		}
 
 		return true;
 	}

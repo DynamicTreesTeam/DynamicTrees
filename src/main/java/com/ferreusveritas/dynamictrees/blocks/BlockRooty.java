@@ -30,6 +30,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -445,10 +447,10 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 //
 //		return true;
 //	}
-//
-//	@OnlyIn(Dist.CLIENT)
-//	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-//		return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos);
-//	}
+
+	@OnlyIn(Dist.CLIENT)
+	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
+		return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos);
+	}
 	
 }

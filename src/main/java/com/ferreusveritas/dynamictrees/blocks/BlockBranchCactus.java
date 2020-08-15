@@ -100,11 +100,6 @@ public class BlockBranchCactus extends BlockBranch {
 		return false;
 	}
 
-	@Override
-	public TreePartType getTreePartType() {
-		return null;
-	}
-
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////

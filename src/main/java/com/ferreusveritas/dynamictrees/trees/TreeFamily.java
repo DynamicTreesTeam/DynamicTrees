@@ -4,6 +4,9 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.cells.CellMetadata;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import net.minecraft.block.Block;
@@ -21,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -46,12 +50,12 @@ import java.util.List;
 public class TreeFamily {
 	
 	public final static TreeFamily NULLFAMILY = new TreeFamily() {
-//		@Override public void setCommonSpecies(Species species) {}
-//		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
-//		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
-//		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
-//		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, HandSide hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) { return false; }
-//		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
+		@Override public void setCommonSpecies(Species species) {}
+		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
+		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
+		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
+		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) { return false; }
+		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 	};
 	
 	/** Simple name of the tree e.g. "oak" */
@@ -251,7 +255,7 @@ public class TreeFamily {
 	}
 
 //	@OnlyIn(Dist.CLIENT)
-	public int getRootColor(BlockState state, World blockAccess, BlockPos pos) {
+	public int getRootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
 		return getWoodColor();
 	}
 
@@ -332,17 +336,17 @@ public class TreeFamily {
 	//BRANCHES
 	///////////////////////////////////////////
 
-//	public int getRadiusForCellKit(World blockAccess, BlockPos pos, BlockState blockState, Direction dir, BlockBranch branch) {
-//		int radius = branch.getRadius(blockState);
-//		int meta = CellMetadata.NONE;
-//		if(hasConiferVariants && radius == 1) {
-//			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-//				meta = CellMetadata.CONIFERTOP;
-//			}
-//		}
-//
-//		return CellMetadata.radiusAndMeta(radius, meta);
-//	}
+	public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BlockBranch branch) {
+		int radius = branch.getRadius(blockState);
+		int meta = CellMetadata.NONE;
+		if(hasConiferVariants && radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				meta = CellMetadata.CONIFERTOP;
+			}
+		}
+
+		return CellMetadata.radiusAndMeta(radius, meta);
+	}
 
 	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
 	public float getPrimaryThickness() {
@@ -366,9 +370,9 @@ public class TreeFamily {
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
 
-//	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
-//		return fallingEntity.defaultAnimationHandler();
-//	}
+	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+		return fallingEntity.defaultAnimationHandler();
+	}
 
 	///////////////////////////////////////////
 	// LEAVES HANDLING

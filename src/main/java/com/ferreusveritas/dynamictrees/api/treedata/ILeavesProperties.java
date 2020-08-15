@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
@@ -47,7 +48,7 @@ public interface ILeavesProperties {
 	ICellKit getCellKit();
 
 //	@OnlyIn(Dist.CLIENT)
-	int foliageColorMultiplier(BlockState state, World world, BlockPos pos);
+	int foliageColorMultiplier(BlockState state, IEnviromentBlockReader reader, BlockPos pos);
 
 	/**
 	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update

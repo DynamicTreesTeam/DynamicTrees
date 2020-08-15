@@ -72,6 +72,8 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.*;
@@ -96,7 +98,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -104,12 +106,10 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
@@ -542,35 +542,35 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return true;
 	}
 
-//	public boolean transitionToTree(World world, BlockPos pos) {
-//		//Ensure planting conditions are right
-//		TreeFamily family = getFamily();
-//		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-//			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
-//			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
-//			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
-//			return true;
-//		}
-//
-//		return false;
-//	}
-//
-//	public AxisAlignedBB getSaplingBoundingBox() {
-//		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
-//	}
-//
-//	//This is used to load the sapling model
-//	public ResourceLocation getSaplingName() {
-//		return getRegistryName();
-//	}
-//
-//	public int saplingColorMultiplier(BlockState state, World access, BlockPos pos, int tintIndex) {
-//		return getLeavesProperties().foliageColorMultiplier(state, access, pos);
-//	}
-//
-//	public SoundType getSaplingSound() {
-//		return SoundType.PLANT;
-//	}
+	public boolean transitionToTree(World world, BlockPos pos) {
+		//Ensure planting conditions are right
+		TreeFamily family = getFamily();
+		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
+			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
+			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
+			return true;
+		}
+
+		return false;
+	}
+
+	public AxisAlignedBB getSaplingBoundingBox() {
+		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
+	}
+
+	//This is used to load the sapling model
+	public ResourceLocation getSaplingName() {
+		return getRegistryName();
+	}
+
+	public int saplingColorMultiplier(BlockState state, IEnviromentBlockReader access, BlockPos pos, int tintIndex) {
+		return getLeavesProperties().foliageColorMultiplier(state, access, pos);
+	}
+
+	public SoundType getSaplingSound() {
+		return SoundType.PLANT;
+	}
 
 	///////////////////////////////////////////
 	//DIRT
@@ -1149,9 +1149,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
 
-//	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
-//		return getFamily().selectAnimationHandler(fallingEntity);
-//	}
+	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+		return getFamily().selectAnimationHandler(fallingEntity);
+	}
 
 	//////////////////////////////
 	// BONSAI POT

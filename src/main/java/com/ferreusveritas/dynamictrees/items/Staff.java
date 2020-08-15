@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -19,14 +20,17 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -212,9 +216,10 @@ public class Staff extends Item {
 		if(nbt.hasUniqueId(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
-			Species species = TreeRegistry.findSpeciesSloppy("oak");
-			setSpecies(itemStack, species);
-			return species;
+//			Species species = TreeRegistry.findSpeciesSloppy("oak");
+//			setSpecies(itemStack, species);
+//			return species;
+			return Species.NULLSPECIES;
 		}
 	}
 
@@ -255,53 +260,55 @@ public class Staff extends Item {
 		return uses <= 0;
 	}
 
-//	public int getColor(ItemStack itemStack, int tint) {
-//		if(tint == 0) {
-//			CompoundNBT nbt = getNBT(itemStack);
-//
-//			int color = 0x005b472f;//Original brown wood color
-//
-//			if(nbt.hasKey(HANDLE)) {
-//				try {
-//					color = Color.decode(nbt.getString(HANDLE)).getRGB();
-//				} catch (NumberFormatException e) {
-//					nbt.removeTag(HANDLE);
-//				}
-//			}
-//			else {
-//				color = getSpecies(itemStack).getFamily().getWoodColor();
-//			}
-//
-//			return color;
-//		}
-//		else
-//		if(tint == 1) {
-//			CompoundNBT nbt = getNBT(itemStack);
-//
-//			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
-//
-//			if(nbt.hasKey(COLOR)) {
-//				try {
-//					color = Color.decode(nbt.getString(COLOR)).getRGB();
-//				} catch (NumberFormatException e) {
-//					nbt.removeTag(COLOR);
-//				}
-//			}
-//
-//			return color;
-//		}
-//
-//
-//		return 0xFFFFFFFF;//white
-//	}
-//
-//	public Staff setColor(ItemStack itemStack, String colStr) {
-//		CompoundNBT nbt = getNBT(itemStack);
-//		nbt.setString(COLOR, colStr);
-//		itemStack.setTagCompound(nbt);
-//		return this;
-//	}
-//
+	public int getColor(ItemStack itemStack, int tint) {
+		if(tint == 0) {
+			CompoundNBT nbt = getNBT(itemStack);
+
+			int color = 0x005b472f;//Original brown wood color
+
+			Species species = getSpecies(itemStack);
+
+			if(nbt.hasUniqueId(HANDLE)) {
+				try {
+					color = Color.decode(nbt.getString(HANDLE)).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.remove(HANDLE);
+				}
+			}
+			else if (species.isValid()){
+				color = species.getFamily().getWoodColor();
+			}
+
+			return color;
+		}
+		else
+		if(tint == 1) {
+			CompoundNBT nbt = getNBT(itemStack);
+
+			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
+
+			if(nbt.hasUniqueId(COLOR)) {
+				try {
+					color = Color.decode(nbt.getString(COLOR)).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.remove(COLOR);
+				}
+			}
+
+			return color;
+		}
+
+
+		return 0xFFFFFFFF;//white
+	}
+
+	public Staff setColor(ItemStack itemStack, String colStr) {
+		CompoundNBT nbt = getNBT(itemStack);
+		nbt.putString(COLOR, colStr);
+		itemStack.setTag(nbt);
+		return this;
+	}
+
 	public String getCode(ItemStack itemStack) {
 		String code = "P";//Code of a sapling
 		CompoundNBT nbt = getNBT(itemStack);
@@ -316,43 +323,27 @@ public class Staff extends Item {
 		return code;
 	}
 
-	/**
-	* returns the action that specifies what animation to play when the items are being used
-	*/
-//	@Override
-//	public Enum getItemUseAction(ItemStack itemStack) {
-//		return EnumAction.BLOCK;
-//	}
-
-	/**
-	* Make the player hold the staff like a sword
-	*/
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isFull3D() {
-//		return true;
-//	}
-
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
-		tooltip.add(new StringTextComponent("Tree: " + ((species != null) ? species : "none")));
-		tooltip.add(new StringTextComponent("Code: §6" + getCode(stack)));
+		tooltip.add(new StringTextComponent("Tree: " + ((species.isValid()) ? species : "none")));
+		tooltip.add(new StringTextComponent("Code: ").appendSibling(  new StringTextComponent(getCode(stack)).applyTextStyle(TextFormatting.GOLD)  ));
 	}
 
 	/**
 	* Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
 	*/
-//	@Override
-//	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
-//		Multimap multimap = super.getAttributeModifiers(equipmentSlot, stack);
-//		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-//			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
-//			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
-//		}
-//		return multimap;
-//	}
+
+	@Override
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap multimap = super.getAttributeModifiers(equipmentSlot);
+		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
+		}
+		return multimap;
+	}
 
 	///////////////////////////////////////////
 	// RENDERING

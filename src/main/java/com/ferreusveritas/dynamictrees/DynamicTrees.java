@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees;
 
+import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -115,6 +116,7 @@ public class DynamicTrees
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT
+        DTClient.setup();
     }
 
     @SubscribeEvent

@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 
+import com.ferreusveritas.dynamictrees.cells.CellMetadata;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
@@ -12,20 +15,31 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.IProperty;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraftforge.common.ToolType;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
@@ -33,7 +47,7 @@ public class BlockBranchBasic extends BlockBranch {
 
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
 
-	protected BlockState branchStates[];
+	protected BlockState[] branchStates;
 
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
@@ -45,75 +59,54 @@ public class BlockBranchBasic extends BlockBranch {
 
 	// Useful for more unique subclasses
 	public BlockBranchBasic(Properties properties, String name) {
-		super(properties.sound(SoundType.WOOD), name); //aaaaand they also sound like wood.
-		//setHarvestLevel("axe", 0);//Default to axe harvest
+		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0), name); //aaaaand they also sound like wood.
+		this.setDefaultState(this.getDefaultState().with(RADIUS, 1));
 
 		cacheBranchStates();
 	}
 
-	@Override
-	public void futureBreak(BlockState state, World world, BlockPos pos, LivingEntity player) {
-
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(RADIUS);
 	}
 
-	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
-		return null;
-	}
-
-	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
-		return 0;
-	}
-
-	@Override
-	public boolean shouldAnalyse() {
-		return false;
-	}
-
-	@Override
-	public MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal) {
-		return null;
-	}
-
-	@Override
-	public TreePartType getTreePartType() {
-		return null;
+	@Nullable
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(RADIUS, 1);
 	}
 
 	public void cacheBranchStates() {
-//		setDefaultState(this.blockState.getBaseState().withProperty(RADIUS, 1));
-//
-//		branchStates = new BlockState[RADMAX_NORMAL + 1];
-//
-//		//Cache the branch blocks states for rapid lookup
-//		branchStates[0] = Blocks.AIR.getDefaultState();
-//		for(int radius = 1; radius <= RADMAX_NORMAL; radius++) {
-//			branchStates[radius] = getDefaultState().withProperty(BlockBranchBasic.RADIUS, radius);
-//		}
+		setDefaultState(stateContainer.getBaseState().with(RADIUS, 1));
+
+		branchStates = new BlockState[RADMAX_NORMAL + 1];
+
+		//Cache the branch blocks states for rapid lookup
+		branchStates[0] = Blocks.AIR.getDefaultState();
+		for(int radius = 1; radius <= RADMAX_NORMAL; radius++) {
+			branchStates[radius] = getDefaultState().with(BlockBranchBasic.RADIUS, radius);
+		}
 	}
 
-//	public IProperty<?>[] getIgnorableProperties() {
-//		return new IProperty<?>[]{ RADIUS };
-//	}
-//
-//
-//	///////////////////////////////////////////
-//	// BLOCKSTATES
-//	///////////////////////////////////////////
-//
+	public IProperty<?>[] getIgnorableProperties() {
+		return new IProperty<?>[]{ RADIUS };
+	}
+
+
+	///////////////////////////////////////////
+	// BLOCKSTATES
+	///////////////////////////////////////////
+
 //	@Override
 //	protected BlockStateContainer createBlockState() {
 //		IProperty[] listedProperties = { RADIUS };
-//		return new ExtendedBlockState(this, listedProperties, CONNECTIONS);
+//		return new BlockState(this, listedProperties, CONNECTIONS);
 //	}
-//
-//	/**
-//	 * Convert the given metadata into a BlockState for this Block
-//	 */
+
+	/**
+	 * Convert the given metadata into a BlockState for this Block
+	 */
 //	@Override
 //	public BlockState getStateFromMeta(int meta) {
-//		return this.getDefaultState().withProperty(RADIUS, (meta & 7) + 1);
+//		return this.getDefaultState().with(RADIUS, (meta & 7) + 1);
 //	}
 //
 //	/**
@@ -123,23 +116,23 @@ public class BlockBranchBasic extends BlockBranch {
 //	public int getMetaFromState(BlockState state) {
 //		return state.getValue(RADIUS) - 1;
 //	}
-//
-//	@Override
-//	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-//		if (state instanceof BlockState) {
-//			BlockState retval = (BlockState) state;
-//			int thisRadius = getRadius(state);
-//
-//			for (Direction dir : Direction.VALUES) {
-//				retval = retval.withProperty(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
-//			}
-//			return retval;
-//		}
-//
-//		return state;
-//	}
-//
-//
+
+	@Override
+	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
+		if (state != null) {
+			BlockState retval = state;
+			int thisRadius = getRadius(state);
+
+			for (Direction dir : Direction.values()) {
+				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+			}
+			return retval;
+		}
+
+		return state;
+	}
+
+
 	///////////////////////////////////////////
 	// TREE INFORMATION
 	///////////////////////////////////////////
@@ -192,44 +185,44 @@ public class BlockBranchBasic extends BlockBranch {
 
 		return didRot;
 	}
-//
-//
-//	///////////////////////////////////////////
-//	// PHYSICAL PROPERTIES
-//	///////////////////////////////////////////
-//
-//	@Override
-//	public float getBlockHardness(BlockState blockState, World world, BlockPos pos) {
-//		int radius = getRadius(blockState);
-//		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
-//	};
-//
-//	@Override
-//	public int getFlammability(IBlockReader world, BlockPos pos, Direction face) {
-//		return flammability;
-//	}
-//
-//	@Override
-//	public int getFireSpreadSpeed(IBlockReader world, BlockPos pos, Direction face) {
-//		int radius = getRadius(world.getBlockState(pos));
-//		return (fireSpreadSpeed * radius) / 8 ;
-//	}
-//
-//	public BlockBranchBasic setFlammability(int flammability) {
-//		this.flammability = flammability;
-//		return this;
-//	}
-//
-//	public BlockBranchBasic setFireSpreadSpeed(int fireSpreadSpeed) {
-//		this.fireSpreadSpeed = fireSpreadSpeed;
-//		return this;
-//	}
-//
-//
-//	///////////////////////////////////////////
-//	// RENDERING
-//	///////////////////////////////////////////
-//
+
+
+	///////////////////////////////////////////
+	// PHYSICAL PROPERTIES
+	///////////////////////////////////////////
+
+	@Deprecated
+	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
+		int radius = getRadius(blockState);
+		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+	}
+
+	@Override
+	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		int radius = getRadius(world.getBlockState(pos));
+		return (fireSpreadSpeed * radius) / 8 ;
+	}
+
+	@Override
+	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		return flammability;
+	}
+
+	public BlockBranchBasic setFlammability(int flammability) {
+		this.flammability = flammability;
+		return this;
+	}
+
+	public BlockBranchBasic setFireSpreadSpeed(int fireSpreadSpeed) {
+		this.fireSpreadSpeed = fireSpreadSpeed;
+		return this;
+	}
+
+
+	///////////////////////////////////////////
+	// RENDERING
+	///////////////////////////////////////////
+
 //	@Override
 //	public boolean isOpaqueCube(BlockState state) {
 //		return getRadius(state) == RADMAX_NORMAL;
@@ -245,19 +238,19 @@ public class BlockBranchBasic extends BlockBranch {
 	// GROWTH
 	///////////////////////////////////////////
 
-//	@Override
-//	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
-//		TreeFamily thisTree = getFamily();
-//
-//		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
-//			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
-//			int radius = CellMetadata.getRadius(radiusAndMeta);
-//			int metadata = CellMetadata.getMeta(radiusAndMeta);
-//			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
-//		} else {
-//			return CellNull.NULLCELL;
-//		}
-//	}
+	@Override
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
+		TreeFamily thisTree = getFamily();
+
+		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
+			int radius = CellMetadata.getRadius(radiusAndMeta);
+			int metadata = CellMetadata.getMeta(radiusAndMeta);
+			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
+		} else {
+			return CellNull.NULLCELL;
+		}
+	}
 
 	@Override
 	public int getRadius(BlockState blockState) {
@@ -361,45 +354,46 @@ public class BlockBranchBasic extends BlockBranch {
 
 		return signal;
 	}
-//
-//
-//	///////////////////////////////////////////
-//	// PHYSICAL BOUNDS
-//	///////////////////////////////////////////
-//
-//	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
-//	// The result is that only thin branches and trunks can be climbed
-//	@Override
-//	public boolean isLadder(BlockState state, IBlockReader world, BlockPos pos, LivingEntity entity) {
-//		return DTConfigs.enableBranchClimbling;
-//	}
-//
-//	@Override
-//	public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-//
-//		if (state.getBlock() != this) {
-//			return NULL_AABB;
-//		}
-//
-//		int thisRadius = getRadius(state);
-//
-//		boolean connectionMade = false;
-//		double radius = thisRadius / 16.0;
-//		double gap = 0.5 - radius;
-//		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-//		for (Direction dir : Direction.VALUES) {
-//			if (getSideConnectionRadius(blockAccess, pos, thisRadius, dir) > 0) {
-//				connectionMade = true;
-//				aabb = aabb.expand(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap);
-//			}
-//		}
-//		if (connectionMade) {
-//			return aabb.offset(0.5, 0.5, 0.5);
-//		}
-//
-//		return new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-//	}
-//
+
+
+	///////////////////////////////////////////
+	// PHYSICAL BOUNDS
+	///////////////////////////////////////////
+
+	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
+	// The result is that only thin branches and trunks can be climbed
+
+	@Override
+	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
+		return DTConfigs.enableBranchClimbling.get();
+	}
+
+	@Override
+	public VoxelShape getCollisionShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
+
+		if (state.getBlock() != this) {
+			return VoxelShapes.empty();
+		}
+
+		int thisRadius = getRadius(state);
+
+		boolean connectionMade = false;
+		double radius = thisRadius / 16.0;
+		double gap = 0.5 - radius;
+		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+		for (Direction dir : Direction.values()) {
+			if (getSideConnectionRadius(blockReader, pos, thisRadius, dir) > 0) {
+				connectionMade = true;
+				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
+			}
+		}
+		if (connectionMade) {
+			return VoxelShapes.create(aabb.offset(0.5, 0.5, 0.5));
+		}
+
+		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
+	}
+
 //	@Override
 //	public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
 //		if(entityIn instanceof EntityFallingTree) {
@@ -409,14 +403,14 @@ public class BlockBranchBasic extends BlockBranch {
 //		boolean hasConnections = false;
 //		int thisRadius = getRadius(state);
 //
-//		for (Direction dir : Direction.VALUES) {
+//		for (Direction dir : Direction.values()) {
 //			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
 //			if (connRadius > 0) {
 //				hasConnections = true;
 //				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
 //				double gap = 0.5 - radius;
 //				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-//				aabb = aabb.expand(dir.getFrontOffsetX() * gap, dir.getFrontOffsetY() * gap, dir.getFrontOffsetZ() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
+//				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
 //				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 //			}
 //		}
@@ -427,77 +421,83 @@ public class BlockBranchBasic extends BlockBranch {
 //		}
 //
 //	}
-//
-//	@Override
-//	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
-//		return getRadius(blockState);
-//	}
-//
-//	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
-//		BlockPos deltaPos = pos.offset(side);
-//		BlockState blockState = blockAccess.getBlockState(deltaPos);
-//		return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
-//	}
-//
-//
-//	///////////////////////////////////////////
-//	// NODE ANALYSIS
-//	///////////////////////////////////////////
-//
-//	protected int getMaxSignalDepth() {
-//		return 32;
-//	}
-//
-//	/**
-//	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out
-//	 * and a returnRun() on the way back.
-//	 *
-//	 * Okay so a little explanation here..
-//	 * I've been hit up by people who claim that recursion is a bad idea.  The reason why they think this is because java has to push values
-//	 * on the stack for each level of recursion and then pop them off as the levels complete.  Many times this can lead to performance issues.
-//	 * Fine, I understand that.  The reason why it doesn't matter here is because of the object oriented nature of how the tree parts
-//	 * function demand that a different analyze function be called for each object type.  Even if this were rewritten to be iterative the
-//	 * same number of stack pushes and pops would need to be performed to run the custom function for each node in the network anyway.  The
-//	 * depth of recursion for this algorithm is less than 32.  So there's no real risk of a stack overflow.
-//	 *
-//	 * The difference being that in an iterative design I would need to maintain a stack array holding all of the values and push and pop
-//	 * them manually or use a stack index.  This is messy and not something I would want to maintain for practically non-existent gains.
-//	 * Java does a pretty good job of managing the stack on its own.
-//	 */
-//	@Override
-//	public MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal) {
-//		// Note: fromDir will be null in the origin node
-//		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
-//			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
-//			for (Direction dir : Direction.VALUES) {// Spread signal in various directions
-//				if (dir != fromDir) {// don't count where the signal originated from
-//					BlockPos deltaPos = pos.offset(dir);
-//
-//					BlockState deltaState = world.getBlockState(deltaPos);
-//					ITreePart treePart = TreeHelper.getTreePart(deltaState);
-//
-//					if(treePart.shouldAnalyse()) {
-//						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
-//
-//						// This should only be true for the originating block when the root node is found
-//						if (signal.found && signal.localRootDir == null && fromDir == null) {
-//							signal.localRootDir = dir;
-//						}
-//					}
-//				}
-//			}
-//			signal.returnRun(blockState, world, pos, fromDir);
-//		} else {
-//			BlockState state = world.getBlockState(pos);
-//			if(state.getBlock() instanceof BlockBranch) {
-//				BlockBranch branch = (BlockBranch) state.getBlock();
-//				branch.breakDeliberate(world, pos, EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
-//			}
-//			signal.overflow = true;
-//		}
-//		signal.depth--;
-//
-//		return signal;
-//	}
+
+	@Override
+	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
+		return getRadius(blockState);
+	}
+
+	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
+		BlockPos deltaPos = pos.offset(side);
+		BlockState blockState = blockAccess.getBlockState(deltaPos);
+		return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+	}
+
+
+	///////////////////////////////////////////
+	// NODE ANALYSIS
+	///////////////////////////////////////////
+
+	protected int getMaxSignalDepth() {
+		return 32;
+	}
+
+	@Override
+	public boolean shouldAnalyse() {
+		return false;
+	}
+
+
+	/**
+	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out
+	 * and a returnRun() on the way back.
+	 *
+	 * Okay so a little explanation here..
+	 * I've been hit up by people who claim that recursion is a bad idea.  The reason why they think this is because java has to push values
+	 * on the stack for each level of recursion and then pop them off as the levels complete.  Many times this can lead to performance issues.
+	 * Fine, I understand that.  The reason why it doesn't matter here is because of the object oriented nature of how the tree parts
+	 * function demand that a different analyze function be called for each object type.  Even if this were rewritten to be iterative the
+	 * same number of stack pushes and pops would need to be performed to run the custom function for each node in the network anyway.  The
+	 * depth of recursion for this algorithm is less than 32.  So there's no real risk of a stack overflow.
+	 *
+	 * The difference being that in an iterative design I would need to maintain a stack array holding all of the values and push and pop
+	 * them manually or use a stack index.  This is messy and not something I would want to maintain for practically non-existent gains.
+	 * Java does a pretty good job of managing the stack on its own.
+	 */
+	@Override
+	public MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal) {
+		// Note: fromDir will be null in the origin node
+		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
+			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
+			for (Direction dir : Direction.values()) {// Spread signal in various directions
+				if (dir != fromDir) {// don't count where the signal originated from
+					BlockPos deltaPos = pos.offset(dir);
+
+					BlockState deltaState = world.getBlockState(deltaPos);
+					ITreePart treePart = TreeHelper.getTreePart(deltaState);
+
+					if(treePart.shouldAnalyse()) {
+						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
+
+						// This should only be true for the originating block when the root node is found
+						if (signal.found && signal.localRootDir == null && fromDir == null) {
+							signal.localRootDir = dir;
+						}
+					}
+				}
+			}
+			signal.returnRun(blockState, world, pos, fromDir);
+		} else {
+			BlockState state = world.getBlockState(pos);
+			if(state.getBlock() instanceof BlockBranch) {
+				BlockBranch branch = (BlockBranch) state.getBlock();
+				branch.breakDeliberate(world, pos, DynamicTrees.EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
+			}
+			signal.overflow = true;
+		}
+		signal.depth--;
+
+		return signal;
+	}
 	
 }

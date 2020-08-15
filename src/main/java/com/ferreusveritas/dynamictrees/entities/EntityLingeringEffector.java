@@ -79,10 +79,10 @@ public class EntityLingeringEffector extends Entity {
 //	protected void entityInit() {}
 //
 //	@Override
-//	protected void readEntityFromNBT(NBTTagCompound compound) {}
+//	protected void readEntityFromNBT(CompoundNBT compound) {}
 //
 //	@Override
-//	protected void writeEntityToNBT(NBTTagCompound compound) {}
+//	protected void writeEntityToNBT(CompoundNBT compound) {}
 //
 //	@Override
 //	public void onUpdate() {

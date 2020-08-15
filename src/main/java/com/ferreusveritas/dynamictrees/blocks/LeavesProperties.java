@@ -5,13 +5,17 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
 
@@ -136,14 +140,9 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 
 	@Override
-	public int foliageColorMultiplier(BlockState state, World world, BlockPos pos) {
-		return 0;
-	}
-
-	//	@OnlyIn(Dist.CLIENT)
-	public int foliageColorMultiplier(BlockState state, IBlockReader world, BlockPos pos) {
-//		return Minecraft.getInstance().getBlockColors().colorMultiplier(getPrimitiveLeaves(), world, pos, 0);
-		return 0;
+	@OnlyIn(Dist.CLIENT)
+	public int foliageColorMultiplier(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
+		return Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), world, pos, 0);
 	}
 	
 	@Override
@@ -156,8 +155,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
-//		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
-		return 0;
+		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}
 	
 }
