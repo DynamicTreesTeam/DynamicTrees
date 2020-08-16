@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 
 public class BlockRootyDirt extends BlockRooty {
 	
@@ -15,7 +15,7 @@ public class BlockRootyDirt extends BlockRooty {
 	}
 	
 	public BlockRootyDirt(String name, boolean isTileEntity) {
-		super(name, Material.GROUND, isTileEntity);
+		super(name, Material.EARTH, isTileEntity);
 	}
 	
 	///////////////////////////////////////////
@@ -23,7 +23,7 @@ public class BlockRootyDirt extends BlockRooty {
 	///////////////////////////////////////////
 	
 	@Override
-	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
+	public BlockState getMimic(IBlockReader access, BlockPos pos) {
 		return MimicProperty.getDirtMimic(access, pos);
 	}
 	
@@ -32,7 +32,7 @@ public class BlockRootyDirt extends BlockRooty {
 	///////////////////////////////////////////
 	
 	@Override
-	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+	public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
 		return layer == BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	

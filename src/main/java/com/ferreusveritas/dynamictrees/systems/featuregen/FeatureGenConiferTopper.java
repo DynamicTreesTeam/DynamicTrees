@@ -1,17 +1,16 @@
 package com.ferreusveritas.dynamictrees.systems.featuregen;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+
+import java.util.Collections;
+import java.util.List;
 
 public class FeatureGenConiferTopper implements IPostGenFeature {
 	
@@ -22,7 +21,7 @@ public class FeatureGenConiferTopper implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
 		BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
 		world.setBlockState(highest.up(1), leavesProperties.getDynamicLeavesState(4));

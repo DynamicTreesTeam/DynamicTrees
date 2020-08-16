@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AnimationHandlerVoid implements IAnimationHandler {
 	
@@ -34,7 +33,7 @@ public class AnimationHandlerVoid implements IAnimationHandler {
 	public void dropPayload(EntityFallingTree entity) {	} //Payload is dropped in initMotion
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean shouldRender(EntityFallingTree entity) {
 		return false;
 	}

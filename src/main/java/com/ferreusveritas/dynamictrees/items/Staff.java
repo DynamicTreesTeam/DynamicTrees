@@ -1,10 +1,5 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.awt.Color;
-import java.util.List;
-
-import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -12,32 +7,39 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
+
+import javax.annotation.Nullable;
+import java.awt.*;
+import java.util.List;
 
 /**
 * Try the following in a command block to demonstrate the extra tag functionality.
@@ -57,25 +59,25 @@ public class Staff extends Item {
 	public Staff() {
 		this("staff");
 	}
-	
+
 	public Staff(String name) {
+		super(new Item.Properties().maxStackSize(1)
+				.group(DTRegistries.dynamicTreesTab)
+				.addToolType(ToolType.AXE, 3));
 		setRegistryName(name);
-		setUnlocalizedName(getRegistryName().toString());
-		setMaxStackSize(1);
-		setHarvestLevel("axe", 3);
-		setCreativeTab(ModTabs.dynamicTreesTab);
 	}
-	
+
+
 	@Override
-	public float getDestroySpeed(ItemStack stack, IBlockState state) {
+	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
 			return 64.0f;
 		}
 		return super.getDestroySpeed(stack, state);
 	}
-	
+
 	@Override
-	public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+	public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
 		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
 			if(decUses(stack)) {
 				stack.shrink(1);
@@ -84,58 +86,60 @@ public class Staff extends Item {
 		}
 		return false;
 	}
-	
+
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-				
-		ItemStack heldStack = player.getHeldItem(hand);
-		
-		IBlockState clickedBlockState = world.getBlockState(pos);
+	public ActionResultType onItemUse(ItemUseContext context) {
+
+		ItemStack heldStack = context.getPlayer().getHeldItem(context.getHand());
+
+		BlockState clickedBlockState = context.getWorld().getBlockState(context.getPos());
 		Block clickedBlock = clickedBlockState.getBlock();
 
+		BlockPos pos = context.getPos();
+
 		//Dereference proxy trunk shell
-		if(clickedBlock == ModBlocks.blockTrunkShell) {
-			ShellMuse muse = ((BlockTrunkShell)clickedBlock).getMuse(world, clickedBlockState, pos);
+		if(clickedBlock instanceof BlockTrunkShell) {
+			ShellMuse muse = ((BlockTrunkShell)clickedBlock).getMuse(context.getWorld(), clickedBlockState, context.getPos());
 			if(muse != null) {
 				clickedBlockState = muse.state;
 				pos = muse.pos;
 				clickedBlock = clickedBlockState.getBlock();
 			}
 		}
-		
+
 		ITreePart treePart = TreeHelper.getTreePart(clickedBlock);
 		BlockPos rootPos = pos;
-		
+
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
-			MapSignal signal = branch.analyse(clickedBlockState, world, pos, null, new MapSignal());//Analyze entire tree network to find root node
+			MapSignal signal = branch.analyse(clickedBlockState, context.getWorld(), pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {
 				rootPos = signal.root;
-				treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
+				treePart = TreeHelper.getTreePart(context.getWorld().getBlockState(rootPos));
 			}
 		}
-		
+
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			Species species = TreeHelper.getExactSpecies(world.getBlockState(rootPos), world, rootPos);
+			Species species = TreeHelper.getExactSpecies(context.getWorld().getBlockState(rootPos), context.getWorld(), rootPos);
 			if(species.isValid()) {
-				if(!player.isSneaking()) {
-					String code = new JoCode(world, rootPos, player.getHorizontalFacing()).toString();
+				if(!context.getPlayer().isSneaking()) {
+					String code = new JoCode(context.getWorld(), rootPos, context.getPlayer().getHorizontalFacing()).toString();
 					setCode(heldStack, code);
-					if(world.isRemote) {//Make sure this doesn't run on the server
-						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
+					if(context.getWorld().isRemote) {//Make sure this doesn't run on the server
+//						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 					}
 				}
 				setSpecies(heldStack, species);
-				return EnumActionResult.SUCCESS;
+				return ActionResultType.SUCCESS;
 			}
 		}
-		
+
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
-		if(species.isValid() && species.isAcceptableSoil(world, pos, clickedBlockState)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
+		if(species.isValid() && species.isAcceptableSoil(context.getWorld(), pos, clickedBlockState)) {
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(context.getWorld(), species, pos, context.getWorld().getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			if(hasMaxUses(heldStack)) {
 				if(decUses(heldStack)) {
 					heldStack.shrink(1);//If the player is in creative this will have no effect.
@@ -143,212 +147,206 @@ public class Staff extends Item {
 			} else {
 				heldStack.shrink(1);//If the player is in creative this will have no effect.
 			}
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		}
-		
-		return EnumActionResult.FAIL;
+
+		return ActionResultType.FAIL;
 	}
-	
+
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		return hasMaxUses(stack);
 	}
-	
-	@Override
-	public int getMaxItemUseDuration(ItemStack stack) {
-		return super.getMaxItemUseDuration(stack);
-	}
-	
+
+//	@Override
+//	public int getMaxItemUseDuration(ItemStack stack) {
+//		return super.getMaxItemUseDuration(stack);
+//	}
+
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
 		double damage = getUses(stack) / (double)getMaxUses(stack);
 		return 1 - damage;
 	}
-	
+
 	/**
 	* Gets the NBT for the itemStack or creates a new one if it doesn't exist
-	* 
+	*
 	* @param itemStack
 	* @return
 	*/
-	public NBTTagCompound getNBT(ItemStack itemStack) {
-		return itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
+	public CompoundNBT getNBT(ItemStack itemStack) {
+		return itemStack.hasTag() ? itemStack.getTag() : new CompoundNBT();
 	}
-	
+
 	public boolean isReadOnly(ItemStack itemStack) {
 		return getNBT(itemStack).getBoolean(READONLY);
 	}
-	
+
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setBoolean(READONLY, readonly);
-		itemStack.setTagCompound(nbt);
+		CompoundNBT nbt = getNBT(itemStack);
+		nbt.putBoolean(READONLY, readonly);
+		itemStack.setTag(nbt);
 		return this;
 	}
-	
+
 	public Staff setSpecies(ItemStack itemStack, Species species) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString(TREE, species.toString());
-		itemStack.setTagCompound(nbt);
+		CompoundNBT nbt = getNBT(itemStack);
+		String name;
+		if (species == Species.NULLSPECIES){
+			name = "null";
+		} else {
+			name = species.toString();
+		}
+		nbt.putString(TREE, name);
+		itemStack.setTag(nbt);
 		return this;
 	}
-	
+
 	public Staff setCode(ItemStack itemStack, String code) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString(CODE, code);
-		itemStack.setTagCompound(nbt);
+		CompoundNBT nbt = getNBT(itemStack);
+		nbt.putString(CODE, code);
+		itemStack.setTag(nbt);
 		return this;
 	}
-	
+
 	public Species getSpecies(ItemStack itemStack) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		
-		if(nbt.hasKey(TREE)) {
+		CompoundNBT nbt = getNBT(itemStack);
+
+		if(nbt.hasUniqueId(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
-			Species species = TreeRegistry.findSpeciesSloppy("oak");
-			setSpecies(itemStack, species);
-			return species;
+//			Species species = TreeRegistry.findSpeciesSloppy("oak");
+//			setSpecies(itemStack, species);
+//			return species;
+			return Species.NULLSPECIES;
 		}
 	}
-	
+
 	public int getUses(ItemStack itemStack) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		
-		if(nbt.hasKey(USES)) {
-			return nbt.getInteger(USES);
+		CompoundNBT nbt = getNBT(itemStack);
+
+		if(nbt.hasUniqueId(USES)) {
+			return nbt.getInt(USES);
 		} else {
 			int uses = getMaxUses(itemStack);
 			setUses(itemStack, uses);
 			return uses;
 		}
-		
+
 	}
-	
+
 	public void setUses(ItemStack itemStack, int value) {
-		getNBT(itemStack).setInteger(USES, value);
+		getNBT(itemStack).putInt(USES, value);
 	}
-	
+
 	public int getMaxUses(ItemStack itemStack) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		
-		if(nbt.hasKey(MAXUSES)) {
-			return nbt.getInteger(MAXUSES);
+		CompoundNBT nbt = getNBT(itemStack);
+
+		if(nbt.hasUniqueId(MAXUSES)) {
+			return nbt.getInt(MAXUSES);
 		}
-		
+
 		return 0;
 	}
-	
+
 	public boolean hasMaxUses(ItemStack itemStack) {
-		return getNBT(itemStack).hasKey(MAXUSES);
+		return getNBT(itemStack).hasUniqueId(MAXUSES);
 	}
-	
+
 	public boolean decUses(ItemStack itemStack) {
 		int uses = Math.max(0, getUses(itemStack) - 1);
 		setUses(itemStack, uses);
 		return uses <= 0;
 	}
-	
+
 	public int getColor(ItemStack itemStack, int tint) {
 		if(tint == 0) {
-			NBTTagCompound nbt = getNBT(itemStack);
-			
+			CompoundNBT nbt = getNBT(itemStack);
+
 			int color = 0x005b472f;//Original brown wood color
-			
-			if(nbt.hasKey(HANDLE)) {
+
+			Species species = getSpecies(itemStack);
+
+			if(nbt.hasUniqueId(HANDLE)) {
 				try {
 					color = Color.decode(nbt.getString(HANDLE)).getRGB();
 				} catch (NumberFormatException e) {
-					nbt.removeTag(HANDLE);
+					nbt.remove(HANDLE);
 				}
 			}
-			else {
-				color = getSpecies(itemStack).getFamily().getWoodColor();
+			else if (species.isValid()){
+				color = species.getFamily().getWoodColor();
 			}
-			
+
 			return color;
 		}
 		else
 		if(tint == 1) {
-			NBTTagCompound nbt = getNBT(itemStack);
-			
+			CompoundNBT nbt = getNBT(itemStack);
+
 			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
-			
-			if(nbt.hasKey(COLOR)) {
+
+			if(nbt.hasUniqueId(COLOR)) {
 				try {
 					color = Color.decode(nbt.getString(COLOR)).getRGB();
 				} catch (NumberFormatException e) {
-					nbt.removeTag(COLOR);
+					nbt.remove(COLOR);
 				}
 			}
-			
+
 			return color;
 		}
-		
-		
+
+
 		return 0xFFFFFFFF;//white
 	}
-	
+
 	public Staff setColor(ItemStack itemStack, String colStr) {
-		NBTTagCompound nbt = getNBT(itemStack);
-		nbt.setString(COLOR, colStr);
-		itemStack.setTagCompound(nbt);
+		CompoundNBT nbt = getNBT(itemStack);
+		nbt.putString(COLOR, colStr);
+		itemStack.setTag(nbt);
 		return this;
 	}
-	
+
 	public String getCode(ItemStack itemStack) {
 		String code = "P";//Code of a sapling
-		NBTTagCompound nbt = getNBT(itemStack);
-		
-		if(nbt.hasKey(CODE)) {
+		CompoundNBT nbt = getNBT(itemStack);
+
+		if(nbt.hasUniqueId(CODE)) {
 			code = nbt.getString(CODE);
 		} else {
-			nbt.setString(CODE, code);
-			itemStack.setTagCompound(nbt);
+			nbt.putString(CODE, code);
+			itemStack.setTag(nbt);
 		}
-		
+
 		return code;
 	}
-	
-	/**
-	* returns the action that specifies what animation to play when the items are being used
-	*/
+
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public EnumAction getItemUseAction(ItemStack itemStack) {
-		return EnumAction.BLOCK;
-	}
-	
-	/**
-	* Make the player hold the staff like a sword
-	*/
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean isFull3D() {
-		return true;
-	}
-	
-	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
-		tooltip.add("Tree: " + ((species != null) ? species : "none"));
-		tooltip.add("Code: §6" + getCode(stack));
+		tooltip.add(new StringTextComponent("Tree: " + ((species.isValid()) ? species : "none")));
+		tooltip.add(new StringTextComponent("Code: ").appendSibling(  new StringTextComponent(getCode(stack)).applyTextStyle(TextFormatting.GOLD)  ));
 	}
-	
+
 	/**
 	* Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
 	*/
+
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
-		Multimap multimap = super.getAttributeModifiers(equipmentSlot, stack);
-		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap multimap = super.getAttributeModifiers(equipmentSlot);
+		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
+			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
 		}
 		return multimap;
 	}
-	
+
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-	
+
 }

@@ -2,9 +2,6 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -15,17 +12,17 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
-		if(dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
-			if(world.isRemote) {
-				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_HAPPY, 8);
-			} else {
-				if(grow) {
-					TreeHelper.growPulse(world, rootPos);
-				}
-			}
-			return true;
-		}
+//		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
+//		if(dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
+//			if(world.isRemote) {
+//				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_HAPPY, 8);
+//			} else {
+//				if(grow) {
+//					TreeHelper.growPulse(world, rootPos);
+//				}
+//			}
+//			return true;
+//		}
 		return false;
 	}
 	

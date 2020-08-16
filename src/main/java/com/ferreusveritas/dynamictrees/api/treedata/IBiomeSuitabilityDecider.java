@@ -1,8 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -11,13 +9,13 @@ import net.minecraft.world.biome.Biome;
 /**
  * Provides the suitability factor for a tree at a given biome or position.
  * Mods should implement this interface and register it via the {@link TreeRegistry} to control the suitability of a tree in a {@link Biome}.
- * 
+ *
  * @author ferreusveritas
  */
 public interface IBiomeSuitabilityDecider {
 
-	public Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
-	
+//	public Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
+
 	/** Decision interface for handling the event */
 	public class Decision {
 		private boolean handled;//The handling indicator

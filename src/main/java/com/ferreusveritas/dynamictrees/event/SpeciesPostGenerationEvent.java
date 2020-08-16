@@ -1,14 +1,13 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Event;
+
+import java.util.List;
 
 /**
  * This event fires after a tree has been created and decorated.
@@ -23,9 +22,9 @@ public class SpeciesPostGenerationEvent extends Event {
 	private final BlockPos rootPos;
 	private final List<BlockPos> endPoints;
 	private final SafeChunkBounds safeBounds;
-	private final IBlockState initialDirtState;
+	private final BlockState initialDirtState;
 	
-	public SpeciesPostGenerationEvent(World world, Species species, BlockPos rootPos, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public SpeciesPostGenerationEvent(World world, Species species, BlockPos rootPos, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		this.world = world;
 		this.species = species;
 		this.rootPos = rootPos;
@@ -69,7 +68,7 @@ public class SpeciesPostGenerationEvent extends Event {
 	 * 
 	 * @return The initial state of the dirt block before it was changed
 	 */
-	public IBlockState getInitialDirtState() {
+	public BlockState getInitialDirtState() {
 		return initialDirtState;
 	}
 }

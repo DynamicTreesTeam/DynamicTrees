@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class TextureUtils {
 	
 	public static class PixelBuffer {
-		public final int[] pixels;
+		public int[] pixels; //final
 		public final int w;
 		public final int h;
 		
@@ -19,17 +19,17 @@ public class TextureUtils {
 		}
 		
 		public PixelBuffer(TextureAtlasSprite sprite) {
-			this.w = sprite.getIconWidth();
-			this.h = sprite.getIconHeight();
-			int data[][] = sprite.getFrameTextureData(0);
-			pixels = data[0];
+			this.w = sprite.getWidth();
+			this.h = sprite.getHeight();
+//			int[][] data = sprite.getFrameTextureData(0);
+//			pixels = data[0];
 		}
 		
 		public PixelBuffer(TextureAtlasSprite sprite, boolean copy) {
-			this.w = sprite.getIconWidth();
-			this.h = sprite.getIconHeight();
-			int[][] original = sprite.getFrameTextureData(0);
-			pixels = Arrays.copyOf(original[0], original[0].length);
+			this.w = sprite.getWidth();
+			this.h = sprite.getHeight();
+//			int[][] original = sprite.getFrameTextureData(0);
+//			pixels = Arrays.copyOf(original[0], original[0].length);
 		}
 		
 		public PixelBuffer(PixelBuffer other) {
@@ -39,13 +39,13 @@ public class TextureUtils {
 		}
 		
 		public void apply(TextureAtlasSprite sprite) {
-			if(w == sprite.getIconWidth() && h == sprite.getIconHeight()) {
-				int[][] original = sprite.getFrameTextureData(0);
-				int[][] data = new int[original.length][];
-				data[0] = pixels;
+			if(w == sprite.getWidth() && h == sprite.getHeight()) {
+//				int[][] original = sprite.getFrameTextureData(0);
+//				int[][] data = new int[original.length][];
+//				data[0] = pixels;
 				ArrayList<int[][]> ftd = new ArrayList<>();
-				ftd.add(data);
-				sprite.setFramesTextureData(ftd);
+//				ftd.add(data);
+//				sprite.setFramesTextureData(ftd);
 			}
 		}
 		

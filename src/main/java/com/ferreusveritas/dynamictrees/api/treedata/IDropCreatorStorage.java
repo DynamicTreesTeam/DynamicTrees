@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import java.util.Map;
-
 import net.minecraft.util.ResourceLocation;
+
+import java.util.Map;
 
 public interface IDropCreatorStorage extends IDropCreator {
 

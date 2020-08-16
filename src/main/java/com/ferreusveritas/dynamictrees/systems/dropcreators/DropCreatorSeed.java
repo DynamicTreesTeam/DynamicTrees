@@ -1,20 +1,15 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import java.util.List;
-import java.util.Random;
-
-import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-import com.ferreusveritas.dynamictrees.event.SeedVoluntaryDropEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
+
+import java.util.List;
+import java.util.Random;
 
 public class DropCreatorSeed implements IDropCreator {
 
@@ -45,7 +40,7 @@ public class DropCreatorSeed implements IDropCreator {
 
 	@Override
 	public ResourceLocation getName() {
-		return new ResourceLocation(ModConstants.MODID, "seed");
+		return new ResourceLocation(DynamicTrees.MODID, "seed");
 	}
 	
 	@Override
@@ -58,19 +53,19 @@ public class DropCreatorSeed implements IDropCreator {
 
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		if(getVoluntaryRarity() * ModConfigs.seedDropRate > random.nextFloat()) {
-			dropList.add(species.getSeedStack(1));
-			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
-			MinecraftForge.EVENT_BUS.post(seedDropEvent);
-			if(seedDropEvent.isCanceled()) {
-				dropList.clear();
-			}
-		}
+//		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() > random.nextFloat()) {
+//			dropList.add(species.getSeedStack(1));
+//			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
+//			MinecraftForge.EVENT_BUS.post(seedDropEvent);
+//			if(seedDropEvent.isCanceled()) {
+//				dropList.clear();
+//			}
+//		}
 		return dropList;
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
 		//Hokey fortune stuff here to match Vanilla logic.
 		if (fortune > 0) {

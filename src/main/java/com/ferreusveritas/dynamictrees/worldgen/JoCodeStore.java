@@ -1,22 +1,16 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.MathHelper;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
 
 /**
  * A storage class for {@link JoCode} objects.
@@ -45,7 +39,7 @@ public class JoCodeStore {
 	
 	public void addCodesFromFile(Species species, String filename) {
 		try {
-			Logger.getLogger(ModConstants.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
+			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
 			if(stream != null) {
 				InputStreamReader streamReader = new InputStreamReader(stream, "UTF-8");
@@ -90,9 +84,9 @@ public class JoCodeStore {
 	//Code reserved for collecting WorldGen JoCodes
 	@SuppressWarnings("unused")
 	private void collectWorldGenCodes(int radius, JoCode joCode) {
-		EnumFacing dirs[] = {EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST};
+		Direction dirs[] = {Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST};
 		ArrayList<String> arr = new ArrayList<String>() ;
-		for(EnumFacing dir: dirs) {
+		for(Direction dir: dirs) {
 			arr.add(joCode.rotate(dir).toString());
 		}
 		
@@ -100,7 +94,7 @@ public class JoCodeStore {
 		System.out.println(species + ":" + radius + ":" + arr.get(0));
 	}
 	
-	public JoCode getRandomCode(int radius, Random rand) {		
+	public JoCode getRandomCode(int radius, Random rand) {
 		ArrayList<JoCode> list = getListForRadius(radius);
 		if(!list.isEmpty()) {
 			return list.get(rand.nextInt(list.size()));

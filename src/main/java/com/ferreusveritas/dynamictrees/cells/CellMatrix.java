@@ -2,14 +2,14 @@ package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public class CellMatrix implements ICell {
 
 	private final int value;
 	private final byte[] valMap;
 	
-	public CellMatrix(int value, byte valMap[]) {
+	public CellMatrix(int value, byte[] valMap) {
 		this.value = value;
 		this.valMap = valMap;
 	}
@@ -20,7 +20,7 @@ public class CellMatrix implements ICell {
 	}
 	
 	@Override
-	public int getValueFromSide(EnumFacing side) {
+	public int getValueFromSide(Direction side) {
 		return valMap[(side.ordinal() << 3) + value];
 	}
 	

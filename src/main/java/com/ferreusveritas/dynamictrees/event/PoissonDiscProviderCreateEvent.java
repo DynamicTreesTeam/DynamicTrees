@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
-
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 

@@ -1,41 +1,32 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.function.Function;
-
-import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.InvalidBlockStateException;
-import net.minecraft.command.NumberInvalidException;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
 
 public class LeavesPropertiesJson extends LeavesProperties {
 	
@@ -53,7 +44,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 	
 	public LeavesPropertiesJson(JsonObject jsonObj) {
-		super(ModBlocks.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
+		super(DTRegistries.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
 	}
@@ -72,7 +63,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 				} else
 				if("leaves".equals(key)) {
 					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-						getPrimitiveLeaves(element.getAsString()).assignTo(this);
+						getPrimitiveLeaves(element.getAsJsonObject()).assignTo(this);
 					} else
 					if(element.isJsonObject()) {
 						getPrimitiveLeaves(element.getAsJsonObject()).assignTo(this);
@@ -113,10 +104,10 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 	
 	public static class PrimitiveLeavesComponents {
-		public IBlockState state;
+		public BlockState state;
 		public ItemStack stack;
 		
-		public PrimitiveLeavesComponents(IBlockState state, ItemStack stack) {
+		public PrimitiveLeavesComponents(BlockState state, ItemStack stack) {
 			this.state = state;
 			this.stack = stack;
 		}
@@ -127,23 +118,23 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 	
-	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
-		IBlockState state = getBlockState(leavesDesc);
-		ItemStack stack = ItemStack.EMPTY;
-		
-		if(state.getBlock() != Blocks.AIR) {
-			int meta = state.getBlock().damageDropped(state);
-			
-			//Minecraft metadata logic for leaves is buggy and needs this work around
-			if(state.getBlock() == Blocks.LEAVES2 && meta >= 4) {//Bug in minecraft where the damageDropped doesn't work for Leaves2
-				meta -= 4;
-			}
-			
-			stack = new ItemStack(Item.getItemFromBlock(state.getBlock()), 1, meta);
-		}
-		
-		return new PrimitiveLeavesComponents(state, stack);
-	}
+//	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
+//		BlockState state = getBlockState(leavesDesc);
+//		ItemStack stack = ItemStack.EMPTY;
+//
+//		if(state.getBlock() != Blocks.AIR) {
+//			int meta = state.getBlock().damageDropped(state);
+//
+//			//Minecraft metadata logic for leaves is buggy and needs this work around
+//			if(state.getBlock() == Blocks.LEAVES2 && meta >= 4) {//Bug in minecraft where the damageDropped doesn't work for Leaves2
+//				meta -= 4;
+//			}
+//
+//			stack = new ItemStack(Item.getItemFromBlock(state.getBlock()), 1, meta);
+//		}
+//
+//		return new PrimitiveLeavesComponents(state, stack);
+//	}
 	
 	private static PrimitiveLeavesComponents getPrimitiveLeaves(JsonObject jsonObj) {
 		
@@ -158,26 +149,26 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
 	}
 	
-	private static IBlockState getBlockState(String blockStateDesc) {
-		String blockString = blockStateDesc;
-		String argString = "default";
-		String[] args = blockStateDesc.split(" ");
-		
-		if(args.length == 2) {
-			blockString = args[0];
-			argString = args[1];
-		}
-		
-		Block block = Block.REGISTRY.getObject(new ResourceLocation(blockString));
-		
-		try {
-			return CommandBase.convertArgToBlockState(block, argString);
-		}
-		catch (NumberInvalidException | InvalidBlockStateException e) {
-			e.printStackTrace();
-			return block.getDefaultState();
-		}
-	}
+//	private static BlockState getBlockState(String blockStateDesc) {
+//		String blockString = blockStateDesc;
+//		String argString = "default";
+//		String[] args = blockStateDesc.split(" ");
+//
+//		if(args.length == 2) {
+//			blockString = args[0];
+//			argString = args[1];
+//		}
+//
+//		Block block = Block.REGISTRY.getObject(new ResourceLocation(blockString));
+//
+//		try {
+//			return CommandBase.convertArgToBlockState(block, argString);
+//		}
+//		catch (NumberInvalidException | InvalidBlockStateException e) {
+//			e.printStackTrace();
+//			return block.getDefaultState();
+//		}
+//	}
 	
 	public static JsonObject getJsonObject(String jsonData) {
 		try {
@@ -214,7 +205,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
 		return (fromRadius == 1 || connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}
 	
@@ -235,7 +226,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	protected ILeavesUpdate leavesUpdate = (w,p,s,r,l) -> true;
 	
 	public static interface ILeavesUpdate {
-		boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand, ILeavesProperties leavesProperties);
+		boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand, ILeavesProperties leavesProperties);
 	}
 	
 	public void setLeavesUpdate(ILeavesUpdate leavesUpdate) {
@@ -243,7 +234,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 	
 	@Override
-	public boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		return leavesUpdate.updateTick(worldIn, pos, state, rand, this);
 	}
 	
@@ -272,45 +263,46 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private JsonPrimitive colorPrimitive = null;
 	
-	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	private IBlockColor colorMultiplier;
 	
-	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	@Override
-	public int foliageColorMultiplier(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return colorMultiplier.colorMultiplier(state, world, pos, -1);
+	public int foliageColorMultiplier(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
+		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 
-	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	private IBlockColor processColor(JsonPrimitive primitive) {
-		int color = -1;
-		if(primitive.isNumber()) {
-			color = (int) primitive.getAsNumber();
-		} else
-		if(primitive.isString()) {
-			String code = primitive.getAsString();
-			if(code.startsWith("@")) {
-				code = code.substring(1);
-				if("biome".equals(code)) { //Built in code since we need access to super
-					return (state, world, pos, t) -> {
-						return world.getBiome(pos).getModdedBiomeFoliageColor(super.foliageColorMultiplier(state, world, pos));
-					};
-				}
-				IBlockColor blockColor = BlockColorMultipliers.find(code);
-				if(blockColor != null) {
-					return blockColor;
-				} else {
-					System.err.println("Error: ColorMultiplier resource \"" + code + "\" could not be found.");
-				}
-			} else {
-				color = Color.decode(code).getRGB();
-			}
-		}
-		int c = color;
-		return (s,w,p,t) -> c;
+//		int color = -1;
+//		if(primitive.isNumber()) {
+//			color = (int) primitive.getAsNumber();
+//		} else
+//		if(primitive.isString()) {
+//			String code = primitive.getAsString();
+//			if(code.startsWith("@")) {
+//				code = code.substring(1);
+//				if("biome".equals(code)) { //Built in code since we need access to super
+//					return (state, world, pos, t) -> {
+//						return world.getBiome(pos).getModdedBiomeFoliageColor(super.foliageColorMultiplier(state, world, pos));
+//					};
+//				}
+//				IBlockColor blockColor = BlockColorMultipliers.find(code);
+//				if(blockColor != null) {
+//					return blockColor;
+//				} else {
+//					System.err.println("Error: ColorMultiplier resource \"" + code + "\" could not be found.");
+//				}
+//			} else {
+//				color = Color.decode(code).getRGB();
+//			}
+//		}
+//		int c = color;
+//		return (s,w,p,t) -> c;
+		return null;
 	}
 	
-	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public void resolveClient() {
 		if(colorPrimitive != null) {
 			colorMultiplier = processColor(colorPrimitive);
@@ -320,7 +312,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+//	@OnlyIn(Dist.CLIENT)
 	public static void postInitClient() {
 		for(LeavesPropertiesJson res: resolutionList) {
 			res.resolveClient();

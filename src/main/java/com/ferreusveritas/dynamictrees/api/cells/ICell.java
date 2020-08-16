@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.cells;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public interface ICell {
 
@@ -8,6 +8,6 @@ public interface ICell {
 	public int getValue();
 	
 	//This is the value the cell returns for a side
-	public int getValueFromSide(EnumFacing side);
+	public int getValueFromSide(Direction side);
 	
 }

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.cells;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * Cell that always returns 0
@@ -18,7 +18,7 @@ public class CellNull implements ICell {
 	}
 
 	@Override
-	public int getValueFromSide(EnumFacing side) {
+	public int getValueFromSide(Direction side) {
 		return 0;
 	}
 

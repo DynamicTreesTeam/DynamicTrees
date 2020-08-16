@@ -1,23 +1,17 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.TreeMap;
-
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Manages and creates all the Poisson discs in a single dimension.

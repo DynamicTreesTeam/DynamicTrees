@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.List;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+
+import java.util.List;
 
 public class BlockBounds {
 
@@ -116,7 +116,7 @@ public class BlockBounds {
 		return new BlockPos(maxX, maxY, maxZ);
 	}
 
-	public BlockBounds shrink(EnumFacing dir, int amount) {
+	public BlockBounds shrink(Direction dir, int amount) {
 		switch(dir) {
 			case DOWN: minY += amount; break;
 			case UP: maxY -= amount; break;
@@ -156,7 +156,7 @@ public class BlockBounds {
 		return expand(-amount);
 	}
 	
-	public Iterable<BlockPos.MutableBlockPos> iterate() {
+	public Iterable<BlockPos> iterate() {
 		return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 	

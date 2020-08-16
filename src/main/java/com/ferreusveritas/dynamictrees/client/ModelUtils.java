@@ -1,19 +1,20 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockPart;
-import net.minecraft.client.renderer.block.model.BlockPartFace;
-import net.minecraft.client.renderer.block.model.FaceBakery;
+import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.BlockPart;
+import net.minecraft.client.renderer.model.BlockPartFace;
+import net.minecraft.client.renderer.model.FaceBakery;
+import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.common.model.ITransformation;
 
 public class ModelUtils {
 	
-	public static float[] getUVs(AxisAlignedBB box, EnumFacing face) {
+	public static float[] getUVs(AxisAlignedBB box, Direction face) {
 		switch(face) {
 			default:
 			case DOWN:  return new float[]{ (float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ };
@@ -32,7 +33,7 @@ public class ModelUtils {
 	 * @param face
 	 * @return
 	 */
-	public static int getFaceAngle (Axis axis, EnumFacing face) {
+	public static int getFaceAngle (Axis axis, Direction face) {
 		if(axis == Axis.Y) { //UP / DOWN
 			return 0;
 		}
@@ -45,7 +46,7 @@ public class ModelUtils {
 				default: return 90;
 			}
 		} else { //EAST/WEST
-			return (face == EnumFacing.NORTH) ? 270 : 90;
+			return (face == Direction.NORTH) ? 270 : 90;
 		}
 	}
 	
@@ -64,8 +65,9 @@ public class ModelUtils {
 		};
 	}
 	
-	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, EnumFacing dir, net.minecraftforge.common.model.ITransformation transform, boolean uvlocked) {
-		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, transform, blockPart.partRotation, uvlocked, blockPart.shade);
+	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ISprite sprite, boolean uvlocked) {
+
+		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, sprite, blockPart.partRotation, uvlocked);
 	}
 	
 }

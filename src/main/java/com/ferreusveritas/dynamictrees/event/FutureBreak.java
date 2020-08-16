@@ -1,27 +1,26 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class FutureBreak {
 	
 	public static List<FutureBreak> futureBreaks = new LinkedList<>();
 	
-	public final IBlockState state;
+	public final BlockState state;
 	public final World world;
 	public final BlockPos pos;
-	public final EntityLivingBase entity;
+	public final LivingEntity entity;
 	public int ticks = 0;
 	
-	public FutureBreak(IBlockState state, World world, BlockPos pos, EntityLivingBase entity, int ticks) {
+	public FutureBreak(BlockState state, World world, BlockPos pos, LivingEntity entity, int ticks) {
 		this.state = state;
 		this.world = world;
 		this.pos = pos;

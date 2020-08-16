@@ -1,17 +1,17 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import java.util.Collection;
-import java.util.function.Function;
-
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.Collection;
+import java.util.function.Function;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	
@@ -19,7 +19,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	private final ResourceLocation baseRingLocationAlternate;
 	
 	public ThickRingTextureAtlasSprite(ResourceLocation spriteName, ResourceLocation baseRingLocation) {
-		super(spriteName.toString());
+		super(spriteName, 32, 32);
 		
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = null;
@@ -33,14 +33,14 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	 * @param baseRingLocationAlternate
 	 */
 	public ThickRingTextureAtlasSprite(ResourceLocation spriteName, ResourceLocation baseRingLocation, ResourceLocation baseRingLocationAlternate) {
-		super(spriteName.toString());
+		super(spriteName, 32, 32);
 		
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = baseRingLocationAlternate;
 	}
 	
 	@Override
-	public boolean hasCustomLoader(net.minecraft.client.resources.IResourceManager manager, net.minecraft.util.ResourceLocation location) {
+	public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
 		return true;
 	}
 	
@@ -52,10 +52,10 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		}
 		
 		//A basic check that fits 80% of the time.  Usually the ringed texture's resource ends in "top" e.g. "log_oak_top"
-		if(baseRingLocation.getResourcePath().endsWith("top")) {
+		if(baseRingLocation.getPath().endsWith("top")) {
 			return baseRingLocation;
 		}
-		if(baseRingLocationAlternate.getResourcePath().endsWith("top")) {
+		if(baseRingLocationAlternate.getPath().endsWith("top")) {
 			return baseRingLocationAlternate;
 		}
 		
@@ -119,20 +119,20 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	@Override
 	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
 		TextureAtlasSprite baseTexture = textureGetter.apply(solveRingTexture(textureGetter));
-		int srcWidth = baseTexture.getIconWidth();
-		int srcHeight = baseTexture.getIconHeight();
+		int srcWidth = baseTexture.getWidth();
+		int srcHeight = baseTexture.getHeight();
 		
-		this.width = srcWidth * 3;
-		this.height = srcHeight * 3;
+//		this.width = srcWidth * 3;
+//		this.height = srcHeight * 3;
 		
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
 		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 		
 		//Load the pixels into the TextureAtlasSprite
-		int mipmapLevels = baseTexture.getFrameTextureData(0).length;
-		int[][] textureData = new int[mipmapLevels][];
-		textureData[0] = majPixbuf.pixels;// only generate texture data for the first mipmap level, let Minecraft handle the rest
-		this.setFramesTextureData(Lists.<int[][]>newArrayList(textureData));
+//		int mipmapLevels = baseTexture.getFrameTextureData(0).length;
+//		int[][] textureData = new int[mipmapLevels][];
+//		textureData[0] = majPixbuf.pixels;// only generate texture data for the first mipmap level, let Minecraft handle the rest
+//		this.setFramesTextureData(Lists.<int[][]>newArrayList(textureData));
 		
 		return false;
 	}
@@ -162,19 +162,19 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		for(int nesting = 0; nesting < 3; nesting++) {
 			int edge = 2;
 			int pixbufSel = 0;
-			for(EnumFacing dir : EnumFacing.HORIZONTALS) { //SWNE
-				EnumFacing out = dir;
-				EnumFacing ovr = dir.rotateY();
-				int offX = out.getFrontOffsetX();
-				int offY = out.getFrontOffsetZ();
+			for(Direction dir : CoordUtils.HORIZONTALS) { //SWNE
+				Direction out = dir;
+				Direction ovr = dir.rotateY();
+				int offX = out.getXOffset();
+				int offY = out.getZOffset();
 				int compX = (offX == 1 ? -6 : 0) + (dir.getAxis() == Axis.Z ? -2 : 0);
 				int compY = (offY == 1 ? -6 : 0) + (dir.getAxis() == Axis.X ? -2 : 0);
 				int startX = offX * (14 + nesting * 6);
 				int startY = offY * (14 + nesting * 6);
 				for(int way = -1; way <= 1; way+=2) {
 					for(int i = 0; i < 4 + nesting; i++) {
-						int rowX = ovr.getFrontOffsetX() * i * way * 4;
-						int rowY = ovr.getFrontOffsetZ() * i * way * 4;
+						int rowX = ovr.getXOffset() * i * way * 4;
+						int rowY = ovr.getZOffset() * i * way * 4;
 						int realX = centerX + startX + compX + rowX;
 						int realY = centerY + startY + compY + rowY;
 						edges[((pixbufSel++ * 13402141) >> 1) & 3].blit(majPixbuf, realX * scale, realY * scale, edge);

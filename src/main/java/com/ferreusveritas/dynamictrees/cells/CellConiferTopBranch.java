@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public class CellConiferTopBranch implements ICell {
 
@@ -15,7 +15,7 @@ public class CellConiferTopBranch implements ICell {
 
 	//Used for giving more hydration if the below block is also a branch
 	@Override
-	public int getValueFromSide(EnumFacing side) {
+	public int getValueFromSide(Direction side) {
 		return map[side.ordinal()];
 	}
 	

@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-	
 public interface IAnimationHandler {
 	String getName();
 	void initMotion(EntityFallingTree entity);
@@ -12,10 +11,10 @@ public interface IAnimationHandler {
 	void dropPayload(EntityFallingTree entity);
 	boolean shouldDie(EntityFallingTree entity);
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks);
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	boolean shouldRender(EntityFallingTree entity);
 
 }

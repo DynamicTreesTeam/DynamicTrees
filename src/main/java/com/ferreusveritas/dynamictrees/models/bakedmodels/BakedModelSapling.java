@@ -1,30 +1,29 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Function;
-
-import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.SpeciesProperty;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.function.Function;
 
 
 /**
@@ -32,7 +31,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author ferreusveritas
  *
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class BakedModelSapling implements IBakedModel {
 	
 	private static IBakedModel[] modelMap;
@@ -45,56 +44,56 @@ public class BakedModelSapling implements IBakedModel {
 		return bakedModel != null ? bakedModel : errorSaplingModel;
 	}
 	
-	public BakedModelSapling(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+//	public BakedModelSapling(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+//
+//		try {
+//			IModel model = ModelLoaderRegistry.getModel(new ResourceLocation(DynamicTrees.MODID, "block/saplings/error"));
+//			if(model != null) {
+//				errorSaplingModel = model.bake(state, format, bakedTextureGetter);
+//			}
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		particleTexture = bakedTextureGetter.apply(new ResourceLocation("blocks/dirt"));
+//
+//		modelMap = new IBakedModel[Species.REGISTRY.getEntries().size()];
+//
+//		int modelId = 0;
+//
+//		for(Entry<ResourceLocation, Species> entry : Species.REGISTRY.getEntries()) {
+//			Species species = entry.getValue();
+//			ResourceLocation resLoc = species.getSaplingName();
+//			species.saplingModelId = modelId;
+//			if(species != Species.NULLSPECIES) {
+//				try {
+//					IModel model = ModelLoaderRegistry.getModel(new ResourceLocation(resLoc.getResourceDomain(), "block/saplings/" + resLoc.getResourcePath()));
+//					if(model != null) {
+//						modelMap[modelId] = model.bake(state, format, bakedTextureGetter);
+//					}
+//				}
+//				catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			modelId++;
+//		}
+//
+//	}
 
-		try {
-			IModel model = ModelLoaderRegistry.getModel(new ResourceLocation(ModConstants.MODID, "block/saplings/error"));
-			if(model != null) {
-				errorSaplingModel = model.bake(state, format, bakedTextureGetter);
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		particleTexture = bakedTextureGetter.apply(new ResourceLocation("blocks/dirt"));
-		
-		modelMap = new IBakedModel[Species.REGISTRY.getEntries().size()];
-		
-		int modelId = 0;
-		
-		for(Entry<ResourceLocation, Species> entry : Species.REGISTRY.getEntries()) {
-			Species species = entry.getValue();
-			ResourceLocation resLoc = species.getSaplingName();
-			species.saplingModelId = modelId;
-			if(species != Species.NULLSPECIES) {
-				try {
-					IModel model = ModelLoaderRegistry.getModel(new ResourceLocation(resLoc.getResourceDomain(), "block/saplings/" + resLoc.getResourcePath()));
-					if(model != null) {
-						modelMap[modelId] = model.bake(state, format, bakedTextureGetter);
-					}
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			modelId++;
-		}
-		
-	}
-	
 	@Override
-	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
 		List<BakedQuad> quads = new ArrayList<>(12);
-		
-		if (state != null && state.getBlock() instanceof BlockDynamicSapling && state instanceof IExtendedBlockState) {
-			Species species = ((IExtendedBlockState) state).getValue(SpeciesProperty.SPECIES);
-			quads.addAll(getModelForSapling(species).getQuads(ModBlocks.blockDynamicSapling.getDefaultState(), side, rand));
-		}
-		
+
+//		if (state != null && state.getBlock() instanceof BlockDynamicSapling && state instanceof BlockState) {
+//			Species species = ((BlockState) state).get(SpeciesProperty.SPECIES);
+//			quads.addAll(getModelForSapling(species).getQuads(DTRegistries.blockDynamicSapling.getDefaultState(), side, rand));
+//		}
+
 		return quads;
 	}
-	
+
 	@Override
 	public boolean isAmbientOcclusion() {
 		return true;

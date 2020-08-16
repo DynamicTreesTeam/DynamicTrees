@@ -1,26 +1,25 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.Random;
-import java.util.function.Function;
-
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+
+import java.util.Random;
+import java.util.function.Function;
 
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	
-	public NoiseGeneratorPerlin noiseGenerator;
+	public PerlinNoiseGenerator noiseGenerator;
 	protected final TreeGenerator treeGenerator;
 	protected final World world;
 	protected int pass;
 	protected Function<Integer, Integer> chunkMultipass;
 	
 	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, World world) {
-		noiseGenerator = new NoiseGeneratorPerlin(new Random(96), 1);
+		noiseGenerator = new PerlinNoiseGenerator(new Random(96), 1);
 		this.world = world;
 		this.treeGenerator = treeGenerator;
 	}

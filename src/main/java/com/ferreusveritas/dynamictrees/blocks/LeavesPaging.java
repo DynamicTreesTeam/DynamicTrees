@@ -1,26 +1,22 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.ModContainer;
+import org.apache.logging.log4j.core.util.Loader;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * This class provides a mechanism for mapping leaves sub blocks to
@@ -44,8 +40,9 @@ public class LeavesPaging {
 		
 	private static String autoModId(@Nullable String modid) {
 		if(modid == null || "".equals(modid)) {
-			ModContainer mc = Loader.instance().activeModContainer();
-			modid = mc == null ? ModConstants.MODID : mc.getModId();
+//			ModContainer mc = Loader.getClassLoader();
+			modid = DynamicTrees.MODID;
+//			modid = mc == null ? DynamicTrees.MODID : mc.getModId();
 		}
 		return modid;
 	}
@@ -60,22 +57,22 @@ public class LeavesPaging {
 		modLastSeq.put(modid, seq + 1);
 		return seq;
 	}
-	
+
 	public static int getLastSequenceNumber(@Nullable String modid) {
 		return modLastSeq.computeIfAbsent(autoModId(modid), i -> 0) - 1;
 	}
-	
+
 	public static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, @Nonnull ILeavesProperties leavesProperties) {
 		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq);
 		int tree = seq & 3;
-		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().withProperty(BlockDynamicLeaves.TREE, tree));
+		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().with(BlockDynamicLeaves.TREE, tree));
 		leaves.setProperties(tree, leavesProperties);
 		return leaves;
 	}
-	
+
 	/**
 	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
-	 * 
+	 *
 	 * @param modid
 	 * @param seq
 	 * @return
@@ -83,63 +80,64 @@ public class LeavesPaging {
 	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq) {
 		int key = seq / 4;
 		String regname = "leaves" + key;
-		
-		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
+
+//		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
+		return null;
 	}
-	
+
 	/**
 	 * 	Get the map of leaves from for the appropriate modid.
 	 *  If the map does not exist then one is created.
-	 * 
+	 *
 	 * @param modid The ModId of the mod accessing this
 	 * @return The map of {@link BlockDynamicLeaves}
 	 */
 	public static Map<Integer, BlockDynamicLeaves> getLeavesMapForModId(@Nullable String modid) {
 		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
 	}
-	
+
 	public static Map<String, ILeavesProperties> buildAll(Object ... leavesProperties) {
 		return buildAllForMod(autoModId(""), leavesProperties);
 	}
-	
+
 	public static Map<String, ILeavesProperties> buildAllForMod(String modid, Object ... leavesProperties) {
 		Map<String, ILeavesProperties> leafMap = new HashMap<>();
-		
+
 		for(int i = 0; i < (leavesProperties.length & ~1); i+=2) {
 			String label = leavesProperties[i].toString();
 			Object obj = leavesProperties[i+1];
-			
+
 			ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
-			
+
 			if(obj instanceof ILeavesProperties) {
 				newLp = (ILeavesProperties) obj;
 			} else
 			if(obj instanceof String && !"".equals(obj)) {
 				newLp = new LeavesPropertiesJson((String) obj);
 			}
-			
+
 			getNextLeavesBlock(modid, newLp);
 			leafMap.put(label, newLp);
 		}
-		
+
 		return leafMap;
 	}
-	
+
 	public static Map<String, ILeavesProperties> build(String jsonData) {
 		return build(autoModId(""), jsonData);
 	}
-	
+
 	public static Map<String, ILeavesProperties> build(String modid, String jsonData) {
 		return build(modid, LeavesPropertiesJson.getJsonObject(jsonData));
 	}
-	
+
 	public static Map<String, ILeavesProperties> build(JsonObject root) {
 		return build(autoModId(""), root);
 	}
-	
+
 	public static Map<String, ILeavesProperties> build(String modid, JsonObject root) {
 		Map<String, ILeavesProperties> leafMap = new HashMap<>();
-		
+
 		if(root != null) {
 			for(Entry<String, JsonElement> entry : root.entrySet()) {
 				String label = entry.getKey();
@@ -152,10 +150,10 @@ public class LeavesPaging {
 				leafMap.put(label, newLp);
 			}
 		}
-		
+
 		return leafMap;
 	}
-	
+
 	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
 		return build(autoModId(""), jsonLocation);
 	}
@@ -165,22 +163,22 @@ public class LeavesPaging {
 		if(element != null && element.isJsonObject()) {
 			return build(element.getAsJsonObject());
 		}
-		
-		Logger.getLogger(ModConstants.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + modid + " at " + jsonLocation);
-				
+
+		Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + modid + " at " + jsonLocation);
+
 		return null;
 	}
-	
-	@SideOnly(Side.CLIENT)
-	public static void setStateMappers() {
-		LeavesStateMapper mapper = new LeavesStateMapper();
-		for(String modId : modLeavesArray.keySet()) {
-			LeavesPaging.getLeavesMapForModId(modId).forEach((key,leaves) -> ModelLoader.setCustomStateMapper(leaves, mapper));
-		}
-	}
-	
+
+//	@OnlyIn(Dist.CLIENT)
+//	public static void setStateMappers() {
+//		LeavesStateMapper mapper = new LeavesStateMapper();
+//		for(String modId : modLeavesArray.keySet()) {
+//			LeavesPaging.getLeavesMapForModId(modId).forEach((key, leaves) -> ModelLoader.setCustomStateMapper(leaves, mapper));
+//		}
+//	}
+
 	/**
-	 * Frees up the memory since this is only used during startup 
+	 * Frees up the memory since this is only used during startup
 	 */
 	public static void cleanUp() {
 		modLeavesArray = new HashMap<>();

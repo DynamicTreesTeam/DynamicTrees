@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import net.minecraft.world.biome.Biome;
 
 public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
@@ -27,7 +26,7 @@ public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 				String simple = prim.getAsString();
 				if("standard".equals(simple)) {
 					//Start dropping tree spawn opportunities when the radius gets bigger than 3
-					dbase.setChanceSelector(biome, (rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL, Operation.REPLACE); 
+					dbase.setChanceSelector(biome, (rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL, Operation.REPLACE);
 				}
 			}
 		}

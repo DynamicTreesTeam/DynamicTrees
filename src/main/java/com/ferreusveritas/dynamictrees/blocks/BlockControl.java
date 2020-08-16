@@ -1,19 +1,19 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.item.BlockItemUseContext;
 
 public class BlockControl extends Block {
 	
 	public BlockControl() {
-		super(Material.AIR);
+		super(Properties.create(Material.AIR));
 	}
-	
+
 	@Override
-	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean isReplaceable(BlockState state, BlockItemUseContext useContext) {
 		return false;
 	}
-	
+
 }

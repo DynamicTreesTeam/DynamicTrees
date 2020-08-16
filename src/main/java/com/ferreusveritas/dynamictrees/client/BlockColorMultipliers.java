@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class BlockColorMultipliers {
 	
 	private static Map<String, IBlockColor> colorBase = new HashMap<>();

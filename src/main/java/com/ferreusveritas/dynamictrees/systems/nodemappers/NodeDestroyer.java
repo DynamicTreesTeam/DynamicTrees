@@ -1,18 +1,17 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Destroys all branches on a tree and the surrounding leaves.
@@ -33,7 +32,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
@@ -47,7 +46,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

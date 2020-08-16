@@ -1,15 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import java.util.ArrayList;
-
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.JoCode.CodeCompiler;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 public class NodeCoder implements INodeInspector {
 	
@@ -31,16 +30,16 @@ public class NodeCoder implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		
 		Link link = new Link(pos);
 		
 		//We've reached the end of a branch and we're starting again.
 		for(int i = links.size() - 1; i >= 0; i--) {//We start at the end because that's the most likely place we came from
 			Link l = links.get(i);
-			if(	pos.getX() + fromDir.getFrontOffsetX() == l.pos.getX() && 
-				pos.getY() + fromDir.getFrontOffsetY() == l.pos.getY() && 
-				pos.getZ() + fromDir.getFrontOffsetZ() == l.pos.getZ()) {
+			if(	pos.getX() + fromDir.getXOffset() == l.pos.getX() &&
+				pos.getY() + fromDir.getYOffset() == l.pos.getY() &&
+				pos.getZ() + fromDir.getZOffset() == l.pos.getZ()) {
 				//Create linkage
 				l.links[fromDir.getOpposite().ordinal()] = link;
 				link.links[fromDir.ordinal()] = l;
@@ -55,22 +54,22 @@ public class NodeCoder implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
-	
+
 	public byte[] compile(JoCode joCode) {
-		CodeCompiler cc = new CodeCompiler();
-				
+		JoCode.CodeCompiler cc = new JoCode.CodeCompiler();
+
 		if(links.size() > 0) {
 			nextLink(cc, links.get(0), null);
 		}
-		
+
 		return cc.compile();
 	}
 	
-	private void nextLink(CodeCompiler cc, Link link, Link fromLink) {
-		
+	private void nextLink(JoCode.CodeCompiler cc, Link link, Link fromLink) {
+
 		for(int dir = 0; dir < 6; dir++) {
 			Link l = link.links[dir];
 			if(l != null && l != fromLink) {

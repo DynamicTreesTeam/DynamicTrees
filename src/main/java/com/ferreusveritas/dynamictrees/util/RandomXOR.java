@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.Random;
-
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Random;
 
 public class RandomXOR extends Random {
 

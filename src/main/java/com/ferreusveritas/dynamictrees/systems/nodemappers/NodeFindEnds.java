@@ -1,14 +1,13 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Finds all branch end points.
@@ -22,21 +21,21 @@ public class NodeFindEnds implements INodeInspector {
 	
 	public NodeFindEnds() { //Array is provided for you
 		this.endPoints = new ArrayList<BlockPos>(32);
-		last = BlockPos.ORIGIN;
+		last = BlockPos.ZERO;
 	}
 	
 	public NodeFindEnds(List<BlockPos> ends) { //Or use your own
 		this.endPoints = ends;
-		last = BlockPos.ORIGIN;
+		last = BlockPos.ZERO;
 	}
 	
 	@Override
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		return true;
 	}
 	
 	@Override
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		
 		//Okay.. so.. a little explanation. If we are only one block away from the last block we returned from then we can't be on an end
 		BlockPos dPos = pos.subtract(last);

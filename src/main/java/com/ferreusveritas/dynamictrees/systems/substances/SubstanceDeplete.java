@@ -2,9 +2,6 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -14,11 +11,11 @@ public class SubstanceDeplete implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
-		if(dirt.fertilize(world, rootPos, -amount)) {
-			TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_ANGRY, 8);
-			return true;
-		}
+//		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
+//		if(dirt.fertilize(world, rootPos, -amount)) {
+//			TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_ANGRY, 8);
+//			return true;
+//		}
 		return false;
 	}
 	

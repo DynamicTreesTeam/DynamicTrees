@@ -1,22 +1,22 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import java.util.Iterator;
-
-import com.ferreusveritas.dynamictrees.ModConfigs;
-
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.Iterator;
 
 public class DropEventHandler {
 	
 	@SubscribeEvent
 	public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {
 
-		if(ModConfigs.worldGen && ModConfigs.enableAppleTrees) {
-			if(event.getState().getBlock() == Blocks.LEAVES || event.getState().getBlock() == Blocks.LEAVES2) {
+		if(DTConfigs.worldGen.get() && DTConfigs.enableAppleTrees.get()) {
+			if(event.getState().getBlock() instanceof LeavesBlock) {
 				Iterator<ItemStack> iter = event.getDrops().iterator();
 				while(iter.hasNext()) {
 					ItemStack stack = iter.next();

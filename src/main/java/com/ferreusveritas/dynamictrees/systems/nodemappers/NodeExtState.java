@@ -1,49 +1,47 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.IExtendedBlockState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
-* Makes a BlockPos -> IExtendedBlockState map for all of the branches
+* Makes a BlockPos -> BlockState map for all of the branches
 * @author ferreusveritas
 */
 public class NodeExtState implements INodeInspector {
 	
-	private final Map<BlockPos, IExtendedBlockState> map = new HashMap<>();
+	private final Map<BlockPos, BlockState> map = new HashMap<>();
 	private final BlockPos origin;
-	
+
 	public NodeExtState(BlockPos origin) {
 		this.origin = origin;
 	}
-	
-	public Map<BlockPos, IExtendedBlockState> getExtStateMap() {
+
+	public Map<BlockPos, BlockState> getExtStateMap() {
 		return map;
 	}
-	
+
 	@Override
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
-		
+
 		if(branch != null) {
-			map.put(pos.subtract(origin), (IExtendedBlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
+			map.put(pos.subtract(origin), (BlockState) blockState.getBlock().getExtendedState(blockState, world, pos));
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
-	
+
 }

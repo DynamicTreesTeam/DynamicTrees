@@ -1,15 +1,15 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.Random;
-
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+
+import java.util.Random;
 
 public class BlockRootySand extends BlockRooty {
 	
@@ -21,7 +21,7 @@ public class BlockRootySand extends BlockRooty {
 	
 	public BlockRootySand(String name, boolean isTileEntity) {
 		super(name, Material.SAND, isTileEntity);
-		setSoundType(SoundType.SAND);
+//		setSoundType(SoundType.SAND);
 	}
 	
 	///////////////////////////////////////////
@@ -29,7 +29,7 @@ public class BlockRootySand extends BlockRooty {
 	///////////////////////////////////////////
 	
 	@Override
-	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
+	public BlockState getMimic(IBlockReader access, BlockPos pos) {
 		return MimicProperty.getSandMimic(access, pos);
 	}
 	
@@ -38,21 +38,21 @@ public class BlockRootySand extends BlockRooty {
 	// INTERACTION
 	///////////////////////////////////////////
 	
-	public IBlockState getDecayBlockState(IBlockAccess access, BlockPos pos) {
+	public BlockState getDecayBlockState(IBlockReader access, BlockPos pos) {
 		return Blocks.SAND.getDefaultState();
 	}
 	
-	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return Item.getItemFromBlock(Blocks.SAND);
-	}
-	
+//	@Override
+//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
+//		return Item.getItemFromBlock(Blocks.SAND);
+//	}
+//
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
 	
 	@Override
-	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+	public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
 		return layer == BlockRenderLayer.CUTOUT_MIPPED || layer == BlockRenderLayer.SOLID;
 	}
 	

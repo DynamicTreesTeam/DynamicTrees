@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.featuregen;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -12,13 +10,14 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+
+import java.util.List;
 
 public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	
@@ -46,20 +45,20 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 * @return The modified position of the rooty dirt that is one block higher
 	 */
 	@Override
-	public BlockPos preGeneration(World world, BlockPos rootPos, Species species, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
+	public BlockPos preGeneration(World world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(radius >= moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//worldgen test
-			IBlockState initialDirtState = world.getBlockState(rootPos);
-			IBlockState initialUnderState = world.getBlockState(rootPos.down());
+			BlockState initialDirtState = world.getBlockState(rootPos);
+			BlockState initialUnderState = world.getBlockState(rootPos.down());
 			
-			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.GROUND && initialUnderState.getMaterial() != Material.ROCK)) {
+			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.EARTH && initialUnderState.getMaterial() != Material.ROCK)) {
 				Biome biome = world.getBiome(rootPos);
-				initialUnderState = biome.fillerBlock;
+				initialUnderState = biome.getSurfaceBuilderConfig().getTop();
 			}
 			
 			rootPos = rootPos.up();
 			
 			for(Cell cell: moundMap.getAllNonZeroCells()) {
-				IBlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
+				BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
 				world.setBlockState(rootPos.add(cell.getPos()), placeState);
 			}
 		}
@@ -73,13 +72,13 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 */
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
 			BlockPos treePos = rootPos.up();
-			IBlockState belowState = world.getBlockState(rootPos.down());
+			BlockState belowState = world.getBlockState(rootPos.down());
 			
 			//Place dirt blocks around rooty dirt block if tree has a > 8 radius
-			IBlockState branchState = world.getBlockState(treePos);
+			BlockState branchState = world.getBlockState(treePos);
 			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BlockBranch.RADMAX_NORMAL) {
 				for(Surround dir: Surround.values()) {
 					BlockPos dPos = rootPos.add(dir.getOffset());

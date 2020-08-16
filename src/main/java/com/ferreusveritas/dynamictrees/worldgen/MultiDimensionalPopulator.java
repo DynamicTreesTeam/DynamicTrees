@@ -1,15 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.io.File;
-
-import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.minecraft.util.ResourceLocation;
+
+import java.io.File;
 
 /**
  * A simple loader that reads a JSON file and facilitates database population
@@ -54,14 +53,14 @@ public class MultiDimensionalPopulator {
 						defaultPopulator.populate(database);
 						
 						//This creates a link for the dimension id to this new database
-						TreeGenerator.getTreeGenerator().linkDimensionToDataBase(dim, database);
+//						TreeGenerator.getTreeGenerator().linkDimensionToDataBase(new Di, database);
 						
 						//Apply all of the referred json files
 						for(JsonElement filename : files) {
 							if(filename.isJsonPrimitive()) {
-								File file = new File(ModConfigs.configDirectory.getAbsolutePath() + "/" + filename.getAsString());
+//								File file = new File(DTConfigs.configDirectory.getAbsolutePath() + "/" + filename.getAsString());
 								//Each populator overwrites the results of the previous one in succession
-								new BiomeDataBasePopulatorJson(JsonHelper.load(file)).populate(database);
+//								new BiomeDataBasePopulatorJson(JsonHelper.load(file)).populate(database);
 							}
 						}
 						

@@ -15,8 +15,7 @@ public interface ISubstanceEffect {
 	 * For an instant effect.
 	 * 
 	 * @param world
-	 * @param dirt
-	 * @param rootPos 
+	 * @param rootPos
 	 * @return true for success.  false otherwise
 	 */
 	public boolean apply(World world, BlockPos rootPos);
@@ -25,7 +24,6 @@ public interface ISubstanceEffect {
 	 * For a continuously updating effect.
 	 * 
 	 * @param world
-	 * @param dirt
 	 * @param rootPos
 	 * @param deltaTicks
 	 * @return true to stay alive. false to kill effector

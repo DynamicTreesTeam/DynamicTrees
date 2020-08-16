@@ -1,17 +1,16 @@
 package com.ferreusveritas.dynamictrees.systems;
 
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Random;
 
 public class GrowSignal {
 	
 	//Forward data
 	public float energy;
-	public EnumFacing dir;
+	public Direction dir;
 	public int numTurns;
 	public int numSteps;
 	private Species species;
@@ -32,7 +31,7 @@ public class GrowSignal {
 	public GrowSignal(Species species, BlockPos rootPos, float energy) {
 		this.species = species;
 		this.energy = energy;
-		dir = EnumFacing.UP;
+		dir = Direction.UP;
 		radius = 0.0f;
 		numTurns = 0;
 		numSteps = 0;
@@ -61,7 +60,7 @@ public class GrowSignal {
 		return success;
 	}
 	
-	public boolean doTurn(EnumFacing targetDir) {
+	public boolean doTurn(Direction targetDir) {
 		if(dir != targetDir) {//Check for a direction change
 			dir = targetDir;
 			numTurns++;

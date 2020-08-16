@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -15,7 +14,7 @@ public class NullLogic implements IGrowthLogicKit {
 	}
 	
 	@Override
-	public EnumFacing newDirectionSelected(Species species, EnumFacing newDir, GrowSignal signal) {
+	public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
 		return newDir;
 	}
 	

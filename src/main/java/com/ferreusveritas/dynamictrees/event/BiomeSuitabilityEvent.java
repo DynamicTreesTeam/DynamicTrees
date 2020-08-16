@@ -1,15 +1,14 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 @Cancelable
-public class BiomeSuitabilityEvent extends Event  {
+public class BiomeSuitabilityEvent extends Event {
 
 	protected World world;
 	protected Biome biome;

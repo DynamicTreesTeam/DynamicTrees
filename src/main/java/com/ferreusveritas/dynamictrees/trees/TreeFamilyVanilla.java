@@ -1,13 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.ModBlocks;
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-
-import net.minecraft.block.BlockNewLog;
-import net.minecraft.block.BlockOldLog;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.init.Blocks;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -18,25 +13,25 @@ import net.minecraft.util.ResourceLocation;
  */
 public class TreeFamilyVanilla extends TreeFamily {
 	
-	public final BlockPlanks.EnumType woodType;
+	public final DynamicTrees.VanillaWoodTypes woodType;
 	
-	public TreeFamilyVanilla(BlockPlanks.EnumType wood) {
-		super(new ResourceLocation(ModConstants.MODID, wood.getName().replace("_","")));
+	public TreeFamilyVanilla(DynamicTrees.VanillaWoodTypes wood) {
+		super(new ResourceLocation(DynamicTrees.MODID, wood.toString().replace("_","")));
 		
 		woodType = wood;
 		getCommonLeaves().setTree(this);
 		
 		//Setup tree references
-		boolean isOld = wood.getMetadata() < 4;
-		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
+//		boolean isOld = wood.getMetadata() < 4;
+//		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
 				
 		//Setup common species
-		getCommonSpecies().generateSeed();
+//		getCommonSpecies().generateSeed();
 	}
 	
 	@Override
 	public ILeavesProperties getCommonLeaves() {
-		return ModBlocks.leaves.get(getName().getResourcePath());
+		return DTRegistries.leaves.get(getName().getPath());
 	}
-	
+
 }

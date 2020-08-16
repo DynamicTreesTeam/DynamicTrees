@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import com.ferreusveritas.dynamictrees.util.SimpleBitmap;
-
 import net.minecraft.util.math.BlockPos;
 
 public class PoissonDisc extends Vec2i {
@@ -10,7 +9,7 @@ public class PoissonDisc extends Vec2i {
 	public int arc;
 	public boolean real;
 	
-	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles 
+	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles
 	private static SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
 	
 	static {

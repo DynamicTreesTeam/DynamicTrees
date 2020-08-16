@@ -1,16 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import java.util.List;
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * This exists solely to aid in the creation of a cleaner anonymous class.
@@ -43,7 +41,7 @@ public class DropCreator implements IDropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		return dropList;
 	}
 

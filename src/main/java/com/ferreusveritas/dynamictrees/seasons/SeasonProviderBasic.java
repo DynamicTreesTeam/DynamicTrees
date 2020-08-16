@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.seasons;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 /**
@@ -53,11 +53,11 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	public void notifyPlayersOfDate(World world) {
 		
 		String dayString = String.valueOf(day + 1) + numeralSuffix[(day + 1) % 10]; 
-		String dataString = dayString + " of " + monthNames[month] + " " + String.valueOf(year) + " S:" + seasonNames[(int) Math.floor(season)] + " [" + String.format("%1.2f", season) + "] M:" + world.getMoonPhase() + " V:" + world.getWorldTime();
+		String dataString = dayString + " of " + monthNames[month] + " " + String.valueOf(year) + " S:" + seasonNames[(int) Math.floor(season)] + " [" + String.format("%1.2f", season) + "] M:" + world.getMoonPhase() + " V:" + world.getGameTime();
 		
 		if(!world.isRemote) {
-			for(EntityPlayer player : world.playerEntities) {
-				player.sendMessage(new TextComponentString("Date: " + dataString));
+			for(PlayerEntity player : world.getPlayers()) {
+				player.sendMessage(new StringTextComponent("Date: " + dataString));
 			}
 		}
 	}

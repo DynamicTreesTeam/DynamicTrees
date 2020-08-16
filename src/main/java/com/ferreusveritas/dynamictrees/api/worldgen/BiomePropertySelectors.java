@@ -1,16 +1,14 @@
 package com.ferreusveritas.dynamictrees.api.worldgen;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Provides the forest density for a given biome.
@@ -19,7 +17,7 @@ import net.minecraft.world.biome.Biome;
  * @author ferreusveritas
  */
 public class BiomePropertySelectors {
-	
+
 	public interface IChanceSelector {
 		EnumChance getChance(Random random, @Nonnull Species species, int radius);
 	}
@@ -29,9 +27,9 @@ public class BiomePropertySelectors {
 	}
 
 	public interface ISpeciesSelector {
-		SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random);
+		SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random);
 	}
-	
+
 	/**
 	 * This is the data that represents a species selection.
 	 * This class was necessary to have an unhandled state.
@@ -39,29 +37,29 @@ public class BiomePropertySelectors {
 	public static class SpeciesSelection {
 		private boolean handled;
 		private final Species species;
-		
+
 		public SpeciesSelection() {
 			handled = false;
 			species = Species.NULLSPECIES;
 		}
-		
+
 		public SpeciesSelection(@Nonnull Species species) {
 			this.species = species;
 			handled = true;
 		}
-		
+
 		public boolean isHandled() {
 			return handled;
 		}
-		
+
 		public Species getSpecies() {
 			return species;
 		}
 	}
-	
+
 	public static class StaticSpeciesSelector implements ISpeciesSelector {
 		final SpeciesSelection decision;
-		
+
 		public StaticSpeciesSelector(SpeciesSelection decision) {
 			this.decision = decision;
 		}
@@ -69,17 +67,17 @@ public class BiomePropertySelectors {
 		public StaticSpeciesSelector(@Nonnull Species species) {
 			this(new SpeciesSelection(species));
 		}
-		
+
 		public StaticSpeciesSelector() {
 			this(new SpeciesSelection());
 		}
-		
+
 		@Override
-		public SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random) {
+		public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random) {
 			return decision;
 		}
 	}
-	
+
 	public static class RandomSpeciesSelector implements ISpeciesSelector {
 
 		private class Entry {
@@ -87,35 +85,35 @@ public class BiomePropertySelectors {
 				decision = d;
 				weight = w;
 			}
-			
+
 			public SpeciesSelection decision;
 			public int weight;
 		}
-		
+
 		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
 		int totalWeight;
-		
+
 		public int getSize() {
 			return decisionTable.size();
 		}
-		
+
 		public RandomSpeciesSelector add(@Nonnull Species species, int weight) {
 			decisionTable.add(new Entry(new SpeciesSelection(species), weight));
 			totalWeight += weight;
 			return this;
 		}
-		
+
 		public RandomSpeciesSelector add(int weight) {
 			decisionTable.add(new Entry(new SpeciesSelection(), weight));
 			totalWeight += weight;
 			return this;
-			
+
 		}
-		
+
 		@Override
-		public SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random) {
+		public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random) {
 			int chance = random.nextInt(totalWeight);
-			
+
 			for(Entry entry: decisionTable) {
 				if(chance < entry.weight) {
 					return entry.decision;
@@ -125,10 +123,10 @@ public class BiomePropertySelectors {
 
 			return decisionTable.get(decisionTable.size() - 1).decision;
 		}
-		
+
 	}
-	
-	
+
+
 	public enum EnumChance {
 		OK,
 		CANCEL,

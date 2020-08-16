@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.cells;
 
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
 public class CellKits {
@@ -30,12 +30,12 @@ public class CellKits {
 	}
 	
 	public CellKits() {
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "deciduous"), deciduous);
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "conifer"), conifer);
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "acacia"), acacia);
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "darkoak"), darkoak);
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "bare"), bare);
-		TreeRegistry.registerCellKit(new ResourceLocation(ModConstants.MODID, "palm"), palm);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "deciduous"), deciduous);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "conifer"), conifer);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "acacia"), acacia);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "darkoak"), darkoak);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "bare"), bare);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "palm"), palm);
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {
@@ -147,7 +147,7 @@ public class CellKits {
 			final int map[] = {0, 3, 5, 5, 5, 5};
 			
 			@Override
-			public int getValueFromSide(EnumFacing side) {
+			public int getValueFromSide(Direction side) {
 				return map[side.ordinal()];
 			}
 			
@@ -274,8 +274,8 @@ public class CellKits {
 			}
 						
 			@Override
-			public int getValueFromSide(EnumFacing side) {
-				return side == EnumFacing.UP ? getValue() : 0;
+			public int getValueFromSide(Direction side) {
+				return side == Direction.UP ? getValue() : 0;
 			}
 			
 		};
@@ -356,7 +356,7 @@ public class CellKits {
 		public int solve(ICell[] cells) {
 			int nv[] = new int[16];//neighbor hydration values
 			
-			for(EnumFacing dir: EnumFacing.VALUES) {
+			for(Direction dir: Direction.values()) {
 				nv[cells[dir.ordinal()].getValueFromSide(dir.getOpposite())]++;
 			}
 						

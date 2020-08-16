@@ -6,9 +6,8 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -23,11 +22,11 @@ public class NodeInflator implements INodeInspector {
 	public NodeInflator(Species species, SimpleVoxmap leafMap) {
 		this.species = species;
 		this.leafMap = leafMap;
-		last = BlockPos.ORIGIN;
+		last = BlockPos.ZERO;
 	}
 	
 	@Override
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 				
 		if(branch != null){
@@ -38,7 +37,7 @@ public class NodeInflator implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {
+	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		//Calculate Branch Thickness based on neighboring branches
 		
 		BlockBranch branch = TreeHelper.getBranch(blockState);
@@ -47,7 +46,7 @@ public class NodeInflator implements INodeInspector {
 			float areaAccum = radius * radius;//Start by accumulating the branch we just came from
 			boolean isTwig = true;
 			
-			for(EnumFacing dir: EnumFacing.VALUES) {
+			for(Direction dir: Direction.values()) {
 				if(!dir.equals(fromDir)) {//Don't count where the signal originated from
 					
 					BlockPos dPos = pos.offset(dir);
@@ -57,7 +56,7 @@ public class NodeInflator implements INodeInspector {
 						continue;
 					}
 					
-					IBlockState deltaBlockState = world.getBlockState(dPos);
+					BlockState deltaBlockState = world.getBlockState(dPos);
 					ITreePart treepart = TreeHelper.getTreePart(deltaBlockState);
 					if(branch.isSameTree(treepart)) {
 						int branchRadius = treepart.getRadius(deltaBlockState);

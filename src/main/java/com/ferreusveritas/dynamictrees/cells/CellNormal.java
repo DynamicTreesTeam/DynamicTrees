@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * Cell that simply returns it's value
@@ -24,7 +24,7 @@ public class CellNormal implements ICell {
 	}
 
 	@Override
-	public int getValueFromSide(EnumFacing side) {
+	public int getValueFromSide(Direction side) {
 		return value;
 	}
 	

@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -13,7 +12,7 @@ public class JungleLogic implements IGrowthLogicKit {
 	@Override
 	public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
 		
-		EnumFacing originDir = signal.dir.getOpposite();
+		Direction originDir = signal.dir.getOpposite();
 		
 		int treeHash = CoordUtils.coordHashCode(signal.rootPos, 2);
 		int posHash = CoordUtils.coordHashCode(pos, 2);
@@ -39,8 +38,8 @@ public class JungleLogic implements IGrowthLogicKit {
 	}
 	
 	@Override
-	public EnumFacing newDirectionSelected(Species species, EnumFacing newDir, GrowSignal signal) {
-		if(signal.isInTrunk() && newDir != EnumFacing.UP) {//Turned out of trunk
+	public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
+		if(signal.isInTrunk() && newDir != Direction.UP) {//Turned out of trunk
 			signal.energy = 4.0f;
 		}
 		return newDir;

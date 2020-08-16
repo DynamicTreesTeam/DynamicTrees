@@ -1,16 +1,12 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.function.Function;
-
-import com.ferreusveritas.dynamictrees.ModConfigs;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IChanceSelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IDensitySelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ISpeciesSelector;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
-
-import net.minecraft.init.Biomes;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.function.Function;
 
 public class BiomeDataBase {
 	
@@ -26,20 +22,20 @@ public class BiomeDataBase {
 	private final BiomeEntry table[][] = new BiomeEntry[16][];
 	
 	public BiomeEntry getEntry(Biome biome) {
-		if(biome != null) {
-			int biomeId = Biome.getIdForBiome(biome);//This should only return 0 - 255 because of Minecraft limitations
-			if (biomeId >= 0 && biomeId <= 255 ) {//Enforce 0-255 for biome id to account for misbehaving mods like Mystcraft
-				BiomeEntry list[] = table[biomeId >> 4];
-				if(list == null) {
-					list = table[biomeId >> 4] = new BiomeEntry[16];
-					for(int i = 0; i < 16; i++) {
-						list[i] = BADENTRY;
-					}
-				}
-				BiomeEntry entry = list[biomeId & 0x0f];
-				return entry != BADENTRY ? entry : (list[biomeId & 0x0f] = new BiomeEntry(biome, biomeId));
-			}
-		}
+//		if(biome != null) {
+//			int biomeId = Biome.getIdForBiome(biome);//This should only return 0 - 255 because of Minecraft limitations
+//			if (biomeId >= 0 && biomeId <= 255 ) {//Enforce 0-255 for biome id to account for misbehaving mods like Mystcraft
+//				BiomeEntry list[] = table[biomeId >> 4];
+//				if(list == null) {
+//					list = table[biomeId >> 4] = new BiomeEntry[16];
+//					for(int i = 0; i < 16; i++) {
+//						list[i] = BADENTRY;
+//					}
+//				}
+//				BiomeEntry entry = list[biomeId & 0x0f];
+//				return entry != BADENTRY ? entry : (list[biomeId & 0x0f] = new BiomeEntry(biome, biomeId));
+//			}
+//		}
 		return BADENTRY;
 	}
 	
@@ -50,7 +46,7 @@ public class BiomeDataBase {
 	}
 	
 	public boolean isValid() {
-		for(Biome biome: Biome.REGISTRY) {
+		for(Biome biome: ForgeRegistries.BIOMES) {
 			BiomeEntry entry = getEntry(biome);
 			if(entry.getBiome() != biome) {
 				return false;
@@ -261,7 +257,7 @@ public class BiomeDataBase {
 	}
 	
 	public BiomeDataBase setForestness(Biome biome, float forestness) {
-		getEntry(biome).setForestness(Math.max(forestness, ModConfigs.seedMinForestness));
+		getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.seedMinForestness.get()));
 		return this;
 	}
 	

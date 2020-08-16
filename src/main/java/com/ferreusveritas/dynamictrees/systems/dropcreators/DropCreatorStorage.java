@@ -1,21 +1,15 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.*;
 
 /**
  * This works somewhat like a loot table except much more powerful.
@@ -29,7 +23,7 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 
 	@Override
 	public ResourceLocation getName() {
-		return new ResourceLocation(ModConstants.MODID, "storage");
+		return new ResourceLocation(DynamicTrees.MODID, "storage");
 	}
 	
 	@Override
@@ -83,7 +77,7 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 	}
 	
 	@Override
-	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {

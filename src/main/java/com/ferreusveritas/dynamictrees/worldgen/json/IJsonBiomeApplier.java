@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.minecraft.world.biome.Biome;
 
 public interface IJsonBiomeApplier {

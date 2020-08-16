@@ -1,12 +1,11 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
 import com.google.common.collect.AbstractIterator;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
 * A simple implementation of a voxel map
@@ -174,7 +173,7 @@ public class SimpleVoxmap {
 	}
 	
 	public SimpleVoxmap filter(BlockPos from, BlockPos to, IFilterOp op) {
-		for(MutableBlockPos pos : BlockPos.getAllInBoxMutable(from, to) ) {
+		for(BlockPos pos : BlockPos.getAllInBoxMutable(from, to) ) {
 			setVoxel(pos, op.getOp(getVoxel(pos)));
 		}
 		return this;
@@ -356,13 +355,13 @@ public class SimpleVoxmap {
 					private int dataPos = -1;
 					private boolean yclean;
 					private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
-					
+
 					@Override
 					protected MutableBlockPos computeNext() {
-						
+
 						main:
 						while(true) {
-							
+
 							if (x < lenX - 1) {
 								x++;//Move to read next cell on x axis
 							}
@@ -375,14 +374,14 @@ public class SimpleVoxmap {
 								//We have completed an x and z scan of a y layer.
 								x = -1;//Reset the x to just before the first cell for another y layer
 								z = 0;//Reset z for another y layer
-								
+
 								//Once we get here we have completed an entire y layer scan
 								//if the layer is clean then we mark it as such to self optimize
 								touched[y] = !yclean;
-								
+
 								y++;//Bump up a layer
 								yclean = true; //Let's pretend this new layer is clean
-								
+
 								while(y < lenY) {
 									if(touched[y]) {
 										continue main;//We suspect there's data on this layer so let's hit it
@@ -391,26 +390,26 @@ public class SimpleVoxmap {
 									y++;//Bump up a layer
 									yclean = true; //Let's pretend this new layer is clean
 								}
-								
+
 								return this.endOfData();//There's no more data
 							}
-							
+
 							if((data[++dataPos] & mask) > 0) {
 								yclean = false; //We found non-zero data.  Therefore this y layer is dirty
 								return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
 							}
 						}
-						
+
 					}
-					
+
 				};
 			}
 		};
 	}
-	
+
 	/** Create an Iterable that returns all top(Y-axis) positions in the map whose value is non-zero */
 	public Iterable<MutableBlockPos> getTops() {
-		
+
 		return new Iterable<MutableBlockPos>() {
 			@Override
 			public Iterator<MutableBlockPos> iterator() {

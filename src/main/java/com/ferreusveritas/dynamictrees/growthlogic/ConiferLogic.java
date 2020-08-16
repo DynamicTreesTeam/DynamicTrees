@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -51,7 +50,7 @@ public class ConiferLogic implements IGrowthLogicKit {
 	@Override
 	public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
 		
-		EnumFacing originDir = signal.dir.getOpposite();
+		Direction originDir = signal.dir.getOpposite();
 		
 		//Alter probability map for direction change
 		probMap[0] = 0;//Down is always disallowed for spruce
@@ -65,8 +64,8 @@ public class ConiferLogic implements IGrowthLogicKit {
 	}
 	
 	@Override
-	public EnumFacing newDirectionSelected(Species species, EnumFacing newDir, GrowSignal signal) {
-		if(signal.isInTrunk() && newDir != EnumFacing.UP){//Turned out of trunk
+	public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
+		if(signal.isInTrunk() && newDir != Direction.UP){//Turned out of trunk
 			signal.energy /= energyDivisor;
 			if (signal.energy > horizontalLimiter) signal.energy = horizontalLimiter;
 		}
@@ -78,7 +77,7 @@ public class ConiferLogic implements IGrowthLogicKit {
 	//so we feed the hash function the in-game month
 	@Override
 	public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {
-		long day = world.getTotalWorldTime() / 24000L;
+		long day = world.getGameTime() / 24000L;
 		int month = (int)day / 30;//Change the hashs every in-game month
 		
 		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function

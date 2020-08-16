@@ -1,23 +1,22 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 @Cancelable
-public class SeedVoluntaryPlantEvent extends Event  {
+public class SeedVoluntaryPlantEvent extends Event {
 
-	protected EntityItem seedEntityItem;
+	protected ItemEntity seedEntityItem;
 	protected ItemStack seedStack;
 	protected Species species;
 	protected BlockPos pos;//Where the sapling will be created
 	protected boolean willPlant = false;
 	
-	public SeedVoluntaryPlantEvent(EntityItem entityItem, Species species, BlockPos pos, boolean willPlant) {
+	public SeedVoluntaryPlantEvent(ItemEntity entityItem, Species species, BlockPos pos, boolean willPlant) {
 		this.seedEntityItem = entityItem;
 		this.pos = pos;
 		this.species = species;
@@ -32,7 +31,7 @@ public class SeedVoluntaryPlantEvent extends Event  {
 		this.species = species;
 	}
 	
-	public EntityItem getEntityItem() {
+	public ItemEntity getEntityItem() {
 		return seedEntityItem;
 	}
 	
@@ -43,7 +42,7 @@ public class SeedVoluntaryPlantEvent extends Event  {
 	/**
 	 * Use this to force the seed to plant regardless of it's natural chances
 	 *  
-	 * @param force true to force sapling to plant.  false will allow nature to take it's coarse.
+	 * @param willPlant true to force sapling to plant.  false will allow nature to take it's coarse.
 	 */
 	public void setWillPlant(boolean willPlant) {
 		this.willPlant = willPlant;

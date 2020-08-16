@@ -1,21 +1,20 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import java.util.List;
-import java.util.Random;
-
-import com.ferreusveritas.dynamictrees.ModConstants;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.List;
+import java.util.Random;
+
 public class DropCreatorLogs extends DropCreator {
 
 	public DropCreatorLogs() {
-		super(new ResourceLocation(ModConstants.MODID, "logs"));
+		super(new ResourceLocation(DynamicTrees.MODID, "logs"));
 	}
 
 	@Override

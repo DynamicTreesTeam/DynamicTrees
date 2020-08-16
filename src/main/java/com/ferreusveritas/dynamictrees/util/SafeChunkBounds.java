@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 
 public class SafeChunkBounds {
 	
@@ -49,17 +48,17 @@ public class SafeChunkBounds {
 
 		for(Tile t : tiles) {
 			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
-			Chunk c = world.getChunkProvider().getLoadedChunk(cp.x, cp.z);
-			chunkBounds[t.index] = c != null ? new BlockBounds(cp) : BlockBounds.INVALID;
+			boolean c = world.getChunkProvider().isChunkLoaded(new ChunkPos(cp.x, cp.z));
+			chunkBounds[t.index] = c ? new BlockBounds(cp) : BlockBounds.INVALID;
 		}
 
 		for(Tile t : tiles) {
 			BlockBounds curr = chunkBounds[t.index];
 			if(curr != BlockBounds.INVALID) {
-				for(EnumFacing dir : EnumFacing.HORIZONTALS) {
+				for(Direction dir : CoordUtils.HORIZONTALS) {
 					boolean validDir = false;
 					if((t.borders & (1 << dir.getIndex())) != 0) {
-						BlockBounds adjTile = chunkBounds[t.index + dir.getFrontOffsetX() + dir.getFrontOffsetZ() * 4];
+						BlockBounds adjTile = chunkBounds[t.index + dir.getXOffset() + dir.getZOffset() * 4];
 						validDir = adjTile != BlockBounds.INVALID;
 					}
 					if(!validDir) {
@@ -95,11 +94,11 @@ public class SafeChunkBounds {
 		return inBounds(min, gap) && inBounds(max, gap) && inBounds(new BlockPos(min.getX(), 0, max.getZ()), gap) && inBounds(new BlockPos(max.getX(), 0, min.getZ()), gap);
 	}
 	
-	public void setBlockState(World world, BlockPos pos, IBlockState state, boolean gap) {
+	public void setBlockState(World world, BlockPos pos, BlockState state, boolean gap) {
 		setBlockState(world, pos, state, 3, gap);
 	}
 	
-	public void setBlockState(World world, BlockPos pos, IBlockState state, int flags, boolean gap) {
+	public void setBlockState(World world, BlockPos pos, BlockState state, int flags, boolean gap) {
 		if(inBounds(pos, gap)) {
 			world.setBlockState(pos, state, flags);
 		}

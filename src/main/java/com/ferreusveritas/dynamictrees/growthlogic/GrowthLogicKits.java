@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.ModTrees;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import net.minecraft.util.ResourceLocation;
 
 public class GrowthLogicKits {
@@ -15,10 +14,10 @@ public class GrowthLogicKits {
 	}
 	
 	public GrowthLogicKits() {
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(ModConstants.MODID, ModTrees.NULL), new NullLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(ModConstants.MODID, ModTrees.DARKOAK), new DarkOakLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(ModConstants.MODID, ModTrees.CONIFER), new ConiferLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(ModConstants.MODID, ModTrees.JUNGLE), new JungleLogic());
+		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.NULL), new NullLogic());
+		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.DARKOAK), new DarkOakLogic());
+		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.CONIFER), new ConiferLogic());
+		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.JUNGLE), new JungleLogic());
 	}
 	
 }

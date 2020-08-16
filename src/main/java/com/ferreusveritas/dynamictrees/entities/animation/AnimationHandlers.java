@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * 
@@ -24,10 +23,8 @@ public class AnimationHandlers {
 		public void initMotion(EntityFallingTree entity) {
 			super.initMotion(entity);
 			
-			EnumFacing cutDir = entity.getDestroyData().cutDir;
-			entity.motionX += cutDir.getOpposite().getFrontOffsetX() * 0.1;
-			entity.motionY += cutDir.getOpposite().getFrontOffsetY() * 0.1;
-			entity.motionZ += cutDir.getOpposite().getFrontOffsetZ() * 0.1;
+			Direction cutDir = entity.getDestroyData().cutDir;
+			entity.addVelocity(cutDir.getOpposite().getXOffset() * 0.1,cutDir.getOpposite().getYOffset() * 0.1,cutDir.getOpposite().getZOffset() * 0.1);
 		}
 		
 	};
