@@ -57,14 +57,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 
-	public static final IProperty[] CONNECTIONS = {
-			IntegerProperty.create("radiusd", 0, 8),
-			IntegerProperty.create("radiusu", 0, 8),
-			IntegerProperty.create("radiusn", 0, 8),
-			IntegerProperty.create("radiuss", 0, 8),
-			IntegerProperty.create("radiusw", 0, 8),
-			IntegerProperty.create("radiuse", 0, 8)
-	};
+//	public static final IntegerProperty[] CONNECTIONS = {
+//			IntegerProperty.create("radiusd", 0, 8),
+//			IntegerProperty.create("radiusu", 0, 8),
+//			IntegerProperty.create("radiusn", 0, 8),
+//			IntegerProperty.create("radiuss", 0, 8),
+//			IntegerProperty.create("radiusw", 0, 8),
+//			IntegerProperty.create("radiuse", 0, 8)
+//	};
 
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
 
@@ -160,16 +160,16 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	// RENDERING
 	///////////////////////////////////////////
 
+	@Override
+	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return false;
+	}
+
 //	@Override
 //	public static boolean isOpaque(VoxelShape shape) {
 //		return false;
 //	}
-//
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//
+
 //	@Override
 //	public boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
 //		return true;

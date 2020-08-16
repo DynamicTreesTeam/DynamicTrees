@@ -94,7 +94,7 @@ public class ModelEntityFallingTree {
 			BlockState exState = destructionData.getBranchBlockState(0);
 			if(exState != null) {
 				for(Direction face: Direction.values()) {
-					exState = exState.with(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
+//					exState = exState.with(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
 				}
 				int radius = ((BlockBranch) exState.getBlock()).getRadius(exState);
 				float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;

@@ -55,18 +55,15 @@ public class BlockBranchBasic extends BlockBranch {
 	// Trees are mostly made of wood
 	public BlockBranchBasic(String name) {
 		this(Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
+		this.setDefaultState(this.getDefaultState().with(RADIUS, 1));
+
 	}
 
 	// Useful for more unique subclasses
 	public BlockBranchBasic(Properties properties, String name) {
 		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0), name); //aaaaand they also sound like wood.
-		this.setDefaultState(this.getDefaultState().with(RADIUS, 1));
 
 		cacheBranchStates();
-	}
-
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS);
 	}
 
 	@Nullable
@@ -95,38 +92,19 @@ public class BlockBranchBasic extends BlockBranch {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
-//	@Override
-//	protected BlockStateContainer createBlockState() {
-//		IProperty[] listedProperties = { RADIUS };
-//		return new BlockState(this, listedProperties, CONNECTIONS);
-//	}
-
-	/**
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-//	@Override
-//	public BlockState getStateFromMeta(int meta) {
-//		return this.getDefaultState().with(RADIUS, (meta & 7) + 1);
-//	}
-//
-//	/**
-//	 * Convert the BlockState into the correct metadata value
-//	 */
-//	@Override
-//	public int getMetaFromState(BlockState state) {
-//		return state.getValue(RADIUS) - 1;
-//	}
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(RADIUS);
+	}
 
 	@Override
 	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
 		if (state != null) {
-			BlockState retval = state;
 			int thisRadius = getRadius(state);
 
-			for (Direction dir : Direction.values()) {
-				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
-			}
-			return retval;
+//			for (Direction dir : Direction.values()) {
+//				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+//			}
+			return state;
 		}
 
 		return state;
@@ -369,7 +347,7 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
 
 		if (state.getBlock() != this) {
 			return VoxelShapes.empty();

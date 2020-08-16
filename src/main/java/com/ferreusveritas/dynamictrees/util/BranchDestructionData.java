@@ -134,10 +134,10 @@ public class BranchDestructionData {
 
 	private int encodeBranchesConnections(BlockState exState) {
 		int result = 0;
-		for(Direction face : Direction.values()) {
-			int rad = (int) exState.get(BlockBranch.CONNECTIONS[face.getIndex()]);
-			result |= (rad & 0x1F) << (face.getIndex() * 5);//5 bits per face * 6 faces = 30bits
-		}
+//		for(Direction face : Direction.values()) {
+//			int rad = (int) exState.get(BlockBranch.CONNECTIONS[face.getIndex()]);
+//			result |= (rad & 0x1F) << (face.getIndex() * 5);//5 bits per face * 6 faces = 30bits
+//		}
 		return result;
 	}
 
@@ -163,15 +163,15 @@ public class BranchDestructionData {
 
 	private BlockState decodeBranchBlockState(int encodedRadPos, int encodedConnections) {
 		BlockBranch branch = (BlockBranch)species.getFamily().getDynamicBranch();
-		if(branch instanceof BlockBranch) {
+		if(branch != null) {
 			int radius = decodeBranchRadius(encodedRadPos);
 			BlockState state = branch.getStateForRadius(radius);
-			if(state instanceof BlockState) {
+			if(state != null) {
 				BlockState exState = (BlockState) state;
-				for(Direction face : Direction.values()) {
-					int rad = (int) (encodedConnections >> (face.getIndex() * 5) & 0x1F);
-					exState = exState.with(BlockBranch.CONNECTIONS[face.getIndex()], MathHelper.clamp(rad, 0, 8));
-				}
+//				for(Direction face : Direction.values()) {
+//					int rad = (int) (encodedConnections >> (face.getIndex() * 5) & 0x1F);
+//					exState = exState.with(BlockBranch.CONNECTIONS[face.getIndex()], MathHelper.clamp(rad, 0, 8));
+//				}
 				return exState;
 			}
 		}
@@ -286,15 +286,15 @@ public class BranchDestructionData {
 		switch(posType) {
 			default:
 			case BRANCHES:
-				getter = absolute ? i -> getBranchRelPos(i).add(cutPos) : i -> getBranchRelPos(i);
+				getter = absolute ? i -> getBranchRelPos(i).add(cutPos) : this::getBranchRelPos;
 				limit = getNumBranches();
 				break;
 			case ENDPOINTS:
-				getter = absolute ? i -> getEndPointRelPos(i).add(cutPos) : i -> getEndPointRelPos(i);
+				getter = absolute ? i -> getEndPointRelPos(i).add(cutPos) : this::getEndPointRelPos;
 				limit = getNumEndpoints();
 				break;
 			case LEAVES:
-				getter = absolute ? i -> getLeavesRelPos(i).add(cutPos) : i -> getLeavesRelPos(i);
+				getter = absolute ? i -> getLeavesRelPos(i).add(cutPos) : this::getLeavesRelPos;
 				limit = getNumLeaves();
 				break;
 		}

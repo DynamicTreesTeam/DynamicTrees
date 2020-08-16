@@ -31,6 +31,7 @@ public class DTRegistries {
 	///////////////////////////////////////////
     public static Block test;
     public static BlockBranchBasic testBranch;
+    public static BlockBranchThick testThickBranch;
 
     public static BlockRooty blockRootyDirt;
     public static BlockRooty blockRootySand;
@@ -49,6 +50,9 @@ public class DTRegistries {
     public static void setupBlocks() {
         test = new TESTBLOCK();
         testBranch = new BlockBranchBasic("testbranch");
+        testThickBranch = new BlockBranchThick("testbranchthick");
+
+        blockTrunkShell = new BlockTrunkShell();
     }
 
     public static void setupLeavesProperties() {
@@ -62,6 +66,10 @@ public class DTRegistries {
 
         registry.register(test);
         registry.register(testBranch);
+        registry.register(testThickBranch);
+        registry.register(testThickBranch.otherBlock);
+
+        registry.register(blockTrunkShell);
     }
 
     ///////////////////////////////////////////
