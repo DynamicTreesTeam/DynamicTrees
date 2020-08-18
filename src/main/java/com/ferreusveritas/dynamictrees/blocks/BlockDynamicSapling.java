@@ -9,12 +9,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class BlockDynamicSapling extends Block{ // implements ITileEntityProvider, IGrowable {
 
@@ -188,15 +189,16 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	}
 //
 //
-//	///////////////////////////////////////////
-//	// PHYSICAL BOUNDS
-//	///////////////////////////////////////////
-//
-//	@Override
-//	public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader access, BlockPos pos) {
-//		return getSpecies(access, pos, state).getSaplingBoundingBox();
-//	}
-//
+	///////////////////////////////////////////
+	// PHYSICAL BOUNDS
+	///////////////////////////////////////////
+
+
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
+		return getSpecies(access, pos, state).getSaplingShape();
+	}
+
 //	///////////////////////////////////////////
 //	// RENDERING
 //	///////////////////////////////////////////

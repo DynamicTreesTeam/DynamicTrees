@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -16,17 +18,35 @@ public class TreeFamilyVanilla extends TreeFamily {
 	public final DynamicTrees.VanillaWoodTypes woodType;
 	
 	public TreeFamilyVanilla(DynamicTrees.VanillaWoodTypes wood) {
-		super(new ResourceLocation(DynamicTrees.MODID, wood.toString().replace("_","")));
+		super(new ResourceLocation(DynamicTrees.MODID, wood.toString()));
 		
 		woodType = wood;
-		getCommonLeaves().setTree(this);
-		
+//		getCommonLeaves().setTree(this);
+
 		//Setup tree references
-//		boolean isOld = wood.getMetadata() < 4;
-//		setPrimitiveLog((isOld ? Blocks.LOG : Blocks.LOG2).getDefaultState().withProperty(isOld ? BlockOldLog.VARIANT : BlockNewLog.VARIANT, wood));
-				
+		switch (wood){
+			case darkoak:
+				setPrimitiveLog(Blocks.DARK_OAK_LOG);
+				break;
+			case acacia:
+				setPrimitiveLog(Blocks.ACACIA_LOG);
+				break;
+			case jungle:
+				setPrimitiveLog(Blocks.JUNGLE_LOG);
+				break;
+			case birch:
+				setPrimitiveLog(Blocks.BIRCH_LOG);
+				break;
+			case spruce:
+				setPrimitiveLog(Blocks.SPRUCE_LOG);
+				break;
+			case oak:
+				setPrimitiveLog(Blocks.OAK_LOG);
+				break;
+		}
+
 		//Setup common species
-//		getCommonSpecies().generateSeed();
+		getCommonSpecies().generateSeed();
 	}
 	
 	@Override

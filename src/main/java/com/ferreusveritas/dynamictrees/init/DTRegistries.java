@@ -1,10 +1,15 @@
 package com.ferreusveritas.dynamictrees.init;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamilyVanilla;
+import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -14,14 +19,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -52,12 +56,15 @@ public class DTRegistries {
         testBranch = new BlockBranchBasic("testbranch");
         testThickBranch = new BlockBranchThick("testbranchthick");
 
+        blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
         blockTrunkShell = new BlockTrunkShell();
+        blockApple = new BlockFruit();
+        blockDynamicSapling = new BlockDynamicSapling("sapling");
     }
 
     public static void setupLeavesProperties() {
- //       leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
- //       leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
+//        leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
+//        leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
     }
 
     @SubscribeEvent
@@ -69,7 +76,24 @@ public class DTRegistries {
         registry.register(testThickBranch);
         registry.register(testThickBranch.otherBlock);
 
-        registry.register(blockTrunkShell);
+        ArrayList<Block> treeBlocks = new ArrayList<Block>();
+        DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+//        DTRegistries.dynamicCactus.getRegisterableBlocks(treeBlocks);
+        treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(DynamicTrees.MODID).values());
+
+        registry.registerAll(
+//                blockRootyDirt,
+//                blockRootySand,
+//                blockRootyDirtSpecies,
+                blockRootyDirtFake,
+                blockDynamicSapling,
+//                blockBonsaiPot,
+//                blockFruitCocoa,
+                blockApple,
+                blockTrunkShell
+        );
+
+        registry.registerAll(treeBlocks.toArray(new Block[0]));
     }
 
     ///////////////////////////////////////////
@@ -89,10 +113,18 @@ public class DTRegistries {
     public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
         IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 
-        registry.register(dirtBucket);
-        registry.register(treeStaff);
+        ArrayList<Item> treeItems = new ArrayList<Item>();
+        DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
+//        DTRegistries.dynamicCactus.getRegisterableItems(treeItems);
+
+        registry.registerAll(
+//                dendroPotion,
+                dirtBucket,
+                treeStaff);
+        registry.registerAll(treeItems.toArray(new Item[0]));
 
         Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
+        registry.register(new BlockItem(blockRootyDirtFake, properties).setRegistryName(Objects.requireNonNull(blockRootyDirtFake.getRegistryName())));
         registry.register(new BlockItem(test, properties).setRegistryName(Objects.requireNonNull(test.getRegistryName())));
     }
 
@@ -106,24 +138,22 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onEntitiesRegistry(final RegistryEvent.Register<EntityType<?>> entityRegistryEvent) {
-
     }
 
     ///////////////////////////////////////////
     //TILE ENTITIES
     ///////////////////////////////////////////
 
-
-    @SubscribeEvent
-    public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
-//        tileEntityRegistryEvent.getRegistry().register();
-    }
-
     public static void setupTileEntities() {
         //In 1.13 these will need to change to the proper Dynamic Trees domain but unfortunately for now it'll have
         //to stay in the minecraft domain for backwards compatibility with existing worldsaves.
 //        GameRegistry.registerTileEntity(TileEntitySpecies.class, new ResourceLocation("minecraft", "species_tile_entity"));
 //        GameRegistry.registerTileEntity(TileEntityBonsai.class, new ResourceLocation("minecraft", "bonsai_tile_entity"));
+    }
+
+    @SubscribeEvent
+    public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
+//        tileEntityRegistryEvent.getRegistry().register();
     }
 
     ///////////////////////////////////////////

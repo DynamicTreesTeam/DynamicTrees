@@ -1,68 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-//import com.ferreusveritas.dynamictrees.DynamicTrees;
-//import com.ferreusveritas.dynamictrees.DTRegistries.
-//import com.ferreusveritas.dynamictrees.DTConfigs.
-//import com.ferreusveritas.dynamictrees.ModConstants;
-//import com.ferreusveritas.dynamictrees.api.*;
-//import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-//import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-//import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
-//import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-//import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-//import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-//import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
-//import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-//import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-//import com.ferreusveritas.dynamictrees.blocks.*;
-//import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-//import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
-//import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
-//import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
-//import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-//import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
-//import com.ferreusveritas.dynamictrees.items.Seed;
-//import com.ferreusveritas.dynamictrees.systems.*;
-//import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
-//import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
-//import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
-//import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
-//import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
-//import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
-//import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
-//import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
-//import com.ferreusveritas.dynamictrees.util.CoordUtils;
-//import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-//import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-//import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-//import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
-//import net.minecraft.block.Block;
-//import net.minecraft.block.SoundType;
-//import net.minecraft.block.BlockState;
-//import net.minecraft.entity.item.EntityItem;
-//import net.minecraft.entity.player.EntityPlayer;
-//import net.minecraft.init.Blocks;
-//import net.minecraft.init.Items;
-//import net.minecraft.item.Item;
-//import net.minecraft.item.ItemStack;
-//import net.minecraft.util.Direction;
-//import net.minecraft.util.EnumHand;
-//import net.minecraft.util.ResourceLocation;
-//import net.minecraft.util.math.AxisAlignedBB;
-//import net.minecraft.util.math.BlockPos;
-//import net.minecraft.util.math.MathHelper;
-//import net.minecraft.util.math.Vec3d;
-//import net.minecraft.world.World;
-//import net.minecraft.world.World;
-//import net.minecraft.world.biome.Biome;
-//import net.minecraftforge.common.BiomeDictionary;
-//import net.minecraftforge.common.BiomeDictionary.Type;
-//import net.minecraftforge.common.MinecraftForge;
-//import net.minecraftforge.common.util.Constants.NBT;
-//import net.minecraftforge.event.RegistryEvent;
-//import net.minecraftforge.registries.IForgeRegistry;
-//import net.minecraftforge.registries.RegistryBuilder;
-
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -83,6 +20,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
@@ -99,6 +37,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -109,8 +49,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -143,16 +87,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * The proper place to use this is during the preInit phase of your mod.
 	 */
 	public static IForgeRegistry<Species> REGISTRY;
-
-	public static void newRegistry(RegistryEvent.NewRegistry event) {
-		REGISTRY = new RegistryBuilder<Species>()
-				.setName(new ResourceLocation(DynamicTrees.MODID, "species"))
-				.setDefaultKey(new ResourceLocation(DynamicTrees.MODID, "null"))
-				.disableSaving()
-				.setType(Species.class)
-				.setIDRange(0, Integer.MAX_VALUE - 1)
-				.create();
-	}
 
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
 	protected final TreeFamily treeFamily;
@@ -229,15 +163,15 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
 		this.treeFamily = treeFamily;
-//		setLeavesProperties(leavesProperties);
-//
-//		setStandardSoils();
-//		seedStack = new ItemStack(Seed.NULLSEED);
-//		saplingBlock = Blocks.AIR.getDefaultState();
-//
-//		//Add JoCode models for worldgen
-//		addJoCodes();
-//		addDropCreator(new DropCreatorLogs());
+		setLeavesProperties(leavesProperties);
+
+		setStandardSoils();
+		seedStack = new ItemStack(Seed.NULLSEED);
+		saplingBlock = Blocks.AIR.getDefaultState();
+
+		//Add JoCode models for worldgen
+		addJoCodes();
+		addDropCreator(new DropCreatorLogs());
 	}
 
 	public boolean isValid() {
@@ -502,10 +436,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 		return true;
 	}
-//
-//	///////////////////////////////////////////
-//	//SAPLING
-//	///////////////////////////////////////////
+
+	///////////////////////////////////////////
+	//SAPLING
+	///////////////////////////////////////////
 
 	/**
 	 * Checks surroundings and places a dynamic sapling block.
@@ -555,8 +489,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return false;
 	}
 
-	public AxisAlignedBB getSaplingBoundingBox() {
-		return new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f);
+	public VoxelShape getSaplingShape() {
+		return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f));
 	}
 
 	//This is used to load the sapling model
@@ -978,10 +912,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	// BIOME HANDLING
 	//////////////////////////////
 
-//	public Species envFactor(Type type, float factor) {
-//		envFactors.put(type, factor);
-//		return this;
-//	}
+	public Species envFactor(BiomeDictionary.Type type, float factor) {
+		envFactors.put(type, factor);
+		return this;
+	}
 
 	/**
 	*
@@ -1034,22 +968,22 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public static final float defaultSuitability() {
 		return 0.85f;
 	}
-//
-//	/**
-//	* A convenience function to test if a biome is one of the many options passed.
-//	*
-//	* @param biomeToCheck The biome we are matching
-//	* @param biomes Multiple biomes to match against
-//	* @return True if a match is found. False if not.
-//	*/
-//	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome... biomes) {
-//		for(Biome biome: biomes) {
-//			if(biomeToCheck == biome) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
+
+	/**
+	* A convenience function to test if a biome is one of the many options passed.
+	*
+	* @param biomeToCheck The biome we are matching
+	* @param biomes Multiple biomes to match against
+	* @return True if a match is found. False if not.
+	*/
+	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome... biomes) {
+		for(Biome biome: biomes) {
+			if(biomeToCheck == biome) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	//////////////////////////////
 	// INTERACTIVE

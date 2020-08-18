@@ -14,6 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -32,21 +33,22 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
-///**
-// * This structure describes a Tree Family whose member Species all have a common wood type.
-// *
-//* A {@link TreeFamily} is more or less just a definition of {@link BlockBranch} blocks.
-//* It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
-//* the tree is made of and consequently what kind of log you get when you cut it down.
-//*
-//* A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
-//* It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
-//* All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
-//* species(the common species).
-//*
-//* @author ferreusveritas
-//*/
+/**
+ * This structure describes a Tree Family whose member Species all have a common wood type.
+ *
+* A {@link TreeFamily} is more or less just a definition of {@link BlockBranch} blocks.
+* It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
+* the tree is made of and consequently what kind of log you get when you cut it down.
+*
+* A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
+* It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
+* All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
+* species(the common species).
+*
+* @author ferreusveritas
+*/
 public class TreeFamily {
 	
 	public final static TreeFamily NULLFAMILY = new TreeFamily() {
@@ -97,7 +99,7 @@ public class TreeFamily {
 	public TreeFamily(ResourceLocation name) {
 		this.name = name;
 
-//		setDynamicBranch(createBranch());
+		setDynamicBranch(createBranch());
 		stick = new ItemStack(Items.STICK);
 		createSpecies();
 	}
@@ -194,15 +196,15 @@ public class TreeFamily {
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		//Register an itemBlock for the branch block
 		Block branch = getDynamicBranch();
-		itemList.add(Item.BLOCK_TO_ITEM.get(branch).setRegistryName(branch.getRegistryName()));
+		itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
 
 		if(isThick()) {
 			//An ItemBlock must be registered in order for Waila to work properly
 			branch = ((BlockBranchThick) branch).getPairSide(true);
-			itemList.add(Item.BLOCK_TO_ITEM.get(branch).setRegistryName(branch.getRegistryName()));
+			itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
 		}
 
-		getCommonSpecies().getSeed().ifValid(s -> itemList.add(s));
+		getCommonSpecies().getSeed().ifValid(itemList::add);
 
 		return itemList;
 	}
@@ -225,17 +227,17 @@ public class TreeFamily {
 	 *
 	 * @return the branch to be created
 	 */
-//	public BlockBranch createBranch() {
-//		String branchName = name + "branch";
-//		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
-//	}
-//
-//	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
-//		dynamicBranch = gBranch;//Link the tree to the branch
-//		dynamicBranch.setFamily(this);//Link the branch back to the tree
-//
-//		return this;
-//	}
+	public BlockBranch createBranch() {
+		String branchName = name + "branch";
+		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
+	}
+
+	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
+		dynamicBranch = gBranch;//Link the tree to the branch
+		dynamicBranch.setFamily(this);//Link the branch back to the tree
+
+		return this;
+	}
 
 	public BlockBranch getDynamicBranch() {
 		return dynamicBranch;
@@ -289,9 +291,9 @@ public class TreeFamily {
 	 * @param primLog A blockstate of the log
 	 * @return TreeFamily for chaining calls
 	 */
-//	protected TreeFamily setPrimitiveLog(BlockState primLog) {
-//		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock()), 1, primLog.getBlock().damageDropped(primLog)));
-//	}
+	protected TreeFamily setPrimitiveLog(BlockState primLog) {
+		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock())));
+	}
 
 	/**
 	 * Used to set the type of log item that a tree drops when it's harvested.
@@ -306,6 +308,9 @@ public class TreeFamily {
 		primitiveLog = primLog;
 		primitiveLogItemStack = primLogStack;
 		return this;
+	}
+	protected TreeFamily setPrimitiveLog(Block primLogBlock) {
+		return this.setPrimitiveLog(primLogBlock.getDefaultState(), new ItemStack(primLogBlock));
 	}
 
 	/**

@@ -1,10 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import com.sun.javafx.geom.Vec3f;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.particle.ParticleManager;
@@ -15,13 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.EnumProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -44,12 +41,14 @@ public class BlockTrunkShell extends Block {
 	public static class ShellMuse {
 		public final BlockState state;
 		public final BlockPos pos;
+		public final BlockPos museOffset;
 		public final Surround dir;
 		
-		public ShellMuse(BlockState state, BlockPos pos, Surround dir) {
+		public ShellMuse(BlockState state, BlockPos pos, Surround dir, BlockPos museOffset) {
 			this.state = state;
 			this.pos = pos;
 			this.dir = dir;
+			this.museOffset = museOffset;
 		}
 		
 		public int getRadius() {
@@ -129,17 +128,23 @@ public class BlockTrunkShell extends Block {
 	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
 		return getMuseUnchecked(access, access.getBlockState(pos), pos);
 	}
-
 	@Nullable
 	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
+		return getMuseUnchecked(access, state, pos, pos);
+	}
+	@Nullable
+	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos, @Nonnull BlockPos originalPos) {
 		Surround museDir = getMuseDir(state, pos);
 		BlockPos musePos = pos.add(museDir.getOffset());
 		BlockState museState = access.getBlockState(musePos);
 		Block block = museState.getBlock();
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
-			return new ShellMuse(museState, musePos, museDir);
+			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
+		} else if (block instanceof BlockTrunkShell){ //If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse
+			if (new Vec3d(((BlockTrunkShell)block).getMuseDir(museState, musePos).getOffset()).add(new Vec3d(museDir.getOffset())).lengthSquared() > 2.25){
+				return (((BlockTrunkShell)block).getMuseUnchecked(access, museState, musePos, originalPos));
+			}
 		}
-
 		return null;
 	}
 
@@ -177,15 +182,26 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
 		ShellMuse muse = getMuse(reader, state, pos);
-		if(muse != null) {
+		if (muse != null){
 			VoxelShape shape = muse.state.getShape(reader, muse.pos);
-			return VoxelShapes.create(shape.getBoundingBox().offset(new BlockPos(muse.dir.getOffset())).intersect(VoxelShapes.fullCube().getBoundingBox()));
+			return VoxelShapes.create(shape.getBoundingBox().offset(muse.museOffset));
 		} else {
 			return VoxelShapes.empty();//NULL_AABB;
 		}
 	}
 
-//	@Override
+	@Override
+	public VoxelShape getCollisionShape(@Nonnull BlockState state,@Nonnull  IBlockReader reader,@Nonnull  BlockPos pos, ISelectionContext context) {
+		ShellMuse muse = getMuse(reader, state, pos);
+		if(muse != null) {
+			VoxelShape shape = muse.state.getShape(reader, muse.pos);
+			return VoxelShapes.create(shape.getBoundingBox().offset(muse.museOffset).intersect(VoxelShapes.fullCube().getBoundingBox()));
+		} else {
+			return VoxelShapes.empty();//NULL_AABB;
+		}
+	}
+
+	//	@Override
 //	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 //		return super.getCollisionShape(state, worldIn, pos, context);
 //	}
@@ -281,7 +297,12 @@ public class BlockTrunkShell extends Block {
 		return 0;
 	}
 
-//	@Override
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.INVISIBLE;
+	}
+
+	//	@Override
 //	public boolean isOpaqueCube(BlockState state) {
 //		return false;
 //	}

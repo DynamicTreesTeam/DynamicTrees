@@ -27,16 +27,18 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
+import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 
 //
 //	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
-	public static final int RADMAX_THICK = 24;
+	public static final int RADMAX_THICK = 32;
 //
 	protected static final IntegerProperty RADIUSNYBBLE = IntegerProperty.create("radius", 0, 15); //39 ?
 	protected final boolean extended;

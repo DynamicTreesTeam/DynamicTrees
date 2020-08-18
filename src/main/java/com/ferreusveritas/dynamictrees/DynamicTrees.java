@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -80,12 +82,12 @@ public class DynamicTrees
 	}
 
 	public enum VanillaWoodTypes {
-        OAK,
-        SPRUCE,
-        BIRCH,
-        JUNGLE,
-        DARKOAK,
-        ACACIA
+        oak,
+        spruce,
+        birch,
+        jungle,
+        darkoak,
+        acacia
     }
 
     public enum EnumDestroyMode {
@@ -108,11 +110,10 @@ public class DynamicTrees
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
-        //MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setup(final FMLCommonSetupEvent event) { //PREINIT
-
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT

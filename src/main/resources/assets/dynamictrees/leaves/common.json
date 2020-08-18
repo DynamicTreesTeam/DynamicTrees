@@ -1,8 +1,8 @@
 {
-	"oak":		{"leaves":"minecraft:leaves variant=oak" },
-	"spruce":	{"leaves":"minecraft:leaves variant=spruce", "color":"@biome", "smother":3, "cellkit":"conifer" },
-	"birch":	{"leaves":"minecraft:leaves variant=birch", "color":"@biome" },
-	"jungle":	{"leaves":"minecraft:leaves variant=jungle", "light":12 },
-	"acacia":	{"leaves":"minecraft:leaves2 variant=acacia", "cellkit":"acacia", "smother":2 },
-	"darkoak":	{"leaves":"minecraft:leaves2 variant=dark_oak", "cellkit":"darkoak", "smother":3 }
+	"oak":		{"leaves":"minecraft:oak_leaves" },
+	"spruce":	{"leaves":"minecraft:spruce_leaves", "color":"@biome", "smother":3, "cellkit":"conifer" },
+	"birch":	{"leaves":"minecraft:birch_leaves", "color":"@biome" },
+	"jungle":	{"leaves":"minecraft:jungle_leaves", "light":12 },
+	"acacia":	{"leaves":"minecraft:acacia_leaves", "cellkit":"acacia", "smother":2 },
+	"darkoak":	{"leaves":"minecraft:dark_oak_leaves", "cellkit":"darkoak", "smother":3 }
 }

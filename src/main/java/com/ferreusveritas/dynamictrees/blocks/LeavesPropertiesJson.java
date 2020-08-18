@@ -34,7 +34,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private int lightRequirement = 13;
 	private int smotherLeavesMax = 4;
-	private JsonObject jsonObj = null;
+	private JsonObject jsonObj;
 	private boolean connectAnyRadius = false;
 	private int flammability = 60;// Mimic vanilla leaves
 	private int fireSpreadSpeed = 30;// Mimic vanilla leaves
