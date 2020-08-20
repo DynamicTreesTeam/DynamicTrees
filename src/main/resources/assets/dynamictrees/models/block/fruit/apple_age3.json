@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "dynamictrees:blocks/apple",
-        "apple": "dynamictrees:blocks/apple"
+        "particle": "dynamictrees:block/apple",
+        "apple": "dynamictrees:block/apple"
     },
     "elements": [
         {   "from": [ 6, 11, 6 ],

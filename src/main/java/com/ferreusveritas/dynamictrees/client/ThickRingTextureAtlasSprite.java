@@ -51,7 +51,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 			return this.baseRingLocation;
 		}
 		
-		//A basic check that fits 80% of the time.  Usually the ringed texture's resource ends in "top" e.g. "log_oak_top"
+		//A basic check that fits 80% of the time.  Usually the ringed texture's resource ends in "top" e.g. "oak_log_top"
 		if(baseRingLocation.getPath().endsWith("top")) {
 			return baseRingLocation;
 		}

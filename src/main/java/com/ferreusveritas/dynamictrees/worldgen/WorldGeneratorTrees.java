@@ -7,7 +7,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //import net.minecraft.block.material.Material;
 //import net.minecraft.block.state.IBlockState;
 //import net.minecraft.init.Blocks;
-//import net.minecraft.util.EnumFacing;
+//import net.minecraft.util.Direction;
 //import net.minecraft.util.math.BlockPos;
 //import net.minecraft.util.math.BlockPos.MutableBlockPos;
 //import net.minecraft.util.math.ChunkPos;
@@ -31,16 +31,16 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //
 //		protected ArrayList<Integer> findSubterraneanLayerHeights(World world, BlockPos start) {
 //
-//			MutableBlockPos pos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
+//			MutableBlockPos pos = new MutableBlockPos(world.getHeight(start)).move(Direction.DOWN);
 //
 //			ArrayList<Integer> layers = new ArrayList();
 //
 //			while(inNetherRange(pos)) {
-//				while(!world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
-//				while(world.isAirBlock(pos) && inNetherRange(pos))  { pos.move(EnumFacing.DOWN); } //Move down 1 block at a time until we hit not-air
+//				while(!world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } //Zip up 4 blocks at a time until we hit air
+//				while(world.isAirBlock(pos) && inNetherRange(pos))  { pos.move(Direction.DOWN); } //Move down 1 block at a time until we hit not-air
 //				if (world.getBlockState(pos).getMaterial() != Material.LAVA) { layers.add(pos.getY()); } //Record this position
-//				pos.move(EnumFacing.UP, 16); //Move up 16 blocks
-//				while(world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit ground
+//				pos.move(Direction.UP, 16); //Move up 16 blocks
+//				while(world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } //Zip up 4 blocks at a time until we hit ground
 //			}
 //
 //			//Discard the last result as it's just the top of the biome(bedrock for nether)
@@ -69,7 +69,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //
 //			Chunk chunk = world.getChunkFromBlockCoords(start);//We'll use a chunk for the search so we don't have to keep looking up the chunk for every block
 //
-//			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.UP, 2);//Mutable allows us to change the test position easily
+//			MutableBlockPos mPos = new MutableBlockPos(world.getHeight(start)).move(Direction.UP, 2);//Mutable allows us to change the test position easily
 //			while(inOverworldRange(mPos)) {
 //
 //				IBlockState state = chunk.getBlockState(mPos);
@@ -85,7 +85,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //					}
 //				}
 //
-//				mPos.move(EnumFacing.DOWN);
+//				mPos.move(Direction.DOWN);
 //			}
 //
 //			return BlockPos.ORIGIN;

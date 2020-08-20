@@ -1,5 +1,13 @@
 package com.ferreusveritas.dynamictrees;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.event.DropEventHandler;
+import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
+import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
+import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -8,6 +16,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -104,16 +113,24 @@ public class DynamicTrees
 
         DTRegistries.setupBlocks();
         DTRegistries.setupItems();
+
+        LeavesPropertiesJson.resolveAll();
         DTRegistries.setupLeavesProperties();
+
         DTRegistries.setupEntities();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
+        registerCommonEventHandlers();
+
         MinecraftForge.EVENT_BUS.register(this);
+
+//        WorldGenRegistry.populateDataBase();
     }
 
     private void setup(final FMLCommonSetupEvent event) { //PREINIT
+
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT
@@ -122,5 +139,35 @@ public class DynamicTrees
 
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) { //SERVER INIT
+    }
+
+    public void cleanUp() {
+        LeavesPropertiesJson.cleanUp();
+        LeavesPaging.cleanUp();
+        TreeRegistry.cleanupCellKit();
+        TreeRegistry.cleanupGrowthLogicKit();
+    }
+
+    public void registerCommonEventHandlers() {
+        //        MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
+//        if(DTConfigs.worldGen.get()) {
+//            MinecraftForge.EVENT_BUS.register(new DropEventHandler());
+//        }
+//
+//        if(Loader.isModLoaded("fastleafdecay")) {
+//            MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
+//        }
+//
+//        //An event for dealing with Vanilla Saplings
+//        if(ModConfigs.replaceVanillaSapling) {
+//            MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
+//        }
+//
+//        //Conveniently accessible disaster(Optional World Generation)
+//        if(WorldGenRegistry.isWorldGenEnabled()) {
+//            GameRegistry.registerWorldGenerator(new WorldGeneratorTrees(), 20);
+//            MinecraftForge.TERRAIN_GEN_BUS.register(new TreeGenCancelEventHandler());
+//            MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
+//        }
     }
 }

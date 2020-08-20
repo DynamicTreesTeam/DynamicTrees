@@ -1,7 +1,7 @@
 {
     "parent": "dynamictrees:item/branch",
     "textures": {
-        "bark": "blocks/log_birch",
-        "rings": "blocks/log_birch_top"
+        "bark": "block/birch_log",
+        "rings": "block/birch_log_top"
     }
 }

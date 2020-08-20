@@ -1,9 +1,9 @@
 {   "parent": "block/block",
     "textures": {
-        "particle": "blocks/cactus_side",
-        "side": "blocks/cactus_side",
-        "top": "blocks/cactus_top",
-				"bottom": "blocks/cactus_bottom"
+        "particle": "block/cactus_side",
+        "side": "block/cactus_side",
+        "top": "block/cactus_top",
+				"bottom": "block/cactus_bottom"
     },
     "display": {
         "fixed": {

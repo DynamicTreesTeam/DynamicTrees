@@ -48,6 +48,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -449,8 +450,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @return true if the planting was successful
 	 */
 	public boolean plantSapling(IWorld world, BlockPos pos) {
-
-		if(world.getBlockState(pos).getBlock().canBeReplacedByLeaves(world.getBlockState(pos), world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+		if(world.getBlockState(pos).getMaterial().isReplaceable() && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
 			DTRegistries.blockDynamicSapling.setSpecies(world, pos, this);
 			return true;
 		}
@@ -587,7 +587,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * later time.
 	 */
 	protected final void setStandardSoils() {
-		addAcceptableSoil(Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM);
+		addAcceptableSoil(Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.GRASS_BLOCK, Blocks.FARMLAND, Blocks.MYCELIUM);
 	}
 
 	/**
@@ -1040,13 +1040,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param player The {@link PlayerEntity} that hit the {@link Block}
 	 * @param hand Hand used to peform the action
 	 * @param heldItem The {@link ItemStack} the {@link PlayerEntity} hit the {@link Block} with.
-	 * @param side The side of the block that was hit.
-	 * @param hitX X axis of hit with hitPos
-	 * @param hitY Y axis of hit with hitPos
-	 * @param hitZ Z axis of hit with hitPos
+	 * @param hit The block ray trace of the clicking action
 	 * @return True if action was handled, false otherwise.
 	 */
-	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
 
 		if (heldItem != null) {//Something in the hand
 			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {

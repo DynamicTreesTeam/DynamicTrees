@@ -1,8 +1,0 @@
-{
-    "variants": {
-        "age=0": { "model": "dynamictrees:apple_age0" },
-        "age=1": { "model": "dynamictrees:apple_age1" },
-        "age=2": { "model": "dynamictrees:apple_age2" },
-        "age=3": { "model": "dynamictrees:apple_age3" }
-    }
-}

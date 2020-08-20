@@ -156,7 +156,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		if (getRadius(state) > 8){
 			setRadius(world, pos, getRadius(state), Direction.DOWN);
 		}
-		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit.getFace(), hit.getPos().getX(), hit.getPos().getY(), hit.getPos().getZ());
+		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit);
 	}
 
 	///////////////////////////////////////////

@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0":"dynamictrees:items/dirtbucket"
+        "layer0":"dynamictrees:item/dirtbucket"
     }
 }

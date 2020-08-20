@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "dynamictrees:darkoakroot#dynamicroot" }
+        "normal": { "model": "dynamictrees:block/darkoakroot#dynamicroot" }
     }
 }

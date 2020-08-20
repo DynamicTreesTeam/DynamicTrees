@@ -1,7 +1,7 @@
 {
     "parent": "block/grass_normal",
     "textures": {
-        "particle": "blocks/dirt",
-        "side": "dynamictrees:blocks/rootydirt-dirt"
+        "particle": "block/dirt",
+        "side": "dynamictrees:block/rootydirt-dirt"
     }
 }

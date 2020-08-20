@@ -51,7 +51,7 @@ import java.util.function.Function;
 //		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
 //		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 //
-//		final Direction[] run = side ? Direction.HORIZONTALS : new Direction[] { Direction.UP, Direction.DOWN };
+//		final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[] { Direction.UP, Direction.DOWN };
 //		ArrayList<Vec3i> offsets = new ArrayList<>();
 //
 //		for (Surround dir: Surround.values()) {

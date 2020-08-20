@@ -1,6 +1,6 @@
 {
     "textures": {
-        "bark": "blocks/stone",
-        "rings": "blocks/stone"
+        "bark": "block/stone",
+        "rings": "block/stone"
     }
 }

@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowerPotBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.ItemEntity;
@@ -185,11 +186,10 @@ public class Seed extends Item {
 
 	public ActionResultType onItemUsePlantSeed(ItemUseContext context) {
 
-		BlockState iblockstate = context.getWorld().getBlockState(context.getPos());
-		Block block = iblockstate.getBlock();
+		BlockState state = context.getWorld().getBlockState(context.getPos());
 		BlockPos pos = context.getPos();
 		Direction facing = context.getFace();
-		if(block.canBeReplacedByLeaves(context.getWorld().getBlockState(pos), context.getWorld(), pos)) {
+		if(state.getMaterial().isReplaceable()) {
 			pos = pos.down();
 			facing = Direction.UP;
 		}

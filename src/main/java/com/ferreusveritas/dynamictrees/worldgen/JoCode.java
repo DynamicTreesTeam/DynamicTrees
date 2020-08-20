@@ -256,7 +256,7 @@ public class JoCode {
 	}
 
 	protected boolean setBlockForGeneration(World world, Species species, BlockPos pos, Direction dir, boolean careful) {
-		if(world.getBlockState(pos).getBlock().canBeReplacedByLeaves(world.getBlockState(pos), world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+		if(world.getBlockState(pos).getMaterial().isReplaceable() && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
 		}

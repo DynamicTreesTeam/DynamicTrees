@@ -1,7 +1,7 @@
 {   "parent": "dynamictrees:block/sapling",
     "textures": {
-        "particle": "blocks/leaves_acacia",
-        "log": "blocks/log_acacia",
-        "leaves": "blocks/leaves_acacia"
+        "particle": "block/leaves_acacia",
+        "log": "block/acacia_log",
+        "leaves": "block/leaves_acacia"
     }
 }

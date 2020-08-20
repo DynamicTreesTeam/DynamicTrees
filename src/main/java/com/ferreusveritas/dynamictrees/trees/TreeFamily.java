@@ -23,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
@@ -56,7 +57,7 @@ public class TreeFamily {
 		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
-		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) { return false; }
+		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 	};
 	
@@ -155,12 +156,12 @@ public class TreeFamily {
 	// INTERACTION
 	///////////////////////////////////////////
 
-	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
 
 		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
 
 		if(rootPos != BlockPos.ZERO) {
-			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
 		}
 
 		return false;

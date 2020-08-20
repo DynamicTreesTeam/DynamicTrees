@@ -1,6 +1,6 @@
 {
     "parent":"dynamictrees:item/standardseed",
     "textures": {
-        "layer0":"dynamictrees:items/darkoakseed"
+        "layer0":"dynamictrees:item/darkoakseed"
     }
 }

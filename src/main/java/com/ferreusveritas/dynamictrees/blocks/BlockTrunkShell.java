@@ -9,6 +9,7 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -116,8 +117,8 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
-	public boolean canBeReplacedByLeaves(BlockState state, IWorldReader world, BlockPos pos) {
-		return getMuse(world, pos) == null;
+	public boolean isReplaceable(BlockState state, BlockItemUseContext useContext) {
+		return getMuse(useContext.getWorld(), useContext.getPos()) == null;
 	}
 
 	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {

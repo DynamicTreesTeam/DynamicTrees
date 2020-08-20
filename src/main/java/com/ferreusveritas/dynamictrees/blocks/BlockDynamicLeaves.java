@@ -14,10 +14,12 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -40,11 +42,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public static boolean passableLeavesModLoaded = false;
 
 	protected static Random backupRng = new Random();
-
-
-	public BlockDynamicLeaves(Properties properties) {
-		super(properties);
-	}
 
 	@Override
 	public int age(World world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
@@ -99,32 +96,22 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public static final IntegerProperty HYDRO = IntegerProperty.create("hydro", 1, 4);
 	public static final IntegerProperty TREE = IntegerProperty.create("tree", 0, 3);
 
-	public ILeavesProperties properties[] = new ILeavesProperties[] { LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES };
+	public ILeavesProperties[] properties = new ILeavesProperties[] { LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES };
 
-//	public BlockDynamicLeaves() {
-//		this.setDefaultState(this.blockState.getBaseState().withProperty(HYDRO, 4).withProperty(TREE, 0));
-//	}
-//
-//	public Block setDefaultNaming(String modid, String name) {
-//		setRegistryName(modid, name);
-//		setUnlocalizedName(getRegistryName().toString());
-//		return this;
-//	}
-//
-//	@Override
-//	protected BlockStateContainer createBlockState() {
-//		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE, DECAYABLE});
-//	}
-//
-//	@Override
-//	public BlockState getStateFromMeta(int meta) {
-//		return this.getDefaultState().withProperty(TREE, (meta >> 2) & 3).withProperty(HYDRO, (meta & 3) + 1);
-//	}
-//
-//	@Override
-//	public int getMetaFromState(BlockState state) {
-//		return (state.getValue(HYDRO) - 1) | (state.getValue(TREE) << 2);
-//	}
+	public BlockDynamicLeaves() {
+		super(Properties.create(Material.LEAVES));
+		this.setDefaultState(this.stateContainer.getBaseState().with(HYDRO, 4).with(TREE, 0));
+	}
+
+	public Block setDefaultNaming(String modid, String name) {
+		setRegistryName(modid, name);
+		return this;
+	}
+
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(HYDRO, TREE, DISTANCE, PERSISTENT);
+	}
 
 	public void setProperties(int tree, ILeavesProperties properties) {
 		this.properties[tree & 3] = properties;

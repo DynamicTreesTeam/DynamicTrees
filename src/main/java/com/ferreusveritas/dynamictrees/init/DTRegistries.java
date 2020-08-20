@@ -14,10 +14,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,10 +30,6 @@ public class DTRegistries {
     ///////////////////////////////////////////
 	//BLOCKS
 	///////////////////////////////////////////
-    public static Block test;
-    public static BlockBranchBasic testBranch;
-    public static BlockBranchThick testThickBranch;
-
     public static BlockRooty blockRootyDirt;
     public static BlockRooty blockRootySand;
     public static BlockRooty blockRootyDirtSpecies;
@@ -49,46 +42,42 @@ public class DTRegistries {
 
     public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 
-    public static CommonBlockStates blockStates;
+    public static final CommonBlockStates blockStates = new CommonBlockStates();
 
     public static void setupBlocks() {
-        test = new TESTBLOCK();
-        testBranch = new BlockBranchBasic("testbranch");
-        testThickBranch = new BlockBranchThick("testbranchthick");
-
+        blockRootyDirt = new BlockRootyDirt(false);//Dirt
+        blockRootySand = new BlockRootySand(false);//Sand
+        blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
         blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
+        blockDynamicSapling = new BlockDynamicSapling("sapling");//Dynamic version of a Vanilla sapling
+        blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
+        blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
+        blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
         blockTrunkShell = new BlockTrunkShell();
-        blockApple = new BlockFruit();
-        blockDynamicSapling = new BlockDynamicSapling("sapling");
     }
 
     public static void setupLeavesProperties() {
-//        leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
-//        leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
+        leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
+        leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
     }
 
     @SubscribeEvent
     public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
         IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 
-        registry.register(test);
-        registry.register(testBranch);
-        registry.register(testThickBranch);
-        registry.register(testThickBranch.otherBlock);
-
         ArrayList<Block> treeBlocks = new ArrayList<Block>();
         DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
-//        DTRegistries.dynamicCactus.getRegisterableBlocks(treeBlocks);
+        DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
         treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(DynamicTrees.MODID).values());
 
         registry.registerAll(
-//                blockRootyDirt,
-//                blockRootySand,
-//                blockRootyDirtSpecies,
+                blockRootyDirt,
+                blockRootySand,
+                blockRootyDirtSpecies,
                 blockRootyDirtFake,
                 blockDynamicSapling,
-//                blockBonsaiPot,
-//                blockFruitCocoa,
+                blockBonsaiPot,
+                blockFruitCocoa,
                 blockApple,
                 blockTrunkShell
         );
@@ -105,8 +94,9 @@ public class DTRegistries {
     public static Staff treeStaff;
 
     public static void setupItems() {
-        dirtBucket = new DirtBucket();
-        treeStaff = new Staff();
+        dendroPotion = new DendroPotion();//Potions
+        dirtBucket = new DirtBucket();//Dirt Bucket
+        treeStaff = new Staff();//Creative Mode Staff
     }
 
     @SubscribeEvent
@@ -115,17 +105,12 @@ public class DTRegistries {
 
         ArrayList<Item> treeItems = new ArrayList<Item>();
         DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
-//        DTRegistries.dynamicCactus.getRegisterableItems(treeItems);
+        DTTrees.dynamicCactus.getRegisterableItems(treeItems);
 
-        registry.registerAll(
-//                dendroPotion,
-                dirtBucket,
-                treeStaff);
+        registry.registerAll(dendroPotion, dirtBucket, treeStaff);
         registry.registerAll(treeItems.toArray(new Item[0]));
 
-        Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
-        registry.register(new BlockItem(blockRootyDirtFake, properties).setRegistryName(Objects.requireNonNull(blockRootyDirtFake.getRegistryName())));
-        registry.register(new BlockItem(test, properties).setRegistryName(Objects.requireNonNull(test.getRegistryName())));
+//        Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
     }
 
     ///////////////////////////////////////////
@@ -163,13 +148,14 @@ public class DTRegistries {
     public static final ItemGroup dynamicTreesTab = new ItemGroup("dynamictrees") {
         @Override
         public ItemStack createIcon() {
-            return new ItemStack(test);
+            return TreeRegistry.findSpeciesSloppy(DynamicTrees.VanillaWoodTypes.oak.toString()).getSeedStack(1);
         }
     };
 
-    public static class CommonBlockStates {
+    public static final class CommonBlockStates {
         public final BlockState air = Blocks.AIR.getDefaultState();
         public final BlockState dirt = Blocks.DIRT.getDefaultState();
+        public final BlockState coarsedirt = Blocks.COARSE_DIRT.getDefaultState();
         public final BlockState sand = Blocks.SAND.getDefaultState();
         public final BlockState grass = Blocks.GRASS.getDefaultState();
         public final BlockState podzol = Blocks.PODZOL.getDefaultState();

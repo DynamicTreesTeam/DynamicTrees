@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "dynamictrees:applesapling" }
+        "normal": { "model": "dynamictrees:block/applesapling" }
     }
 }

@@ -26,7 +26,7 @@ public class DTTrees {
 
 	public static ArrayList<TreeFamilyVanilla> baseFamilies = new ArrayList<>();
 	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
-//    public static TreeCactus dynamicCactus;
+    public static TreeCactus dynamicCactus;
 
 	/**
 	 * Pay Attn! This should be run after the Dynamic Trees Mod
@@ -35,14 +35,14 @@ public class DTTrees {
 	 */
 	public static void setupTrees() {
 		Species.REGISTRY.register(Species.NULLSPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "null")));
-		Collections.addAll(baseFamilies, new TreeOak()); //, new TreeSpruce(), new TreeBirch(), new TreeJungle(), new TreeAcacia(), new TreeDarkOak()
+		Collections.addAll(baseFamilies, new TreeOak(), new TreeSpruce(), new TreeBirch(), new TreeJungle(), new TreeAcacia(), new TreeDarkOak());
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
-//        dynamicCactus = new TreeCactus();
-//        dynamicCactus.registerSpecies(Species.REGISTRY);
+        dynamicCactus = new TreeCactus();
+        dynamicCactus.registerSpecies(Species.REGISTRY);
 
 		//Registers a fake species for generating mushrooms
-//        Species.REGISTRY.register(new Mushroom(true));
-//        Species.REGISTRY.register(new Mushroom(false));
+        Species.REGISTRY.register(new Mushroom(true));
+        Species.REGISTRY.register(new Mushroom(false));
 
 		for(TreeFamilyVanilla vanillaFamily: baseFamilies) {
 //            TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());

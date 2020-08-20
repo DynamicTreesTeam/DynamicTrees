@@ -54,7 +54,7 @@ public class DirtBucket extends Item {
 					return new ActionResult(ActionResultType.FAIL, itemStack);
 				}
 				else {
-					boolean isReplacable = world.getBlockState(blockpos).getBlock().canBeReplacedByLeaves(world.getBlockState(blockpos), world, blockpos);
+					boolean isReplacable = world.getBlockState(blockpos).getMaterial().isReplaceable();
 					BlockPos workingBlockPos = isReplacable && blockRayTraceResult.getFace() == Direction.UP ? blockpos : blockpos.offset(blockRayTraceResult.getFace());
 
 					if (!player.canPlayerEdit(workingBlockPos, blockRayTraceResult.getFace(), itemStack)) {
@@ -77,7 +77,7 @@ public class DirtBucket extends Item {
 	
 	public boolean tryPlaceContainedDirt(@Nullable PlayerEntity player, World world, BlockPos posIn) {
 		BlockState blockstate = world.getBlockState(posIn);
-		boolean replaceable = blockstate.getBlock().canBeReplacedByLeaves(world.getBlockState(posIn), world, posIn);
+		boolean replaceable = blockstate.getMaterial().isReplaceable();
 
 		if(replaceable) {
 			if (!world.isRemote) {

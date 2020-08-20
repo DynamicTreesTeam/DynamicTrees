@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
@@ -9,10 +10,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -35,8 +33,9 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	
-	public static final String name = "fruit";
-	
+	public static final String name = "fruitapple";
+	public Vec3d itemSpawnOffset = new Vec3d(0.5, 0.6, 0.5);
+
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
 	
@@ -49,17 +48,21 @@ public class BlockFruit extends Block implements IGrowable {
 				.tickRandomly()
 				.hardnessAndResistance(0.3f));
 		setRegistryName(name);
-//		hasTileEntity = true;
 	}
 
 	public BlockFruit setBonemealable(boolean bonemealable) {
 		this.bonemealable = bonemealable;
 		return this;
 	}
-	
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
+
+	public void setItemSpawnOffset (float x, float y, float z){
+		itemSpawnOffset = new Vec3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
+	}
+
+	@Override
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
 		if (!this.canBlockStay(worldIn, pos, state)) {
-			this.dropBlock(worldIn, pos, state);
+			this.dropBlock(worldIn, pos);
 		}
 		else {
 			int age = state.get(AGE);
@@ -70,12 +73,11 @@ public class BlockFruit extends Block implements IGrowable {
 			} else
 			if (age == 3) {
 				if(matureAction(worldIn, pos, state, rand)) {
-					dropBlock(worldIn, pos, state);
+					dropBlock(worldIn, pos);
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Override this to make the fruit do something once it's mature.
@@ -93,23 +95,23 @@ public class BlockFruit extends Block implements IGrowable {
 	@Override
 	public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
 		if (!this.canBlockStay(world, pos, state)) {
-			this.dropBlock((World)world, pos, state);
+			this.dropBlock((World)world, pos);
 		}
 	}
 
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (state.get(AGE) >= 3 ) {
-			this.dropBlock(worldIn, pos, state);
+			this.dropBlock(worldIn, pos);
 			return true;
 		}
 
 		return false;
 	}
 
-	private void dropBlock(World worldIn, BlockPos pos, BlockState state) {
+	private void dropBlock(World worldIn, BlockPos pos) {
 		worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-		this.getItem(worldIn, pos, state);
+		worldIn.addEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, droppedFruit));
 	}
 
 	/**
@@ -131,8 +133,7 @@ public class BlockFruit extends Block implements IGrowable {
 
 	@Override
 	public boolean canGrow(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
-		return false;
-		//return (Integer)state.getValue(AGE) < 3;
+		return state.get(AGE) < 3;
 	}
 
 	@Override
@@ -142,7 +143,7 @@ public class BlockFruit extends Block implements IGrowable {
 
 	@Override
 	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
-		int age = (Integer)state.get(AGE);
+		int age = state.get(AGE);
 		int newAge = MathHelper.clamp(age + 1, 0, 3);
 		if(newAge != age) {
 			world.setBlockState(pos, state.with(AGE, newAge), 2);
@@ -206,20 +207,6 @@ public class BlockFruit extends Block implements IGrowable {
 	///////////////////////////////////////////
 	// BLOCKSTATE
 	///////////////////////////////////////////
-
-	/**
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public BlockState getStateFromMeta(int meta) {
-		return this.getDefaultState().with(AGE, meta & 3);
-	}
-
-	/**
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(BlockState state) {
-		return state.get(AGE) & 3;
-	}
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {

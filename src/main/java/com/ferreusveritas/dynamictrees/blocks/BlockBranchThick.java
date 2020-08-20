@@ -249,7 +249,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
 		}
 
-		if(block.canBeReplacedByLeaves(world.getBlockState(pos), world, pos) || block instanceof BushBlock) {
+		if(state.getMaterial().isReplaceable() || block instanceof BushBlock) {
 			return ReplaceableState.REPLACEABLE;
 		}
 

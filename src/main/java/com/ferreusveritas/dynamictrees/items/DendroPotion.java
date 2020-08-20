@@ -15,10 +15,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
@@ -76,12 +79,11 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	public DendroPotion(String name) {
-		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
+		super(new Item.Properties().group(DTRegistries.dynamicTreesTab).maxStackSize(1));
 		setRegistryName(name);
-//		setMaxStackSize(1);
 //		setHasSubtypes(true);
 	}
-	
+
 //	@Override
 //	public void getSubItems(ItemGroup tab, NonNullList<ItemStack> subItems) {
 //		if(isInCreativeTab(tab)) {
@@ -133,14 +135,15 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 
 		return null;
 	}
-//
-//	public ItemStack setTargetTree(ItemStack itemStack, TreeFamily tree) {
-//		CompoundNBT nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new CompoundNBT();
-//		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
-//		itemStack.setTagCompound(nbtTag);
-//		return itemStack;
-//	}
-//
+
+	public ItemStack setTargetTree(ItemStack itemStack, TreeFamily tree) {
+		CompoundNBT nbtTag = itemStack.hasTag() ? itemStack.getTag() : new CompoundNBT();
+		assert nbtTag != null;
+		nbtTag.putString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
+		itemStack.setTag(nbtTag);
+		return itemStack;
+	}
+
 //	public DendroPotion registerRecipes(IForgeRegistry<IRecipe> registry) {
 //
 //		PotionType awkward = PotionType.REGISTRY.getObject(new ResourceLocation("awkward"));
@@ -180,32 +183,32 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 //				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 //				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 //
-//		for(TreeFamily tree : ModTrees.baseFamilies) {
+//		for(TreeFamily tree : DTTrees.baseFamilies) {
 //			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
 //			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
 //		}
 //
 //		return this;
 //	}
-//
-//	@Override
-//	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag tooltipFlag) {
-//		super.addInformation(stack, world, tooltip, tooltipFlag);
-//
-//		DendroPotionType potionType = getPotionType(stack);
-//
-//		if(potionType == DendroPotionType.TRANSFORM) {
-//			Species species = getTargetSpecies(stack);
-//			if(species == null) {
-//				tooltip.add(getPotionType(stack).getLore());
-//			} else {
-//				tooltip.add("Transform a tree into a " + species.getRegistryName().getPath() + " tree");
-//			}
-//		} else {
-//			tooltip.add(getPotionType(stack).getLore());
-//		}
-//
-//	}
+
+
+	@Override
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
+
+		DendroPotionType potionType = getPotionType(stack);
+
+		if(potionType == DendroPotionType.TRANSFORM) {
+			Species species = getTargetSpecies(stack);
+			if(species == null) {
+				tooltip.add(new StringTextComponent(getPotionType(stack).getLore()));
+			} else {
+				tooltip.add(new StringTextComponent("Transform a tree into a " + species.getRegistryName().getPath() + " tree"));
+			}
+		} else {
+			tooltip.add(new StringTextComponent(getPotionType(stack).getLore()));
+		}
+	}
 	
 	public int getColor(ItemStack stack, int tint) {
 		return tint == 0 ? getPotionType(stack).getColor() : 0xFFFFFFFF;

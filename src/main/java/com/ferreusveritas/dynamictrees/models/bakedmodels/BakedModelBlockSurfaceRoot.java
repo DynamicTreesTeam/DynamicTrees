@@ -36,7 +36,7 @@ import java.util.function.Function;
 //		for(int r = 0; r < 8; r++) {
 //			int radius = r + 1;
 //			if(radius < 8) {
-//				for(Direction dir: Direction.HORIZONTALS) {
+//				for(Direction dir: CoordUtils.HORIZONTALS) {
 //					int horIndex = dir.getHorizontalIndex();
 //					sleeves[horIndex][r] = bakeSleeve(radius, dir, barkIcon);
 //					verts[horIndex][r] = bakeVert(radius, dir, barkIcon);
@@ -183,7 +183,7 @@ import java.util.function.Function;
 //
 //			//Get quads for sleeves models
 //			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-//				for(Direction connDir : Direction.HORIZONTALS) {
+//				for(Direction connDir : CoordUtils.HORIZONTALS) {
 //					int idx = connDir.getHorizontalIndex();
 //					int connRadius = connections[idx];
 //					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
@@ -211,7 +211,7 @@ import java.util.function.Function;
 //	 */
 //	protected int[] pollConnections(int coreRadius, BlockState extendedBlockState) {
 //		int[] connections = new int[4];
-//		for(Direction dir: Direction.HORIZONTALS) {
+//		for(Direction dir: CoordUtils.HORIZONTALS) {
 //			int horIndex = dir.getHorizontalIndex();
 //			int connection = getConnectionRadius(extendedBlockState, BlockSurfaceRoot.CONNECTIONS[horIndex]);
 //			connections[horIndex] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
@@ -230,7 +230,7 @@ import java.util.function.Function;
 //		int largestConnection = 0;
 //		Direction sourceDir = null;
 //
-//		for(Direction dir: Direction.HORIZONTALS){
+//		for(Direction dir: CoordUtils.HORIZONTALS){
 //			int horIndex = dir.getHorizontalIndex();
 //			int connRadius = connections[horIndex];
 //			if(connRadius > largestConnection){

@@ -1,31 +1,27 @@
 package com.ferreusveritas.dynamictrees.systems.featuregen;
 
-//import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-//import com.ferreusveritas.dynamictrees.trees.Species;
-//import com.ferreusveritas.dynamictrees.util.CoordUtils;
-//import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-//import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-//import net.minecraft.block.BlockOldLeaf;
-//import net.minecraft.block.BlockOldLog;
-//import net.minecraft.block.BlockPlanks;
-//import net.minecraft.block.BlockState;
-//import net.minecraft.init.Blocks;
-//import net.minecraft.util.math.BlockPos;
-//import net.minecraft.util.math.BlockPos.MutableBlockPos;
-//import net.minecraft.util.math.MathHelper;
-//import net.minecraft.util.math.Vec3d;
-//import net.minecraft.world.World;
-//import net.minecraft.world.biome.Biome;
-//
-//import java.util.List;
-//
-//public class FeatureGenUndergrowth implements IPostGenFeature {
-//
-//	@Override
-//	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+
+import java.util.List;
+
+public class FeatureGenUndergrowth implements IPostGenFeature {
+
+	@Override
+	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 //		if(safeBounds != SafeChunkBounds.ANY && radius > 2) {//worldgen
 //
-//			Vec3d vTree = new Vec3d(rootPos).addVector(0.5, 0.5, 0.5);
+//			Vec3d vTree = new Vec3d(rootPos).add(0.5, 0.5, 0.5);
 //
 //			for(int i = 0; i < 2; i++) {
 //
@@ -59,8 +55,8 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 //
 //			return true;
 //		}
-//
-//		return false;
-//	}
-//
-//}
+
+		return false;
+	}
+
+}

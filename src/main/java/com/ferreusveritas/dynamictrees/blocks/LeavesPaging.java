@@ -81,8 +81,7 @@ public class LeavesPaging {
 		int key = seq / 4;
 		String regname = "leaves" + key;
 
-//		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
-		return null;
+		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
 	}
 
 	/**

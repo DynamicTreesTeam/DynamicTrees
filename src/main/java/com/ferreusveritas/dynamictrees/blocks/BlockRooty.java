@@ -21,6 +21,7 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -59,7 +60,7 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 		super(Properties.create(material).sound(SoundType.GROUND).tickRandomly());
 //		this.hasTileEntity = isTileEntity;
 		setRegistryName(name);
-		setDefaultState(this.getStateContainer().getBaseState().with(LIFE, 15));
+//		setDefaultState(this.getStateContainer().getBaseState().with(LIFE, 15));
 	}
 
 
@@ -103,10 +104,16 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 //		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 //	}
 //
-//	///////////////////////////////////////////
-//	// BLOCKSTATES
-//	///////////////////////////////////////////
-//
+	///////////////////////////////////////////
+	// BLOCKSTATES
+	///////////////////////////////////////////
+
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(LIFE);
+	}
+
+
 //	@Override
 //	protected BlockStateContainer createBlockState() {
 //		return new ExtendedBlockState(this, new IProperty[]{LIFE}, new IUnlistedProperty[] {MimicProperty.MIMIC});
