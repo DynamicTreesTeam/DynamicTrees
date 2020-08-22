@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 public interface ICellKit {
 
-	ICell getCellForLeaves(int hydro);
+	ICell getCellForLeaves(int distance);
 	
 	ICell getCellForBranch(int radius, int meta);
 	

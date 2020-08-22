@@ -93,7 +93,7 @@ public class LeavesProperties implements ILeavesProperties {
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.getDefaultState();
 		for(int i = 1; i <= 4; i++) {
-			dynamicLeavesBlockHydroStates[i] = state.with(BlockDynamicLeaves.HYDRO, i);
+			dynamicLeavesBlockHydroStates[i] = state.with(BlockDynamicLeaves.DISTANCE, i);
 		}
 		
 		return this;

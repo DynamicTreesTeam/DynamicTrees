@@ -32,7 +32,7 @@ public interface ILeavesProperties {
 
 	BlockState getDynamicLeavesState();
 
-	BlockState getDynamicLeavesState(int hydro);
+	BlockState getDynamicLeavesState(int distance);
 
 	int getFlammability();
 

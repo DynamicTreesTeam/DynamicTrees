@@ -7,6 +7,8 @@ import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamilyVanilla;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
@@ -138,7 +140,8 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
-//        tileEntityRegistryEvent.getRegistry().register();
+        tileEntityRegistryEvent.getRegistry().register(TileEntityType.Builder.create(TileEntitySpecies::new, blockRootyDirtSpecies).build(null).setRegistryName(blockRootyDirtSpecies.getRegistryName()));
+        tileEntityRegistryEvent.getRegistry().register(TileEntityType.Builder.create(TileEntityBonsai::new, blockBonsaiPot).build(null).setRegistryName(blockBonsaiPot.getRegistryName()));
     }
 
     ///////////////////////////////////////////

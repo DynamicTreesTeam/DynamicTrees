@@ -21,6 +21,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.awt.*;
 import java.util.List;
@@ -47,15 +48,14 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		super(DTRegistries.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
+		//resolve();
 	}
 	
 	public void resolve() {
-		
 		if(jsonObj != null) {
 			for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {
 				String key = entry.getKey();
 				JsonElement element = entry.getValue();
-				
 				if("color".equals(key)) {
 					if(element.isJsonPrimitive()) {
 						colorPrimitive = element.getAsJsonPrimitive();
@@ -63,10 +63,10 @@ public class LeavesPropertiesJson extends LeavesProperties {
 				} else
 				if("leaves".equals(key)) {
 					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-						getPrimitiveLeaves(element.getAsJsonObject()).assignTo(this);
+						getPrimitiveLeaves(element.getAsString()).assignTo(this);
 					} else
 					if(element.isJsonObject()) {
-						getPrimitiveLeaves(element.getAsJsonObject()).assignTo(this);
+						getPrimitiveLeaves(element.getAsString()).assignTo(this);
 					}
 				} else
 				if("cellkit".equals(key)) {
@@ -118,23 +118,17 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 	
-//	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
-//		BlockState state = getBlockState(leavesDesc);
-//		ItemStack stack = ItemStack.EMPTY;
-//
-//		if(state.getBlock() != Blocks.AIR) {
-//			int meta = state.getBlock().damageDropped(state);
-//
-//			//Minecraft metadata logic for leaves is buggy and needs this work around
-//			if(state.getBlock() == Blocks.LEAVES2 && meta >= 4) {//Bug in minecraft where the damageDropped doesn't work for Leaves2
-//				meta -= 4;
-//			}
-//
-//			stack = new ItemStack(Item.getItemFromBlock(state.getBlock()), 1, meta);
-//		}
-//
-//		return new PrimitiveLeavesComponents(state, stack);
-//	}
+	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
+		Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(leavesDesc));
+		ItemStack stack = ItemStack.EMPTY;
+
+		if(block != Blocks.AIR) {
+
+			stack = new ItemStack(Item.BLOCK_TO_ITEM.get(block), 1);
+		}
+
+		return new PrimitiveLeavesComponents(block.getDefaultState(), stack);
+	}
 	
 	private static PrimitiveLeavesComponents getPrimitiveLeaves(JsonObject jsonObj) {
 		
@@ -149,26 +143,9 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
 	}
 	
-//	private static BlockState getBlockState(String blockStateDesc) {
-//		String blockString = blockStateDesc;
-//		String argString = "default";
-//		String[] args = blockStateDesc.split(" ");
-//
-//		if(args.length == 2) {
-//			blockString = args[0];
-//			argString = args[1];
-//		}
-//
-//		Block block = Block.REGISTRY.getObject(new ResourceLocation(blockString));
-//
-//		try {
-//			return CommandBase.convertArgToBlockState(block, argString);
-//		}
-//		catch (NumberInvalidException | InvalidBlockStateException e) {
-//			e.printStackTrace();
-//			return block.getDefaultState();
-//		}
-//	}
+	private static BlockState getBlockState(String blockStateDesc) {
+		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockStateDesc))).getDefaultState();
+	}
 	
 	public static JsonObject getJsonObject(String jsonData) {
 		try {

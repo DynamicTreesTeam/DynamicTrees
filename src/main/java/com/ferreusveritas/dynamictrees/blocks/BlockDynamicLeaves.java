@@ -16,10 +16,13 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -42,6 +45,9 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public static boolean passableLeavesModLoaded = false;
 
 	protected static Random backupRng = new Random();
+
+//	public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 4);
+//	public static final BooleanProperty PERSISTENT = BooleanProperty.create("flowering");
 
 	@Override
 	public int age(World world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
@@ -93,14 +99,11 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return null;
 	}
 
-	public static final IntegerProperty HYDRO = IntegerProperty.create("hydro", 1, 4);
-	public static final IntegerProperty TREE = IntegerProperty.create("tree", 0, 3);
-
-	public ILeavesProperties[] properties = new ILeavesProperties[] { LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES, LeavesProperties.NULLPROPERTIES };
+	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
 
 	public BlockDynamicLeaves() {
 		super(Properties.create(Material.LEAVES));
-		this.setDefaultState(this.stateContainer.getBaseState().with(HYDRO, 4).with(TREE, 0));
+		this.setDefaultState(this.stateContainer.getBaseState());
 	}
 
 	public Block setDefaultNaming(String modid, String name) {
@@ -110,15 +113,15 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(HYDRO, TREE, DISTANCE, PERSISTENT);
+		builder.add(DISTANCE, PERSISTENT);
 	}
 
-	public void setProperties(int tree, ILeavesProperties properties) {
-		this.properties[tree & 3] = properties;
+	public void setProperties(ILeavesProperties properties) {
+		this.properties = properties;
 	}
 
 	public ILeavesProperties getProperties(BlockState blockState) {
-		return properties[blockState.get(TREE) & 3];
+		return properties;
 	}
 //
 //	@Override
@@ -175,7 +178,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	@Override
 //	public int age(World world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
 //		ILeavesProperties leavesProperties = getProperties(state);
-//		int oldHydro = state.getValue(BlockDynamicLeaves.HYDRO);
+//		int oldHydro = state.getValue(BlockDynamicLeaves.DISTANCE);
 //		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 //
 //		//Check hydration level.  Dry leaves are dead leaves.
@@ -228,12 +231,12 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 //	protected static interface NewLeavesPropertiesHandler {
 //		BlockState getLeaves(World world, BlockPos pos, BlockState leavesStateWithHydro);
 //	}
-//
-//	@Override
-//	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-//		return getProperties(state).getPrimitiveLeavesItemStack();
-//	}
-//
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return getProperties(state).getPrimitiveLeavesItemStack();
+	}
+
 //	@Override
 //	public void breakBlock(World worldIn, BlockPos pos, BlockState state) {}
 //
@@ -462,7 +465,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
-		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.get(BlockDynamicLeaves.HYDRO)) : CellNull.NULLCELL;
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.get(LeavesBlock.DISTANCE)) : CellNull.NULLCELL;
 	}
 
 	@Override

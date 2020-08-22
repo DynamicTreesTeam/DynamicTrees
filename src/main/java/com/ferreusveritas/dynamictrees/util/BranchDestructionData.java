@@ -202,7 +202,7 @@ public class BranchDestructionData {
 	}
 
 	private int encodeLeaves(BlockPos relPos, BlockDynamicLeaves block, BlockState state) {
-		return	(state.get(BlockDynamicLeaves.HYDRO) << 24) | encodeRelBlockPos(relPos);
+		return	(state.get(BlockDynamicLeaves.DISTANCE) << 24) | encodeRelBlockPos(relPos);
 	}
 
 	public int getNumLeaves() {

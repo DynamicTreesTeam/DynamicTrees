@@ -20,7 +20,7 @@ public class TileEntitySpecies extends TileEntity {
 	ResourceLocation speciesName = species.getRegistryName();
 
 	public TileEntitySpecies() {
-		super(TileEntityType.BARREL);
+		super(null);
 	}
 
 	public Species getSpecies() {
@@ -35,32 +35,20 @@ public class TileEntitySpecies extends TileEntity {
 		this.speciesName = species.getRegistryName();
 		this.markDirty();
 	}
-	
+
+	@Override
 	public void read(CompoundNBT tag) {
 		if(tag.hasUniqueId("species")) {
 			speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
 	}
-	
+
+	@Override
 	public CompoundNBT write(CompoundNBT tag) {
 		tag.putString("species", speciesName.toString());
 		return tag;
 	}
-	
-//	@Override
-//	public void readFromNBT(CompoundNBT tag) {
-//		super.readFromNBT(tag);
-//		read(tag);
-//	}
-//
-//	@Override
-//	public CompoundNBT writeToNBT(CompoundNBT tag) {
-//		super.writeToNBT(tag);
-//		write(tag);
-//
-//		return tag;
-//	}
 //
 //	@Override
 //	public SPacketUpdateTileEntity getUpdatePacket() {

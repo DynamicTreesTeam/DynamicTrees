@@ -28,6 +28,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
@@ -85,7 +87,7 @@ public class TreeFamily {
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int woodColor;//For roots
 
 	public TreeFamily() {
@@ -336,7 +338,6 @@ public class TreeFamily {
 		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return stack;
 	}
-
 
 	///////////////////////////////////////////
 	//BRANCHES

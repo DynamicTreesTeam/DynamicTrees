@@ -277,7 +277,7 @@ public class TreeBuilder {
 						}
 					};
 
-					LeavesPaging.getLeavesBlockForSequence(DynamicTrees.MODID, seqNum, dynamicLeavesProperties);
+					LeavesPaging.getLeavesBlockForSequence(DynamicTrees.MODID, seqNum, dynamicLeavesProperties, dynamicLeavesProperties.getTree().getName().getPath());
 				}
 
 				this.setPrimitiveLog(primitiveLogBlockState, new ItemStack(primitiveLeavesBlockState.getBlock()));

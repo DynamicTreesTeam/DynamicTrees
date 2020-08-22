@@ -114,8 +114,8 @@ public class DynamicTrees
         DTRegistries.setupBlocks();
         DTRegistries.setupItems();
 
-        LeavesPropertiesJson.resolveAll();
         DTRegistries.setupLeavesProperties();
+        LeavesPropertiesJson.resolveAll();
 
         DTRegistries.setupEntities();
 

@@ -52,7 +52,6 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
-		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		Species.REGISTRY = new RegistryBuilder<Species>()
 				.setName(new ResourceLocation(DynamicTrees.MODID, "species"))
 				.setDefaultKey(new ResourceLocation(DynamicTrees.MODID, "null"))

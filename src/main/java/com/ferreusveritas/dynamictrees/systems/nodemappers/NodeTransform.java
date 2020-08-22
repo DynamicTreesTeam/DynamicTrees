@@ -48,7 +48,7 @@ public class NodeTransform implements INodeInspector {
 //				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 //					BlockState state = world.getBlockState(leavesPos);
 //					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
-//						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.getValue(BlockDynamicLeaves.HYDRO) : 2;
+//						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.getValue(BlockDynamicLeaves.DISTANCE) : 2;
 //						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
 //					}
 //				}

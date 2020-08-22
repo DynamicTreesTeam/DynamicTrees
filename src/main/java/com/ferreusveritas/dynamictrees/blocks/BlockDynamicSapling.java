@@ -6,18 +6,29 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.IFluidState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootContext;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Random;
 
-public class BlockDynamicSapling extends Block{ // implements ITileEntityProvider, IGrowable {
+public class BlockDynamicSapling extends Block implements IGrowable {
 
 	public BlockDynamicSapling(String name) {
 		super(Properties.create(Material.PLANTS)
@@ -55,70 +66,78 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 		return tileEntitySpecies != null ? tileEntitySpecies.getSpecies() : Species.NULLSPECIES;
 	}
 
+	public Species getSpecies(TileEntitySpecies tileEntity, BlockState state) {
+		return tileEntity != null ? tileEntity.getSpecies() : Species.NULLSPECIES;
+	}
 
-//	///////////////////////////////////////////
-//	// TILE ENTITY STUFF
-//	///////////////////////////////////////////
-//
+
+	///////////////////////////////////////////
+	// TILE ENTITY STUFF
+	///////////////////////////////////////////
+
+
+	@Override
+	public boolean hasTileEntity(BlockState state) {
+		return true;
+	}
+
+	@Nullable
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		return new TileEntitySpecies();
+	}
+
+	/*
+	 * The following is modeled after the harvesting logic flow of flower pots since they too have a
+	 * tileEntity that holds items that should be dropped when the block is destroyed.
+	 */
+
 //	@Override
-//	public TileEntity createNewTileEntity(World worldIn, int meta) {
-//		return new TileEntitySpecies();
-//	}
-//
-//	/*
-//	 * The following is modeled after the harvesting logic flow of flower pots since they too have a
-//	 * tileEntity that holds items that should be dropped when the block is destroyed.
-//	 */
-//
-//	@Override
-//	public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, EntityPlayer player) {
+//	public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
 //		super.onBlockHarvested(worldIn, pos, state, player);
-//
-//		if (player.capabilities.isCreativeMode) {
-//			TileEntitySpecies tileentityspecies = getTileEntity(worldIn, pos);
-//			if(tileentityspecies != null) {
-//				tileentityspecies.setSpecies(Species.NULLSPECIES);//Prevents dropping a seed in creative mode
-//			}
-//		}
 //	}
-//
+
 	@Nullable
 	protected TileEntitySpecies getTileEntity(IBlockReader access, BlockPos pos) {
 		TileEntity tileentity = access.getTileEntity(pos);
 		return tileentity instanceof TileEntitySpecies ? (TileEntitySpecies)tileentity : null;
 	}
-//
-//	@Override
-//	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-//		if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
-//		return super.removedByPlayer(state, world, pos, player, willHarvest);
-//	}
-//
-//	@Override
-//	public void harvestBlock(World world, EntityPlayer player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack tool) {
-//		super.harvestBlock(world, player, pos, state, te, tool);
-//		world.setBlockToAir(pos);
-//	}
-//
-//	/**
-//	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
-//	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
-//	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
-//	 */
-//	@Override
-//	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-//		TileEntity tileentity = worldIn.getTileEntity(pos);
-//		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
-//	}
-//
-//	///////////////////////////////////////////
-//	// INTERACTION
-//	///////////////////////////////////////////
-//
-//	@Override
-//	public void updateTick(World world, BlockPos pos, BlockState state, Random rand) {
-//		grow(world, rand, pos, state);
-//	}
+
+	@Override
+	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
+		if (willHarvest) return true; //If it will harvest, delay deletion of the block until after getDrops
+		return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
+	}
+
+	@Override
+	public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+		super.harvestBlock(world, player, pos, state, te, stack);
+		if (!player.isCreative()) {
+			dropBlock(world, state, pos);
+		}
+		world.removeBlock(pos, false);
+	}
+
+	/**
+	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
+	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
+	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
+	 */
+	@Override
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity != null && tileentity.receiveClientEvent(id, param);
+	}
+
+	///////////////////////////////////////////
+	// INTERACTION
+	///////////////////////////////////////////
+
+
+	@Override
+	public void tick(BlockState state, World world, BlockPos pos, Random rand) {
+		grow(world, rand, pos, state);
+	}
 
 	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
@@ -138,57 +157,59 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 		return canSaplingStay(world, getSpecies(world, pos, state), pos);
 	}
 
-//	@Override
-//	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
-//		Species species = getSpecies(world, pos, state);
-//		if(canBlockStay(world, pos, state)) {
-//			species.transitionToTree(world, pos);
-//		} else {
-//			dropBlock(world, species, state, pos);
-//		}
-//	}
-//
-//	@Override
-//	public SoundType getSoundType(BlockState state, World world, BlockPos pos, Entity entity) {
-//		return getSpecies(world, pos, state).getSaplingSound();
-//	}
-//
-//	///////////////////////////////////////////
-//	// DROPS
-//	///////////////////////////////////////////
-//
-//	@Override
-//	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-//		if (!this.canBlockStay(world, pos, state)) {
-//			dropBlock(world, getSpecies(world, pos, state), state, pos);
-//		}
-//	}
-//
-//	protected void dropBlock(World world, Species tree, BlockState state, BlockPos pos) {
-//		dropBlockAsItem(world, pos, state, 0);
-//		world.setBlockToAir(pos);
-//	}
-//
-//	@Override
-//	public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState state, int fortune) {
-//		super.getDrops(drops, world, pos, state, fortune);
-//		Species species = getSpecies(world, pos, state);
+	@Override
+	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
+		Species species = getSpecies(world, pos, state);
+		if(canBlockStay(world, pos, state)) {
+			species.transitionToTree(world, pos);
+		} else {
+			dropBlock(world, state, pos);
+		}
+	}
+
+	@Override
+	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+		return getSpecies(world, pos, state).getSaplingSound();
+	}
+
+	///////////////////////////////////////////
+	// DROPS
+	///////////////////////////////////////////
+
+
+	@Override
+	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+		if (!this.canBlockStay(world, pos, state)) {
+			dropBlock(world, state, pos);
+		}
+	}
+
+	protected void dropBlock(World world, BlockState state, BlockPos pos) {
+		world.addEntity(new ItemEntity(world, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, getSpecies(world, pos, state).getSeedStack(1)));
+		world.removeBlock(pos, false);
+	}
+
+	@Override
+	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
+		return getSpecies(worldIn, pos, state).getSeedStack(1);
+	}
+
+	//	@Override
+//	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+//		List<ItemStack> drops = super.getDrops(state, builder);
+//		Species species = getSpecies(builder.getWorld(), builder.);
 //		if(species != Species.NULLSPECIES) {
 //			drops.add(species.getSeedStack(1));
 //		}
+//		return drops;
 //	}
-//
-//	@Override
-//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-//		return null;//The sapling block itself is not obtainable
-//	}
-//
-//	@Override
-//	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-//		return getSpecies(world, pos, state).getSeedStack(1);
-//	}
-//
-//
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return getSpecies(world, pos, state).getSeedStack(1);
+	}
+
+
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
@@ -199,10 +220,10 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 		return getSpecies(access, pos, state).getSaplingShape();
 	}
 
-//	///////////////////////////////////////////
-//	// RENDERING
-//	///////////////////////////////////////////
-//
+	///////////////////////////////////////////
+	// RENDERING
+	///////////////////////////////////////////
+
 //	@Override
 //	public boolean isFullCube(BlockState state) {
 //		return false;
@@ -223,17 +244,18 @@ public class BlockDynamicSapling extends Block{ // implements ITileEntityProvide
 //	public BlockRenderLayer getBlockLayer() {
 //		return BlockRenderLayer.CUTOUT_MIPPED;
 //	}
-//
-//	@Override
-//	public boolean canGrow(World world, BlockPos pos, BlockState state, boolean isClient) {
-//		return getSpecies(world, pos, state).canGrowWithBoneMeal(world, pos);
-//	}
-//
-//	@Override
-//	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
-//		return getSpecies(world, pos, state).canUseBoneMealNow(world, rand, pos);
-//	}
-//
+
+
+	@Override
+	public boolean canGrow(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
+		return getSpecies(world, pos, state).canGrowWithBoneMeal((World) world, pos);
+	}
+
+	@Override
+	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
+		return getSpecies(world, pos, state).canUseBoneMealNow(world, rand, pos);
+	}
+
 //	@Override
 //	@OnlyIn(Dist.CLIENT)
 //	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {

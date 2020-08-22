@@ -74,7 +74,6 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 		return new TileEntitySpecies();
 	}
 
-
 //	/** Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated */
 //	public void breakBlock(World worldIn, BlockPos pos, BlockState state) {
 //		super.breakBlock(worldIn, pos, state);

@@ -47,8 +47,8 @@ public class LeavesPaging {
 		return modid;
 	}
 	
-	public static BlockDynamicLeaves getNextLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties) {
-		return getLeavesBlockForSequence(modid, getNextSequenceNumber(modid), leavesProperties);
+	public static BlockDynamicLeaves getNextLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String label) {
+		return getLeavesBlockForSequence(modid, getNextSequenceNumber(modid), leavesProperties, label);
 	}
 	
 	public static int getNextSequenceNumber(@Nullable String modid) {
@@ -62,21 +62,33 @@ public class LeavesPaging {
 		return modLastSeq.computeIfAbsent(autoModId(modid), i -> 0) - 1;
 	}
 
-	public static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, @Nonnull ILeavesProperties leavesProperties) {
-		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq);
-		int tree = seq & 3;
-		leavesProperties.setDynamicLeavesState(leaves.getDefaultState().with(BlockDynamicLeaves.TREE, tree));
-		leaves.setProperties(tree, leavesProperties);
+	public static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, @Nonnull ILeavesProperties leavesProperties, String name) {
+		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq, name);
+//		int tree = seq & 3;
+		leavesProperties.setDynamicLeavesState(leaves.getDefaultState());
+		leaves.setProperties(leavesProperties);
 		return leaves;
 	}
 
+	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, String leavesName) {
+		String regname = "dynamic_" + leavesName + "_leaves";
+		//String regname = "leaves" + seq;
+
+		System.out.println(leavesName);
+
+		return getLeavesMapForModId(modid).computeIfAbsent(seq, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
+	}
+
 	/**
-	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
-	 *
-	 * @param modid
-	 * @param seq
-	 * @return
+	 * Old system
 	 */
+//	/**
+//	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
+//	 *
+//	 * @param modid
+//	 * @param seq
+//	 * @return
+//	 */
 	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq) {
 		int key = seq / 4;
 		String regname = "leaves" + key;
@@ -115,7 +127,7 @@ public class LeavesPaging {
 				newLp = new LeavesPropertiesJson((String) obj);
 			}
 
-			getNextLeavesBlock(modid, newLp);
+			getNextLeavesBlock(modid, newLp, (String)obj);
 			leafMap.put(label, newLp);
 		}
 
@@ -145,7 +157,7 @@ public class LeavesPaging {
 					JsonObject jsonObj = entry.getValue().getAsJsonObject();
 					newLp = new LeavesPropertiesJson(jsonObj);
 				}
-				getNextLeavesBlock(modid, newLp);
+				getNextLeavesBlock(modid, newLp, label);
 				leafMap.put(label, newLp);
 			}
 		}
