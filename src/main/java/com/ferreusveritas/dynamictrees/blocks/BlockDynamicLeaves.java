@@ -510,12 +510,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	// DROPS
 	//////////////////////////////
 
-
-	@Override
-	public boolean isShearable(@Nonnull ItemStack item, IWorldReader world, BlockPos pos) {
-		return true;
-	}
-
 	//When the leaves are sheared just return vanilla leaves for usability
 	@Nonnull
 	@Override
@@ -551,17 +545,9 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		if(access != null) {
 			ArrayList<BlockPos> branchList = new ArrayList<>();
 
-			System.out.println(leavesProperties.getTree());
-
-			ICellKit cellKit = leavesProperties.getCellKit();
-			System.out.println(cellKit);
-
-			SimpleVoxmap voxmap = cellKit.getLeafCluster();
-			System.out.println(voxmap);
-
 			//Find all of the branches that are nearby
-			for(BlockPos.MutableBlockPos dPos: voxmap.getAllNonZero()) {
-				dPos = (BlockPos.MutableBlockPos) pos.add(BlockPos.ZERO.subtract(dPos));//Becomes immutable at this point
+			for(BlockPos dPos: leavesProperties.getCellKit().getLeafCluster().getAllNonZero()) {
+				dPos = pos.add(BlockPos.ZERO.subtract(dPos));//Becomes immutable at this point
 				BlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BlockBranch branch = TreeHelper.getBranch(state);
@@ -584,7 +570,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 					}
 				}
 
-				return TreeHelper.getExactSpecies(((World) access).getBlockState(closest), (World) access, closest);
+				return TreeHelper.getExactSpecies((access).getBlockState(closest), access, closest);
 			}
 		}
 

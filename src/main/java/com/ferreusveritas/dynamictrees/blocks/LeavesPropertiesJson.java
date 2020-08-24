@@ -39,28 +39,18 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	private boolean connectAnyRadius = false;
 	private int flammability = 60;// Mimic vanilla leaves
 	private int fireSpreadSpeed = 30;// Mimic vanilla leaves
-	private String treeSpecies;
 
 	public LeavesPropertiesJson(String jsonData) {
 		this(getJsonObject(jsonData));
-	}
-
-	public LeavesPropertiesJson(JsonObject jsonObj, String treeName) {
-		this(jsonObj);
-		treeSpecies = treeName;
 	}
 
 	public LeavesPropertiesJson(JsonObject jsonObj) {
 		super(DTRegistries.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
-		//resolve();
 	}
 	
 	public void resolve() {
-		if (!treeSpecies.isEmpty()){
-			this.setTree(TreeRegistry.findSpeciesSloppy(treeSpecies).getFamily());
-		}
 
 		if(jsonObj != null) {
 			for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {

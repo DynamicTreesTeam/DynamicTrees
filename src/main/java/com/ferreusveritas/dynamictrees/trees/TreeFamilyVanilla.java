@@ -21,7 +21,7 @@ public class TreeFamilyVanilla extends TreeFamily {
 		super(new ResourceLocation(DynamicTrees.MODID, wood.toString()));
 		
 		woodType = wood;
-//		getCommonLeaves().setTree(this);
+		getCommonLeaves().setTree(this);
 
 		//Setup tree references
 		switch (wood){

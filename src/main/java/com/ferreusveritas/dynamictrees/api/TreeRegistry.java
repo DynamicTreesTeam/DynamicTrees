@@ -82,40 +82,40 @@ public class TreeRegistry {
 	}
 
 
-//	//////////////////////////////
-//	// DROP HANDLING
-//	//////////////////////////////
-//
-//	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MODID, "global");
-//
-//	/**
-//	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
-//	 * all trees.
-//	 *
-//	 * @param dropCreator
-//	 */
-//	public static boolean registerDropCreator(ResourceLocation speciesName, IDropCreator dropCreator) {
-//		if(speciesName == null || speciesName.equals(globalName)) {
-//			return globalDropCreatorStorage.addDropCreator(dropCreator);
-//		} else {
-//			return findSpecies(speciesName).addDropCreator(dropCreator);
-//		}
-//	}
-//
-//	public static boolean removeDropCreator(ResourceLocation speciesName, ResourceLocation dropCreatorName) {
-//		if(speciesName == null || speciesName.equals(globalName)) {
-//			return globalDropCreatorStorage.remDropCreator(dropCreatorName);
-//		} else {
-//			return findSpecies(speciesName).remDropCreator(dropCreatorName);
-//		}
-//	}
-//
-//	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
-//		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<ResourceLocation, Map<ResourceLocation, IDropCreator>>();
-//		dir.put(globalName, globalDropCreatorStorage.getDropCreators());
-//		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
-//		return dir;
-//	}
+	//////////////////////////////
+	// DROP HANDLING
+	//////////////////////////////
+
+	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MODID, "global");
+
+	/**
+	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
+	 * all trees.
+	 *
+	 * @param dropCreator
+	 */
+	public static boolean registerDropCreator(ResourceLocation speciesName, IDropCreator dropCreator) {
+		if(speciesName == null || speciesName.equals(globalName)) {
+			return globalDropCreatorStorage.addDropCreator(dropCreator);
+		} else {
+			return findSpecies(speciesName).addDropCreator(dropCreator);
+		}
+	}
+
+	public static boolean removeDropCreator(ResourceLocation speciesName, ResourceLocation dropCreatorName) {
+		if(speciesName == null || speciesName.equals(globalName)) {
+			return globalDropCreatorStorage.remDropCreator(dropCreatorName);
+		} else {
+			return findSpecies(speciesName).remDropCreator(dropCreatorName);
+		}
+	}
+
+	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
+		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<ResourceLocation, Map<ResourceLocation, IDropCreator>>();
+		dir.put(globalName, globalDropCreatorStorage.getDropCreators());
+		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
+		return dir;
+	}
 
 	//////////////////////////////
 	// CELLKIT HANDLING

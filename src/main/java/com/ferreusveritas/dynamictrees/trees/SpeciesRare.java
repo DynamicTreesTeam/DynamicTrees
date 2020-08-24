@@ -11,7 +11,14 @@ package com.ferreusveritas.dynamictrees.trees;
 //import net.minecraft.world.World;
 
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 /**
  * A species that places a TileEntity variation of Saplings and RootyDirtBlocks.
@@ -30,33 +37,33 @@ public class SpeciesRare extends Species {
 		super(name, treeFamily, leavesProperties);
 	}
 
-//	@Override
-//	public boolean plantSapling(World world, BlockPos pos) {
-//		super.plantSapling(world, pos);
-//		TileEntity tileEntity = world.getTileEntity(pos);
-//		if(tileEntity instanceof TileEntitySpecies) {
-//			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
-//			speciesTE.setSpecies(this);
-//			return true;
-//		}
-//		return false;
-//	}
+	@Override
+	public boolean plantSapling(IWorld world, BlockPos pos) {
+		super.plantSapling(world, pos);
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+			speciesTE.setSpecies(this);
+			return true;
+		}
+		return false;
+	}
 
-//	@Override
-//	public BlockRooty getRootyBlock() {
-//		return ModRegistries.blockRootyDirtSpecies;
-//	}
+	@Override
+	public BlockRooty getRootyBlock() {
+		return DTRegistries.blockRootyDirtSpecies;
+	}
 
-//	@Override
-//	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-//		super.placeRootyDirtBlock(world, rootPos, life);
-//		TileEntity tileEntity = world.getTileEntity(rootPos);
-//		if(tileEntity instanceof TileEntitySpecies) {
-//			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
-//			speciesTE.setSpecies(this);
-//			return true;
-//		}
-//		return true;
-//	}
+	@Override
+	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
+		super.placeRootyDirtBlock(world, rootPos, life);
+		TileEntity tileEntity = world.getTileEntity(rootPos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+			speciesTE.setSpecies(this);
+			return true;
+		}
+		return true;
+	}
 
 }

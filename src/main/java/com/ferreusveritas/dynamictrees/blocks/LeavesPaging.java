@@ -157,7 +157,7 @@ public class LeavesPaging {
 				ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
 				if(!label.startsWith("-")) { //A hyphen can be prepended to a label to create an unused gap
 					JsonObject jsonObj = entry.getValue().getAsJsonObject();
-					newLp = new LeavesPropertiesJson(jsonObj, label);
+					newLp = new LeavesPropertiesJson(jsonObj);
 				}
 				getNextLeavesBlock(modid, newLp, label);
 				leafMap.put(label, newLp);

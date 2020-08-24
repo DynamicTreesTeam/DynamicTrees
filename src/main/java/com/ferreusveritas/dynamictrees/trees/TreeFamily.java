@@ -254,12 +254,12 @@ public class TreeFamily {
 		return false;
 	}
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getWoodColor() {
 		return woodColor;
 	}
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getRootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
 		return getWoodColor();
 	}
