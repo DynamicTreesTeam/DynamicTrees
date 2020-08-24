@@ -114,9 +114,6 @@ public class DynamicTrees
         DTRegistries.setupBlocks();
         DTRegistries.setupItems();
 
-        DTRegistries.setupLeavesProperties();
-        LeavesPropertiesJson.resolveAll();
-
         DTRegistries.setupEntities();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -129,8 +126,9 @@ public class DynamicTrees
 //        WorldGenRegistry.populateDataBase();
     }
 
-    private void setup(final FMLCommonSetupEvent event) { //PREINIT
-
+    private void setup(final FMLCommonSetupEvent event) {
+        LeavesPropertiesJson.resolveAll();
+ //       cleanUp();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT

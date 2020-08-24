@@ -56,6 +56,8 @@ public class DTRegistries {
         blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
         blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
         blockTrunkShell = new BlockTrunkShell();
+
+        setupLeavesProperties();
     }
 
     public static void setupLeavesProperties() {

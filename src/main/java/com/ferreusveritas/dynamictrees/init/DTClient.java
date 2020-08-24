@@ -150,7 +150,7 @@ public class DTClient {
 //        RenderingRegistry.registerEntityRenderingHandler(EntityFallingTree.class, new RenderFallingTree.Factory());
     }
 
-    public int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
+    public static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
         return leavesProperties.foliageColorMultiplier(blockState, world, pos);
     }
 
@@ -158,7 +158,7 @@ public class DTClient {
     // PARTICLES
     ///////////////////////////////////////////
 
-    public void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
+    public static void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
         if(world.isRemote) {
             Particle particle = Minecraft.getInstance().particles.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
             assert particle != null;
@@ -173,7 +173,7 @@ public class DTClient {
         }
     }
 
-    public void crushLeavesBlock(World world, BlockPos pos, BlockState blockState, Entity entity) {
+    public static void crushLeavesBlock(World world, BlockPos pos, BlockState blockState, Entity entity) {
         if(world.isRemote) {
             Random random = world.rand;
             ITreePart treePart = TreeHelper.getTreePart(blockState);

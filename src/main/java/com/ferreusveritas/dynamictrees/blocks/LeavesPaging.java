@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.google.gson.JsonElement;
@@ -66,35 +68,35 @@ public class LeavesPaging {
 		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq, name);
 //		int tree = seq & 3;
 		leavesProperties.setDynamicLeavesState(leaves.getDefaultState());
+
+//		leavesProperties.setTree(TreeRegistry.findSpeciesSloppy(name).getFamily());
+
 		leaves.setProperties(leavesProperties);
 		return leaves;
 	}
 
 	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, String leavesName) {
 		String regname = "dynamic_" + leavesName + "_leaves";
-		//String regname = "leaves" + seq;
-
-		System.out.println(leavesName);
 
 		return getLeavesMapForModId(modid).computeIfAbsent(seq, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
 	}
 
-	/**
-	 * Old system
-	 */
 //	/**
-//	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
-//	 *
-//	 * @param modid
-//	 * @param seq
-//	 * @return
+//	 * Old system
 //	 */
-	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq) {
-		int key = seq / 4;
-		String regname = "leaves" + key;
-
-		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
-	}
+////	/**
+////	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
+////	 *
+////	 * @param modid
+////	 * @param seq
+////	 * @return
+////	 */
+//	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq) {
+//		int key = seq / 4;
+//		String regname = "leaves" + key;
+//
+//		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
+//	}
 
 	/**
 	 * 	Get the map of leaves from for the appropriate modid.
@@ -155,7 +157,7 @@ public class LeavesPaging {
 				ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
 				if(!label.startsWith("-")) { //A hyphen can be prepended to a label to create an unused gap
 					JsonObject jsonObj = entry.getValue().getAsJsonObject();
-					newLp = new LeavesPropertiesJson(jsonObj);
+					newLp = new LeavesPropertiesJson(jsonObj, label);
 				}
 				getNextLeavesBlock(modid, newLp, label);
 				leafMap.put(label, newLp);
@@ -179,14 +181,6 @@ public class LeavesPaging {
 
 		return null;
 	}
-
-//	@OnlyIn(Dist.CLIENT)
-//	public static void setStateMappers() {
-//		LeavesStateMapper mapper = new LeavesStateMapper();
-//		for(String modId : modLeavesArray.keySet()) {
-//			LeavesPaging.getLeavesMapForModId(modId).forEach((key, leaves) -> ModelLoader.setCustomStateMapper(leaves, mapper));
-//		}
-//	}
 
 	/**
 	 * Frees up the memory since this is only used during startup

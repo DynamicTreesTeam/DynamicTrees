@@ -163,5 +163,11 @@ public class LeavesProperties implements ILeavesProperties {
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
 		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "LeavesProperties{" +
+				"primitiveLeaves=" + primitiveLeaves +
+				", tree=" + tree + '}';
+	}
 }
