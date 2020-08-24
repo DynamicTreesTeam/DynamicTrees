@@ -1,25 +1,17 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.event.DropEventHandler;
-import com.ferreusveritas.dynamictrees.event.LeafUpdateEventHandler;
-import com.ferreusveritas.dynamictrees.event.PoissonDiscEventHandler;
-import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -148,7 +140,6 @@ public class DynamicTrees
 
     public void cleanUp() {
         LeavesPropertiesJson.cleanUp();
-        LeavesPaging.cleanUp();
         TreeRegistry.cleanupCellKit();
         TreeRegistry.cleanupGrowthLogicKit();
     }

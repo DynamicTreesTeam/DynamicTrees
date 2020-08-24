@@ -1,5 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -8,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -22,12 +28,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
 
 public class LeavesPropertiesJson extends LeavesProperties {
 	
@@ -123,28 +123,10 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		ItemStack stack = ItemStack.EMPTY;
 
 		if(block != Blocks.AIR) {
-
 			stack = new ItemStack(Item.BLOCK_TO_ITEM.get(block), 1);
 		}
 
 		return new PrimitiveLeavesComponents(block.getDefaultState(), stack);
-	}
-	
-	private static PrimitiveLeavesComponents getPrimitiveLeaves(JsonObject jsonObj) {
-		
-		for(Entry<String, JsonElement> entry : jsonObj.entrySet()) {
-			String name = entry.getKey();
-			PrimitiveLeavesComponents comp = findPrimitiveComponents(name, entry.getValue());
-			if(comp != null) {
-				return comp;
-			}
-		}
-		
-		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
-	}
-	
-	private static BlockState getBlockState(String blockStateDesc) {
-		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockStateDesc))).getDefaultState();
 	}
 	
 	public static JsonObject getJsonObject(String jsonData) {
@@ -168,7 +150,6 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	public static void cleanUp() {
 		//Free memory
 		resolutionList = null;
-		blockstateFinderMap = null;
 	}
 	
 	@Override
@@ -213,25 +194,6 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	@Override
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		return leavesUpdate.updateTick(worldIn, pos, state, rand, this);
-	}
-	
-	///////////////////////////////////////////
-	//PRIMITIVE LEAVES FINDING
-	///////////////////////////////////////////
-	
-	protected static Map<String, Function<JsonElement, PrimitiveLeavesComponents>> blockstateFinderMap = new HashMap<>();
-	
-	public static void addLeavesFinderFunction(String finderName, Function<JsonElement, PrimitiveLeavesComponents> function) {
-		blockstateFinderMap.put(finderName, function);
-	}
-	
-	public static PrimitiveLeavesComponents findPrimitiveComponents(String finderName, JsonElement jsonElement) {
-		Function<JsonElement, PrimitiveLeavesComponents> function = blockstateFinderMap.get(finderName);
-		if(function != null) {
-			return function.apply(jsonElement);
-		}
-		
-		return new PrimitiveLeavesComponents(Blocks.AIR.getDefaultState(), ItemStack.EMPTY);
 	}
 	
 	///////////////////////////////////////////

@@ -1,44 +1,34 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.ModContainer;
-import org.apache.logging.log4j.core.util.Loader;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import net.minecraft.util.ResourceLocation;
+
 /**
- * This class provides a mechanism for mapping leaves sub blocks to
- * their corresponding leaves properties.  This is currently a 4:1 ratio.
- * This method will be obsolete in MC 1.13 since each blockstate will
- * be able to contain it's own leaves properties.
- * 
- * The data is only used by mods for initialization purposes and all
- * contained data will be erased during postInit().
- * 
  * @author ferreusveritas
  */
 public class LeavesPaging {
 	
+	private static HashMap<String, List<BlockDynamicLeaves> > modLeavesArray = new HashMap<>();
+	
 	///////////////////////////////////////////
 	//BLOCK PAGING
 	///////////////////////////////////////////
-	
-	private static HashMap<String, HashMap<Integer, BlockDynamicLeaves> > modLeavesArray = new HashMap<>();
-	private static HashMap<String, Integer> modLastSeq = new HashMap<>();
 		
 	private static String autoModId(@Nullable String modid) {
 		if(modid == null || "".equals(modid)) {
@@ -49,55 +39,22 @@ public class LeavesPaging {
 		return modid;
 	}
 	
-	public static BlockDynamicLeaves getNextLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String label) {
-		return getLeavesBlockForSequence(modid, getNextSequenceNumber(modid), leavesProperties, label);
-	}
-	
-	public static int getNextSequenceNumber(@Nullable String modid) {
-		modid = autoModId(modid);
-		int seq = modLastSeq.computeIfAbsent(modid, i -> 0);
-		modLastSeq.put(modid, seq + 1);
-		return seq;
-	}
-
-	public static int getLastSequenceNumber(@Nullable String modid) {
-		return modLastSeq.computeIfAbsent(autoModId(modid), i -> 0) - 1;
-	}
-
-	public static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, @Nonnull ILeavesProperties leavesProperties, String name) {
-		BlockDynamicLeaves leaves = getLeavesBlockForSequence(modid, seq, name);
-//		int tree = seq & 3;
+	private static BlockDynamicLeaves createLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String name) {
+		BlockDynamicLeaves leaves = createLeavesBlock(modid, name);
 		leavesProperties.setDynamicLeavesState(leaves.getDefaultState());
-
-//		leavesProperties.setTree(TreeRegistry.findSpeciesSloppy(name).getFamily());
-
 		leaves.setProperties(leavesProperties);
 		return leaves;
 	}
 
-	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq, String leavesName) {
+	private static BlockDynamicLeaves createLeavesBlock(@Nullable String modid, String leavesName) {
 		String regname = "dynamic_" + leavesName + "_leaves";
 
-		return getLeavesMapForModId(modid).computeIfAbsent(seq, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
+		List<BlockDynamicLeaves> map = getLeavesListForModId(modid);
+		BlockDynamicLeaves newLeaves = (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname);
+		map.add(newLeaves);
+		return newLeaves;
 	}
-
-//	/**
-//	 * Old system
-//	 */
-////	/**
-////	 * A convenience function for packing 4 {@link BlockDynamicLeaves} blocks into one Minecraft block using metadata.
-////	 *
-////	 * @param modid
-////	 * @param seq
-////	 * @return
-////	 */
-//	private static BlockDynamicLeaves getLeavesBlockForSequence(@Nullable String modid, int seq) {
-//		int key = seq / 4;
-//		String regname = "leaves" + key;
-//
-//		return getLeavesMapForModId(modid).computeIfAbsent(key, k -> (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname));
-//	}
-
+	
 	/**
 	 * 	Get the map of leaves from for the appropriate modid.
 	 *  If the map does not exist then one is created.
@@ -105,8 +62,8 @@ public class LeavesPaging {
 	 * @param modid The ModId of the mod accessing this
 	 * @return The map of {@link BlockDynamicLeaves}
 	 */
-	public static Map<Integer, BlockDynamicLeaves> getLeavesMapForModId(@Nullable String modid) {
-		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new HashMap<Integer, BlockDynamicLeaves>());
+	public static List<BlockDynamicLeaves> getLeavesListForModId(@Nullable String modid) {
+		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new ArrayList<BlockDynamicLeaves>());
 	}
 
 	public static Map<String, ILeavesProperties> buildAll(Object ... leavesProperties) {
@@ -129,7 +86,7 @@ public class LeavesPaging {
 				newLp = new LeavesPropertiesJson((String) obj);
 			}
 
-			getNextLeavesBlock(modid, newLp, (String)obj);
+			createLeavesBlock(modid, newLp, (String)obj);
 			leafMap.put(label, newLp);
 		}
 
@@ -154,12 +111,9 @@ public class LeavesPaging {
 		if(root != null) {
 			for(Entry<String, JsonElement> entry : root.entrySet()) {
 				String label = entry.getKey();
-				ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
-				if(!label.startsWith("-")) { //A hyphen can be prepended to a label to create an unused gap
-					JsonObject jsonObj = entry.getValue().getAsJsonObject();
-					newLp = new LeavesPropertiesJson(jsonObj);
-				}
-				getNextLeavesBlock(modid, newLp, label);
+				JsonObject jsonObj = entry.getValue().getAsJsonObject();
+				ILeavesProperties newLp = new LeavesPropertiesJson(jsonObj);
+				createLeavesBlock(modid, newLp, label);
 				leafMap.put(label, newLp);
 			}
 		}
@@ -180,14 +134,6 @@ public class LeavesPaging {
 		Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + modid + " at " + jsonLocation);
 
 		return null;
-	}
-
-	/**
-	 * Frees up the memory since this is only used during startup
-	 */
-	public static void cleanUp() {
-		modLeavesArray = new HashMap<>();
-		modLastSeq = new HashMap<>();
 	}
 	
 }

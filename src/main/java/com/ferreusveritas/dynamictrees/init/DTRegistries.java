@@ -1,30 +1,43 @@
 package com.ferreusveritas.dynamictrees.init;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
+import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamilyVanilla;
-import com.ferreusveritas.dynamictrees.trees.TreeOak;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
-
-import java.util.*;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -72,7 +85,7 @@ public class DTRegistries {
         ArrayList<Block> treeBlocks = new ArrayList<Block>();
         DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
         DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
-        treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(DynamicTrees.MODID).values());
+        treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 
         registry.registerAll(
                 blockRootyDirt,
