@@ -1,5 +1,9 @@
 package com.ferreusveritas.dynamictrees.items;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -7,6 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,59 +20,33 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 
-
-public class Seed extends Item {
-	
-	public final static Seed NULLSEED = new Seed() {
-		@Override public void setSpecies(Species species, ItemStack seedStack) {}
-		@Override public Species getSpecies(ItemStack seedStack) { return Species.NULLSPECIES; }
-		@Override public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) { entityItem.onKillCommand(); return false; }
-		@Override public ActionResultType onItemUse(ItemUseContext context) { return ActionResultType.FAIL; }
-	};
+public class Seed extends Item implements IPlantable {
 	
 	private Species species;//The tree this seed creates
 
 	public Seed() { super(new Item.Properties());setRegistryName("null"); }
-	public Seed(String name) {
+	
+	public Seed(Species species) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
-		setRegistryName(name);
+		setRegistryName(species.getRegistryName().getPath() + "seed");
 	}
 	
-	public void setSpecies(Species species, ItemStack seedStack) {
-		this.species = species;
-	}
-	
-	public Species getSpecies(ItemStack seedStack) {
+	public Species getSpecies() {
 		return species;
-	}
-	
-	public boolean isValid() {
-		return this != NULLSEED;
-	}
-	
-	public void ifValid(Consumer<Seed> c) {
-		if(isValid()) {
-			c.accept(this);
-		}
 	}
 
 	@Override
@@ -84,7 +63,7 @@ public class Seed extends Item {
 			if(!world.isRemote) {//Server side only
 				ItemStack seedStack = entityItem.getItem();
 				BlockPos pos = new BlockPos(entityItem);
-				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(seedStack), pos, shouldPlant(world, pos, seedStack));
+				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(), pos, shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
 				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
 					doPlanting(world, pos, null, seedStack);
@@ -98,7 +77,7 @@ public class Seed extends Item {
 	}
 
 	public boolean doPlanting(World world, BlockPos pos, PlayerEntity planter, ItemStack seedStack) {
-		Species species = getSpecies(seedStack);
+		Species species = getSpecies();
 		if(species.plantSapling(world, pos)) {//Do the planting
 			String joCode = getCode(seedStack);
 			if(!joCode.isEmpty()) {
@@ -120,7 +99,7 @@ public class Seed extends Item {
 			return false;
 		}
 
-		float plantChance = (float) (getSpecies(seedStack).biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
+		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
 
 		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
 		if(DTConfigs.seedOnlyForest.get() && treeGen != null) {
@@ -172,10 +151,9 @@ public class Seed extends Item {
 		//Handle Flower Pot interaction
 		BlockState emptyPotState = context.getWorld().getBlockState(context.getPos());
 		if(emptyPotState.getBlock() instanceof FlowerPotBlock && (emptyPotState == emptyPotState.getBlock().getDefaultState()) ) { //Empty Flower Pot of some kind
-			Species species = getSpecies(context.getItem());
-			BlockBonsaiPot bonzaiPot = species.getBonzaiPot();
+			BlockBonsaiPot bonzaiPot = getSpecies().getBonzaiPot();
 			context.getWorld().setBlockState(context.getPos(), bonzaiPot.getDefaultState());
-			if(bonzaiPot.setSpecies(context.getWorld(), species, context.getPos()) && bonzaiPot.setPotState(context.getWorld(), emptyPotState, context.getPos())) {
+			if(bonzaiPot.setSpecies(context.getWorld(), getSpecies(), context.getPos()) && bonzaiPot.setPotState(context.getWorld(), emptyPotState, context.getPos())) {
 				context.getItem().shrink(1);
 				return ActionResultType.SUCCESS;
 			}
@@ -208,18 +186,18 @@ public class Seed extends Item {
 
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
-		ItemStack seedStack = Objects.requireNonNull(context.getPlayer()).getHeldItem(context.getHand());
-
+		//ItemStack seedStack = Objects.requireNonNull(context.getPlayer()).getHeldItem(context.getHand());
+		
 		//Handle Flower Pot interaction
 		if(onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
-
+		
 		//Handle Planting Seed interaction
 		if(onItemUsePlantSeed(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
-
+		
 		return ActionResultType.FAIL;
 	}
 
@@ -241,6 +219,16 @@ public class Seed extends Item {
 				tooltip.add(new StringTextComponent("Seed Life Span: §3" + nbtData.getInt("lifespan")));
 			}
 		}
+	}
+
+	
+	///////////////////////////////////////////
+	//IPlantable Interface
+	///////////////////////////////////////////
+	
+	@Override
+	public BlockState getPlant(IBlockReader world, BlockPos pos) {
+		return getSpecies().getSapling().map(Block::getDefaultState).orElse(Blocks.AIR.getDefaultState());
 	}
 
 }

@@ -3,8 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
+
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -24,29 +23,12 @@ public class TreeFamilyVanilla extends TreeFamily {
 		getCommonLeaves().setTree(this);
 
 		//Setup tree references
-		switch (wood){
-			case darkoak:
-				setPrimitiveLog(Blocks.DARK_OAK_LOG);
-				break;
-			case acacia:
-				setPrimitiveLog(Blocks.ACACIA_LOG);
-				break;
-			case jungle:
-				setPrimitiveLog(Blocks.JUNGLE_LOG);
-				break;
-			case birch:
-				setPrimitiveLog(Blocks.BIRCH_LOG);
-				break;
-			case spruce:
-				setPrimitiveLog(Blocks.SPRUCE_LOG);
-				break;
-			case oak:
-				setPrimitiveLog(Blocks.OAK_LOG);
-				break;
-		}
+		setPrimitiveLog(wood.getLog());
 
 		//Setup common species
 		getCommonSpecies().generateSeed();
+		getCommonSpecies().generateSapling();
+		
 	}
 	
 	@Override

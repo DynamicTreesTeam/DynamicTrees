@@ -8,6 +8,8 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -91,7 +93,19 @@ public class DynamicTrees
         birch,
         jungle,
         darkoak,
-        acacia
+        acacia;
+        
+        public Block getLog() {
+        	switch(this) {
+				case acacia: return Blocks.ACACIA_LOG;
+				case birch: return Blocks.BIRCH_LOG;
+				case darkoak: return Blocks.DARK_OAK_LOG;
+				case jungle: return Blocks.JUNGLE_LOG;
+				case oak: return Blocks.OAK_LOG;
+				case spruce: return Blocks.SPRUCE_LOG;
+				default: return Blocks.OAK_LOG;
+        	}
+        }
     }
 
     public enum EnumDestroyMode {

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.Optional;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -103,7 +105,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 		
 		//Mega jungle are just jungle trees under special circumstances..  So they have the same seeds
 		@Override
-		public Seed getSeed() {
+		public Optional<Seed> getSeed() {
 			return getCommonSpecies().getSeed();
 		}
 		

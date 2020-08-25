@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+//TODO: 1.14.4 This gets flattened into the normal block branch with radius 1 - 32 and eliminated 
+
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 
 //

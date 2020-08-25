@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -61,7 +62,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
@@ -85,15 +85,15 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraftforge.registries.IForgeRegistryEntry<Species> {
 
 	public final static Species NULLSPECIES = new Species() {
-		@Override public Seed getSeed() { return Seed.NULLSEED; }
+		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
-		@Override public ItemStack setSeedStack(ItemStack newSeedStack) { return new ItemStack(getSeed()); }
-		@Override public ItemStack getSeedStack(int qty) { return new ItemStack(getSeed()); }
+		@Override public Species setSeed(Seed newSeed) { return this; }
+		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
@@ -132,10 +132,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
-	/** Hold damage value for seed items with multiple variants */
-	protected ItemStack seedStack;
+	protected Seed seed = null;
 	/** A blockState that will turn itself into this tree */
-	protected BlockState saplingBlock;
+	protected BlockDynamicSapling saplingBlock = null;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
 
@@ -184,8 +183,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		setLeavesProperties(leavesProperties);
 
 		setStandardSoils();
-		seedStack = new ItemStack(Seed.NULLSEED);
-		saplingBlock = Blocks.AIR.getDefaultState();
 
 		//Add JoCode models for worldgen
 		addJoCodes();
@@ -268,21 +265,21 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	///////////////////////////////////////////
 
 	/**
-	 * Get a copy of the {@link Seed} stack with the supplied quantity.
-	 * This is necessary because the stack may be combined with
-	 * NBT data.
+	 * Get an ItemStack of the species {@link Seed} with the supplied quantity.
 	 *
 	 * @param qty The number of items in the newly copied stack.
-	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
+	 * @return An {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		ItemStack stack = seedStack.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+		return hasSeed() ? new ItemStack(seed, qty) : ItemStack.EMPTY;
 	}
-
-	public Seed getSeed() {
-		return (Seed) seedStack.getItem();
+	
+	public boolean hasSeed() {
+		return seed != null;
+	}
+	
+	public Optional<Seed> getSeed() {
+		return Optional.ofNullable(seed);
 	}
 
 	/**
@@ -290,32 +287,17 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * in the appropriate registries.
 	 */
 	public Species generateSeed() {
-		Seed seed = new Seed(getRegistryName().getPath() + "seed");
-		setSeedStack(new ItemStack(seed));
-		return this;
+		return setSeed(new Seed(this));
 	}
 
 	/**
-	 * Sets the {@link ItemStack} that is used for this Species.
-	 * The {@link ItemStack} must contain an {@link Item} of type {@link Seed}
-	 * or this will fail.
-	 *
-	 * This links the {@link Seed} to the {@link Species} and vice versa.
-	 *
-	 * @param newSeedStack The input {@link ItemStack} containing a {@link Seed} item.
-	 * @return The input {@link ItemStack} or an {@link ItemStack#EMPTY} on failure.
+	 * 
+	 * @param newSeed
+	 * @return this for chaining
 	 */
-	public ItemStack setSeedStack(ItemStack newSeedStack) {
-
-		if(newSeedStack.getItem() instanceof Seed) {
-			seedStack = newSeedStack;
-			Seed seed = (Seed) seedStack.getItem();
-			seed.setSpecies(this, seedStack);
-			return seedStack;
-		} else {
-			System.err.println("setSeedStack must have an ItemStack with an Item that is an instance of a Seed");
-		}
-		return ItemStack.EMPTY;
+	public Species setSeed(Seed newSeed) {
+		seed = newSeed;
+		return this;
 	}
 
 	/**
@@ -455,10 +437,29 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return true;
 	}
 
+	
 	///////////////////////////////////////////
 	//SAPLING
 	///////////////////////////////////////////
 
+	public Species setSapling(BlockDynamicSapling sapling) {
+		saplingBlock = sapling;
+		return this;
+	}
+	
+	/**
+	 * Generate a sapling. Developer is still required to register the block
+	 * in the appropriate registries.
+	 */
+	public Species generateSapling() {
+		setSapling(new BlockDynamicSapling(this));
+		return this;
+	}
+	
+	public Optional<BlockDynamicSapling> getSapling() {
+		return Optional.ofNullable(saplingBlock);
+	}
+	
 	/**
 	 * Checks surroundings and places a dynamic sapling block.
 	 *
@@ -467,11 +468,12 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @return true if the planting was successful
 	 */
 	public boolean plantSapling(IWorld world, BlockPos pos) {
-		if(world.getBlockState(pos).getMaterial().isReplaceable() && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
-			DTRegistries.blockDynamicSapling.setSpecies(world, pos, this);
-			return true;
+		if(saplingBlock != null) {
+			if(world.getBlockState(pos).getMaterial().isReplaceable() && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+				world.setBlockState(pos, saplingBlock.getDefaultState(), 3);
+				return true;
+			}
 		}
-
 		return false;
 	}
 

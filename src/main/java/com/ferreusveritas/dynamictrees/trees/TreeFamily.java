@@ -1,14 +1,27 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.CellMetadata;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,23 +33,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
-
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * This structure describes a Tree Family whose member Species all have a common wood type.
@@ -73,9 +78,7 @@ public class TreeFamily {
 	/** The dynamic branch used by this tree family */
 	private BlockBranch dynamicBranch;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
-	private BlockState primitiveLog = Blocks.AIR.getDefaultState();
-	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
-	private ItemStack primitiveLogItemStack = ItemStack.EMPTY;
+	private Block primitiveLog = Blocks.AIR;
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -180,12 +183,16 @@ public class TreeFamily {
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		if(isThick()) {
+			//TODO: This goes away as branch block will be flattened
 			BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
 			blockList.add(branch.getPairSide(false));
 			blockList.add(branch.getPairSide(true));
 		} else {
 			blockList.add(getDynamicBranch());
 		}
+		
+		getCommonSpecies().getSapling().ifPresent(blockList::add);
+		
 		return blockList;
 	}
 
@@ -207,7 +214,7 @@ public class TreeFamily {
 			itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
 		}
 
-		getCommonSpecies().getSeed().ifValid(itemList::add);
+		getCommonSpecies().getSeed().ifPresent(itemList::add);
 
 		return itemList;
 	}
@@ -289,31 +296,16 @@ public class TreeFamily {
 
 	/**
 	 * Used to set the type of log item that a tree drops when it's harvested.
-	 * Uses damageDropped() to automatically set the ItemStack metadata from a BlockState.
-	 *
-	 * @param primLog A blockstate of the log
-	 * @return TreeFamily for chaining calls
-	 */
-	protected TreeFamily setPrimitiveLog(BlockState primLog) {
-		return setPrimitiveLog(primLog, new ItemStack(Item.getItemFromBlock(primLog.getBlock())));
-	}
-
-	/**
-	 * Used to set the type of log item that a tree drops when it's harvested.
 	 * Use this function to explicitly set the itemstack instead of having it
 	 * done automatically.
 	 *
-	 * @param primLog A blockstate of the log
+	 * @param primLog A block object that is the log
 	 * @param primLogStack An itemStack of the log item
 	 * @return TreeFamily for chaining calls
 	 */
-	protected TreeFamily setPrimitiveLog(BlockState primLog, ItemStack primLogStack) {
+	protected TreeFamily setPrimitiveLog(Block primLog) {
 		primitiveLog = primLog;
-		primitiveLogItemStack = primLogStack;
 		return this;
-	}
-	protected TreeFamily setPrimitiveLog(Block primLogBlock) {
-		return this.setPrimitiveLog(primLogBlock.getDefaultState(), new ItemStack(primLogBlock));
 	}
 
 	/**
@@ -321,9 +313,9 @@ public class TreeFamily {
 	 * material. Chiefly used to determine the wood hardness for harvesting
 	 * behavior.
 	 *
-	 * @return BlockState of the primitive log.
+	 * @return Block of the primitive log.
 	 */
-	public BlockState getPrimitiveLog() {
+	public Block getPrimitiveLog() {
 		return primitiveLog;
 	}
 
@@ -333,12 +325,11 @@ public class TreeFamily {
 	 * @param qty The quantity of logs requested
 	 * @return itemStack of requested logs.
 	 */
-	public ItemStack getPrimitiveLogItemStack(int qty) {
-		ItemStack stack = primitiveLogItemStack.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+	public ItemStack getPrimitiveLogs(int qty) {
+		return new ItemStack(primitiveLog, qty); 
 	}
 
+	
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////

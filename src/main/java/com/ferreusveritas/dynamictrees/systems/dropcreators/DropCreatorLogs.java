@@ -23,7 +23,7 @@ public class DropCreatorLogs extends DropCreator {
 		
 		int numLogs = las.logs;
 		while(numLogs > 0) {
-			dropList.add(species.getFamily().getPrimitiveLogItemStack(numLogs >= 64 ? 64 : numLogs));
+			dropList.add(species.getFamily().getPrimitiveLogs(numLogs >= 64 ? 64 : numLogs));
 			numLogs -= 64;
 		}
 		int numSticks = las.sticks;

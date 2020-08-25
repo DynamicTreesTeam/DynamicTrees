@@ -23,6 +23,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class TreeOak extends TreeFamilyVanilla {
@@ -116,7 +117,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		
 		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
-		public Seed getSeed() {
+		public Optional<Seed> getSeed() {
 			return getCommonSpecies().getSeed();
 		}
 		
@@ -189,7 +190,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	
 	@Override
 	public List<Item> getRegisterableItems(List<Item> itemList) {
-		itemList.add(appleSpecies.getSeed());//Since we generated the apple species internally we need to let the seed out to be registered.
+		appleSpecies.getSeed().ifPresent(itemList::add);//Since we generated the apple species internally we need to let the seed out to be registered.
 		return super.getRegisterableItems(itemList);
 	}
 	

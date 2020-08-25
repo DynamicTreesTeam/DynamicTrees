@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.Optional;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.ConiferLogic;
@@ -80,7 +82,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		
 		//Mega spruce are just spruce in a mega taiga..  So they have the same seeds
 		@Override
-		public Seed getSeed() {
+		public Optional<Seed> getSeed() {
 			return getCommonSpecies().getSeed();
 		}
 		

@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
@@ -49,7 +48,6 @@ public class DTRegistries {
     public static BlockRooty blockRootySand;
     public static BlockRooty blockRootyDirtSpecies;
     public static Block blockRootyDirtFake;
-    public static BlockDynamicSapling blockDynamicSapling;
     public static BlockFruit blockApple;
     public static BlockFruitCocoa blockFruitCocoa;
     public static BlockBonsaiPot blockBonsaiPot;
@@ -64,7 +62,6 @@ public class DTRegistries {
         blockRootySand = new BlockRootySand(false);//Sand
         blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
         blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
-        blockDynamicSapling = new BlockDynamicSapling("sapling");//Dynamic version of a Vanilla sapling
         blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
         blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
         blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
@@ -92,7 +89,6 @@ public class DTRegistries {
                 blockRootySand,
                 blockRootyDirtSpecies,
                 blockRootyDirtFake,
-                blockDynamicSapling,
                 blockBonsaiPot,
                 blockFruitCocoa,
                 blockApple,

@@ -161,7 +161,7 @@ public class TreeCactus extends TreeFamily {
 	public TreeCactus() {
 		super(new ResourceLocation(DynamicTrees.MODID, "cactus"));
 		
-		setPrimitiveLog(Blocks.CACTUS.getDefaultState(), new ItemStack(Blocks.CACTUS));
+		setPrimitiveLog(Blocks.CACTUS);
 		setStick(ItemStack.EMPTY);
 	}
 	
