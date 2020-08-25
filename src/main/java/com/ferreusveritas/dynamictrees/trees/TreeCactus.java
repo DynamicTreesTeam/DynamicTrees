@@ -21,6 +21,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -162,7 +163,7 @@ public class TreeCactus extends TreeFamily {
 		super(new ResourceLocation(DynamicTrees.MODID, "cactus"));
 		
 		setPrimitiveLog(Blocks.CACTUS);
-		setStick(ItemStack.EMPTY);
+		setStick(Items.AIR);
 	}
 	
 	@Override

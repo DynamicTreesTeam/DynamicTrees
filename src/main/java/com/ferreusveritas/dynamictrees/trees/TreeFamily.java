@@ -86,7 +86,7 @@ public class TreeFamily {
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
-	private ItemStack stick;
+	private Item stick = null;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 
@@ -106,7 +106,7 @@ public class TreeFamily {
 		this.name = name;
 
 		setDynamicBranch(createBranch());
-		stick = new ItemStack(Items.STICK);
+		stick = Items.STICK;
 		createSpecies();
 	}
 
@@ -277,8 +277,8 @@ public class TreeFamily {
 	 * @param itemStack An itemstack of the stick
 	 * @return TreeFamily for chaining calls
 	 */
-	protected TreeFamily setStick(ItemStack itemStack) {
-		stick = itemStack;
+	protected TreeFamily setStick(Item item) {
+		stick = item;
 		return this;
 	}
 
@@ -289,9 +289,7 @@ public class TreeFamily {
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		ItemStack stack = stick.copy();
-		stack.setCount(MathHelper.clamp(qty, 0, 64));
-		return stack;
+		return new ItemStack(stick, MathHelper.clamp(qty, 0, 64));
 	}
 
 	/**

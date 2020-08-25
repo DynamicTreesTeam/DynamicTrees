@@ -155,11 +155,6 @@ public class LeavesProperties implements ILeavesProperties {
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
 	
 	@Override
-	public boolean appearanceChangesWithHydro() {
-		return false;
-	}
-	
-	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
 		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}

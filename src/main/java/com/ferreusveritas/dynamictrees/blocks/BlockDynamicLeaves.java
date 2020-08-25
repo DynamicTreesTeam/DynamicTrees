@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.*;
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -13,12 +13,22 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.init.DTClient;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.*;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -27,18 +37,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -47,20 +50,16 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.*;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.PlantType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 
 public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
 
@@ -163,7 +162,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 			if(oldHydro != newHydro) {//Only update if the hydro has changed. A little performance gain
 				//We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
 				//does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-				world.setBlockState(pos, leavesProperties.getDynamicLeavesState(newHydro), leavesProperties.appearanceChangesWithHydro() ? 2 : 4);
+				world.setBlockState(pos, leavesProperties.getDynamicLeavesState(newHydro), 4);
 			}
 		}
 
@@ -323,7 +322,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public boolean growLeavesIfLocationIsSuitable(World world, ILeavesProperties leavesProp, BlockPos pos, int hydro) {
 		hydro = hydro == 0 ? leavesProp.getCellKit().getDefaultHydration() : hydro;
 		if(isLocationSuitableForNewLeaves(world, leavesProp, pos)) {
-			world.setBlockState(pos, leavesProp.getDynamicLeavesState(hydro), 2 | (leavesProp.appearanceChangesWithHydro() ? 1 : 0));//Removed Notify Neighbors Flag for performance
+			world.setBlockState(pos, leavesProp.getDynamicLeavesState(hydro), 2);//Removed Notify Neighbors Flag for performance
 			return true;
 		}
 		return false;

@@ -1,18 +1,18 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public interface ILeavesProperties {
 
@@ -60,8 +60,6 @@ public interface ILeavesProperties {
 	 * @return return true to allow the normal DynamicLeavesBlock update to occur
 	 */
 	boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand);
-
-	boolean appearanceChangesWithHydro();
 
 	int getRadiusForConnection(BlockState blockState, IBlockReader blockReader, BlockPos pos, BlockBranch from, Direction side, int fromRadius);
 
