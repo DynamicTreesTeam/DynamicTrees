@@ -7,18 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
-import com.ferreusveritas.dynamictrees.client.QuadManipulator;
-import com.ferreusveritas.dynamictrees.client.TextureUtils;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
-import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
-import com.ferreusveritas.dynamictrees.items.DendroPotion;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockRooty;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelSapling;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -128,10 +117,6 @@ public class DTClient {
 //                },
 //                DTRegistries.blockRootyDirt, DTRegistries.blockRootyDirtSpecies, DTRegistries.blockRootySand, DTRegistries.blockRootyDirtFake);
 
-        //Register Sapling Colorizer
-        ModelHelper.regColorHandler(DTRegistries.blockDynamicSapling, (state, access, pos, tintIndex) ->
-                isValid(access, pos) ? DTRegistries.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex) : white);
-
         //Register Bonsai Pot Colorizer
 //        ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
 //                ? DTRegistries.blockBonsaiPot.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
@@ -145,6 +130,14 @@ public class DTClient {
         ModelHelper.regColorHandler(DTRegistries.treeStaff, (stack, tint) -> DTRegistries.treeStaff.getColor(stack, tint));
 
         //TREE PARTS
+
+        //Register Sapling Colorizer
+        for (Species species : Species.REGISTRY){
+            if (species.getSapling().isPresent()){
+                ModelHelper.regColorHandler(species.getSapling().get(), (state, access, pos, tintIndex) ->
+                        isValid(access, pos) ? species.saplingColorMultiplier(state, access, pos, tintIndex) : white);
+            }
+        }
 
 //        Register GrowingLeavesBlocks Colorizers
         for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MODID)) {

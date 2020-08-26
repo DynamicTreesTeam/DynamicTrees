@@ -94,9 +94,9 @@ public class BakedModelSapling implements IDynamicBakedModel {
 		}
 
 		List<BakedQuad> quads = new ArrayList<>(12);
-		Species species = extraData.getData(TileEntitySpecies.SPECIES);
-
-		quads.addAll(getModelForSapling(species).getQuads(DTRegistries.blockDynamicSapling.getDefaultState(), side, rand, extraData));
+//		Species species = extraData.getData(TileEntitySpecies.SPECIES);
+//
+//		quads.addAll(getModelForSapling(species).getQuads(DTRegistries.blockDynamicSapling.getDefaultState(), side, rand, extraData));
 
 		return quads;
 	}

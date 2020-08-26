@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -19,6 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -52,6 +54,15 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		return species;
 	}
 
+	@Override
+	public boolean canGrow(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
+		return getSpecies().canGrowWithBoneMeal((World) world, pos);
+	}
+
+	@Override
+	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
+		return getSpecies().canUseBoneMealNow(world, rand, pos);
+	}
 
 	///////////////////////////////////////////
 	// INTERACTION
@@ -135,7 +146,6 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
-
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
 		return getSpecies().getSaplingShape();
@@ -145,36 +155,10 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	// RENDERING
 	///////////////////////////////////////////
 
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//
-//	@Override
-//	public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face) {
-//		return BlockFaceShape.UNDEFINED;//This prevents fences and walls from attempting to connect to saplings.
-//	}
-//
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public BlockRenderLayer getBlockLayer() {
-//		return BlockRenderLayer.CUTOUT_MIPPED;
-//	}
-
-
+	@Nonnull
 	@Override
-	public boolean canGrow(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
-		return getSpecies().canGrowWithBoneMeal((World) world, pos);
-	}
-
-	@Override
-	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
-		return getSpecies().canUseBoneMealNow(world, rand, pos);
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	
 }
