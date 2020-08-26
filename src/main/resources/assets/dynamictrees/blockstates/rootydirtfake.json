@@ -1,5 +1,5 @@
 {
   "variants": {
-		"normal": { "model": "dynamictrees:block/roots" }
+		"": { "model": "dynamictrees:block/roots" }
 	}
 }

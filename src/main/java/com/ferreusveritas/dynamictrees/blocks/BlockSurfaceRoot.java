@@ -260,7 +260,7 @@ public class BlockSurfaceRoot extends Block {
 //				double radialHeight = getRadialHeight(r) / 16.0;
 //				double gap = 0.5 - radius;
 //				AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight, radius);
-//				aabb = aabb.expand(dir.getFrontOffsetX() * gap, 0, dir.getFrontOffsetZ() * gap).offset(0.5, 0.0, 0.5);
+//				aabb = aabb.expand(dir.getXOffset() * gap, 0, dir.getZOffset() * gap).offset(0.5, 0.0, 0.5);
 //				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
 //			}
 //		}

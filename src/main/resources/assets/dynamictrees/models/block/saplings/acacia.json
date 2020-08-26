@@ -1,7 +1,7 @@
-{   "parent": "dynamictrees:block/sapling",
+{   "parent": "dynamictrees:block/smartmodel/sapling",
     "textures": {
-        "particle": "block/leaves_acacia",
+        "particle": "block/acacia_leaves",
         "log": "block/acacia_log",
-        "leaves": "block/leaves_acacia"
+        "leaves": "block/acacia_leaves"
     }
 }

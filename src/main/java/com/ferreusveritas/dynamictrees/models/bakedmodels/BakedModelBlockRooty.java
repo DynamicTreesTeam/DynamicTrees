@@ -15,14 +15,17 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.data.IDynamicBakedModel;
+import net.minecraftforge.client.model.data.IModelData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class BakedModelBlockRooty implements IBakedModel {
+public class BakedModelBlockRooty implements IDynamicBakedModel {
 
 	protected IBakedModel rootsModel;
 
@@ -60,29 +63,30 @@ public class BakedModelBlockRooty implements IBakedModel {
         return null;
     }
 
-//	@Override
-//	public List<BakedQuad> getQuads(BlockState state, Direction side, long rand) {
-//		List<BakedQuad> quads = new ArrayList<>(16);
+    @Nonnull
+    @Override
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+        List<BakedQuad> quads = new ArrayList<>(16);
+
+//        if (state != null && state.getBlock() instanceof IMimic) {
+//            BlockState extendedState = (state);
+//            BlockState mimicState = extendedState.get(MimicProperty.MIMIC);
 //
-//		if (state != null && state.getBlock() instanceof IMimic && state instanceof BlockState) {
-//			BlockState extendedState = ((BlockState) state);
-//			BlockState mimicState = extendedState.getValue(MimicProperty.MIMIC);
+//            Minecraft mc = Minecraft.getInstance();
+//            BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
+//            BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
+//            IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
 //
-//			Minecraft mc = Minecraft.getInstance();
-//			BlockRendererDispatcher blockRendererDispatcher = mc.getBlockRendererDispatcher();
-//			BlockModelShapes blockModelShapes = blockRendererDispatcher.getBlockModelShapes();
-//			IBakedModel mimicModel = blockModelShapes.getModelForState(mimicState);
+//            quads.addAll(mimicModel.getQuads(mimicState, side, rand));
 //
-//			quads.addAll(mimicModel.getQuads(mimicState, side, rand));
-//
-//			if(MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.CUTOUT_MIPPED) {
-//				quads.addAll(rootsModel.getQuads(state, side, rand));
-//			}
-//		}
-//
-//		return quads;
-//	}
-//
+//            if(MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.CUTOUT_MIPPED) {
+//                quads.addAll(rootsModel.getQuads(state, side, rand));
+//            }
+//        }
+
+        return quads;
+    }
+
 //	@Override
 //	public boolean isAmbientOcclusion() {
 //		return true;

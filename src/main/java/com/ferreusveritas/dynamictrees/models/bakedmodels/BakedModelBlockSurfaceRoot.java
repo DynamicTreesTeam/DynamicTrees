@@ -59,11 +59,11 @@ import java.util.function.Function;
 //		//Work in double units(*2)
 //		int dradius = radius * 2;
 //		int halfSize = (16 - dradius) / 2;
-//		int halfSizeX = dir.getFrontOffsetX() != 0 ? halfSize : dradius;
-//		int halfSizeZ = dir.getFrontOffsetZ() != 0 ? halfSize : dradius;
+//		int halfSizeX = dir.getXOffset() != 0 ? halfSize : dradius;
+//		int halfSizeZ = dir.getZOffset() != 0 ? halfSize : dradius;
 //		int move = 16 - halfSize;
-//		int centerX = 16 + (dir.getFrontOffsetX() * move);
-//		int centerZ = 16 + (dir.getFrontOffsetZ() * move);
+//		int centerX = 16 + (dir.getXOffset() * move);
+//		int centerZ = 16 + (dir.getZOffset() * move);
 //
 //		Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, 0, (centerZ - halfSizeZ) / 2);
 //		Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, radialHeight, (centerZ + halfSizeZ) / 2);
@@ -75,7 +75,7 @@ import java.util.function.Function;
 //
 //		Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 //
-//		for(Direction face: Direction.VALUES) {
+//		for(Direction face: Direction.values()) {
 //			if(dir.getOpposite() != face) { //Discard side of sleeve that faces core
 //				BlockFaceUV uvface = null;
 //					if(face.getAxis().isHorizontal()) {
@@ -91,27 +91,27 @@ import java.util.function.Function;
 //		}
 //
 //		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
+//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.EMPTY).setTexture(bark);
 //
 //		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 //			Direction face = e.getKey();
 //			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
 //		}
 //
-//		return builder.makeBakedModel();
+//		return builder.build();
 //	}
 //
 //	private IBakedModel bakeVert(int radius, Direction dir, TextureAtlasSprite bark) {
 //		int radialHeight = getRadialHeight(radius);
-//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(bark);
+//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.EMPTY).setTexture(bark);
 //
 //		AxisAlignedBB partBoundary = new AxisAlignedBB(8 - radius, radialHeight, 8 - radius, 8 + radius, 16 + radialHeight, 8 + radius)
-//			.offset(dir.getFrontOffsetX() * 7, 0, dir.getFrontOffsetZ() * 7);
+//			.offset(dir.getXOffset() * 7, 0, dir.getZOffset() * 7);
 //
 //		for(int i = 0; i < 2; i++) {
 //			AxisAlignedBB pieceBoundary = partBoundary.intersect(new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(0, 16 * i, 0));
 //
-//			for (Direction face: Direction.VALUES) {
+//			for (Direction face: Direction.values()) {
 //				Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 //
 //				BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(pieceBoundary, face)), ModelUtils.getFaceAngle(Axis.Y, face));
@@ -124,7 +124,7 @@ import java.util.function.Function;
 //			}
 //		}
 //
-//		return builder.makeBakedModel();
+//		return builder.build();
 //	}
 //
 //	public IBakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
@@ -136,7 +136,7 @@ import java.util.function.Function;
 //
 //		Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 //
-//		for(Direction face: Direction.VALUES) {
+//		for(Direction face: Direction.values()) {
 //			BlockFaceUV uvface;
 //			if(face.getAxis().isHorizontal()) {
 //				boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
@@ -149,14 +149,14 @@ import java.util.function.Function;
 //		}
 //
 //		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.NONE).setTexture(icon);
+//		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.EMPTY).setTexture(icon);
 //
 //		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 //			Direction face = e.getKey();
 //			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
 //		}
 //
-//		return builder.makeBakedModel();
+//		return builder.build();
 //	}
 //
 //	@Override

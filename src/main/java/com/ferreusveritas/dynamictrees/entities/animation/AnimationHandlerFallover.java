@@ -126,10 +126,10 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 //					float damage = entity.getDestroyData().woodVolume * Math.abs(fallSpeed) * 3f;
 //					if(getData(entity).bounces == 0 && damage > 2) {
 //						//System.out.println("damage: " + damage);
-//						living.motionX += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getFrontOffsetX() * damage * 0.2f;
+//						living.motionX += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getXOffset() * damage * 0.2f;
 //						living.motionX += world.rand.nextFloat() - 0.5;
 //						living.motionY += world.rand.nextFloat() * fallSpeed * 0.25f;
-//						living.motionZ += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getFrontOffsetZ() * damage * 0.2f;
+//						living.motionZ += world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getZOffset() * damage * 0.2f;
 //						living.motionZ += world.rand.nextFloat() - 0.5;
 //						damage *= DTConfigs.fallingTreeDamageMultiplier;
 //						//System.out.println("Tree Falling Damage: " + damage + "/" + living.getHealth());
@@ -154,8 +154,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 //
 //		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.rotationYaw : entity.rotationPitch;
 //
-//		int offsetX = toolDir.getFrontOffsetX();
-//		int offsetZ = toolDir.getFrontOffsetZ();
+//		int offsetX = toolDir.getXOffset();
+//		int offsetZ = toolDir.getZOffset();
 //		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 //		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
 //		float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
@@ -206,8 +206,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 //
 //		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.rotationYaw : entity.rotationPitch;
 //
-//		int offsetX = toolDir.getFrontOffsetX();
-//		int offsetZ = toolDir.getFrontOffsetZ();
+//		int offsetX = toolDir.getXOffset();
+//		int offsetZ = toolDir.getZOffset();
 //		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 //		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
 //		float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
@@ -277,7 +277,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 //		int radius = entity.getDestroyData().getBranchRadius(0);
 //
 //		Direction toolDir = entity.getDestroyData().toolDir;
-//		Vec3d toolVec = new Vec3d(toolDir.getFrontOffsetX(), toolDir.getFrontOffsetY(), toolDir.getFrontOffsetZ()).scale(radius / 16.0f);
+//		Vec3d toolVec = new Vec3d(toolDir.getXOffset(), toolDir.getYOffset(), toolDir.getZOffset()).scale(radius / 16.0f);
 //
 //		GlStateManager.translate(-toolVec.x, -toolVec.y, -toolVec.z);
 //		GlStateManager.rotate(-yaw, 0, 0, 1);

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -8,6 +9,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,6 +29,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class LeavesPropertiesJson extends LeavesProperties {
@@ -202,46 +206,43 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	private JsonPrimitive colorPrimitive = null;
 	
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private IBlockColor colorMultiplier;
 	
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int foliageColorMultiplier(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
 		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private IBlockColor processColor(JsonPrimitive primitive) {
-//		int color = -1;
-//		if(primitive.isNumber()) {
-//			color = (int) primitive.getAsNumber();
-//		} else
-//		if(primitive.isString()) {
-//			String code = primitive.getAsString();
-//			if(code.startsWith("@")) {
-//				code = code.substring(1);
-//				if("biome".equals(code)) { //Built in code since we need access to super
-//					return (state, world, pos, t) -> {
-//						return world.getBiome(pos).getModdedBiomeFoliageColor(super.foliageColorMultiplier(state, world, pos));
-//					};
-//				}
-//				IBlockColor blockColor = BlockColorMultipliers.find(code);
-//				if(blockColor != null) {
-//					return blockColor;
-//				} else {
-//					System.err.println("Error: ColorMultiplier resource \"" + code + "\" could not be found.");
-//				}
-//			} else {
-//				color = Color.decode(code).getRGB();
-//			}
-//		}
-//		int c = color;
-//		return (s,w,p,t) -> c;
-		return null;
+		int color = -1;
+		if(primitive.isNumber()) {
+			color = (int) primitive.getAsNumber();
+		} else
+		if(primitive.isString()) {
+			String code = primitive.getAsString();
+			if(code.startsWith("@")) {
+				code = code.substring(1);
+				if("biome".equals(code)) { //Built in code since we need access to super
+					return (state, world, pos, t) -> world.getBiome(pos).getFoliageColor(pos);
+				}
+				IBlockColor blockColor = BlockColorMultipliers.find(code);
+				if(blockColor != null) {
+					return blockColor;
+				} else {
+					System.err.println("Error: ColorMultiplier resource \"" + code + "\" could not be found.");
+				}
+			} else {
+				color = Color.decode(code).getRGB();
+			}
+		}
+		int c = color;
+		return (s,w,p,t) -> c;
 	}
 	
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void resolveClient() {
 		if(colorPrimitive != null) {
 			colorMultiplier = processColor(colorPrimitive);
@@ -251,7 +252,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static void postInitClient() {
 		for(LeavesPropertiesJson res: resolutionList) {
 			res.resolveClient();

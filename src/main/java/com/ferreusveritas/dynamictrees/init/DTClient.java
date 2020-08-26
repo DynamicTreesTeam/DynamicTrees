@@ -13,6 +13,9 @@ import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockRooty;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelSapling;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
@@ -21,7 +24,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.particles.*;
 import net.minecraft.util.Direction;
@@ -31,11 +37,17 @@ import net.minecraft.world.FoliageColors;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -45,7 +57,7 @@ public class DTClient {
 
     public static void setup() {
         registerJsonColorMultipliers();
-        registerClientEventHandlers();
+
         registerEntityRenderers();
 
         registerColorHandlers();
@@ -53,6 +65,15 @@ public class DTClient {
 
         discoverWoodColors();
         LeavesPropertiesJson.postInitClient();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public static void onTextureStitch(TextureStitchEvent.Pre event){
+        if (!event.getMap().getBasePath().equals("textures")){
+            return;
+        }
+        event.addSprite(new ResourceLocation(DynamicTrees.MODID, "block/sapling"));
     }
 
     private static void discoverWoodColors() {
@@ -107,10 +128,9 @@ public class DTClient {
 //                },
 //                DTRegistries.blockRootyDirt, DTRegistries.blockRootyDirtSpecies, DTRegistries.blockRootySand, DTRegistries.blockRootyDirtFake);
 
-//        //Register Sapling Colorizer
-//        ModelHelper.regColorHandler(DTRegistries.blockDynamicSapling, (state, access, pos, tintIndex) -> {
-//            return isValid(access, pos) ? DTRegistries.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex) : white;
-//        });
+        //Register Sapling Colorizer
+        ModelHelper.regColorHandler(DTRegistries.blockDynamicSapling, (state, access, pos, tintIndex) ->
+                isValid(access, pos) ? DTRegistries.blockDynamicSapling.getSpecies(access, pos, state).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 
         //Register Bonsai Pot Colorizer
 //        ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
@@ -126,25 +146,25 @@ public class DTClient {
 
         //TREE PARTS
 
-        //Register GrowingLeavesBlocks Colorizers
-//        for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesMapForModId(DynamicTrees.MODID).values()) {
-//            ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->
-//                    TreeHelper.isLeaves(state.getBlock()) ? ((BlockDynamicLeaves) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
-//            );
-//        }
+//        Register GrowingLeavesBlocks Colorizers
+        for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MODID)) {
+            ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->
+                    TreeHelper.isLeaves(state.getBlock()) ? ((BlockDynamicLeaves) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
+            );
+        }
 
     }
 
     public static void registerJsonColorMultipliers() {
         //Register programmable custom block color providers for LeavesPropertiesJson
-        BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> FoliageColors.getBirch() );
+        BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> FoliageColors.getBirch());
         BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> FoliageColors.getSpruce());
     }
 
-    public static void registerClientEventHandlers() {
-        MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
-        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
-    }
+//    public static void registerClientEventHandlers() {
+//        MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
+//        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
+//    }
 
     public static void registerEntityRenderers() {
 //        RenderingRegistry.registerEntityRenderingHandler(EntityFallingTree.class, new RenderFallingTree.Factory());
