@@ -34,6 +34,7 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
@@ -46,6 +47,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
@@ -57,30 +59,18 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 
-//	public static final IntegerProperty[] CONNECTIONS = {
-//			IntegerProperty.create("radiusd", 0, 8),
-//			IntegerProperty.create("radiusu", 0, 8),
-//			IntegerProperty.create("radiusn", 0, 8),
-//			IntegerProperty.create("radiuss", 0, 8),
-//			IntegerProperty.create("radiusw", 0, 8),
-//			IntegerProperty.create("radiuse", 0, 8)
-//	};
-
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
 
 	public BlockBranch(Properties properties, String name){
-		super(properties.noDrops()); //removes drops from block
+		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
 		setRegistryName(name);
-		//setHarvestLevel("axe", 0);
+
+
 	}
 
 	public BlockBranch(Material material, String name) {
 		this(Properties.create(material), name);
 	}
-//
-//	public IProperty<?>[] getIgnorableProperties() {
-//		return new IProperty<?>[]{};
-//	}
 
 	///////////////////////////////////////////
 	// TREE INFORMATION
@@ -167,21 +157,6 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
 		return false;
 	}
-
-//	@Override
-//	public static boolean isOpaque(VoxelShape shape) {
-//		return false;
-//	}
-
-//	@Override
-//	public boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-//		return true;
-//	}
-//
-//	@Override
-//	public BlockFaceShape getBlockFaceShape(World worldIn, BlockState state, BlockPos pos, Direction face) {
-//		return BlockFaceShape.UNDEFINED;//This prevents fences and walls from attempting to connect to branches.
-//	}
 
 	///////////////////////////////////////////
 	// GROWTH
@@ -361,7 +336,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		volume *= DTConfigs.treeHarvestMultiplier.get();// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, ret, volume);
 	}
-//
+
 //	/*
 //	1.10.2 Simplified Block Harvesting Logic Flow(for no silk touch)
 //

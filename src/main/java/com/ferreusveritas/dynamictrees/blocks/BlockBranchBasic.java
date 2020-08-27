@@ -23,9 +23,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -96,19 +98,19 @@ public class BlockBranchBasic extends BlockBranch {
 		builder.add(RADIUS);
 	}
 
-	@Override
-	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-		if (state != null) {
-			int thisRadius = getRadius(state);
-
-//			for (Direction dir : Direction.values()) {
-//				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
-//			}
-			return state;
-		}
-
-		return state;
-	}
+//	@Override
+//	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
+//		if (state != null) {
+//			int thisRadius = getRadius(state);
+//
+////			for (Direction dir : Direction.values()) {
+////				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
+////			}
+//			return state;
+//		}
+//
+//		return state;
+//	}
 
 
 	///////////////////////////////////////////
@@ -201,16 +203,10 @@ public class BlockBranchBasic extends BlockBranch {
 	// RENDERING
 	///////////////////////////////////////////
 
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return getRadius(state) == RADMAX_NORMAL;
-//	}
-//
-//	@Override
-//	public boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-//		return getRadius(blockState) != RADMAX_NORMAL || super.shouldSideBeRendered(blockState, blockAccess, pos, side);
-//	}
-
+	@Override
+	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return getRadius(state) == RADMAX_NORMAL;
+	}
 
 	///////////////////////////////////////////
 	// GROWTH
