@@ -1,11 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -21,14 +15,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DoublePlantBlock;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -37,9 +24,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
@@ -50,16 +37,17 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
 
@@ -67,7 +55,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	protected static Random backupRng = new Random();
 
-//	public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 4);
+//	public static final IntegerProperty DISTANCE = IntegerProperty.create("hydro", 1, 7);
 //	public static final BooleanProperty PERSISTENT = BooleanProperty.create("flowering");
 
 	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
@@ -80,6 +68,10 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public Block setDefaultNaming(String modid, String name) {
 		setRegistryName(modid, name);
 		return this;
+	}
+
+	public boolean ticksRandomly(BlockState state) {
+		return !state.get(PERSISTENT);
 	}
 
 	@Override
@@ -112,9 +104,16 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return getProperties(world.getBlockState(pos)).getFireSpreadSpeed();
 	}
 
+	@Nonnull
+	public BlockState updatePostPlacement(@Nonnull BlockState stateIn, Direction facing, BlockState facingState, @Nonnull IWorld worldIn, @Nonnull BlockPos currentPos, BlockPos facingPos) { return stateIn; }
+
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState();
+	}
+
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
-		super.tick(state, worldIn, pos, rand);
+	public void tick(BlockState state, World worldIn, @Nonnull BlockPos pos, Random rand) {
+//		super.tick(state, worldIn, pos, rand);
 
 		if (rand == null) rand = backupRng;
 		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
@@ -398,11 +397,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		//If there's already leaves here then don't kill them if it's a little dark
 		//If it's empty space then don't create leaves unless it's sufficiently bright
 		//The range allows for adaptation to the hysteretic effect that could cause blocks to rapidly appear and disappear
-		if(world.getLightFor(LightType.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement())) {
-			return true;
-		}
-
-		return false;
+		return world.getLightFor(LightType.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement());
 	}
 
 	/** Used to find if the leaf block is at the bottom of the stack */

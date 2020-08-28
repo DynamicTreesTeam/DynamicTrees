@@ -13,9 +13,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class CellKits {
 	
-	private static final ICellSolver NULLCELLSOLVER = new ICellSolver() {
-		@Override public int solve(ICell[] cells) { return 0; }
-	};
+	private static final ICellSolver NULLCELLSOLVER = cells -> 0;
 	
 	public static final ICellKit NULLCELLKIT = new ICellKit() {
 		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULLCELL; }
@@ -40,7 +38,7 @@ public class CellKits {
 	
 	private final ICellKit deciduous = new ICellKit() {
 
-		private final ICell normalCells[] = {
+		private final ICell[] normalCells = {
 				CellNull.NULLCELL,
 				new CellNormal(1),
 				new CellNormal(2),
@@ -90,7 +88,7 @@ public class CellKits {
 		private final ICell coniferBranch = new CellConiferBranch();
 		private final ICell coniferTopBranch = new CellConiferTopBranch();
 
-		private final ICell coniferLeafCells[] = {
+		private final ICell[] coniferLeafCells = {
 				CellNull.NULLCELL,
 				new CellConiferLeaf(1),
 				new CellConiferLeaf(2),
@@ -136,9 +134,7 @@ public class CellKits {
 		}
 		
 	};
-	
-	
-	
+
 	private final ICellKit acacia = new ICellKit() {
 		
 		private final ICell acaciaBranch = new ICell() {
@@ -147,7 +143,7 @@ public class CellKits {
 				return 5;
 			}
 			
-			final int map[] = {0, 3, 5, 5, 5, 5};
+			final int[] map = {0, 3, 5, 5, 5, 5};
 			
 			@Override
 			public int getValueFromSide(Direction side) {
@@ -156,7 +152,7 @@ public class CellKits {
 			
 		};
 
-		private final ICell acaciaLeafCells[] = {
+		private final ICell[] acaciaLeafCells = {
 				CellNull.NULLCELL,
 				new CellAcaciaLeaf(1),
 				new CellAcaciaLeaf(2),
@@ -164,7 +160,7 @@ public class CellKits {
 				new CellAcaciaLeaf(4),
 				new CellAcaciaLeaf(5),
 				new CellAcaciaLeaf(6),
-				new CellAcaciaLeaf(7),
+				new CellAcaciaLeaf(7)
 		};
 
 		private final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
@@ -202,7 +198,7 @@ public class CellKits {
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new CellNormal(5);
 		
-		private final ICell darkOakLeafCells[] = {
+		private final ICell[] darkOakLeafCells = {
 				CellNull.NULLCELL,
 				new CellDarkOakLeaf(1),
 				new CellDarkOakLeaf(2),
@@ -289,12 +285,15 @@ public class CellKits {
 			
 		};
 		
-		private final ICell palmFrondCells[] = {
+		private final ICell[] palmFrondCells = {
 				CellNull.NULLCELL,
 				new CellPalmFrond(1),
 				new CellPalmFrond(2),
 				new CellPalmFrond(3),
-				new CellPalmFrond(4)
+				new CellPalmFrond(4),
+				new CellPalmFrond(5),
+				new CellPalmFrond(6),
+				new CellPalmFrond(7)
 			}; 
 		
 		private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0221});
@@ -355,15 +354,15 @@ public class CellKits {
 	
 	static public class BasicSolver implements ICellSolver {
 		
-		private final short codes[];
+		private final short[] codes;
 		
-		public BasicSolver(short codes[]) {
+		public BasicSolver(short[] codes) {
 			this.codes = codes;
 		}
 		
 		@Override
 		public int solve(ICell[] cells) {
-			int nv[] = new int[16];//neighbor hydration values
+			int[] nv = new int[16];//neighbor hydration values
 			
 			for(Direction dir: Direction.values()) {
 				nv[cells[dir.ordinal()].getValueFromSide(dir.getOpposite())]++;

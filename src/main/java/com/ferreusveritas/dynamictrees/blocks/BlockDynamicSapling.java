@@ -55,12 +55,12 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	}
 
 	@Override
-	public boolean canGrow(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
+	public boolean canGrow(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
 		return getSpecies().canGrowWithBoneMeal((World) world, pos);
 	}
 
 	@Override
-	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
+	public boolean canUseBonemeal(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		return getSpecies().canUseBoneMealNow(world, rand, pos);
 	}
 
@@ -93,7 +93,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	}
 
 	@Override
-	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
+	public void grow(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		if(canBlockStay(world, pos, state)) {
 			getSpecies().transitionToTree(world, pos);
 		} else {
@@ -123,13 +123,15 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		world.removeBlock(pos, false);
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
 		return getSpecies().getSeedStack(1);
 	}
 
+	@Nonnull
 	@Override
-	public List<ItemStack> getDrops(BlockState state, Builder builder) {
+	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull Builder builder) {
 		//TODO: Deal with 1.14's new loot drop system.  For now just return a fresh array.
 		List<ItemStack> drops = new ArrayList<>();
 		drops.add(getSpecies().getSeedStack(1));
@@ -146,6 +148,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
+	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
 		return getSpecies().getSaplingShape();

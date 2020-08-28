@@ -36,6 +36,7 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 
@@ -82,8 +83,6 @@ public class BlockRooty extends Block implements ITreePart {
 
 	@Override
 	public void tick(BlockState state, World world, BlockPos pos, Random random) {
-		super.tick(state, world, pos, random);
-
 		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			updateTree(state, world, pos, random, true);
 		}
@@ -129,21 +128,23 @@ public class BlockRooty extends Block implements ITreePart {
 	/**
 	 * This is the state the rooty dirt returns to once it no longer supports a tree structure.
 	 *
-	 * @param access
+	 * @param access world
 	 * @param pos The position of the {@link BlockRooty}
-	 * @return
+	 * @return blockstate that the rooty dirt turns into when decayed
 	 */
 	public BlockState getDecayBlockState(IBlockReader access, BlockPos pos) {
-		return Blocks.DIRT.getDefaultState();
+		return primitiveDirt.getDefaultState();
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
 		return new ItemStack(primitiveDirt);
 	}
 
+	@Nonnull
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
 		List<ItemStack> drops = new LinkedList<>();
 		drops.add(new ItemStack(primitiveDirt));
 		return drops;
@@ -185,7 +186,7 @@ public class BlockRooty extends Block implements ITreePart {
 	}
 
 	@Override
-	public void onBlockHarvested(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+	public void onBlockHarvested(World world, @Nonnull BlockPos pos, BlockState state, @Nonnull PlayerEntity player) {
 		destroyTree(world, pos);
 		super.onBlockHarvested(world, pos, state, player);
 	}
@@ -326,6 +327,7 @@ public class BlockRooty extends Block implements ITreePart {
 		}
 	}
 
+	@Nonnull
 	@Override
 	public PushReaction getPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
@@ -344,7 +346,7 @@ public class BlockRooty extends Block implements ITreePart {
 	// RENDERING
 	///////////////////////////////////////////
 
-
+	@Nonnull
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;

@@ -103,7 +103,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[ 4 ];
+		return dynamicLeavesBlockHydroStates[ maxHydro ];
 	}
 	
 	@Override

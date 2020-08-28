@@ -660,6 +660,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 */
 	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
+		System.out.println("SPECIES UPDATE");
+
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 
