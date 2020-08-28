@@ -74,7 +74,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	public BlockDynamicLeaves() {
 		super(Properties.create(Material.LEAVES).sound(SoundType.PLANT).tickRandomly());
-		this.setDefaultState(this.stateContainer.getBaseState().with(PERSISTENT, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(DISTANCE, LeavesProperties.maxHydro).with(PERSISTENT, false));
 	}
 
 	public Block setDefaultNaming(String modid, String name) {
@@ -114,6 +114,8 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+		super.tick(state, worldIn, pos, rand);
+
 		if (rand == null) rand = backupRng;
 		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			double attempts = DTConfigs.treeGrowthFolding.get() * DTConfigs.treeGrowthMultiplier.get();
@@ -140,14 +142,17 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	protected void doTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		if((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
-			if(getProperties(state).updateTick(worldIn, pos, state, rand)) {
-	//			age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
+			if(!state.get(LeavesBlock.PERSISTENT) && getProperties(state).updateTick(worldIn, pos, state, rand)) {
+				age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 			}
 		}
 	}
 
 	@Override
 	public int age(World world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
+
+//		world.removeBlock(pos, false);
+
 		ILeavesProperties leavesProperties = getProperties(state);
 		int oldHydro = state.get(BlockDynamicLeaves.DISTANCE);
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
@@ -199,7 +204,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return (w, p, l) -> l; //By default just pass the blockState along
 	}
 
-	protected static interface NewLeavesPropertiesHandler {
+	protected interface NewLeavesPropertiesHandler {
 		BlockState getLeaves(World world, BlockPos pos, BlockState leavesStateWithHydro);
 	}
 
@@ -345,22 +350,22 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		}
 
 		//Help to grow into double tall grass and ferns in a more natural way
-		if(block instanceof DoublePlantBlock){
-			BlockState bs = world.getBlockState(pos);
-			DoubleBlockHalf half = bs.get(DoublePlantBlock.HALF);
-			if(half == DoubleBlockHalf.UPPER) {//Top block of double plant
-				if(belowBlockState.getBlock() instanceof DoublePlantBlock) {
+//		if(block instanceof DoublePlantBlock){
+//			BlockState bs = world.getBlockState(pos);
+//			DoubleBlockHalf half = bs.get(DoublePlantBlock.HALF);
+//			if(half == DoubleBlockHalf.UPPER) {//Top block of double plant
+//				if(belowBlockState.getBlock() instanceof DoublePlantBlock) {
 //					if(type == EnumPlantType.GRASS || type == EnumPlantType.FERN) {//tall grass or fern
 //						world.removeBlock(pos, false);
 //						Blocks.TALL_GRASS
 //						world.setBlockState(pos.down(), Blocks.GRASS.getDefaultState()
 //								.with(BlockTallGrass.TYPE, type == EnumPlantType.GRASS ? BlockTallGrass.EnumType.GRASS : BlockTallGrass.EnumType.FERN), 3);
 //					}
-				}
-			}
-		}
+//				}
+//			}
+//		}
 
-		return world.isAirBlock(pos) && hasAdequateLight(blockState, world, leavesProperties, pos);
+		return (world.isAirBlock(pos) || world.getBlockState(pos).getMaterial().isReplaceable()) && hasAdequateLight(blockState, world, leavesProperties, pos);
 	}
 
 

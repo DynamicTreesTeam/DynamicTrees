@@ -65,7 +65,6 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
 		setRegistryName(name);
 
-
 	}
 
 	public BlockBranch(Material material, String name) {
@@ -142,6 +141,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 
 	@Deprecated
 	public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+
 		net.minecraft.item.ItemStack heldItem = player.getHeldItem(hand);
 		if (getRadius(state) > 8){
 			setRadius(world, pos, getRadius(state), Direction.DOWN);

@@ -1,7 +1,10 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.client.ThickRingTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.IResource;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -41,39 +44,44 @@ public class TextureGenerationHandler {
 		return outputRes;
 	}
 	
-//	@OnlyIn(Dist.CLIENT)
-//	@SubscribeEvent
-//	public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-//		IResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-//
-//		for (Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()) {
-//
-//			if(entry.getKey() instanceof DualResourceLocation) {
-//				dualStitch(event, (DualResourceLocation) entry.getKey(), entry.getValue());
-//				continue;
-//			}
-//
-//			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getNamespace(), String.format("%s/%s%s", event.getMap().getBasePath(), entry.getValue().getPath(), ".png"));
-//
-//			IResource resource;
-//			try {
-//				resource = resourceManager.getResource(textureLocation);
-//			} catch (IOException e) {
-//				resource = null;
-//			}
-//
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
+		IResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+
+//		if (!event.getMap().getBasePath().equals("textures")){
+//			return;
+//		}
+//		event.addSprite(new ResourceLocation(DynamicTrees.MODID, "block/sapling"));
+
+		for (Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()) {
+
+			if(entry.getKey() instanceof DualResourceLocation) {
+				dualStitch(event, (DualResourceLocation) entry.getKey(), entry.getValue());
+				continue;
+			}
+
+			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getNamespace(), String.format("%s/%s%s", event.getMap().getBasePath(), entry.getValue().getPath(), ".png"));
+
+			IResource resource;
+			try {
+				resource = resourceManager.getResource(textureLocation);
+			} catch (IOException e) {
+				resource = null;
+			}
+
 //			if (resource != null) {
 //				event.getMap().registerSprite(entry.getValue());
 //			} else {
 //				event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(entry.getValue(), entry.getKey()));
 //			}
-//		}
-//	}
-//
-//	@OnlyIn(Dist.CLIENT)
-//	public static void dualStitch(TextureStitchEvent.Pre event, DualResourceLocation key, ResourceLocation value) {
+		}
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static void dualStitch(TextureStitchEvent.Pre event, DualResourceLocation key, ResourceLocation value) {
 //		event.getMap().setTextureEntry(new ThickRingTextureAtlasSprite(value, key, key.getAlternate()));
-//	}
+	}
 
 	
 }

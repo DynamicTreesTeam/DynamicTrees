@@ -7,30 +7,36 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Random;
+import java.util.*;
 
 
 /**
@@ -55,8 +61,6 @@ public class BlockRooty extends Block implements ITreePart {
 		setRegistryName("rooty_"+ primitiveDirt.getRegistryName().getPath()); //ModLoadingContext.get().getActiveNamespace();
 
 		this.primitiveDirt = primitiveDirt;
-
-//		FERTILITY = IntegerProperty.create("fertility", 0, maxFertility);
 	}
 
 	///////////////////////////////////////////
@@ -78,6 +82,8 @@ public class BlockRooty extends Block implements ITreePart {
 
 	@Override
 	public void tick(BlockState state, World world, BlockPos pos, Random random) {
+		super.tick(state, world, pos, random);
+
 		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			updateTree(state, world, pos, random, true);
 		}
@@ -131,61 +137,64 @@ public class BlockRooty extends Block implements ITreePart {
 		return Blocks.DIRT.getDefaultState();
 	}
 
-//	@Override
-//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-//		return Item.getItemFromBlock(Blocks.DIRT);
-//	}
-//
-//	@Override
-//	public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-//		BlockState mimicState = getMimic(world, pos);
-//		return new ItemStack(mimicState.getBlock(), 1, mimicState.getBlock().damageDropped(mimicState));
-//	}
-//
-//	@Override
-//	public float getBlockHardness(BlockState blockState, World worldIn, BlockPos pos) {
-//		return 20.0f;//Encourage proper tool usage and discourage bypassing tree felling by digging the root from under the tree
-//	};
-//
-//	@Override
-//	protected boolean canSilkHarvest() {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean hasComparatorInputOverride(BlockState state) {
-//		return true;
-//	}
-//
-//	@Override
-//	public int getComparatorInputOverride(BlockState blockState, World world, BlockPos pos) {
-//		return getSoilLife(blockState, world, pos);
-//	}
-//
-//	@Override
-//	public boolean onBlockActivated(World world, BlockPos pos, BlockState state, EntityPlayer player, EnumHand hand, Direction facing, float hitX, float hitY, float hitZ) {
-//		ItemStack heldItem = player.getHeldItem(hand);
-//		return getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);
-//	}
-//
-//	public void destroyTree(World world, BlockPos rootPos) {
-//		Optional<BlockBranch> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
-//
-//		if(branch.isPresent()) {
-//			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true);
-//			EntityFallingTree.dropTree(world, destroyData, new ArrayList<ItemStack>(0), DestroyType.ROOT);
-//		}
-//	}
-//
-//	@Override
-//	public void onBlockHarvested(World world, BlockPos pos, BlockState state, EntityPlayer player) {
-//		destroyTree(world, pos);
-//	}
-//
-//	@Override
-//	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-//		destroyTree(world, pos);
-//	}
+	@Override
+	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
+		return new ItemStack(primitiveDirt);
+	}
+
+	@Override
+	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		List<ItemStack> drops = new LinkedList<>();
+		drops.add(new ItemStack(primitiveDirt));
+		return drops;
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return new ItemStack(primitiveDirt);
+	}
+
+	@Override
+	public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
+		return (float) (primitiveDirt.getBlockHardness(blockState, worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
+	}
+
+	@Override
+	public boolean hasComparatorInputOverride(BlockState state) {
+		return true;
+	}
+
+	@Override
+	public int getComparatorInputOverride(BlockState blockState, World world, BlockPos pos) {
+		return getSoilLife(blockState, world, pos);
+	}
+
+	@Override
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit);
+	}
+
+
+	public void destroyTree(World world, BlockPos rootPos) {
+		Optional<BlockBranch> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
+
+		if(branch.isPresent()) {
+			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true);
+			EntityFallingTree.dropTree(world, destroyData, new ArrayList<>(0), EntityFallingTree.DestroyType.ROOT);
+		}
+	}
+
+	@Override
+	public void onBlockHarvested(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		destroyTree(world, pos);
+		super.onBlockHarvested(world, pos, state, player);
+	}
+
+	@Override
+	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
+		destroyTree(world, pos);
+		super.onBlockExploded(state, world, pos, explosion);
+	}
 
 	public int getSoilLife(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return blockState.get(FERTILITY);
@@ -330,58 +339,6 @@ public class BlockRooty extends Block implements ITreePart {
 	public final boolean isRootNode() {
 		return true;
 	}
-
-
-//
-//	/**
-//	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.
-//	 * So dirt bits end up green if we don't.
-//	 */
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
-//		BlockState mimicState = getMimic(world, pos);
-//		manager.addBlockDestroyEffects(pos, mimicState);
-//
-//		return true;
-//	}
-//
-//	/**
-//	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.
-//	 * So dirt bits end up green if we don't.
-//	 */
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
-//		BlockPos pos = target.getBlockPos();
-//		BlockState mimicState = ((BlockState) getExtendedState(state, world, pos)).getValue(MimicProperty.MIMIC);
-//		Random rand = world.rand;
-//
-//		int x = pos.getX();
-//		int y = pos.getY();
-//		int z = pos.getZ();
-//		AxisAlignedBB axisalignedbb = state.getBoundingBox(world, pos);
-//		double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
-//		double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
-//		double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
-//
-//		switch(target.sideHit) {
-//			case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
-//			case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
-//			case NORTH: d2 = z + axisalignedbb.minZ - 0.1D; break;
-//			case SOUTH: d2 = z + axisalignedbb.maxZ + 0.1D; break;
-//			case WEST:  d0 = x + axisalignedbb.minX - 0.1D; break;
-//			case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
-//		}
-//
-//		//Safe to spawn particles here since this is a client side only member function
-//		ParticleDigging particle = (ParticleDigging) manager.spawnEffectParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), d0, d1, d2, 0, 0, 0, new int[]{Block.getStateId(mimicState)});
-//		if(particle != null) {
-//			particle.setBlockPos(pos).multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
-//		}
-//
-//		return true;
-//	}
 
 	///////////////////////////////////////////
 	// RENDERING

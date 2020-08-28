@@ -274,7 +274,7 @@ public class TreeFamily {
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 *
-	 * @param itemStack An itemstack of the stick
+	 * @param item An itemstack of the stick
 	 * @return TreeFamily for chaining calls
 	 */
 	protected TreeFamily setStick(Item item) {
@@ -298,7 +298,7 @@ public class TreeFamily {
 	 * done automatically.
 	 *
 	 * @param primLog A block object that is the log
-	 * @param primLogStack An itemStack of the log item
+	 * @param primLog An itemStack of the log item
 	 * @return TreeFamily for chaining calls
 	 */
 	protected TreeFamily setPrimitiveLog(Block primLog) {

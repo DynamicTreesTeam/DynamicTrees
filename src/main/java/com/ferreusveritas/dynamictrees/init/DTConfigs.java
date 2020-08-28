@@ -31,6 +31,7 @@ public class DTConfigs {
 	public static ForgeConfigSpec.IntValue maxBranchRotRadius;
 	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
 	public static ForgeConfigSpec.BooleanValue enableThickTrees;
+	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
 
 	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
 	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
@@ -51,7 +52,7 @@ public class DTConfigs {
 //	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 
 	public static ForgeConfigSpec.BooleanValue fancyThickRings;
-	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
+//	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
 
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
 
@@ -90,7 +91,9 @@ public class DTConfigs {
 			enableAppleTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableAppleTrees", true);
 			enableThickTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
-				define("enableAppleTrees", true);
+				define("enableThickTrees", true);
+			rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
+				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		SERVER_BUILDER.pop();
 
 		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
@@ -132,8 +135,8 @@ public class DTConfigs {
 		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
 			fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
 				define("fancyThickRings", true);
-			rootyTextureMimicry = SERVER_BUILDER.comment("Rooty dirt blocks will mimic the texture of adjacent soil blocks to better match the environment. Otherwise will always default to the most generic block").
-				define("rootyTextureMimicry", true);
+//			rootyTextureMimicry = SERVER_BUILDER.comment("Rooty dirt blocks will mimic the texture of adjacent soil blocks to better match the environment. Otherwise will always default to the most generic block").
+//				define("rootyTextureMimicry", true);
 		CLIENT_BUILDER.pop();
 
 		SERVER_BUILDER.comment("Debug settings for development").push("debug");

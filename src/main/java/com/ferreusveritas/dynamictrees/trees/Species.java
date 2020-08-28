@@ -30,7 +30,9 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -55,6 +57,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -73,6 +76,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -525,14 +529,15 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
 		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
+		if (primitiveDirt instanceof BlockRooty)
+			return true;
 		if (RootyBlockHelper.getRootyBlocksMap().containsKey(primitiveDirt)){
 			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(BlockRooty.FERTILITY, life));
-		} else {
-			System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
-			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(BlockRooty.FERTILITY, life));
+			return true;
 		}
-
-		return true;
+		System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
+		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(BlockRooty.FERTILITY, life));
+		return false;
 	}
 
 	public Species setSoilLongevity(int longevity) {
@@ -943,24 +948,24 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 		Biome biome = world.getBiome(pos);
 
-//		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
-//		BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
-//		MinecraftForge.EVENT_BUS.post(suitabilityEvent);
-//		if(suitabilityEvent.isHandled()) {
-//			return suitabilityEvent.getSuitability();
-//		}
-//
+		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
+		BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
+		MinecraftForge.EVENT_BUS.post(suitabilityEvent);
+		if(suitabilityEvent.isHandled()) {
+			return suitabilityEvent.getSuitability();
+		}
+
 		float ugs = (float)(double) DTConfigs.scaleBiomeGrowthRate.get();//universal growth scalar
-//
-//		if(ugs == 1.0f || isBiomePerfect(biome)) {
-//			return 1.0f;
-//		}
-//
+
+		if(ugs == 1.0f || isBiomePerfect(biome)) {
+			return 1.0f;
+		}
+
 		float suit = defaultSuitability();
-//
-//		for(Type t : BiomeDictionary.getTypes(biome)) {
-//			suit *= envFactors.containsKey(t) ? envFactors.get(t) : 1.0f;
-//		}
+
+		for(BiomeDictionary.Type t : BiomeDictionary.getTypes(biome)) {
+			suit *= envFactors.getOrDefault(t, 1.0f);
+		}
 
 		//Linear interpolation of suitability with universal growth scalar
 		suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
@@ -1009,6 +1014,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 		//Bonemeal fertilizes the soil and causes a single growth pulse
 		if( canBoneMeal() && itemStack.getItem() == Items.BONE_MEAL) {
+
 			return new SubstanceFertilize().setAmount(1).setGrow(true);
 		}
 
@@ -1036,8 +1042,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 		if(effect != null) {
 			if(effect.isLingering()) {
-//				world.spawnEntity(new EntityLingeringEffector(world, rootPos, effect));
-//				return true;
+				world.addEntity(new EntityLingeringEffector(null, world));
+				return true;
 			} else {
 				return effect.apply(world, rootPos);
 			}

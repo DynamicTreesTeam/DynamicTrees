@@ -8,7 +8,7 @@ import java.util.*;
 public class RootyBlockHelper {
 
     private static Map<Block, BlockRooty> rootyBlocksMap = new HashMap<>();
-    private static LinkedList<Block> blackList = new LinkedList<>();
+    private static LinkedList<BlockRooty> rootyBlocksList;
 
     /** THIS MUST BE CALLED BEFORE addToRootyBlocksMap
      *
@@ -18,9 +18,9 @@ public class RootyBlockHelper {
      */
     public static boolean excemptBlock(Block blockToExcempt, Block defaultTo){
         if (rootyBlocksMap.containsKey(blockToExcempt))
-            return false; //block was already registered
+            return false; //block was already rootified
         if (!rootyBlocksMap.containsKey(defaultTo)){
-            addToRootyBlocksMap(defaultTo);
+            addToRootyBlocksMap(defaultTo); //default isnt found, so we create it
         }
         rootyBlocksMap.put(blockToExcempt, rootyBlocksMap.get(defaultTo));
         return true;
@@ -46,14 +46,19 @@ public class RootyBlockHelper {
         return rootyBlocksMap;
     }
 
-    public static Collection<BlockRooty> getListForRegistry(){
-        LinkedList<BlockRooty> listNotRepeated = new LinkedList<>();
-        for (BlockRooty rooty : rootyBlocksMap.values()){
-            if (!listNotRepeated.contains(rooty)){
-                listNotRepeated.add(rooty);
+    public static LinkedList<BlockRooty> generateListForRegistry(boolean forceRemap){
+        if (rootyBlocksList == null){
+            rootyBlocksList = new LinkedList<>();
+            forceRemap = true;
+        }
+        if (forceRemap){
+            for (BlockRooty rooty : rootyBlocksMap.values()){
+                if (!rootyBlocksList.contains(rooty)){
+                    rootyBlocksList.add(rooty);
+                }
             }
         }
-        return listNotRepeated;
+        return rootyBlocksList;
     }
 
 }

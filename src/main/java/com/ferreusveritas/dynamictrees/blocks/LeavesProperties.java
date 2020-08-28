@@ -50,12 +50,14 @@ public class LeavesProperties implements ILeavesProperties {
 		@Override public int getLightRequirement() { return 15; }
 		@Override public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return false; }
 	};
-	
+
+	protected static final int maxHydro = 4;
+
 	protected BlockState primitiveLeaves;
 	protected ItemStack primitiveLeavesItemStack;
 	protected ICellKit cellKit;
 	protected TreeFamily tree = TreeFamily.NULLFAMILY;
-	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[5];
+	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	
 	private LeavesProperties() {}
 	
@@ -92,7 +94,7 @@ public class LeavesProperties implements ILeavesProperties {
 		
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.getDefaultState();
-		for(int i = 1; i <= 4; i++) {
+		for(int i = 1; i <= maxHydro; i++) {
 			dynamicLeavesBlockHydroStates[i] = state.with(BlockDynamicLeaves.DISTANCE, i);
 		}
 		
@@ -101,12 +103,12 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[4];
+		return dynamicLeavesBlockHydroStates[ 4 ];
 	}
 	
 	@Override
 	public BlockState getDynamicLeavesState(int hydro) {
-		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, 4)];
+		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)];
 	}
 	
 	@Override

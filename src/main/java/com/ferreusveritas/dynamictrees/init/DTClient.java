@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -56,15 +57,6 @@ public class DTClient {
         LeavesPropertiesJson.postInitClient();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void onTextureStitch(TextureStitchEvent.Pre event){
-        if (!event.getMap().getBasePath().equals("textures")){
-            return;
-        }
-        event.addSprite(new ResourceLocation(DynamicTrees.MODID, "block/sapling"));
-    }
-
     private static void discoverWoodColors() {
 //
 //        Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString());
@@ -108,14 +100,16 @@ public class DTClient {
         final BlockColors blockColors = Minecraft.getInstance().getBlockColors();
 
         //Register Rooty Colorizers
-//        blockColors.register((state, world, pos, tintIndex) -> {
-//                    switch(tintIndex) {
-//                        case 0: return blockColors.getColor(DTRegistries.blockStates.grass, world, pos, tintIndex);
-//                        case 1: return state.getBlock() instanceof BlockRooty ? ((BlockRooty) state.getBlock()).rootColor(state, world, pos) : white;
-//                        default: return white;
-//                    }
-//                },
-//                DTRegistries.blockRootyDirt, DTRegistries.blockRootyDirtSpecies, DTRegistries.blockRootySand, DTRegistries.blockRootyDirtFake);
+        for (BlockRooty roots : RootyBlockHelper.generateListForRegistry(false)){
+            blockColors.register((state, world, pos, tintIndex) -> {
+                        switch(tintIndex) {
+                            case 0: return blockColors.getColor(roots.getPrimitiveDirt().getDefaultState(), world, pos, tintIndex);
+                            case 1: return state.getBlock() instanceof BlockRooty ? roots.rootColor(state, world, pos) : white;
+                            default: return white;
+                        }
+                    }, roots
+            );
+        }
 
         //Register Bonsai Pot Colorizer
 //        ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)

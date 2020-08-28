@@ -39,7 +39,7 @@ public class CellKits {
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {
-		
+
 		private final ICell normalCells[] = {
 				CellNull.NULLCELL,
 				new CellNormal(1),
@@ -89,15 +89,18 @@ public class CellKits {
 		
 		private final ICell coniferBranch = new CellConiferBranch();
 		private final ICell coniferTopBranch = new CellConiferTopBranch();
-		
+
 		private final ICell coniferLeafCells[] = {
-			CellNull.NULLCELL,
-			new CellConiferLeaf(1),
-			new CellConiferLeaf(2),
-			new CellConiferLeaf(3),
-			new CellConiferLeaf(4)
+				CellNull.NULLCELL,
+				new CellConiferLeaf(1),
+				new CellConiferLeaf(2),
+				new CellConiferLeaf(3),
+				new CellConiferLeaf(4),
+				new CellConiferLeaf(5),
+				new CellConiferLeaf(6),
+				new CellConiferLeaf(7)
 		};
-		
+
 		private final BasicSolver coniferSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0211});
 		
 		@Override
@@ -152,15 +155,18 @@ public class CellKits {
 			}
 			
 		};
-		
+
 		private final ICell acaciaLeafCells[] = {
 				CellNull.NULLCELL,
 				new CellAcaciaLeaf(1),
 				new CellAcaciaLeaf(2),
 				new CellAcaciaLeaf(3),
-				new CellAcaciaLeaf(4)
-			}; 
-		
+				new CellAcaciaLeaf(4),
+				new CellAcaciaLeaf(5),
+				new CellAcaciaLeaf(6),
+				new CellAcaciaLeaf(7),
+		};
+
 		private final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
 		
 		@Override
@@ -201,7 +207,10 @@ public class CellKits {
 				new CellDarkOakLeaf(1),
 				new CellDarkOakLeaf(2),
 				new CellDarkOakLeaf(3),
-				new CellDarkOakLeaf(4)
+				new CellDarkOakLeaf(4),
+				new CellDarkOakLeaf(5),
+				new CellDarkOakLeaf(6),
+				new CellDarkOakLeaf(7)
 			}; 
 		
 		private final BasicSolver darkOakSolver = new BasicSolver(new short[] {0x0514, 0x0423, 0x0412, 0x0312, 0x0211});

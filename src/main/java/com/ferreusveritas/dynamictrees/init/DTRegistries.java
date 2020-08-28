@@ -19,7 +19,6 @@ import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -34,7 +33,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -76,7 +74,7 @@ public class DTRegistries {
         DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
         treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 
-        for (BlockRooty rooty : RootyBlockHelper.getListForRegistry()){
+        for (BlockRooty rooty : RootyBlockHelper.generateListForRegistry(false)){
                 registry.register(rooty);
         }
 
