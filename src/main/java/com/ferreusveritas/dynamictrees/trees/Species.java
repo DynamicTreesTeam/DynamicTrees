@@ -12,13 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
-import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -529,12 +523,15 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	//DIRT
 	///////////////////////////////////////////
 
-	public BlockRooty getRootyBlock() {
-		return DTRegistries.blockRootyDirt;
-	}
-
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		world.setBlockState(rootPos, getRootyBlock().getDefaultState().with(BlockRooty.LIFE, life));
+		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
+		if (RootyBlockHelper.getRootyBlocksMap().containsKey(primitiveDirt)){
+			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(BlockRooty.FERTILITY, life));
+		} else {
+			System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
+			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(BlockRooty.FERTILITY, life));
+		}
+
 		return true;
 	}
 
@@ -621,7 +618,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 */
 	public boolean isAcceptableSoil(IWorld world, BlockPos pos, BlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilList.contains(soilBlock) || soilBlock instanceof BlockRooty;
+		return soilList.contains(soilBlock) || (soilBlock instanceof BlockRooty && soilList.contains(((BlockRooty)soilBlock).getPrimitiveDirt()));
 	}
 
 	/**

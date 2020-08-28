@@ -41,7 +41,7 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	
 	public BlockDynamicSapling(Species species) {
 		super(Properties.create(Material.PLANTS).sound(SoundType.PLANT).tickRandomly());
-		setRegistryName(species.getRegistryName().getPath() + "_sapling");
+		setRegistryName( "dynamic_" + species.getRegistryName().getPath() + "_sapling");
 		this.species = species;
 	}
 

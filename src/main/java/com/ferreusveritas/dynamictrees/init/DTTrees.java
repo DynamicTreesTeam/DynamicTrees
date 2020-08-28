@@ -1,7 +1,11 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.trees.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -9,6 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegistryBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -44,10 +49,25 @@ public class DTTrees {
         Species.REGISTRY.register(new Mushroom(true));
         Species.REGISTRY.register(new Mushroom(false));
 
-		for(TreeFamilyVanilla vanillaFamily: baseFamilies) {
-//            TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());
-		}
+		RootyBlockHelper.excemptBlock(Blocks.FARMLAND, Blocks.DIRT); // We excempt farmland from having a custom rooty block and default to Dirt's rooty block.
 
+		setupRootyBlocks(Species.REGISTRY.getValues()); // Rooty Dirt blocks are created for each allowed soil in the registry (except the previously excempt ones)
+
+
+	}
+
+	/**
+	 * This method must be called by any addon that adds new allowed soils that arent vanilla
+	 * @param speciesList list of species with new allowed soils to be rootified
+	 */
+	public static void setupRootyBlocks (Collection<Species> speciesList){
+		for(Species species: speciesList) {
+			for (Block soil : species.getAcceptableSoils()){
+				if (!RootyBlockHelper.getRootyBlocksMap().containsKey(soil)){
+					RootyBlockHelper.addToRootyBlocksMap(soil);
+				}
+			}
+		}
 	}
 
 	@SubscribeEvent

@@ -1,10 +1,22 @@
 {
     "parent": "block/block",
     "textures": {
+        "dirt": "block/dirt",
 		"roots": "dynamictrees:block/roots",
       	"particle": "block/dirt"
     },
     "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "north", "tintindex": 0 },
+                "up":    { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "north", "tintindex": 0 },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "north", "tintindex": 0 },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "south", "tintindex": 0 },
+                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "west", "tintindex": 0 },
+                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "dirt", "cullface": "east", "tintindex": 0 }
+            }
+        },
         {   "from": [ 0, 0, 0 ],
             "to": [ 16, 16, 16 ],
             "faces": {

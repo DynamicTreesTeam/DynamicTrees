@@ -68,7 +68,7 @@ public class TreeCactus extends TreeFamily {
 			envFactor(Type.SANDY, 1.05f);
 			
 			clearAcceptableSoils();
-			addAcceptableSoil(Blocks.SAND);
+			addAcceptableSoil(Blocks.SAND, Blocks.RED_SAND);
 		}
 		
 		@Override
@@ -84,11 +84,11 @@ public class TreeCactus extends TreeFamily {
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
 		}
 		
-		@Override
-		public BlockRooty getRootyBlock() {
-			return DTRegistries.blockRootySand;
-		}
-		
+//		@Override
+//		public BlockRooty getRootyBlock() {
+//			return DTRegistries.blockRootySand;
+//		}
+//
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.DESERT_LAKES);

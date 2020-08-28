@@ -13,30 +13,23 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 
 
@@ -52,98 +45,43 @@ import java.util.Random;
  * @author ferreusveritas
  *
  */
-public class BlockRooty extends Block implements ITreePart, IMimic {
+public class BlockRooty extends Block implements ITreePart {
 
-	public static final IntegerProperty LIFE = IntegerProperty.create("life", 0, 15);
+	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
+	private final Block primitiveDirt;
 
-	public BlockRooty(String name, Material material, boolean isTileEntity) {
-		super(Properties.create(material).sound(SoundType.GROUND).tickRandomly());
-//		this.hasTileEntity = isTileEntity;
-		setRegistryName(name);
-//		setDefaultState(this.getStateContainer().getBaseState().with(LIFE, 15));
+	public BlockRooty(Block primitiveDirt) {
+		super(Properties.from(primitiveDirt).tickRandomly());
+		setRegistryName("rooty_"+ primitiveDirt.getRegistryName().getPath()); //ModLoadingContext.get().getActiveNamespace();
+
+		this.primitiveDirt = primitiveDirt;
+
+//		FERTILITY = IntegerProperty.create("fertility", 0, maxFertility);
 	}
 
-
-	///////////////////////////////////////////
-	// TILE ENTITY
-	///////////////////////////////////////////
-
-	@Nullable
-	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new TileEntitySpecies();
-	}
-
-//	/** Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated */
-//	public void breakBlock(World worldIn, BlockPos pos, BlockState state) {
-//		super.breakBlock(worldIn, pos, state);
-//		if(hasTileEntity(state)) {
-//			worldIn.removeTileEntity(pos);
-//		}
-//	}
-//
-//	@Override
-//	public boolean hasTileEntity(BlockState state) {
-//		return hasTileEntity;
-//	}
-//
-//	@Override
-//	public TileEntity createNewTileEntity(World worldIn, int meta) {
-//		return hasTileEntity ? new TileEntitySpecies() : null;
-//	}
-//
-//	/**
-//	 * Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On
-//	 * the Server, this may perform additional changes to the world, like pistons replacing the block with an extended
-//	 * base. On the client, the update may involve replacing tile entities or effects such as sounds or particles
-//	 */
-//	@Override
-//	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-//		TileEntity tileentity = worldIn.getTileEntity(pos);
-//		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
-//	}
-//
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
-	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(LIFE);
+	public Block getPrimitiveDirt (){
+		return primitiveDirt;
 	}
 
-
-//	@Override
-//	protected BlockStateContainer createBlockState() {
-//		return new ExtendedBlockState(this, new IProperty[]{LIFE}, new IUnlistedProperty[] {MimicProperty.MIMIC});
-//	}
-//
-//	/**
-//	 * Convert the given metadata into a BlockState for this Block
-//	 */
-//	@Override
-//	public BlockState getStateFromMeta(int meta) {
-//		return this.getDefaultState().withProperty(LIFE, meta);
-//	}
-//
-//	/**
-//	 * Convert the BlockState into the correct metadata value
-//	 */
-//	@Override
-//	public int getMetaFromState(BlockState state) {
-//		return state.getValue(LIFE).intValue();
-//	}
-
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FERTILITY);
+	}
 
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-//	@Override
-//	public void randomTick(World world, BlockPos pos, BlockState state, Random random) {
-//		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
-//			updateTree(state, world, pos, random, true);
-//		}
-//	}
+
+	@Override
+	public void tick(BlockState state, World world, BlockPos pos, Random random) {
+		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
+			updateTree(state, world, pos, random, true);
+		}
+	}
 
 	public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
 		return Direction.UP;
@@ -250,12 +188,12 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 //	}
 
 	public int getSoilLife(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return blockState.get(LIFE);
+		return blockState.get(FERTILITY);
 	}
 
 	public void setSoilLife(World world, BlockPos rootPos, int life) {
 		Species species = getSpecies(world.getBlockState(rootPos), world, rootPos);
-		world.setBlockState(rootPos, getDefaultState().with(LIFE, MathHelper.clamp(life, 0, 15)), 3);
+		world.setBlockState(rootPos, getDefaultState().with(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
 		world.notifyNeighborsOfStateChange(rootPos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
 		setSpecies(world, rootPos, species);
 
@@ -379,10 +317,10 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 		}
 	}
 
-//	@Override
-//	public PushReaction getMobilityFlag(BlockState state) {
-//		return PushReaction.BLOCK.BLOCK;
-//	}
+	@Override
+	public PushReaction getPushReaction(BlockState state) {
+		return PushReaction.BLOCK;
+	}
 
 	public final TreePartType getTreePartType() {
 		return TreePartType.ROOT;
@@ -393,16 +331,7 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 		return true;
 	}
 
-	@Override
-	public BlockState getExtendedState(BlockState state, IBlockReader access, BlockPos pos) {
-//		return state instanceof BlockState ? ((BlockState)state).withProperty(MimicProperty.MIMIC, getMimic(access, pos)) : state;
-		return state;
-	}
 
-	@Override
-	public BlockState getMimic(IBlockReader access, BlockPos pos) {
-		return Blocks.DIRT.getDefaultState(); //Default to dirt
-	}
 //
 //	/**
 //	 * We have to reinvent this wheel because Minecraft colors the particles with tintindex 0.. which is used for the grass texture.
@@ -453,6 +382,16 @@ public class BlockRooty extends Block implements ITreePart, IMimic {
 //
 //		return true;
 //	}
+
+	///////////////////////////////////////////
+	// RENDERING
+	///////////////////////////////////////////
+
+
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {

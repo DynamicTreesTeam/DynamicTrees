@@ -49,10 +49,10 @@ public class SpeciesRare extends Species {
 		return false;
 	}
 
-	@Override
-	public BlockRooty getRootyBlock() {
-		return DTRegistries.blockRootyDirtSpecies;
-	}
+//	@Override
+//	public BlockRooty getRootyBlock() {
+//		return DTRegistries.blockRootyDirtSpecies;
+//	}
 
 	@Override
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {

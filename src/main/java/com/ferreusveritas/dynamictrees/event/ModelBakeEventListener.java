@@ -17,21 +17,21 @@ public class ModelBakeEventListener {
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
 		
-		Block[] rootyBlocks = new Block[] { DTRegistries.blockRootyDirt, DTRegistries.blockRootyDirtSpecies, DTRegistries.blockRootySand, DTRegistries.blockRootyDirtFake};
-		
-		for(Block block: rootyBlocks) {
-			IBakedModel rootsObject = event.getModelRegistry().get(new ModelResourceLocation(block.getRegistryName(), "normal"));
-			if (rootsObject != null) {
-				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsObject);
-				event.getModelRegistry().put(new ModelResourceLocation(block.getRegistryName(), "normal"), rootyModel);
-			}
-		}
-		
-		IBakedModel flowerPotObject = event.getModelRegistry().get(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"));
-		if (flowerPotObject != null) {
-			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotObject);
-			event.getModelRegistry().put(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
-		}
+//		Block[] rootyBlocks = new Block[] { DTRegistries.blockRootyDirt, DTRegistries.blockRootyDirtSpecies, DTRegistries.blockRootySand, DTRegistries.blockRootyDirtFake};
+//
+//		for(Block block: rootyBlocks) {
+//			IBakedModel rootsObject = event.getModelRegistry().get(new ModelResourceLocation(block.getRegistryName(), "normal"));
+//			if (rootsObject != null) {
+//				BakedModelBlockRooty rootyModel = new BakedModelBlockRooty(rootsObject);
+//				event.getModelRegistry().put(new ModelResourceLocation(block.getRegistryName(), "normal"), rootyModel);
+//			}
+//		}
+//
+//		IBakedModel flowerPotObject = event.getModelRegistry().get(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"));
+//		if (flowerPotObject != null) {
+//			BakedModelBlockBonsaiPot bonsaiPotModel = new BakedModelBlockBonsaiPot(flowerPotObject);
+//			event.getModelRegistry().put(new ModelResourceLocation(DTRegistries.blockBonsaiPot.getRegistryName(), "normal"), bonsaiPotModel);
+//		}
 	}
 	
 }

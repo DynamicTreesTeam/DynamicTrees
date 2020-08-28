@@ -5,15 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
@@ -36,6 +34,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -44,10 +43,7 @@ public class DTRegistries {
     ///////////////////////////////////////////
 	//BLOCKS
 	///////////////////////////////////////////
-    public static BlockRooty blockRootyDirt;
-    public static BlockRooty blockRootySand;
-    public static BlockRooty blockRootyDirtSpecies;
-    public static Block blockRootyDirtFake;
+//    public static Block blockRootyDirtFake;
     public static BlockFruit blockApple;
     public static BlockFruitCocoa blockFruitCocoa;
     public static BlockBonsaiPot blockBonsaiPot;
@@ -58,10 +54,6 @@ public class DTRegistries {
     public static final CommonBlockStates blockStates = new CommonBlockStates();
 
     public static void setupBlocks() {
-        blockRootyDirt = new BlockRootyDirt(false);//Dirt
-        blockRootySand = new BlockRootySand(false);//Sand
-        blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
-        blockRootyDirtFake = new BlockRootyDirtFake("rootydirtfake");
         blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
         blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
         blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
@@ -84,11 +76,11 @@ public class DTRegistries {
         DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
         treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 
+        for (BlockRooty rooty : RootyBlockHelper.getListForRegistry()){
+                registry.register(rooty);
+        }
+
         registry.registerAll(
-                blockRootyDirt,
-                blockRootySand,
-                blockRootyDirtSpecies,
-                blockRootyDirtFake,
                 blockBonsaiPot,
                 blockFruitCocoa,
                 blockApple,
@@ -151,7 +143,6 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
-        tileEntityRegistryEvent.getRegistry().register(TileEntityType.Builder.create(TileEntitySpecies::new, blockRootyDirtSpecies).build(null).setRegistryName(blockRootyDirtSpecies.getRegistryName()));
         tileEntityRegistryEvent.getRegistry().register(TileEntityType.Builder.create(TileEntityBonsai::new, blockBonsaiPot).build(null).setRegistryName(blockBonsaiPot.getRegistryName()));
     }
 
