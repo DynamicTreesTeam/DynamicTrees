@@ -65,7 +65,7 @@ public class CoordUtils {
 	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
 		for(Surround surr: CoordUtils.Surround.values()) {
 			Vec3i dir = surr.getOffset();
-			if(world.getChunkProvider().isChunkLoaded(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))){
+			if(!world.getChunkProvider().isChunkLoaded(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))){
 				return false;
 			}
 		}

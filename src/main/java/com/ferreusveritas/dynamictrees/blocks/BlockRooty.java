@@ -110,7 +110,6 @@ public class BlockRooty extends Block implements ITreePart {
 			if(species.isValid()) {
 				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
-
 				if(treeBase != TreeHelper.nullTreePart) {
 					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, natural);
 				}

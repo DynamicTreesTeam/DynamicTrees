@@ -308,6 +308,23 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		addDropCreator(new DropCreatorSeed());
 		return this;
 	}
+	public Species setupStandardSeedDropping(float rarity) {
+		addDropCreator(new DropCreatorSeed(rarity));
+		return this;
+	}
+
+	/**
+	 * Same as setupStandardSeedDropping except it allows
+	 * for a custom seed item.
+	 */
+	public Species setupCustomSeedDropping(ItemStack customSeed) {
+		addDropCreator(new DropCreatorSeed().setCustomSeedDrop(customSeed));
+		return this;
+	}
+	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
+		addDropCreator(new DropCreatorSeed(rarity).setCustomSeedDrop(customSeed));
+		return this;
+	}
 
 	public boolean addDropCreator(IDropCreator dropCreator) {
 		return dropCreatorStorage.addDropCreator(dropCreator);
@@ -659,8 +676,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
 	 */
 	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
-
-		System.out.println("SPECIES UPDATE");
 
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);

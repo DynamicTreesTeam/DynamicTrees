@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -48,7 +48,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			envFactor(Type.MUSHROOM, 1.25f);
 			
 			if(DTConfigs.worldGen.get() && !DTConfigs.enableAppleTrees.get()) {
-				addDropCreator(new DropCreatorApple());
+				addDropCreator(new DropCreatorFruit());
 			}
 			
 			setupStandardSeedDropping();

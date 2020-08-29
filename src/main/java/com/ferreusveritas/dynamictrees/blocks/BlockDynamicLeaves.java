@@ -113,8 +113,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public void tick(BlockState state, World worldIn, @Nonnull BlockPos pos, Random rand) {
-//		super.tick(state, worldIn, pos, rand);
-
 		if (rand == null) rand = backupRng;
 		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			double attempts = DTConfigs.treeGrowthFolding.get() * DTConfigs.treeGrowthMultiplier.get();
@@ -149,8 +147,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public int age(World world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
-
-//		world.removeBlock(pos, false);
 
 		ILeavesProperties leavesProperties = getProperties(state);
 		int oldHydro = state.get(BlockDynamicLeaves.DISTANCE);

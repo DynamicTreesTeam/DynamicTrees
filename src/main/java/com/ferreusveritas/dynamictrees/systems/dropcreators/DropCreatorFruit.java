@@ -21,18 +21,28 @@ import java.util.Random;
  * @author ferreusveritas
  *
  */
-public class DropCreatorApple extends DropCreator {
+public class DropCreatorFruit extends DropCreator {
 
-	public static final DropCreatorApple instance = new DropCreatorApple();
+	public static final DropCreatorFruit instance = new DropCreatorFruit();
 	public ItemStack fruit = new ItemStack(Items.APPLE);
+	protected final float rarity;
 
-	public DropCreatorApple() {
-		super(new ResourceLocation(DynamicTrees.MODID, "apple"));
+	public DropCreatorFruit (){
+		this(1.0f);
 	}
 
-	public DropCreatorApple setFruitDrop (Item fruitItem){
+	public DropCreatorFruit(float rarity) {
+		super(new ResourceLocation(DynamicTrees.MODID, "apple"));
+		this.rarity = rarity;
+	}
+
+	public DropCreatorFruit setFruitDrop (Item fruitItem){
 		this.fruit = new ItemStack(fruitItem);
 		return this;
+	}
+
+	protected float getLeavesRarity() {
+		return rarity;
 	}
 
 	@Override
@@ -46,7 +56,7 @@ public class DropCreatorApple extends DropCreator {
 			}
 		}
 		
-		if(random.nextInt(chance) == 0) {
+		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
 			dropList.add(fruit);
 		}
 		return dropList;

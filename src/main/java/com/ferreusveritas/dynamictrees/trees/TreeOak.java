@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 import net.minecraft.block.BlockState;
@@ -42,7 +42,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			envFactor(Type.FOREST, 1.05f);
 			
 			if(DTConfigs.worldGen.get() && !DTConfigs.enableAppleTrees.get()) {//If we've disabled apple trees we still need some way to get apples.
-				addDropCreator(new DropCreatorApple());
+				addDropCreator(new DropCreatorFruit());
 			}
 			
 			setupStandardSeedDropping();
