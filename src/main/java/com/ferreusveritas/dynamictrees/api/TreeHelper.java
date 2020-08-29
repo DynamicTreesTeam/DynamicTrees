@@ -1,15 +1,12 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -29,18 +26,20 @@ public class TreeHelper {
 	
 	public static final ITreePart nullTreePart = new NullTreePart();
 	
-	/**	Use {@link LeavesPaging} instead */
+	/*
+	//**	Use {@link LeavesPaging} instead
 	@Deprecated
 	public static BlockDynamicLeaves getLeavesBlockForSequence(String modid, int seq, ILeavesProperties leavesProperties) {
 		System.err.println("Warning: Mod used deprecated call to TreeHelper.getLeavesBlockForSequence(). Please notify the mod author of \"" + modid + "\" that this will be removed in future versions.");
 		return LeavesPaging.getLeavesBlockForSequence(modid, seq, leavesProperties);
 	}
 	
-	/**	Use {@link LeavesPaging} instead */
+	//**	Use {@link LeavesPaging} instead
 	@Deprecated
 	public static HashMap<Integer, BlockDynamicLeaves> getLeavesMapForModId(String modid) {
 		return (HashMap<Integer, BlockDynamicLeaves>) LeavesPaging.getLeavesMapForModId(modid);
 	}
+	*/
 	
 	///////////////////////////////////////////
 	//CONVENIENCE METHODS

@@ -177,7 +177,9 @@ public class BlockBranchBasic extends BlockBranch {
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		int radius = getRadius(blockState);
-		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		float hardness = getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		hardness = Math.min(hardness, ModConfigs.maxTreeHardness);//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+		return hardness;
 	};
 	
 	@Override
