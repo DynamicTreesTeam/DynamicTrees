@@ -39,7 +39,7 @@ public class NodeDestroyer implements INodeInspector {
 			if(branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
 				endPoints.add(pos);
 			}
-			world.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);//Destroy the branch without notifying the client
+			world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);//Destroy the branch and notify the client
 		}
 		
 		return true;

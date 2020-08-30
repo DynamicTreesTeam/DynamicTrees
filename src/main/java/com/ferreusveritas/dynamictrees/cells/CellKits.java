@@ -23,7 +23,7 @@ public class CellKits {
 		@Override public int getDefaultHydration() { return 0; }
 	};
 	
-	public static void preInit() {
+	public static void setup() {
 		new CellKits();
 	}
 	

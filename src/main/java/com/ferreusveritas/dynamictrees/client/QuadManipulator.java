@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 
+import static net.minecraft.client.renderer.BlockModelShapes.getModelLocation;
+
 @OnlyIn(Dist.CLIENT)
 public class QuadManipulator {
 	

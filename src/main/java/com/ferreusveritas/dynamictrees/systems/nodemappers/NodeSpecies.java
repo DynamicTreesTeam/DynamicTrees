@@ -16,20 +16,20 @@ public class NodeSpecies implements INodeInspector {
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		
-//		ITreePart treePart = TreeHelper.getTreePart(blockState);
-//
-//		switch(treePart.getTreePartType()) {
-//			case BRANCH:
-//				if(determination == Species.NULLSPECIES) {
-//					determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
-//				}
-//				break;
-//			case ROOT:
-//				determination = TreeHelper.getRooty(treePart).getSpecies(world.getBlockState(pos), world, pos);
-//				break;
-//			default:
-//				break;
-//		}
+		ITreePart treePart = TreeHelper.getTreePart(blockState);
+
+		switch(treePart.getTreePartType()) {
+			case BRANCH:
+				if(determination == Species.NULLSPECIES) {
+					determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
+				}
+				break;
+			case ROOT:
+				determination = TreeHelper.getRooty(treePart).getSpecies(world.getBlockState(pos), world, pos);
+				break;
+			default:
+				break;
+		}
 		
 		return true;
 	}

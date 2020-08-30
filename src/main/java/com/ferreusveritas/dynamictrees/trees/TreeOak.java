@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -154,6 +155,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			envFactor(Type.DRY, 0.25f);
 			
 			generateSeed();
+			generateSapling();
 			
 			addGenFeature(new FeatureGenFruit(DTRegistries.blockApple).setRayDistance(4));
 		}
@@ -187,7 +189,13 @@ public class TreeOak extends TreeFamilyVanilla {
 		speciesRegistry.register(swampSpecies);
 		speciesRegistry.register(appleSpecies);
 	}
-	
+
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList.add(appleSpecies.getSapling().get());
+		return super.getRegisterableBlocks(blockList);
+	}
+
 	@Override
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		appleSpecies.getSeed().ifPresent(itemList::add);//Since we generated the apple species internally we need to let the seed out to be registered.

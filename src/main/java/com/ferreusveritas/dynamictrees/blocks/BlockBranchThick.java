@@ -30,6 +30,7 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -38,10 +39,9 @@ import java.util.Random;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 
-//
 //	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
 	public static final int RADMAX_THICK = 32;
-//
+
 	protected static final IntegerProperty RADIUSNYBBLE = IntegerProperty.create("radius", 0, 15); //39 ?
 	protected final boolean extended;
 	public BlockBranchThick otherBlock;
@@ -75,6 +75,10 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	//We can't override this function since the "otherBlock" will not have been created yet.
 	@Override
 	public void cacheBranchStates() { }
+
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(RADIUSNYBBLE);
+	}
 
 	public void cacheBranchThickStates() {
 		setDefaultState(this.getStateContainer().getBaseState().with(RADIUSNYBBLE, 0));
@@ -146,24 +150,6 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 //	//////////////////////////////////////////////////
 //	//end highly experimental code
 //	//////////////////////////////////////////////////
-
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUSNYBBLE);
-	}
-
-	@Override
-	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-		if (state != null) {
-			int thisRadius = getRadius(state);
-
-//			for (Direction dir : Direction.values()) {
-//				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
-//			}
-			return (BlockState) state;
-		}
-
-		return state;
-	}
 
 
 	///////////////////////////////////////////
@@ -290,7 +276,8 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	///////////////////////////////////////////
 
 
-	@Override
+	@Nonnull
+    @Override
 	public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
 		int thisRadius = getRadius(state);
 		if(thisRadius <= RADMAX_NORMAL) {
@@ -300,17 +287,6 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		double radius = thisRadius / 16.0;
 		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius));
 	}
-
-//	@Override
-//	public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-//		int radius = getRadius(state);
-//		if(radius <= RADMAX_NORMAL) {
-//			super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entityIn, p_185477_7_);
-//			return;
-//		}
-//
-//		addCollisionBoxToList(pos, entityBox, collidingBoxes, getBoundingBox(state, world, pos));
-//	}
 
 	@Override
 	public boolean isMusable() {

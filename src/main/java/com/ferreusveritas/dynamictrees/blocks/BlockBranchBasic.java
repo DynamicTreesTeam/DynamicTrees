@@ -42,6 +42,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.common.ToolType;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
@@ -98,20 +99,6 @@ public class BlockBranchBasic extends BlockBranch {
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(RADIUS);
 	}
-
-//	@Override
-//	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-//		if (state != null) {
-//			int thisRadius = getRadius(state);
-//
-////			for (Direction dir : Direction.values()) {
-////				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(world, pos, thisRadius, dir));
-////			}
-//			return state;
-//		}
-//
-//		return state;
-//	}
 
 
 	///////////////////////////////////////////
@@ -204,10 +191,10 @@ public class BlockBranchBasic extends BlockBranch {
 	// RENDERING
 	///////////////////////////////////////////
 
-	@Override
-	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		return getRadius(state) == RADMAX_NORMAL;
-	}
+//	@Override
+//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//		return getRadius(state) == RADMAX_NORMAL;
+//	}
 
 	///////////////////////////////////////////
 	// GROWTH
@@ -242,7 +229,7 @@ public class BlockBranchBasic extends BlockBranch {
 
 	@Override
 	public BlockState getStateForRadius(int radius) {
-		return branchStates[MathHelper.clamp(radius, 0, getMaxRadius())];
+		return branchStates[MathHelper.clamp(radius, 1, getMaxRadius())];
 	}
 
 	// Directionless probability grabber
@@ -343,9 +330,9 @@ public class BlockBranchBasic extends BlockBranch {
 		return DTConfigs.enableBranchClimbling.get();
 	}
 
+	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
-
 		if (state.getBlock() != this) {
 			return VoxelShapes.empty();
 		}
@@ -396,9 +383,8 @@ public class BlockBranchBasic extends BlockBranch {
 
 	@Override
 	public boolean shouldAnalyse() {
-		return false;
+		return true;
 	}
-
 
 	/**
 	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out

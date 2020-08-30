@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
@@ -23,6 +24,7 @@ import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -34,6 +36,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -120,12 +123,23 @@ public class DTRegistries {
     //ENTITIES
     ///////////////////////////////////////////
 
-    public static void setupEntities() {
+    public final static String FALLING_TREE = "falling_tree";
 
+    public static EntityType<EntityFallingTree> fallingTree;
+
+    public static void setupEntities() {
+        fallingTree = EntityType.Builder.create(EntityFallingTree::new, EntityClassification.MISC)
+                .setShouldReceiveVelocityUpdates(true).setTrackingRange(512).setUpdateInterval(Integer.MAX_VALUE)
+                .build(FALLING_TREE);
     }
 
     @SubscribeEvent
     public static void onEntitiesRegistry(final RegistryEvent.Register<EntityType<?>> entityRegistryEvent) {
+        setupEntities();
+
+        IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
+
+        registry.register(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MODID, FALLING_TREE)));
     }
 
     ///////////////////////////////////////////

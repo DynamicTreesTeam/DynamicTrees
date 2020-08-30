@@ -27,6 +27,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -48,10 +49,7 @@ import java.util.*;
 // */
 public class EntityFallingTree extends Entity implements IModelTracker {
 
-    @Override
-    public IPacket<?> createSpawnPacket() {
-        return null;
-    }
+
 
 	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_NBT);
 
@@ -86,12 +84,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		ROOT
 	}
 
-	/** FIX ENTITY TYPE*/
-    public EntityFallingTree(World worldIn) {
-        super(EntityType.DOLPHIN, worldIn);
-        //setBoundingBox(new AxisAlignedBB());
-        //setSize(1.0f, 1.0f);
-    }
+	public EntityFallingTree(EntityType<?> entityTypeIn, World worldIn) {
+		super(entityTypeIn, worldIn);
+	}
 
 	public boolean isClientBuilt() {
 		return clientBuilt;
@@ -373,19 +368,19 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	 * @param entity
 	 */
 	public static void standardDropLogsPayload(EntityFallingTree entity) {
-//		World world = entity.world;
-//		if(!world.isRemote) {
-//			BlockPos cutPos = entity.getDestroyData().cutPos;
-//			entity.getPayload().forEach(i -> spawnItemAsEntity(world, cutPos, i));
-//		}
+		World world = entity.world;
+		if(!world.isRemote) {
+			BlockPos cutPos = entity.getDestroyData().cutPos;
+			entity.getPayload().forEach(i -> spawnItemAsEntity(world, cutPos, i));
+		}
 	}
 
 	public static void standardDropLeavesPayLoad(EntityFallingTree entity) {
-//		World world = entity.world;
-//		if(!world.isRemote) {
-//			BlockPos cutPos = entity.getDestroyData().cutPos;
-//			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
-//		}
+		World world = entity.world;
+		if(!world.isRemote) {
+			BlockPos cutPos = entity.getDestroyData().cutPos;
+			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
+		}
 	}
 
 	/**
@@ -494,10 +489,15 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		}
 	}
 
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		return new SSpawnObjectPacket(this);
+	}
+
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
-			EntityFallingTree entity = new EntityFallingTree(world).setData(destroyData, woodDropList, destroyType);
+			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
 			if(entity.isAlive()) {
 				world.addEntity(entity);
 			}

@@ -3,11 +3,13 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.event.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -120,9 +122,9 @@ public class DynamicTrees
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-        CellKits.preInit();
-        GrowthLogicKits.preInit();
-//        TreeGenerator.preInit();
+        CellKits.setup();
+        GrowthLogicKits.setup();
+        TreeGenerator.setup();
 
         DTRegistries.setupBlocks();
         DTRegistries.setupItems();
@@ -159,20 +161,20 @@ public class DynamicTrees
     }
 
     public void registerCommonEventHandlers() {
-        //        MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
-//        if(DTConfigs.worldGen.get()) {
-//            MinecraftForge.EVENT_BUS.register(new DropEventHandler());
-//        }
-//
+        MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
+        if(DTConfigs.worldGen.get()) {
+            MinecraftForge.EVENT_BUS.register(new DropEventHandler());
+        }
+
 //        if(Loader.isModLoaded("fastleafdecay")) {
 //            MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
 //        }
-//
-//        //An event for dealing with Vanilla Saplings
-//        if(ModConfigs.replaceVanillaSapling) {
-//            MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
-//        }
-//
+
+        //An event for dealing with Vanilla Saplings
+        if(DTConfigs.replaceVanillaSapling.get()) {
+            MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
+        }
+
 //        //Conveniently accessible disaster(Optional World Generation)
 //        if(WorldGenRegistry.isWorldGenEnabled()) {
 //            GameRegistry.registerWorldGenerator(new WorldGeneratorTrees(), 20);

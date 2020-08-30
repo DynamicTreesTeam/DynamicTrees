@@ -8,6 +8,11 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
+import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
+import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
+import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -51,7 +56,7 @@ public class DTClient {
         registerEntityRenderers();
 
         registerColorHandlers();
-//        MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
+        MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 
         discoverWoodColors();
         LeavesPropertiesJson.postInitClient();
@@ -112,8 +117,8 @@ public class DTClient {
         }
 
         //Register Bonsai Pot Colorizer
-//        ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
-//                ? DTRegistries.blockBonsaiPot.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+        ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
+                ? DTRegistries.blockBonsaiPot.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 
         //ITEMS
 
@@ -148,13 +153,13 @@ public class DTClient {
         BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> FoliageColors.getSpruce());
     }
 
-//    public static void registerClientEventHandlers() {
-//        MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
-//        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
-//    }
+    public static void registerClientEventHandlers() {
+        MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
+        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
+    }
 
     public static void registerEntityRenderers() {
-//        RenderingRegistry.registerEntityRenderingHandler(EntityFallingTree.class, new RenderFallingTree.Factory());
+        RenderingRegistry.registerEntityRenderingHandler(EntityFallingTree.class, new RenderFallingTree.Factory());
     }
 
     public static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {

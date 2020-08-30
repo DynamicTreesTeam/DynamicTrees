@@ -23,7 +23,7 @@ public class VanillaSaplingEventHandler {
 					double y = event.getPos().getY() + 0.5;
 					double z = event.getPos().getZ() + 0.5;
 					ItemEntity itemEntity = new ItemEntity((World) event.getWorld(), x, y, z, species.getSeedStack(1));
-//					event.getWorld().spawnEntity(itemEntity);
+					event.getWorld().addEntity(itemEntity);
 				}
 			}
 		}

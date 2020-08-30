@@ -9,7 +9,7 @@ public class GrowthLogicKits {
 	
 	public final static NullLogic nullLogic = new NullLogic();
 	
-	public static void preInit() {
+	public static void setup() {
 		new GrowthLogicKits();
 	}
 	

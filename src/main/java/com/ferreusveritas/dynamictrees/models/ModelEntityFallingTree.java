@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.Direction;
@@ -22,32 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-//import com.ferreusveritas.dynamictrees.client.QuadManipulator;
-//import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-//import com.ferreusveritas.dynamictrees.trees.Species;
-//import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-//import com.ferreusveritas.dynamictrees.util.BranchDestructionData.PosType;
-//import net.minecraft.block.state.BlockState;
-//import net.minecraft.client.Minecraft;
-//import net.minecraft.client.renderer.BlockRendererDispatcher;
-//import net.minecraft.client.renderer.block.model.BakedQuad;
-//import net.minecraft.client.renderer.block.model.IBakedModel;
-//import net.minecraft.util.Direction;
-//import net.minecraft.util.math.BlockPos;
-//import net.minecraft.util.math.Vec3d;
-//import net.minecraft.world.World;
-//import net.minecraftforge.common.property.BlockState;
-//import net.minecraftforge.fml.relauncher.Side;
-//import net.minecraftforge.fml.relauncher.SideOnly;
-//
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map.Entry;
-//
-@OnlyIn(Dist.CLIENT)
-public class ModelEntityFallingTree {
+public class ModelEntityFallingTree extends EntityModel<EntityFallingTree> {
 
 	protected final List<BakedQuad> quads;
 	protected final int leavesColor;
@@ -63,24 +39,24 @@ public class ModelEntityFallingTree {
 		entityId = entity.getEntityId();
 	}
 
-//	public List<BakedQuad> getQuads() {
-//		return quads;
-//	}
-//
-//	public int getLeavesColor() {
-//		return leavesColor;
-//	}
-//
-//	public int getEntityId() {
-//		return entityId;
-//	}
-//
-//	public static int getBrightness(EntityFallingTree entity) {
-//		BranchDestructionData destructionData = entity.getDestroyData();
-//		World world = entity.getEntityWorld();
-//		return world.getBlockState(destructionData.cutPos).getPackedLightmapCoords(world, destructionData.cutPos);
-//	}
-//
+	public List<BakedQuad> getQuads() {
+		return quads;
+	}
+
+	public int getLeavesColor() {
+		return leavesColor;
+	}
+
+	public int getEntityId() {
+		return entityId;
+	}
+
+	public static int getBrightness(EntityFallingTree entity) {
+		BranchDestructionData destructionData = entity.getDestroyData();
+		World world = entity.getEntityWorld();
+		return world.getBlockState(destructionData.cutPos).getPackedLightmapCoords(world, destructionData.cutPos);
+	}
+
 	public static List<BakedQuad> generateTreeQuads(EntityFallingTree entity) {
 		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 		BranchDestructionData destructionData = entity.getDestroyData();
@@ -113,9 +89,6 @@ public class ModelEntityFallingTree {
 				if(leavesClusters != null) {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
-//						if (leafState instanceof BlockState) {
-//							leafState = ((BlockState) leafState).getClean();
-//						}
 						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey())));
 					}
 				} else {

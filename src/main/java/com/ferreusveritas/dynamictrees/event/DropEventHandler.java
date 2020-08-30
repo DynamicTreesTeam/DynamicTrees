@@ -17,13 +17,7 @@ public class DropEventHandler {
 
 		if(DTConfigs.worldGen.get() && DTConfigs.enableAppleTrees.get()) {
 			if(event.getState().getBlock() instanceof LeavesBlock) {
-				Iterator<ItemStack> iter = event.getDrops().iterator();
-				while(iter.hasNext()) {
-					ItemStack stack = iter.next();
-					if(stack.getItem() == Items.APPLE) {
-						iter.remove();
-					}
-				}
+				event.getDrops().removeIf(stack -> stack.getItem() == Items.APPLE);
 			}
 		}
 	}

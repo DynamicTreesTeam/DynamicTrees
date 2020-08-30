@@ -314,7 +314,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, DTRegistries.blockStates.air, 0);//Covertly destroy the leaves on the server side
+					world.setBlockState(imPos, DTRegistries.blockStates.air, 2);//Covertly destroy the leaves on the server side
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 				}
@@ -370,16 +370,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 
 		//Try to get the face being pounded on
-		BlockRayTraceResult rtResult;
-		{
-			RayTraceResult raytrace = Minecraft.getInstance().objectMouseOver;
-			if (raytrace instanceof BlockRayTraceResult && raytrace.getType() == RayTraceResult.Type.BLOCK) {
-				rtResult = (BlockRayTraceResult) raytrace;
-			} else {
-				return;
-			}
-		}
-		Direction toolDir = entity.isSneaking() ? rtResult.getFace().getOpposite() : rtResult.getFace();
+		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(PlayerEntity.REACH_DISTANCE).getValue() : 5.0D;
+		BlockRayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
+		Direction toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.getFace().getOpposite() : rtResult.getFace()) : Direction.DOWN;
 
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
@@ -391,15 +384,17 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor);
 
-//		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
-//			entity.setActiveHand(Hand.MAIN_HAND);//Players do things with hands.
-//		}
+		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
+			entity.setActiveHand(Hand.MAIN_HAND);//Players do things with hands.
+		}
 
 		float chance = 1.0f;
 		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
 		if (entity instanceof PlayerEntity)
 		{
-			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting((NonNullList<ItemStack>) woodItems, world, cutPos, state, fortune, chance, false, (PlayerEntity) entity);
+			NonNullList<ItemStack> woodItemsNonNull = NonNullList.create();
+			woodItemsNonNull.addAll(woodItems);
+			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItemsNonNull, world, cutPos, state, fortune, chance, false, (PlayerEntity) entity);
 		}
 		final float finalChance = chance;
 
@@ -450,7 +445,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	 * @return
 	 */
     @Nullable
-    public RayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
+    public BlockRayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
         Vec3d vec3d = entity.getEyePosition(partialTicks);
         Vec3d vec3d1 = entity.getLook(partialTicks);
         Vec3d vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
