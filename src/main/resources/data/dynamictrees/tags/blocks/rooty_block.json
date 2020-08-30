@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "dynamictrees:rooty_dirt",
+    "dynamictrees:rooty_coarse_dirt",
+    "dynamictrees:rooty_podzol",
+    "dynamictrees:rooty_grass_block",
+    "dynamictrees:rooty_mycelium",
+    "dynamictrees:rooty_sand",
+    "dynamictrees:rooty_red_sand"
+  ]
+}

@@ -25,8 +25,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
@@ -61,8 +63,9 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
 
 	public BlockDynamicLeaves() {
-		super(Properties.create(Material.LEAVES).sound(SoundType.PLANT).tickRandomly());
+		super(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT));
 		this.setDefaultState(this.stateContainer.getBaseState().with(DISTANCE, LeavesProperties.maxHydro).with(PERSISTENT, false));
+
 	}
 
 	public Block setDefaultNaming(String modid, String name) {
@@ -70,6 +73,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return this;
 	}
 
+	@Override
 	public boolean ticksRandomly(BlockState state) {
 		return !state.get(PERSISTENT);
 	}
@@ -112,9 +116,10 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	}
 
 	@Override
-	public void tick(BlockState state, World worldIn, @Nonnull BlockPos pos, Random rand) {
+	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random rand) {
 		if (rand == null) rand = backupRng;
-		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
+		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0)
+		{
 			double attempts = DTConfigs.treeGrowthFolding.get() * DTConfigs.treeGrowthMultiplier.get();
 
 			if(attempts >= 1.0f || rand.nextFloat() < attempts) {
@@ -137,9 +142,12 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		}
 	}
 
+	@Override
+	public void tick(BlockState state, World worldIn, @Nonnull BlockPos pos, Random rand) { }
+
 	protected void doTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		if((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
-			if(!state.get(LeavesBlock.PERSISTENT) && getProperties(state).updateTick(worldIn, pos, state, rand)) {
+			if(getProperties(state).updateTick(worldIn, pos, state, rand)) {
 				age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 			}
 		}
@@ -212,11 +220,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		return getProperties(state).getPrimitiveLeavesItemStack();
 	}
-
-//	@Override
-//	public MapColor getMapColor(BlockState state, World world, BlockPos pos) {
-//		return getProperties(state).getPrimitiveLeaves().getMapColor(world, pos);
-//	}
 
 	/**
 	 * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
@@ -345,20 +348,16 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		}
 
 		//Help to grow into double tall grass and ferns in a more natural way
-//		if(block instanceof DoublePlantBlock){
-//			BlockState bs = world.getBlockState(pos);
-//			DoubleBlockHalf half = bs.get(DoublePlantBlock.HALF);
-//			if(half == DoubleBlockHalf.UPPER) {//Top block of double plant
-//				if(belowBlockState.getBlock() instanceof DoublePlantBlock) {
-//					if(type == EnumPlantType.GRASS || type == EnumPlantType.FERN) {//tall grass or fern
-//						world.removeBlock(pos, false);
-//						Blocks.TALL_GRASS
-//						world.setBlockState(pos.down(), Blocks.GRASS.getDefaultState()
-//								.with(BlockTallGrass.TYPE, type == EnumPlantType.GRASS ? BlockTallGrass.EnumType.GRASS : BlockTallGrass.EnumType.FERN), 3);
-//					}
-//				}
-//			}
-//		}
+		BlockState stateDown = world.getBlockState(pos.down());
+		if (block instanceof DoublePlantBlock && blockState.get(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER &&
+				stateDown.getBlock() instanceof DoublePlantBlock && stateDown.get(DoublePlantBlock.HALF) == DoubleBlockHalf.LOWER){
+			if (block == Blocks.TALL_GRASS){
+				world.setBlockState(pos.down(), Blocks.GRASS.getDefaultState());
+			} else if (block == Blocks.LARGE_FERN){
+				world.setBlockState(pos.down(), Blocks.FERN.getDefaultState());
+			}
+			world.removeBlock(pos, false);
+		}
 
 		return (world.isAirBlock(pos) || world.getBlockState(pos).getMaterial().isReplaceable()) && hasAdequateLight(blockState, world, leavesProperties, pos);
 	}
@@ -572,27 +571,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return Species.NULLSPECIES;
 	}
 
-//	@Override
-//	protected boolean canSilkHarvest() {
-//		return false;
-//	}
-//
-//	//Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
-//	@Override
-//	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-//		return null;
-//	}
-//
-//	@Override
-//	public int quantityDropped(Random random) {
-//		return 0;
-//	}
-//
-//	@Override
-//	public int damageDropped(BlockState state) {
-//		return 0;
-//	}
-
 	//////////////////////////////
 	// RENDERING FUNCTIONS
 	//////////////////////////////
@@ -600,11 +578,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
 		return getProperties(blockState).getRadiusForConnection(blockState, world, pos, from, side, fromRadius);
-	}
-
-	@Override
-	public boolean isFoliage(BlockState state, IWorldReader world, BlockPos pos) {
-		return true;
 	}
 
 	@Override
@@ -636,29 +609,6 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return PushReaction.DESTROY;
 	}
 
-//	@Override
-//	public EnumType getWoodType(int meta) {
-//		return BlockPlanks.EnumType.OAK;//Shouldn't matter since it's only used to name things in ItemLeaves
-//	}
-//
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return Blocks.LEAVES.isOpaqueCube(state);
-//	}
-
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return Blocks.OAK_LEAVES.getRenderLayer();
-	}
-
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean shouldSideBeRendered(BlockState blockState, World blockAccess, BlockPos pos, Direction side) {
-//		setGraphicsLevel(!Blocks.LEAVES.isOpaqueCube(blockState));
-//		return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
-//	}
-
 	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.LEAVES;
@@ -669,4 +619,8 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		return true;
 	}
 
+	@Override
+	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return 0.2F;
+	}
 }

@@ -81,12 +81,16 @@ public class BlockRooty extends Block implements ITreePart {
 	// INTERACTION
 	///////////////////////////////////////////
 
+
 	@Override
-	public void tick(BlockState state, World world, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, World world, BlockPos pos, Random random) {
 		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			updateTree(state, world, pos, random, true);
 		}
 	}
+
+//	@Override
+//	public void tick(BlockState state, World world, BlockPos pos, Random random) { }
 
 	public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
 		return Direction.UP;

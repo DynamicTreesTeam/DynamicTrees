@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.BlockState;
@@ -13,13 +14,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public interface ILeavesProperties {
 
 	/** The type of tree these leaves connect to */
 	ILeavesProperties setTree(TreeFamily tree);
 
-//	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */
+	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */
 	TreeFamily getTree();
 
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
@@ -47,7 +50,7 @@ public interface ILeavesProperties {
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
 
-//	@OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	int foliageColorMultiplier(BlockState state, IEnviromentBlockReader reader, BlockPos pos);
 
 	/**

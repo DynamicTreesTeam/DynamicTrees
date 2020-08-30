@@ -26,7 +26,7 @@ import java.util.List;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
 	
-	public static final String name = "dendropotion";
+	public static final String name = "dendro_potion";
 
 	public enum DendroPotionType {
 		BIOCHAR(    0, true, "biochar",     0x27231c, "Base tree potion for brewing"),

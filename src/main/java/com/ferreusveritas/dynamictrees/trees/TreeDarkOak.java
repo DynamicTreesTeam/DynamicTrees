@@ -114,10 +114,10 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	BlockSurfaceRoot surfaceRootBlock;
 	
 	public TreeDarkOak() {
-		super(DynamicTrees.VanillaWoodTypes.darkoak);
+		super(DynamicTrees.VanillaWoodTypes.dark_oak);
 		hasConiferVariants = true;
 		
-		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");
+		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "_root");
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.DARK_OAK_LEAVES);
 	}

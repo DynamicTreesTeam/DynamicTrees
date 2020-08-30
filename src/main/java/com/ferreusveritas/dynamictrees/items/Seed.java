@@ -42,7 +42,7 @@ public class Seed extends Item implements IPlantable {
 	
 	public Seed(Species species) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
-		setRegistryName(species.getRegistryName().getPath() + "seed");
+		setRegistryName(species.getRegistryName().getPath() + "_seed");
 		this.species = species;
 	}
 	

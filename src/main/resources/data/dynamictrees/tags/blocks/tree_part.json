@@ -1,0 +1,25 @@
+{
+  "replace": false,
+  "values": [
+    "dynamictrees:dynamic_jungle_leaves",
+    "dynamictrees:dynamic_oak_leaves",
+    "dynamictrees:dynamic_spruce_leaves",
+    "dynamictrees:dynamic_dark_oak_leaves",
+    "dynamictrees:dynamic_acacia_leaves",
+    "dynamictrees:dynamic_birch_leaves",
+    "dynamictrees:cactus_branch",
+    "dynamictrees:dark_oak_branch",
+    "dynamictrees:oak_branch",
+    "dynamictrees:acacia_branch",
+    "dynamictrees:birch_branch",
+    "dynamictrees:jungle_branch",
+    "dynamictrees:spruce_branch",
+    "dynamictrees:rooty_dirt",
+    "dynamictrees:rooty_coarse_dirt",
+    "dynamictrees:rooty_podzol",
+    "dynamictrees:rooty_grass_block",
+    "dynamictrees:rooty_mycelium",
+    "dynamictrees:rooty_sand",
+    "dynamictrees:rooty_red_sand"
+  ]
+}

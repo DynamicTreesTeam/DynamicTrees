@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 
 public class DirtBucket extends Item {
 	
-	public static final String name = "dirtbucket";
+	public static final String name = "dirt_bucket";
 	
 	public DirtBucket() {
 		this(name);

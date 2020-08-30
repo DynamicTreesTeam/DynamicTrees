@@ -92,14 +92,14 @@ public class DynamicTrees
         spruce,
         birch,
         jungle,
-        darkoak,
+        dark_oak,
         acacia;
         
         public Block getLog() {
         	switch(this) {
 				case acacia: return Blocks.ACACIA_LOG;
 				case birch: return Blocks.BIRCH_LOG;
-				case darkoak: return Blocks.DARK_OAK_LOG;
+				case dark_oak: return Blocks.DARK_OAK_LOG;
 				case jungle: return Blocks.JUNGLE_LOG;
 				case oak: return Blocks.OAK_LOG;
 				case spruce: return Blocks.SPRUCE_LOG;
