@@ -370,7 +370,6 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 
 		//Try to get the face being pounded on
-		//final double reachDistance = entity instanceof PlayerEntity ? ((PlayerEntity)entity).abilities..getAttributeValue() : 5.0D;
 		BlockRayTraceResult rtResult;
 		{
 			RayTraceResult raytrace = Minecraft.getInstance().objectMouseOver;

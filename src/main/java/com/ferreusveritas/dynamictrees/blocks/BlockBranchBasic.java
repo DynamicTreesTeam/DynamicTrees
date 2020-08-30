@@ -32,6 +32,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -354,47 +355,24 @@ public class BlockBranchBasic extends BlockBranch {
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
-		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius).offset(0.5, 0.5, 0.5);
+		VoxelShape shape =  VoxelShapes.create(aabb);
 		for (Direction dir : Direction.values()) {
-			if (getSideConnectionRadius(blockReader, pos, thisRadius, dir) > 0) {
+			int sideRad = getSideConnectionRadius(blockReader, pos, thisRadius, dir);
+			if (sideRad > 0) {
 				connectionMade = true;
-				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
+				// if the radius of the adjacent branch is larger, we stick with our radius. Otherwise we use the adjacent radius
+				double thisGap = (sideRad > thisRadius) ? gap : 0.5 - (sideRad / 16.0);
+				AxisAlignedBB aabbSide = (sideRad > thisRadius) ? aabb : new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(sideRad / 16.0).offset(0.5, 0.5, 0.5);
+				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabbSide.expand(dir.getXOffset() * thisGap, dir.getYOffset() * thisGap, dir.getZOffset() * thisGap)), IBooleanFunction.OR);
 			}
 		}
 		if (connectionMade) {
-			return VoxelShapes.create(aabb.offset(0.5, 0.5, 0.5));
+			return shape;
 		}
 
 		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
 	}
-
-//	@Override
-//	public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-//		if(entityIn instanceof EntityFallingTree) {
-//			return;
-//		}
-//
-//		boolean hasConnections = false;
-//		int thisRadius = getRadius(state);
-//
-//		for (Direction dir : Direction.values()) {
-//			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
-//			if (connRadius > 0) {
-//				hasConnections = true;
-//				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
-//				double gap = 0.5 - radius;
-//				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-//				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
-//				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
-//			}
-//		}
-//
-//		if(!hasConnections) {
-//			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
-//			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
-//		}
-//
-//	}
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
