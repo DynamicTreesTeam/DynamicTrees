@@ -134,29 +134,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	}
 	
 	private Species getWailaSpecies(World world, BlockPos pos) {
-		IBlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		
-		//Dereference proxy trunk shell block
-		if(block instanceof BlockTrunkShell) {
-			ShellMuse muse = ((BlockTrunkShell)block).getMuse(world, pos);
-			if(muse != null) {
-				state = muse.state;
-				block = state.getBlock();
-				pos = muse.pos;
-			}
-		}
-		
-		if(block instanceof BlockBranch) {
-			BlockBranch branch = (BlockBranch) state.getBlock();
-			Species species = TreeHelper.getExactSpecies(state, world, pos);
-			if(species == Species.NULLSPECIES) {
-				species = branch.getFamily().getCommonSpecies();
-			}
-			return species;
-		}
-		
-		return Species.NULLSPECIES;
+		return TreeHelper.getBestGuessSpecies(world, pos);
 	}
 	
 }

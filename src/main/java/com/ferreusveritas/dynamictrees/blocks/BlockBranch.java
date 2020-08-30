@@ -609,7 +609,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		IBlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
-			Species species = TreeHelper.getExactSpecies(state, world, pos);
+			Species species = TreeHelper.getExactSpecies(world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, EnumFacing.DOWN, false);
 			float woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);

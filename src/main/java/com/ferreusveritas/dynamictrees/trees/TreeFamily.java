@@ -166,7 +166,7 @@ public class TreeFamily {
 		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
 		
 		if(rootPos != BlockPos.ORIGIN) {
-			TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+			TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
 		}
 
 		return false;

@@ -2,16 +2,20 @@ package com.ferreusveritas.dynamictrees.api;
 
 import java.util.Optional;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -138,6 +142,60 @@ public class TreeHelper {
 		
 	}
 
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos) {
+		return getJoCode(world, pos, EnumFacing.SOUTH);
+	}
+	
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos, EnumFacing facing) {
+		if(pos == null) {
+			return Optional.empty();
+		}
+		pos = dereferenceTrunkShell(world, pos);
+		BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+		return rootPos != BlockPos.ORIGIN ? Optional.of(new JoCode(world, rootPos, facing)) : Optional.empty();
+	}
+	
+	public static BlockPos dereferenceTrunkShell(World world, BlockPos pos) {
+		
+		IBlockState blockState = world.getBlockState(pos);
+
+		if(blockState.getBlock() == ModBlocks.blockTrunkShell) {
+			ShellMuse muse = ((BlockTrunkShell)blockState.getBlock()).getMuse(world, blockState, pos);
+			if(muse != null) {
+				return muse.pos;
+			}
+		}
+		
+		return pos;
+	}
+
+	public static Species getCommonSpecies(World world, BlockPos pos) {
+		pos = dereferenceTrunkShell(world, pos);
+		IBlockState state = world.getBlockState(pos);
+		if(state.getBlock() instanceof BlockBranch) {
+			BlockBranch branch = (BlockBranch) state.getBlock();
+			return branch.getFamily().getCommonSpecies();
+		}
+		
+		return Species.NULLSPECIES;
+	}
+	
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 * 
+	 * This function is deprecated and will be removed in the future.
+	 * Use getExactSpecies(World, BlockPos)
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	@Deprecated
+	public static Species getExactSpecies(IBlockState unused, World world, BlockPos pos) {
+		return getExactSpecies(world, pos);
+	}
 	
 	/**
 	 * This is resource intensive.  Use only for interaction code.
@@ -148,13 +206,32 @@ public class TreeHelper {
 	 * @param pos
 	 * @return
 	 */
-	public static Species getExactSpecies(IBlockState blockState, World world, BlockPos pos) {
+	public static Species getExactSpecies(World world, BlockPos pos) {
+		
+		pos = dereferenceTrunkShell(world, pos);
+		IBlockState blockState = world.getBlockState(pos);
+		
 		BlockPos rootPos = findRootNode(blockState, world, pos);
 		if(rootPos != BlockPos.ORIGIN) {
 			IBlockState rootyState = world.getBlockState(rootPos);
 			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
 		}
 		return Species.NULLSPECIES;
+	}
+	
+	/**
+ 	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.  Tries to find the
+	 * exact species and if that fails tries to find the common species.
+	 * 
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static Species getBestGuessSpecies(World world, BlockPos pos) {
+		Species species = getExactSpecies(world, pos);
+		return species == Species.NULLSPECIES ? getCommonSpecies(world, pos) : species;
 	}
 	
 	/**
