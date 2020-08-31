@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import javafx.geometry.Side;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -79,7 +80,8 @@ public class DTClient {
                 BlockState state = family.getPrimitiveLog().getDefaultState();
                 if(state.getBlock() != Blocks.AIR) {
                     IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
-                    ResourceLocation resloc = model.getParticleTexture().getName();
+                    List<BakedQuad> quads = model.getQuads(state, Direction.UP, null); //We get the TOP face of the log model
+                    ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that top face
                     System.out.println(resloc);
                     if(!resloc.toString().isEmpty()) {
                         TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));
