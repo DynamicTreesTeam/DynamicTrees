@@ -21,32 +21,23 @@ public class TextureUtils {
 		public PixelBuffer(TextureAtlasSprite sprite) {
 			this.w = sprite.getWidth();
 			this.h = sprite.getHeight();
-//			int[][] data = sprite.getFrameTextureData(0);
-//			pixels = data[0];
+			pixels = new int[w * h];
+			for (int x=0;x<w;x++){
+				for (int y=0;y<h;y++){
+					pixels[calcPos(x,y)] = sprite.getPixelRGBA(0, x, y);
+				}
+			}
+
 		}
 		
 		public PixelBuffer(TextureAtlasSprite sprite, boolean copy) {
-			this.w = sprite.getWidth();
-			this.h = sprite.getHeight();
-//			int[][] original = sprite.getFrameTextureData(0);
-//			pixels = Arrays.copyOf(original[0], original[0].length);
+			this(sprite);
 		}
 		
 		public PixelBuffer(PixelBuffer other) {
 			this.w = other.w;
 			this.h = other.h;
 			this.pixels = Arrays.copyOf(other.pixels, other.pixels.length);
-		}
-		
-		public void apply(TextureAtlasSprite sprite) {
-			if(w == sprite.getWidth() && h == sprite.getHeight()) {
-//				int[][] original = sprite.getFrameTextureData(0);
-//				int[][] data = new int[original.length][];
-//				data[0] = pixels;
-				ArrayList<int[][]> ftd = new ArrayList<>();
-//				ftd.add(data);
-//				sprite.setFramesTextureData(ftd);
-			}
 		}
 		
 		public int calcPos(int offX, int offY) {
@@ -84,8 +75,7 @@ public class TextureUtils {
 					for(int y = 0; y < h; y++) {
 						for(int x = 0; x < w; x++) {
 							int destX = h - y - 1;
-							int destY = x;
-							dst.setPixel(destX + offX, destY + offY, getPixel(x, y));
+							dst.setPixel(destX + offX, x + offY, getPixel(x, y));
 						}
 					}
 					return;
@@ -101,12 +91,10 @@ public class TextureUtils {
 				case 3:
 					for(int y = 0; y < h; y++) {
 						for(int x = 0; x < w; x++) {
-							int destX = y;
 							int destY = w - x - 1;
-							dst.setPixel(destX + offX, destY + offY, getPixel(x, y));
+							dst.setPixel(y + offX, destY + offY, getPixel(x, y));
 						}
 					}
-					return;
 			}
 		}
 		
@@ -128,11 +116,8 @@ public class TextureUtils {
 		}
 		
 		public void fill(int color) {
-			for(int i = 0; i < pixels.length; i++) {
-				pixels[i] = color;
-			}
+			Arrays.fill(pixels, color);
 		}
-		
 	}
 	
 	public static int compose(int r, int g, int b, int a) {
@@ -158,18 +143,19 @@ public class TextureUtils {
 	public static int alpha(int c) {
 		return (c >> 24) & 0xFF;
 	}
-	
-	public static int red(int c) {
+
+	public static int blue(int c) {
 		return (c >> 16) & 0xFF;
 	}
-	
+
 	public static int green(int c) {
 		return (c >> 8) & 0xFF;
 	}
-	
-	public static int blue(int c) {
+
+	public static int red(int c) {
 		return (c) & 0xFF;
 	}
+
 	
 	public static int avgColors(int pixels[]) {
 		long rAccum = 0;

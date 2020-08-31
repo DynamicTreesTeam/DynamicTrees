@@ -1,11 +1,5 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockRooty;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;

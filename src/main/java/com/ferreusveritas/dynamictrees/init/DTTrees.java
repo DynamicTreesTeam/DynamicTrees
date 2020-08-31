@@ -52,8 +52,6 @@ public class DTTrees {
 		RootyBlockHelper.excemptBlock(Blocks.FARMLAND, Blocks.DIRT); // We excempt farmland from having a custom rooty block and default to Dirt's rooty block.
 
 		setupRootyBlocks(Species.REGISTRY.getValues()); // Rooty Dirt blocks are created for each allowed soil in the registry (except the previously excempt ones)
-
-
 	}
 
 	/**

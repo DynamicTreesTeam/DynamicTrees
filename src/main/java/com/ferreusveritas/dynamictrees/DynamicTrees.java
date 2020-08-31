@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -131,8 +132,8 @@ public class DynamicTrees
 
         DTRegistries.setupEntities();
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
         registerCommonEventHandlers();
 
@@ -141,17 +142,13 @@ public class DynamicTrees
 //        WorldGenRegistry.populateDataBase();
     }
 
-    private void setup(final FMLCommonSetupEvent event) {
+    private void commonSetup(final FMLCommonSetupEvent event) {
         LeavesPropertiesJson.resolveAll();
  //       cleanUp();
     }
 
-    private void doClientStuff(final FMLClientSetupEvent event) { //CLIENT INIT
+    private void clientSetup(final FMLClientSetupEvent event) {
         DTClient.setup();
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) { //SERVER INIT
     }
 
     public void cleanUp() {

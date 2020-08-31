@@ -6,14 +6,18 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.stream.Collectors;
 
 
 public class NodeFreezer implements INodeInspector {
 	
 	Species species;
+	private static final int freezeRadius = 3;
 	
 	public NodeFreezer(Species species) {
 		this.species = species;
@@ -39,15 +43,15 @@ public class NodeFreezer implements INodeInspector {
 	
 	//Clumsy hack to freeze leaves
 	public void freezeSurroundingLeaves(World world, BlockBranch branch, BlockPos twigPos) {
-//		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
-//			TreeFamily tree = branch.getFamily();
-//			BlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
-//			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
+		if (!world.isRemote && !world.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+			TreeFamily tree = branch.getFamily();
+			BlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
+//			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-freezeRadius, -freezeRadius, -freezeRadius), twigPos.add(freezeRadius, freezeRadius, freezeRadius))) {
 //				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
-//					world.setBlockState(leavesPos, primLeaves.withProperty(BlockLeaves.DECAYABLE, false).withProperty(BlockLeaves.CHECK_DECAY, false));
+//					world.setBlockState(leavesPos, primLeaves.with(LeavesBlock.PERSISTENT, true));
 //				}
 //			}
-//		}
+		}
 	}
 	
 }

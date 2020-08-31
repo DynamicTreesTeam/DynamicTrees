@@ -32,6 +32,9 @@
   "item.dynamictrees.acacia_seed":"Acacia Seed",
   "item.dynamictrees.apple_seed":"Apple Pip",
   "item.dynamictrees.cactus_seed":"Cactus Seed",
+  "item.dynamictrees.brown_mushroom_seed":"Brown Mushroom Cap",
+  "item.dynamictrees.red_mushroom_seed":"Red Mushroom Cap",
+  "item.dynamictrees.chorus_seed":"Chorus Seed",
 
   "item.dynamictrees.dendro_potion.biochar":"Biochar Base Potion",
   "item.dynamictrees.dendro_potion.depletion":"Potion of Depletion",

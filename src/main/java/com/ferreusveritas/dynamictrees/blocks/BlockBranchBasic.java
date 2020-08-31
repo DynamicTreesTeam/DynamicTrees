@@ -191,10 +191,9 @@ public class BlockBranchBasic extends BlockBranch {
 	// RENDERING
 	///////////////////////////////////////////
 
-//	@Override
-//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return getRadius(state) == RADMAX_NORMAL;
-//	}
+	public boolean isSolid(BlockState state) {
+		return getRadius(state) >= RADMAX_NORMAL;
+	}
 
 	///////////////////////////////////////////
 	// GROWTH

@@ -1,5 +1,6 @@
 {
-  "variants": {
-		"": { "model": "dynamictrees:block/roots" }
-	}
+	"multipart": [
+		{   "apply": { "model": "block/dirt" }},
+		{	"apply": { "model": "dynamictrees:block/roots" }}
+	]
 }

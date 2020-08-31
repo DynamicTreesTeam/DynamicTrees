@@ -89,6 +89,7 @@ public class DTRegistries {
         );
 
         registry.registerAll(treeBlocks.toArray(new Block[0]));
+
     }
 
     ///////////////////////////////////////////

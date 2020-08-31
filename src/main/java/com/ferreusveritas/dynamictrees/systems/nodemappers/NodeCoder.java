@@ -15,7 +15,7 @@ public class NodeCoder implements INodeInspector {
 	private class Link {
 		BlockPos pos;
 		int forks;
-		Link links[];//Links to the other possible 6 directions
+		Link[] links;//Links to the other possible 6 directions
 		
 		public Link(BlockPos pos) {
 			this.pos = pos;

@@ -8,17 +8,22 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.client.QuadManipulator;
+import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.event.ModelBakeEventListener;
 import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -40,10 +45,12 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.model.Models;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,33 +65,34 @@ public class DTClient {
         registerColorHandlers();
         MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 
-        discoverWoodColors();
         LeavesPropertiesJson.postInitClient();
     }
 
-    private static void discoverWoodColors() {
-//
-//        Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString());
-//
-//        for(TreeFamily family : Species.REGISTRY.getValues().stream().map(s -> s.getFamily()).distinct().collect(Collectors.toList())) {
-//            family.woodColor = 0xFFF1AE;//For roots
-//            if(family != TreeFamily.NULLFAMILY) {
-//                BlockState state = family.getPrimitiveLog();
-//                if(state.getBlock() != Blocks.AIR) {
-//                    IModel model = QuadManipulator.getModelManager().getModel(state);
-//                    ResourceLocation resloc = QuadManipulator.getModelTexture(model, bakedTextureGetter, state, Direction.UP);
-//                    if(resloc != null) {
-//                        TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));
-//                        int u = pixbuf.w / 16;
-//                        TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
-//                        pixbuf.blit(center, u * -8, u * -8);
-//
-//                        family.woodColor = center.averageColor();
-//                    }
-//                }
-//            }
-//        }
-//
+    @OnlyIn(Dist.CLIENT)
+    public static void discoverWoodColors() {
+
+        Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString());
+
+        for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
+            family.woodColor = 0xFFF1AE;//For roots
+            if(family != TreeFamily.NULLFAMILY) {
+                BlockState state = family.getPrimitiveLog().getDefaultState();
+                if(state.getBlock() != Blocks.AIR) {
+                    IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
+                    ResourceLocation resloc = model.getParticleTexture().getName();
+                    System.out.println(resloc);
+                    if(!resloc.toString().isEmpty()) {
+                        TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));
+                        int u = pixbuf.w / 16;
+                        TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+                        pixbuf.blit(center, u * -8, u * -8);
+
+                        family.woodColor = center.averageColor();
+                    }
+                }
+            }
+        }
+
     }
 
     public void cleanUp() {
