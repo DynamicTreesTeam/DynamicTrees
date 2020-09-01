@@ -171,7 +171,8 @@ public class TreeCactus extends TreeFamily {
 	
 	@Override
 	public BlockBranch createBranch() {
-		return new BlockBranchCactus("cactusbranch");
+		String branchName = getName() + "branch";
+		return new BlockBranchCactus(branchName);
 	}
 	
 	@Override

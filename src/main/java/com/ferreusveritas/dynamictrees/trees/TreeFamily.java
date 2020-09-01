@@ -234,7 +234,7 @@ public class TreeFamily {
 	 * @return the branch to be created
 	 */
 	public BlockBranch createBranch() {
-		String branchName = name + "branch";
+		String branchName = getName() + "branch";
 		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
 	}
 	
