@@ -5,7 +5,10 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelSapling;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -28,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -146,6 +150,31 @@ public class BlockDynamicSapling extends Block implements ITileEntityProvider, I
 	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
 		grow(world, rand, pos, state);
+	}
+	
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+
+		ItemStack heldItem = player.getHeldItem(hand);
+		
+		//Make a special case for the potion of burgeoning.  Since it only makes sense.
+		if (heldItem != null && !heldItem.isEmpty()) {//Something in the hand
+			//Use substance provider interface if it's available
+			if(heldItem.getItem() instanceof ISubstanceEffectProvider) {
+				ISubstanceEffectProvider provider = (ISubstanceEffectProvider) heldItem.getItem();
+				ISubstanceEffect substanceEffect = provider.getSubstanceEffect(heldItem);
+				if(substanceEffect instanceof SubstanceGrowth) {
+					Species species = getSpecies(world, pos, state);
+					if(canSaplingStay(world, species, pos)) {
+						if(species.transitionToTree(world, pos)) {
+							return species.onTreeActivated(world, pos.down(), pos, state, player, hand, heldItem, facing, hitX, hitY, hitZ);		
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	public static boolean canSaplingStay(World world, Species species, BlockPos pos) {
