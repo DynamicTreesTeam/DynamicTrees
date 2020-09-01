@@ -53,7 +53,6 @@ public class TileEntitySpecies extends TileEntity {
 	@Nonnull
 	@Override
 	public CompoundNBT write(CompoundNBT tag) {
-		System.out.println(speciesName);
 		tag.putString("species", speciesName.toString());
 		return super.write(tag);
 	}

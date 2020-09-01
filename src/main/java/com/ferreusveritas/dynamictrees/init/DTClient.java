@@ -82,7 +82,6 @@ public class DTClient {
                     IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
                     List<BakedQuad> quads = model.getQuads(state, Direction.DOWN, null); //We get the BOTTOM face of the log model
                     ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that top face
-                    System.out.println(resloc);
                     if(!resloc.toString().isEmpty()) {
                         TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));
                         int u = pixbuf.w / 16;

@@ -62,9 +62,9 @@ public class DTConfigs {
 
 		SERVER_BUILDER.comment("Seed settings").push("seeds");
 			seedDropRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-				defineInRange("dropRate", 0.0, 0.0, 1.0);
+				defineInRange("dropRate", 0.1, 0.0, 1.0);
 			seedPlantRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
-				defineInRange("plantRate", 1f/8f, 0.0, 1.0);
+				defineInRange("plantRate", 1f/6f, 0.0, 1.0);
 			seedTimeToLive = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
 				defineInRange("timeToLive", 1200, 0, 6000);
 			seedOnlyForest = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes").
@@ -135,8 +135,6 @@ public class DTConfigs {
 		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
 			fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
 				define("fancyThickRings", true);
-//			rootyTextureMimicry = SERVER_BUILDER.comment("Rooty dirt blocks will mimic the texture of adjacent soil blocks to better match the environment. Otherwise will always default to the most generic block").
-//				define("rootyTextureMimicry", true);
 		CLIENT_BUILDER.pop();
 
 		SERVER_BUILDER.comment("Debug settings for development").push("debug");

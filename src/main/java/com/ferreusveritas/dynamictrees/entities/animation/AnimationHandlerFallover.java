@@ -25,6 +25,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -210,20 +211,13 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		Vec3d vec3d2 = new Vec3d(segX, segY, segZ);
 
 		return world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
-				EntityPredicates.NOT_SPECTATING
-//			Predicates.and(
-//				EntityPredicates.NOT_SPECTATING,
-//				new Predicate<Entity>() {
-//					public boolean apply(@Nullable Entity apply) {
-//						if(apply instanceof LivingEntity && apply.canBeCollidedWith()) {
-//							AxisAlignedBB axisalignedbb = apply.getBoundingBox().grow(maxRadius);
-//							return axisalignedbb.contains(vec3d1) || axisalignedbb.intersects(vec3d1, vec3d2);
-//						}
-//
-//						return false;
-//					}
-//				}
-//			)
+				entity1 -> {
+					if(entity1 instanceof LivingEntity && entity1.canBeCollidedWith()) {
+						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(maxRadius);
+						return axisalignedbb.contains(vec3d1) || axisalignedbb.intersects(vec3d1, vec3d2);
+					}
+					return false;
+				}
 		).stream().map( a -> (LivingEntity)a ).collect(Collectors.toList());
 
 	}
