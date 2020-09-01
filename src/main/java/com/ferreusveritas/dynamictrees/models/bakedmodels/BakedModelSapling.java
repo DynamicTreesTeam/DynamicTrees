@@ -89,7 +89,9 @@ public class BakedModelSapling implements IBakedModel {
 		
 		if (state != null && state.getBlock() instanceof BlockDynamicSapling && state instanceof IExtendedBlockState) {
 			Species species = ((IExtendedBlockState) state).getValue(SpeciesProperty.SPECIES);
-			quads.addAll(getModelForSapling(species).getQuads(ModBlocks.blockDynamicSapling.getDefaultState(), side, rand));
+			if(species != null) {//Shouldn't happen but better to be safe
+				quads.addAll(getModelForSapling(species).getQuads(ModBlocks.blockDynamicSapling.getDefaultState(), side, rand));
+			}
 		}
 		
 		return quads;
