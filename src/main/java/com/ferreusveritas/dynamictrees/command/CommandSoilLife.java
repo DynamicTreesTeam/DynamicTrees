@@ -62,7 +62,7 @@ public class CommandSoilLife extends SubCommand {
 				sender.sendMessage((new TextComponentString("" + life)));
 			}
 		} else {
-			throw new CommandException("commands.dynamictrees.soillife.notreeerror");
+			throw new CommandException("commands.dynamictrees.soillife.notreeerror", pos.getX() + " " + pos.getY() + " " + pos.getZ());
 		}
 		
 	}

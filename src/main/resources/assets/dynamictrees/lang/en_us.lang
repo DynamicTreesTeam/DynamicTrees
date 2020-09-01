@@ -51,6 +51,7 @@ commands.dynamictrees.createstaff.colorerror=%s is not a decodable color
 commands.dynamictrees.createstaff.readonlyerror=%s is not a boolean
 commands.dynamictrees.createstaff.maxuseserror=%s is not a valid positive integer
 commands.dynamictrees.soillife.lifeerror=%s is not a valid integer
-commands.dynamictrees.soillife.notreeerror=No tree found
+commands.dynamictrees.soillife.notreeerror=No tree found at %s
+commands.dynamictrees.growpulse.norootyerror=No rooty dirt found at %s
 
 death.attack.fallingtree=%1$s was crushed by a falling tree

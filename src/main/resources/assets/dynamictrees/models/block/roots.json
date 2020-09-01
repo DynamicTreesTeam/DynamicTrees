@@ -1,8 +1,8 @@
 {
 	"parent": "block/block",
 	"textures": {
-		"roots": "dynamictrees:block/roots",
-		"roots_bottom": "dynamictrees:block/roots_bottom",
+		"roots": "dynamictrees:blocks/roots",
+		"roots_bottom": "dynamictrees:blocks/roots_bottom",
 		"particle": "block/dirt"
 	},
 	"elements": [

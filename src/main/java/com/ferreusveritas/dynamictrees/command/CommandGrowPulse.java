@@ -46,6 +46,8 @@ public class CommandGrowPulse extends SubCommand {
 		ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos));
 		if(part.isRootNode()) {
 			TreeHelper.growPulse(world, pos);
+		} else {
+			throw new CommandException("commands.dynamictrees.growpulse.norootyerror", pos.getX() + " " + pos.getY() + " " + pos.getZ());
 		}
 	}
 		
