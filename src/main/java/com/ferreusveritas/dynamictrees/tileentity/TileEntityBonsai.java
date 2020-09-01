@@ -70,11 +70,11 @@ public class TileEntityBonsai extends TileEntity {
 
 	@Override
 	public void read(CompoundNBT tag) {
-		if(tag.hasUniqueId("species")) {
+		if(tag.contains("species")) {
 			speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
-		if(tag.hasUniqueId("pot")) {
+		if(tag.contains("pot")) {
 			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(tag.getString("pot")));
 			potState = block != Blocks.AIR ? block.getDefaultState() : Blocks.FLOWER_POT.getDefaultState();
 		}

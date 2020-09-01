@@ -173,7 +173,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 
 		CompoundNBT tag = getVoxelData();
 
-		if(tag.hasUniqueId("species")) {
+		if(tag.contains("species")) {
 			setupFromNBT(tag);
 			clientBuilt = true;
 		} else {
@@ -459,7 +459,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		setupFromNBT(vox);
 		setVoxelData(vox);
 
-		if(compound.hasUniqueId("payload")) {
+		if(compound.contains("payload")) {
 			ListNBT list = (ListNBT) compound.get("payload");
 
 			Iterator<INBT> iter = list.iterator();

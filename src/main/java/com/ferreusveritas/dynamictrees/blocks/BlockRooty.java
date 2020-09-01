@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -19,6 +20,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
@@ -37,6 +39,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 
@@ -83,14 +86,16 @@ public class BlockRooty extends Block implements ITreePart {
 
 
 	@Override
+	public boolean hasTileEntity(BlockState state) {
+		return true;
+	}
+
+	@Override
 	public void randomTick(BlockState state, World world, BlockPos pos, Random random) {
 		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
 			updateTree(state, world, pos, random, true);
 		}
 	}
-
-//	@Override
-//	public void tick(BlockState state, World world, BlockPos pos, Random random) { }
 
 	public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
 		return Direction.UP;
@@ -307,14 +312,12 @@ public class BlockRooty extends Block implements ITreePart {
 
 		TreeFamily tree = getFamily(state, world, rootPos);
 
-		if(hasTileEntity(state)) {
-			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
+		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
 
-			if(rootyDirtTE != null) {
-				Species species = rootyDirtTE.getSpecies();
-				if(species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
-					return rootyDirtTE.getSpecies();
-				}
+		if(rootyDirtTE != null) {
+			Species species = rootyDirtTE.getSpecies();
+			if(species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
+				return rootyDirtTE.getSpecies();
 			}
 		}
 
@@ -322,11 +325,9 @@ public class BlockRooty extends Block implements ITreePart {
 	}
 
 	public void setSpecies(World world, BlockPos rootPos, Species species) {
-		if(hasTileEntity(world.getBlockState(rootPos))) {
-			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
-			if(rootyDirtTE != null) {
-				rootyDirtTE.setSpecies(species);
-			}
+		TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
+		if(rootyDirtTE != null) {
+			rootyDirtTE.setSpecies(species);
 		}
 	}
 
@@ -353,6 +354,11 @@ public class BlockRooty extends Block implements ITreePart {
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
+	}
+
+	@Override
+	public boolean isSolid(BlockState state) {
+		return true;
 	}
 
 	@OnlyIn(Dist.CLIENT)

@@ -80,7 +80,7 @@ public class DTClient {
                 BlockState state = family.getPrimitiveLog().getDefaultState();
                 if(state.getBlock() != Blocks.AIR) {
                     IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
-                    List<BakedQuad> quads = model.getQuads(state, Direction.UP, null); //We get the TOP face of the log model
+                    List<BakedQuad> quads = model.getQuads(state, Direction.DOWN, null); //We get the BOTTOM face of the log model
                     ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that top face
                     System.out.println(resloc);
                     if(!resloc.toString().isEmpty()) {

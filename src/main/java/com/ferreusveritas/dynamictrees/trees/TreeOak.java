@@ -192,7 +192,7 @@ public class TreeOak extends TreeFamilyVanilla {
 
 	@Override
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList.add(appleSpecies.getSapling().get());
+		appleSpecies.getSapling().ifPresent(blockList::add);
 		return super.getRegisterableBlocks(blockList);
 	}
 

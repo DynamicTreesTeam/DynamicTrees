@@ -1,11 +1,16 @@
 package com.ferreusveritas.dynamictrees.tileentity;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 /**
  * 
@@ -20,7 +25,7 @@ public class TileEntitySpecies extends TileEntity {
 	ResourceLocation speciesName = species.getRegistryName();
 
 	public TileEntitySpecies() {
-		super(null);
+		super(DTRegistries.speciesTE);
 	}
 
 	public Species getSpecies() {
@@ -38,33 +43,20 @@ public class TileEntitySpecies extends TileEntity {
 
 	@Override
 	public void read(CompoundNBT tag) {
-		if(tag.hasUniqueId("species")) {
+		if(tag.contains("species")) {
 			speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
+		super.read(tag);
 	}
 
+	@Nonnull
 	@Override
 	public CompoundNBT write(CompoundNBT tag) {
+		System.out.println(speciesName);
 		tag.putString("species", speciesName.toString());
-		return tag;
+		return super.write(tag);
 	}
-//
-//	@Override
-//	public SPacketUpdateTileEntity getUpdatePacket() {
-//		CompoundNBT syncData = new CompoundNBT();
-//		this.write(syncData);
-//		return new SPacketUpdateTileEntity(this.pos, 1, syncData);
-//	}
-//
-//	@Override
-//	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-//		read(pkt.getNbtCompound());
-//	}
-//
-//	//Packages up the data on the server to send to the client.  Client handles it with handleUpdateTag() which reads it with readFromNBT()
-//	public CompoundNBT getUpdateTag() {
-//		return this.writeToNBT(new CompoundNBT());
-//	}
-//
+
+
 }

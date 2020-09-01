@@ -125,7 +125,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public Species getTargetSpecies(ItemStack itemStack) {
 		if(itemStack.hasTag()){
 			CompoundNBT nbtTag = itemStack.getTag();
-			if(nbtTag.hasUniqueId("target")) {
+			if(nbtTag.contains("target")) {
 				String targetTree = nbtTag.getString("target");
 				if(!targetTree.equals("")) {
 					return TreeRegistry.findSpecies(new ResourceLocation(targetTree));

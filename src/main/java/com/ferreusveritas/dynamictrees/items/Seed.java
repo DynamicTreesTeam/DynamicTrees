@@ -131,7 +131,7 @@ public class Seed extends Item implements IPlantable {
 		if(seedStack.hasTag()) {
 			CompoundNBT nbtData = seedStack.getTag();
 			assert nbtData != null;
-			if(nbtData.hasUniqueId("lifespan")) {
+			if(nbtData.contains("lifespan")) {
 				lifespan = nbtData.getInt("lifespan");
 			}
 		}
@@ -216,7 +216,7 @@ public class Seed extends Item implements IPlantable {
 			}
 			CompoundNBT nbtData = stack.getTag();
 			assert nbtData != null;
-			if(nbtData.hasUniqueId("lifespan")) {
+			if(nbtData.contains("lifespan")) {
 				tooltip.add(new StringTextComponent("Seed Life Span: §3" + nbtData.getInt("lifespan")));
 			}
 		}

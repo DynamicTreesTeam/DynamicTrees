@@ -213,7 +213,7 @@ public class Staff extends Item {
 	public Species getSpecies(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
 
-		if(nbt.hasUniqueId(TREE)) {
+		if(nbt.contains(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
 //			Species species = TreeRegistry.findSpeciesSloppy("oak");
@@ -226,7 +226,7 @@ public class Staff extends Item {
 	public int getUses(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
 
-		if(nbt.hasUniqueId(USES)) {
+		if(nbt.contains(USES)) {
 			return nbt.getInt(USES);
 		} else {
 			int uses = getMaxUses(itemStack);
@@ -243,7 +243,7 @@ public class Staff extends Item {
 	public int getMaxUses(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
 
-		if(nbt.hasUniqueId(MAXUSES)) {
+		if(nbt.contains(MAXUSES)) {
 			return nbt.getInt(MAXUSES);
 		}
 
@@ -251,7 +251,7 @@ public class Staff extends Item {
 	}
 
 	public boolean hasMaxUses(ItemStack itemStack) {
-		return getNBT(itemStack).hasUniqueId(MAXUSES);
+		return getNBT(itemStack).contains(MAXUSES);
 	}
 
 	public boolean decUses(ItemStack itemStack) {
@@ -268,7 +268,7 @@ public class Staff extends Item {
 
 			Species species = getSpecies(itemStack);
 
-			if(nbt.hasUniqueId(HANDLE)) {
+			if(nbt.contains(HANDLE)) {
 				try {
 					color = Color.decode(nbt.getString(HANDLE)).getRGB();
 				} catch (NumberFormatException e) {
@@ -287,7 +287,7 @@ public class Staff extends Item {
 
 			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
 
-			if(nbt.hasUniqueId(COLOR)) {
+			if(nbt.contains(COLOR)) {
 				try {
 					color = Color.decode(nbt.getString(COLOR)).getRGB();
 				} catch (NumberFormatException e) {
@@ -313,7 +313,7 @@ public class Staff extends Item {
 		String code = "P";//Code of a sapling
 		CompoundNBT nbt = getNBT(itemStack);
 
-		if(nbt.hasUniqueId(CODE)) {
+		if(nbt.contains(CODE)) {
 			code = nbt.getString(CODE);
 		} else {
 			nbt.putString(CODE, code);

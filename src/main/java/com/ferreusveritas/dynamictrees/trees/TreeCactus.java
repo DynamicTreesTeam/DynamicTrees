@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -50,7 +51,9 @@ public class TreeCactus extends TreeFamily {
 			setBasicGrowingParameters(0.875f, 4.0f, 4, 2, 1.0f);
 			
 			this.setSoilLongevity(1);
-			
+
+			generateSapling();
+
 			addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MODID, "cactusseeds")) {
 				@Override
 				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
@@ -83,12 +86,7 @@ public class TreeCactus extends TreeFamily {
 			
 			return super.getEnergy(world, pos) * biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % 3);//Vary the height energy by a psuedorandom hash function
 		}
-		
-//		@Override
-//		public BlockRooty getRootyBlock() {
-//			return DTRegistries.blockRootySand;
-//		}
-//
+
 		@Override
 		public boolean isBiomePerfect(Biome biome) {
 			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.DESERT_LAKES);
@@ -190,7 +188,13 @@ public class TreeCactus extends TreeFamily {
 	public void createSpecies() {
 		setCommonSpecies(new SpeciesCactus(this));
 	}
-	
+
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+//		commonSpecies.getSapling().ifPresent(blockList::add);
+		return super.getRegisterableBlocks(blockList);
+	}
+
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);

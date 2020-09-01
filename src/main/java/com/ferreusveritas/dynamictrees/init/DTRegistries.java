@@ -1,8 +1,6 @@
 package com.ferreusveritas.dynamictrees.init;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
@@ -21,6 +19,7 @@ import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
 
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -147,16 +146,22 @@ public class DTRegistries {
     //TILE ENTITIES
     ///////////////////////////////////////////
 
+    public static TileEntityType<TileEntitySpecies> speciesTE;
+    public static TileEntityType<TileEntityBonsai> bonsaiTE;
+
     public static void setupTileEntities() {
-        //In 1.13 these will need to change to the proper Dynamic Trees domain but unfortunately for now it'll have
-        //to stay in the minecraft domain for backwards compatibility with existing worldsaves.
-//        GameRegistry.registerTileEntity(TileEntitySpecies.class, new ResourceLocation("minecraft", "species_tile_entity"));
-//        GameRegistry.registerTileEntity(TileEntityBonsai.class, new ResourceLocation("minecraft", "bonsai_tile_entity"));
+        LinkedList<BlockRooty> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
+        System.out.println(rootyDirts.get(0));
+        speciesTE = TileEntityType.Builder.create(TileEntitySpecies::new, rootyDirts.toArray(new BlockRooty[0])).build(null);
+        bonsaiTE = TileEntityType.Builder.create(TileEntityBonsai::new, blockBonsaiPot).build(null);
     }
 
     @SubscribeEvent
     public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
-        tileEntityRegistryEvent.getRegistry().register(TileEntityType.Builder.create(TileEntityBonsai::new, blockBonsaiPot).build(null).setRegistryName(blockBonsaiPot.getRegistryName()));
+        setupTileEntities();
+
+        tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(blockBonsaiPot.getRegistryName()));
+        tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "tile_entity_species")));
     }
 
     ///////////////////////////////////////////
