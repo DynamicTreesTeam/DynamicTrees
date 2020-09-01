@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 
 import net.minecraft.block.BlockSapling;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -56,7 +57,9 @@ public class ModTrees {
 		Species.REGISTRY.register(new Mushroom(false));
 		
 		for(TreeFamilyVanilla vanillaFamily: baseFamilies) {
-			TreeRegistry.registerSaplingReplacer(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType), vanillaFamily.getCommonSpecies());
+			IBlockState defaultSaplingState = Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, vanillaFamily.woodType);
+			TreeRegistry.registerSaplingReplacer(defaultSaplingState.withProperty(BlockSapling.STAGE, 0), vanillaFamily.getCommonSpecies());
+			TreeRegistry.registerSaplingReplacer(defaultSaplingState.withProperty(BlockSapling.STAGE, 1), vanillaFamily.getCommonSpecies());
 		}
 
 	}

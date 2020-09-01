@@ -84,7 +84,9 @@ public class CommonProxy {
 		
 		//An event for dealing with Vanilla Saplings
 		if(ModConfigs.replaceVanillaSapling) {
-			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
+			VanillaSaplingEventHandler handler = new VanillaSaplingEventHandler();
+			MinecraftForge.EVENT_BUS.register(handler);
+			MinecraftForge.TERRAIN_GEN_BUS.register(handler);
 		}
 		
 		//Conveniently accessible disaster(Optional World Generation)
