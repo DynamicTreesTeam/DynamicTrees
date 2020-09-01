@@ -1,20 +1,28 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.List;
+import java.util.function.BiFunction;
+
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenClearVolume;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenCocoa;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFlareBottom;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
+import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenRoots;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenUndergrowth;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -23,6 +31,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -61,14 +70,14 @@ public class TreeJungle extends TreeFamilyVanilla {
 	}
 	
 	
-	public class SpeciesMegaJungle extends Species {
+	public class SpeciesMegaJungle extends SpeciesRare {
 		
 		private static final String speciesName = "megajungle";
 		
 		SpeciesMegaJungle(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
 
-			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
+			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
 			
 			envFactor(Type.COLD, 0.15f);
@@ -80,9 +89,17 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			//Add species features
 			addGenFeature(new FeatureGenVine().setQuantity(16).setMaxLength(16));
+			addGenFeature(new FeatureGenFlareBottom());//Flare the bottom
 			addGenFeature(new FeatureGenClearVolume(8));//Clear a spot for the thick tree trunk
 			addGenFeature(new FeatureGenMound(999));//Place a 3x3 of dirt under thick trees
-			//addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
+			addGenFeature(new FeatureGenRoots(9).setScaler(getRootScaler()));//Finally Generate Roots
+		}
+		
+		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
+			return (inRadius, trunkRadius) -> {
+				float scale = MathHelper.clamp(trunkRadius >= 9 ? (trunkRadius / 18f) : 0, 0, 1);
+				return (int) (inRadius * scale);
+			};
 		}
 		
 		@Override
@@ -122,12 +139,17 @@ public class TreeJungle extends TreeFamilyVanilla {
 	}
 	
 	Species megaSpecies;
+	BlockSurfaceRoot surfaceRootBlock;
 	
 	public TreeJungle() {
 		super(BlockPlanks.EnumType.JUNGLE);
 		canSupportCocoa = true;
+		
+		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");
+		
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.JUNGLE); });
 	}
+	
 	
 	@Override
 	public void createSpecies() {
@@ -138,7 +160,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
-		//speciesRegistry.register(megaSpecies);
+		speciesRegistry.register(megaSpecies);
 	}
 	
 	@Override
@@ -149,6 +171,18 @@ public class TreeJungle extends TreeFamilyVanilla {
 	@Override
 	public boolean autoCreateBranch() {
 		return true;
+	}
+	
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList = super.getRegisterableBlocks(blockList);
+		blockList.add(surfaceRootBlock);
+		return blockList;
+	}
+	
+	@Override
+	public BlockSurfaceRoot getSurfaceRoots() {
+		return surfaceRootBlock;
 	}
 	
 	@Override

@@ -24,7 +24,7 @@ public class JungleLogic implements IGrowthLogicKit {
 		probMap[2] = probMap[3] = probMap[4] = probMap[5] = 0;
 		int sideTurn = !signal.isInTrunk() || (signal.isInTrunk() && ((signal.numSteps + treeHash) % 5 == 0) && (radius > 1) ) ? 2 : 0;//Only allow turns when we aren't in the trunk(or the branch is not a twig)
 		
-		int height = 18 + ((treeHash % 7829) % 8);
+		int height = (species.isThick() ? 22 : 18) + ((treeHash % 7829) % 8);
 		
 		if(signal.delta.getY() < height ) {
 			probMap[2 + (posHash % 4)] = sideTurn;
@@ -41,7 +41,7 @@ public class JungleLogic implements IGrowthLogicKit {
 	@Override
 	public EnumFacing newDirectionSelected(Species species, EnumFacing newDir, GrowSignal signal) {
 		if(signal.isInTrunk() && newDir != EnumFacing.UP) {//Turned out of trunk
-			signal.energy = 4.0f;
+			signal.energy = species.isThick() ? 6.0f : 4.0f;
 		}
 		return newDir;
 	}
