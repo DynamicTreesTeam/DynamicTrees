@@ -107,13 +107,6 @@ public class TreeJungle extends TreeFamilyVanilla {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 		
-		/*protected BiFunction<Integer, Integer, Integer> getRootScaler() {
-			return (inRadius, trunkRadius) -> {
-				float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-				return (int) (inRadius * scale);
-			};
-		}*/
-		
 		//Mega jungle are just jungle trees under special circumstances..  So they have the same seeds
 		@Override
 		public ItemStack getSeedStack(int qty) {
