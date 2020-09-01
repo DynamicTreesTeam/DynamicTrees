@@ -10,6 +10,8 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.particles.BasicParticleType;
+import net.minecraft.particles.ParticleType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -188,7 +190,7 @@ public class TreeHelper {
 	 * @param type
 	 * @param num
 	 */
-	public static void treeParticles(World world, BlockPos rootPos, ParticleTypes type, int num) {
+	public static void treeParticles(World world, BlockPos rootPos, BasicParticleType type, int num) {
 		if(world.isRemote) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
 		}

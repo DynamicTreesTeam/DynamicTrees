@@ -188,7 +188,7 @@ public class DTClient {
     }
 
     /** Not strictly necessary. But adds a little more isolation to the server for particle effects */
-    public void spawnParticle(World world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
+    public static void spawnParticle(World world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
         if(world.isRemote) {
             world.addParticle(particleType, x, y, z, mx, my, mz);
         }

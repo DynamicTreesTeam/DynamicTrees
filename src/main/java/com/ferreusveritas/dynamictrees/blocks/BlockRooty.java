@@ -147,20 +147,18 @@ public class BlockRooty extends Block implements ITreePart {
 	@Nonnull
 	@Override
 	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		return new ItemStack(primitiveDirt);
+		return primitiveDirt.getItem(worldIn, pos, primitiveDirt.getDefaultState());
 	}
 
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		List<ItemStack> drops = new LinkedList<>();
-		drops.add(new ItemStack(primitiveDirt));
-		return drops;
+		return primitiveDirt.getDrops(primitiveDirt.getDefaultState(), builder);
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(primitiveDirt);
+		return primitiveDirt.getPickBlock(primitiveDirt.getDefaultState(), target, world, pos, player);
 	}
 
 	@Override

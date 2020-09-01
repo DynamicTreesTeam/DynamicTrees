@@ -87,11 +87,6 @@ public class BlockBranchBasic extends BlockBranch {
 		}
 	}
 
-	public IProperty<?>[] getIgnorableProperties() {
-		return new IProperty<?>[]{ RADIUS };
-	}
-
-
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
@@ -99,7 +94,6 @@ public class BlockBranchBasic extends BlockBranch {
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(RADIUS);
 	}
-
 
 	///////////////////////////////////////////
 	// TREE INFORMATION

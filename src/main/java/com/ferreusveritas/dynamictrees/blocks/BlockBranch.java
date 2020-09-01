@@ -141,11 +141,10 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 
 	@Deprecated
 	public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-
+//		if (getRadius(state) > 8){
+//			setRadius(world, pos, getRadius(state), Direction.DOWN);
+//		}
 		net.minecraft.item.ItemStack heldItem = player.getHeldItem(hand);
-		if (getRadius(state) > 8){
-			setRadius(world, pos, getRadius(state), Direction.DOWN);
-		}
 		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit);
 	}
 
