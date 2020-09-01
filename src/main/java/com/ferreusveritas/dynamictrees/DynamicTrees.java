@@ -11,28 +11,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 /**
-* <p><pre><tt><b>
-*  ╭─────────────────╮
-*  │                 │
-*  │       ▓▓        │
-*  │      ▓▓▓▓▓      │
-*  │     ▓▓▓┼▓▓▓     │
-*  │    ▓▓▓▓│▓▓▓     │
-*  │    ▓▓└─┧ ▓▓▓    │
-*  │     ▓  ┠─┘▓     │
-*  │        ┃        │
-*  │  █████████████  │
-*  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒  │
-*  │  ░░░░░░░░░░░░░  │
-*  ╞═════════════════╡
-*  │  DYNAMIC TREES  │
-*  ╰─────────────────╯
-* </b></tt></pre></p>
-* 
-* <p>
 * 2016-2018 Ferreusveritas
-* </p>
-*
 */
 @Mod(modid = ModConstants.MODID, name = ModConstants.NAME, version=ModConstants.VERSION, dependencies=ModConstants.DEPENDENCIES)
 public class DynamicTrees {
