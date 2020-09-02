@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.command.DTCommand;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
+import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -9,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 
 /**
 * 2016-2018 Ferreusveritas
@@ -41,6 +43,11 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new DTCommand());
+	}
+	
+	@Mod.EventHandler
+	public static void serverStopped(FMLServerStoppedEvent event) {
+		WorldGeneratorTrees.clearFlatWorldCache();
 	}
 	
 }
