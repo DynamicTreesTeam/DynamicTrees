@@ -1,0 +1,47 @@
+{
+  "block.dynamictrees.rooty_dirt":"Дёрн с корнями",
+  "block.dynamictrees.rooty_coarse_dirt":"Каменистая земля с корнями",
+  "block.dynamictrees.rooty_grass_block":"Трава с корнями",
+  "block.dynamictrees.rooty_podzol":"Подзол с корнями",
+  "block.dynamictrees.rooty_mycelium":"Мицелий с корнями",
+  "block.dynamictrees.rooty_sand":"Песок с корнями",
+  "block.dynamictrees.rooty_red_sand":"Красный песок с корнями",
+
+  "block.dynamictrees.dynamic_oak_leaves":"Динамические дубовые листья",
+  "block.dynamictrees.dynamic_spruce_leaves":"Динамическая хвоя",
+  "block.dynamictrees.dynamic_birch_leaves":"Динамические берёзовые листья",
+  "block.dynamictrees.dynamic_jungle_leaves":"Динамические листья тропического дерева",
+  "block.dynamictrees.dynamic_dark_oak_leaves":"Динамические листья тёмного дуба",
+  "block.dynamictrees.dynamic_acacia_leaves":"Динамические листья акации",
+
+  "block.dynamictrees.oak_branch":"Динамический дуб",
+  "block.dynamictrees.spruce_branch":"Dynamic ель",
+  "block.dynamictrees.birch_branch":"Динамическая берёза",
+  "block.dynamictrees.jungle_branch":"Динамическое дерево джунглей",
+  "block.dynamictrees.dark_oak_branch":"Динамический тёмный дуб",
+  "block.dynamictrees.acacia_branch":"Динамическая акация",
+  "block.dynamictrees.cactus_branch":"Динамический кактус",
+
+  "item.dynamictrees.oak_seed":"Жёлудь дуба",
+  "item.dynamictrees.spruce_seed":"Еловая шишка",
+  "item.dynamictrees.birch_seed":"Березовая сережка",
+  "item.dynamictrees.jungle_seed":"Джунглевый стручок",
+  "item.dynamictrees.dark_oak_seed":"Жёлудь тёмного дуба",
+  "item.dynamictrees.acacia_seed":"Семя акации",
+  "item.dynamictrees.apple_seed":"Яблочное зёрнышко",
+  "item.dynamictrees.cactus_seed":"Семя кактуса",
+  "item.dynamictrees.brown_mushroom_seed":"Шапочка коричневого гриба",
+  "item.dynamictrees.red_mushroom_seed":"Шапочка красного гриба",
+  "item.dynamictrees.chorus_seed":"Семя хоруса",
+
+  "item.dynamictrees.dendro_potion.depletion":"Зелье истощения",
+  "item.dynamictrees.dendro_potion.defoliance":"Зелье дефолианта",
+  "item.dynamictrees.dendro_potion.burgeoning":"Зелье роста",
+  "item.dynamictrees.dendro_potion.fertility":"Зелье плодородия",
+  "item.dynamictrees.dendro_potion.persistance":"Зелье стойкости",
+  "item.dynamictrees.dendro_potion.transform":"Зелье превращения",
+
+  "item.dynamictrees.dirt_bucket":"Ведро грязи",
+  "item.dynamictrees.staff":"Лесной посох",
+  "item.dynamictrees.bonsai_pot":"Бонсаи горшок"
+}
