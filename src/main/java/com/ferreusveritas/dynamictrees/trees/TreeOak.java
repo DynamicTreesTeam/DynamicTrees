@@ -76,7 +76,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	public class SpeciesSwampOak extends Species {
 				
 		SpeciesSwampOak(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), treeFamily.getName().getPath() + "_swamp"), treeFamily);
+			super(new ResourceLocation(treeFamily.getName().getNamespace(), "swamp_" + treeFamily.getName().getPath()), treeFamily);
 			
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
