@@ -15,13 +15,19 @@ import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 @Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModTrees {
@@ -67,6 +73,21 @@ public class ModTrees {
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
 		Species.newRegistry(event);
+	}
+	
+	public static void setupExtraSoils() {
+		NonNullList<ItemStack> list = OreDictionary.getOres("sand");
+		
+		Species cactus = dynamicCactus.getCommonSpecies();
+		
+		for(ItemStack entry : list) {
+			Item item = entry.getItem();
+			if(entry.getItem() instanceof ItemBlock) {
+				ItemBlock itemBlock = (ItemBlock) item;
+				Block sandBlock = itemBlock.getBlock();
+				cactus.addAcceptableSoil(sandBlock);
+			}
+		}
 	}
 	
 }

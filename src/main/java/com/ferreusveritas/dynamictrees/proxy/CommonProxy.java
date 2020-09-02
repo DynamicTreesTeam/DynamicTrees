@@ -58,6 +58,7 @@ public class CommonProxy {
 	
 	public void postInit() {
 		WorldGenRegistry.populateDataBase();
+		ModTrees.setupExtraSoils();
 	}
 	
 	public void cleanUp() {
