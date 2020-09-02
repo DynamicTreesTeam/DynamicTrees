@@ -33,6 +33,7 @@ import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -387,7 +388,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			}
 		}
 		
-		return world.isAirBlock(pos) && hasAdequateLight(blockState, world, leavesProperties, pos);
+		boolean isReplaceable = blockState.getMaterial() == Material.AIR || block == Blocks.SNOW_LAYER;
+		
+		return isReplaceable && hasAdequateLight(blockState, world, leavesProperties, pos);
 	}
 	
 	
