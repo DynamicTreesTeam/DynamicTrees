@@ -66,8 +66,6 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 		return false;
 	}
 
-
-
 	@Override
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		BlockState blockState = world.getBlockState(treePos);

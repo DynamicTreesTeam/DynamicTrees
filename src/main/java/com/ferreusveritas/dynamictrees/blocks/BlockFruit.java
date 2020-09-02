@@ -114,6 +114,11 @@ public class BlockFruit extends Block implements IGrowable {
 		worldIn.addEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, droppedFruit));
 	}
 
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return getFruitDrop();
+	}
+
 	/**
 	 * Checks if Leaves of any kind are above this block.  Not picky.
 	 *

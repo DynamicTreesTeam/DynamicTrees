@@ -26,6 +26,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -244,33 +245,36 @@ public class BlockBranchCactus extends BlockBranch {
 		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
 	}
 
-//	@Override
-//	public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean p_185477_7_) {
-//		int thisRadius = getRadius(state);
-//
-//		int numConnections = 0;
-//		for (Direction dir : Direction.values()) {
-//			int connRadius = getSideConnectionRadius(world, pos, thisRadius, dir);
-//			if (connRadius > 0) {
-//				numConnections++;
-//				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
-//				double gap = 0.5 - radius;
-//				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-//				aabb = aabb.offset(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);
-//				addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
-//			}
-//		}
-//		if (!state.getValue(TRUNK) && numConnections == 1 && state.getValue(ORIGIN).getAxis().isHorizontal()) {
-//			double radius = MathHelper.clamp(4, 1, thisRadius) / 16.0;
-//			double gap = 0.5 - radius;
-//			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-//			aabb = aabb.offset(Direction.UP.getXOffset() * gap, Direction.UP.getYOffset() * gap, Direction.UP.getZOffset() * gap).offset(0.5, 0.5, 0.5);
-//			addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb);
-//		}
-//
-//		double min = 0.5 - (thisRadius / 16.0), max = 0.5 + (thisRadius / 16.0);
-//		addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(min, min, min, max, max, max));
-//	}
+	@Override
+	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		int thisRadius = getRadius(state);
+
+		VoxelShape shape = VoxelShapes.empty();
+
+		int numConnections = 0;
+		for (Direction dir : Direction.values()) {
+			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
+			if (connRadius > 0) {
+				numConnections++;
+				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
+				double gap = 0.5 - radius;
+				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+				aabb = aabb.offset(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);
+				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+			}
+		}
+		if (!state.get(TRUNK) && numConnections == 1 && state.get(ORIGIN).getAxis().isHorizontal()) {
+			double radius = MathHelper.clamp(4, 1, thisRadius) / 16.0;
+			double gap = 0.5 - radius;
+			AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+			aabb = aabb.offset(Direction.UP.getXOffset() * gap, Direction.UP.getYOffset() * gap, Direction.UP.getZOffset() * gap).offset(0.5, 0.5, 0.5);
+			shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+		}
+
+		double min = 0.5 - (thisRadius / 16.0), max = 0.5 + (thisRadius / 16.0);
+		shape = VoxelShapes.combine(shape, VoxelShapes.create(new AxisAlignedBB(min, min, min, max, max, max)), IBooleanFunction.OR);
+		return shape;
+	}
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {

@@ -7,17 +7,24 @@ import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.Direction;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
 import java.util.Random;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class CoordUtils {
 
@@ -128,9 +135,9 @@ public class CoordUtils {
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
 
 		if(!safeBounds.inBounds(vantagePos, false) || world.isAirBlock(vantagePos)) {//The observing block must be in free space
-			RayTraceResult result = rayTraceBlocks(world, vantageVec, branchVec, false, true, false, safeBounds);
+			RayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
 			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
-			if(result != null) {
+			if (result != null){
 				BlockPos hitPos = new BlockPos(result.getHitVec());
 				if(result.getType() == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ZERO) {//We found a block
 					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
@@ -142,176 +149,130 @@ public class CoordUtils {
 
 		return null;
 	}
-	
 
 	/**
 	 * I had to import Minecraft's block ray trace algorithm to make it worldgen blocksafe.
 	 * I honestly don't know much about what's going on in here because I haven't studied it.
-	 * 
+	 *
 	 * If an attempt is made to read a block in an unloaded chunk it will simply return AIR or
 	 * the properties of AIR where applicable.
-	 * 
+	 *
 	 * @param world
-	 * @param vantage
-	 * @param lookingAt
-	 * @param stopOnLiquid
-	 * @param ignoreBlockWithoutBoundingBox
-	 * @param returnLastUncollidableBlock
+	 * @param context
 	 * @return
 	 */
-	public static RayTraceResult rayTraceBlocks(World world, Vec3d vantage, Vec3d lookingAt, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, SafeChunkBounds safeBounds) {
+	public static BlockRayTraceResult rayTraceBlocks(World world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
+		return getRayTraceVector(context, (fromContext, blockPos) -> {
+			BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.getDefaultState();
+			IFluidState ifluidstate = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.getDefaultState();
+			Vec3d startVec = fromContext.getStartVector();
+			Vec3d endVec = fromContext.getEndVector();
+			VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, world, blockPos) : VoxelShapes.empty();
+			BlockRayTraceResult blockraytraceresult = world.rayTraceBlocks(startVec, endVec, blockPos, voxelshape, blockstate);
+			VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(ifluidstate, world, blockPos) : VoxelShapes.empty();
+			BlockRayTraceResult blockraytraceresult1 = voxelshape1.rayTrace(startVec, endVec, blockPos);
+			double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult.getHitVec());
+			double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult1.getHitVec());
+			return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
+		}, (context1) -> {
+			Vec3d vec3d = context1.getStartVector().subtract(context1.getEndVector());
+			return BlockRayTraceResult.createMiss(context1.getEndVector(), Direction.getFacingFromVector(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context1.getEndVector()));
+		});
+	}
+	static <T> T getRayTraceVector(CustomRayTraceContext context, BiFunction<CustomRayTraceContext, BlockPos, T> biFunction, Function<CustomRayTraceContext, T> function) {
+		Vec3d startVec = context.getStartVector();
+		Vec3d endVec = context.getEndVector();
+		if (startVec.equals(endVec)) {
+			return function.apply(context);
+		} else {
+			double vantX = MathHelper.lerp(-1.0E-7D, endVec.x, startVec.x);
+			double vantY = MathHelper.lerp(-1.0E-7D, endVec.y, startVec.y);
+			double vantZ = MathHelper.lerp(-1.0E-7D, endVec.z, startVec.z);
+			double lookX = MathHelper.lerp(-1.0E-7D, startVec.x, endVec.x);
+			double lookY = MathHelper.lerp(-1.0E-7D, startVec.y, endVec.y);
+			double lookZ = MathHelper.lerp(-1.0E-7D, startVec.z, endVec.z);
+			int i = MathHelper.floor(lookX);
+			int j = MathHelper.floor(lookY);
+			int k = MathHelper.floor(lookZ);
+			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(i, j, k);
+			T t = biFunction.apply(context, blockpos$mutableblockpos);
+			if (t != null) {
+				return t;
+			} else {
+				double d6 = vantX - lookX;
+				double d7 = vantY - lookY;
+				double d8 = vantZ - lookZ;
+				int l = MathHelper.signum(d6);
+				int i1 = MathHelper.signum(d7);
+				int j1 = MathHelper.signum(d8);
+				double d9 = l == 0 ? Double.MAX_VALUE : (double)l / d6;
+				double d10 = i1 == 0 ? Double.MAX_VALUE : (double)i1 / d7;
+				double d11 = j1 == 0 ? Double.MAX_VALUE : (double)j1 / d8;
+				double d12 = d9 * (l > 0 ? 1.0D - MathHelper.frac(lookX) : MathHelper.frac(lookX));
+				double d13 = d10 * (i1 > 0 ? 1.0D - MathHelper.frac(lookY) : MathHelper.frac(lookY));
+				double d14 = d11 * (j1 > 0 ? 1.0D - MathHelper.frac(lookZ) : MathHelper.frac(lookZ));
 
-		if (!Double.isNaN(vantage.x) && !Double.isNaN(vantage.y) && !Double.isNaN(vantage.z)) {
-			if (!Double.isNaN(lookingAt.x) && !Double.isNaN(lookingAt.y) && !Double.isNaN(lookingAt.z)) {
-				int vantX = MathHelper.floor(lookingAt.x);
-				int vantY = MathHelper.floor(lookingAt.y);
-				int vantZ = MathHelper.floor(lookingAt.z);
-				int lookX = MathHelper.floor(vantage.x);
-				int lookY = MathHelper.floor(vantage.y);
-				int lookZ = MathHelper.floor(vantage.z);
-				BlockPos lookPos = new BlockPos(lookX, lookY, lookZ);
-				BlockState lookState = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
-				Block lookBlock = lookState.getBlock();
-
-//				AxisAlignedBB colBB1 = safeBounds.inBounds(lookPos, false) ? lookState.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
-//
-//				//This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
-//				boolean specialRayTraceCollision = lookBlock instanceof IRayTraceCollision && ((IRayTraceCollision) lookBlock).isRayTraceCollidable();
-//
-//				if (specialRayTraceCollision || ((!ignoreBlockWithoutBoundingBox || colBB1 != Block.NULL_AABB) && lookBlock.canCollideCheck(lookState, stopOnLiquid))) {
-//					RayTraceResult raytraceresult = lookState.collisionRayTrace(world, lookPos, vantage, lookingAt);
-//
-//					if (raytraceresult != null) {
-//						return raytraceresult;
-//					}
-//				}
-
-				RayTraceResult raytraceresult2 = null;
-				int ropeLen = 200;
-
-				while (ropeLen-- >= 0) {
-					if (Double.isNaN(vantage.x) || Double.isNaN(vantage.y) || Double.isNaN(vantage.z)) {
-						return null;
-					}
-
-					if (lookX == vantX && lookY == vantY && lookZ == vantZ) {
-						return returnLastUncollidableBlock ? raytraceresult2 : null;
-					}
-
-					boolean flagX = true;
-					boolean flagY = true;
-					boolean flagZ = true;
-					double modX = 999.0D;
-					double modY = 999.0D;
-					double modZ = 999.0D;
-
-					if (vantX > lookX) {
-						modX = (double)lookX + 1.0D;
-					}
-					else if (vantX < lookX) {
-						modX = (double)lookX + 0.0D;
-					}
-					else {
-						flagX = false;
-					}
-
-					if (vantY > lookY) {
-						modY = (double)lookY + 1.0D;
-					}
-					else if (vantY < lookY) {
-						modY = (double)lookY + 0.0D;
-					}
-					else {
-						flagY = false;
-					}
-
-					if (vantZ > lookZ) {
-						modZ = (double)lookZ + 1.0D;
-					}
-					else if (vantZ < lookZ) {
-						modZ = (double)lookZ + 0.0D;
-					}
-					else {
-						flagZ = false;
+				while(d12 <= 1.0D || d13 <= 1.0D || d14 <= 1.0D) {
+					if (d12 < d13) {
+						if (d12 < d14) {
+							i += l;
+							d12 += d9;
+						} else {
+							k += j1;
+							d14 += d11;
+						}
+					} else if (d13 < d14) {
+						j += i1;
+						d13 += d10;
+					} else {
+						k += j1;
+						d14 += d11;
 					}
 
-					double unkX = 999.0D;
-					double unkY = 999.0D;
-					double unkZ = 999.0D;
-					double deltaX = lookingAt.x - vantage.x;
-					double deltaY = lookingAt.y - vantage.y;
-					double deltaZ = lookingAt.z - vantage.z;
-
-					if (flagX) {
-						unkX = (modX - vantage.x) / deltaX;
+					T t1 = biFunction.apply(context, blockpos$mutableblockpos.setPos(i, j, k));
+					if (t1 != null) {
+						return t1;
 					}
-					if (flagY) {
-						unkY = (modY - vantage.y) / deltaY;
-					}
-					if (flagZ) {
-						unkZ = (modZ - vantage.z) / deltaZ;
-					}
-					if (unkX == -0.0D) {
-						unkX = -1.0E-4D;
-					}
-					if (unkY == -0.0D) {
-						unkY = -1.0E-4D;
-					}
-					if (unkZ == -0.0D) {
-						unkZ = -1.0E-4D;
-					}
-
-					Direction enumfacing;
-
-					if (unkX < unkY && unkX < unkZ) {
-						enumfacing = vantX > lookX ? Direction.WEST : Direction.EAST;
-						vantage = new Vec3d(modX, vantage.y + deltaY * unkX, vantage.z + deltaZ * unkX);
-					}
-					else if (unkY < unkZ) {
-						enumfacing = vantY > lookY ? Direction.DOWN : Direction.UP;
-						vantage = new Vec3d(vantage.x + deltaX * unkY, modY, vantage.z + deltaZ * unkY);
-					}
-					else {
-						enumfacing = vantZ > lookZ ? Direction.NORTH : Direction.SOUTH;
-						vantage = new Vec3d(vantage.x + deltaX * unkZ, vantage.y + deltaY * unkZ, modZ);
-					}
-
-					lookX = MathHelper.floor(vantage.x) - (enumfacing == Direction.EAST ? 1 : 0);
-					lookY = MathHelper.floor(vantage.y) - (enumfacing == Direction.UP ? 1 : 0);
-					lookZ = MathHelper.floor(vantage.z) - (enumfacing == Direction.SOUTH ? 1 : 0);
-					lookPos = new BlockPos(lookX, lookY, lookZ);
-					BlockState lookState2 = safeBounds.inBounds(lookPos, false) ? world.getBlockState(lookPos) : Blocks.AIR.getDefaultState();
-					Block lookBlock2 = lookState2.getBlock();
-
-//					AxisAlignedBB colBB2 = safeBounds.inBounds(lookPos, false) ? lookState2.getCollisionBoundingBox(world, lookPos) : Block.NULL_AABB;
-//
-//					//This is used in case the Passable Leaves mod has changed the expected behavior of the getCollisionBoundingBox() member function
-//					specialRayTraceCollision = lookBlock2 instanceof IRayTraceCollision && ((IRayTraceCollision) lookBlock2).isRayTraceCollidable();
-//
-//					if (specialRayTraceCollision || !ignoreBlockWithoutBoundingBox || lookState2.getMaterial() == Material.PORTAL || colBB2 != Block.NULL_AABB) {
-//						if (specialRayTraceCollision || lookBlock2.canCollideCheck(lookState2, stopOnLiquid)) {
-//							RayTraceResult raytraceresult1 = lookState2.collisionRayTrace(world, lookPos, vantage, lookingAt);
-//							if (raytraceresult1 != null) {
-//								return raytraceresult1;
-//							}
-//						}
-//						else {
-//							raytraceresult2 = new RayTraceResult(RayTraceResult.Type.MISS, vantage, enumfacing, lookPos);
-//						}
-//					}
 				}
 
-				return returnLastUncollidableBlock ? raytraceresult2 : null;
+				return function.apply(context);
 			}
-			else {
-				return null;
-			}
-		}
-		else {
-			return null;
 		}
 	}
-	
+
+	/**
+	 * We make a custom ray trace context since vanilla's ray trace context requires an entity (for no reason '-_-)
+	 */
+	private static class CustomRayTraceContext {
+		private final Vec3d startVec;
+		private final Vec3d endVec;
+		private final net.minecraft.util.math.RayTraceContext.BlockMode blockMode;
+		private final net.minecraft.util.math.RayTraceContext.FluidMode fluidMode;
+
+		public CustomRayTraceContext(Vec3d startVecIn, Vec3d endVecIn, net.minecraft.util.math.RayTraceContext.BlockMode blockModeIn, net.minecraft.util.math.RayTraceContext.FluidMode fluidModeIn) {
+			this.startVec = startVecIn;
+			this.endVec = endVecIn;
+			this.blockMode = blockModeIn;
+			this.fluidMode = fluidModeIn;
+		}
+
+		public Vec3d getEndVector() {
+			return this.endVec;
+		}
+
+		public Vec3d getStartVector() {
+			return this.startVec;
+		}
+
+		public VoxelShape getBlockShape(BlockState state, IBlockReader world, BlockPos pos) {
+			return this.blockMode.get(state, world, pos, ISelectionContext.dummy());
+		}
+
+		public VoxelShape getFluidShape(IFluidState state, IBlockReader world, BlockPos pos) {
+			return this.fluidMode.test(state) ? state.getShape(world, pos) : VoxelShapes.empty();
+		}
+	}
+
 	/**
 	 * @param world The world
 	 * @param startPos The starting position

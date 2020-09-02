@@ -325,7 +325,7 @@ public class BlockBranchBasic extends BlockBranch {
 
 	@Nonnull
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if (state.getBlock() != this) {
 			return VoxelShapes.empty();
 		}
@@ -335,23 +335,45 @@ public class BlockBranchBasic extends BlockBranch {
 		boolean connectionMade = false;
 		double radius = thisRadius / 16.0;
 		double gap = 0.5 - radius;
-		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius).offset(0.5, 0.5, 0.5);
-		VoxelShape shape =  VoxelShapes.create(aabb);
+		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
 		for (Direction dir : Direction.values()) {
-			int sideRad = getSideConnectionRadius(blockReader, pos, thisRadius, dir);
-			if (sideRad > 0) {
+			if (getSideConnectionRadius(worldIn, pos, thisRadius, dir) > 0) {
 				connectionMade = true;
-				// if the radius of the adjacent branch is larger, we stick with our radius. Otherwise we use the adjacent radius
-				double thisGap = (sideRad > thisRadius) ? gap : 0.5 - (sideRad / 16.0);
-				AxisAlignedBB aabbSide = (sideRad > thisRadius) ? aabb : new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(sideRad / 16.0).offset(0.5, 0.5, 0.5);
-				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabbSide.expand(dir.getXOffset() * thisGap, dir.getYOffset() * thisGap, dir.getZOffset() * thisGap)), IBooleanFunction.OR);
+				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
 			}
 		}
 		if (connectionMade) {
-			return shape;
+			return VoxelShapes.create(aabb.offset(0.5, 0.5, 0.5));
 		}
 
 		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
+	}
+
+	@Override
+	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		boolean hasConnections = false;
+		int thisRadius = getRadius(state);
+
+		VoxelShape shape = VoxelShapes.empty();
+
+		for (Direction dir : Direction.values()) {
+			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
+			if (connRadius > 0) {
+				hasConnections = true;
+				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
+				double gap = 0.5 - radius;
+				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
+				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
+				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+			}
+		}
+
+		if(!hasConnections) {
+			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
+			shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+		}
+
+		return shape;
 	}
 
 	@Override
