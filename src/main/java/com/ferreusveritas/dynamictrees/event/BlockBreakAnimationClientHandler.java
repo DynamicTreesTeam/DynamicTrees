@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
@@ -53,7 +54,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockBreakAnimationClientHandler implements IResourceManagerReloadListener {
 	
 	public static final BlockBreakAnimationClientHandler instance = new BlockBreakAnimationClientHandler(Minecraft.getMinecraft());
-	private static final Map<Integer, DestroyBlockProgress> damagedBranches = Maps.<Integer, DestroyBlockProgress>newHashMap();
+	private static final Map<Integer, DestroyBlockProgress> damagedBranches = new ConcurrentHashMap<Integer, DestroyBlockProgress>();
 	
 	private final TextureAtlasSprite[] destroyBlockIcons = new TextureAtlasSprite[10];
 	
