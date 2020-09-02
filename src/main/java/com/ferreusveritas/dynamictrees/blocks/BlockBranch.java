@@ -460,6 +460,11 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		//Get all of the wood drops
 		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
 		
+		if(!ModConfigs.sloppyBreakDrops) {
+			destroyData.leavesDrops.clear();
+			woodDropList.clear();
+		}
+		
 		//This will drop the EntityFallingTree into the world
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, destroyType);
 	}

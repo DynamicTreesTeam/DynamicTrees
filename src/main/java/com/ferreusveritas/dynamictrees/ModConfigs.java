@@ -39,6 +39,8 @@ public class ModConfigs {
 	public static boolean enableFallingTreeDamage;
 	public static float fallingTreeDamageMultiplier;
 	public static boolean dirtBucketPlacesDirt;
+	public static boolean sloppyBreakDrops;
+	
 	public static boolean replaceVanillaSapling;
 	
 	public static boolean podzolGen;
@@ -87,6 +89,7 @@ public class ModConfigs {
 		enableFallingTreeDamage = config.getBoolean("enableFallingTreeDamage", "interaction", true, "If enabled then trees will harm living entities when falling");
 		fallingTreeDamageMultiplier = config.getFloat("fallingTreeDamageMultiplier", "interaction", 1.0f, 0.0f, 100.0f, "Multiplier for damage incurred by a falling tree");
 		dirtBucketPlacesDirt = config.getBoolean("dirtBucketPlacesDirt", "interaction", true, "If enabled the Dirt Bucket will place a dirt block on right-click");
+		sloppyBreakDrops = config.getBoolean("sloppyBreakDrops", "interaction", false, "If enabled then improperly broken trees(not by an entity) will still drop wood.");
 		
 		//Vanilla
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");
