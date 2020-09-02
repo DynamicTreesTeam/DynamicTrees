@@ -39,7 +39,7 @@ public class BlockRootySand extends BlockRooty {
 	///////////////////////////////////////////
 	
 	public IBlockState getDecayBlockState(IBlockAccess access, BlockPos pos) {
-		return Blocks.SAND.getDefaultState();
+		return MimicProperty.getSandMimic(access, pos);
 	}
 	
 	@Override

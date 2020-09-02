@@ -437,7 +437,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 						BlockPos dPos = rootPos.offset(dir);
 						IBlockState findState = world.getBlockState(dPos);
 						if(findState == biomeState) {
-							world.setBlockState(rootPos, world.getBiome(rootPos).topBlock);
+							world.setBlockState(rootPos, biomeState);
 							return;
 						}
 					}
