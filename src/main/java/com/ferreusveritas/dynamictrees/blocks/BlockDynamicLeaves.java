@@ -44,6 +44,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
@@ -217,6 +218,16 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {}
+	
+	@Override
+	public boolean isPassable(IBlockAccess access, BlockPos pos) {
+		return passableLeavesModLoaded ? super.isPassable(access, pos) : ModConfigs.isLeavesPassable;
+	}
+	
+	@Override
+	public PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return (passableLeavesModLoaded || ModConfigs.isLeavesPassable) ? PathNodeType.OPEN : PathNodeType.BLOCKED;
+	}
 	
 	@Override
 	public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -621,11 +632,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	@Override
 	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return getProperties(blockState).getRadiusForConnection(blockState, blockAccess, pos, from, side, fromRadius);
-	}
-	
-	@Override
-	public boolean isPassable(IBlockAccess access, BlockPos pos) {
-		return passableLeavesModLoaded ? super.isPassable(access, pos) : ModConfigs.isLeavesPassable;
 	}
 	
 	@Override
