@@ -67,16 +67,23 @@ public class TreeJungle extends TreeFamilyVanilla {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 		
+		@Override
+		public Species getMegaSpecies() {
+			return megaSpecies;
+		}
+		
 	}
 	
 	
-	public class SpeciesMegaJungle extends SpeciesRare {
+	public class SpeciesMegaJungle extends Species {
 		
 		private static final String speciesName = "megajungle";
 		
 		SpeciesMegaJungle(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
 
+			setRequiresTileEntity(true);
+			
 			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
 			
@@ -129,6 +136,11 @@ public class TreeJungle extends TreeFamilyVanilla {
 			return true;
 		}
 		
+		@Override
+		public boolean isMega() {
+			return true;
+		}
+
 	}
 	
 	Species megaSpecies;

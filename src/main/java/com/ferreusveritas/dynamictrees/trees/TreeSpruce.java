@@ -15,6 +15,7 @@ import net.minecraft.init.Biomes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -56,6 +57,15 @@ public class TreeSpruce extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily);
 		}
 		
+		@Override
+		public Species getMegaSpecies() {
+			return megaSpecies;
+		}
+		
+	}
+	
+	protected boolean isLocationForMega(IBlockAccess access, BlockPos trunkPos) {
+		return Species.isOneOfBiomes(access.getBiome(trunkPos), Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS);
 	}
 	
 	public class SpeciesMegaSpruce extends SpeciesBaseSpruce {
@@ -94,6 +104,17 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		public boolean isThick() {
 			return true;
 		}
+		
+		@Override
+		public boolean isMega() {
+			return true;
+		}
+		
+		@Override
+		public boolean getRequiresTileEntity(World world, BlockPos pos) {
+			return !isLocationForMega(world, pos);
+		}
+		
 	}
 	
 	Species megaSpecies;
@@ -104,15 +125,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.SPRUCE); });
 		
 		//This will cause the mega spruce to be planted if the player is in a mega taiga biome
-		addSpeciesLocationOverride(new ISpeciesLocationOverride() {
-			@Override
-			public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
-				if(Species.isOneOfBiomes(access.getBiome(trunkPos), Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS)) {
-					return megaSpecies;
-				}
-				return Species.NULLSPECIES;
-			}
-		});
+		addSpeciesLocationOverride((access, trunkPos) -> isLocationForMega(access, trunkPos) ? megaSpecies : Species.NULLSPECIES);
 		
 	}
 	

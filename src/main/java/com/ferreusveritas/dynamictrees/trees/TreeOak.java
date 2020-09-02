@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -140,12 +141,14 @@ public class TreeOak extends TreeFamilyVanilla {
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
-	public class SpeciesAppleOak extends SpeciesRare {
+	public class SpeciesAppleOak extends Species {
 		
 		private static final String speciesName = "apple";
 		
 		public SpeciesAppleOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getResourceDomain(), speciesName), treeFamily);
+			
+			setRequiresTileEntity(true);
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
@@ -163,16 +166,23 @@ public class TreeOak extends TreeFamilyVanilla {
 		public boolean isBiomePerfect(Biome biome) {
 			return biome == Biomes.PLAINS;
 		}
-		
+	
 	}
 	
 	Species swampSpecies;
 	Species appleSpecies;
 	
+	protected boolean isLocationSwampy(IBlockAccess access, BlockPos pos) {
+		return BiomeDictionary.hasType(access.getBiome(pos), Type.SWAMP);
+	}
+	
 	public TreeOak() {
 		super(BlockPlanks.EnumType.OAK);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK); });
+		
+		// This will cause the swamp variation of the oak to grow when the player plants a common oak acorn in a swamp.
+		addSpeciesLocationOverride((access, trunkPos) -> isLocationSwampy(access, trunkPos) ? swampSpecies : Species.NULLSPECIES);
 	}
 	
 	@Override
@@ -193,20 +203,6 @@ public class TreeOak extends TreeFamilyVanilla {
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		itemList.add(appleSpecies.getSeed());//Since we generated the apple species internally we need to let the seed out to be registered.
 		return super.getRegisterableItems(itemList);
-	}
-	
-	/**
-	 * This will cause the swamp variation of the oak to grow when the player plants
-	 * a common oak acorn.
-	 */
-	@Override
-	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
-		//TODO: Move to location override mechanism
-		if(BiomeDictionary.hasType(world.getBiome(trunkPos), Type.SWAMP)) {
-			return swampSpecies;
-		}
-		
-		return super.getSpeciesForLocation(world, trunkPos);
 	}
 	
 	@Override

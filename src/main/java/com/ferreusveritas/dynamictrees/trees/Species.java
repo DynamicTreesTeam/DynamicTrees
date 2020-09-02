@@ -53,6 +53,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -68,6 +69,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
@@ -140,6 +142,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected int soilLongevity = 8;
 	
 	protected HashSet<Block> soilList = new HashSet<Block>();
+	
+	private boolean requiresTileEntity = false;
 	
 	//Leaves
 	protected ILeavesProperties leavesProperties;
@@ -265,6 +269,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public float getTapering() {
 		return tapering;
 	}
+	
+	//Rare species require TileEntity Storage
+	public boolean getRequiresTileEntity(World world, BlockPos pos) {
+		return requiresTileEntity;
+	}
+	
+	public void setRequiresTileEntity(boolean truth) {
+		requiresTileEntity = truth;
+	}
+	
 	
 	///////////////////////////////////////////
 	//LEAVES
@@ -542,13 +556,28 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
-	
+
+	/**
+	 * DEPRECATED.  Use position sensitive version instead  
+	 */
+	@Deprecated
 	public BlockRooty getRootyBlock() {
 		return ModBlocks.blockRootyDirt;
 	}
 	
+	public BlockRooty getRootyBlock(World world, BlockPos pos) {
+		return getRequiresTileEntity(world, pos) ? ModBlocks.blockRootyDirtSpecies : getRootyBlock();
+	}
+	
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		world.setBlockState(rootPos, getRootyBlock().getDefaultState().withProperty(BlockRooty.LIFE, life));
+		world.setBlockState(rootPos, getRootyBlock(world, rootPos).getDefaultState().withProperty(BlockRooty.LIFE, life));
+		
+		TileEntity tileEntity = world.getTileEntity(rootPos);
+		if(tileEntity instanceof TileEntitySpecies) {
+			TileEntitySpecies speciesTE = (TileEntitySpecies) tileEntity;
+			speciesTE.setSpecies(this);
+		}
+		
 		return true;
 	}
 	
@@ -1112,6 +1141,20 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 	}
 
+	
+	///////////////////////////////////////////
+	// MEGANESS
+	///////////////////////////////////////////
+	
+	public boolean isMega() {
+		return false;
+	}
+	
+	public Species getMegaSpecies() {
+		return Species.NULLSPECIES;
+	}
+
+	
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
@@ -1119,6 +1162,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
 		return getFamily().selectAnimationHandler(fallingEntity);
 	}
+	
 	
 	//////////////////////////////
 	// BONSAI POT

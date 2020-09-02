@@ -262,7 +262,6 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 		world.setBlockState(rootPos, getDefaultState().withProperty(LIFE, MathHelper.clamp(life, 0, 15)), 3);
 		world.notifyNeighborsOfStateChange(rootPos, this, false);//Notify all neighbors of NSEWUD neighbors(for comparator)
 		setSpecies(world, rootPos, species);
-		
 	}
 	
 	public boolean fertilize(World world, BlockPos pos, int amount) {
@@ -368,7 +367,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 				if(species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
 					return rootyDirtTE.getSpecies();
 				}
-			}		
+			}
 		} 
 		
 		return tree.getSpeciesForLocation(world, rootPos.offset(getTrunkDirection(world, rootPos)));
@@ -379,8 +378,8 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 			TileEntitySpecies rootyDirtTE = getTileEntitySpecies(world, rootPos);
 			if(rootyDirtTE instanceof TileEntitySpecies) {
 				rootyDirtTE.setSpecies(species);
-			}		
-		} 
+			}
+		}
 	}
 	
 	@Override
