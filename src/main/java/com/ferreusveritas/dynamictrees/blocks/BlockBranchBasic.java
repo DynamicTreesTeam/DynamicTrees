@@ -349,7 +349,7 @@ public class BlockBranchBasic extends BlockBranch {
 	// The result is that only thin branches and trunks can be climbed
 	@Override
 	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
-		return ModConfigs.enableBranchClimbling;
+		return ModConfigs.enableBranchClimbling && getRadius(state) <= 3;
 	}
 	
 	@Override

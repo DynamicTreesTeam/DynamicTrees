@@ -1,14 +1,11 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableTable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
@@ -16,10 +13,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.BlockStateContainer.StateImplementation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -32,7 +27,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	
@@ -102,11 +96,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		super.setFamily(tree);
 		if (!extended) otherBlock.setFamily(tree);
 	}
-	
-	@Override
-	public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
-		return false;
-	}
+
 	
 	///////////////////////////////////////////
 	// BLOCKSTATES
@@ -115,7 +105,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	//////////////////////////////////////////////////
 	//The following is highly experimental code
 	//////////////////////////////////////////////////
-	class StateImplementationCachedRadius extends StateImplementation {
+	/*class StateImplementationCachedRadius extends StateImplementation {
 		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap < IProperty<?>, Comparable<? >> propertiesIn) { super(blockIn, propertiesIn); }
 		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap<IProperty<?>, Comparable<?>> propertiesIn, ImmutableTable<IProperty<?>, Comparable<?>, IBlockState> propertyValueTable) { super(blockIn, propertiesIn, propertyValueTable); }
 		
@@ -133,7 +123,7 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 		protected StateImplementation createState(Block block, ImmutableMap<IProperty<?>, Comparable<?>> properties, ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties) {
 			return new StateImplementationCachedRadius(block, properties);
 		}
-	}
+	}*/
 	//////////////////////////////////////////////////
 	//end highly experimental code
 	//////////////////////////////////////////////////
