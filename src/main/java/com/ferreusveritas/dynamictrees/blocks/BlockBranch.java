@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -457,13 +458,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, EnumFacing.DOWN, false);
 		
-		//Get all of the wood drops
-		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
-		
-		if(!ModConfigs.sloppyBreakDrops) {
-			destroyData.leavesDrops.clear();
-			woodDropList.clear();
-		}
+		//Sloppy breaks return no goodies.
+		List<ItemStack> woodDropList = Collections.EMPTY_LIST;
+		destroyData.leavesDrops.clear();
 		
 		//This will drop the EntityFallingTree into the world
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, destroyType);

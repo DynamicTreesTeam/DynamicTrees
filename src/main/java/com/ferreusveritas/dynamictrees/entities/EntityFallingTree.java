@@ -181,13 +181,21 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 				
 		BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 		
-		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(PosType.BRANCHES), destroyData.getPositions(PosType.LEAVES))) {
-			IBlockState state = world.getBlockState(absPos);
-			if(TreeHelper.isTreePart(state)) {
-				world.setBlockState(absPos, ModBlocks.blockStates.air, 0);////The client needs to set it's blocks to air
+		if(destroyType == DestroyType.VOID) { //Void usually occurs during worldgen.  So we need to ensure that what we're breaking is still tree stuff
+			for(BlockPos absPos: Iterables.concat(destroyData.getPositions(PosType.BRANCHES), destroyData.getPositions(PosType.LEAVES))) {
+				IBlockState state = world.getBlockState(absPos);
+				if(TreeHelper.isTreePart(state)) {
+					world.setBlockState(absPos, ModBlocks.blockStates.air, 0);//The client needs to set it's blocks to air
+					renderBounds.union(absPos);//Expand the re-render volume to include this block
+				}
+			}
+		} else { //Other types of legitimate breaking can set blocks to air directly which improves performance.
+			for(BlockPos absPos: Iterables.concat(destroyData.getPositions(PosType.BRANCHES), destroyData.getPositions(PosType.LEAVES))) {
+				world.setBlockState(absPos, ModBlocks.blockStates.air, 0);//The client needs to set it's blocks to air
 				renderBounds.union(absPos);//Expand the re-render volume to include this block
 			}
 		}
+			
 		
 		cleanupShellBlocks(destroyData);
 		

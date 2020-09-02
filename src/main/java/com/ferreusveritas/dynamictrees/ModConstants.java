@@ -25,7 +25,7 @@ public class ModConstants {
 	public static final String DYNAMICTREESTRAVERSE = "dttraverse";
 	public static final String DYNAMICTREESHNC = "dynamictreeshnc";
 	public static final String RUSTIC = "rustic";
-		
+	
 	//Other Mod Versions.. These have been added to avoid the whole "Duh.. How come my mod is crashing?" bullshit bug reports.
 	public static final String DYNAMICTREESBOP_VER = GREATERTHAN + "1.4.1d" + ORGREATER;
 	public static final String DYNAMICTREESTC_VER =	 GREATERTHAN + "1.4.1d" + ORGREATER;
