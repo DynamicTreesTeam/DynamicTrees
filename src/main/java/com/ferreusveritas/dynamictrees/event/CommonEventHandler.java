@@ -12,8 +12,6 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonEventHandler {
 	
-	SeasonManager seasonManager = new SeasonManager();
-	
 	@SubscribeEvent
 	public void onWorldTick(WorldTickEvent event) {
 
@@ -22,7 +20,7 @@ public class CommonEventHandler {
 		}
 		
 		if(event.type == Type.WORLD && event.phase == Phase.START && event.world.provider.getDimension() == 0) {
-			seasonManager.updateTick(event.world, event.world.getWorldTime());
+			SeasonManager.updateTick(event.world, event.world.getWorldTime());
 		}
 	}
 	

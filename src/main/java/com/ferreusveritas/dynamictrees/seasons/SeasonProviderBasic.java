@@ -5,7 +5,9 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 /**
- * Basic season provider with minimal features
+ * Basic season provider with minimal features. 
+ * Probably not very fun and definitely not realistic.
+ * Let it serve as an example.
  * 
  * @author ferreusveritas
  *
@@ -37,7 +39,6 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	
 	@Override
 	public void updateTick(World world, long worldTicks) {
-		
 		year = worldTicks / (ticksPerDay * daysPerMonth * monthsPerYear); //years since epoch
 		month = (int) ((worldTicks / (ticksPerDay * daysPerMonth)) % monthsPerYear); //month of the year
 		day = (int) ((worldTicks / ticksPerDay) % daysPerMonth); //day of the month
@@ -47,7 +48,6 @@ public class SeasonProviderBasic implements ISeasonProvider {
 			notifyPlayersOfDate(world);
 			currentDay = day;
 		}
-		
 	}
 	
 	public void notifyPlayersOfDate(World world) {
@@ -67,7 +67,7 @@ public class SeasonProviderBasic implements ISeasonProvider {
 	//2 Fall
 	//3 Winter
 	@Override
-	public float getSeasonValue() {
+	public float getSeasonValue(World world) {
 		return season;
 	}
 	

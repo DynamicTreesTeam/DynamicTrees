@@ -21,12 +21,11 @@ public class SeasonProviderNull implements ISeasonProvider {
 	}
 	
 	@Override
-	public float getSeasonValue() {
+	public float getSeasonValue(World world) {
 		return lockedSeasonValue;
 	}
 	
 	@Override
-	public void updateTick(World world, long worldTicks) {
-	}
+	public void updateTick(World world, long worldTicks) { }
 
 }

@@ -44,6 +44,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.seasons.SeasonManager;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
@@ -240,7 +241,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	public float getGrowthRate(World world, BlockPos rootPos) {
-		return growthRate;
+		return growthRate * seasonalGrowthFactor(world, rootPos);
 	}
 	
 	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
@@ -1046,6 +1047,18 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return false;
 	}
+
+	/**
+	 * Pulls data from the SeasonManager to determine the rate of tree growth
+	 * 
+	 * @param world The world
+	 * @param rootPos the BlockPos of the Rooty Dirt
+	 * @return value from 0.0(no growth) to 1.0(full growth)
+	 */
+	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
+		return SeasonManager.globalSeasonalGrowthRate(world, rootPos);
+	}
+	
 	
 	//////////////////////////////
 	// INTERACTIVE
@@ -1153,7 +1166,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public Species getMegaSpecies() {
 		return Species.NULLSPECIES;
 	}
-
+	
 	
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
