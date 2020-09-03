@@ -14,6 +14,8 @@ public class ModConstants {
 	public static final String AT = "@[";
 	public static final String GREATERTHAN = "@(";
 	public static final String ORGREATER = ",)";
+		
+	public static final String SERENESEASONS = "sereneseasons";
 	
 	//Other mods can use this string to depend on the latest version of Dynamic Trees
 	public static final String DYNAMICTREES_LATEST = MODID + AT + VERSION + ORGREATER;

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.command.DTCommand;
+import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
 
@@ -27,6 +28,7 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit(event);
+		CompatHandler.HandleCompat();
 	}
 	
 	@Mod.EventHandler
