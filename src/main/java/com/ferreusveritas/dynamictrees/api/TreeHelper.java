@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
@@ -11,11 +10,10 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
@@ -259,7 +257,7 @@ public class TreeHelper {
 		return getBranch(state.getBlock());
 	}
 
-	public final static int getRadius(World access, BlockPos pos) {
+	public final static int getRadius(IBlockReader access, BlockPos pos) {
 		BlockState state = access.getBlockState(pos);
 		return getTreePart(state).getRadius(state);
 	}

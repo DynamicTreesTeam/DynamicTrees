@@ -1,10 +1,12 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -13,14 +15,21 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.extensions.IForgeBakedModel;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
+import org.apache.commons.lang3.tuple.Pair;
+import sun.reflect.generics.tree.Tree;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +48,11 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 
-	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+	public BakedModelBlockBranchBasic() {
 		this.modelBlock = new BlockModel(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
 
-		TextureAtlasSprite barkIcon = bakedTextureGetter.apply(barkRes);
-		TextureAtlasSprite ringIcon = bakedTextureGetter.apply(ringsRes);
+		TextureAtlasSprite barkIcon = Minecraft.getInstance().getTextureMap().getSprite(new ResourceLocation("minecraft", "block/oak_log"));
+		TextureAtlasSprite ringIcon = Minecraft.getInstance().getTextureMap().getSprite(new ResourceLocation("minecraft", "block/oak_log_top"));
 		barkParticles = barkIcon;
 
 		for(int i = 0; i < 8; i++) {
@@ -160,71 +169,110 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
-		return getQuads(state, side, rand);
+        List<BakedQuad> quadsList = new ArrayList<>(24);
+        if (state != null) {
+            int coreRadius = getRadius(state);
+
+			int[] connections = new int[] {0,0,0,0,0,0};
+            if (extraData instanceof Connections){
+				connections = ((Connections) extraData).getAllRadii();
+			}
+
+
+            //Count number of connections
+            int numConnections = 0;
+            for(int i: connections) {
+                numConnections += (i != 0) ? 1: 0;
+            }
+
+            //The source direction is the biggest connection from one of the 6 directions
+            Direction sourceDir = getSourceDir(coreRadius, connections);
+            if(sourceDir == null) {
+                sourceDir = Direction.DOWN;
+            }
+            int coreDir = resolveCoreDir(sourceDir);
+
+            //This is for drawing the rings on a terminating branch
+            Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+
+            //Get quads for core model
+            if(side == null || coreRadius != connections[side.getIndex()]) {
+                if(coreRingDir == null || coreRingDir != side) {
+                    quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, side, rand));
+                } else {
+                    quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand));
+                }
+            }
+            //Get quads for sleeves models
+            if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
+                for(Direction connDir : Direction.values()) {
+                    int idx = connDir.getIndex();
+                    int connRadius = connections[idx];
+                    //If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+                    if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
+                        quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, side, rand));
+                    }
+                }
+            }
+        } else {
+            //Not extended block state
+        }
+
+        return quadsList;
 	}
 
-	@Override
-	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
-		List<BakedQuad> quadsList = new ArrayList<>(24);
-		if (state != null) {
-			int coreRadius = getRadius(state);
-			int[] connections = pollConnections(coreRadius, (BlockState)state);
+	private static class Connections implements IModelData{
 
-			//Count number of connections
-			int numConnections = 0;
-			for(int i: connections) {
-				numConnections += (i != 0) ? 1: 0;
-			}
+		private int[] radii;
+//		ModelProperty<Integer>[] radii = new ModelProperty<Integer>[6];
 
-			//The source direction is the biggest connection from one of the 6 directions
-			Direction sourceDir = getSourceDir(coreRadius, connections);
-			if(sourceDir == null) {
-				sourceDir = Direction.DOWN;
-			}
-			int coreDir = resolveCoreDir(sourceDir);
-
-			//This is for drawing the rings on a terminating branch
-			Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
-
-			//Get quads for core model
-			if(side == null || coreRadius != connections[side.getIndex()]) {
-				if(coreRingDir == null || coreRingDir != side) {
-					quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, side, rand));
-				} else {
-					quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand));
-				}
-			}
-			//Get quads for sleeves models
-			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-				for(Direction connDir : Direction.values()) {
-					int idx = connDir.getIndex();
-					int connRadius = connections[idx];
-					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-					if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
-						quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, side, rand));
-					}
-				}
-			}
-		} else {
-			//Not extended block state
+		public Connections (){
+			radii = new int[] {0,0,0,0,0,0};
 		}
 
-		return quadsList;
+		public int getRadius (Direction dir){
+			return radii[dir.getIndex()];
+		}
+
+		public void setRadius (Direction dir, int radius){
+			radii[dir.getIndex()] = radius;
+		}
+
+		public int[] getAllRadii (){
+			return radii;
+		}
+
+		@Override
+		public boolean hasProperty(ModelProperty<?> prop) {
+			return false;
+		}
+
+		@Nullable
+		@Override
+		public <T> T getData(ModelProperty<T> prop) {
+			return null;
+		}
+
+		@Nullable
+		@Override
+		public <T> T setData(ModelProperty<T> prop, T data) {
+			return null;
+		}
 	}
 
 	/**
 	 * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.
 	 *
-	 * @param coreRadius the radius of this block
-	 * @param extendedBlockState
-	 * @return an array of 6 integers, one for the radius of each connecting side. DUNSWE.
 	 */
-	protected int[] pollConnections(int coreRadius, BlockState extendedBlockState) {
-		int[] connections = new int[6];
-//		for(Direction dir: Direction.values()) {
-//			int connection = getConnectionRadius(extendedBlockState, BlockBranch.CONNECTIONS[dir.geIndex()]);
-//			connections[dir.getIndex()] = MathHelper.clamp(connection, 0, coreRadius);//Do not allow connections to exceed core radius
-//		}
+	@Nonnull
+	@Override
+	public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+		Connections connections = new Connections();
+		for (Direction dir : Direction.values()){
+			if (TreeHelper.isBranch(world.getBlockState(pos.offset(dir)))){
+				connections.setRadius(dir, TreeHelper.getRadius(world, pos.offset(dir)));
+			}
+		}
 		return connections;
 	}
 
@@ -268,7 +316,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		return ((BlockBranchBasic) blockState.getBlock()).getRadius(blockState);
 	}
 
-	/**
+    /**
 	 * Get the connection radius of a direction from the ExtendedBlockState
 	 *
 	 * @param iExtendedBlockState
@@ -280,9 +328,18 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		return connection;
 	}
 
-	@Override
-	public boolean isAmbientOcclusion() {
-		return true;
+    @Override public boolean isAmbientOcclusion(BlockState state) {
+        return isAmbientOcclusion();
+    }
+	@Override public boolean isAmbientOcclusion() {
+		return false;
+	}
+
+	@Override public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
+		return getParticleTexture();
+	}
+	@Override public TextureAtlasSprite getParticleTexture() {
+		return barkParticles;
 	}
 
 	@Override
@@ -292,23 +349,23 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 
 	@Override
 	public boolean isBuiltInRenderer() {
-		return true;
+		return false;
 	}
 
-	// used for block breaking shards
-	@Override
-	public TextureAtlasSprite getParticleTexture() {
-		return barkParticles;
-	}
-
-	@Override
-	public ItemCameraTransforms getItemCameraTransforms() {
-		return sleeves[0][0].getItemCameraTransforms();
-	}
-
+	@Nonnull
 	@Override
 	public ItemOverrideList getOverrides() {
-		return null;
+		return ItemOverrideList.EMPTY;
 	}
+
+	@Override
+	public boolean doesHandlePerspectives() {
+		return false;
+	}
+
+    @Override
+    public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+        return net.minecraftforge.client.ForgeHooksClient.handlePerspective(getBakedModel(), cameraTransformType);
+    }
 
 }
