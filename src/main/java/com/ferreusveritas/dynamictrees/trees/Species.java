@@ -1058,7 +1058,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 
 		if(effect != null) {
-			player.swingArm(hand);
 			if(effect.isLingering()) {
 				world.addEntity(new EntityLingeringEffector(null, world));
 				return true;
