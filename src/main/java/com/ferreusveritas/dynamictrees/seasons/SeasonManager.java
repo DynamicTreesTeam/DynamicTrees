@@ -15,25 +15,25 @@ import net.minecraft.world.World;
 public class SeasonManager implements ISeasonManager {
 	
 	private Map<Integer, SeasonContext> seasonContextMap = new HashMap<>();
-	private Function<World, Tuple<ISeasonProvider, ActiveSeasonGrowthCalculator> > seasonMapper = w -> new Tuple(new SeasonProviderNull(), new NullSeasonGrowthCalculator());
+	private Function<World, Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> > seasonMapper = w -> new Tuple(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
 	
 	public SeasonManager() {}
 	
-	public SeasonManager(Function<World, Tuple<ISeasonProvider, ActiveSeasonGrowthCalculator> > seasonMapper) {
+	public SeasonManager(Function<World, Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> > seasonMapper) {
 		this.seasonMapper = seasonMapper;
 	}
 	
-	private Tuple<ISeasonProvider, ActiveSeasonGrowthCalculator> createProvider(World world) {
+	private Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> createProvider(World world) {
 		return seasonMapper.apply(world);
 	}
 
 	private SeasonContext getContext(World world) {
 		return seasonContextMap.computeIfAbsent(world.provider.getDimension(), d -> {
-			Tuple<ISeasonProvider, ActiveSeasonGrowthCalculator> tuple = createProvider(world);
+			Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> tuple = createProvider(world);
 			return new SeasonContext(tuple.getFirst(), tuple.getSecond());	
 		});
 	}
-
+	
 	public void setProvider(World world, ISeasonProvider provider, ISeasonGrowthCalculator calc) {
 		setProvider(world, provider, calc);
 	}

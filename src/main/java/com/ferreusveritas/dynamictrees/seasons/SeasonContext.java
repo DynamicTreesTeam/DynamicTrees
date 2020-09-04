@@ -4,12 +4,12 @@ import net.minecraft.world.World;
 
 public class SeasonContext {
 	private ISeasonProvider provider;
-	private ActiveSeasonGrowthCalculator calculator;
+	private SeasonGrowthCalculatorActive calculator;
 	private float temperateRate;
 	private float tropicalRate;
 	private float seedDropRate;
 	
-	public SeasonContext(ISeasonProvider provider, ActiveSeasonGrowthCalculator calculator) {
+	public SeasonContext(ISeasonProvider provider, SeasonGrowthCalculatorActive calculator) {
 		this.provider = provider;
 		this.calculator = calculator;
 	}
