@@ -12,10 +12,12 @@ public interface ISeasonManager {
 	
 	public void updateTick(World world, long worldTicks);
 	
-	public float getGrowthRate(World world, BlockPos rootPos);
+	public float getGrowthFactor(World world, BlockPos rootPos);
 	
-	public float getSeedDropRate(World world, BlockPos rootPos);
+	public float getSeedDropFactor(World world, BlockPos rootPos);
 
+	public float getFruitProductionFactor(World world, BlockPos rootPos);
+	
 	public float getSeasonValue(World world);
 	
 }

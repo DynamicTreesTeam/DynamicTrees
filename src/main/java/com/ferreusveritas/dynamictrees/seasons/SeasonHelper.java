@@ -22,12 +22,16 @@ public class SeasonHelper {
 		seasonManager.updateTick(world, worldTicks);
 	}
 	
-	static public float globalSeasonalGrowthRate(World world, BlockPos rootPos) {
-		return seasonManager.getGrowthRate(world, rootPos);
+	static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos) {
+		return seasonManager.getGrowthFactor(world, rootPos);
 	}
 	
-	static public float globalSeasonalSeedDropRate(World world, BlockPos pos) {
-		return seasonManager.getSeedDropRate(world, pos);
+	static public float globalSeasonalSeedDropFactor(World world, BlockPos pos) {
+		return seasonManager.getSeedDropFactor(world, pos);
+	}
+	
+	static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos) {
+		return seasonManager.getFruitProductionFactor(world, pos);
 	}
 	
 	static public float getSeasonValue(World world) {

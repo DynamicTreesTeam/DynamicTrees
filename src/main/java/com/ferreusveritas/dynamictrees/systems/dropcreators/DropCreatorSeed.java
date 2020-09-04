@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class DropCreatorSeed implements IDropCreator {
-
+	
 	protected final float rarity;
 	
 	public DropCreatorSeed() {
@@ -42,7 +42,7 @@ public class DropCreatorSeed implements IDropCreator {
 	protected float getLeavesRarity() {
 		return rarity;
 	}
-
+	
 	@Override
 	public ResourceLocation getName() {
 		return new ResourceLocation(ModConstants.MODID, "seed");
@@ -50,15 +50,19 @@ public class DropCreatorSeed implements IDropCreator {
 	
 	@Override
 	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		if((1 / 64f) * getHarvestRarity() > random.nextFloat()) {//1 in 64 chance to drop a seed on destruction..	
+		float rarity = getHarvestRarity();
+		rarity *= (fortune + 1) / 64f;
+		rarity *= Math.min(species.seasonalSeedDropFactor(world, leafPos) + 0.15f, 1.0);
+		
+		if(rarity > random.nextFloat()) {//1 in 64 chance to drop a seed on destruction..	
 			dropList.add(species.getSeedStack(1));
 		}
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		if(getVoluntaryRarity() * ModConfigs.seedDropRate > random.nextFloat()) {
+		if(getVoluntaryRarity() * ModConfigs.seedDropRate * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
 			dropList.add(species.getSeedStack(1));
 			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);
@@ -68,7 +72,7 @@ public class DropCreatorSeed implements IDropCreator {
 		}
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getLeavesDrop(IBlockAccess access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
@@ -80,18 +84,27 @@ public class DropCreatorSeed implements IDropCreator {
 			}
 		}
 		
+		float seasonFactor = 1.0f;
+		
+		if(access instanceof World) {
+			World world = (World) access;
+			if(!world.isRemote) {
+				seasonFactor = species.seasonalSeedDropFactor(world, breakPos);
+			}
+		}
+		
 		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
-			dropList.add(species.getSeedStack(1));
+			if(seasonFactor > random.nextFloat()) {
+				dropList.add(species.getSeedStack(1));
+			}
 		}
 		
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
 		return dropList;
 	}
-
-
-		
+	
 }

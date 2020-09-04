@@ -22,9 +22,9 @@ import net.minecraft.util.ResourceLocation;
 * @author ferreusveritas
 */
 public class TreeRegistry {
-
+	
 	public static final IDropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
-	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>(); 
+	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>();
 	private static HashMap<ResourceLocation, IGrowthLogicKit> growthLogicKitRegistry = new HashMap<>();
 	
 	//////////////////////////////

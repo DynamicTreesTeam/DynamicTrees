@@ -20,7 +20,9 @@ public class FeatureGenCocoa implements IPostGenFeature, IPostGrowFeature {
 	@Override
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-			addCocoa(world, rootPos, false);
+			if(species.seasonalFruitProductionFactor(world, treePos) > world.rand.nextFloat()) {
+				addCocoa(world, rootPos, false);
+			}
 		}
 		return false;
 	}

@@ -64,15 +64,22 @@ public class SeasonManager implements ISeasonManager {
 		getContext(world).updateTick(world, worldTicks);
 	}
 	
-	public float getGrowthRate (World world, BlockPos rootPos) {
+	public float getGrowthFactor (World world, BlockPos rootPos) {
 		SeasonContext context = getContext(world);
-		return isTropical.test(world, rootPos) ? context.getTropicalValue() : context.getTemperateValue();
+		return isTropical.test(world, rootPos) ? context.getTropicalGrowthFactor() : context.getTemperateGrowthFactor();
 	};
 	
-	public float getSeedDropRate(World world, BlockPos rootPos) {
-		return getContext(world).getSeedDropRate();
+	public float getSeedDropFactor(World world, BlockPos rootPos) {
+		SeasonContext context = getContext(world);
+		return isTropical.test(world, rootPos) ? context.getTropicalSeedDropFactor() : context.getTemperateSeedDropFactor();
 	}
-
+	
+	@Override
+	public float getFruitProductionFactor(World world, BlockPos rootPos) {
+		SeasonContext context = getContext(world);
+		return isTropical.test(world, rootPos) ? context.getTropicalFruitProductionFactor() : context.getTemperateFruitProductionFactor();
+	}
+	
 	public float getSeasonValue(World world) {
 		return getContext(world).getSeasonProvider().getSeasonValue(world);
 	}

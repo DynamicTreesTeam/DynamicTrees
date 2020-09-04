@@ -1047,7 +1047,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 		return false;
 	}
-
+	
+	//////////////////////////////
+	// SEASONAL
+	//////////////////////////////
+	
 	/**
 	 * Pulls data from the SeasonManager to determine the rate of tree growth
 	 * 
@@ -1056,7 +1060,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return value from 0.0(no growth) to 1.0(full growth)
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-		return SeasonHelper.globalSeasonalGrowthRate(world, rootPos);
+		return SeasonHelper.globalSeasonalGrowthFactor(world, rootPos);
+	}
+	
+	public float seasonalSeedDropFactor(World world, BlockPos pos) {
+		return SeasonHelper.globalSeasonalSeedDropFactor(world, pos);
+	}
+	
+	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
+		return SeasonHelper.globalSeasonalFruitProductionFactor(world, pos);
 	}
 	
 	

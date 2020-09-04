@@ -58,6 +58,7 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if(!endPoints.isEmpty()) {
 			int qty = getQuantity(true);
+			qty *= species.seasonalFruitProductionFactor(world, rootPos);
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
 				addFruit(world, species, rootPos.up(), endPoint, true, false, safeBounds);
@@ -73,14 +74,17 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 		BlockBranch branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && branch.getRadius(blockState) >= fruitingRadius && natural) {
-			NodeFindEnds endFinder = new NodeFindEnds();
-			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-			List<BlockPos> endPoints = endFinder.getEnds();
-			int qty = getQuantity(false);
-			if(!endPoints.isEmpty()) {
-				for(int i = 0; i < qty; i++) {
-					BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-					addFruit(world, species, rootPos.up(), endPoint, false, true, SafeChunkBounds.ANY);
+			if(species.seasonalFruitProductionFactor(world, rootPos) > world.rand.nextFloat()) {
+				NodeFindEnds endFinder = new NodeFindEnds();
+				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
+				List<BlockPos> endPoints = endFinder.getEnds();
+				int qty = getQuantity(false);
+				
+				if(!endPoints.isEmpty()) {
+					for(int i = 0; i < qty; i++) {
+						BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
+						addFruit(world, species, rootPos.up(), endPoint, false, true, SafeChunkBounds.ANY);
+					}
 				}
 			}
 		}

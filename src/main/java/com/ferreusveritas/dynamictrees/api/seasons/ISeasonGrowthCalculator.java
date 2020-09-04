@@ -7,10 +7,10 @@ package com.ferreusveritas.dynamictrees.api.seasons;
  */
 public interface ISeasonGrowthCalculator {
 	
-	float calcTemperateGrowthRate(float seasonValue);
+	float calcGrowthRate(float seasonValue, ClimateZoneType type);
 	
-	float calcTropicalGrowthRate(float seasonValue);
+	float calcSeedDropRate(float seasonValue, ClimateZoneType type);
 	
-	float calcSeedDropRate(float seasonValue);
+	float calcFruitProduction(float seasonValue, ClimateZoneType type);
 	
 }

@@ -1,13 +1,18 @@
 package com.ferreusveritas.dynamictrees.seasons;
 
+import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
+
 import net.minecraft.world.World;
 
 public class SeasonContext {
 	private ISeasonProvider provider;
 	private SeasonGrowthCalculatorActive calculator;
-	private float temperateRate;
-	private float tropicalRate;
-	private float seedDropRate;
+	private float temperateGrowthFactor;
+	private float tropicalGrowthFactor;
+	private float temperateSeedDropFactor;
+	private float tropicalSeedDropFactor;
+	private float temperateFruitProductionFactor;
+	private float tropicalFruitProductionFactor;
 	
 	public SeasonContext(ISeasonProvider provider, SeasonGrowthCalculatorActive calculator) {
 		this.provider = provider;
@@ -15,12 +20,16 @@ public class SeasonContext {
 	}
 	
 	public void updateTick(World world, long worldTicks) {
+		
 		if(worldTicks % 20 == 0) {
 			provider.updateTick(world, worldTicks);
 			float seasonValue = provider.getSeasonValue(world);
-			temperateRate = calculator.calcTemperateGrowthRate(seasonValue);
-			tropicalRate = calculator.calcTropicalGrowthRate(seasonValue);
-			seedDropRate = calculator.calcSeedDropRate(seasonValue);
+			temperateGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TEMPERATE);
+			tropicalGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TROPICAL);
+			temperateSeedDropFactor = calculator.calcSeedDropRate(seasonValue, ClimateZoneType.TEMPERATE);
+			tropicalSeedDropFactor = calculator.calcSeedDropRate(seasonValue, ClimateZoneType.TROPICAL);
+			temperateFruitProductionFactor = calculator.calcFruitProduction(seasonValue, ClimateZoneType.TEMPERATE);
+			tropicalFruitProductionFactor = calculator.calcFruitProduction(seasonValue, ClimateZoneType.TROPICAL);
 		}
 	}
 	
@@ -28,16 +37,28 @@ public class SeasonContext {
 		return provider;
 	}
 	
-	public float getTemperateValue() {
-		return temperateRate;
+	public float getTemperateGrowthFactor() {
+		return temperateGrowthFactor;
 	}
 	
-	public float getTropicalValue() {
-		return tropicalRate;
+	public float getTropicalGrowthFactor() {
+		return tropicalGrowthFactor;
 	}
 	
-	public float getSeedDropRate() {
-		return seedDropRate;
+	public float getTemperateSeedDropFactor() {
+		return temperateSeedDropFactor;
+	}
+	
+	public float getTropicalSeedDropFactor() {
+		return tropicalSeedDropFactor;
+	}
+	
+	public float getTemperateFruitProductionFactor() {
+		return temperateFruitProductionFactor;
+	}
+	
+	public float getTropicalFruitProductionFactor() {
+		return tropicalFruitProductionFactor;
 	}
 	
 }
