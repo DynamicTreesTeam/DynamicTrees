@@ -137,9 +137,9 @@ public class TreeFamily {
 	 * @param trunkPos
 	 * @return
 	 */
-	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
+	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
 		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
-			Species species = override.getSpeciesForLocation(access, trunkPos);
+			Species species = override.getSpeciesForLocation(world, trunkPos);
 			if(species.isValid()) {
 				return species;
 			}
@@ -154,7 +154,7 @@ public class TreeFamily {
 	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 	
 	public interface ISpeciesLocationOverride {
-		Species getSpeciesForLocation(World access, BlockPos trunkPos);
+		Species getSpeciesForLocation(World world, BlockPos trunkPos);
 	}
 	
 	///////////////////////////////////////////
