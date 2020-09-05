@@ -15,21 +15,21 @@ import net.minecraft.world.World;
 public class SeasonManager implements ISeasonManager {
 	
 	private Map<Integer, SeasonContext> seasonContextMap = new HashMap<>();
-	private Function<World, Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> > seasonMapper = w -> new Tuple(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
+	private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator> > seasonMapper = w -> new Tuple(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
 	
 	public SeasonManager() {}
 	
-	public SeasonManager(Function<World, Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> > seasonMapper) {
+	public SeasonManager(Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator> > seasonMapper) {
 		this.seasonMapper = seasonMapper;
 	}
 	
-	private Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> createProvider(World world) {
+	private Tuple<ISeasonProvider, ISeasonGrowthCalculator> createProvider(World world) {
 		return seasonMapper.apply(world);
 	}
 
 	private SeasonContext getContext(World world) {
 		return seasonContextMap.computeIfAbsent(world.provider.getDimension(), d -> {
-			Tuple<ISeasonProvider, SeasonGrowthCalculatorActive> tuple = createProvider(world);
+			Tuple<ISeasonProvider, ISeasonGrowthCalculator> tuple = createProvider(world);
 			return new SeasonContext(tuple.getFirst(), tuple.getSecond());	
 		});
 	}
@@ -54,7 +54,7 @@ public class SeasonManager implements ISeasonManager {
 	public void setTropicalPredicate(BiPredicate<World, BlockPos> predicate) {
 		isTropical = predicate;
 	}
-
+	
 	
 	////////////////////////////////////////////////////////////////
 	// ISeasonManager Interface
