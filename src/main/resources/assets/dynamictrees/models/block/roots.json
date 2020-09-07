@@ -3,7 +3,7 @@
 	"textures": {
 		"roots": "dynamictrees:blocks/roots",
 		"roots_bottom": "dynamictrees:blocks/roots_bottom",
-		"particle": "block/dirt"
+		"particle": "blocks/dirt"
 	},
 	"elements": [
 		{   "from": [ 0, 0, 0 ],
