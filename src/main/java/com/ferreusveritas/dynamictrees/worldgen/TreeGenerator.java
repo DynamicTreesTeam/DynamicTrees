@@ -66,7 +66,7 @@ public class TreeGenerator {
 	}
 	
 	public void BlackListDimension(int dimensionId) {
-		System.out.println("DynamicTrees Applying BlackListed Dimension: " + dimensionId);
+		//System.out.println("DynamicTrees Applying BlackListed Dimension: " + dimensionId);
 		dimensionMap.put(dimensionId, DIMENSIONBLACKLISTED);
 	}
 	

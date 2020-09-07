@@ -21,7 +21,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -172,8 +171,8 @@ public class TreeOak extends TreeFamilyVanilla {
 	Species swampSpecies;
 	Species appleSpecies;
 	
-	protected boolean isLocationSwampy(IBlockAccess access, BlockPos pos) {
-		return BiomeDictionary.hasType(access.getBiome(pos), Type.SWAMP);
+	protected boolean isLocationSwampy(World world, BlockPos pos) {
+		return BiomeDictionary.hasType(world.getBiome(pos), Type.SWAMP);
 	}
 	
 	public TreeOak() {
@@ -182,7 +181,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		addConnectableVanillaLeaves((state) -> { return state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.OAK); });
 		
 		// This will cause the swamp variation of the oak to grow when the player plants a common oak acorn in a swamp.
-		addSpeciesLocationOverride((access, trunkPos) -> isLocationSwampy(access, trunkPos) ? swampSpecies : Species.NULLSPECIES);
+		addSpeciesLocationOverride((world, trunkPos) -> isLocationSwampy(world, trunkPos) ? swampSpecies : Species.NULLSPECIES);
 	}
 	
 	@Override
