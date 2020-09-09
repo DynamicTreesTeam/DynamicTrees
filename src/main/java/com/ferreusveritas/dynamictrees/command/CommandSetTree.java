@@ -35,6 +35,7 @@ public class CommandSetTree extends SubCommand {
 			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
 			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, Species.REGISTRY.getKeys());
 			case 6: return Lists.newArrayList(DEFAULTJOCODE);
+			case 7: return Lists.newArrayList("0");
 		}
 
 		return super.getTabCompletions(server, sender, args, targetPos);
@@ -45,6 +46,7 @@ public class CommandSetTree extends SubCommand {
 		BlockPos pos = BlockPos.ORIGIN;
 		Species species = null;
 		String joCode = "";
+		int turns = 0;
 
 		if(args.length < 5) {
 			throw new WrongUsageException("commands.dynamictrees.setree.usage", new Object[0]);
@@ -60,15 +62,21 @@ public class CommandSetTree extends SubCommand {
 					}
 					break;
 				case 5:	joCode = args[5]; break;
+				case 6: try {
+						turns = Integer.parseInt(args[6]);
+					} catch(NumberFormatException e) {
+						throw new WrongUsageException("commands.dynamictrees.setree.speciesturnserror", args[6]);
+					}
+					break;
 			}
 		}
-
 
 		if(joCode.isEmpty()) {
 			joCode = DEFAULTJOCODE;
 		}
 
-		species.getJoCode(joCode).setCareful(true).generate(world, species, pos, world.getBiome(pos), EnumFacing.SOUTH, 8, SafeChunkBounds.ANY);
+		turns = (3 - (turns % 4)) + 3;
+		species.getJoCode(joCode).rotate(EnumFacing.getHorizontal(turns)).setCareful(true).generate(world, species, pos, world.getBiome(pos), EnumFacing.SOUTH, 8, SafeChunkBounds.ANY);
 	}
 
 }
