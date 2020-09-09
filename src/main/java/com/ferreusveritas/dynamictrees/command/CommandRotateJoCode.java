@@ -41,7 +41,7 @@ public class CommandRotateJoCode extends SubCommand {
 		int turns = 0;
 		
 		if(args.length < 2) {
-			throw new WrongUsageException("commands.dynamictrees.setree.usage", new Object[0]);
+			throw new WrongUsageException("commands.dynamictrees.rotatejocode.usage", new Object[0]);
 		}
 
 		for(int arg = 0; arg < args.length; arg++) {
@@ -51,7 +51,7 @@ public class CommandRotateJoCode extends SubCommand {
 					try {
 						turns = Integer.parseInt(args[2]);
 					} catch(NumberFormatException e) {
-						throw new WrongUsageException("commands.dynamictrees.setree.specieserror", args[2]);
+						throw new WrongUsageException("commands.dynamictrees.rotatejocode.turnserror", args[2]);
 					}
 					break;
 			}

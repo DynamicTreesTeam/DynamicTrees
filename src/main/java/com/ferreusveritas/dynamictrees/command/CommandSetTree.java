@@ -65,7 +65,7 @@ public class CommandSetTree extends SubCommand {
 				case 6: try {
 						turns = Integer.parseInt(args[6]);
 					} catch(NumberFormatException e) {
-						throw new WrongUsageException("commands.dynamictrees.setree.speciesturnserror", args[6]);
+						throw new WrongUsageException("commands.dynamictrees.rotatejocode.turnserror", args[6]);
 					}
 					break;
 			}
