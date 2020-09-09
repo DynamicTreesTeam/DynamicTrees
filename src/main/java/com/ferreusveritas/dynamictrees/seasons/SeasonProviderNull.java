@@ -10,19 +10,12 @@ import net.minecraft.world.World;
  */
 public class SeasonProviderNull implements ISeasonProvider {
 	
-	protected float lockedSeasonValue;
 	
-	public SeasonProviderNull() {
-		this(1.0f);
-	}
-	
-	public SeasonProviderNull(float seasonValue) {
-		lockedSeasonValue = seasonValue;
-	}
+	public SeasonProviderNull() {}
 	
 	@Override
-	public float getSeasonValue(World world) {
-		return lockedSeasonValue;
+	public Float getSeasonValue(World world) {
+		return null;
 	}
 	
 	@Override

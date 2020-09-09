@@ -24,7 +24,7 @@ public class SeasonContext {
 		
 		if(worldTicks % 20 == 0) {
 			provider.updateTick(world, worldTicks);
-			float seasonValue = provider.getSeasonValue(world);
+			Float seasonValue = provider.getSeasonValue(world);
 			temperateGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TEMPERATE);
 			tropicalGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TROPICAL);
 			temperateSeedDropFactor = calculator.calcSeedDropRate(seasonValue, ClimateZoneType.TEMPERATE);

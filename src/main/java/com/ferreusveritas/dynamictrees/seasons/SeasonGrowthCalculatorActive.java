@@ -12,7 +12,12 @@ public class SeasonGrowthCalculatorActive implements ISeasonGrowthCalculator {
 	}
 	
 	@Override
-	public float calcGrowthRate(float seasonValue, ClimateZoneType type) {
+	public float calcGrowthRate(Float seasonValue, ClimateZoneType type) {
+		
+		if(seasonValue == null) {
+			return 1.0f;
+		}
+		
 		switch(type) {
 			case TEMPERATE: return clippedsineWave(seasonValue, 7, 0.8f, 1.0f);
 			case TROPICAL: return clippedsineWave(seasonValue, 2, 0.31f, 0.9f);
@@ -21,7 +26,12 @@ public class SeasonGrowthCalculatorActive implements ISeasonGrowthCalculator {
 	}
 	
 	@Override
-	public float calcSeedDropRate(float seasonValue, ClimateZoneType type) {
+	public float calcSeedDropRate(Float seasonValue, ClimateZoneType type) {
+		
+		if(seasonValue == null) {
+			return 1.0f;
+		}
+		
 		switch(type) {
 			case TEMPERATE: return clippedsineWave(seasonValue, 5, 1.5f, -0.25f);
 			case TROPICAL: return clippedsineWave(seasonValue, 7, 0.31f, 0.9f);
@@ -30,7 +40,12 @@ public class SeasonGrowthCalculatorActive implements ISeasonGrowthCalculator {
 	}
 	
 	@Override
-	public float calcFruitProduction(float seasonValue, ClimateZoneType type) {
+	public float calcFruitProduction(Float seasonValue, ClimateZoneType type) {
+		
+		if(seasonValue == null) {
+			return 1.0f;
+		}
+		
 		switch(type) {
 			case TEMPERATE: return clippedsineWave(seasonValue, 7, 1.0f, 1.0f);
 			case TROPICAL: return clippedsineWave(seasonValue, 1, 0.31f, 0.9f);

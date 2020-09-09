@@ -18,6 +18,6 @@ public interface ISeasonManager {
 
 	public float getFruitProductionFactor(World world, BlockPos rootPos);
 	
-	public float getSeasonValue(World world);
+	public Float getSeasonValue(World world);
 	
 }

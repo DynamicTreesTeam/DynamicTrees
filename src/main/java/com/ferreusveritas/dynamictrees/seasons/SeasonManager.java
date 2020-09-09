@@ -80,7 +80,7 @@ public class SeasonManager implements ISeasonManager {
 		return isTropical.test(world, rootPos) ? context.getTropicalFruitProductionFactor() : context.getTemperateFruitProductionFactor();
 	}
 	
-	public float getSeasonValue(World world) {
+	public Float getSeasonValue(World world) {
 		return getContext(world).getSeasonProvider().getSeasonValue(world);
 	}
 	
