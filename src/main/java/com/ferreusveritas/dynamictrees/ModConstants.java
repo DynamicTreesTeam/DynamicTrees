@@ -30,7 +30,7 @@ public class ModConstants {
 	
 	//Other Mod Versions.. These have been added to avoid the whole "Duh.. How come my mod is crashing?" bullshit bug reports.
 	public static final String DYNAMICTREESBOP_VER = AT + "1.12.2-1.4.1e" + ORGREATER;
-	public static final String DYNAMICTREESTC_VER =	 AT + "1.12.2-1.4.1e" + ORGREATER;
+	public static final String DYNAMICTREESTC_VER =	 AT + "1.12.2-1.4.2" + ORGREATER;
 	public static final String DYNAMICTREESPHC_VER = AT + "1.12.2-1.4.2" + ORGREATER;
 	public static final String DYNAMICTREESTRAVERSE_VER =  AT + "1.12.2-2.0" + ORGREATER;
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is no longer supported
@@ -50,7 +50,7 @@ public class ModConstants {
 		+ NEXT
 		+ OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESTC_VER
 		+ NEXT
-		+ OPTBEFORE + DYNAMICTREESTC + DYNAMICTREESPHC_VER
+		+ OPTBEFORE + DYNAMICTREESPHC_VER + DYNAMICTREESPHC_VER
 		+ NEXT
 		+ OPTBEFORE + DYNAMICTREESTRAVERSE + DYNAMICTREESTRAVERSE_VER
 		+ NEXT
