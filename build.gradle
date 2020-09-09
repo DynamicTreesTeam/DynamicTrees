@@ -9,18 +9,26 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.10.0'
-group = 'com.ferreusveritas.dynamictrees' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'dynamictrees'
+ext.configFile = file "build.properties"
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+version = "${config.mc_version}-${config.mod_version}"
+group = config.package_group
+archivesBaseName = config.mod_name
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200119-1.14.3'
+    mappings channel: 'snapshot', version: "${config.mappings_version}"
 
     runs {
         client {
@@ -83,7 +91,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.2.23'
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
     //Adds HWYLA to the dev environment
     compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
