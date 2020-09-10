@@ -32,6 +32,7 @@ public class DTCommand extends CommandBase {
 		addSubCommand(new CommandSpeciesList());
 		addSubCommand(new CommandCreateStaff());
 		addSubCommand(new CommandRotateJoCode());
+		addSubCommand(new CommandSetCoordXor());
 	}
 
 	@Override

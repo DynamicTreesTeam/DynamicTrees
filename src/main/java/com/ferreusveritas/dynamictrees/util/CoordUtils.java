@@ -25,6 +25,9 @@ import net.minecraft.world.World;
 
 public class CoordUtils {
 
+	//Used for devs to simulate tree growing in different location hashes
+	public static int coordXor = 0;
+	
 	public enum Surround implements IStringSerializable {
 		N ("n" , EnumFacing.NORTH),
 		NW("nw", EnumFacing.NORTH, EnumFacing.WEST),
@@ -343,7 +346,7 @@ public class CoordUtils {
 	
 	public static int coordHashCode(BlockPos pos, int a, int b, int c) {
 		int hash = (pos.getX() * a ^ pos.getY() * b ^ pos.getZ() * c) >> 1;
-		return hash & 0xFFFF;
+		return (hash ^ coordXor) & 0xFFFF;
 	}
 	
 	public static int coordHashCode(BlockPos pos, int readyMade) {
