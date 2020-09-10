@@ -43,5 +43,7 @@
 
   "item.dynamictrees.dirt_bucket":"Dirt Bucket",
   "item.dynamictrees.staff":"Woodland Staff",
-  "item.dynamictrees.bonsai_pot":"Bonsai Pot"
+  "item.dynamictrees.bonsai_pot":"Bonsai Pot",
+
+  "commands.dynamictrees.repop.run": "§aRepoblando la base de datos de generación mundial."
 }

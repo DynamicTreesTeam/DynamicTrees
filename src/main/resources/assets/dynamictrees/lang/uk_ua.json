@@ -43,5 +43,7 @@
 
   "item.dynamictrees.dirt_bucket":"Відро бруду",
   "item.dynamictrees.staff":"Лісовий посох",
-  "item.dynamictrees.bonsai_pot":"Горщик бонсай"
+  "item.dynamictrees.bonsai_pot":"Горщик бонсай",
+
+  "commands.dynamictrees.repop.run": "§aПерезаповнення бази даних генератора дерев"
 }
