@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.DropEventHandler;
+import com.ferreusveritas.dynamictrees.event.ServerEventHandler;
 import com.ferreusveritas.dynamictrees.event.VanillaSaplingEventHandler;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
@@ -157,6 +158,7 @@ public class DynamicTrees
 
     public void registerCommonEventHandlers() {
         MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ServerEventHandler());
         if(DTConfigs.worldGen.get()) {
             MinecraftForge.EVENT_BUS.register(new DropEventHandler());
         }
@@ -177,4 +179,5 @@ public class DynamicTrees
 //            MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 //        }
     }
+
 }
