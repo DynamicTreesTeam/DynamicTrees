@@ -5,10 +5,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-
-import java.io.File;
-import java.util.HashSet;
 
 @Mod.EventBusSubscriber
 public class DTConfigs {
@@ -24,6 +20,7 @@ public class DTConfigs {
 
 	public static ForgeConfigSpec.DoubleValue treeGrowthMultiplier;
 	public static ForgeConfigSpec.DoubleValue treeHarvestMultiplier;
+	public static ForgeConfigSpec.DoubleValue maxTreeHardness;
 	public static ForgeConfigSpec.IntValue treeGrowthFolding;
 	public static ForgeConfigSpec.BooleanValue dropSticks;
 	public static ForgeConfigSpec.DoubleValue scaleBiomeGrowthRate;
@@ -78,6 +75,8 @@ public class DTConfigs {
 				defineInRange("growthMultiplier", 0.5f, 0, 16f);
 			treeHarvestMultiplier = SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
 				defineInRange("harvestMultiplier", 1f, 0f, 128f);
+			maxTreeHardness = SERVER_BUILDER.comment("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.").
+					defineInRange("maxTreeHardness", 20f, 1f, 200f);
 			treeGrowthFolding = SERVER_BUILDER.comment("Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.").
 				defineInRange("growthFolding", 2, 1, 8);
 			dropSticks = SERVER_BUILDER.comment("If enabled then sticks will be dropped for partial logs").

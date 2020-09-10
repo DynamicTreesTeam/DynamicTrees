@@ -1,11 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 
-import com.ferreusveritas.dynamictrees.cells.CellMetadata;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -13,6 +8,10 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.cells.CellMetadata;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
@@ -20,14 +19,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -39,12 +34,10 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Random;
 
 public class BlockBranchBasic extends BlockBranch {
@@ -156,7 +149,9 @@ public class BlockBranchBasic extends BlockBranch {
 	@Deprecated
 	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
 		int radius = getRadius(blockState);
-		return getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		float hardness = getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+		return hardness;
 	}
 
 	@Override
