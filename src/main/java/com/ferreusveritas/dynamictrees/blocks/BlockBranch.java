@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -20,41 +21,38 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.PushReaction;
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.IProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
-
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.Property;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class BlockBranch extends Block implements ITreePart, IFutureBreakable {
+public abstract class
+BlockBranch extends Block implements ITreePart, IFutureBreakable {
 
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -540,7 +538,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public void onExplosionDestroy(World world, BlockPos pos, Explosion explosion) {
 		BlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
-			Species species = TreeHelper.getExactSpecies(state, world, pos);
+			Species species = TreeHelper.getExactSpecies(world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false);
 			float woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);

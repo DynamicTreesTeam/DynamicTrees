@@ -3,10 +3,12 @@ package com.ferreusveritas.dynamictrees.api;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
@@ -16,7 +18,6 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 public class TreeHelper {
@@ -133,6 +134,60 @@ public class TreeHelper {
 
 	}
 
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos) {
+		return getJoCode(world, pos, Direction.SOUTH);
+	}
+
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos, Direction direction) {
+		if(pos == null) {
+			return Optional.empty();
+		}
+		pos = dereferenceTrunkShell(world, pos);
+		BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+		return rootPos != BlockPos.ZERO ? Optional.of(new JoCode(world, rootPos, direction)) : Optional.empty();
+	}
+
+	public static BlockPos dereferenceTrunkShell(World world, BlockPos pos) {
+
+		BlockState blockState = world.getBlockState(pos);
+
+		if(blockState.getBlock() == DTRegistries.blockTrunkShell) {
+			BlockTrunkShell.ShellMuse muse = ((BlockTrunkShell)blockState.getBlock()).getMuse(world, blockState, pos);
+			if(muse != null) {
+				return muse.pos;
+			}
+		}
+
+		return pos;
+	}
+
+	public static Species getCommonSpecies(World world, BlockPos pos) {
+		pos = dereferenceTrunkShell(world, pos);
+		BlockState state = world.getBlockState(pos);
+		if (state.getBlock() instanceof BlockBranch) {
+			BlockBranch branch = (BlockBranch) state.getBlock();
+			return branch.getFamily().getCommonSpecies();
+		}
+
+		return Species.NULLSPECIES;
+	}
+
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 *
+	 * This function is deprecated and will be removed in the future.
+	 * Use getExactSpecies(World, BlockPos)
+	 *
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	@Deprecated
+	public static Species getExactSpecies(BlockState unused, World world, BlockPos pos) {
+		return getExactSpecies(world, pos);
+	}
 
 	/**
 	 * This is resource intensive.  Use only for interaction code.
@@ -143,13 +198,32 @@ public class TreeHelper {
 	 * @param pos
 	 * @return
 	 */
-	public static Species getExactSpecies(BlockState blockState, World world, BlockPos pos) {
+	public static Species getExactSpecies(World world, BlockPos pos) {
+		pos = dereferenceTrunkShell(world, pos);
+		BlockState blockState = world.getBlockState(pos);
+
 		BlockPos rootPos = findRootNode(blockState, world, pos);
+
 		if(rootPos != BlockPos.ZERO) {
 			BlockState rootyState = world.getBlockState(rootPos);
 			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
 		}
 		return Species.NULLSPECIES;
+	}
+
+	/**
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.  Tries to find the
+	 * exact species and if that fails tries to find the common species.
+	 *
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static Species getBestGuessSpecies(World world, BlockPos pos) {
+		Species species = getExactSpecies(world, pos);
+		return species == Species.NULLSPECIES ? getCommonSpecies(world, pos) : species;
 	}
 
 	/**
