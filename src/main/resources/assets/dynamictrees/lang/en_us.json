@@ -51,5 +51,5 @@
   "commands.dynamictrees.repop.run": "§aRepopulating worldgen database.",
   "commands.dynamictrees.gettree.success": "§aSpecies: §b%s §aJoCode: §b%s",
   "commands.dynamictrees.gettree.failure": "§cCould not find tree species at this position.",
-  "commands.dynamictrees.gettree.invalidargs": "§cPlease provide coordinates for the tree."
+  "commands.dynamictrees.nocoords": "§cPlease provide coordinates for the %s."
 }

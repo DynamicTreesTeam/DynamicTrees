@@ -25,7 +25,6 @@ import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import org.apache.commons.lang3.tuple.Pair;
-import sun.reflect.generics.tree.Tree;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

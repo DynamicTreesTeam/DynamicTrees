@@ -8,7 +8,8 @@ public class ServerEventHandler {
 
     @SubscribeEvent
     public void onServerStart (final FMLServerStartingEvent event) {
-        DTCommand.registerDTCommand(event.getCommandDispatcher());
+        // Register DT command.
+        new DTCommand().registerDTCommand(event.getCommandDispatcher());
     }
 
 }

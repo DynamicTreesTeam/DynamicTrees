@@ -6,18 +6,30 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public final class DTCommand {
 
-    public static final SubCommand repopCommand = new RepopCommand();
-    public static final SubCommand getTreeCommand = new GetTreeCommand();
+    private final List<SubCommand> subCommands = new ArrayList<>();
 
-    public static void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
-        // Create 'dt' command.
-        LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal(CommandConstants.COMMAND)
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
-                .then(repopCommand.register())
-                .then(getTreeCommand.register())
-        );
+    public DTCommand() {
+        this.subCommands.add(new RepopCommand());
+        this.subCommands.add(new GetTreeCommand());
+        this.subCommands.add(new GrowPulseCommand());
+    }
+
+    public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
+        // Create DT command builder.
+        LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.<CommandSource>literal(CommandConstants.COMMAND)
+                .requires(commandSource -> commandSource.hasPermissionLevel(2));
+
+        // Add DT sub-commands.
+        for (SubCommand subCommand : this.subCommands) dtCommandBuilder = dtCommandBuilder.then(subCommand.register());
+
+        // Register DT command.
+        LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(dtCommandBuilder);
 
         // Create 'dynamictrees' alias.
         dispatcher.register(Commands.literal("dynamictrees")
