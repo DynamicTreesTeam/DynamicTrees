@@ -25,7 +25,7 @@ item.dynamictrees:cactusseed.name=Cactus Seed
 
 item.dynamictrees:dendropotion.biochar.name=Biochar Base Potion
 item.dynamictrees:dendropotion.depletion.name=Potion of Depletion
-item.dynamictrees:dendropotion.defoliance.name=Potion of Defoliance
+item.dynamictrees:dendropotion.gigas.name=Potion of Gigas
 item.dynamictrees:dendropotion.burgeoning.name=Potion of Burgeoning
 item.dynamictrees:dendropotion.fertility.name=Potion of Fertility
 item.dynamictrees:dendropotion.persistance.name=Potion of Persistance

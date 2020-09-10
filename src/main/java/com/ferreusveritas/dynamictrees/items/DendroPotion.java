@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDeplete;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
+import com.ferreusveritas.dynamictrees.systems.substances.SubstanceMega;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -39,13 +40,13 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public enum DendroPotionType {
 		BIOCHAR(    0, true, "biochar",     0x27231c, "Base tree potion for brewing"),
-		DEPLETION(  1, true, "depletion",	  0x76be6d, "Destroys tree soil fertility"),
-		GIGAS( 2, false, "gigas",  0xe3901d, "Allows a tree to become mega size"),
+		DEPLETION(  1, true, "depletion",   0x76be6d, "Destroys tree soil fertility"),
+		GIGAS(      2, true, "gigas",       0xe3901d, "Changes a tree's species to it's mega equivalent(if available)"),
 		BURGEONING( 3, true, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
 		FERTILITY(  4, true, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
 		PERSISTANCE(5, true, "persistance", 0x389aff, "Stops tree from changing"),
 		TRANSFORM(  6, true, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
-				
+		
 		private final int index;
 		private final boolean active;
 		private final String name;
@@ -125,7 +126,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			default:
 			case BIOCHAR: return null;
 			case BURGEONING: return new SubstanceGrowth();
-			case GIGAS: return null;
+			case GIGAS: return new SubstanceMega();
 			case DEPLETION: return new SubstanceDeplete().setAmount(15);
 			case FERTILITY: return new SubstanceFertilize().setAmount(15);
 			case PERSISTANCE: return new SubstanceFreeze();
@@ -168,10 +169,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.SLIME_BALL), //Slimeball
 				new ItemStack(this, 1, DendroPotionType.DEPLETION.getIndex()));
 		
-		/*BrewingRecipeRegistry.addRecipe(
+		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
 				new ItemStack(Items.PUMPKIN_SEEDS), //Pumpkin seeds
-				new ItemStack(this, 1, DendroPotionType.DEFOLIANCE.getIndex()));*/
+				new ItemStack(this, 1, DendroPotionType.GIGAS.getIndex()));
 		
 		BrewingRecipeRegistry.addRecipe(
 				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
