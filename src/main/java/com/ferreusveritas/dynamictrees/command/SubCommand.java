@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -10,6 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class SubCommand {
 
     /**
@@ -17,6 +21,12 @@ public abstract class SubCommand {
      * Handle the execution with coordinates by overriding executeWithCoords() method.
      */
     protected boolean takesCoordinates = false;
+
+    /**
+     * extraArguments - Append any extra arguments you wish to add onto the command in the constructor.
+     * These will be registered automatically.
+     */
+    protected List<RequiredArgumentBuilder<CommandSource, ?>> extraArguments = new ArrayList<>();
 
     protected abstract String getName ();
     protected abstract int execute (CommandContext<CommandSource> context);
@@ -34,12 +44,19 @@ public abstract class SubCommand {
     }
 
     public ArgumentBuilder<CommandSource, ?> register() {
-        LiteralArgumentBuilder<CommandSource> subCommand = Commands.literal(this.getName()).executes(this::execute);
+        LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName()).executes(this::execute);
 
-        if (this.takesCoordinates) subCommand = subCommand.then(Commands.argument("location", Vec3Argument.vec3())
-                .executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource()))));
+        ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
 
-        return subCommand;
+        if (this.takesCoordinates) subSubCommandBuilder = Commands.argument("location", Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource())));
+
+        for (RequiredArgumentBuilder<CommandSource, ?> argumentBuilder : this.extraArguments) {
+            if (subSubCommandBuilder == null) subSubCommandBuilder = argumentBuilder;
+            else subSubCommandBuilder.then(argumentBuilder);
+        }
+
+        if (subSubCommandBuilder == null) return subCommandBuilder;
+        return subCommandBuilder.then(subSubCommandBuilder);
     }
 
     protected void sendMessage (CommandContext<CommandSource> context, ITextComponent message) {

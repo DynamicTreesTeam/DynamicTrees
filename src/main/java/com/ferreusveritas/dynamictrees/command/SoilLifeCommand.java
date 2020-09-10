@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
@@ -16,6 +15,9 @@ public final class SoilLifeCommand extends SubCommand {
 
     public SoilLifeCommand() {
         this.takesCoordinates = true;
+
+        // Register setting soil life as an extra argument.
+        this.extraArguments.add(Commands.argument("life", IntegerArgumentType.integer(0, 15)).executes(context -> setSoilLife(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource()), IntegerArgumentType.getInteger(context, "life"))));
     }
 
     @Override
@@ -58,13 +60,6 @@ public final class SoilLifeCommand extends SubCommand {
         TreeHelper.getRooty(state).setSoilLife(worldIn, rootPos, soilLife);
 
         return 1;
-    }
-
-    @Override
-    public ArgumentBuilder<CommandSource, ?> register() {
-        return Commands.literal(this.getName()).executes(this::execute)
-                .then(Commands.argument("location", Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource())))
-                        .then(Commands.argument("soilLife", IntegerArgumentType.integer(0, 15)).executes(context -> setSoilLife(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource()), IntegerArgumentType.getInteger(context, "soilLife")))));
     }
 
 }
