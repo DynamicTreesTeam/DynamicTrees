@@ -18,6 +18,7 @@ public final class DTCommand {
         this.subCommands.add(new GetTreeCommand());
         this.subCommands.add(new GrowPulseCommand());
         this.subCommands.add(new KillTreeCommand());
+        this.subCommands.add(new SpeciesListCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
