@@ -7,7 +7,6 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class DTCommand {
@@ -18,6 +17,7 @@ public final class DTCommand {
         this.subCommands.add(new RepopCommand());
         this.subCommands.add(new GetTreeCommand());
         this.subCommands.add(new GrowPulseCommand());
+        this.subCommands.add(new KillTreeCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
