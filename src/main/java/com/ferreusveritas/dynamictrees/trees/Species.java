@@ -1166,6 +1166,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 	}
 
+	/**
+	 * The Waila body is the part of the Waila display that shows the species and log/stick count
+	 * 
+	 * @return true if the tree uses the default Waila body display. False if it has a custom one (disabling DT's display)
+	 */
+	public boolean useDefaultWailaBody (){
+		return true;
+	}
 	
 	///////////////////////////////////////////
 	// MEGANESS

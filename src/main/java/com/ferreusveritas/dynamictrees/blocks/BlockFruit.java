@@ -20,6 +20,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -45,7 +46,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	public BlockFruit(String name) {
 		super(Material.PLANTS);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, Integer.valueOf(0)));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, 0));
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		this.setTickRandomly(true);
@@ -97,7 +98,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if ( ((Integer)state.getValue(AGE)).intValue() >= 3 ) {
+		if (state.getValue(AGE) >= 3 ) {
 			this.dropBlock(worldIn, pos, state);
 			return true;
 		}
@@ -109,7 +110,12 @@ public class BlockFruit extends Block implements IGrowable {
 		worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
 		this.dropBlockAsItem(worldIn, pos, state, 0);
 	}
-	
+
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		return getFruitDrop();
+	}
+
 	/**
 	 * Checks if Leaves of any kind are above this block.  Not picky.
 	 * 
@@ -129,7 +135,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	@Override
 	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-		return (Integer)state.getValue(AGE) < 3;
+		return state.getValue(AGE) < 3;
 	}
 	
 	@Override
@@ -139,7 +145,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	@Override
 	public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
-		int age = (Integer)state.getValue(AGE);
+		int age = state.getValue(AGE);
 		int newAge = MathHelper.clamp(age + 1, 0, 3);
 		if(newAge != age) {
 			world.setBlockState(pos, state.withProperty(AGE, newAge), 2);

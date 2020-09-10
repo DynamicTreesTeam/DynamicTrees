@@ -44,15 +44,17 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		if(nbtData.hasKey("species")) {
 			species = TreeRegistry.findSpecies(new ResourceLocation(nbtData.getString("species")));
 		}
-		
 		//Attempt to get species by checking if we're still looking at the same block
 		if(species == Species.NULLSPECIES && lastPos.equals(pos)) {
 			species = lastSpecies;
 		}
-		
 		//Attempt to get species from the world as a last resort as the operation can be rather expensive
 		if(species == Species.NULLSPECIES) {
 			species = getWailaSpecies(accessor.getWorld(), pos);			
+		}
+		
+		if (!species.useDefaultWailaBody()){
+			return tooltip;
 		}
 		
 		if(!lastPos.equals(pos)) {
