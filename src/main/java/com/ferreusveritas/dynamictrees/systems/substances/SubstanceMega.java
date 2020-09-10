@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -28,6 +29,7 @@ public class SubstanceMega implements ISubstanceEffect{
 			dirt = TreeHelper.getRooty(blockState);
 
 			if(dirt.getSpecies(blockState, world, rootPos) == megaSpecies) {
+				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.DRAGON_BREATH, 8);
 				WailaOther.invalidateWailaPosition();
 				return true;
 			};
