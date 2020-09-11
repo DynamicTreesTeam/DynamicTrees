@@ -24,9 +24,9 @@ public final class SetTreeCommand extends SubCommand {
 
         // Register extra arguments.
         // TODO: Get arguments within execute() so we aren't getting all the args in this.
-        this.extraArguments = Commands.argument("species", ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
-                .then(Commands.argument("joCode", StringArgumentType.string())
-                .then(Commands.argument("turns", IntegerArgumentType.integer()).executes(context -> this.setTree(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource()), ResourceLocationArgument.getResourceLocation(context, "species"), StringArgumentType.getString(context, "joCode"), IntegerArgumentType.getInteger(context, "turns")))));
+        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
+                .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string())
+                .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(context -> this.setTree(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()), ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT), StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT)))));
     }
 
     @Override

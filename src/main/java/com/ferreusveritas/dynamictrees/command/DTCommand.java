@@ -14,6 +14,7 @@ public final class DTCommand {
     private final List<SubCommand> subCommands = new ArrayList<>();
 
     public DTCommand() {
+        // Register sub-commands. To add new sub-commands add to the list here.
         this.subCommands.add(new RepopCommand());
         this.subCommands.add(new GetTreeCommand());
         this.subCommands.add(new GrowPulseCommand());
@@ -21,6 +22,7 @@ public final class DTCommand {
         this.subCommands.add(new SpeciesListCommand());
         this.subCommands.add(new SoilLifeCommand());
         this.subCommands.add(new SetTreeCommand());
+        this.subCommands.add(new RotateJoCodeCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {

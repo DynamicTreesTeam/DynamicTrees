@@ -17,7 +17,7 @@ public final class SoilLifeCommand extends SubCommand {
         this.takesCoordinates = true;
 
         // Register setting soil life as an extra argument.
-        this.extraArguments = Commands.argument("life", IntegerArgumentType.integer(0, 15)).executes(context -> setSoilLife(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource()), IntegerArgumentType.getInteger(context, "life")));
+        this.extraArguments = Commands.argument(CommandConstants.SOIL_LIFE_ARGUMENT, IntegerArgumentType.integer(0, 15)).executes(context -> setSoilLife(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()), IntegerArgumentType.getInteger(context, CommandConstants.SOIL_LIFE_ARGUMENT)));
     }
 
     @Override

@@ -45,7 +45,7 @@ public abstract class SubCommand {
 
         ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
 
-        if (this.takesCoordinates) subSubCommandBuilder = Commands.argument("location", Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource())));
+        if (this.takesCoordinates) subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource())));
 
         if (this.extraArguments != null) {
             if (subSubCommandBuilder == null) subSubCommandBuilder = this.extraArguments;

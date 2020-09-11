@@ -9,7 +9,7 @@ public final class RepopCommand extends SubCommand {
 
     @Override
     protected String getName() {
-        return CommandConstants.REPOP;
+        return CommandConstants.REPOPULATE;
     }
 
     @Override
