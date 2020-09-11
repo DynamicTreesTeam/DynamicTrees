@@ -15,9 +15,10 @@ public final class SoilLifeCommand extends SubCommand {
 
     public SoilLifeCommand() {
         this.takesCoordinates = true;
+        this.defaultToExecute = false;
 
         // Register setting soil life as an extra argument.
-        this.extraArguments = Commands.argument(CommandConstants.SOIL_LIFE_ARGUMENT, IntegerArgumentType.integer(0, 15)).executes(context -> setSoilLife(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()), IntegerArgumentType.getInteger(context, CommandConstants.SOIL_LIFE_ARGUMENT)));
+        this.extraArguments = Commands.argument(CommandConstants.SOIL_LIFE_ARGUMENT, IntegerArgumentType.integer(0, 15)).executes(this::execute);
     }
 
     @Override
@@ -27,37 +28,24 @@ public final class SoilLifeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.nocoords", "tree"));
-        return 0;
-    }
-
-    @Override
-    protected int executeWithCoords (CommandContext<CommandSource> context, World worldIn, BlockPos blockPos) {
-        BlockPos rootPos = TreeHelper.findRootNode(worldIn.getBlockState(blockPos), worldIn, blockPos);
+        final World world = context.getSource().getWorld();
+        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
 
         if (rootPos == BlockPos.ZERO) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }
 
-        BlockState state = worldIn.getBlockState(rootPos);
+        BlockState state = world.getBlockState(rootPos);
 
-        final int life = TreeHelper.getRooty(state).getSoilLife(state, worldIn, rootPos);
-        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.soillife.get", life));
-
-        return 1;
-    }
-
-    private int setSoilLife (CommandContext<CommandSource> context, World worldIn, BlockPos blockPos, int soilLife) {
-        BlockPos rootPos = TreeHelper.findRootNode(worldIn.getBlockState(blockPos), worldIn, blockPos);
-
-        if (rootPos == BlockPos.ZERO) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
-            return 0;
+        try {
+            final int soilLife = IntegerArgumentType.getInteger(context, CommandConstants.SOIL_LIFE_ARGUMENT);
+            TreeHelper.getRooty(state).setSoilLife(world, rootPos, soilLife);
+        } catch (IllegalArgumentException e) {
+            final int soilLife = TreeHelper.getRooty(state).getSoilLife(state, world, rootPos);
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.soillife.get", soilLife));
         }
-
-        BlockState state = worldIn.getBlockState(rootPos);
-        TreeHelper.getRooty(state).setSoilLife(worldIn, rootPos, soilLife);
 
         return 1;
     }

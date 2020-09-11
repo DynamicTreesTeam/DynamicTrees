@@ -7,9 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.Vec3Argument;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
 
 public abstract class SubCommand {
 
@@ -20,32 +18,48 @@ public abstract class SubCommand {
     protected boolean takesCoordinates = false;
 
     /**
+     * executesWithCoordinates - Set this to false to disable calling execute when coordinate argument is given only.
+     */
+    protected boolean executesWithCoordinates = true;
+
+    /**
+     * defaultToExecute - Set this to false to disable calling execute() when no arguments are given.
+     */
+    protected boolean defaultToExecute = true;
+
+    /**
      * extraArguments - Append any extra arguments you wish to add onto the command in the constructor.
      * These will be registered automatically.
      */
     protected RequiredArgumentBuilder<CommandSource, ?> extraArguments = null;
 
+    /**
+     * Use this to set the name of the command.
+     *
+     * @return - Name of command.
+     */
     protected abstract String getName ();
-    protected abstract int execute (CommandContext<CommandSource> context);
 
     /**
-     * Use this to perform actions when the sub command is called with appropriate coordinate arguments.
+     * Call this method on valid command execution (when all arguments are given).
+     * Implement it to include command logic.
      *
-     * @param context - Command context.
-     * @param worldIn - World target block is in.
-     * @param blockPos - Position of target block.
-     * @return Integer value which is used by executes() method in ArgumentBuilder.
+     * @param context - Context of the command.
+     * @return - Integer value which is returned to ArgumentBuilder.executes.
      */
-    protected int executeWithCoords (CommandContext<CommandSource> context, World worldIn, BlockPos blockPos) {
-        return 0;
-    }
+    protected abstract int execute (CommandContext<CommandSource> context);
 
     public ArgumentBuilder<CommandSource, ?> register() {
-        LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName()).executes(this::execute);
+        LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName());
+
+        if (this.defaultToExecute) subCommandBuilder.executes(this::execute);
 
         ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
 
-        if (this.takesCoordinates) subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource())));
+        if (this.takesCoordinates) {
+            if (this.executesWithCoordinates) subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(this::execute);
+            else subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3());
+        }
 
         if (this.extraArguments != null) {
             if (subSubCommandBuilder == null) subSubCommandBuilder = this.extraArguments;

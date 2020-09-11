@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -12,6 +13,7 @@ public final class KillTreeCommand extends SubCommand {
 
     public KillTreeCommand() {
         this.takesCoordinates = true;
+        this.defaultToExecute = false;
     }
 
     @Override
@@ -21,22 +23,18 @@ public final class KillTreeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.nocoords", "tree"));
-        return 0;
-    }
-
-    @Override
-    protected int executeWithCoords(CommandContext<CommandSource> context, World worldIn, BlockPos blockPos) {
-        final BlockPos rootPos = TreeHelper.findRootNode(worldIn.getBlockState(blockPos), worldIn, blockPos);
+        final World world = context.getSource().getWorld();
+        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
 
         if (rootPos == BlockPos.ZERO) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }
 
-        TreeHelper.getRooty(worldIn.getBlockState(rootPos)).destroyTree(worldIn, rootPos);
+        TreeHelper.getRooty(world.getBlockState(rootPos)).destroyTree(world, rootPos);
 
-        return 1;
+        return 0;
     }
 
 }

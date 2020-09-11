@@ -9,15 +9,16 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Arrays;
 
 public final class RotateJoCodeCommand extends SubCommand {
 
     public RotateJoCodeCommand() {
+        this.defaultToExecute = false;
+
         this.extraArguments = Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
-                .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(context -> this.rotateJoCode(context, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT))));
+                .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(this::execute));
     }
 
     @Override
@@ -27,17 +28,12 @@ public final class RotateJoCodeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.rotatejocode.failure"));
-        return 0;
-    }
+        final int turns = (3 - (IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT) % 4)) + 3;
+        final String code = new JoCode(StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT)).rotate(Direction.byHorizontalIndex(turns)).toString();
 
-    private int rotateJoCode (CommandContext<CommandSource> context, final String joCode, int turns) {
-        turns = (3 - (turns % 4)) + 3;
-
-        String code = new JoCode(joCode).rotate(Direction.byHorizontalIndex(turns)).toString();
         this.sendMessage(context, new StringTextComponent(code));
 
-        return 1;
+        return 0;
     }
 
 }

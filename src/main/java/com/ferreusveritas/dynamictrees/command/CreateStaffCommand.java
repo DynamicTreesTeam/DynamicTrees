@@ -16,6 +16,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
@@ -24,6 +25,8 @@ public final class CreateStaffCommand extends SubCommand {
 
     public CreateStaffCommand() {
         this.takesCoordinates = true;
+        this.executesWithCoordinates = false;
+        this.defaultToExecute = false;
 
         // Add extra arguments.
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
@@ -42,25 +45,31 @@ public final class CreateStaffCommand extends SubCommand {
     protected int execute(CommandContext<CommandSource> context) {
         try {
             BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-            String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
-            int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
+            final String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
+            final int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
+            final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+
+            if (species == Species.NULLSPECIES) {
+                this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
+                return 0;
+            }
 
             ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
-            DTRegistries.treeStaff.setSpecies(wandStack, TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)))
+            DTRegistries.treeStaff.setSpecies(wandStack, species)
                     .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
                     .setColor(wandStack, colour) // TODO: Fix problem with setting colours. They are currently not set whenever a letter is included in the hex code (...?).
                     .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))
                     .setMaxUses(wandStack, maxUses)
                     .setUses(wandStack, maxUses);
 
-            while(!context.getSource().getWorld().isAirBlock(pos)) pos = pos.up();
+            while (!context.getSource().getWorld().isAirBlock(pos)) pos = pos.up();
 
             World world = context.getSource().getWorld();
             ItemEntity entityItem = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, wandStack);
             entityItem.setMotion(0, 0, 0);
             world.addEntity(entityItem);
         } catch (IllegalArgumentException e) {
-            this.sendMessage(context, new StringTextComponent("Hey! That's not all the args!"));
+            this.sendMessage(context, new StringTextComponent("§cHmm... That wasn't meant to happen... (An unknown error has occurred.)"));
             return 0;
         }
 
