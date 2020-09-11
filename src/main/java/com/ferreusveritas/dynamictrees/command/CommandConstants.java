@@ -12,7 +12,7 @@ public final class CommandConstants {
     public static final String KILL_TREE = "killtree";
     public static final String SPECIES_LIST = "specieslist";
     public static final String SOIL_LIFE = "soillife";
-    public static final String SET_TREE = "setree";
+    public static final String SET_TREE = "settree";
     public static final String ROTATE_JO_CODE = "rotatejocode";
     public static final String CREATE_STAFF = "createstaff";
     public static final String SET_COORD_XOR = "setcoordxor";
