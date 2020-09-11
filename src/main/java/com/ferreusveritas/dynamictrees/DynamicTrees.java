@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -140,7 +139,7 @@ public class DynamicTrees
         MinecraftForge.EVENT_BUS.register(this);
 
 //        WorldGenRegistry.populateDataBase();
-        DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
+        // DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
