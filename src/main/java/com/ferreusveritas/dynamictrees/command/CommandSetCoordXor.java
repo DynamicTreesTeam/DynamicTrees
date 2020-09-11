@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class CommandSetCoordXor extends SubCommand {
 	
-	public static final String SETCOORDXOR = "settcoordxor";
+	public static final String SETCOORDXOR = "setcoordxor";
 	
 	@Override
 	public String getName() {
@@ -36,7 +36,14 @@ public class CommandSetCoordXor extends SubCommand {
 		
 		for(int arg = 0; arg < args.length; arg++) {
 			switch(arg) {
-				case 1: xor = args[1].hashCode(); 
+				case 1: {
+					String work = args[1];
+					try {
+						xor = Integer.parseInt(work);
+					} catch(NumberFormatException e) {
+						xor = work.hashCode();
+					}
+				}
 			}
 		}
 		
