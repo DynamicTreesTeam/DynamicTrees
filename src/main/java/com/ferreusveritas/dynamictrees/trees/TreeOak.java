@@ -149,7 +149,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
-			
+
 			envFactor(Type.COLD, 0.75f);
 			envFactor(Type.HOT, 0.75f);
 			envFactor(Type.DRY, 0.25f);
@@ -166,7 +166,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 	}
-	
+
 	Species swampSpecies;
 	Species appleSpecies;
 	

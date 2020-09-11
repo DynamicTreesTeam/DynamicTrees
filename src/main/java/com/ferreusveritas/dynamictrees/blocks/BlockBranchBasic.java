@@ -315,7 +315,7 @@ public class BlockBranchBasic extends BlockBranch {
 
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.enableBranchClimbling.get();
+		return DTConfigs.enableBranchClimbling.get() && getRadius(state) <= 3;
 	}
 
 	@Nonnull

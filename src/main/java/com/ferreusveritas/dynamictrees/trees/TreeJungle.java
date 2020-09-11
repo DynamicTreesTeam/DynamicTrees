@@ -1,18 +1,19 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.Optional;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.featuregen.*;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -23,11 +24,16 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 
 public class TreeJungle extends TreeFamilyVanilla {
 	
@@ -68,7 +74,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 		SpeciesMegaJungle(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
 
-			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
+			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.JUNGLE));
 			
 			envFactor(Type.COLD, 0.15f);
@@ -80,9 +86,17 @@ public class TreeJungle extends TreeFamilyVanilla {
 			
 			//Add species features
 			addGenFeature(new FeatureGenVine().setQuantity(16).setMaxLength(16));
+			addGenFeature(new FeatureGenFlareBottom()); // Flare the bottom
 			addGenFeature(new FeatureGenClearVolume(8));//Clear a spot for the thick tree trunk
 			addGenFeature(new FeatureGenMound(999));//Place a 3x3 of dirt under thick trees
-			//addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
+			addGenFeature(new FeatureGenRoots(9).setScaler(getRootScaler())); // Finally Generate Roots
+		}
+
+		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
+			return (inRadius, trunkRadius) -> {
+				float scale = MathHelper.clamp(trunkRadius >= 9 ? (trunkRadius / 18f) : 0, 0, 1);
+				return (int) (inRadius * scale);
+			};
 		}
 		
 		@Override
@@ -118,14 +132,18 @@ public class TreeJungle extends TreeFamilyVanilla {
 		public boolean isThick() {
 			return true;
 		}
-		
+
 	}
 	
 	Species megaSpecies;
+	BlockSurfaceRoot surfaceRootBlock;
 	
 	public TreeJungle() {
 		super(DynamicTrees.VanillaWoodTypes.jungle);
 		canSupportCocoa = true;
+
+		surfaceRootBlock = new BlockSurfaceRoot(Material.WOOD, getName() + "root");
+
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.JUNGLE_LEAVES);
 	}
 	
@@ -138,7 +156,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 	@Override
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
 		super.registerSpecies(speciesRegistry);
-		//speciesRegistry.register(megaSpecies);
+		speciesRegistry.register(megaSpecies);
 	}
 	
 	@Override
@@ -149,6 +167,18 @@ public class TreeJungle extends TreeFamilyVanilla {
 	@Override
 	public boolean autoCreateBranch() {
 		return true;
+	}
+
+	@Override
+	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+		blockList = super.getRegisterableBlocks(blockList);
+		blockList.add(surfaceRootBlock);
+		return blockList;
+	}
+
+	@Override
+	public BlockSurfaceRoot getSurfaceRoots() {
+		return surfaceRootBlock;
 	}
 
 	@Override

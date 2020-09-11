@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -171,7 +170,8 @@ public class TreeCactus extends TreeFamily {
 	
 	@Override
 	public BlockBranch createBranch() {
-		return new BlockBranchCactus( getName() + "_branch");
+		String branchName = this.getName() + "_branch";
+		return new BlockBranchCactus( branchName);
 	}
 
 	@Override

@@ -7,6 +7,9 @@ import com.ferreusveritas.dynamictrees.trees.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -131,6 +134,20 @@ public class DTTrees {
 				.create();
 
 		setupTrees();
+	}
+
+	public static void setupExtraSoils() {
+		Collection<Item> sandItems = ItemTags.SAND.getAllElements();
+
+		Species cactus = dynamicCactus.getCommonSpecies();
+
+		for (Item item : sandItems) {
+			if (item instanceof BlockItem) {
+				BlockItem itemBlock = (BlockItem) item;
+				Block sandBlock = itemBlock.getBlock();
+				cactus.addAcceptableSoil(sandBlock);
+			}
+		}
 	}
 	
 }

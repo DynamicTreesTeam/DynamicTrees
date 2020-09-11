@@ -4,15 +4,11 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableTable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
@@ -26,14 +22,9 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 //TODO: 1.14.4 This gets flattened into the normal block branch with radius 1 - 32 and eliminated 
 
@@ -114,11 +105,6 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	public void setFamily(TreeFamily tree) {
 		super.setFamily(tree);
 		if (!extended) otherBlock.setFamily(tree);
-	}
-
-	@Override
-	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return false;
 	}
 
 	///////////////////////////////////////////

@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.Optional;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.ConiferLogic;
@@ -21,6 +19,8 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import java.util.Optional;
 
 public class TreeSpruce extends TreeFamilyVanilla {
 	
@@ -56,9 +56,9 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		SpeciesSpruce(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
 		}
-		
+
 	}
-	
+
 	public class SpeciesMegaSpruce extends SpeciesBaseSpruce {
 		
 		private static final String speciesName = "megaspruce";

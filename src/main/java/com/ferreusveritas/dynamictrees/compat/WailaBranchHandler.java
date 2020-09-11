@@ -10,14 +10,14 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
-import mcp.mobius.waila.addons.minecraft.PluginMinecraft;
-import mcp.mobius.waila.api.*;
+import mcp.mobius.waila.api.IComponentProvider;
+import mcp.mobius.waila.api.IDataAccessor;
+import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.RenderableTextComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -120,7 +120,7 @@ public class WailaBranchHandler implements IComponentProvider{
 	}
 
 	private Species getWailaSpecies(World world, BlockPos pos) {
-		return TreeHelper.getExactSpecies(world.getBlockState(pos), world, pos);
+		return TreeHelper.getBestGuessSpecies(world, pos);
 	}
 
 	private static RenderableTextComponent getRenderable(ItemStack stack) {

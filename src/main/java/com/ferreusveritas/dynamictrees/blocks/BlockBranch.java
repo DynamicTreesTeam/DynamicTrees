@@ -427,6 +427,11 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 		//Get all of the wood drops
 		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
 
+		if(!DTConfigs.sloppyBreakDrops.get()) {
+			destroyData.leavesDrops.clear();
+			woodDropList.clear();
+		}
+
 		//This will drop the EntityFallingTree into the world
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, destroyType);
 	}

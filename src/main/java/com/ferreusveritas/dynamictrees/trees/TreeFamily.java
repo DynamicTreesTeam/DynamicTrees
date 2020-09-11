@@ -1,27 +1,14 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Nonnull;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.cells.CellMetadata;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,6 +29,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This structure describes a Tree Family whose member Species all have a common wood type.
@@ -166,7 +159,7 @@ public class TreeFamily {
 		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
 
 		if(rootPos != BlockPos.ZERO) {
-			return TreeHelper.getExactSpecies(state, world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
+			return TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
 		}
 
 		return false;
@@ -238,7 +231,7 @@ public class TreeFamily {
 	 * @return the branch to be created
 	 */
 	public BlockBranch createBranch() {
-		String branchName = name + "_branch";
+		String branchName = this.getName() + "_branch";
 		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
 	}
 

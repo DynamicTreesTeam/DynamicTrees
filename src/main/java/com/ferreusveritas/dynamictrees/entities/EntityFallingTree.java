@@ -183,8 +183,11 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 
 		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
-			world.setBlockState(absPos, DTRegistries.blockStates.air, 0);////The client needs to set it's blocks to air
-			renderBounds.union(absPos);//Expand the re-render volume to include this block
+			BlockState state = world.getBlockState(absPos);
+			if(TreeHelper.isTreePart(state)) {
+				world.setBlockState(absPos, DTRegistries.blockStates.air, 0);////The client needs to set it's blocks to air
+				renderBounds.union(absPos);//Expand the re-render volume to include this block
+			}
 		}
 
 		cleanupShellBlocks(destroyData);
@@ -433,7 +436,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 						BlockPos dPos = rootPos.offset(dir);
 						BlockState findState = world.getBlockState(dPos);
 						if(findState == biomeState) {
-							world.setBlockState(rootPos, world.getBiome(rootPos).getSurfaceBuilderConfig().getTop());
+							world.setBlockState(rootPos, biomeState);
 							return;
 						}
 					}

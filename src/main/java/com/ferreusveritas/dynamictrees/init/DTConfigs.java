@@ -39,6 +39,7 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue enableFallingTreeDamage;
 	public static ForgeConfigSpec.DoubleValue fallingTreeDamageMultiplier;
 	public static ForgeConfigSpec.BooleanValue dirtBucketPlacesDirt;
+	public static ForgeConfigSpec.BooleanValue sloppyBreakDrops;
 
 	public static ForgeConfigSpec.BooleanValue replaceVanillaSapling;
 
@@ -114,6 +115,8 @@ public class DTConfigs {
 				defineInRange("fallingTreeDamageMultiplier", 1.0, 0.0, 100.0);
 		dirtBucketPlacesDirt = SERVER_BUILDER.comment("If enabled the Dirt Bucket will place a dirt block on right-click").
 				define("dirtBucketPlacesDirt", true);
+		sloppyBreakDrops = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.")
+				.define("sloppyBreakDrops", false);
 		SERVER_BUILDER.pop();
 
 		SERVER_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
