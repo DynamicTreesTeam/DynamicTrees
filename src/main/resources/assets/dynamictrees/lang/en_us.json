@@ -53,5 +53,6 @@
   "commands.dynamictrees.gettree.failure": "§cCould not find tree species at this position.",
   "commands.dynamictrees.nocoords": "§cPlease provide coordinates for the %s.",
   "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s",
-  "commands.dynamictrees.settree.failure": "§cPlease provide coordinates for the tree, a JoCode, and the number of turns."
+  "commands.dynamictrees.settree.failure": "§cPlease provide coordinates for the tree, a JoCode, and the number of turns.",
+  "commands.dynamictrees.rotatejocode.failure": "§cPlease provide a JoCode, and the number of turns."
 }

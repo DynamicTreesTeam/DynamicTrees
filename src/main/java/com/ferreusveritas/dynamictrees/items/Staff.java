@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -19,19 +18,17 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -236,8 +233,9 @@ public class Staff extends Item {
 
 	}
 
-	public void setUses(ItemStack itemStack, int value) {
-		getNBT(itemStack).putInt(USES, value);
+	public Staff setUses(ItemStack itemStack, int value) {
+		this.getNBT(itemStack).putInt(USES, value);
+		return this;
 	}
 
 	public int getMaxUses(ItemStack itemStack) {
@@ -248,6 +246,11 @@ public class Staff extends Item {
 		}
 
 		return 0;
+	}
+
+	public Staff setMaxUses(ItemStack itemStack, int value) {
+		this.getNBT(itemStack).putInt(MAXUSES, value);
+		return this;
 	}
 
 	public boolean hasMaxUses(ItemStack itemStack) {

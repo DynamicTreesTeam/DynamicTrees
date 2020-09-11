@@ -17,6 +17,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
+
 public final class SetTreeCommand extends SubCommand {
 
     public SetTreeCommand() {
@@ -25,8 +27,9 @@ public final class SetTreeCommand extends SubCommand {
         // Register extra arguments.
         // TODO: Get arguments within execute() so we aren't getting all the args in this.
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
-                .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string())
-                .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(context -> this.setTree(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()), ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT), StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT)))));
+                .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
+                        .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer())
+                                .executes(context -> this.setTree(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()), ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT), StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT)))));
     }
 
     @Override

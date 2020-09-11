@@ -6,13 +6,18 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+
+import java.util.Arrays;
 
 public final class RotateJoCodeCommand extends SubCommand {
 
     public RotateJoCodeCommand() {
-        this.extraArguments = Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(context -> this.rotateJoCode(context, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT))));
+        this.extraArguments = Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
+                .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer()).executes(context -> this.rotateJoCode(context, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT), IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT))));
     }
 
     @Override
@@ -22,6 +27,7 @@ public final class RotateJoCodeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
+        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.rotatejocode.failure"));
         return 0;
     }
 
