@@ -11,9 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class SubCommand {
 
     /**
@@ -26,7 +23,7 @@ public abstract class SubCommand {
      * extraArguments - Append any extra arguments you wish to add onto the command in the constructor.
      * These will be registered automatically.
      */
-    protected List<RequiredArgumentBuilder<CommandSource, ?>> extraArguments = new ArrayList<>();
+    protected RequiredArgumentBuilder<CommandSource, ?> extraArguments = null;
 
     protected abstract String getName ();
     protected abstract int execute (CommandContext<CommandSource> context);
@@ -50,9 +47,9 @@ public abstract class SubCommand {
 
         if (this.takesCoordinates) subSubCommandBuilder = Commands.argument("location", Vec3Argument.vec3()).executes(context -> this.executeWithCoords(context, context.getSource().getWorld(), Vec3Argument.getLocation(context, "location").getBlockPos(context.getSource())));
 
-        for (RequiredArgumentBuilder<CommandSource, ?> argumentBuilder : this.extraArguments) {
-            if (subSubCommandBuilder == null) subSubCommandBuilder = argumentBuilder;
-            else subSubCommandBuilder.then(argumentBuilder);
+        if (this.extraArguments != null) {
+            if (subSubCommandBuilder == null) subSubCommandBuilder = this.extraArguments;
+            else subSubCommandBuilder.then(this.extraArguments);
         }
 
         if (subSubCommandBuilder == null) return subCommandBuilder;
