@@ -15,6 +15,7 @@ public final class CommandConstants {
     public static final String SET_TREE = "setree";
     public static final String ROTATE_JO_CODE = "rotatejocode";
     public static final String CREATE_STAFF = "createstaff";
+    public static final String SET_COORD_XOR = "setcoordxor";
 
     // Extra arguments.
     public static final String LOCATION_ARGUMENT = "location";
@@ -25,5 +26,6 @@ public final class CommandConstants {
     public static final String COLOR_ARGUMENT = "color";
     public static final String READ_ONLY_ARGUMENT = "readOnly";
     public static final String MAX_USES_ARGUMENT = "maxUses";
+    public static final String XOR = "xor";
 
 }

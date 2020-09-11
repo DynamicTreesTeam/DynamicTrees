@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
@@ -24,9 +23,11 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class CoordUtils {
+
+	// Used for devs to simulate tree growing in different location hashes.
+	public static int coordXor = 0;
 
 	public static final Direction[] HORIZONTALS = {Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
 
@@ -302,7 +303,7 @@ public class CoordUtils {
 	
 	public static int coordHashCode(BlockPos pos, int a, int b, int c) {
 		int hash = (pos.getX() * a ^ pos.getY() * b ^ pos.getZ() * c) >> 1;
-		return hash & 0xFFFF;
+		return (hash ^ coordXor) & 0xFFFF;
 	}
 	
 	public static int coordHashCode(BlockPos pos, int readyMade) {

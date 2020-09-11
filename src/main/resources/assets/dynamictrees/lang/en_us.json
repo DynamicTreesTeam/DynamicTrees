@@ -52,5 +52,6 @@
   "commands.dynamictrees.gettree.success": "§aSpecies: §b%s §aJoCode: §b%s",
   "commands.dynamictrees.gettree.failure": "§cCould not find tree species at this position.",
   "commands.dynamictrees.error.unknownspecies": "§cUnknown species '%s'",
-  "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s"
+  "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s",
+  "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s"
 }

@@ -24,6 +24,7 @@ public final class DTCommand {
         this.subCommands.add(new SetTreeCommand());
         this.subCommands.add(new RotateJoCodeCommand());
         this.subCommands.add(new CreateStaffCommand());
+        this.subCommands.add(new SetCoordXorCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
