@@ -626,7 +626,7 @@ protected ModelBlock modelBlock;
 				int idx = connDir.getIndex();
 				int connRadius = connections[idx];
 				// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-				if (connRadius > 0 && ((connDir == EnumFacing.UP && connRadius == 4 && extraUpSleeve) || side != connDir || connDir == EnumFacing.DOWN)) {
+				if (connRadius >= 4 && ((connDir == EnumFacing.UP && connRadius == 4 && extraUpSleeve) || side != connDir || connDir == EnumFacing.DOWN)) {
 					quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(extendedBlockState, side, rand));
 				}
 			}
