@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import org.lwjgl.opengl.GL11;
+
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
@@ -20,6 +22,8 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BakedQuadRetextured;
@@ -94,11 +98,11 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		TextureManager textureManager = mc.getTextureManager();
 		
 		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE, SourceFactor.ONE, DestFactor.ZERO);
 		textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 		this.drawBlockDamageTexture(mc, textureManager, Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getPartialTicks());
 		textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 		GlStateManager.disableBlend();
 	}
 	
@@ -132,12 +136,12 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	}
 	
 	private void preRenderDamagedBlocks() {
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.tryBlendFuncSeparate(SourceFactor.DST_COLOR, DestFactor.SRC_COLOR, SourceFactor.ONE, DestFactor.ZERO);
 		GlStateManager.enableBlend();
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
 		GlStateManager.doPolygonOffset(-3.0F, -3.0F);
 		GlStateManager.enablePolygonOffset();
-		GlStateManager.alphaFunc(516, 0.1F);
+		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
 		GlStateManager.enableAlpha();
 		GlStateManager.pushMatrix();
 	}
@@ -163,7 +167,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		if (!BlockBreakAnimationClientHandler.damagedBranches.isEmpty()) {
 			renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 			this.preRenderDamagedBlocks();
-			bufferBuilderIn.begin(7, DefaultVertexFormats.BLOCK);
+			bufferBuilderIn.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 			bufferBuilderIn.setTranslation(-posX, -posY, -posZ);
 			bufferBuilderIn.noColor();
 			
