@@ -189,15 +189,16 @@ public class ClientProxy extends CommonProxy {
 		
 		//Register Rooty Colorizers
 		blockColors.registerBlockColorHandler((state, world, pos, tintIndex) -> {
-				BlockRooty blockRooty;
-				if (state.getBlock() instanceof BlockRooty){
-					blockRooty = (BlockRooty) state.getBlock();
-				} else return white;
-				switch(tintIndex) {
-					case 0: return blockColors.colorMultiplier(blockRooty.getMimic(world, pos), world, pos, tintIndex);
-					case 1: return blockRooty.rootColor(state, world, pos);
-					default: return white;
+				if (state.getBlock() instanceof BlockRooty) {
+					BlockRooty blockRooty = (BlockRooty) state.getBlock();
+					switch(tintIndex) {
+						case 0: return blockColors.colorMultiplier(blockRooty.getMimic(world, pos), world, pos, tintIndex);
+						case 1: return blockRooty.rootColor(state, world, pos);
+						default: return white;
+					}
 				}
+				
+				return white;
 			},
 			ModBlocks.blockRootyDirt, ModBlocks.blockRootyDirtSpecies, ModBlocks.blockRootySand, ModBlocks.blockRootyDirtFake);
 		
