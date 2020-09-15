@@ -20,4 +20,6 @@ public interface ISeasonManager {
 	
 	public Float getSeasonValue(World world);
 	
+	public boolean isTropical(World world, BlockPos rootPos);
+	
 }

@@ -43,16 +43,20 @@ public class SeasonManager implements ISeasonManager {
 	// Tropical Predicate
 	////////////////////////////////////////////////////////////////
 	
-	static private final float TROPICAL_THRESHHOLD = 0.85f; 
+	static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough 
 	
 	private BiPredicate<World, BlockPos> isTropical = (world, rootPos) -> world.getBiome(rootPos).getDefaultTemperature() > TROPICAL_THRESHHOLD;
-
+	
 	/**
 	 * Set the global predicate that determines if a world location is tropical.
 	 * Predicate should return true if tropical, false if temperate.
 	 */
 	public void setTropicalPredicate(BiPredicate<World, BlockPos> predicate) {
 		isTropical = predicate;
+	}
+	
+	public boolean isTropical(World world, BlockPos rootPos) {
+		return isTropical.test(world, rootPos);
 	}
 	
 	
@@ -66,18 +70,18 @@ public class SeasonManager implements ISeasonManager {
 	
 	public float getGrowthFactor (World world, BlockPos rootPos) {
 		SeasonContext context = getContext(world);
-		return isTropical.test(world, rootPos) ? context.getTropicalGrowthFactor() : context.getTemperateGrowthFactor();
+		return isTropical(world, rootPos) ? context.getTropicalGrowthFactor() : context.getTemperateGrowthFactor();
 	};
 	
 	public float getSeedDropFactor(World world, BlockPos rootPos) {
 		SeasonContext context = getContext(world);
-		return isTropical.test(world, rootPos) ? context.getTropicalSeedDropFactor() : context.getTemperateSeedDropFactor();
+		return isTropical(world, rootPos) ? context.getTropicalSeedDropFactor() : context.getTemperateSeedDropFactor();
 	}
 	
 	@Override
 	public float getFruitProductionFactor(World world, BlockPos rootPos) {
 		SeasonContext context = getContext(world);
-		return isTropical.test(world, rootPos) ? context.getTropicalFruitProductionFactor() : context.getTemperateFruitProductionFactor();
+		return isTropical(world, rootPos) ? context.getTropicalFruitProductionFactor() : context.getTemperateFruitProductionFactor();
 	}
 	
 	public Float getSeasonValue(World world) {

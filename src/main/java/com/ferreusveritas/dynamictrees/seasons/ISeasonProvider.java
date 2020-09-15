@@ -10,7 +10,7 @@ public interface ISeasonProvider {
 	 * 
 	 * 0 Spring
 	 * 1 Summer
-	 * 2 Fall
+	 * 2 Autumn
 	 * 3 Winter
 	 * 
 	 * @return season value as a Float object or null if seasons are not enabled

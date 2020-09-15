@@ -11,13 +11,16 @@ import com.ferreusveritas.dynamictrees.seasons.SeasonProviderSereneSeasons;
 
 import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
+import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.SeasonsConfig;
 
 public class SereneSeasonsAdapter implements ICompatAdapter {
 	
 	@Override
 	public void Init() {
-		SeasonHelper.setSeasonManager( new SeasonManager(world -> mapper(world)));
+		SeasonManager seasonManager = new SeasonManager(world -> mapper(world));
+		seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
+		SeasonHelper.setSeasonManager(seasonManager);
 	}
 	
 	public Tuple<ISeasonProvider, ISeasonGrowthCalculator>  mapper(World world) {
