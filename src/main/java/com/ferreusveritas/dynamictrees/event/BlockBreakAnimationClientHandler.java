@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BakedQuadRetextured;
@@ -135,24 +137,28 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		}
 	}
 	
+	
+	//Optifine patches the method in net.minecraft.client.renderer.RenderGlobal with special boilerplate code
+	//for shaders.  The best way to handle this is to simply grant ourselves access to those private methods and
+	//call the vanilla functions.  If they were patched then we get to run the patched code too.
+	static Method preRenderMethod;
+	static Method postRenderMethod;
+	
+	static {
+		preRenderMethod = ReflectionHelper.findMethod(RenderGlobal.class, "preRenderDamagedBlocks", "func_180443_s");
+		preRenderMethod.setAccessible(true);
+		
+		postRenderMethod = ReflectionHelper.findMethod(RenderGlobal.class, "postRenderDamagedBlocks", "func_174969_t");
+		postRenderMethod.setAccessible(true);
+	}
+
+	
 	private void preRenderDamagedBlocks() {
-		GlStateManager.tryBlendFuncSeparate(SourceFactor.DST_COLOR, DestFactor.SRC_COLOR, SourceFactor.ONE, DestFactor.ZERO);
-		GlStateManager.enableBlend();
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
-		GlStateManager.doPolygonOffset(-3.0F, -3.0F);
-		GlStateManager.enablePolygonOffset();
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-		GlStateManager.enableAlpha();
-		GlStateManager.pushMatrix();
+		try { preRenderMethod.invoke(Minecraft.getMinecraft().renderGlobal, new Object[] {}); } catch (Exception e) { }
 	}
 	
 	private void postRenderDamagedBlocks() {
-		GlStateManager.disableAlpha();
-		GlStateManager.doPolygonOffset(0.0F, 0.0F);
-		GlStateManager.disablePolygonOffset();
-		GlStateManager.enableAlpha();
-		GlStateManager.depthMask(true);
-		GlStateManager.popMatrix();
+		try { postRenderMethod.invoke(Minecraft.getMinecraft().renderGlobal, new Object[] {}); } catch (Exception e) { }
 	}
 	
 	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, float partialTicks) {
@@ -161,7 +167,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		double posZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
 		
 		if (mc.world.getWorldTime() % 20 == 0) {
-			this.cleanupExtraDamagedBlocks();
+			cleanupExtraDamagedBlocks();
 		}
 		
 		if (!BlockBreakAnimationClientHandler.damagedBranches.isEmpty()) {
@@ -204,10 +210,12 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		}
 	}
 	
+	
 	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, IBlockState state, IBlockAccess world, BlockPos pos) {
 		state = state.getBlock().getExtendedState(state, world, pos);
 		
 		if (baseModel instanceof ICustomDamageModel) {
+			
 			ICustomDamageModel customDamageModel = (ICustomDamageModel) baseModel;
 			long rand = MathHelper.getPositionRandom(pos);
 			
