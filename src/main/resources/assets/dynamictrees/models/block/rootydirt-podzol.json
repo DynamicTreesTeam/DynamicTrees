@@ -1,7 +1,7 @@
 {
-    "parent": "block/podzol",
-    "textures": {
-        "particle": "blocks/dirt",
-        "side": "dynamictrees:blocks/rootydirt-podzol"
-    }
+	"parent": "block/podzol",
+	"textures": {
+		"particle": "blocks/dirt",
+		"side": "dynamictrees:blocks/rootydirt-podzol"
+	}
 }

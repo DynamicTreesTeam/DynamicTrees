@@ -1,7 +1,7 @@
-{   "parent": "dynamictrees:block/sapling",
-    "textures": {
-        "particle": "blocks/leaves_birch",
-        "log": "blocks/log_birch",
-        "leaves": "blocks/leaves_birch"
-    }
+{	"parent": "dynamictrees:block/sapling",
+	"textures": {
+		"particle": "blocks/leaves_birch",
+		"log": "blocks/log_birch",
+		"leaves": "blocks/leaves_birch"
+	}
 }

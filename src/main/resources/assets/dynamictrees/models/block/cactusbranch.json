@@ -1,7 +1,7 @@
 {
-    "parent": "dynamictrees:block/smartmodel/branch",
-    "textures": {
-        "bark": "blocks/cactus_side",
-        "rings": "blocks/cactus_top"
-    }
+	"parent": "dynamictrees:block/smartmodel/branch",
+	"textures": {
+		"bark": "blocks/cactus_side",
+		"rings": "blocks/cactus_top"
+	}
 }

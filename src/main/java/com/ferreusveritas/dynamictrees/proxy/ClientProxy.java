@@ -32,7 +32,6 @@ import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockBranchCact
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockBranchThick;
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderBlockSurfaceRoot;
 import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderSapling;
-import com.ferreusveritas.dynamictrees.models.loaders.ModelLoaderWrapped;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -173,7 +172,6 @@ public class ClientProxy extends CommonProxy {
 		ModelLoaderRegistry.registerLoader(new ModelLoaderBlockSurfaceRoot());
 		
 		ModelLoaderRegistry.registerLoader(new ModelLoaderSapling());
-		ModelLoaderRegistry.registerLoader(new ModelLoaderWrapped());
 	}
 	
 	private boolean isValid(IBlockAccess access, BlockPos pos) {

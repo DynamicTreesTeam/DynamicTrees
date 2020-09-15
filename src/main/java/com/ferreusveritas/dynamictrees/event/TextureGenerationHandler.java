@@ -39,11 +39,6 @@ public class TextureGenerationHandler {
 		return outputRes;
 	}
 	
-	public static ResourceLocation addDualTextureLocations(ResourceLocation res1, ResourceLocation res2, ResourceLocation outputRes) {		
-		thickRingTextures.put(new DualResourceLocation(res1, res2), outputRes);
-		return outputRes;
-	}
-	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {

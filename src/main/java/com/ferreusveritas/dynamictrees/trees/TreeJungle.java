@@ -174,11 +174,6 @@ public class TreeJungle extends TreeFamilyVanilla {
 	}
 	
 	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
-	
-	@Override
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList = super.getRegisterableBlocks(blockList);
 		blockList.add(surfaceRootBlock);

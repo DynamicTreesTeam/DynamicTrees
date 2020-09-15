@@ -6,7 +6,7 @@
 		"particle": "blocks/dirt"
 	},
 	"elements": [
-		{   "from": [ 0, 0, 0 ],
+		{	"from": [ 0, 0, 0 ],
 			"to": [ 16, 16, 16 ],
 			"faces": {
 				"north": { "uv": [ 0, 0, 16, 16 ], "texture": "roots", "cullface": "north", "tintindex": 1 },
@@ -15,7 +15,7 @@
 				"east":  { "uv": [ 0, 0, 16, 16 ], "texture": "roots", "cullface": "east", "tintindex": 1 }
 			}
 		},
-		{   "from": [ 0.8, -16, 8 ],
+		{	"from": [ 0.8, -16, 8 ],
 			"to": [ 15.2, 0, 8 ],
 			"rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
 			"shade": false,
@@ -24,7 +24,7 @@
 				"south": { "uv": [ 0, 0, 16, 16 ], "texture": "roots_bottom", "cullface": "down", "tintindex": 1 }
 			}
 		},
-		{   "from": [ 8, -16, 0.8 ],
+		{	"from": [ 8, -16, 0.8 ],
 			"to": [ 8, 0, 15.2 ],
 			"rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
 			"shade": false,

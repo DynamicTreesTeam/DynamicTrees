@@ -209,8 +209,4 @@ public class TreeOak extends TreeFamilyVanilla {
 		return true;
 	}
 	
-	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
 }

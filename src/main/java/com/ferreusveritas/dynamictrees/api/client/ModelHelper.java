@@ -2,11 +2,9 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import java.util.stream.Collectors;
 
-import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
-import com.ferreusveritas.dynamictrees.models.ModelResourceLocationWrapped;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
 import net.minecraft.block.Block;
@@ -34,7 +32,8 @@ public class ModelHelper {
 	public static void regModel(TreeFamily tree) {
 		
 		BlockBranch blockBranch = tree.getDynamicBranch();
-		ModelResourceLocation modelLocation = getCreateBranchModel(blockBranch, tree.autoCreateBranch());
+		
+		ModelResourceLocation modelLocation = getBranchModelResourceLocation(blockBranch);
 		
 		setGenericStateMapper(blockBranch, modelLocation);
 		if(blockBranch instanceof BlockBranchThick) {
@@ -47,18 +46,10 @@ public class ModelHelper {
 		}
 	}
 	
-	private static ModelResourceLocation getCreateBranchModel(BlockBranch blockBranch, boolean automatic) {
-		return automatic ? getCreateBranchModelAuto(blockBranch) : getCreateBranchModelManual(blockBranch);
-	}
-	
-	private static ModelResourceLocation getCreateBranchModelAuto(BlockBranch blockBranch) {
-		return new ModelResourceLocationWrapped(new ResourceLocation(ModConstants.MODID, "branch"), blockBranch.getDefaultState());
-	}
-	
-	private static ModelResourceLocation getCreateBranchModelManual(BlockBranch blockBranch) {
+	private static ModelResourceLocation getBranchModelResourceLocation(BlockBranch blockBranch) {
 		ResourceLocation family = blockBranch.getFamily().getName();
 		ResourceLocation resloc = new ResourceLocation(family.getResourceDomain(), family.getResourcePath() + "branch");
-		return new ModelResourceLocation(resloc , null);
+		return new ModelResourceLocation(resloc, null);
 	}
 	
 	public static void setGenericStateMapper(Block block, ModelResourceLocation modelLocation) {

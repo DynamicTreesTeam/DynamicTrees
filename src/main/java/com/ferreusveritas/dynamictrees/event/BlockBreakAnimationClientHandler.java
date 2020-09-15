@@ -192,6 +192,8 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 							IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
 							blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
 						}
+					} else {
+						BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
 					}
 				}
 			}
@@ -225,6 +227,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 			
 			return new SimpleBakedModel(generalQuads, faceQuads, baseModel.isAmbientOcclusion(state), baseModel.isGui3d(), baseModel.getParticleTexture(), baseModel.getItemCameraTransforms(), baseModel.getOverrides());
 		}
+		
 		
 		return (new SimpleBakedModel.Builder(state, baseModel, texture, pos)).makeBakedModel();
 	}

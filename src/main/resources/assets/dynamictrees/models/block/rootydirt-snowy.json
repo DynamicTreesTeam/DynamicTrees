@@ -1,8 +1,8 @@
 {
-    "parent": "block/grass",
-    "textures": {
-        "particle": "blocks/dirt",
-        "top": "blocks/snow",
-        "side": "blocks/grass_side_snowed"
-    }
+	"parent": "block/grass",
+	"textures": {
+		"particle": "blocks/dirt",
+		"top": "blocks/snow",
+		"side": "blocks/grass_side_snowed"
+	}
 }

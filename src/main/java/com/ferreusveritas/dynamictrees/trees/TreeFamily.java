@@ -253,10 +253,6 @@ public class TreeFamily {
 		return false;
 	}
 	
-	public boolean autoCreateBranch() {
-		return false;
-	}
-	
 	@SideOnly(Side.CLIENT)
 	public int getWoodColor() {
 		return woodColor;
