@@ -19,12 +19,14 @@ import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.SpecialChars;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class WailaBranchHandler implements IWailaDataProvider {
@@ -35,7 +37,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-		
+				
 		if(WailaOther.invalidate) {
 			lastPos = BlockPos.ORIGIN;
 			lastSpecies = Species.NULLSPECIES;
@@ -56,7 +58,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		}
 		//Attempt to get species from the world as a last resort as the operation can be rather expensive
 		if(species == Species.NULLSPECIES) {
-			species = getWailaSpecies(accessor.getWorld(), pos);			
+			species = getWailaSpecies(accessor.getWorld(), pos);
 		}
 		
 		if (!species.useDefaultWailaBody()){
@@ -72,7 +74,14 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		lastPos = pos;
 		
 		if(species != Species.NULLSPECIES) {
-			tooltip.add("Species: " + species.getRegistryName().getResourcePath());
+			
+			if(species != species.getFamily().getCommonSpecies()) {
+				tooltip.add("Species: " + species.getLocalizedName());
+			}
+			
+			if(Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
+				tooltip.add(TextFormatting.DARK_GRAY + species.getRegistryName().toString());
+			}
 			
 			String renderString = "";
 			

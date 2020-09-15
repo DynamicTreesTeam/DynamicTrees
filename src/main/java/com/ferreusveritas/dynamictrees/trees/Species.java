@@ -78,6 +78,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -171,6 +172,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public int saplingModelId;
 	
+	private String unlocalizedName = "";
+
+	
 	/**
 	 * Constructor only used by NULLSPECIES
 	 */
@@ -201,6 +205,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
+		setUnlocalizedName(name.toString());
 		this.treeFamily = treeFamily;
 		setLeavesProperties(leavesProperties);
 		
@@ -225,6 +230,19 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public TreeFamily getFamily() {
 		return treeFamily;
+	}
+	
+	public Species setUnlocalizedName(String name) {
+		unlocalizedName = name;
+		return this;
+	}
+	
+	public String getLocalizedName() {
+		return I18n.translateToLocal(this.getUnlocalizedName() + ".name");
+	}
+	
+	public String getUnlocalizedName() {
+		return "species." + this.unlocalizedName;
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {

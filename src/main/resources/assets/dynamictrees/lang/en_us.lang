@@ -14,6 +14,19 @@ tile.dynamictrees:darkoakbranch.name=Dark Oak Tree
 tile.dynamictrees:acaciabranch.name=Acacia Tree
 tile.dynamictrees:cactusbranch.name=Cactus
 
+species.dynamictrees:oak.name=Oak
+species.dynamictrees:oakswamp.name=Swamp Oak
+species.dynamictrees:spruce.name=Spruce
+species.dynamictrees:megaspruce.name=Mega Spruce
+species.dynamictrees:birch.name=Birch
+species.dynamictrees:jungle.name=Jungle
+species.dynamictrees:megajungle.name=Mega Jungle
+species.dynamictrees:darkoak.name=Dark Oak
+species.dynamictrees:acacia.name=Acacia
+species.dynamictrees:apple.name=Apple
+species.dynamictrees:cactus.name=Cactus
+
+
 item.dynamictrees:oakseed.name=Oak Acorn
 item.dynamictrees:spruceseed.name=Spruce Cone
 item.dynamictrees:birchseed.name=Birch Catkin

@@ -41,7 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockBonsaiPot extends BlockContainer {
 	
 	public static final MimicProperty POT = new MimicProperty("pot");
-		
+	
 	public static final String name = "bonsaipot";
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 	
