@@ -19,7 +19,7 @@ public class CommonEventHandler {
 			FutureBreak.process(event.world);
 		}
 		
-		if(event.type == Type.WORLD && event.phase == Phase.START && event.world.provider.getDimension() == 0) {
+		if(event.type == Type.WORLD && event.phase == Phase.START) {
 			SeasonHelper.updateTick(event.world, event.world.getWorldTime());
 		}
 	}
