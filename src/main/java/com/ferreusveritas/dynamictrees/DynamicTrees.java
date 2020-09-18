@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 /**
 * 2016-2018 Ferreusveritas
 */
-@Mod(modid = ModConstants.MODID, name = ModConstants.NAME, version=ModConstants.VERSION, dependencies=ModConstants.DEPENDENCIES)
+@Mod(modid = ModConstants.MODID, name = ModConstants.NAME, version=ModConstants.VERSION, dependencies=ModConstants.DEPENDENCIES, updateJSON = "https://github.com/ferreusveritas/DynamicTrees/blob/1.12.2/version_info.json?raw=true")
 public class DynamicTrees {
 	
 	@Mod.Instance(ModConstants.MODID)
