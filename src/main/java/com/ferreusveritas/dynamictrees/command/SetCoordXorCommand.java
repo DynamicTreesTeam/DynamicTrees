@@ -12,7 +12,7 @@ public final class SetCoordXorCommand extends SubCommand {
     public SetCoordXorCommand() {
         this.defaultToExecute = false;
 
-        this.extraArguments = Commands.argument(CommandConstants.XOR, IntegerArgumentType.integer()).executes(this::execute);
+        this.extraArguments = Commands.argument(CommandConstants.XOR_ARGUMENT, IntegerArgumentType.integer()).executes(this::execute);
     }
 
     @Override
@@ -22,7 +22,7 @@ public final class SetCoordXorCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final int coordXor = IntegerArgumentType.getInteger(context, CommandConstants.XOR);
+        final int coordXor = IntegerArgumentType.getInteger(context, CommandConstants.XOR_ARGUMENT);
         CoordUtils.coordXor = coordXor;
 
         this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.xor.set", coordXor));
