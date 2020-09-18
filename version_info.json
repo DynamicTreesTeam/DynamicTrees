@@ -1,11 +1,10 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
 	"1.12.2": {
-		"1.12.2-0.9.15": "TESTING VERSION CHECKER. REMOVE ME AFTER.",
 		"1.12.2-0.9.14": "New Features:\n- Removed \"Dynamic\" prefix from localized branch names.\n- Species name localizations (please be patient while add-ons catch up, species names will be unlocalized until new add-on releases are made with updated lang files).\n\nBugs Fixed:\n- Dimensions other than 0 now grow trees properly again (bug introduced by Serene Seasons integration effort).\n- Made rooty dirt blocks get color from mimic instead of grass (thanks Max Hyper).\n- Fix optifine shader interaction bug where sky could be seen through breaking texture on trees.\n- Fixed small crash with cactus model (thanks Max Hyper).\n\nInternal:\n- Enhanced SeasonHelper capabilities with helper functions.\n- Removed \"Wrapped\" classes and redefined blockstate files to be more standard.\n- Don't throw an exception when a JoCode file isn't defined."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-0.9.15",
-		"1.12.2-recommended": "1.12.2-0.9.15"
+		"1.12.2-latest": "1.12.2-0.9.14",
+		"1.12.2-recommended": "1.12.2-0.9.14"
 	}
 }
