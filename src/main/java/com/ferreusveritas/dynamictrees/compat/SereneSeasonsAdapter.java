@@ -23,7 +23,7 @@ public class SereneSeasonsAdapter implements ICompatAdapter {
 		SeasonHelper.setSeasonManager(seasonManager);
 	}
 	
-	public Tuple<ISeasonProvider, ISeasonGrowthCalculator>  mapper(World world) {
+	public Tuple<ISeasonProvider, ISeasonGrowthCalculator> mapper(World world) {
 		
 		int dim = world.provider.getDimension();
 		if(SeasonsConfig.isDimensionWhitelisted(dim)) {

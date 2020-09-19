@@ -12,6 +12,8 @@ public interface ISeasonManager {
 	
 	public void updateTick(World world, long worldTicks);
 	
+	public void flushMappings();
+	
 	public float getGrowthFactor(World world, BlockPos rootPos);
 	
 	public float getSeedDropFactor(World world, BlockPos rootPos);

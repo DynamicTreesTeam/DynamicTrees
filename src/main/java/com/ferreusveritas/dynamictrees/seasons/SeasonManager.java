@@ -38,6 +38,10 @@ public class SeasonManager implements ISeasonManager {
 		setProvider(world, provider, calc);
 	}
 	
+	public void flushMappings() {
+		seasonContextMap.clear();
+	}
+	
 	
 	////////////////////////////////////////////////////////////////
 	// Tropical Predicate

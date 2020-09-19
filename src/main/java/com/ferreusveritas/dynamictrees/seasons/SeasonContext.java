@@ -15,6 +15,8 @@ public class SeasonContext {
 	private float temperateFruitProductionFactor;
 	private float tropicalFruitProductionFactor;
 	
+	private long methodTicks = 0;
+	
 	public SeasonContext(ISeasonProvider provider, ISeasonGrowthCalculator calculator) {
 		this.provider = provider;
 		this.calculator = calculator;
@@ -22,7 +24,7 @@ public class SeasonContext {
 	
 	public void updateTick(World world, long worldTicks) {
 		
-		if(worldTicks % 20 == 0) {
+		if(methodTicks % 20 == 0) {
 			provider.updateTick(world, worldTicks);
 			Float seasonValue = provider.getSeasonValue(world);
 			temperateGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TEMPERATE);
@@ -32,6 +34,8 @@ public class SeasonContext {
 			temperateFruitProductionFactor = calculator.calcFruitProduction(seasonValue, ClimateZoneType.TEMPERATE);
 			tropicalFruitProductionFactor = calculator.calcFruitProduction(seasonValue, ClimateZoneType.TROPICAL);
 		}
+		
+		methodTicks++;
 	}
 	
 	public ISeasonProvider getSeasonProvider() {

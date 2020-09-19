@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.command.DTCommand;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
+import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees;
 
 import net.minecraftforge.fml.common.Mod;
@@ -45,6 +46,7 @@ public class DynamicTrees {
 	@Mod.EventHandler
 	public static void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new DTCommand());
+		SeasonHelper.getSeasonManager().flushMappings();
 	}
 	
 	@Mod.EventHandler
