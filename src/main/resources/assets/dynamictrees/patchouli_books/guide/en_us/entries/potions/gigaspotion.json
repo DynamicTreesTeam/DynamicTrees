@@ -1,0 +1,28 @@
+{
+    "name": "Potion of Gigas",
+    "icon": "dynamictrees:dendropotion:2",
+    "category": "potions",
+	"sortnum": "7",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Potion of Gigas",
+      "ingredient": "minecraft:pumpkin_seeds",
+      "bottle": "dynamictrees:dendropotion",
+      "output": "dynamictrees:dendropotion:2",
+      "text": "This potion changes the tree species to its mega equivalent. (if available)"
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/basepotion",
+          "potions/burgeoningpotion",
+          "potions/depletionpotion",
+          "potions/fertilitypotion",
+          "potions/persistancepotion",
+          "potions/transformationpotion"
+        ]
+    }
+  ]
+} 

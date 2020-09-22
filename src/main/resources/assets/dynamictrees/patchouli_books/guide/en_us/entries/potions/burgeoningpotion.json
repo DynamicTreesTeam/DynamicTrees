@@ -1,0 +1,28 @@
+{
+    "name": "Potion of Burgeoning",
+    "icon": "dynamictrees:dendropotion:3",
+    "category": "potions",
+	"sortnum": "3",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Potion of Burgeoning",
+      "ingredient": "minecraft:ghast_tear",
+      "bottle": "dynamictrees:dendropotion",
+      "output": "dynamictrees:dendropotion:3",
+      "text": "This potion causes the tree to rapidly grow."
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/basepotion",
+          "potions/depletionpotion",
+          "potions/fertilitypotion",
+          "potions/gigaspotion",
+          "potions/persistancepotion",
+          "potions/transformationpotion"
+        ]
+    }
+  ]
+} 

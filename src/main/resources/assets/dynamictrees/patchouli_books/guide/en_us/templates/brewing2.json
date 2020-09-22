@@ -1,0 +1,114 @@
+{
+	"components": [
+		{
+			"type": "header",
+			"text": "#title",
+			"x": -1,
+			"y": -6
+		},
+		{
+			"type": "image",
+			"image": "dynamictrees:textures/patchouli/gui/brewing.png",
+			"width": "256",
+			"height": "256",
+			"texture_width": "256",
+			"texture_height": "256",
+			"u": "10",
+			"v": "10",
+			"x": 0,
+			"y": -5,
+			"scale": 0.5
+		},
+		{
+			"type": "item",
+			"item": "Minecraft:blaze_powder",
+			"x": 2,
+			"y": 7
+		},
+		{
+			"type": "item",
+			"item": "#ingredient",
+			"x": 64,
+			"y": 7
+		},
+		{
+			"type": "item",
+			"item": "#bottle",
+			"x": 63,
+			"y": 48
+		},
+		{
+			"type": "item",
+			"item": "#bottle",
+			"x": 40,
+			"y": 41
+		},
+		{
+			"type": "item",
+			"item": "#bottle",
+			"x": 86,
+			"y": 41
+		},
+		{
+			"type": "item",
+			"item": "#output",
+			"x": 97,
+			"y": 7
+		},
+		{
+			"type": "header",
+			"text": "#title2",
+			"x": -1,
+			"y": 70
+		},
+		{
+			"type": "image",
+			"image": "dynamictrees:textures/patchouli/gui/brewing.png",
+			"width": "256",
+			"height": "256",
+			"texture_width": "256",
+			"texture_height": "256",
+			"u": "10",
+			"v": "10",
+			"x": 0,
+			"y": 70,
+			"scale": 0.5
+		},
+		{
+			"type": "item",
+			"item": "Minecraft:blaze_powder",
+			"x": 2,
+			"y": 82
+		},
+		{
+			"type": "item",
+			"item": "#ingredient2",
+			"x": 64,
+			"y": 82
+		},
+		{
+			"type": "item",
+			"item": "#bottle2",
+			"x": 63,
+			"y": 123
+		},
+		{
+			"type": "item",
+			"item": "#bottle2",
+			"x": 40,
+			"y": 116
+		},
+		{
+			"type": "item",
+			"item": "#bottle2",
+			"x": 86,
+			"y": 116
+		},
+		{
+			"type": "item",
+			"item": "#output2",
+			"x": 97,
+			"y": 82
+		}
+	]
+}

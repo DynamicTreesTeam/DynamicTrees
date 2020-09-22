@@ -1,0 +1,17 @@
+{
+    "name": "Trees",
+    "icon": "dynamictrees:oakseed",
+    "category": "features",
+	"sortnum": "1",
+  "pages": [
+	{
+      "type": "text",
+      "title": "Trees",
+      "text": "- Trees grow progressively from seeds to mature trees over time.$(br2)- Trees grow around obstacles in a natural way.$(br2)- Trees have growth rate and mature sizes that are biome, temperature and rainfall dependent.$(br2)- Drop seeds at random that can potentially plant themselves."
+    },
+	{
+      "type": "text",
+      "text": "- Trees won't grow in darkness. Leaves not connected to an outer tree branch or starved of light will die. Outer branches without leaves slowly rot away.$(br2)- Walking on leaves blocks is slow and sinking. Falling onto leaves prevents fall damage and breaks the leaf block.$(br2)- Vanilla Tree Fruits(apples, cocoa beans)$(br2)- Thin branches can be climbed like ladders."
+    }
+  ]
+} 

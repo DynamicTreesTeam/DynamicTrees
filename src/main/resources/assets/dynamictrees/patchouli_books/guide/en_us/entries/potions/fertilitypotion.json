@@ -1,0 +1,28 @@
+{
+    "name": "Potion of Fertility",
+    "icon": "dynamictrees:dendropotion:4",
+    "category": "potions",
+	"sortnum": "4",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Potion of Fertility",
+      "ingredient": "minecraft:fish",
+      "bottle": "dynamictrees:dendropotion",
+      "output": "dynamictrees:dendropotion:4",
+      "text": "This potion fully fertilizes the soil."
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/basepotion",
+          "potions/burgeoningpotion",
+          "potions/depletionpotion",
+          "potions/gigaspotion",
+          "potions/persistancepotion",
+          "potions/transformationpotion"
+        ]
+    }
+  ]
+} 

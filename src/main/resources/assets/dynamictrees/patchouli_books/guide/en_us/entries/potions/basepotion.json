@@ -1,0 +1,28 @@
+{
+    "name": "Biochar Base Potion",
+    "icon": "dynamictrees:dendropotion",
+    "category": "potions",
+	"sortnum": "1",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Biochar Base Potion",
+      "ingredient": "minecraft:coal:1",
+      "bottle": "minecraft:potion{Potion:'minecraft:awkward'}",
+      "output": "dynamictrees:dendropotion",
+      "text": "This is the brewing recipe for the base potion.$(br2)all the potions from dynamic trees use this during brewing."
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/burgeoningpotion",
+          "potions/depletionpotion",
+          "potions/fertilitypotion",
+          "potions/gigaspotion",
+          "potions/persistancepotion",
+          "potions/transformationpotion"
+        ]
+    }
+  ]
+} 
