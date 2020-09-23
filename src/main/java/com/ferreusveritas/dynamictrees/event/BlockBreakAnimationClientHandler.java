@@ -55,6 +55,7 @@ import net.minecraftforge.client.resource.VanillaResourceType;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -64,6 +65,8 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	
 	public static final BlockBreakAnimationClientHandler instance = new BlockBreakAnimationClientHandler(Minecraft.getMinecraft());
 	private static final Map<Integer, DestroyBlockProgress> damagedBranches = new ConcurrentHashMap<Integer, DestroyBlockProgress>();
+	
+	private int tickCounter = 0;
 	
 	private final TextureAtlasSprite[] destroyBlockIcons = new TextureAtlasSprite[10];
 	
@@ -81,6 +84,15 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 					event.getWorld().addEventListener(new RenderGlobalWrapper(event.getWorld()));
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void clientTick(TickEvent.ClientTickEvent event) {
+		tickCounter++;
+		
+		if (tickCounter % 20 == 0) {
+			cleanupExtraDamagedBlocks();
 		}
 	}
 	
@@ -112,10 +124,10 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		Iterator<Entry<Integer, DestroyBlockProgress>> iter = BlockBreakAnimationClientHandler.damagedBranches.entrySet().iterator();
 		
 		while(iter.hasNext()) {
-			DestroyBlockProgress destroyblockprogress = iter.next().getValue();//entry.getValue();
+			DestroyBlockProgress destroyblockprogress = iter.next().getValue();
 			int tick = destroyblockprogress.getCreationCloudUpdateTick();
 			
-			if (Minecraft.getMinecraft().world.getWorldTime() - tick > 400) {
+			if (tickCounter - tick > 400) {
 				iter.remove();
 			}
 		}
@@ -123,15 +135,15 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	
 	public void sendThickBranchBreakProgress(int breakerId, BlockPos pos, int progress) {
 		if (progress >= 0 && progress < 10) {
-			DestroyBlockProgress destroyblockprogress = BlockBreakAnimationClientHandler.damagedBranches.get(Integer.valueOf(breakerId));
+			DestroyBlockProgress destroyblockprogress = BlockBreakAnimationClientHandler.damagedBranches.get(breakerId);
 			
 			if (destroyblockprogress == null || destroyblockprogress.getPosition().getX() != pos.getX() || destroyblockprogress.getPosition().getY() != pos.getY() || destroyblockprogress.getPosition().getZ() != pos.getZ()) {
 				destroyblockprogress = new DestroyBlockProgress(breakerId, pos);
-				BlockBreakAnimationClientHandler.damagedBranches.put(Integer.valueOf(breakerId), destroyblockprogress);
+				BlockBreakAnimationClientHandler.damagedBranches.put(breakerId, destroyblockprogress);
 			}
 			
 			destroyblockprogress.setPartialBlockDamage(progress);
-			destroyblockprogress.setCloudUpdateTick((int) Minecraft.getMinecraft().world.getWorldTime());
+			destroyblockprogress.setCloudUpdateTick(tickCounter);
 		} else {
 			BlockBreakAnimationClientHandler.damagedBranches.remove(breakerId);
 		}
@@ -151,7 +163,6 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		postRenderMethod = ReflectionHelper.findMethod(RenderGlobal.class, "postRenderDamagedBlocks", "func_174969_t");
 		postRenderMethod.setAccessible(true);
 	}
-
 	
 	private void preRenderDamagedBlocks() {
 		try { preRenderMethod.invoke(Minecraft.getMinecraft().renderGlobal, new Object[] {}); } catch (Exception e) { }
@@ -166,26 +177,25 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		double posY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
 		double posZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
 		
-		if (mc.world.getWorldTime() % 20 == 0) {
-			cleanupExtraDamagedBlocks();
-		}
-		
 		if (!BlockBreakAnimationClientHandler.damagedBranches.isEmpty()) {
 			renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			this.preRenderDamagedBlocks();
+			preRenderDamagedBlocks();
 			bufferBuilderIn.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 			bufferBuilderIn.setTranslation(-posX, -posY, -posZ);
 			bufferBuilderIn.noColor();
 			
-			for (Entry<Integer, DestroyBlockProgress> entry : BlockBreakAnimationClientHandler.damagedBranches.entrySet()) {
+			Iterator<Entry<Integer, DestroyBlockProgress>> iter = BlockBreakAnimationClientHandler.damagedBranches.entrySet().iterator();
+			
+			while(iter.hasNext()) {
+				Entry<Integer, DestroyBlockProgress> entry = iter.next();
 				DestroyBlockProgress destroyblockprogress = entry.getValue();
 				BlockPos pos = destroyblockprogress.getPosition();
 				double delX = (double) pos.getX() - posX;
 				double delY = (double) pos.getY() - posY;
 				double delZ = (double) pos.getZ() - posZ;
 				
-				if (delX * delX + delY * delY + delZ * delZ > 16384) {
-					BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
+				if (delX * delX + delY * delY + delZ * delZ > 4096) {
+					iter.remove();
 				} else {
 					IBlockState state = mc.world.getBlockState(pos);
 					if(state.getBlock() instanceof BlockBranch) {
@@ -199,14 +209,14 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 							blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true);
 						}
 					} else {
-						BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
+						iter.remove();
 					}
 				}
 			}
 			
 			tessellatorIn.draw();
-			bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
-			this.postRenderDamagedBlocks();
+			bufferBuilderIn.setTranslation(0.0, 0.0, 0.0);
+			postRenderDamagedBlocks();
 		}
 	}
 	
@@ -318,7 +328,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		}
 		
 	}
-
+	
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
 		if(resourcePredicate.test(VanillaResourceType.TEXTURES)) {
