@@ -34,15 +34,24 @@ public class SeasonHelper {
 	}
 	
 	static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos) {
-		return seasonManager.getGrowthFactor(world, rootPos);
+		return globalSeasonalGrowthFactor(world, rootPos, 0);
+	}
+	static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos, float offset) {
+		return seasonManager.getGrowthFactor(world, rootPos, offset);
 	}
 	
 	static public float globalSeasonalSeedDropFactor(World world, BlockPos pos) {
-		return seasonManager.getSeedDropFactor(world, pos);
+		return globalSeasonalSeedDropFactor(world, pos, 0);
+	}
+	static public float globalSeasonalSeedDropFactor(World world, BlockPos pos, float offset) {
+		return seasonManager.getSeedDropFactor(world, pos, offset);
 	}
 	
 	static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos) {
-		return seasonManager.getFruitProductionFactor(world, pos);
+		return globalSeasonalFruitProductionFactor(world, pos, 0);
+	}
+	static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos, float offset) {
+		return seasonManager.getFruitProductionFactor(world, pos, offset);
 	}
 	
 	/**
