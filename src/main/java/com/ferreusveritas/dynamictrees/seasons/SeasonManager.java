@@ -26,7 +26,7 @@ public class SeasonManager implements ISeasonManager {
 	private Tuple<ISeasonProvider, ISeasonGrowthCalculator> createProvider(World world) {
 		return seasonMapper.apply(world);
 	}
-
+	
 	private SeasonContext getContext(World world) {
 		return seasonContextMap.computeIfAbsent(world.provider.getDimension(), d -> {
 			Tuple<ISeasonProvider, ISeasonGrowthCalculator> tuple = createProvider(world);
@@ -72,26 +72,16 @@ public class SeasonManager implements ISeasonManager {
 		getContext(world).updateTick(world, worldTicks);
 	}
 	
-	public float getGrowthFactor (World world, BlockPos rootPos) {
-		return getGrowthFactor(world, rootPos, 0f);
-	}
 	public float getGrowthFactor (World world, BlockPos rootPos, float offset) {
 		SeasonContext context = getContext(world);
 		return isTropical(world, rootPos) ? context.getTropicalGrowthFactor(offset) : context.getTemperateGrowthFactor(offset);
 	}
 	
-	public float getSeedDropFactor(World world, BlockPos rootPos) {
-		return getSeedDropFactor(world, rootPos, 0f);
-	}
 	public float getSeedDropFactor(World world, BlockPos rootPos, float offset) {
 		SeasonContext context = getContext(world);
 		return isTropical(world, rootPos) ? context.getTropicalSeedDropFactor(offset) : context.getTemperateSeedDropFactor(offset);
 	}
-
-	@Override
-	public float getFruitProductionFactor(World world, BlockPos rootPos) {
-		return getFruitProductionFactor(world, rootPos, 0f);
-	}
+	
 	@Override
 	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset) {
 		SeasonContext context = getContext(world);

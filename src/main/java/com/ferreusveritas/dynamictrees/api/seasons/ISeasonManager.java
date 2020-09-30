@@ -14,13 +14,10 @@ public interface ISeasonManager {
 	
 	public void flushMappings();
 	
-	public float getGrowthFactor(World world, BlockPos rootPos);
 	public float getGrowthFactor(World world, BlockPos rootPos, float offset);
 	
-	public float getSeedDropFactor(World world, BlockPos rootPos);
 	public float getSeedDropFactor(World world, BlockPos rootPos, float offset);
 
-	public float getFruitProductionFactor(World world, BlockPos rootPos);
 	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset);
 	
 	public Float getSeasonValue(World world);
