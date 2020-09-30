@@ -73,19 +73,29 @@ public class SeasonManager implements ISeasonManager {
 	}
 	
 	public float getGrowthFactor (World world, BlockPos rootPos) {
+		return getGrowthFactor(world, rootPos, 0f);
+	}
+	public float getGrowthFactor (World world, BlockPos rootPos, float offset) {
 		SeasonContext context = getContext(world);
-		return isTropical(world, rootPos) ? context.getTropicalGrowthFactor() : context.getTemperateGrowthFactor();
-	};
-	
-	public float getSeedDropFactor(World world, BlockPos rootPos) {
-		SeasonContext context = getContext(world);
-		return isTropical(world, rootPos) ? context.getTropicalSeedDropFactor() : context.getTemperateSeedDropFactor();
+		return isTropical(world, rootPos) ? context.getTropicalGrowthFactor(offset) : context.getTemperateGrowthFactor(offset);
 	}
 	
+	public float getSeedDropFactor(World world, BlockPos rootPos) {
+		return getSeedDropFactor(world, rootPos, 0f);
+	}
+	public float getSeedDropFactor(World world, BlockPos rootPos, float offset) {
+		SeasonContext context = getContext(world);
+		return isTropical(world, rootPos) ? context.getTropicalSeedDropFactor(offset) : context.getTemperateSeedDropFactor(offset);
+	}
+
 	@Override
 	public float getFruitProductionFactor(World world, BlockPos rootPos) {
+		return getFruitProductionFactor(world, rootPos, 0f);
+	}
+	@Override
+	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset) {
 		SeasonContext context = getContext(world);
-		return isTropical(world, rootPos) ? context.getTropicalFruitProductionFactor() : context.getTemperateFruitProductionFactor();
+		return isTropical(world, rootPos) ? context.getTropicalFruitProductionFactor(offset) : context.getTemperateFruitProductionFactor(offset);
 	}
 	
 	public Float getSeasonValue(World world) {

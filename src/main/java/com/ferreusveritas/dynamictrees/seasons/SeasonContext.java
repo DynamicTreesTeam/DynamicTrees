@@ -15,6 +15,8 @@ public class SeasonContext {
 	private float temperateFruitProductionFactor;
 	private float tropicalFruitProductionFactor;
 	
+	private Float seasonValue;
+	
 	private long methodTicks = 0;
 	
 	public SeasonContext(ISeasonProvider provider, ISeasonGrowthCalculator calculator) {
@@ -26,7 +28,7 @@ public class SeasonContext {
 		
 		if(methodTicks % 20 == 0) {
 			provider.updateTick(world, worldTicks);
-			Float seasonValue = provider.getSeasonValue(world);
+			seasonValue = provider.getSeasonValue(world);
 			temperateGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TEMPERATE);
 			tropicalGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TROPICAL);
 			temperateSeedDropFactor = calculator.calcSeedDropRate(seasonValue, ClimateZoneType.TEMPERATE);
@@ -41,29 +43,41 @@ public class SeasonContext {
 	public ISeasonProvider getSeasonProvider() {
 		return provider;
 	}
-	
-	public float getTemperateGrowthFactor() {
-		return temperateGrowthFactor;
+
+	public float getTemperateGrowthFactor(float offset) {
+		if (offset == 0)
+			return temperateGrowthFactor;
+		return calculator.calcGrowthRate(seasonValue + offset, ClimateZoneType.TEMPERATE);
 	}
-	
-	public float getTropicalGrowthFactor() {
-		return tropicalGrowthFactor;
+
+	public float getTropicalGrowthFactor(float offset) {
+		if (offset == 0)
+			return tropicalGrowthFactor;
+		return calculator.calcGrowthRate(seasonValue + offset, ClimateZoneType.TROPICAL);
 	}
-	
-	public float getTemperateSeedDropFactor() {
-		return temperateSeedDropFactor;
+
+	public float getTemperateSeedDropFactor(float offset) {
+		if (offset == 0)
+			return temperateSeedDropFactor;
+		return calculator.calcSeedDropRate(seasonValue + offset, ClimateZoneType.TEMPERATE);
 	}
-	
-	public float getTropicalSeedDropFactor() {
-		return tropicalSeedDropFactor;
+
+	public float getTropicalSeedDropFactor(float offset) {
+		if (offset == 0)
+			return tropicalSeedDropFactor;
+		return calculator.calcSeedDropRate(seasonValue + offset, ClimateZoneType.TROPICAL);
 	}
-	
-	public float getTemperateFruitProductionFactor() {
-		return temperateFruitProductionFactor;
+
+	public float getTemperateFruitProductionFactor(float offset) {
+		if (offset == 0)
+			return temperateFruitProductionFactor;
+		return calculator.calcFruitProduction(seasonValue + offset, ClimateZoneType.TEMPERATE);
 	}
-	
-	public float getTropicalFruitProductionFactor() {
-		return tropicalFruitProductionFactor;
+
+	public float getTropicalFruitProductionFactor(float offset) {
+		if (offset == 0)
+			return tropicalFruitProductionFactor;
+		return calculator.calcFruitProduction(seasonValue + offset, ClimateZoneType.TROPICAL);
 	}
 	
 }
