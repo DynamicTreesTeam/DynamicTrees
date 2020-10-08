@@ -65,7 +65,7 @@ public class BlockFruit extends Block implements IGrowable {
 		else {
 			int age = state.getValue(AGE);
 			
-			if (age < 3 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextInt(5) == 0)) {
+			if (age < 3 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextFloat() < getGrowthChance(worldIn, pos))) {
 				worldIn.setBlockState(pos, state.withProperty(AGE, age + 1), 2);
 				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(worldIn, pos, state, worldIn.getBlockState(pos));
 			} else
@@ -75,6 +75,10 @@ public class BlockFruit extends Block implements IGrowable {
 				}
 			}
 		}
+	}
+	
+	protected float getGrowthChance(World world, BlockPos blockPos) {
+		return 0.2f;
 	}
 	
 	/**
