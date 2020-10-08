@@ -39,6 +39,7 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
+	protected float seasonOffset = 0.0f;
 	
 	public BlockFruit() {
 		this(name);
@@ -56,6 +57,15 @@ public class BlockFruit extends Block implements IGrowable {
 	public BlockFruit setBonemealable(boolean bonemealable) {
 		this.bonemealable = bonemealable;
 		return this;
+	}
+	
+	public BlockFruit setSeasonalOffset(float offset) {
+		this.seasonOffset = offset;
+		return this;
+	}
+	
+	public float getSeasonalOffset() {
+		return seasonOffset;
 	}
 	
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
@@ -80,6 +90,8 @@ public class BlockFruit extends Block implements IGrowable {
 	protected float getGrowthChance(World world, BlockPos blockPos) {
 		return 0.2f;
 	}
+	
+	
 	
 	/**
 	 * Override this to make the fruit do something once it's mature.
