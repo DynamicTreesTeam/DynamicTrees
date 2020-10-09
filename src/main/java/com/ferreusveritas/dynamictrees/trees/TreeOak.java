@@ -158,6 +158,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			generateSeed();
 			
+			ModBlocks.blockApple.setSpecies(this);
 			addGenFeature(new FeatureGenFruit(ModBlocks.blockApple).setRayDistance(4));
 		}
 		

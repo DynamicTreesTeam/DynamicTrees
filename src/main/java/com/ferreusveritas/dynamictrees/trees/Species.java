@@ -104,6 +104,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		@Override public ItemStack getSeedStack(int qty) { return new ItemStack(getSeed()); }
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
+		@Override public boolean testFlowerSeasonHold(World world, BlockPos pos, float seasonValue) { return false; }
 	};
 	
 	/**
@@ -1066,9 +1067,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return false;
 	}
 	
+	
 	//////////////////////////////
 	// SEASONAL
 	//////////////////////////////
+	
+	protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
+	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
 	
 	/**
 	 * Pulls data from the SeasonManager to determine the rate of tree growth
@@ -1087,6 +1092,24 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
 		return SeasonHelper.globalSeasonalFruitProductionFactor(world, pos);
+	}
+	
+	/**
+	 * When seasons are active allow a seasonal time range where fruit growth does
+	 * not progress past the flower stage.  This allows for a flowery spring time.
+	 * 
+	 * @param min The minimum season value
+	 * @param max The maximum season value
+	 * @return
+	 */
+	public Species setFlowerSeasonHold(float min, float max) {
+		flowerSeasonHoldMin = min;
+		flowerSeasonHoldMax = max;
+		return this;
+	}
+	
+	public boolean testFlowerSeasonHold(World world, BlockPos pos, float seasonValue) {
+		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin, flowerSeasonHoldMax);
 	}
 	
 	

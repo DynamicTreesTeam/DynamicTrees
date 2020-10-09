@@ -95,16 +95,22 @@ public class FeatureGenFruit implements IPostGrowFeature, IPostGenFeature {
 	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ORIGIN) {
-			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
-				IBlockState setState;
-				if(blockFruit != null) {
-					setState = blockFruit.getStateForAge(worldGen ? blockFruit.getAgeForWorldGen(world, fruitPos) : 0);
-				} else {
-					setState = worldGen ? ripeFruitState : unripeFruitState;
-				}
-				world.setBlockState(fruitPos, setState);
+			if ( !enableHash || isCoordinateValid(world, fruitPos) ) {
+				world.setBlockState(fruitPos, getFruitState(world, fruitPos, species, worldGen));
 			}
 		}
+	}
+	
+	protected IBlockState getFruitState(World world, BlockPos fruitPos, Species species, boolean worldGen) {
+		if(blockFruit != null) {
+			return blockFruit.getStateForAge(worldGen ? blockFruit.getAgeForWorldGen(world, fruitPos) : 0);
+		} else {
+			return worldGen ? ripeFruitState : unripeFruitState;
+		}
+	}
+	
+	protected boolean isCoordinateValid(World world, BlockPos pos) {
+		return (CoordUtils.coordHashCode(pos, 0) & 3) == 0;
 	}
 	
 }
