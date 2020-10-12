@@ -57,7 +57,7 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 		for (int depth : dMap) {
 			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
 				IBlockState ground = cache[i++] = access.getBlockState(pos.offset(dir).down(depth));
-				if (ground.getMaterial() == Material.GRASS && ground.isBlockNormalCube()) {
+				if (ground.getMaterial() == Material.GRASS && ground.isBlockNormalCube() && (!(ground.getBlock() instanceof IMimic))) {
 					return ground;
 				}
 			}
@@ -88,11 +88,12 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 		for (int depth : dMap) {
 			for (EnumFacing dir : EnumFacing.HORIZONTALS) {
 				IBlockState ground = access.getBlockState(pos.offset(dir).down(depth));
-				if (ground.getMaterial() == Material.SAND) {
+				if (ground.getMaterial() == Material.SAND && (!(ground.getBlock() instanceof IMimic))) {
 					return ground; // Anything made of sand will do fine 
 				}
 			}
 		}
+		
 		return mimic;
 	}
 	

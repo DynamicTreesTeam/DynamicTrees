@@ -19,6 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.blocks.MimicProperty.IMimic;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
@@ -192,9 +193,14 @@ public class ClientProxy extends CommonProxy {
 				if (state.getBlock() instanceof BlockRooty) {
 					BlockRooty blockRooty = (BlockRooty) state.getBlock();
 					switch(tintIndex) {
-						case 0: return blockColors.colorMultiplier(blockRooty.getMimic(world, pos), world, pos, tintIndex);
-						case 1: return blockRooty.rootColor(state, world, pos);
-						default: return white;
+						case 0: { //Layer Zero is the green color of grass 
+							IBlockState muse = blockRooty.getMimic(world, pos);
+							if(!(muse instanceof IMimic)) { //Ensure we don't recurse endlessly
+								return blockColors.colorMultiplier(muse, world, pos, tintIndex);
+							}
+						}
+						case 1: return blockRooty.rootColor(state, world, pos); //Layer One is the root color
+						default: return white; //All other color process unmultiplied
 					}
 				}
 				
