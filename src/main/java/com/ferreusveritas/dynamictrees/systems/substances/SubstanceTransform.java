@@ -25,17 +25,19 @@ public class SubstanceTransform implements ISubstanceEffect {
 		
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
-		
-		if(dirt != null && toSpecies != null) {
-			if(world.isRemote) {
-				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
-			} else {
-				Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
-				if(fromSpecies != Species.NULLSPECIES) {
-					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+
+		if (dirt != null && toSpecies != null) {
+			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
+			if (fromSpecies != Species.NULLSPECIES) {
+				if (fromSpecies.getRegistryName() != toSpecies.getRegistryName()) {
+					if (world.isRemote) {
+						TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
+					} else {
+						dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+					}
+					return true;
 				}
 			}
-			return true;
 		}
 		
 		return false;
