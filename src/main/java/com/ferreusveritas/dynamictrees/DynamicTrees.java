@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
@@ -11,10 +12,12 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.worldgen.TreeGenCancelEventHandler;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -142,13 +145,19 @@ public class DynamicTrees
         // DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
     }
 
+    @SuppressWarnings("deprecation")
     private void commonSetup(final FMLCommonSetupEvent event) {
         LeavesPropertiesJson.resolveAll();
+        DeferredWorkQueue.runLater(this::registerDendroRecipes);
  //       cleanUp();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
         DTClient.setup();
+    }
+
+    private void registerDendroRecipes () {
+        DTRegistries.dendroPotion.registerRecipes();
     }
 
     public void cleanUp() {
@@ -174,11 +183,11 @@ public class DynamicTrees
         }
 
 //        //Conveniently accessible disaster(Optional World Generation)
-//        if(WorldGenRegistry.isWorldGenEnabled()) {
+        if(WorldGenRegistry.isWorldGenEnabled()) {
 //            GameRegistry.registerWorldGenerator(new WorldGeneratorTrees(), 20);
-//            MinecraftForge.TERRAIN_GEN_BUS.register(new TreeGenCancelEventHandler());
+            MinecraftForge.EVENT_BUS.register(new TreeGenCancelEventHandler());
 //            MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
-//        }
+        }
     }
 
 }

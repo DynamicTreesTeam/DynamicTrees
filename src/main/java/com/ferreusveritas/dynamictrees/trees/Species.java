@@ -1042,7 +1042,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 		if(effect != null) {
 			if(effect.isLingering()) {
-				world.addEntity(new EntityLingeringEffector(null, world));
+				world.addEntity(new EntityLingeringEffector(world, rootPos, effect));
 				return true;
 			} else {
 				return effect.apply(world, rootPos);

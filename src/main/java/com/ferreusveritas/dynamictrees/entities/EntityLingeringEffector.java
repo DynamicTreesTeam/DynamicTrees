@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -14,10 +15,6 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 
 public class EntityLingeringEffector extends Entity {
-
-	public EntityLingeringEffector(EntityType<?> entityTypeIn, World worldIn) {
-		super(entityTypeIn, worldIn);
-	}
 
 	@Override
 	protected void registerData() {
@@ -36,7 +33,7 @@ public class EntityLingeringEffector extends Entity {
 
 	@Override
 	public IPacket<?> createSpawnPacket() {
-		return null;
+		return new SSpawnObjectPacket(this);
 	}
 
 	public BlockPos blockPos;
@@ -44,7 +41,7 @@ public class EntityLingeringEffector extends Entity {
 	public boolean extended;
 
 	public EntityLingeringEffector(World world, BlockPos pos, ISubstanceEffect effect) {
-		this(null, world);
+		super(EntityType.AREA_EFFECT_CLOUD, world);
 		stepHeight = 1f;
 		submergedHeight = 1f;
 		noClip = true;

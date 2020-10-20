@@ -1,37 +1,54 @@
 package com.ferreusveritas.dynamictrees.items;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.substances.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
+import mezz.jei.JustEnoughItems;
+import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.load.registration.RecipeRegistration;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.common.brewing.VanillaBrewingRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
-	
+
+	public static final List<DendroBrewingRecipe> brewingRecipes = new ArrayList<>();
+
+	public static final String INDEX_TAG_KEY = "potion_index";
+	public static final String TREE_TAG_KEY = "target";
 	public static final String name = "dendro_potion";
 
 	public enum DendroPotionType {
 		BIOCHAR(    0, true, "biochar",     0x27231c, "Base tree potion for brewing"),
 		DEPLETION(  1, true, "depletion",	  0x76be6d, "Destroys tree soil fertility"),
-		GIGAS( 2, false, "gigas",  0xe3901d, "Allows a tree to become mega size"),
+		GIGAS( 2, true, "gigas",  0xe3901d, "Allows a tree to become mega size"),
 		BURGEONING( 3, true, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
 		FERTILITY(  4, true, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
 		PERSISTANCE(5, true, "persistance", 0x389aff, "Stops tree from changing"),
@@ -80,41 +97,37 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public DendroPotion(String name) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab).maxStackSize(1));
-		setRegistryName(name);
-//		setHasSubtypes(true);
+		this.setRegistryName(name);
 	}
 
-//	@Override
-//	public void getSubItems(ItemGroup tab, NonNullList<ItemStack> subItems) {
-//		if(isInCreativeTab(tab)) {
-//			for(DendroPotionType type : DendroPotionType.values()) {
-//				if(type.getActive()) {
-//					subItems.add(new ItemStack(this, 1, type.getIndex()));
-//				}
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public String getUnlocalizedName(ItemStack stack) {
-//		return super.getUnlocalizedName() + "." + getPotionType(stack).getName();
-//	}
-
-	public DendroPotionType getPotionTypeForDamage(int damage) {
-		return DendroPotionType.values()[damage % DendroPotionType.values().length];
+	private ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {
+		potionStack.getOrCreateTag().putInt(INDEX_TAG_KEY, potionIndex);
+		return potionStack;
 	}
 
-	public DendroPotionType getPotionType(ItemStack stack) {
-		return getPotionTypeForDamage(stack.getDamage());
+	@Override
+	public void fillItemGroup(final ItemGroup group, final NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			for (final DendroPotionType potion : DendroPotionType.values()) {
+				if (potion.getActive()) {
+					final ItemStack potionStack = new ItemStack(this, 1);
+					items.add(this.applyIndexTag(potionStack, potion.getIndex()));
+				}
+			}
+		}
+	}
+
+	public static DendroPotionType getPotionType (ItemStack stack) {
+		return DendroPotionType.values()[stack.getTag().getInt(INDEX_TAG_KEY)];
 	}
 
 	@Override
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
-		switch(getPotionType(itemStack)) {
+		switch (getPotionType(itemStack)) {
 			default:
 			case BIOCHAR: return null;
 			case BURGEONING: return new SubstanceGrowth();
-			case GIGAS: return null;
+			case GIGAS: return new SubstanceMega();
 			case DEPLETION: return new SubstanceDeplete().setAmount(15);
 			case FERTILITY: return new SubstanceFertilize().setAmount(15);
 			case PERSISTANCE: return new SubstanceFreeze();
@@ -123,13 +136,12 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	public Species getTargetSpecies(ItemStack itemStack) {
-		if(itemStack.hasTag()){
-			CompoundNBT nbtTag = itemStack.getTag();
-			if(nbtTag.contains("target")) {
-				String targetTree = nbtTag.getString("target");
-				if(!targetTree.equals("")) {
-					return TreeRegistry.findSpecies(new ResourceLocation(targetTree));
-				}
+		if (itemStack.hasTag()){
+			final CompoundNBT nbtTag = itemStack.getTag();
+
+			if (nbtTag.contains(TREE_TAG_KEY)) {
+				String targetTree = nbtTag.getString(TREE_TAG_KEY);
+				if (!targetTree.equals("")) return TreeRegistry.findSpecies(new ResourceLocation(targetTree));
 			}
 		}
 
@@ -137,76 +149,72 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	public ItemStack setTargetTree(ItemStack itemStack, TreeFamily tree) {
-		CompoundNBT nbtTag = itemStack.hasTag() ? itemStack.getTag() : new CompoundNBT();
-		assert nbtTag != null;
-		nbtTag.putString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
-		itemStack.setTag(nbtTag);
+		itemStack.getOrCreateTag().putString(TREE_TAG_KEY, tree.getCommonSpecies().getRegistryName().toString()); // Only store the common species
 		return itemStack;
 	}
 
-//	public DendroPotion registerRecipes(IForgeRegistry<IRecipe> registry) {
-//
-//		PotionType awkward = PotionType.REGISTRY.getObject(new ResourceLocation("awkward"));
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), awkward),
-//				new ItemStack(Items.COAL, 1, 1), //Charcoal
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()));
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Items.SLIME_BALL), //Slimeball
-//				new ItemStack(this, 1, DendroPotionType.DEPLETION.getIndex()));
-//
-//		/*BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Items.PUMPKIN_SEEDS), //Pumpkin seeds
-//				new ItemStack(this, 1, DendroPotionType.DEFOLIANCE.getIndex()));*/
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Items.GHAST_TEAR), //Ghast Tear
-//				new ItemStack(this, 1, DendroPotionType.BURGEONING.getIndex()));
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Items.FISH), //Raw Fish
-//				new ItemStack(this, 1, DendroPotionType.FERTILITY.getIndex()));
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Blocks.RED_FLOWER, 1, 1), //Blue Orchid
-//				new ItemStack(this, 1, DendroPotionType.PERSISTANCE.getIndex()));
-//
-//		BrewingRecipeRegistry.addRecipe(
-//				new ItemStack(this, 1, DendroPotionType.BIOCHAR.getIndex()),
-//				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
-//				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
-//
-//		for(TreeFamily tree : DTTrees.baseFamilies) {
-//			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-//			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
-//		}
-//
-//		return this;
-//	}
+	public DendroPotion registerRecipes() {
+		final Potion awkward = Potion.getPotionTypeForName("awkward");
 
+		brewingRecipes.add(new DendroBrewingRecipe(
+				PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), awkward),
+				new ItemStack(Items.CHARCOAL, 1), // Charcoal
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Items.SLIME_BALL), // Slime ball
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.DEPLETION.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Items.PUMPKIN_SEEDS), // Pumpkin seeds
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.GIGAS.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Items.GHAST_TEAR), // Ghast Tear
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BURGEONING.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Items.COD), // Raw Fish
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.FERTILITY.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Blocks.BLUE_ORCHID), // Blue Orchid
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.PERSISTANCE.getIndex())));
+		brewingRecipes.add(new DendroBrewingRecipe(
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.BIOCHAR.getIndex()),
+				new ItemStack(Items.PRISMARINE_CRYSTALS), // Prismarine Crystals
+				this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.TRANSFORM.getIndex())));
+
+		for (TreeFamily tree : DTTrees.baseFamilies) {
+			final ItemStack outputStack = setTargetTree(this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.TRANSFORM.getIndex()), tree);
+			brewingRecipes.add(new DendroBrewingRecipe(this.applyIndexTag(new ItemStack(this, 1), DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack));
+		}
+
+		brewingRecipes.forEach(BrewingRecipeRegistry::addRecipe);
+
+		return this;
+	}
+
+	@Override
+	public ITextComponent getDisplayName(ItemStack stack) {
+		return new TranslationTextComponent(super.getName().getString() + "." + getPotionType(stack).getName());
+	}
 
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 
-		DendroPotionType potionType = getPotionType(stack);
+		final DendroPotionType potionType = getPotionType(stack);
 
-		if(potionType == DendroPotionType.TRANSFORM) {
+		if (potionType == DendroPotionType.TRANSFORM) {
 			Species species = getTargetSpecies(stack);
 			if(species == null) {
-				tooltip.add(new StringTextComponent(getPotionType(stack).getLore()));
+				tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));
 			} else {
-				tooltip.add(new StringTextComponent("Transform a tree into a " + species.getRegistryName().getPath() + " tree"));
+				tooltip.add(new StringTextComponent("§7Transform a tree into a " + species.getRegistryName().getPath() + " tree"));
 			}
 		} else {
-			tooltip.add(new StringTextComponent(getPotionType(stack).getLore()));
+			tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));
 		}
 	}
 	

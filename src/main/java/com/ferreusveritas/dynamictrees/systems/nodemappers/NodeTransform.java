@@ -10,6 +10,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.Iterator;
+
 public class NodeTransform implements INodeInspector {
 	
 	Species fromSpecies;
@@ -43,17 +45,17 @@ public class NodeTransform implements INodeInspector {
 	}
 	
 	public void transformSurroundingLeaves(World world, BlockPos twigPos) {
-//		if (!world.isRemote) {
-//			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3))) {
-//				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
-//					BlockState state = world.getBlockState(leavesPos);
-//					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
-//						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.getValue(BlockDynamicLeaves.DISTANCE) : 2;
-//						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
-//					}
-//				}
-//			}
-//		}
+		if (!world.isRemote) {
+			BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3)).forEach(leavesPos -> {
+				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
+					BlockState state = world.getBlockState(leavesPos);
+					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
+						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.get(BlockDynamicLeaves.DISTANCE) : 2;
+						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
+					}
+				}
+			});
+		}
 	}
 	
 }

@@ -14,17 +14,17 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
-		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
-		if(dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
-			if(world.isRemote) {
+		final BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
+
+		if (dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
+			if (world.isRemote) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
 			} else {
-				if(grow) {
-					TreeHelper.growPulse(world, rootPos);
-				}
+				if (grow) TreeHelper.growPulse(world, rootPos);
 			}
 			return true;
 		}
+
 		return false;
 	}
 	

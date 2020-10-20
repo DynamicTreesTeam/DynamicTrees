@@ -26,6 +26,6 @@ public final class CommandConstants {
     public static final String COLOR_ARGUMENT = "color";
     public static final String READ_ONLY_ARGUMENT = "readOnly";
     public static final String MAX_USES_ARGUMENT = "maxUses";
-    public static final String XOR = "xor";
+    public static final String XOR_ARGUMENT = "xor";
 
 }
