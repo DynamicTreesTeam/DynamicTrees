@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -536,6 +537,18 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
 		return from.getFamily().isCompatibleDynamicLeaves(blockState, blockAccess, pos) ? 2: 0;
 	}
+	
+	@Override
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		if(ModConfigs.enableAltLeavesSnow && (fromPos.getY() - pos.getY() == 1)) {
+			IBlockState newState = worldIn.getBlockState(fromPos);
+			if(newState.getBlock() == Blocks.SNOW_LAYER) {
+				worldIn.setBlockState(fromPos, ModBlocks.blockStates.snowLayer, 2);
+				//System.out.println("Snow Layer Formed!: " + fromPos);
+			}
+		}
+	}
+	
 	
 	//////////////////////////////
 	// DROPS

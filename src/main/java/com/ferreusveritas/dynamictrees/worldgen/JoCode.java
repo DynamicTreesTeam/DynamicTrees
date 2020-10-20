@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -338,10 +339,10 @@ public class JoCode {
 					do {
 						IBlockState state = world.getBlockState(iPos);
 						if(state.getMaterial() == Material.AIR) {
-							world.setBlockState(iPos, Blocks.SNOW_LAYER.getDefaultState(), 2);
+							world.setBlockState(iPos, ModBlocks.blockStates.snowLayer, 2);
 							break;
 						}
-						else if (state.getBlock() == Blocks.SNOW_LAYER) {
+						else if (state.getBlock() == ModBlocks.blockLeavesSnow || state.getBlock() == Blocks.SNOW_LAYER) {
 							break;
 						}
 						iPos.setY(iPos.getY() + 1);

@@ -91,5 +91,10 @@ public class SeasonManager implements ISeasonManager {
 	public Float getSeasonValue(World world) {
 		return getContext(world).getSeasonProvider().getSeasonValue(world);
 	}
+
+	@Override
+	public boolean shouldSnowMelt(World world, BlockPos pos) {
+		return getContext(world).getSeasonProvider().shouldSnowMelt(world, pos);
+	}
 	
 }

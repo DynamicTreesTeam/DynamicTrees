@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.seasons;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface ISeasonProvider {
@@ -24,4 +25,7 @@ public interface ISeasonProvider {
 	 * @param worldTicks
 	 */
 	public void updateTick(World world, long worldTicks);
+
+	public boolean shouldSnowMelt(World world, BlockPos pos);
+	
 }

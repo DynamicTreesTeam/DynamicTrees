@@ -24,4 +24,6 @@ public interface ISeasonManager {
 	
 	public boolean isTropical(World world, BlockPos rootPos);
 	
+	public boolean shouldSnowMelt(World world, BlockPos pos);
+	
 }

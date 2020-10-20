@@ -97,4 +97,8 @@ public class SeasonHelper {
 		
 	}
 	
+	static public boolean shouldSnowMelt(World world, BlockPos pos) {
+		return seasonManager.shouldSnowMelt(world, pos);
+	}
+	
 }

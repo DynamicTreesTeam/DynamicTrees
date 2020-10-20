@@ -57,11 +57,11 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	public BlockFruit(String name) {
 		super(Material.PLANTS);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, 0));
+		setDefaultState(this.blockState.getBaseState().withProperty(AGE, 0));
 		setRegistryName(name);
 		setUnlocalizedName(name);
-		this.setTickRandomly(true);
-		this.setHardness(0.3f);
+		setTickRandomly(true);
+		setHardness(0.3f);
 	}
 	
 	public BlockFruit setBonemealable(boolean bonemealable) {

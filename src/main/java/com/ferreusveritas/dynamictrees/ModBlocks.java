@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
+import com.ferreusveritas.dynamictrees.blocks.BlockLeavesSnow;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
 import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
@@ -21,6 +22,7 @@ import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
+import net.minecraft.block.BlockSnow;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -43,7 +45,9 @@ public class ModBlocks {
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
-		
+	
+	public static BlockSnow blockLeavesSnow;
+	
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
 	public static CommonBlockStates blockStates;
@@ -61,7 +65,9 @@ public class ModBlocks {
 		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		blockTrunkShell = new BlockTrunkShell();
 		
-		blockStates = new CommonBlockStates();		
+		blockLeavesSnow = ModConfigs.enableAltLeavesSnow ? new BlockLeavesSnow() : (BlockSnow) Blocks.SNOW_LAYER;
+		
+		blockStates = new CommonBlockStates();
 		
 		setupLeavesProperties();
 	}
@@ -92,6 +98,10 @@ public class ModBlocks {
 			blockTrunkShell
 		);
 		
+		if(ModConfigs.enableAltLeavesSnow) {
+			registry.register(blockLeavesSnow);
+		}
+		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 	}
 	
@@ -103,6 +113,7 @@ public class ModBlocks {
 		public final IBlockState podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
+		public final IBlockState snowLayer = blockLeavesSnow.getDefaultState();
 	}
 	
 }
