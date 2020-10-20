@@ -43,6 +43,7 @@ public class ModConfigs {
 	public static boolean replaceVanillaSapling;
 	
 	public static boolean podzolGen;
+	public static boolean roofedForestMushroomGen;
 	public static boolean worldGen;
 	public static boolean vanillaCactusWorldGen;
 	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
@@ -94,6 +95,7 @@ public class ModConfigs {
 		
 		//World
 		podzolGen = config.getBoolean("podzolGen", "world", true, "Randomly generate podzol under select trees.");
+		roofedForestMushroomGen = config.getBoolean("roofedForestMushroomGen", "world", true, "Generate giant mushrooms in roofed forests.");
 		worldGen = config.getBoolean("worldGen", "world", true, "World Generation produces Dynamic Trees instead of Vanilla trees.");
 		vanillaCactusWorldGen = config.getBoolean("vanillaCactusWorldGen", "world", false, "World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.");
 		String[] dims = config.getStringList("dimensionsBlacklist", "world", new String[] {"7"}, "Blacklist of dimension numbers for disabling Dynamic Tree worldgen");

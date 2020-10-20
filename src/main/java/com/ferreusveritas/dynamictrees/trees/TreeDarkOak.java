@@ -63,10 +63,12 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			addGenFeature(new FeatureGenClearVolume(6));//Clear a spot for the thick tree trunk
 			addGenFeature(new FeatureGenFlareBottom());//Flare the bottom
 			addGenFeature(new FeatureGenMound(5));//Establish mounds
-			addGenFeature(new FeatureGenPredicate(
-				new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3)//Generate Huge Mushrooms
-				).setBiomePredicate(biome -> biome == Biomes.ROOFED_FOREST)//Only allow this feature in roofed forests
-			);
+			if(ModConfigs.roofedForestMushroomGen) {
+				addGenFeature(new FeatureGenPredicate(
+						new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3)//Generate Huge Mushrooms
+						).setBiomePredicate(biome -> biome == Biomes.ROOFED_FOREST)//Only allow this feature in roofed forests
+						);
+			}
 			addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
 		}
 		
