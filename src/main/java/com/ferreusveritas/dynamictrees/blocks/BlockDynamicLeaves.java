@@ -544,7 +544,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 			IBlockState newState = worldIn.getBlockState(fromPos);
 			if(newState.getBlock() == Blocks.SNOW_LAYER) {
 				worldIn.setBlockState(fromPos, ModBlocks.blockStates.snowLayer, 2);
-				//System.out.println("Snow Layer Formed!: " + fromPos);
 			}
 		}
 	}

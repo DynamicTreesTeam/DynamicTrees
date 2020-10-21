@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -22,7 +22,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 @Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModRecipes {
-
+	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void register(RegistryEvent.Register<IRecipe> event) {
 		IForgeRegistry<IRecipe> registry = event.getRegistry();
@@ -31,7 +31,7 @@ public class ModRecipes {
 		
 		//Create a dirt bucket from dirt and a bucket
 		GameRegistry.addShapelessRecipe(new ResourceLocation(ModConstants.MODID, "dirtbucket"), null, new ItemStack(ModItems.dirtBucket),
-			Ingredient.fromItem(Items.BUCKET), Ingredient.fromItem(ItemBlock.getItemFromBlock(Blocks.DIRT)));
+				Ingredient.fromItem(Items.BUCKET), Ingredient.fromItem(Item.getItemFromBlock(Blocks.DIRT)));
 		
 		//Create a seed <-> sapling exchange for the 6 vanilla tree types
 		for(BlockPlanks.EnumType woodType: BlockPlanks.EnumType.values()) {
@@ -52,7 +52,7 @@ public class ModRecipes {
 		createDirtBucketExchangeRecipes(saplingStack, seedStack, seedIsSapling, "seed");
 	}
 	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling, String suffix) {
-		ResourceLocation name = (seedStack.getItem() instanceof Seed)? ((Seed) seedStack.getItem()).getSpecies(seedStack).getRegistryName() : seedStack.getItem().getRegistryName();
+		ResourceLocation name = (seedStack.getItem() instanceof Seed) ? ((Seed) seedStack.getItem()).getSpecies(seedStack).getRegistryName() : seedStack.getItem().getRegistryName();
 		createDirtBucketExchangeRecipes(saplingStack, seedStack, seedIsSapling, suffix, name);
 	}
 	public static void createDirtBucketExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, boolean seedIsSapling, String suffix, ResourceLocation species) {
@@ -65,8 +65,8 @@ public class ModRecipes {
 					new ResourceLocation(speciesDomain, speciesPath + suffix),
 					null,
 					seedStack,
-				Ingredient.fromStacks(saplingStack),
-				Ingredient.fromItem(ModItems.dirtBucket));
+					Ingredient.fromStacks(saplingStack),
+					Ingredient.fromItem(ModItems.dirtBucket));
 			
 			if(seedIsSapling) {
 				//Creates a vanilla sapling from a seed and dirt bucket
@@ -74,15 +74,15 @@ public class ModRecipes {
 						new ResourceLocation(speciesDomain, speciesPath + "sapling"),
 						null,
 						saplingStack,
-					Ingredient.fromStacks(seedStack),
-					Ingredient.fromItem(ModItems.dirtBucket));
+						Ingredient.fromStacks(seedStack),
+						Ingredient.fromItem(ModItems.dirtBucket));
 				
 				//Register the seed in the ore dictionary as a sapling since we can convert for free anyway.
 				OreDictionary.registerOre("treeSapling", seedStack);
 			}
 		}
 	}
-
+	
 	public static void createDirtBucketExchangeRecipesWithFruit(ItemStack saplingStack, ItemStack seedStack, ItemStack fruitStack, boolean seedIsSapling, boolean requiresBonemeal) {
 		createDirtBucketExchangeRecipesWithFruit(saplingStack, seedStack, fruitStack, seedIsSapling, "seed", requiresBonemeal);
 	}
@@ -95,43 +95,43 @@ public class ModRecipes {
 		createDirtBucketExchangeRecipes(saplingStack, seedStack, seedIsSapling, suffix, species);
 		createFruitOnlyExchangeRecipes(saplingStack, seedStack, fruitStack, seedIsSapling, species, requiresBonemeal);
 	}
-
+	
 	public static void createFruitOnlyExchangeRecipes(ItemStack saplingStack, ItemStack seedStack, ItemStack fruitStack, boolean seedIsSapling, ResourceLocation species, boolean requiresBonemeal) {
-		if (fruitStack != null && !fruitStack.isEmpty()){
-			if (!requiresBonemeal){
+		if (fruitStack != null && !fruitStack.isEmpty()) {
+			if (!requiresBonemeal) {
 				//Creates a seed from fruit
 				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "seedfromfruit"),
-					null,
-					seedStack,
-					Ingredient.fromStacks(fruitStack));
+						new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "seedfromfruit"),
+						null,
+						seedStack,
+						Ingredient.fromStacks(fruitStack));
 				//Creates a sapling from fruit and a dirt bucket
-				if (seedIsSapling){
-				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(species.getResourceDomain(), species.getResourcePath()+"saplingfromfruit"),
-					null,
-					saplingStack,
-					Ingredient.fromStacks(fruitStack),
-					Ingredient.fromItem(com.ferreusveritas.dynamictrees.ModItems.dirtBucket));
+				if (seedIsSapling) {
+					GameRegistry.addShapelessRecipe(
+							new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "saplingfromfruit"),
+							null,
+							saplingStack,
+							Ingredient.fromStacks(fruitStack),
+							Ingredient.fromItem(com.ferreusveritas.dynamictrees.ModItems.dirtBucket));
 				}
 			} else {
 				ItemStack bonemeal = new ItemStack(Items.DYE, 1, 15);
 				//Creates a seed from fruit using bonemeal
 				GameRegistry.addShapelessRecipe(
-					new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "seedfromfruitgerminate"),
-					null,
-					seedStack,
-					Ingredient.fromStacks(fruitStack),
-					Ingredient.fromStacks(bonemeal));
+						new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "seedfromfruitgerminate"),
+						null,
+						seedStack,
+						Ingredient.fromStacks(fruitStack),
+						Ingredient.fromStacks(bonemeal));
 				//Creates a sapling from fruit and a dirt bucket using bonemeal
 				if (seedIsSapling) {
 					GameRegistry.addShapelessRecipe(
-						new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "saplingfromfruit"),
-						null,
-						saplingStack,
-						Ingredient.fromStacks(fruitStack),
-						Ingredient.fromStacks(bonemeal),
-						Ingredient.fromItem(com.ferreusveritas.dynamictrees.ModItems.dirtBucket));
+							new ResourceLocation(species.getResourceDomain(), species.getResourcePath() + "saplingfromfruit"),
+							null,
+							saplingStack,
+							Ingredient.fromStacks(fruitStack),
+							Ingredient.fromStacks(bonemeal),
+							Ingredient.fromItem(com.ferreusveritas.dynamictrees.ModItems.dirtBucket));
 				}
 			}
 		}

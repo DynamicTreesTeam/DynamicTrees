@@ -80,32 +80,36 @@ public class BlockFruit extends Block implements IGrowable {
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
 		if (!this.canBlockStay(world, pos, state)) {
 			this.dropBlock(world, pos, state);
+			return;
 		}
-		else {
-			int age = state.getValue(AGE);
-			Float season = SeasonHelper.getSeasonValue(world);
-			
-			if(season != null) { //Non-Null means we are season capable
-				if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
-					outOfSeasonAction(world, pos);//Destroy the block or similar action
-					return;
-				}
-				if(age == 0 && getSpecies().testFlowerSeasonHold(world, pos, season)) {
-					return;//Keep fruit at the flower stage
-				}
+		
+		int age = state.getValue(AGE);
+		Float season = SeasonHelper.getSeasonValue(world);
+		
+		if(season != null) { //Non-Null means we are season capable
+			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
+				outOfSeasonAction(world, pos);//Destroy the block or similar action
+				return;
 			}
-			
-			if (age < 3 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextFloat() < getGrowthChance(world, pos))) {
+			if(age == 0 && getSpecies().testFlowerSeasonHold(world, pos, season)) {
+				return;//Keep fruit at the flower stage
+			}
+		}
+		
+		if (age < 3) {
+			boolean doGrow = rand.nextFloat() < getGrowthChance(world, pos);
+			boolean eventGrow = net.minecraftforge.common.ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
+			if(season != null ? doGrow || eventGrow : eventGrow) { //Prevent a seasons mod from canceling the growth, we handle that ourselves
 				world.setBlockState(pos, state.withProperty(AGE, age + 1), 2);
 				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(world, pos, state, world.getBlockState(pos));
-			} else {
-				if (age == 3) {
-					switch(matureAction(world, pos, state, rand)) {
-						case Nothing: break;
-						case Drop: dropBlock(world, pos, state); break;
-						case Rot: world.setBlockToAir(pos); break;
-						case Custom: break;
-					}
+			}
+		} else {
+			if (age == 3) {
+				switch(matureAction(world, pos, state, rand)) {
+					case Nothing: break;
+					case Drop: dropBlock(world, pos, state); break;
+					case Rot: world.setBlockToAir(pos); break;
+					case Custom: break;
 				}
 			}
 		}
