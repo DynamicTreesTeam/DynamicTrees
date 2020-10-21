@@ -1,10 +1,12 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
 	"1.12.2": {
+		"1.12.2-0.9.16": "New Features:\n- Add alternative snow layer block that forms on leaves(disabled by default) for the purpose of shader waving or custom models.\n- Add config option for giant mushrooms spawning in roofed forests (enabled by default).\n- Internal API additions for add-ons.\n\nBugs Fixed:\n- Transformations potions are not consumed if the target species already matches the potion species.\n- Add checks to prevent runaway mimic recursion causing a client side crash under rare circumstances.",
+		"1.12.2-0.9.15": "New Features:\n- Added patchouli manual.\n- Added forge mod update checking.\n\nBugs Fixed:\n- Fixed concurrent modification exception crash during block breaking.\n- Fixed concurrent modification exception crash during multiple explosions.\n- Fixed \"perma-shrub\" bug that occured if doDayLightCycle was false.",
 		"1.12.2-0.9.14": "New Features:\n- Removed \"Dynamic\" prefix from localized branch names.\n- Species name localizations (please be patient while add-ons catch up, species names will be unlocalized until new add-on releases are made with updated lang files).\n\nBugs Fixed:\n- Dimensions other than 0 now grow trees properly again (bug introduced by Serene Seasons integration effort).\n- Made rooty dirt blocks get color from mimic instead of grass (thanks Max Hyper).\n- Fix optifine shader interaction bug where sky could be seen through breaking texture on trees.\n- Fixed small crash with cactus model (thanks Max Hyper).\n\nInternal:\n- Enhanced SeasonHelper capabilities with helper functions.\n- Removed \"Wrapped\" classes and redefined blockstate files to be more standard.\n- Don't throw an exception when a JoCode file isn't defined."
 	},
 	"promos": {
-		"1.12.2-latest": "1.12.2-0.9.14",
-		"1.12.2-recommended": "1.12.2-0.9.14"
+		"1.12.2-latest": "1.12.2-0.9.16",
+		"1.12.2-recommended": "1.12.2-0.9.16"
 	}
 }
