@@ -1095,6 +1095,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return SeasonHelper.globalSeasonalFruitProductionFactor(world, pos);
 	}
 	
+	/**
+	 * 1 = Spring
+	 * 2 = Summer
+	 * 4 = Autumn
+	 * 8 = Winter
+	 * values are OR'ed together for the return
+	 * or return -1 for no season fertility tooltips.
+	*/
 	public int getSeasonalTooltipFlags(int dimension) {
 		float seasonStart = 0.167f;
 		float seasonEnd = 0.833f;
