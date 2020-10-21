@@ -35,6 +35,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -1092,6 +1093,26 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
 		return SeasonHelper.globalSeasonalFruitProductionFactor(world, pos);
+	}
+	
+	public int getSeasonalTooltipFlags(int dimension) {
+		float seasonStart = 0.167f;
+		float seasonEnd = 0.833f;
+		float threshold = 0.75f;
+		
+		if(BlockFruit.getFruitBlockForSpecies(this) != null) {
+			int seasonFlags = 0;
+			for(int i = 0; i < 4; i++) {
+				float prod1 = seasonalFruitProductionFactor(null, new BlockPos(dimension, (int)((i + seasonStart) * 64.0f), 0));
+				float prod2 = seasonalFruitProductionFactor(null, new BlockPos(dimension, (int)((i + seasonEnd  ) * 64.0f), 0));
+				if(Math.min(prod1, prod2) >= threshold) {
+					seasonFlags |= 1 << i;
+				}
+			}
+			return seasonFlags;
+		}
+		
+		return -1;
 	}
 	
 	/**
