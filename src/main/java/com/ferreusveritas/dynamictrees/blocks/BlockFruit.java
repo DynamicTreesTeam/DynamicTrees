@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
@@ -47,6 +49,12 @@ public class BlockFruit extends Block implements IGrowable {
 	
 	public static final String name = "fruit";
 	
+	private static Map<Species, BlockFruit> speciesFruitMap = new HashMap<>();
+	
+	public static BlockFruit getFruitBlockForSpecies(Species species) {
+		return speciesFruitMap.getOrDefault(species, null);
+	}
+	
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
 	protected Species species = Species.NULLSPECIES;
@@ -70,6 +78,7 @@ public class BlockFruit extends Block implements IGrowable {
 	}
 	
 	public void setSpecies(Species species) {
+		speciesFruitMap.put(species, this);
 		this.species = species;
 	}
 	
@@ -86,7 +95,7 @@ public class BlockFruit extends Block implements IGrowable {
 		int age = state.getValue(AGE);
 		Float season = SeasonHelper.getSeasonValue(world);
 		
-		if(season != null) { //Non-Null means we are season capable
+		if(season != null && getSpecies() != null) { //Non-Null means we are season capable
 			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
 				outOfSeasonAction(world, pos);//Destroy the block or similar action
 				return;

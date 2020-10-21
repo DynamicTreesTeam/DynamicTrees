@@ -43,6 +43,10 @@ public class SeasonContext {
 		return provider;
 	}
 	
+	public ISeasonGrowthCalculator getCalculator() {
+		return calculator;
+	}
+	
 	public float getTemperateGrowthFactor(float offset) {
 		return (offset == 0 || seasonValue == null) ? temperateGrowthFactor : calculator.calcGrowthRate(seasonValue + offset, ClimateZoneType.TEMPERATE);
 	}

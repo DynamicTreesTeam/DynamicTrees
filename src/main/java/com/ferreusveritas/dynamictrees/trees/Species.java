@@ -115,7 +115,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public static IForgeRegistry<Species> REGISTRY;
 	
-	public static void newRegistry(RegistryEvent.NewRegistry event) {		
+	public static void newRegistry(RegistryEvent.NewRegistry event) {
 		REGISTRY = new RegistryBuilder<Species>()
 				.setName(new ResourceLocation(ModConstants.MODID, "species"))
 				.setDefaultKey(new ResourceLocation(ModConstants.MODID, "null"))

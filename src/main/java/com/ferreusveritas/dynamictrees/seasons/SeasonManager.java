@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
 import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
 import com.ferreusveritas.dynamictrees.api.seasons.ISeasonManager;
 
@@ -84,6 +85,11 @@ public class SeasonManager implements ISeasonManager {
 	
 	@Override
 	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset) {
+		
+		if(world == null) {
+			return getFruitProductionFactorAsScan(world, rootPos, offset);
+		}
+		
 		SeasonContext context = getContext(world);
 		return isTropical(world, rootPos) ? context.getTropicalFruitProductionFactor(offset) : context.getTemperateFruitProductionFactor(offset);
 	}
@@ -95,6 +101,20 @@ public class SeasonManager implements ISeasonManager {
 	@Override
 	public boolean shouldSnowMelt(World world, BlockPos pos) {
 		return getContext(world).getSeasonProvider().shouldSnowMelt(world, pos);
+	}
+	
+	public float getFruitProductionFactorAsScan(World world, BlockPos rootPos, float offset) {
+		if(seasonContextMap.size() > 0) {
+			int dim = rootPos.getX();
+			float seasonValue = rootPos.getY() / 64.0f;
+			boolean tropical = rootPos.getZ() >= 1.0f;
+			if(seasonContextMap.containsKey(dim)) {
+				SeasonContext context = seasonContextMap.get(dim);
+				ISeasonGrowthCalculator calculator = context.getCalculator();
+				return calculator.calcFruitProduction(seasonValue + offset, tropical ? ClimateZoneType.TROPICAL : ClimateZoneType.TEMPERATE);
+			}
+		}
+		return 0.0f;
 	}
 	
 }
