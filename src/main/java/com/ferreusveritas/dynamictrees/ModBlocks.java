@@ -113,6 +113,7 @@ public class ModBlocks {
 		DirtHelper.registerSoil(blockRootyDirtSpecies, DirtHelper.DIRTLIKE);
 		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SANDLIKE);
 		DirtHelper.registerSoil(blockRootySand, DirtHelper.SANDLIKE);
+		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
 		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATERLIKE);
 		DirtHelper.registerSoil(Blocks.HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);
 		DirtHelper.registerSoil(Blocks.STAINED_HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);

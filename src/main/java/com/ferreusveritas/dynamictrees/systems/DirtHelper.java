@@ -12,6 +12,7 @@ public class DirtHelper {
 	
 	public static final String DIRTLIKE = "dirtlike";
 	public static final String SANDLIKE = "sandlike";
+	public static final String GRAVELLIKE = "gravellike";
 	public static final String WATERLIKE = "waterlike";
 	public static final String NETHERLIKE = "netherlike";
 	public static final String MUDLIKE = "mudlike";
@@ -28,6 +29,7 @@ public class DirtHelper {
 		
 		createNewAdjective(DIRTLIKE);
 		createNewAdjective(SANDLIKE);
+		createNewAdjective(GRAVELLIKE);
 		createNewAdjective(WATERLIKE);
 		createNewAdjective(NETHERLIKE);
 		createNewAdjective(MUDLIKE);
