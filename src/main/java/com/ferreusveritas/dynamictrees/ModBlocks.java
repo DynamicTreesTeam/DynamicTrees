@@ -117,6 +117,8 @@ public class ModBlocks {
 		DirtHelper.registerSoil(Blocks.HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);
 		DirtHelper.registerSoil(Blocks.STAINED_HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUSLIKE);
+		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHERLIKE);
+		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHERLIKE);
 	}
 	
 	public static class CommonBlockStates {
