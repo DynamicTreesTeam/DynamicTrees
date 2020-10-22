@@ -19,7 +19,8 @@ public class DirtHelper {
 	public static final String MUDLIKE = "mudlike";
 	public static final String HARDCLAYLIKE = "hardclaylike";
 	public static final String SLIMELIKE = "slimelike";
-
+	public static final String FUNGUSLIKE = "funguslike";
+	
 	private static final Map<String, Integer> adjectiveMap;
 	private static final Map<Block, Integer> dirtMap;
 	
@@ -36,6 +37,7 @@ public class DirtHelper {
 		createNewAdjective(MUDLIKE);
 		createNewAdjective(HARDCLAYLIKE);
 		createNewAdjective(SLIMELIKE);
+		createNewAdjective(FUNGUSLIKE);
 	}
 	
 	public static void createNewAdjective(String adjName) {
