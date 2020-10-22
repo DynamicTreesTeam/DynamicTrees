@@ -440,7 +440,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 				
 				//If the materials match and the species can be planted in the default soil for that biome then we'll look around
 				//the block for matching samples of the biome soil.  If we find one then we'll use it to replace the dirt block
-				if(biomeMaterial == belowMaterial && getDestroyData().species.getAcceptableSoils().contains(biomeState.getBlock())) {
+				if(biomeMaterial == belowMaterial && getDestroyData().species.isAcceptableSoil(biomeState)) {
 					for(EnumFacing dir : EnumFacing.HORIZONTALS) {
 						BlockPos dPos = rootPos.offset(dir);
 						IBlockState findState = world.getBlockState(dPos);

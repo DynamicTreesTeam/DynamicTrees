@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeAcacia;
@@ -15,14 +16,12 @@ import com.ferreusveritas.dynamictrees.trees.TreeJungle;
 import com.ferreusveritas.dynamictrees.trees.TreeOak;
 import com.ferreusveritas.dynamictrees.trees.TreeSpruce;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -76,16 +75,10 @@ public class ModTrees {
 	}
 	
 	public static void setupExtraSoils() {
-		NonNullList<ItemStack> list = OreDictionary.getOres("sand");
-		
-		Species cactus = dynamicCactus.getCommonSpecies();
-		
-		for(ItemStack entry : list) {
+		for(ItemStack entry : OreDictionary.getOres("sand")) {
 			Item item = entry.getItem();
-			if(entry.getItem() instanceof ItemBlock) {
-				ItemBlock itemBlock = (ItemBlock) item;
-				Block sandBlock = itemBlock.getBlock();
-				cactus.addAcceptableSoil(sandBlock);
+			if(item instanceof ItemBlock) {
+				DirtHelper.registerSoil(((ItemBlock) item).getBlock(), DirtHelper.Type.SANDLIKE);
 			}
 		}
 	}

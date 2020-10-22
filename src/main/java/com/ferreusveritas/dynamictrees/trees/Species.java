@@ -1,9 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +44,7 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
@@ -64,6 +63,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -145,7 +145,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/** Ideal soil longevity [default = 8]*/
 	protected int soilLongevity = 8;
 	
-	protected HashSet<Block> soilList = new HashSet<Block>();
+	protected int soilTypeFlags = 0;
 	
 	private boolean requiresTileEntity = false;
 	
@@ -619,13 +619,44 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
 	}
 	
+	public Species addAcceptableSoils(DirtHelper.Type ... soilTypes) {
+		soilTypeFlags |= DirtHelper.getSoilFlags(soilTypes);
+		return this;
+	}
+	
 	/**
 	 * Adds blocks to the acceptable soil list.
 	 * 
+	 * DEPRECATED. Use addAcceptableSoils(DirtRegistry.Type ... soilTypes) instead
+	 * 
 	 * @param soilBlocks
 	 */
+	@Deprecated
 	public Species addAcceptableSoil(Block ... soilBlocks) {
-		Collections.addAll(soilList, soilBlocks);
+		for(Block block : soilBlocks) {
+			Material material = block.getMaterial(block.getDefaultState());
+			if(block == Blocks.NETHERRACK) {
+				addAcceptableSoils(DirtHelper.Type.NETHERLIKE);
+			}
+			else if(block == Blocks.GRAVEL) {
+				addAcceptableSoils(DirtHelper.Type.GRAVELLIKE);
+			}
+			else if(material == Material.GROUND) {
+				addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+			}
+			else if(material == Material.GRASS) {
+				addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+			}
+			else if(material == Material.SAND) {
+				addAcceptableSoils(DirtHelper.Type.SANDLIKE);
+			}
+			else if(material == Material.ROCK) {
+				addAcceptableSoils(DirtHelper.Type.STONELIKE);
+			}
+			else if(material == Material.WATER) {
+				addAcceptableSoils(DirtHelper.Type.WATERLIKE);
+			}
+		}
 		return this;
 	}
 	
@@ -634,10 +665,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 
 	 * @param soilBlock
 	 */
+	@Deprecated
 	public Species remAcceptableSoil(Block ... soilBlocks) {
-		for(Block block : soilBlocks) {
+		/*for(Block block : soilBlocks) {
 			soilList.remove(block);
-		}
+		}*/
 		return this;
 	}
 	
@@ -647,7 +679,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * substrates.
 	 */
 	public Species clearAcceptableSoils() {
-		soilList.clear();
+		soilTypeFlags = 0;
 		return this;
 	}
 	
@@ -657,10 +689,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * Should only be used for config purposes and is not
 	 * recommended for realtime gameplay operations.
 	 * 
+	 * DO NOT USE THIS FUNCTION!  THIS WILL SOON BE REMOVED!
+	 * 
 	 * @return A clone of the acceptable soils list.
 	 */
+	@Deprecated
 	public Set<Block> getAcceptableSoils() {
-		return (Set<Block>) soilList.clone();
+		return DirtHelper.getBlocks(soilTypeFlags);
 	}
 	
 	/**
@@ -669,8 +704,20 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * may override this entirely or just modify the list at a
 	 * later time.
 	 */
-	protected final void setStandardSoils() {
-		addAcceptableSoil(Blocks.DIRT, Blocks.GRASS, Blocks.MYCELIUM);
+	protected void setStandardSoils() {
+		addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+	}
+	
+	/**
+	 * Soil acceptability tester.  Mostly to test if the block is dirt but could 
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 * 
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(IBlockState soilBlockState) {
+		return DirtHelper.isSoilAcceptable(soilBlockState.getBlock(), soilTypeFlags);
 	}
 	
 	/**
@@ -684,8 +731,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return
 	 */
 	public boolean isAcceptableSoil(World world, BlockPos pos, IBlockState soilBlockState) {
-		Block soilBlock = soilBlockState.getBlock();
-		return soilList.contains(soilBlock) || soilBlock instanceof BlockRooty;
+		return isAcceptableSoil(soilBlockState);
 	}
 	
 	/**
@@ -699,6 +745,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
 		return isAcceptableSoil(world, pos, soilBlockState);
 	}
+	
 	
 	//////////////////////////////
 	// GROWTH

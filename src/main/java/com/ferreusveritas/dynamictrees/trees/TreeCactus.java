@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchCactus;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
@@ -64,9 +65,11 @@ public class TreeCactus extends TreeFamily {
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
-			
-			clearAcceptableSoils();
-			addAcceptableSoil(Blocks.SAND);
+		}
+		
+		@Override
+		protected void setStandardSoils() {
+			addAcceptableSoils(DirtHelper.Type.SANDLIKE);
 		}
 		
 		@Override

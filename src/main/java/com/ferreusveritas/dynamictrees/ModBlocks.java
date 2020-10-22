@@ -19,6 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -103,6 +104,18 @@ public class ModBlocks {
 		}
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
+		
+		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.GRASS, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirt, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirtFake, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirtSpecies, DirtHelper.Type.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.Type.SANDLIKE);
+		DirtHelper.registerSoil(blockRootySand, DirtHelper.Type.SANDLIKE);
+		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.Type.WATERLIKE);
+		DirtHelper.registerSoil(Blocks.HARDENED_CLAY, DirtHelper.Type.HARDCLAYLIKE);
+		DirtHelper.registerSoil(Blocks.STAINED_HARDENED_CLAY, DirtHelper.Type.HARDCLAYLIKE);
 	}
 	
 	public static class CommonBlockStates {

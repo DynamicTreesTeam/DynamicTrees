@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
+
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.world.biome.Biome;
@@ -28,6 +30,10 @@ public class TreeAcacia extends TreeFamilyVanilla {
 			return BiomeDictionary.hasType(biome, Type.SAVANNA);
 		}
 		
+		@Override
+		protected void setStandardSoils() {
+			addAcceptableSoils(DirtHelper.Type.DIRTLIKE, DirtHelper.Type.HARDCLAYLIKE);
+		}
 	}
 	
 	public TreeAcacia() {
