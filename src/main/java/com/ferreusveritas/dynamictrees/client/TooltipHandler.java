@@ -26,10 +26,8 @@ public class TooltipHandler {
 				if(SeasonHelper.getSeasonValue(world) != null) {
 					int flags = seed.getSpecies(stack).getSeasonalTooltipFlags(world.provider.getDimension());
 					
-					if(flags != -1) {
-						if(flags != 0) {
-							event.getToolTip().add("Fertile Seasons:");
-						}
+					if(flags != 0) {
+						event.getToolTip().add("Fertile Seasons:");
 						
 						if((flags & 15) == 15) {
 							event.getToolTip().add(TextFormatting.LIGHT_PURPLE + " Year-Round");

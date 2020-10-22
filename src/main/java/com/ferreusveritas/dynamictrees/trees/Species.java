@@ -1120,7 +1120,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			return seasonFlags;
 		}
 		
-		return -1;
+		return 0;
 	}
 	
 	/**
