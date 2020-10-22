@@ -1100,8 +1100,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * 2 = Summer
 	 * 4 = Autumn
 	 * 8 = Winter
-	 * values are OR'ed together for the return
-	 * or return -1 for no season fertility tooltips.
+	 * Values are OR'ed together for the return
 	*/
 	public int getSeasonalTooltipFlags(int dimension) {
 		float seasonStart = 0.167f;

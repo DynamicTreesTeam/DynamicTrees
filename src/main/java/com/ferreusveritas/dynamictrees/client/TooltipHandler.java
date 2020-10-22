@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
 
@@ -25,31 +27,34 @@ public class TooltipHandler {
 				World world = player.world;
 				if(SeasonHelper.getSeasonValue(world) != null) {
 					int flags = seed.getSpecies(stack).getSeasonalTooltipFlags(world.provider.getDimension());
-					
-					if(flags != 0) {
-						event.getToolTip().add("Fertile Seasons:");
-						
-						if((flags & 15) == 15) {
-							event.getToolTip().add(TextFormatting.LIGHT_PURPLE + " Year-Round");
-						} else {
-							if ((flags & 1) != 0) {
-								event.getToolTip().add(TextFormatting.GREEN + " Spring");
-							}
-							if ((flags & 2) != 0) {
-								event.getToolTip().add(TextFormatting.YELLOW + " Summer");
-							}
-							if ((flags & 4) != 0) {
-								event.getToolTip().add(TextFormatting.GOLD + " Autumn");
-							}
-							if ((flags & 8) != 0) {
-								event.getToolTip().add(TextFormatting.AQUA + " Winter");
-							}
-						}
-					}
+					applySeasonalTooltips(event.getToolTip(), flags);
 				}
 			}
 		}
 		
+	}
+	
+	public static void applySeasonalTooltips(List<String> tipList, int flags) {
+		if(flags != 0) {
+			tipList.add("Fertile Seasons:");
+			
+			if((flags & 15) == 15) {
+				tipList.add(TextFormatting.LIGHT_PURPLE + " Year-Round");
+			} else {
+				if ((flags & 1) != 0) {
+					tipList.add(TextFormatting.GREEN + " Spring");
+				}
+				if ((flags & 2) != 0) {
+					tipList.add(TextFormatting.YELLOW + " Summer");
+				}
+				if ((flags & 4) != 0) {
+					tipList.add(TextFormatting.GOLD + " Autumn");
+				}
+				if ((flags & 8) != 0) {
+					tipList.add(TextFormatting.AQUA + " Winter");
+				}
+			}
+		}
 	}
 	
 }
