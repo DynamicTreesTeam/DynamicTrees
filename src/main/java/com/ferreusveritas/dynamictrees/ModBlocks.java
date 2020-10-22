@@ -105,17 +105,17 @@ public class ModBlocks {
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 		
-		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.GRASS, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(blockRootyDirt, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(blockRootyDirtFake, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(blockRootyDirtSpecies, DirtHelper.Type.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.Type.SANDLIKE);
-		DirtHelper.registerSoil(blockRootySand, DirtHelper.Type.SANDLIKE);
-		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.Type.WATERLIKE);
-		DirtHelper.registerSoil(Blocks.HARDENED_CLAY, DirtHelper.Type.HARDCLAYLIKE);
-		DirtHelper.registerSoil(Blocks.STAINED_HARDENED_CLAY, DirtHelper.Type.HARDCLAYLIKE);
+		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.GRASS, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirt, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirtFake, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(blockRootyDirtSpecies, DirtHelper.DIRTLIKE);
+		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SANDLIKE);
+		DirtHelper.registerSoil(blockRootySand, DirtHelper.SANDLIKE);
+		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATERLIKE);
+		DirtHelper.registerSoil(Blocks.HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);
+		DirtHelper.registerSoil(Blocks.STAINED_HARDENED_CLAY, DirtHelper.HARDCLAYLIKE);
 	}
 	
 	public static class CommonBlockStates {

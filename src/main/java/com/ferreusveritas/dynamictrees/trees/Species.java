@@ -619,7 +619,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
 	}
 	
-	public Species addAcceptableSoils(DirtHelper.Type ... soilTypes) {
+	public Species addAcceptableSoils(String ... soilTypes) {
 		soilTypeFlags |= DirtHelper.getSoilFlags(soilTypes);
 		return this;
 	}
@@ -636,25 +636,25 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		for(Block block : soilBlocks) {
 			Material material = block.getMaterial(block.getDefaultState());
 			if(block == Blocks.NETHERRACK) {
-				addAcceptableSoils(DirtHelper.Type.NETHERLIKE);
+				addAcceptableSoils(DirtHelper.NETHERLIKE);
 			}
 			else if(block == Blocks.GRAVEL) {
-				addAcceptableSoils(DirtHelper.Type.GRAVELLIKE);
+				addAcceptableSoils(DirtHelper.GRAVELLIKE);
 			}
 			else if(material == Material.GROUND) {
-				addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+				addAcceptableSoils(DirtHelper.DIRTLIKE);
 			}
 			else if(material == Material.GRASS) {
-				addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+				addAcceptableSoils(DirtHelper.DIRTLIKE);
 			}
 			else if(material == Material.SAND) {
-				addAcceptableSoils(DirtHelper.Type.SANDLIKE);
+				addAcceptableSoils(DirtHelper.SANDLIKE);
 			}
 			else if(material == Material.ROCK) {
-				addAcceptableSoils(DirtHelper.Type.STONELIKE);
+				addAcceptableSoils(DirtHelper.STONELIKE);
 			}
 			else if(material == Material.WATER) {
-				addAcceptableSoils(DirtHelper.Type.WATERLIKE);
+				addAcceptableSoils(DirtHelper.WATERLIKE);
 			}
 		}
 		return this;
@@ -705,7 +705,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * later time.
 	 */
 	protected void setStandardSoils() {
-		addAcceptableSoils(DirtHelper.Type.DIRTLIKE);
+		addAcceptableSoils(DirtHelper.DIRTLIKE);
 	}
 	
 	/**

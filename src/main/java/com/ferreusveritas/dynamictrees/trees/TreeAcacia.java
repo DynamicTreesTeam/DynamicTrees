@@ -32,7 +32,7 @@ public class TreeAcacia extends TreeFamilyVanilla {
 		
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.Type.DIRTLIKE, DirtHelper.Type.HARDCLAYLIKE);
+			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.HARDCLAYLIKE);
 		}
 	}
 	

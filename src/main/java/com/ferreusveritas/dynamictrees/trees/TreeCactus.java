@@ -69,7 +69,7 @@ public class TreeCactus extends TreeFamily {
 		
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.Type.SANDLIKE);
+			addAcceptableSoils(DirtHelper.SANDLIKE);
 		}
 		
 		@Override

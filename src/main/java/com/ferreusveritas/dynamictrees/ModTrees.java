@@ -78,7 +78,7 @@ public class ModTrees {
 		for(ItemStack entry : OreDictionary.getOres("sand")) {
 			Item item = entry.getItem();
 			if(item instanceof ItemBlock) {
-				DirtHelper.registerSoil(((ItemBlock) item).getBlock(), DirtHelper.Type.SANDLIKE);
+				DirtHelper.registerSoil(((ItemBlock) item).getBlock(), DirtHelper.SANDLIKE);
 			}
 		}
 	}
