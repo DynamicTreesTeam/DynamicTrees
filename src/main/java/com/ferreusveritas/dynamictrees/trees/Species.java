@@ -1,24 +1,9 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
-import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -28,14 +13,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -60,7 +38,6 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -90,6 +67,9 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
@@ -188,8 +168,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * Constructor suitable for derivative mods that defaults
 	 * the leavesProperties to the common type for the family
-	 * 
-	 * @param modid The MODID of the mod that is registering this species
+	 *
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
 	 */
@@ -199,8 +178,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	/**
 	 * Constructor suitable for derivative mods
-	 * 
-	 * @param modid The MODID of the mod that is registering this species
+	 *
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param leavesProperties The properties of the leaves to be used for this species
 	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
@@ -650,9 +628,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			else if(material == Material.SAND) {
 				addAcceptableSoils(DirtHelper.SANDLIKE);
 			}
-			else if(material == Material.ROCK) {
-				addAcceptableSoils(DirtHelper.STONELIKE);
-			}
 			else if(material == Material.WATER) {
 				addAcceptableSoils(DirtHelper.WATERLIKE);
 			}
@@ -663,7 +638,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	/**
 	 * Removes blocks from the acceptable soil list.
 	 * 
-	 * @param soilBlock
+	 * @param soilBlocks
 	 */
 	@Deprecated
 	public Species remAcceptableSoil(Block ... soilBlocks) {
@@ -1337,9 +1312,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * Override to use other methods.
 	 * 
 	 * @param world The world
-	 * @param pos The position of {@link BlockRooty} this tree is planted in
+	 * @param rootPos The position of {@link BlockRooty} this tree is planted in
 	 * @param biome The biome this tree is generating in
-	 * @param facing The orientation of the tree(rotates JoCode)
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
@@ -1424,7 +1398,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param facing The direction the joCode will build the tree
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
 	 * @param joCode The joCode that will be used to grow the tree
-	 * @param initialDirtState The state of the dirt block before it became rooty
 	 * @return new blockposition of root block.  BlockPos.ORIGIN to cancel generation
 	 */
 	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
