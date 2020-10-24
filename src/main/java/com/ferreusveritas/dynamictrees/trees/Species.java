@@ -496,7 +496,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if the planting was successful
 	 */
 	public boolean plantSapling(World world, BlockPos pos) {
-		
 		if(world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
 			ModBlocks.blockDynamicSapling.setSpecies(world, pos, this);
 			return true;
