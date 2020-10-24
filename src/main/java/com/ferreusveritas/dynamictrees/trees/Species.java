@@ -34,6 +34,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -561,11 +562,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	@Deprecated
 	public BlockRooty getRootyBlock() {
+		Deprecatron.Complain("getRootyBlock", "getRootyBlock() is DEPRECATED and will be removed in the next version of Dynamic Trees. Use the position sensitive version instead. Species: " + this.getRegistryName());
 		return ModBlocks.blockRootyDirt;
 	}
 	
-	public BlockRooty getRootyBlock(World world, BlockPos pos) {
-		return getRequiresTileEntity(world, pos) ? ModBlocks.blockRootyDirtSpecies : getRootyBlock();
+	public BlockRooty getRootyBlock(World world, BlockPos rootPos) {
+		return getRequiresTileEntity(world, rootPos) ? ModBlocks.blockRootyDirtSpecies : ModBlocks.blockRootyDirt;
 	}
 	
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
@@ -611,6 +613,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	@Deprecated
 	public Species addAcceptableSoil(Block ... soilBlocks) {
+		Deprecatron.Complain("addAcceptableSoil", "The Block version of addAcceptableSoil is DEPRECATED and will be removed in future versions. Species: " + this.getRegistryName());
+		
 		for(Block block : soilBlocks) {
 			Material material = block.getMaterial(block.getDefaultState());
 			if(block == Blocks.NETHERRACK) {
@@ -636,19 +640,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 	
 	/**
-	 * Removes blocks from the acceptable soil list.
-	 * 
-	 * @param soilBlocks
-	 */
-	@Deprecated
-	public Species remAcceptableSoil(Block ... soilBlocks) {
-		/*for(Block block : soilBlocks) {
-			soilList.remove(block);
-		}*/
-		return this;
-	}
-	
-	/**
 	 * Will clear the acceptable soils list.  Useful for
 	 * making trees that can only be planted in abnormal
 	 * substrates.
@@ -656,21 +647,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public Species clearAcceptableSoils() {
 		soilTypeFlags = 0;
 		return this;
-	}
-	
-	/**
-	 * Retrieve a clone of the acceptable soils list.
-	 * Editing this set will not affect the original list.
-	 * Should only be used for config purposes and is not
-	 * recommended for realtime gameplay operations.
-	 * 
-	 * DO NOT USE THIS FUNCTION!  THIS WILL SOON BE REMOVED!
-	 * 
-	 * @return A clone of the acceptable soils list.
-	 */
-	@Deprecated
-	public Set<Block> getAcceptableSoils() {
-		return DirtHelper.getBlocks(soilTypeFlags);
 	}
 	
 	/**

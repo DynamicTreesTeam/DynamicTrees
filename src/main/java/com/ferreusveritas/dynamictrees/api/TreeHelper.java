@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -179,6 +180,7 @@ public class TreeHelper {
 	 */
 	@Deprecated
 	public static Species getExactSpecies(IBlockState unused, World world, BlockPos pos) {
+		Deprecatron.Complain("getExactSpecies", "Deprecated use of getExactSpecies method. Will be removed in the future.");
 		return getExactSpecies(world, pos);
 	}
 	

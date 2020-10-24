@@ -14,7 +14,7 @@ public class ModConstants {
 	public static final String AT = "@[";
 	public static final String GREATERTHAN = "@(";
 	public static final String ORGREATER = ",)";
-		
+	
 	public static final String SERENESEASONS = "sereneseasons";
 	
 	//Other mods can use this string to depend on the latest version of Dynamic Trees
@@ -29,9 +29,9 @@ public class ModConstants {
 	public static final String RUSTIC = "rustic";
 	
 	//Other Mod Versions.. These have been added to avoid the whole "Duh.. How come my mod is crashing?" bullshit bug reports.
-	public static final String DYNAMICTREESBOP_VER = AT + "1.12.2-1.4.1e" + ORGREATER;
-	public static final String DYNAMICTREESTC_VER =	 AT + "1.12.2-1.4.2" + ORGREATER;
-	public static final String DYNAMICTREESPHC_VER = AT + "1.12.2-1.4.2" + ORGREATER;
+	public static final String DYNAMICTREESBOP_VER = AT + "1.12.2-1.4.3" + ORGREATER;
+	public static final String DYNAMICTREESTC_VER = AT + "1.12.2-1.4.2" + ORGREATER;
+	public static final String DYNAMICTREESPHC_VER = AT + "1.12.2-2.0.3" + ORGREATER;
 	public static final String DYNAMICTREESTRAVERSE_VER =  AT + "1.12.2-2.0" + ORGREATER;
 	public static final String DYNAMICTREESHNC_VER =  GREATERTHAN + "1.1" + ORGREATER;//Heat and Climate Add-on has not be updated in a while and the latest 1.1 is no longer supported
 	public static final String RUSTIC_VER = GREATERTHAN + "1.0.14" + ORGREATER;

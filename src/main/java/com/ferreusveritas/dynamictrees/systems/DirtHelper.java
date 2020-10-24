@@ -1,10 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import net.minecraft.block.Block;
 
@@ -67,20 +64,6 @@ public class DirtHelper {
 		}
 		
 		return flags;
-	}
-	
-	/** DO NOT USE THIS FUNCTION!  THIS WILL SOON BE REMOVED! */
-	@Deprecated
-	public static Set<Block> getBlocks(int soilFlags) {
-		Set<Block> blocks = new HashSet<>();
-		
-		for(Entry<Block, Integer> entry : dirtMap.entrySet()) {
-			if((entry.getValue() & soilFlags) != 0) {
-				blocks.add(entry.getKey());
-			}
-		}
-		
-		return blocks;
 	}
 	
 }

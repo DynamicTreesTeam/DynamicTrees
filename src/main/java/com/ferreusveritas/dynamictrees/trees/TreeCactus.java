@@ -86,7 +86,7 @@ public class TreeCactus extends TreeFamily {
 		}
 		
 		@Override
-		public BlockRooty getRootyBlock(World world, BlockPos pos) {
+		public BlockRooty getRootyBlock(World world, BlockPos rootPos) {
 			return ModBlocks.blockRootySand;
 		}
 		

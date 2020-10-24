@@ -64,12 +64,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	public static final int RADMAX_NORMAL = 8;
 	
 	public static final IUnlistedProperty CONNECTIONS[] = { 
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
-		new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuss", 0, 8)),
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusw", 0, 8)),
+			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiuse", 0, 8))
 	};
 	
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
@@ -153,7 +153,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 		return support & 0xf;
 	}
 	
-
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
@@ -168,7 +168,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
@@ -242,7 +242,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
 	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, EnumFacing toolDir, boolean wholeTree) {
-				
+		
 		IBlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
 		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
@@ -395,7 +395,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			}
 		}
 	}
-	*/
+	 */
 	
 	@Override
 	public void futureBreak(IBlockState state, World world, BlockPos cutPos, EntityLivingBase entity) {
@@ -476,13 +476,13 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	 * @param partialTicks
 	 * @return
 	 */
-    @Nullable
-    public RayTraceResult playerRayTrace(EntityLivingBase entity, double blockReachDistance, float partialTicks) {
-        Vec3d vec3d = entity.getPositionEyes(partialTicks);
-        Vec3d vec3d1 = entity.getLook(partialTicks);
-        Vec3d vec3d2 = vec3d.addVector(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-        return entity.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
-    }
+	@Nullable
+	public RayTraceResult playerRayTrace(EntityLivingBase entity, double blockReachDistance, float partialTicks) {
+		Vec3d vec3d = entity.getPositionEyes(partialTicks);
+		Vec3d vec3d1 = entity.getLook(partialTicks);
+		Vec3d vec3d2 = vec3d.addVector(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
+		return entity.world.rayTraceBlocks(vec3d, vec3d2, false, false, true);
+	}
 	
 	public enum EnumAxeDamage {
 		VANILLA,
@@ -518,6 +518,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 	
 	public static enum EnumDestroyMode {
+		IGNORE,
 		SLOPPY,
 		SETRADIUS,
 		HARVEST,
@@ -533,25 +534,41 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			//System.out.println("Sloppy break detected at: " + pos);
 			IBlockState toBlockState = world.getBlockState(pos);
 			Block toBlock = toBlockState.getBlock();
-			if(toBlock == Blocks.AIR) {
-				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+			if(toBlock == Blocks.AIR) { //Block was set to air improperly
+				world.setBlockState(pos, state, 0);//Set the branch block back and attempt a proper breaking
 				sloppyBreak(world, pos, DestroyType.VOID);
-			} else
+				setBlockStateIgnored(world, pos, ModBlocks.blockStates.air, 2);//Set back to air in case the sloppy break failed to do so
+				return;
+			} 
 			if(toBlock == Blocks.FIRE) { //Block has burned
-				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
-				sloppyBreak(world, pos, DestroyType.FIRE);
-				//world.setBlockState(pos, Blocks.FIRE.getDefaultState());  <-- FIXME: Causes overflow
-			} else
-			if(toBlock == Blocks.STONE) { //Likely destroyed by the Pyroclasm mod's volcanic lava
-				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+				world.setBlockState(pos, state, 0);//Set the branch block back and attempt a proper breaking
+				sloppyBreak(world, pos, DestroyType.FIRE);//Applies fire effects to falling branches
+				//setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2);//Disabled because the fire is too aggressive
+				setBlockStateIgnored(world, pos, ModBlocks.blockStates.air, 2);//Set back to air instead
+				return;
+			}
+			if(!toBlock.hasTileEntity(toBlockState) && world.getTileEntity(pos) == null) { //Block seems to be a pure blockstate based block.
+				world.setBlockState(pos, state, 0);//Set the branch block back and attempt a proper breaking
 				sloppyBreak(world, pos, DestroyType.VOID);
-				world.setBlockState(pos, toBlockState);//Set back to stone
-			} else {
-				if(ModConfigs.worldGenDebug) {
-					System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
+				setBlockStateIgnored(world, pos, toBlockState, 2);//Set back to whatever block caused this problem
+				return;
+			} else { //There's a tile entity block that snuck in.  Don't touch it!
+				for(EnumFacing dir : EnumFacing.VALUES) {//Let's just play it safe and destroy all surrounding branch block networks
+					BlockPos offPos = pos.offset(dir);
+					IBlockState offState = world.getBlockState(offPos);
+					if(offState.getBlock() instanceof BlockBranch) {
+						sloppyBreak(world, offPos, DestroyType.VOID);
+					}
 				}
 			}
 		}
+	}
+	
+	/** Provides a means to set a blockState over a branch block without triggering sloppy breaking. */
+	public void setBlockStateIgnored(World world, BlockPos pos, IBlockState state, int flags) {
+		destroyMode = EnumDestroyMode.IGNORE; //Set the state machine to ignore so we don't accidentally recurse with breakBlock(...)
+		world.setBlockState(pos, state, flags);
+		destroyMode = EnumDestroyMode.SLOPPY; //Ready the state machine for sloppy breaking again
 	}
 	
 	// Super member also does nothing
