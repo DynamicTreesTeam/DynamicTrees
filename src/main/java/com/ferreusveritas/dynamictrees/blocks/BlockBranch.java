@@ -534,6 +534,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			//System.out.println("Sloppy break detected at: " + pos);
 			IBlockState toBlockState = world.getBlockState(pos);
 			Block toBlock = toBlockState.getBlock();
+			if(toBlock instanceof BlockBranch) {
+				return;
+			}
 			if(toBlock == Blocks.AIR) { //Block was set to air improperly
 				world.setBlockState(pos, state, 0);//Set the branch block back and attempt a proper breaking
 				sloppyBreak(world, pos, DestroyType.VOID);
