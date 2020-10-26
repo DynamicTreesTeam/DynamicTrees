@@ -1,6 +1,7 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
 	"1.12.2": {
+		"1.12.2-0.9.19" : "New Features:\n-Add support API functionality for Add-ons\n Bug Fixes:\n-Fixed stack overflow crash",
 		"1.12.2-0.9.18": "New Features:\n- Created soil registry system.",
 		"1.12.2-0.9.17": "New Features:\n- API support for new Dynamic Trees PHC Add-on feature.",
 		"1.12.2-0.9.16": "New Features:\n- Add alternative snow layer block that forms on leaves(disabled by default) for the purpose of shader waving or custom models.\n- Add config option for giant mushrooms spawning in roofed forests (enabled by default).\n- Internal API additions for add-ons.\n\nBugs Fixed:\n- Transformations potions are not consumed if the target species already matches the potion species.\n- Add checks to prevent runaway mimic recursion causing a client side crash under rare circumstances.",
