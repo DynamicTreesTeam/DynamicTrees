@@ -1,20 +1,29 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch.EnumDestroyMode;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCollector;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -32,26 +41,28 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
-* So named because the base64 codes it generates almost always start with "JO"
-* 
-* This class provides methods for storing and recreating tree shapes.
-* 
-* @author ferreusveritas
-*/
+ * So named because the base64 codes it generates almost always start with "JO"
+ * 
+ * This class provides methods for storing and recreating tree shapes.
+ * 
+ * @author ferreusveritas
+ */
 public class JoCode {
 	
 	static private final String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	static protected final byte forkCode = 6;
 	static protected final byte returnCode = 7;
 	
+	public static boolean secondChanceRegen = false;//Ensures second chance regen doesn't recurse too far
+	
 	public byte[] instructions = new byte[0];
 	protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
 	
 	/**
-	* @param world The world
-	* @param rootPos Block position of rootyDirt block
-	* @param facing A final rotation applied to the code after creation
-	*/
+	 * @param world The world
+	 * @param rootPos Block position of rootyDirt block
+	 * @param facing A final rotation applied to the code after creation
+	 */
 	public JoCode(World world, BlockPos rootPos, EnumFacing facing) {
 		Optional<BlockBranch> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
 		
@@ -87,14 +98,14 @@ public class JoCode {
 	 * A facing matrix for mapping instructions to different rotations
 	 */
 	private byte dirmap[][] = {
-		//  {D, U, N, S, W, E, F, R}
+			//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING NORTH: N->N S->S W->W E->E 0
 			{0, 1, 3, 2, 5, 4, 6, 7},//FACING SOUTH: N->S S->N W->E E->W 180
 			{0, 1, 5, 4, 2, 3, 6, 7},//FACING WEST:	 N->E S->W W->N E->S 90 CW
 			{0, 1, 4, 5, 3, 2, 6, 7},//FACING EAST:	 N->W S->E W->S E->N 90 CCW
-		};
+	};
 	
 	//"Pointers" to the current rotation direction.
 	private byte facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
@@ -140,16 +151,16 @@ public class JoCode {
 	}
 	
 	/**
-	* Generate a tree from a JoCode instruction list.
-	* 
-	* @param world The world
-	* @param seed The seed used to create the tree
-	* @param rootPos The position of what will become the rootydirt block
-	* @param biome The biome of the coordinates.
-	* @param facing Direction of tree
-	* @param radius Constraint radius
-	*/
-	public void generate(World world, Species species, BlockPos rootPos, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
+	 * Generate a tree from a JoCode instruction list.
+	 * 
+	 * @param world The world
+	 * @param seed The seed used to create the tree
+	 * @param rootPos The position of what will become the rootydirt block
+	 * @param biome The biome of the coordinates.
+	 * @param facing Direction of tree
+	 * @param radius Constraint radius
+	 */
+	public void generate(World world, Species species, BlockPos rootPosIn, Biome biome, EnumFacing facing, int radius, SafeChunkBounds safeBounds) {
 		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
@@ -157,8 +168,7 @@ public class JoCode {
 		radius = MathHelper.clamp(radius, 2, 8);
 		
 		setFacing(facing);
-		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this);
-
+		BlockPos rootPos = species.preGeneration(world, rootPosIn, radius, facing, safeBounds, this);
 		
 		if(rootPos != BlockPos.ORIGIN) {
 			IBlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
@@ -166,20 +176,37 @@ public class JoCode {
 			
 			//Make the tree branch structure
 			generateFork(world, species, 0, rootPos, false);
-
-			//Establish a position for the bottom block of the trunk
+			
+			// Establish a position for the bottom block of the trunk
 			BlockPos treePos = rootPos.up();
 			
-			//Fix branch thicknesses and map out leaf locations
+			// Fix branch thicknesses and map out leaf locations
 			IBlockState treeState = world.getBlockState(treePos);
 			BlockBranch branch = TreeHelper.getBranch(treeState);
-			if(branch != null) {//If a branch exists then the growth was successful
+			if(branch != null) {// If a branch exists then the growth was successful
 				ILeavesProperties leavesProperties = species.getLeavesProperties();
 				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
-				INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
-				NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
-				MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
+				INodeInspector inflator = species.getNodeInflator(leafMap);// This is responsible for thickening the branches
+				NodeFindEnds endFinder = new NodeFindEnds();// This is responsible for gathering a list of branch end points
+				MapSignal signal = new MapSignal(inflator, endFinder);// The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
+				signal.destroyLoopedNodes = careful;// During worldgen we will not destroy looped nodes
 				branch.analyse(treeState, world, treePos, EnumFacing.DOWN, signal);
+				if(signal.found || signal.overflow) {// Something went terribly wrong.
+					DynamicTrees.log.debug("Non-viable branch network detected during world generation @ " + treePos);
+					DynamicTrees.log.debug("Species: " + species);
+					DynamicTrees.log.debug("Radius: " + radius);
+					DynamicTrees.log.debug("JoCode: " + this);
+					
+					// Completely blow away any improperly defined network nodes
+					cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
+					// Now that everything is clear we may as well regenerate the tree that screwed everything up.
+					if(!secondChanceRegen) {
+						secondChanceRegen = true;
+						generate(world, species, rootPosIn, biome, facing, radius, safeBounds);
+					}
+					secondChanceRegen = false;
+					return;
+				}
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
@@ -225,6 +252,64 @@ public class JoCode {
 				world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
 			}
 		}
+	}
+	
+	/** Attempt to clean up fused trees that have multiple root blocks by simply destroying them both messily */
+	protected void cleanupFrankentree(World world, BlockPos treePos, IBlockState treeState, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+		Set<BlockPos> blocksToDestroy = new HashSet<>();
+		BlockBranch branch = TreeHelper.getBranch(treeState);
+		MapSignal signal = new MapSignal(new NodeCollector(blocksToDestroy));
+		signal.destroyLoopedNodes = false;
+		signal.trackVisited = true;
+		branch.analyse(treeState, world, treePos, null, signal);
+		BlockBranch.destroyMode = EnumDestroyMode.IGNORE;
+		for(BlockPos pos : blocksToDestroy) {
+			if(safeBounds.inBounds(pos, false)) {
+				IBlockState branchState = world.getBlockState(pos);
+				Optional<BlockBranch> branchBlock = TreeHelper.getBranchOpt(branchState);
+				if(branchBlock.isPresent()) {
+					int radius = branchBlock.get().getRadius(branchState);
+					TreeFamily family = branchBlock.get().getFamily();
+					Species species = family.getCommonSpecies();
+					if(family.getPrimaryThickness() == radius) {
+						ILeavesProperties leavesProperties = species.getLeavesProperties();
+						if(leavesProperties != LeavesProperties.NULLPROPERTIES) {
+							SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
+							if(leafCluster != LeafClusters.NULLMAP) {
+								for(Cell cell : leafCluster.getAllNonZeroCells()) {
+									BlockPos delPos = pos.add(cell.getPos());
+									if(safeBounds.inBounds(delPos, false)) {
+										IBlockState leavesState = world.getBlockState(delPos);
+										if(TreeHelper.isLeaves(leavesState)) {
+											BlockDynamicLeaves leavesBlock = (BlockDynamicLeaves) leavesState.getBlock();
+											if(leavesProperties.getTree() == leavesBlock.getProperties(leavesState).getTree()) {
+												world.setBlockState(delPos, ModBlocks.blockStates.air, 2);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					world.setBlockState(pos, ModBlocks.blockStates.air, 2);
+				}
+				
+			}
+		}
+		BlockBranch.destroyMode = EnumDestroyMode.HARVEST;
+		
+		//Now wreck out all surrounding leaves.  Let them grow back naturally.
+		/*if(!endPoints.isEmpty()) {
+			BlockBounds bounds = new BlockBounds(endPoints);
+			bounds.expand(3);
+			for(BlockPos pos : bounds.iterate()) {
+				if(safeBounds.inBounds(pos, false)) {
+					if(TreeHelper.isLeaves(world.getBlockState(pos))) {
+						world.setBlockState(pos, ModBlocks.blockStates.air, 2);
+					}
+				}
+			}
+		}*/
 	}
 	
 	/**
@@ -299,16 +384,16 @@ public class JoCode {
 						if(v == 0) {//Air
 							count = 0;//Reset the count
 						} else
-						if((v & 0x0F) != 0) {//Leaves
-							count++;
-							if(count > smotherMax){//Smother value
-								leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
-							}
-						} else
-						if((v & 0x10) != 0) {//Twig
-							count++;
-							leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
-						}
+							if((v & 0x0F) != 0) {//Leaves
+								count++;
+								if(count > smotherMax){//Smother value
+									leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
+								}
+							} else
+								if((v & 0x10) != 0) {//Twig
+									count++;
+									leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
+								}
 					}
 				}
 			}
@@ -393,7 +478,7 @@ public class JoCode {
 		public CodeCompiler() {
 			instructions = new ArrayList<>();
 		}
-
+		
 		public CodeCompiler(int size) {
 			instructions = new ArrayList<>(size);
 		}

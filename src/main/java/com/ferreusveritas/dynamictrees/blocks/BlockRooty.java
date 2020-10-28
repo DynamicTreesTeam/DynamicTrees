@@ -327,7 +327,11 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		
-		signal.root = pos;
+		if(signal.root == null) {
+			signal.root = pos;
+		} else {
+			signal.multiroot = true;
+		}
 		signal.found = true;
 		
 		return signal;

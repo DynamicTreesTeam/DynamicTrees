@@ -116,16 +116,20 @@ public class BlockBounds {
 		return new BlockPos(maxX, maxY, maxZ);
 	}
 
-	public BlockBounds shrink(EnumFacing dir, int amount) {
+	public BlockBounds expand(EnumFacing dir, int amount) {
 		switch(dir) {
-			case DOWN: minY += amount; break;
-			case UP: maxY -= amount; break;
-			case NORTH: minZ += amount; break;
-			case SOUTH: maxZ -= amount; break;
-			case WEST: minX += amount; break;
-			case EAST: maxX -= amount; break;
+			case DOWN: minY -= amount; break;
+			case UP: maxY += amount; break;
+			case NORTH: minZ -= amount; break;
+			case SOUTH: maxZ += amount; break;
+			case WEST: minX -= amount; break;
+			case EAST: maxX += amount; break;
 		}
 		return this;
+	}
+	
+	public BlockBounds shrink(EnumFacing dir, int amount) {
+		return expand(dir, -amount);
 	}
 	
 	public BlockBounds move(int x, int y, int z) {

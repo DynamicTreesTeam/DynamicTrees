@@ -445,6 +445,11 @@ public class BlockBranchBasic extends BlockBranch {
 	@Override
 	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
+		
+		if(signal.overflow || (signal.trackVisited && signal.doTrackingVisited(pos))) {
+			return signal;
+		}
+		
 		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (EnumFacing dir : EnumFacing.VALUES) {// Spread signal in various directions
@@ -467,7 +472,7 @@ public class BlockBranchBasic extends BlockBranch {
 			signal.returnRun(blockState, world, pos, fromDir);
 		} else {
 			IBlockState state = world.getBlockState(pos);
-			if(state.getBlock() instanceof BlockBranch) {
+			if(signal.destroyLoopedNodes && state.getBlock() instanceof BlockBranch) {
 				BlockBranch branch = (BlockBranch) state.getBlock();
 				branch.breakDeliberate(world, pos, EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
 			}

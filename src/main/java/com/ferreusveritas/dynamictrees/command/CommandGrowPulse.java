@@ -14,14 +14,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CommandGrowPulse extends SubCommand {
-
+	
 	public static final String GROWPULSE = "growpulse";
 	
 	@Override
 	public String getName() {
 		return GROWPULSE;
 	}
-
+	
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
 		
@@ -33,7 +33,7 @@ public class CommandGrowPulse extends SubCommand {
 		
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
-
+	
 	@Override
 	public void execute(World world, ICommandSender sender, String[] args) throws CommandException {
 		
@@ -50,5 +50,5 @@ public class CommandGrowPulse extends SubCommand {
 			throw new CommandException("commands.dynamictrees.growpulse.norootyerror", pos.getX() + " " + pos.getY() + " " + pos.getZ());
 		}
 	}
-		
+	
 }

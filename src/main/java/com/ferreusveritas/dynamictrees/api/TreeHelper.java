@@ -336,7 +336,8 @@ public class TreeHelper {
 	}
 
 	public final static Optional<BlockBranch> getBranchOpt(IBlockState state) {
-		return isBranch(state.getBlock()) ? Optional.of((BlockBranch)state.getBlock()) : Optional.empty();
+		Block block = state.getBlock();
+		return isBranch(block) ? Optional.of((BlockBranch)block) : Optional.empty();
 	}
 
 	public final static Optional<BlockBranch> getBranchOpt(ITreePart treepart) {
@@ -386,6 +387,11 @@ public class TreeHelper {
 	
 	public final static BlockRooty getRooty(IBlockState blockState) {
 		return getRooty(blockState.getBlock());
+	}
+	
+	public final static Optional<BlockRooty> getRootyOpt(IBlockState blockState) {
+		Block block = blockState.getBlock();
+		return isRooty(block) ? Optional.of((BlockRooty)block) : Optional.empty();
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
+import org.apache.logging.log4j.Logger;
+
 import com.ferreusveritas.dynamictrees.command.DTCommand;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.proxy.CommonProxy;
@@ -26,8 +28,11 @@ public class DynamicTrees {
 	@SidedProxy(clientSide = "com.ferreusveritas.dynamictrees.proxy.ClientProxy", serverSide = "com.ferreusveritas.dynamictrees.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
+	public static Logger log;
+	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		log = event.getModLog();
 		proxy.preInit(event);
 		CompatHandler.HandleCompat();
 	}
