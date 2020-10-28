@@ -63,9 +63,13 @@ public class BlockRootyWater extends BlockRooty {
 			new UnlistedPropertyFloat("level_se"),
 			new UnlistedPropertyFloat("level_ne"),
 	};
-	
+
 	public BlockRootyWater(boolean isTileEntity) {
-		super("rootywater", Material.WATER, isTileEntity);
+		this(isTileEntity,"rootywater");
+	}
+
+	public BlockRootyWater(boolean isTileEntity, String name) {
+		super(name, Material.WATER, isTileEntity);
 		setSoundType(SoundType.PLANT);
 		setDefaultState(super.getDefaultState());
 		isSmoothWaterInstalled = Loader.isModLoaded("smoothwater");
