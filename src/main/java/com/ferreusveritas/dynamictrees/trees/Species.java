@@ -1,9 +1,23 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.function.Consumer;
+
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.*;
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
+import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -13,7 +27,14 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -34,14 +55,13 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,9 +88,6 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
@@ -555,15 +572,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
-
-	/**
-	 * DEPRECATED.  Use position sensitive version instead  
-	 */
-	@Deprecated
-	public BlockRooty getRootyBlock() {
-		Deprecatron.Complain("getRootyBlock", "getRootyBlock() is DEPRECATED and will be removed in the next version of Dynamic Trees. Use the position sensitive version instead. Species: " + this.getRegistryName());
-		return ModBlocks.blockRootyDirt;
-	}
 	
 	public BlockRooty getRootyBlock(World world, BlockPos rootPos) {
 		return getRequiresTileEntity(world, rootPos) ? ModBlocks.blockRootyDirtSpecies : ModBlocks.blockRootyDirt;
@@ -600,41 +608,6 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public Species addAcceptableSoils(String ... soilTypes) {
 		soilTypeFlags |= DirtHelper.getSoilFlags(soilTypes);
-		return this;
-	}
-	
-	/**
-	 * Adds blocks to the acceptable soil list.
-	 * 
-	 * DEPRECATED. Use addAcceptableSoils(DirtRegistry.Type ... soilTypes) instead
-	 * 
-	 * @param soilBlocks
-	 */
-	@Deprecated
-	public Species addAcceptableSoil(Block ... soilBlocks) {
-		Deprecatron.Complain("addAcceptableSoil", "The Block version of addAcceptableSoil is DEPRECATED and will be removed in future versions. Species: " + this.getRegistryName());
-		
-		for(Block block : soilBlocks) {
-			Material material = block.getMaterial(block.getDefaultState());
-			if(block == Blocks.NETHERRACK) {
-				addAcceptableSoils(DirtHelper.NETHERLIKE);
-			}
-			else if(block == Blocks.GRAVEL) {
-				addAcceptableSoils(DirtHelper.GRAVELLIKE);
-			}
-			else if(material == Material.GROUND) {
-				addAcceptableSoils(DirtHelper.DIRTLIKE);
-			}
-			else if(material == Material.GRASS) {
-				addAcceptableSoils(DirtHelper.DIRTLIKE);
-			}
-			else if(material == Material.SAND) {
-				addAcceptableSoils(DirtHelper.SANDLIKE);
-			}
-			else if(material == Material.WATER) {
-				addAcceptableSoils(DirtHelper.WATERLIKE);
-			}
-		}
 		return this;
 	}
 	

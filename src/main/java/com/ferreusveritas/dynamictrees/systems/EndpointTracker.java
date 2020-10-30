@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
+//** This is highly experimental leaves-fall-off-in-winter stuff that will probably never be implemented */ 
 public class EndpointTracker {
 	
 	public static class ChunkLocation extends Vec3i {
