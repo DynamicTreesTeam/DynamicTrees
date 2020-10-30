@@ -50,7 +50,6 @@ public class ModConfigs {
 	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 	
 	public static boolean fancyThickRings;
-	public static boolean rootyTextureMimicry;
 	
 	public static boolean worldGenDebug;
 	
@@ -111,7 +110,6 @@ public class ModConfigs {
 		
 		//Client
 		fancyThickRings = config.getBoolean("fancyThickRings", "client", true, "Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched");
-		rootyTextureMimicry = config.getBoolean("rootyTextureMimicry", "client", true, "Rooty dirt blocks will mimic the texture of adjacent soil blocks to better match the environment. Otherwise will always default to the most generic block");
 		
 		//Debug
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");

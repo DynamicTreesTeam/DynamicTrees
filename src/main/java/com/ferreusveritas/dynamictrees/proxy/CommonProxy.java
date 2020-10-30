@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.blocks.MimicProperty;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.event.CommonEventHandler;
 import com.ferreusveritas.dynamictrees.event.DropEventHandler;
@@ -59,6 +60,7 @@ public class CommonProxy {
 	public void postInit() {
 		WorldGenRegistry.populateDataBase();
 		ModTrees.setupExtraSoils();
+		MimicProperty.setupSoilFlags();
 	}
 	
 	public void cleanUp() {
