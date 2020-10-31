@@ -36,6 +36,10 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 			return pos.getY() >= 0 && pos.getY() <= 128;
 		}
 
+		protected boolean isReplaceable(World world, BlockPos pos){
+			return world.getBlockState(pos).getBlock().isReplaceable(world, pos) && !world.getBlockState(pos).getMaterial().isLiquid();
+		}
+		
 		protected ArrayList<Integer> findSubterraneanLayerHeights(World world, BlockPos start) {
 
 			MutableBlockPos pos = new MutableBlockPos(new BlockPos(start.getX(), 0, start.getZ()));
@@ -43,11 +47,11 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 			ArrayList<Integer> layers = new ArrayList();
 
 			while(inNetherRange(pos)) {
-				while(!world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
-				while(world.isAirBlock(pos) && inNetherRange(pos))  { pos.move(EnumFacing.DOWN); } //Move down 1 block at a time until we hit not-air
-				if (world.getBlockState(pos).getMaterial() != Material.LAVA) { layers.add(pos.getY()); } //Record this position
+				while(!isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit air
+				while(isReplaceable(world, pos) && inNetherRange(pos))  { pos.move(EnumFacing.DOWN); } //Move down 1 block at a time until we hit not-air
+				layers.add(pos.getY()); //Record this position
 				pos.move(EnumFacing.UP, 16); //Move up 16 blocks
-				while(world.isAirBlock(pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit ground
+				while(isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(EnumFacing.UP, 4); } //Zip up 4 blocks at a time until we hit ground
 			}
 
 			//Discard the last result as it's just the top of the biome(bedrock for nether)
