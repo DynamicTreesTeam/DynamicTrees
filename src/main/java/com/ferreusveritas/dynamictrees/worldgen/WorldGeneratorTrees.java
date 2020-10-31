@@ -38,7 +38,7 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 
 		protected ArrayList<Integer> findSubterraneanLayerHeights(World world, BlockPos start) {
 
-			MutableBlockPos pos = new MutableBlockPos(world.getHeight(start)).move(EnumFacing.DOWN);
+			MutableBlockPos pos = new MutableBlockPos(new BlockPos(start.getX(), 0, start.getZ()));
 
 			ArrayList<Integer> layers = new ArrayList();
 
