@@ -110,7 +110,7 @@ public class TreeHelper {
 	 * @param treePos The position of the bottom most block of a trees trunk
 	 * @param halfWidth The "radius" of the cuboid volume
 	 * @param height The height of the cuboid volume
- 	 * @param iterations The number of times to age the volume
+	 * @param iterations The number of times to age the volume
 	 */
 	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, int iterations, SafeChunkBounds safeBounds){
 		//Slow and dirty iteration over a cuboid volume.  Try to avoid this by using a voxmap if you can
@@ -126,7 +126,7 @@ public class TreeHelper {
 		}
 		
 	}
-
+	
 	public static Optional<JoCode> getJoCode(World world, BlockPos pos) {
 		return getJoCode(world, pos, EnumFacing.SOUTH);
 	}
@@ -143,7 +143,7 @@ public class TreeHelper {
 	public static BlockPos dereferenceTrunkShell(World world, BlockPos pos) {
 		
 		IBlockState blockState = world.getBlockState(pos);
-
+		
 		if(blockState.getBlock() == ModBlocks.blockTrunkShell) {
 			ShellMuse muse = ((BlockTrunkShell)blockState.getBlock()).getMuse(world, blockState, pos);
 			if(muse != null) {
@@ -153,7 +153,7 @@ public class TreeHelper {
 		
 		return pos;
 	}
-
+	
 	public static Species getCommonSpecies(World world, BlockPos pos) {
 		pos = dereferenceTrunkShell(world, pos);
 		IBlockState state = world.getBlockState(pos);
@@ -188,7 +188,7 @@ public class TreeHelper {
 	}
 	
 	/**
- 	 * This is resource intensive.  Use only for interaction code.
+	 * This is resource intensive.  Use only for interaction code.
 	 * Only the root node can determine the exact species and it has
 	 * to be found by mapping the branch network.  Tries to find the
 	 * exact species and if that fails tries to find the common species.
@@ -229,6 +229,26 @@ public class TreeHelper {
 		
 		return BlockPos.ORIGIN;
 	}
+	
+	
+	/**
+	 * Sets a custom rooty block decay(what dirt it becomes when the tree is gone) algorithm for
+	 * mods that have special requirements.
+	 * 
+	 * @param decay
+	 */
+	public static void setCustomRootBlockDecay(ICustomRootDecay decay) {
+		BlockRooty.customRootDecay = decay;
+	}
+	
+	/**
+	 * Provided as a means for an implementation to chain the handlers
+	 * @return the currently defined custom rooty block decay handler
+	 */
+	public static ICustomRootDecay getCustomRootBlockDecay() {
+		return BlockRooty.customRootDecay;
+	}
+	
 	
 	/**
 	 * Convenience function that spawns particles all over the tree branches
@@ -315,12 +335,12 @@ public class TreeHelper {
 	public final static Optional<BlockBranch> getBranchOpt(Block block) {
 		return isBranch(block) ? Optional.of((BlockBranch)block) : Optional.empty();
 	}
-
+	
 	public final static Optional<BlockBranch> getBranchOpt(IBlockState state) {
 		Block block = state.getBlock();
 		return isBranch(block) ? Optional.of((BlockBranch)block) : Optional.empty();
 	}
-
+	
 	public final static Optional<BlockBranch> getBranchOpt(ITreePart treepart) {
 		return treepart instanceof BlockBranch ? Optional.of((BlockBranch)treepart) : Optional.empty();
 	}

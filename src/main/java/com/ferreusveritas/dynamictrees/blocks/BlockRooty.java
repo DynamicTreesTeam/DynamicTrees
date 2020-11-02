@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.ModConfigs;
+import com.ferreusveritas.dynamictrees.api.ICustomRootDecay;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -47,6 +48,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -67,6 +69,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *
  */
 public class BlockRooty extends Block implements ITreePart, ITileEntityProvider, IMimic {
+	
+	public static ICustomRootDecay customRootDecay = null;
 	
 	public static final PropertyInteger LIFE = PropertyInteger.create("life", 0, 15);
 	
@@ -195,6 +199,35 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	 */
 	public IBlockState getDecayBlockState(IBlockAccess access, BlockPos pos) {
 		return Blocks.DIRT.getDefaultState();
+	}
+	
+	//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+	public void doDecay(World world, BlockPos rootPos, IBlockState rootyState, Species species) {
+		if(!world.isRemote) {
+			if(TreeHelper.isRooty(rootyState)) {
+				updateTree(rootyState, world, rootPos, world.rand, true);//This will turn the rooty dirt back to it's default soil block. Usually dirt or sand
+				IBlockState newState = world.getBlockState(rootPos);
+				
+				if(!TreeHelper.isRooty(newState)) { //Make sure we're not still a rooty block
+					if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
+						return;
+					}
+					
+					Biome biome = world.getBiome(rootPos);
+					IBlockState mimic = getMimic(world, rootPos);
+					
+					if(mimic == biome.topBlock || mimic == biome.fillerBlock) {
+						world.setBlockState(rootPos, mimic);
+					}
+					else if(biome.topBlock.getMaterial() == newState.getMaterial()) {
+						world.setBlockState(rootPos, biome.topBlock);
+					}
+					else if(biome.fillerBlock.getMaterial() == newState.getMaterial()) {
+						world.setBlockState(rootPos, biome.fillerBlock);
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
