@@ -50,7 +50,6 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 		if(entity.world.getBlockState(belowBlock).isSideSolid(entity.world, belowBlock, EnumFacing.UP)) {
 			entity.onGround = true;
-			return;
 		}
 	}
 	
