@@ -5,6 +5,7 @@ import java.util.List;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
 
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -26,6 +27,8 @@ public class TooltipHandler {
 			if(player != null) {
 				World world = player.world;
 				if(SeasonHelper.getSeasonValue(world) != null) {
+					Species species = seed.getSpecies(stack);
+					if (species == null || !species.isValid()) return;
 					int flags = seed.getSpecies(stack).getSeasonalTooltipFlags(world.provider.getDimension());
 					applySeasonalTooltips(event.getToolTip(), flags);
 				}
