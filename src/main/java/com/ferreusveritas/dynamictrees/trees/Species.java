@@ -55,6 +55,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -604,6 +605,18 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public int maxBranchRadius() {
 		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
+	}
+	
+	/**	
+	 * This function currently does nothing.  It's only present to prevent dependent projects from crashing.
+	 * DEPRECATED. Use addAcceptableSoils(DirtRegistry.Type ... soilTypes) instead	
+	 * 	
+	 * @param soilBlocks	
+	 */	
+	@Deprecated	
+	public Species addAcceptableSoil(Block ... soilBlocks) {
+		Deprecatron.Complain("addAcceptableSoil", "The Block version of addAcceptableSoil is DEPRECATED. Species: " + this.getRegistryName());	
+		return this;	
 	}
 	
 	public Species addAcceptableSoils(String ... soilTypes) {
