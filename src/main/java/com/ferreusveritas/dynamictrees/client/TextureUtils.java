@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-
-import java.util.ArrayList;
 import java.util.Arrays;
+
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class TextureUtils {
 	

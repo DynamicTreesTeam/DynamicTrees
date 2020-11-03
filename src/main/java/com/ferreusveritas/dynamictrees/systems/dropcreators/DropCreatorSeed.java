@@ -1,25 +1,25 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
+import java.util.List;
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryDropEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.item.Item;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.List;
-import java.util.Random;
-
 public class DropCreatorSeed implements IDropCreator {
-
+	
 	protected final float rarity;
 	protected ItemStack customSeed = ItemStack.EMPTY;
-
+	
 	public DropCreatorSeed() {
 		this(1.0f);
 	}
@@ -27,14 +27,14 @@ public class DropCreatorSeed implements IDropCreator {
 	public DropCreatorSeed(float rarity) {
 		this.rarity = rarity;
 	}
-
+	
 	//Set a custom seed if for some reason the tree should not drop its own seed
 	//Example: Tree A drops seeds of tree B
 	public DropCreatorSeed setCustomSeedDrop (ItemStack fruitItem){
 		this.customSeed = fruitItem;
 		return this;
 	}
-
+	
 	//Provided for customization via override
 	protected float getHarvestRarity() {
 		return rarity;
@@ -49,7 +49,7 @@ public class DropCreatorSeed implements IDropCreator {
 	protected float getLeavesRarity() {
 		return rarity;
 	}
-
+	
 	//Allows for overriding species seed drop if a custom seed is set.
 	protected ItemStack getSeedStack(Species species){
 		if (customSeed.isEmpty()){
@@ -58,7 +58,7 @@ public class DropCreatorSeed implements IDropCreator {
 			return customSeed;
 		}
 	}
-
+	
 	@Override
 	public ResourceLocation getName() {
 		return new ResourceLocation(DynamicTrees.MODID, "seed");
@@ -71,7 +71,7 @@ public class DropCreatorSeed implements IDropCreator {
 		}
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
 		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() > random.nextFloat()) {
@@ -84,7 +84,7 @@ public class DropCreatorSeed implements IDropCreator {
 		}
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
@@ -102,12 +102,12 @@ public class DropCreatorSeed implements IDropCreator {
 		
 		return dropList;
 	}
-
+	
 	@Override
 	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
 		return dropList;
 	}
-
-
-		
+	
+	
+	
 }

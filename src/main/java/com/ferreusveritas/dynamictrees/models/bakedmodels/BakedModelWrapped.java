@@ -1,11 +1,5 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-
-import java.util.List;
-
 //public abstract class BakedModelWrapped implements IBakedModel {
 //
 //	private IBakedModel wrappedModel;

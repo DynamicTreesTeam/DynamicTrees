@@ -37,7 +37,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class Seed extends Item implements IPlantable {
 	
 	private Species species;//The tree this seed creates
-
+	
 	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULLSPECIES;}
 	
 	public Seed(Species species) {
@@ -49,7 +49,7 @@ public class Seed extends Item implements IPlantable {
 	public Species getSpecies() {
 		return species;
 	}
-
+	
 	@Override
 	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
 		if(entityItem.lifespan == 6000) { //6000(5 minutes) is the default lifespan for an entity item
@@ -58,7 +58,7 @@ public class Seed extends Item implements IPlantable {
 				entityItem.lifespan = 6001;//Ensure this isn't run again
 			}
 		}
-
+		
 		if(entityItem.ticksExisted >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
 			World world = entityItem.world;
 			if(!world.isRemote) {//Server side only
@@ -73,10 +73,10 @@ public class Seed extends Item implements IPlantable {
 			}
 			entityItem.onKillCommand();
 		}
-
+		
 		return false;
 	}
-
+	
 	public boolean doPlanting(World world, BlockPos pos, PlayerEntity planter, ItemStack seedStack) {
 		Species species = getSpecies();
 		if(species.plantSapling(world, pos)) {//Do the planting
@@ -89,34 +89,34 @@ public class Seed extends Item implements IPlantable {
 		}
 		return false;
 	}
-
+	
 	public boolean shouldPlant(World world, BlockPos pos, ItemStack seedStack) {
-
+		
 		if(hasForcePlant(seedStack)) {
 			return true;
 		}
-
+		
 		if(!world.canBlockSeeSky(pos)) {
 			return false;
 		}
-
+		
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
-
+		
 		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
 		if(DTConfigs.seedOnlyForest.get() && treeGen != null) {
 			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
 		}
-
+		
 		float accum = 1.0f;
 		int count = seedStack.getCount();
 		while(count-- > 0) {
 			accum *= 1.0f - plantChance;
 		}
 		plantChance = 1.0f - accum;
-
+		
 		return plantChance > world.rand.nextFloat();
 	}
-
+	
 	public boolean hasForcePlant(ItemStack seedStack) {
 		boolean forcePlant = false;
 		if(seedStack.hasTag()) {
@@ -125,7 +125,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		return forcePlant;
 	}
-
+	
 	public int getTimeToLive(ItemStack seedStack) {
 		int lifespan = DTConfigs.seedTimeToLive.get();//1 minute by default(helps with lag)
 		if(seedStack.hasTag()) {
@@ -137,7 +137,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		return lifespan;
 	}
-
+	
 	public String getCode(ItemStack seedStack) {
 		String joCode = "";
 		if(seedStack.hasTag()) {
@@ -147,7 +147,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		return joCode;
 	}
-
+	
 	public ActionResultType onItemUseFlowerPot(ItemUseContext context) {
 		//Handle Flower Pot interaction
 		BlockState emptyPotState = context.getWorld().getBlockState(context.getPos());
@@ -159,12 +159,12 @@ public class Seed extends Item implements IPlantable {
 				return ActionResultType.SUCCESS;
 			}
 		}
-
+		
 		return ActionResultType.PASS;
 	}
-
+	
 	public ActionResultType onItemUsePlantSeed(ItemUseContext context) {
-
+		
 		BlockState state = context.getWorld().getBlockState(context.getPos());
 		BlockPos pos = context.getPos();
 		Direction facing = context.getFace();
@@ -172,7 +172,7 @@ public class Seed extends Item implements IPlantable {
 			pos = pos.down();
 			facing = Direction.UP;
 		}
-
+		
 		if (facing == Direction.UP) {//Ensure this seed is only used on the top side of a block
 			if (context.getPlayer().canPlayerEdit(pos, facing, context.getItem()) && context.getPlayer().canPlayerEdit(pos.up(), facing, context.getItem())) {//Ensure permissions to edit block
 				if(doPlanting(context.getWorld(), pos.up(), context.getPlayer(), context.getItem())) {
@@ -181,10 +181,10 @@ public class Seed extends Item implements IPlantable {
 				}
 			}
 		}
-
+		
 		return ActionResultType.PASS;
 	}
-
+	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 		//ItemStack seedStack = Objects.requireNonNull(context.getPlayer()).getHeldItem(context.getHand());
@@ -201,11 +201,11 @@ public class Seed extends Item implements IPlantable {
 		
 		return ActionResultType.FAIL;
 	}
-
+	
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, world, tooltip, flagIn);
-
+		
 		if(stack.hasTag()) {
 			String joCode = getCode(stack);
 			if(!joCode.isEmpty()) {
@@ -221,7 +221,7 @@ public class Seed extends Item implements IPlantable {
 			}
 		}
 	}
-
+	
 	
 	///////////////////////////////////////////
 	//IPlantable Interface
@@ -231,5 +231,5 @@ public class Seed extends Item implements IPlantable {
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
 		return getSpecies().getSapling().map(Block::getDefaultState).orElse(Blocks.AIR.getDefaultState());
 	}
-
+	
 }

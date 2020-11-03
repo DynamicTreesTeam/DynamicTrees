@@ -1,17 +1,17 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import java.util.Collection;
+import java.util.function.Function;
+
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.Collection;
-import java.util.function.Function;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	
@@ -118,15 +118,15 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	
 	@Override
 	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-		TextureAtlasSprite baseTexture = textureGetter.apply(solveRingTexture(textureGetter));
-		int srcWidth = baseTexture.getWidth();
-		int srcHeight = baseTexture.getHeight();
+//		TextureAtlasSprite baseTexture = textureGetter.apply(solveRingTexture(textureGetter));
+//		int srcWidth = baseTexture.getWidth();
+//		int srcHeight = baseTexture.getHeight();
 		
 //		this.width = srcWidth * 3;
 //		this.height = srcHeight * 3;
 		
-		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
-		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
+//		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
+//		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 		
 		//Load the pixels into the TextureAtlasSprite
 //		int mipmapLevels = baseTexture.getFrameTextureData(0).length;

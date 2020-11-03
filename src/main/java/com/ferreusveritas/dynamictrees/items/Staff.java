@@ -39,9 +39,9 @@ import java.awt.*;
 import java.util.List;
 
 /**
-* Try the following in a command block to demonstrate the extra tag functionality.
-* /give @p dynamictrees:staff 1 0 {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
-*/
+ * Try the following in a command block to demonstrate the extra tag functionality.
+ * /give @p dynamictrees:staff 1 0 {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
+ */
 public class Staff extends Item {
 	
 	public final static String HANDLE = "handle";
@@ -56,15 +56,15 @@ public class Staff extends Item {
 	public Staff() {
 		this("staff");
 	}
-
+	
 	public Staff(String name) {
 		super(new Item.Properties().maxStackSize(1)
 				.group(DTRegistries.dynamicTreesTab)
 				.addToolType(ToolType.AXE, 3));
 		setRegistryName(name);
 	}
-
-
+	
+	
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
@@ -72,7 +72,7 @@ public class Staff extends Item {
 		}
 		return super.getDestroySpeed(stack, state);
 	}
-
+	
 	@Override
 	public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
 		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
@@ -83,17 +83,17 @@ public class Staff extends Item {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
-
+		
 		ItemStack heldStack = context.getPlayer().getHeldItem(context.getHand());
-
+		
 		BlockState clickedBlockState = context.getWorld().getBlockState(context.getPos());
 		Block clickedBlock = clickedBlockState.getBlock();
-
+		
 		BlockPos pos = context.getPos();
-
+		
 		//Dereference proxy trunk shell
 		if(clickedBlock instanceof BlockTrunkShell) {
 			ShellMuse muse = ((BlockTrunkShell)clickedBlock).getMuse(context.getWorld(), clickedBlockState, context.getPos());
@@ -103,10 +103,10 @@ public class Staff extends Item {
 				clickedBlock = clickedBlockState.getBlock();
 			}
 		}
-
+		
 		ITreePart treePart = TreeHelper.getTreePart(clickedBlock);
 		BlockPos rootPos = pos;
-
+		
 		//Check if the tree part is a branch and look for the root node if so
 		BlockBranch branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
@@ -116,7 +116,7 @@ public class Staff extends Item {
 				treePart = TreeHelper.getTreePart(context.getWorld().getBlockState(rootPos));
 			}
 		}
-
+		
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
 			Species species = TreeHelper.getExactSpecies(context.getWorld().getBlockState(rootPos), context.getWorld(), rootPos);
@@ -125,14 +125,14 @@ public class Staff extends Item {
 					String code = new JoCode(context.getWorld(), rootPos, context.getPlayer().getHorizontalFacing()).toString();
 					setCode(heldStack, code);
 					if(context.getWorld().isRemote) {//Make sure this doesn't run on the server
-//						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
+						//						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 					}
 				}
 				setSpecies(heldStack, species);
 				return ActionResultType.SUCCESS;
 			}
 		}
-
+		
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species.isValid() && species.isAcceptableSoil(context.getWorld(), pos, clickedBlockState)) {
@@ -146,47 +146,47 @@ public class Staff extends Item {
 			}
 			return ActionResultType.SUCCESS;
 		}
-
+		
 		return ActionResultType.FAIL;
 	}
-
+	
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		return hasMaxUses(stack);
 	}
-
-//	@Override
-//	public int getMaxItemUseDuration(ItemStack stack) {
-//		return super.getMaxItemUseDuration(stack);
-//	}
-
+	
+	//	@Override
+	//	public int getMaxItemUseDuration(ItemStack stack) {
+	//		return super.getMaxItemUseDuration(stack);
+	//	}
+	
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
 		double damage = getUses(stack) / (double)getMaxUses(stack);
 		return 1 - damage;
 	}
-
+	
 	/**
-	* Gets the NBT for the itemStack or creates a new one if it doesn't exist
-	*
-	* @param itemStack
-	* @return
-	*/
+	 * Gets the NBT for the itemStack or creates a new one if it doesn't exist
+	 *
+	 * @param itemStack
+	 * @return
+	 */
 	public CompoundNBT getNBT(ItemStack itemStack) {
 		return itemStack.hasTag() ? itemStack.getTag() : new CompoundNBT();
 	}
-
+	
 	public boolean isReadOnly(ItemStack itemStack) {
 		return getNBT(itemStack).getBoolean(READONLY);
 	}
-
+	
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
 		CompoundNBT nbt = getNBT(itemStack);
 		nbt.putBoolean(READONLY, readonly);
 		itemStack.setTag(nbt);
 		return this;
 	}
-
+	
 	public Staff setSpecies(ItemStack itemStack, Species species) {
 		CompoundNBT nbt = getNBT(itemStack);
 		String name;
@@ -199,30 +199,30 @@ public class Staff extends Item {
 		itemStack.setTag(nbt);
 		return this;
 	}
-
+	
 	public Staff setCode(ItemStack itemStack, String code) {
 		CompoundNBT nbt = getNBT(itemStack);
 		nbt.putString(CODE, code);
 		itemStack.setTag(nbt);
 		return this;
 	}
-
+	
 	public Species getSpecies(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
-
+		
 		if(nbt.contains(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
-//			Species species = TreeRegistry.findSpeciesSloppy("oak");
-//			setSpecies(itemStack, species);
-//			return species;
+			//			Species species = TreeRegistry.findSpeciesSloppy("oak");
+			//			setSpecies(itemStack, species);
+			//			return species;
 			return Species.NULLSPECIES;
 		}
 	}
-
+	
 	public int getUses(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
-
+		
 		if(nbt.contains(USES)) {
 			return nbt.getInt(USES);
 		} else {
@@ -230,47 +230,47 @@ public class Staff extends Item {
 			setUses(itemStack, uses);
 			return uses;
 		}
-
+		
 	}
-
+	
 	public Staff setUses(ItemStack itemStack, int value) {
 		this.getNBT(itemStack).putInt(USES, value);
 		return this;
 	}
-
+	
 	public int getMaxUses(ItemStack itemStack) {
 		CompoundNBT nbt = getNBT(itemStack);
-
+		
 		if(nbt.contains(MAXUSES)) {
 			return nbt.getInt(MAXUSES);
 		}
-
+		
 		return 0;
 	}
-
+	
 	public Staff setMaxUses(ItemStack itemStack, int value) {
 		this.getNBT(itemStack).putInt(MAXUSES, value);
 		return this;
 	}
-
+	
 	public boolean hasMaxUses(ItemStack itemStack) {
 		return getNBT(itemStack).contains(MAXUSES);
 	}
-
+	
 	public boolean decUses(ItemStack itemStack) {
 		int uses = Math.max(0, getUses(itemStack) - 1);
 		setUses(itemStack, uses);
 		return uses <= 0;
 	}
-
+	
 	public int getColor(ItemStack itemStack, int tint) {
 		if(tint == 0) {
 			CompoundNBT nbt = getNBT(itemStack);
-
+			
 			int color = 0x005b472f;//Original brown wood color
-
+			
 			Species species = getSpecies(itemStack);
-
+			
 			if(nbt.contains(HANDLE)) {
 				try {
 					color = Color.decode(nbt.getString(HANDLE)).getRGB();
@@ -281,51 +281,51 @@ public class Staff extends Item {
 			else if (species.isValid()){
 				color = species.getFamily().getWoodColor();
 			}
-
+			
 			return color;
 		}
 		else
-		if(tint == 1) {
-			CompoundNBT nbt = getNBT(itemStack);
-
-			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
-
-			if(nbt.contains(COLOR)) {
-				try {
-					color = Color.decode(nbt.getString(COLOR)).getRGB();
-				} catch (NumberFormatException e) {
-					nbt.remove(COLOR);
+			if(tint == 1) {
+				CompoundNBT nbt = getNBT(itemStack);
+				
+				int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
+				
+				if(nbt.contains(COLOR)) {
+					try {
+						color = Color.decode(nbt.getString(COLOR)).getRGB();
+					} catch (NumberFormatException e) {
+						nbt.remove(COLOR);
+					}
 				}
+				
+				return color;
 			}
-
-			return color;
-		}
-
-
+		
+		
 		return 0xFFFFFFFF;//white
 	}
-
+	
 	public Staff setColor(ItemStack itemStack, String colStr) {
 		CompoundNBT nbt = getNBT(itemStack);
 		nbt.putString(COLOR, colStr);
 		itemStack.setTag(nbt);
 		return this;
 	}
-
+	
 	public String getCode(ItemStack itemStack) {
 		String code = "P";//Code of a sapling
 		CompoundNBT nbt = getNBT(itemStack);
-
+		
 		if(nbt.contains(CODE)) {
 			code = nbt.getString(CODE);
 		} else {
 			nbt.putString(CODE, code);
 			itemStack.setTag(nbt);
 		}
-
+		
 		return code;
 	}
-
+	
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -333,11 +333,11 @@ public class Staff extends Item {
 		tooltip.add(new StringTextComponent("Tree: " + ((species.isValid()) ? species : "none")));
 		tooltip.add(new StringTextComponent("Code: ").appendSibling(  new StringTextComponent(getCode(stack)).applyTextStyle(TextFormatting.GOLD)  ));
 	}
-
+	
 	/**
-	* Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
-	*/
-
+	 * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
+	 */
+	
 	@Override
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap multimap = super.getAttributeModifiers(equipmentSlot);
@@ -347,9 +347,9 @@ public class Staff extends Item {
 		}
 		return multimap;
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 }

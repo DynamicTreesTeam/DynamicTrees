@@ -1,28 +1,28 @@
 package com.ferreusveritas.dynamictrees.init;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @Mod.EventBusSubscriber
 public class DTConfigs {
-
+	
 	public static ForgeConfigSpec SERVER_CONFIG;
 	public static ForgeConfigSpec COMMON_CONFIG;
 	public static ForgeConfigSpec CLIENT_CONFIG;
-
+	
 	public static ForgeConfigSpec.DoubleValue seedDropRate;
 	public static ForgeConfigSpec.DoubleValue seedPlantRate;
 	public static ForgeConfigSpec.IntValue seedTimeToLive;
 	public static ForgeConfigSpec.BooleanValue seedOnlyForest;
 	public static ForgeConfigSpec.DoubleValue seedMinForestness;
-
+	
 	public static ForgeConfigSpec.DoubleValue treeGrowthMultiplier;
 	public static ForgeConfigSpec.DoubleValue treeHarvestMultiplier;
 	public static ForgeConfigSpec.DoubleValue maxTreeHardness;
@@ -34,7 +34,7 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
 	public static ForgeConfigSpec.BooleanValue enableThickTrees;
 	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
-
+	
 	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
 	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
 	public static ForgeConfigSpec.BooleanValue enableBranchClimbling;
@@ -45,64 +45,64 @@ public class DTConfigs {
 	public static ForgeConfigSpec.DoubleValue fallingTreeDamageMultiplier;
 	public static ForgeConfigSpec.BooleanValue dirtBucketPlacesDirt;
 	public static ForgeConfigSpec.BooleanValue sloppyBreakDrops;
-
+	
 	public static ForgeConfigSpec.BooleanValue replaceVanillaSapling;
-
+	
 	public static ForgeConfigSpec.BooleanValue podzolGen;
 	public static ForgeConfigSpec.BooleanValue worldGen;
 	public static ForgeConfigSpec.BooleanValue vanillaCactusWorldGen;
-//	private static ForgeConfigSpec.IntValue dimensionBlacklistCfg;
-//	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
+	//	private static ForgeConfigSpec.IntValue dimensionBlacklistCfg;
+	//	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 	public static ForgeConfigSpec.ConfigValue<List<Integer>> dimensionBlackList;
-
+	
 	public static ForgeConfigSpec.BooleanValue fancyThickRings;
-//	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
-
+	//	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
+	
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
-
+	
 	static {
 		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-
+		
 		SERVER_BUILDER.comment("Seed settings").push("seeds");
-			seedDropRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
+		seedDropRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
 				defineInRange("dropRate", 0.1, 0.0, 1.0);
-			seedPlantRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
+		seedPlantRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
 				defineInRange("plantRate", 1f/6f, 0.0, 1.0);
-			seedTimeToLive = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
+		seedTimeToLive = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
 				defineInRange("timeToLive", 1200, 0, 6000);
-			seedOnlyForest = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes").
+		seedOnlyForest = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes").
 				define("onlyForest", true);
-			seedMinForestness = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional").
+		seedMinForestness = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional").
 				defineInRange("dropRate", 0.0, 0.0, 1.0);
 		SERVER_BUILDER.pop();
-
+		
 		SERVER_BUILDER.comment("Tree settings").push("trees");
-			treeGrowthMultiplier = SERVER_BUILDER.comment("Factor that multiplies the rate at which trees grow. Use at own risk").
+		treeGrowthMultiplier = SERVER_BUILDER.comment("Factor that multiplies the rate at which trees grow. Use at own risk").
 				defineInRange("growthMultiplier", 0.5f, 0, 16f);
-			treeHarvestMultiplier = SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
+		treeHarvestMultiplier = SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
 				defineInRange("harvestMultiplier", 1f, 0f, 128f);
-			maxTreeHardness = SERVER_BUILDER.comment("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.").
-					defineInRange("maxTreeHardness", 20f, 1f, 200f);
-			treeGrowthFolding = SERVER_BUILDER.comment("Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.").
+		maxTreeHardness = SERVER_BUILDER.comment("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.").
+				defineInRange("maxTreeHardness", 20f, 1f, 200f);
+		treeGrowthFolding = SERVER_BUILDER.comment("Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.").
 				defineInRange("growthFolding", 2, 1, 8);
-			dropSticks = SERVER_BUILDER.comment("If enabled then sticks will be dropped for partial logs").
+		dropSticks = SERVER_BUILDER.comment("If enabled then sticks will be dropped for partial logs").
 				define("dropSticks", true);
-			scaleBiomeGrowthRate = SERVER_BUILDER.comment("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome").
+		scaleBiomeGrowthRate = SERVER_BUILDER.comment("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome").
 				defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
-			diseaseChance = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
+		diseaseChance = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
-			maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to rot away. 8 = Full block size.  Set to 0 to prevent rotting").
+		maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to rot away. 8 = Full block size.  Set to 0 to prevent rotting").
 				defineInRange("maxBranchRotRadius", 8, 0, 24);
-			enableAppleTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
+		enableAppleTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableAppleTrees", true);
-			enableThickTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
+		enableThickTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableThickTrees", true);
-			rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
+		rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		SERVER_BUILDER.pop();
-
+		
 		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
 		isLeavesPassable = SERVER_BUILDER.comment("If enabled all leaves will be passable").
 				define("isLeavesPassable", false);
@@ -125,46 +125,46 @@ public class DTConfigs {
 		sloppyBreakDrops = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.")
 				.define("sloppyBreakDrops", false);
 		SERVER_BUILDER.pop();
-
+		
 		SERVER_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
-			replaceVanillaSapling = SERVER_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
+		replaceVanillaSapling = SERVER_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
 		SERVER_BUILDER.pop();
-
+		
 		SERVER_BUILDER.comment("World settings").push("world");
-			podzolGen = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
+		podzolGen = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
 				define("podzolGen", true);
-			vanillaCactusWorldGen = SERVER_BUILDER.comment("World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.").
+		vanillaCactusWorldGen = SERVER_BUILDER.comment("World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.").
 				define("vanillaCactusWorldGen",false);
-
+		
 		SERVER_BUILDER.pop();
-
+		
 		COMMON_BUILDER.comment("World settings").push("world");
-			worldGen = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
+		worldGen = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
 				define("worldGen", true);
-			dimensionBlackList = COMMON_BUILDER.comment("Blacklist of dimension numbers for disabling Dynamic Tree worldgen").
-					define("dimensionsBlacklist", new ArrayList<>());
-
+		dimensionBlackList = COMMON_BUILDER.comment("Blacklist of dimension numbers for disabling Dynamic Tree worldgen").
+				define("dimensionsBlacklist", new ArrayList<>());
+		
 		COMMON_BUILDER.pop();
-
+		
 		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
-			fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
+		fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
 				define("fancyThickRings", true);
 		CLIENT_BUILDER.pop();
-
+		
 		SERVER_BUILDER.comment("Debug settings for development").push("debug");
-			worldGenDebug = SERVER_BUILDER.comment("Enable to mark tree spawn locations with wool circles.").
+		worldGenDebug = SERVER_BUILDER.comment("Enable to mark tree spawn locations with wool circles.").
 				define("debug", false);
 		SERVER_BUILDER.pop();
-
+		
 		SERVER_CONFIG = SERVER_BUILDER.build();
 		COMMON_CONFIG = COMMON_BUILDER.build();
 		CLIENT_CONFIG = CLIENT_BUILDER.build();
 	}
-
+	
 	@SubscribeEvent
 	public static void onLoad (final ModConfig.Loading configEvent){ }
-
+	
 	@SubscribeEvent
 	public static void onReload (final ModConfig.ConfigReloading configEvent){ }
 }

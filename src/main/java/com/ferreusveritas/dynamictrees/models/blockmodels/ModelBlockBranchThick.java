@@ -1,16 +1,5 @@
 package com.ferreusveritas.dynamictrees.models.blockmodels;
 
-import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.model.IModelState;
-
-import java.util.Collection;
-import java.util.function.Function;
-
 //@OnlyIn(Dist.CLIENT)
 //public class ModelBlockBranchThick extends ModelBlockBranchBasic {
 //

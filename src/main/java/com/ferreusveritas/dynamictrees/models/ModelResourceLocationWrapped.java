@@ -14,23 +14,23 @@ import net.minecraftforge.client.model.ICustomModelLoader;
  *
  */
 public class ModelResourceLocationWrapped extends ModelResourceLocation {
-
+	
 	private BlockState state;
-
+	
 	public ModelResourceLocationWrapped(ResourceLocation location, BlockState state) {
 		super(location, null);
 		this.state = state;
 	}
-
+	
 	public BlockState getBlockState() {
 		return state;
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other) && (other instanceof ModelResourceLocationWrapped && ((ModelResourceLocationWrapped) other).getBlockState().equals(getBlockState()));
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return super.hashCode() ^ getBlockState().hashCode();

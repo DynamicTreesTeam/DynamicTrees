@@ -1,12 +1,5 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import net.minecraft.world.World;
-import net.minecraftforge.event.world.ChunkDataEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 public class PoissonDiscEventHandler {
 
 //	/** This piece of crap event will not fire until after PLENTY of chunks have already generated when creating a new world.  WHY!? */

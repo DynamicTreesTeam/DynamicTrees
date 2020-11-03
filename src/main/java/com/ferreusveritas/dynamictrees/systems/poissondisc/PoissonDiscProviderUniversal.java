@@ -1,14 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraftforge.common.MinecraftForge;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class PoissonDiscProviderUniversal {
 //
 //	Map<Dimension, IPoissonDiscProvider> providerMap = new HashMap<>();

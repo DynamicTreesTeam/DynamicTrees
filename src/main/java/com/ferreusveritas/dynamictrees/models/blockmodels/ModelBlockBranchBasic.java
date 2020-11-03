@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.models.blockmodels;
 
+import java.util.function.Function;
+
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
-import com.google.common.collect.ImmutableList;
+
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelBakery;
@@ -13,10 +15,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.model.IModelState;
-
-import java.util.Collection;
-import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelBlockBranchBasic implements IModel {

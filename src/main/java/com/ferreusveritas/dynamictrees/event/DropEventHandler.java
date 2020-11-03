@@ -1,14 +1,11 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import net.minecraft.block.Blocks;
+
 import net.minecraft.block.LeavesBlock;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-
-import java.util.Iterator;
 
 public class DropEventHandler {
 	
