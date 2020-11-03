@@ -6,10 +6,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Mod.EventBusSubscriber
 public class DTConfigs {
 
 	public static ForgeConfigSpec SERVER_CONFIG;
+	public static ForgeConfigSpec COMMON_CONFIG;
 	public static ForgeConfigSpec CLIENT_CONFIG;
 
 	public static ForgeConfigSpec.DoubleValue seedDropRate;
@@ -48,6 +53,7 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue vanillaCactusWorldGen;
 //	private static ForgeConfigSpec.IntValue dimensionBlacklistCfg;
 //	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
+	public static ForgeConfigSpec.ConfigValue<List<Integer>> dimensionBlackList;
 
 	public static ForgeConfigSpec.BooleanValue fancyThickRings;
 //	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
@@ -55,8 +61,9 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
 
 	static {
-		ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
-		ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
+		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
+		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
+		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
 		SERVER_BUILDER.comment("Seed settings").push("seeds");
 			seedDropRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
@@ -127,12 +134,18 @@ public class DTConfigs {
 		SERVER_BUILDER.comment("World settings").push("world");
 			podzolGen = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
 				define("podzolGen", true);
-			worldGen = SERVER_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
-				define("worldGen", true);
 			vanillaCactusWorldGen = SERVER_BUILDER.comment("World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.").
 				define("vanillaCactusWorldGen",false);
 
 		SERVER_BUILDER.pop();
+
+		COMMON_BUILDER.comment("World settings").push("world");
+			worldGen = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
+				define("worldGen", true);
+			dimensionBlackList = COMMON_BUILDER.comment("Blacklist of dimension numbers for disabling Dynamic Tree worldgen").
+					define("dimensionsBlacklist", new ArrayList<>());
+
+		COMMON_BUILDER.pop();
 
 		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
 			fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
@@ -145,6 +158,7 @@ public class DTConfigs {
 		SERVER_BUILDER.pop();
 
 		SERVER_CONFIG = SERVER_BUILDER.build();
+		COMMON_CONFIG = COMMON_BUILDER.build();
 		CLIENT_CONFIG = CLIENT_BUILDER.build();
 	}
 
