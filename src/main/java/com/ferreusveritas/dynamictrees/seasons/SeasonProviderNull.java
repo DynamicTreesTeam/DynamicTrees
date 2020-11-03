@@ -15,16 +15,16 @@ public class SeasonProviderNull implements ISeasonProvider {
 	public SeasonProviderNull() {}
 	
 	@Override
-	public Float getSeasonValue(World world) {
+	public Float getSeasonValue(World world, BlockPos pos) {
 		return null;
 	}
 	
 	@Override
 	public void updateTick(World world, long worldTicks) { }
-
+	
 	@Override
 	public boolean shouldSnowMelt(World world, BlockPos pos) {
 		return false;
 	}
-
+	
 }

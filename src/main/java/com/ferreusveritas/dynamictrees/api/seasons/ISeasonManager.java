@@ -20,7 +20,7 @@ public interface ISeasonManager {
 	
 	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset);
 	
-	public Float getSeasonValue(World world);
+	public Float getSeasonValue(World world, BlockPos rootPos);
 	
 	public boolean isTropical(World world, BlockPos rootPos);
 	

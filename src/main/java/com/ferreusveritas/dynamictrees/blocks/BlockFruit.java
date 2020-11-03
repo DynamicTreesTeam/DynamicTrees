@@ -93,7 +93,7 @@ public class BlockFruit extends Block implements IGrowable {
 		}
 		
 		int age = state.getValue(AGE);
-		Float season = SeasonHelper.getSeasonValue(world);
+		Float season = SeasonHelper.getSeasonValue(world, pos);
 		
 		if(season != null && getSpecies() != null) { //Non-Null means we are season capable
 			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
@@ -286,7 +286,7 @@ public class BlockFruit extends Block implements IGrowable {
 	}
 	
 	public int getAgeForWorldGen(World world, BlockPos pos) {
-		Float seasonValue = SeasonHelper.getSeasonValue(world);
+		Float seasonValue = SeasonHelper.getSeasonValue(world, pos);
 		return seasonValue != null ? getAgeForSeasonalWorldGen(world, pos, seasonValue) : 3;
 	}
 	

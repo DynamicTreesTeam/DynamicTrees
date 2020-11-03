@@ -58,8 +58,8 @@ public class SeasonHelper {
 	 * @param world The world
 	 * @return season value 0.0(Early Spring, Inclusive) -> 4.0(Later Winter, Exclusive) or null if there's no seasons in the world.
 	 */
-	static public Float getSeasonValue(World world) {
-		return seasonManager.getSeasonValue(world);
+	static public Float getSeasonValue(World world, BlockPos pos) {
+		return seasonManager.getSeasonValue(world, pos);
 	}
 	
 	/**

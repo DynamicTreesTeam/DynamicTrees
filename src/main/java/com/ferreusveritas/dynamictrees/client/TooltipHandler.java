@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -26,7 +27,7 @@ public class TooltipHandler {
 			EntityPlayer player = event.getEntityPlayer();
 			if(player != null) {
 				World world = player.world;
-				if(SeasonHelper.getSeasonValue(world) != null) {
+				if(SeasonHelper.getSeasonValue(world, BlockPos.ORIGIN) != null) {
 					Species species = seed.getSpecies(stack);
 					if (species == null || !species.isValid()) return;
 					int flags = seed.getSpecies(stack).getSeasonalTooltipFlags(world.provider.getDimension());

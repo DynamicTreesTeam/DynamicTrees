@@ -14,7 +14,7 @@ public class SeasonProviderSereneSeasons implements ISeasonProvider {
 	private float seasonValue = 1.0f;
 	
 	@Override
-	public Float getSeasonValue(World world) {
+	public Float getSeasonValue(World world, BlockPos pos) {
 		return seasonValue;
 	}
 	

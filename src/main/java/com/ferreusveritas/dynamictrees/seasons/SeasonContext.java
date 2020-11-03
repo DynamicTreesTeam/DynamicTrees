@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.seasons;
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
 import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SeasonContext {
@@ -27,7 +28,7 @@ public class SeasonContext {
 		
 		if(methodTicks % 20 == 0) {
 			provider.updateTick(world, worldTicks);
-			seasonValue = provider.getSeasonValue(world);
+			seasonValue = provider.getSeasonValue(world, BlockPos.ORIGIN);
 			temperateGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TEMPERATE);
 			tropicalGrowthFactor = calculator.calcGrowthRate(seasonValue, ClimateZoneType.TROPICAL);
 			temperateSeedDropFactor = calculator.calcSeedDropRate(seasonValue, ClimateZoneType.TEMPERATE);
@@ -64,7 +65,7 @@ public class SeasonContext {
 	}
 	
 	public float getTemperateFruitProductionFactor(float offset) {
-		return (offset == 0 || seasonValue == null) ? temperateFruitProductionFactor :  calculator.calcFruitProduction(seasonValue + offset, ClimateZoneType.TEMPERATE);
+		return (offset == 0 || seasonValue == null) ? temperateFruitProductionFactor : calculator.calcFruitProduction(seasonValue + offset, ClimateZoneType.TEMPERATE);
 	}
 	
 	public float getTropicalFruitProductionFactor(float offset) {
