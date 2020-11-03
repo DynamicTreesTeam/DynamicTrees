@@ -34,7 +34,7 @@ public class DynamicTrees {
 	public void preInit(FMLPreInitializationEvent event) {
 		log = event.getModLog();
 		proxy.preInit(event);
-		CompatHandler.HandleCompat();
+		CompatHandler.preInit();
 	}
 	
 	@Mod.EventHandler
