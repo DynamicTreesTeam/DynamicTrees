@@ -342,17 +342,17 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		return connection;
 	}
 	
-	@Override public boolean isAmbientOcclusion(BlockState state) {
-		return isAmbientOcclusion();
-	}
-	@Override public boolean isAmbientOcclusion() {
-		return false;
+	@Override
+	public boolean isAmbientOcclusion() {
+		return true;
 	}
 	
-	@Override public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
+	@Override
+	public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
 		return getParticleTexture();
 	}
-	@Override public TextureAtlasSprite getParticleTexture() {
+	@Override
+	public TextureAtlasSprite getParticleTexture() {
 		return barkParticles;
 	}
 	
