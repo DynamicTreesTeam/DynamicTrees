@@ -42,12 +42,13 @@ public class ModelBlockBranchBasic implements IModel {
 	// Bake the subcomponents into a CompositeModel
 	@Override
 	public IBakedModel bake(ModelBakery bakery, Function<ResourceLocation, TextureAtlasSprite> spriteGetter, ISprite sprite, VertexFormat format) {
-		try {
+		/*try {
 			return new BakedModelBlockBranchBasic();
 		} catch (Exception exception) {
 			System.err.println("BranchModel.bake() failed due to exception:" + exception);
 			return ModelLoaderRegistry.getMissingModel().bake(bakery, spriteGetter, sprite);
-		}
+		}*/
+		return null;
 	}
 
 }

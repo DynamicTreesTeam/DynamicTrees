@@ -36,6 +36,7 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -55,11 +56,11 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
-	public BakedModelBlockBranchBasic() {
+	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes) {
 		this.modelBlock = new BlockModel(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
 		
-		TextureAtlasSprite barkIcon = Minecraft.getInstance().getTextureMap().getSprite(new ResourceLocation("minecraft", "block/oak_log"));
-		TextureAtlasSprite ringIcon = Minecraft.getInstance().getTextureMap().getSprite(new ResourceLocation("minecraft", "block/oak_log_top"));
+		TextureAtlasSprite barkIcon = Minecraft.getInstance().getTextureMap().getSprite(barkRes);
+		TextureAtlasSprite ringIcon = Minecraft.getInstance().getTextureMap().getSprite(ringsRes);
 		barkParticles = barkIcon;
 		
 		for(int i = 0; i < 8; i++) {
@@ -185,7 +186,6 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 				connections = ((Connections) extraData).getAllRadii();
 			}
 			
-			
 			//Count number of connections
 			int numConnections = 0;
 			for(int i: connections) {
@@ -275,11 +275,18 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Override
 	public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Connections connections = new Connections();
-		for (Direction dir : Direction.values()){
-			if (TreeHelper.isBranch(world.getBlockState(pos.offset(dir)))){
-				connections.setRadius(dir, TreeHelper.getRadius(world, pos.offset(dir)));
+		
+		if(state.getBlock() instanceof BlockBranchBasic) {
+			BlockBranchBasic thisBranch = (BlockBranchBasic) state.getBlock();
+			int coreRadius = thisBranch.getRadius(state);
+			for(Direction dir: Direction.values()) {
+				BlockPos deltaPos = pos.offset(dir);
+				BlockState neighborBlockState = world.getBlockState(deltaPos);
+				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, thisBranch, dir, coreRadius);
+				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
 			}
 		}
+		
 		return connections;
 	}
 	

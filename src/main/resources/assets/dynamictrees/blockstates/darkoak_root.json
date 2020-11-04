@@ -1,0 +1,5 @@
+{
+	"variants": {
+		"": { "model": "dynamictrees:block/darkoak_root#dynamicroot" }
+	}
+}

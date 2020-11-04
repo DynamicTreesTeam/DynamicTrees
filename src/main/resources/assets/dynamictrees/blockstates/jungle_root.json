@@ -1,5 +1,5 @@
 {
-  "variants": {
-    "normal": { "model": "dynamictrees:jungle_root#dynamicroot" }
-  }
+	"variants": {
+		"normal": { "model": "dynamictrees:jungle_root#dynamicroot" }
+	}
 }

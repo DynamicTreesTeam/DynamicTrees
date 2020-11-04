@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "": { "model": "block/spruce_fence_post" }
-    }
+	"variants": {
+		"": { "model": "block/goodwood" }
+	}
 }

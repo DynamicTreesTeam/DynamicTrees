@@ -33,8 +33,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("dynamictrees")
-public class DynamicTrees
-{
+public class DynamicTrees {
 	
 	public static final String MODID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
