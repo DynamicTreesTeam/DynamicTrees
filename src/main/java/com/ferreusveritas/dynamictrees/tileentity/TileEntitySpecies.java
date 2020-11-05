@@ -21,30 +21,25 @@ import net.minecraftforge.common.util.LazyOptional;
  */
 public class TileEntitySpecies extends TileEntity {
 	
-	Species species = Species.NULLSPECIES;
-	ResourceLocation speciesName = species.getRegistryName();
+	private Species species = Species.NULLSPECIES;
 	
 	public TileEntitySpecies() {
 		super(DTRegistries.speciesTE);
 	}
 	
 	public Species getSpecies() {
-		if(species == Species.NULLSPECIES) {
-			species = TreeRegistry.findSpecies(speciesName);
-		}
 		return species;
 	}
 	
 	public void setSpecies(Species species) {
 		this.species = species;
-		this.speciesName = species.getRegistryName();
 		this.markDirty();
 	}
 	
 	@Override
 	public void read(CompoundNBT tag) {
 		if(tag.contains("species")) {
-			speciesName = new ResourceLocation(tag.getString("species"));
+			ResourceLocation speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
 		super.read(tag);
@@ -53,7 +48,7 @@ public class TileEntitySpecies extends TileEntity {
 	@Nonnull
 	@Override
 	public CompoundNBT write(CompoundNBT tag) {
-		tag.putString("species", speciesName.toString());
+		tag.putString("species", species.getRegistryName().toString());
 		return super.write(tag);
 	}
 	
