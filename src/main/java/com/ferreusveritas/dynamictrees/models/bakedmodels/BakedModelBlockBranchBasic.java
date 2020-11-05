@@ -8,9 +8,6 @@ import java.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.vecmath.Matrix4f;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
@@ -209,9 +206,9 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 				//Get quads for core model
 				if(coreRadius != connections[face.getIndex()]) {
 					if(coreRingDir == null || coreRingDir != face) {
-						quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand));
+						quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
 					} else {
-						quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand));
+						quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
 					}
 				}
 				//Get quads for sleeves models
@@ -221,7 +218,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 						int connRadius = connections[idx];
 						//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 						if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
-							quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, face, rand));
+							quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, face, rand, extraData));
 						}
 					}
 				}
@@ -241,10 +238,6 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		
 		public Connections (){
 			radii = new int[] {0,0,0,0,0,0};
-		}
-		
-		public int getRadius (Direction dir){
-			return radii[dir.getIndex()];
 		}
 		
 		public void setRadius (Direction dir, int radius){
@@ -370,11 +363,6 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Override
 	public boolean doesHandlePerspectives() {
 		return false;
-	}
-	
-	@Override
-	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
-		return net.minecraftforge.client.ForgeHooksClient.handlePerspective(getBakedModel(), cameraTransformType);
 	}
 	
 }
