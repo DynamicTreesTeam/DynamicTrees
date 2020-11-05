@@ -129,7 +129,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 	
 	@Override
 	public boolean isThick() {
-		return true;
+		return false;
 	}
 	
 	@Override

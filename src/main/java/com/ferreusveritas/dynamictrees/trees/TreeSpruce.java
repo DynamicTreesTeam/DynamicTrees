@@ -93,7 +93,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		
 		@Override
 		public boolean isThick() {
-			return true;
+			return false;
 		}
 	}
 	
@@ -131,7 +131,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 	
 	@Override
 	public boolean isThick() {
-		return true;
+		return false;
 	}
 	
 	@Override
