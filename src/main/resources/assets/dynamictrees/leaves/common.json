@@ -4,5 +4,5 @@
 	"birch":	{"leaves":"minecraft:birch_leaves", "color":"@birch" },
 	"jungle":	{"leaves":"minecraft:jungle_leaves", "light":12 },
 	"acacia":	{"leaves":"minecraft:acacia_leaves", "cellkit":"acacia", "smother":2 },
-	"darkoak":	{"leaves":"minecraft:dark_oak_leaves", "cellkit":"darkoak", "smother":3 }
+	"dark_oak":	{"leaves":"minecraft:dark_oak_leaves", "cellkit":"dark_oak", "smother":3 }
 }
