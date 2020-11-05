@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -30,7 +31,6 @@ import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelRotation;
 import net.minecraft.client.renderer.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.state.IProperty;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
@@ -177,8 +177,10 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
-		List<BakedQuad> quadsList = new ArrayList<>(24);
-		if (state != null) {
+		
+		if (side == null && state != null) {
+			List<BakedQuad> quadsList = new ArrayList<>(24);
+			
 			int coreRadius = getRadius(state);
 			
 			int[] connections = new int[] {0,0,0,0,0,0};
@@ -202,30 +204,34 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 			//This is for drawing the rings on a terminating branch
 			Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
 			
-			//Get quads for core model
-			if(side == null || coreRadius != connections[side.getIndex()]) {
-				if(coreRingDir == null || coreRingDir != side) {
-					quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, side, rand));
-				} else {
-					quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand));
-				}
-			}
-			//Get quads for sleeves models
-			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-				for(Direction connDir : Direction.values()) {
-					int idx = connDir.getIndex();
-					int connRadius = connections[idx];
-					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-					if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
-						quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, side, rand));
+			for(Direction face  : Direction.values()) {
+				
+				//Get quads for core model
+				if(coreRadius != connections[face.getIndex()]) {
+					if(coreRingDir == null || coreRingDir != face) {
+						quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand));
+					} else {
+						quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand));
 					}
 				}
+				//Get quads for sleeves models
+				if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
+					for(Direction connDir : Direction.values()) {
+						int idx = connDir.getIndex();
+						int connRadius = connections[idx];
+						//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+						if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
+							quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, face, rand));
+						}
+					}
+				}
+				
 			}
-		} else {
-			//Not extended block state
+			
+			return quadsList;
 		}
 		
-		return quadsList;
+		return Collections.emptyList();
 	}
 	
 	private static class Connections implements IModelData{
@@ -274,6 +280,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Nonnull
 	@Override
 	public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+		
 		Connections connections = new Connections();
 		
 		if(state.getBlock() instanceof BlockBranchBasic) {
@@ -328,18 +335,6 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	protected int getRadius(BlockState blockState) {
 		// This way works with branches that don't have the RADIUS property, like cactus
 		return ((BlockBranchBasic) blockState.getBlock()).getRadius(blockState);
-	}
-	
-	/**
-	 * Get the connection radius of a direction from the ExtendedBlockState
-	 *
-	 * @param iExtendedBlockState
-	 * @param whichConnection
-	 * @return
-	 */
-	protected int getConnectionRadius(BlockState iExtendedBlockState, IProperty<Integer> whichConnection) {
-		Integer connection = iExtendedBlockState.get(whichConnection);
-		return connection;
 	}
 	
 	@Override
