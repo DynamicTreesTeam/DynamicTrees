@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -45,7 +46,7 @@ public final class CreateStaffCommand extends SubCommand {
     protected int execute(CommandContext<CommandSource> context) {
         try {
             BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-            final String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
+            String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
             final int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
             final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
 
@@ -53,6 +54,8 @@ public final class CreateStaffCommand extends SubCommand {
                 this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
                 return 0;
             }
+
+            if (!colour.startsWith("#")) colour = "#" + colour;
 
             ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
             DTRegistries.treeStaff.setSpecies(wandStack, species)

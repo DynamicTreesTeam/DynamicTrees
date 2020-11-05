@@ -165,50 +165,33 @@ public class Staff extends Item {
 		double damage = getUses(stack) / (double)getMaxUses(stack);
 		return 1 - damage;
 	}
-	
-	/**
-	 * Gets the NBT for the itemStack or creates a new one if it doesn't exist
-	 *
-	 * @param itemStack
-	 * @return
-	 */
-	public CompoundNBT getNBT(ItemStack itemStack) {
-		return itemStack.hasTag() ? itemStack.getTag() : new CompoundNBT();
-	}
-	
+
 	public boolean isReadOnly(ItemStack itemStack) {
-		return getNBT(itemStack).getBoolean(READONLY);
+		return itemStack.getOrCreateTag().getBoolean(READONLY);
 	}
 	
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
-		CompoundNBT nbt = getNBT(itemStack);
-		nbt.putBoolean(READONLY, readonly);
-		itemStack.setTag(nbt);
+		itemStack.getOrCreateTag().putBoolean(READONLY, readonly);
 		return this;
 	}
 	
 	public Staff setSpecies(ItemStack itemStack, Species species) {
-		CompoundNBT nbt = getNBT(itemStack);
 		String name;
-		if (species == Species.NULLSPECIES){
-			name = "null";
-		} else {
-			name = species.toString();
-		}
-		nbt.putString(TREE, name);
-		itemStack.setTag(nbt);
+
+		if (species == Species.NULLSPECIES) name = "null";
+		else name = species.toString();
+
+		itemStack.getOrCreateTag().putString(TREE, name);
 		return this;
 	}
 	
 	public Staff setCode(ItemStack itemStack, String code) {
-		CompoundNBT nbt = getNBT(itemStack);
-		nbt.putString(CODE, code);
-		itemStack.setTag(nbt);
+		itemStack.getOrCreateTag().putString(CODE, code);
 		return this;
 	}
 	
 	public Species getSpecies(ItemStack itemStack) {
-		CompoundNBT nbt = getNBT(itemStack);
+		CompoundNBT nbt = itemStack.getOrCreateTag();
 		
 		if(nbt.contains(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
@@ -221,7 +204,7 @@ public class Staff extends Item {
 	}
 	
 	public int getUses(ItemStack itemStack) {
-		CompoundNBT nbt = getNBT(itemStack);
+		CompoundNBT nbt = itemStack.getOrCreateTag();
 		
 		if(nbt.contains(USES)) {
 			return nbt.getInt(USES);
@@ -234,12 +217,12 @@ public class Staff extends Item {
 	}
 	
 	public Staff setUses(ItemStack itemStack, int value) {
-		this.getNBT(itemStack).putInt(USES, value);
+		itemStack.getOrCreateTag().putInt(USES, value);
 		return this;
 	}
 	
 	public int getMaxUses(ItemStack itemStack) {
-		CompoundNBT nbt = getNBT(itemStack);
+		CompoundNBT nbt = itemStack.getOrCreateTag();
 		
 		if(nbt.contains(MAXUSES)) {
 			return nbt.getInt(MAXUSES);
@@ -249,12 +232,12 @@ public class Staff extends Item {
 	}
 	
 	public Staff setMaxUses(ItemStack itemStack, int value) {
-		this.getNBT(itemStack).putInt(MAXUSES, value);
+		itemStack.getOrCreateTag().putInt(MAXUSES, value);
 		return this;
 	}
 	
 	public boolean hasMaxUses(ItemStack itemStack) {
-		return getNBT(itemStack).contains(MAXUSES);
+		return itemStack.getOrCreateTag().contains(MAXUSES);
 	}
 	
 	public boolean decUses(ItemStack itemStack) {
@@ -264,63 +247,55 @@ public class Staff extends Item {
 	}
 	
 	public int getColor(ItemStack itemStack, int tint) {
-		if(tint == 0) {
-			CompoundNBT nbt = getNBT(itemStack);
-			
-			int color = 0x005b472f;//Original brown wood color
+		final CompoundNBT nbt = itemStack.getOrCreateTag();
+
+		if (tint == 0) {
+			int color = 0x005b472f; // Original brown wood color
 			
 			Species species = getSpecies(itemStack);
 			
-			if(nbt.contains(HANDLE)) {
+			if (nbt.contains(HANDLE)) {
 				try {
 					color = Color.decode(nbt.getString(HANDLE)).getRGB();
 				} catch (NumberFormatException e) {
 					nbt.remove(HANDLE);
 				}
 			}
-			else if (species.isValid()){
+			else if (species.isValid()) {
 				color = species.getFamily().getWoodColor();
 			}
 			
 			return color;
-		}
-		else
-			if(tint == 1) {
-				CompoundNBT nbt = getNBT(itemStack);
-				
-				int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
-				
-				if(nbt.contains(COLOR)) {
-					try {
-						color = Color.decode(nbt.getString(COLOR)).getRGB();
-					} catch (NumberFormatException e) {
-						nbt.remove(COLOR);
-					}
+		} else if (tint == 1) {
+			int color = 0x0000FFFF; // Cyan crystal like Radagast the Brown's staff.
+
+			if (nbt.contains(COLOR)) {
+				try {
+					color = Color.decode(nbt.getString(COLOR)).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.remove(COLOR);
 				}
-				
-				return color;
 			}
+
+			return color;
+		}
 		
 		
 		return 0xFFFFFFFF;//white
 	}
 	
 	public Staff setColor(ItemStack itemStack, String colStr) {
-		CompoundNBT nbt = getNBT(itemStack);
-		nbt.putString(COLOR, colStr);
-		itemStack.setTag(nbt);
+		itemStack.getOrCreateTag().putString(COLOR, colStr);
 		return this;
 	}
 	
 	public String getCode(ItemStack itemStack) {
 		String code = "P";//Code of a sapling
-		CompoundNBT nbt = getNBT(itemStack);
-		
-		if(nbt.contains(CODE)) {
-			code = nbt.getString(CODE);
+
+		if (itemStack.getOrCreateTag().contains(CODE)) {
+			code = itemStack.getTag().getString(CODE);
 		} else {
-			nbt.putString(CODE, code);
-			itemStack.setTag(nbt);
+			itemStack.getTag().putString(CODE, code);
 		}
 		
 		return code;

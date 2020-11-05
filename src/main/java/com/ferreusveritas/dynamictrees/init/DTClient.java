@@ -124,7 +124,7 @@ public class DTClient {
 		// Register Potion Colorizer
 		ModelHelper.regColorHandler(DTRegistries.dendroPotion, (stack, tint) -> DTRegistries.dendroPotion.getColor(stack, tint));
 		
-		//Register Woodland Staff Mesher and Colorizer
+		//Register Woodland Staff Colorizer
 		ModelHelper.regColorHandler(DTRegistries.treeStaff, (stack, tint) -> DTRegistries.treeStaff.getColor(stack, tint));
 		
 		//TREE PARTS
