@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -186,6 +187,25 @@ public class TreeHelper {
 		}
 		return Species.NULLSPECIES;
 	}
+	
+	
+	/**	
+	 * This is resource intensive.  Use only for interaction code.
+	 * Only the root node can determine the exact species and it has
+	 * to be found by mapping the branch network.
+	 * 
+	 * This function is deprecated. Use getExactSpecies(World, BlockPos)
+	 * 
+	 * @param world	
+	 * @param pos	
+	 * @return	
+	 */	
+	@Deprecated	
+	public static Species getExactSpecies(IBlockState unused, World world, BlockPos pos) {	
+		Deprecatron.Complain("getExactSpecies", "Deprecated use of getExactSpecies method. Will be removed in the future.");	
+		return getExactSpecies(world, pos);	
+	}
+	
 	
 	/**
 	 * This is resource intensive.  Use only for interaction code.
