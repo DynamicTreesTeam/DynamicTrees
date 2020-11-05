@@ -69,7 +69,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 	
 	public class SpeciesMegaJungle extends Species {
 		
-		private static final String speciesName = "megajungle";
+		private static final String speciesName = "mega_jungle";
 		
 		SpeciesMegaJungle(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);

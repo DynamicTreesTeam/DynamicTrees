@@ -60,7 +60,7 @@ public final class CreateStaffCommand extends SubCommand {
             ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
             DTRegistries.treeStaff.setSpecies(wandStack, species)
                     .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
-                    .setColor(wandStack, colour) // TODO: Fix problem with setting colours. They are currently not set whenever a letter is included in the hex code (...?).
+                    .setColor(wandStack, colour)
                     .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))
                     .setMaxUses(wandStack, maxUses)
                     .setUses(wandStack, maxUses);

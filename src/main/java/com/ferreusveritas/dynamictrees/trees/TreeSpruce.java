@@ -61,7 +61,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 
 	public class SpeciesMegaSpruce extends SpeciesBaseSpruce {
 		
-		private static final String speciesName = "megaspruce";
+		private static final String speciesName = "mega_spruce";
 		
 		SpeciesMegaSpruce(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
