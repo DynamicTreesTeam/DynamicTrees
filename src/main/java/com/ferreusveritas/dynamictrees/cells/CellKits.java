@@ -31,7 +31,7 @@ public class CellKits {
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "deciduous"), deciduous);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "conifer"), conifer);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "acacia"), acacia);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "darkoak"), darkoak);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "dark_oak"), dark_oak);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "bare"), bare);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MODID, "palm"), palm);
 	}
@@ -193,7 +193,7 @@ public class CellKits {
 	};
 	
 	
-	private final ICellKit darkoak = new ICellKit() {
+	private final ICellKit dark_oak = new ICellKit() {
 		
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new CellNormal(5);

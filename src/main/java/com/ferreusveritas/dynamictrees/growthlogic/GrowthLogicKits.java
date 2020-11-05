@@ -15,7 +15,7 @@ public class GrowthLogicKits {
 	
 	public GrowthLogicKits() {
 		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.NULL), new NullLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.DARKOAK), new DarkOakLogic());
+		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.DARK_OAK), new DarkOakLogic());
 		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.CONIFER), new ConiferLogic());
 		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MODID, DTTrees.JUNGLE), new JungleLogic());
 	}

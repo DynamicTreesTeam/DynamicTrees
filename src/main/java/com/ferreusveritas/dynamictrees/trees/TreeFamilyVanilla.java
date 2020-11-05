@@ -17,8 +17,8 @@ public class TreeFamilyVanilla extends TreeFamily {
 	public final DynamicTrees.VanillaWoodTypes woodType;
 	
 	public TreeFamilyVanilla(DynamicTrees.VanillaWoodTypes wood) {
-		super(new ResourceLocation(DynamicTrees.MODID, wood.toString().replace("_", "")));
-		
+		super(new ResourceLocation(DynamicTrees.MODID, wood.toString()));
+
 		woodType = wood;
 		getCommonLeaves().setTree(this);
 

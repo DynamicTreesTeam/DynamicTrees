@@ -24,7 +24,7 @@ public class ModelBakeEventListener {
 		bakeBranch(event, DTTrees.BIRCH, "block/birch_log", "block/birch_log_top");
 		bakeBranch(event, DTTrees.SPRUCE, "block/spruce_log", "block/spruce_log_top");
 		bakeBranch(event, DTTrees.JUNGLE, "block/jungle_log", "block/jungle_log_top");
-		bakeBranch(event, DTTrees.DARKOAK, "block/dark_oak_log", "block/dark_oak_log_top");
+		bakeBranch(event, DTTrees.DARK_OAK, "block/dark_oak_log", "block/dark_oak_log_top");
 		bakeBranch(event, DTTrees.ACACIA, "block/acacia_log", "block/acacia_log_top");
 	}
 
