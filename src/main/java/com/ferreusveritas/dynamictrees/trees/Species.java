@@ -1,6 +1,25 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
+import com.ferreusveritas.dynamictrees.api.IGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
+import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -10,7 +29,13 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
+import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -29,11 +54,13 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
+import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -59,9 +86,6 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraftforge.registries.IForgeRegistryEntry<Species> {
 	
@@ -107,6 +131,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	protected int soilLongevity = 8;
 	
 	protected HashSet<Block> soilList = new HashSet<Block>();
+	
+	private boolean requiresTileEntity = false;
 	
 	//Leaves
 	protected ILeavesProperties leavesProperties;
@@ -227,6 +253,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public float getTapering() {
 		return tapering;
 	}
+	
+	//Rare species require TileEntity Storage
+	public boolean getRequiresTileEntity(World world, BlockPos pos) {
+		return requiresTileEntity;
+	}
+	
+	public void setRequiresTileEntity(boolean truth) {
+		requiresTileEntity = truth;
+	}
+	
 	
 	///////////////////////////////////////////
 	//LEAVES
@@ -494,12 +530,20 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public boolean transitionToTree(World world, BlockPos pos) {
+		
 		//Ensure planting conditions are right
 		TreeFamily family = getFamily();
 		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
+			
+			if(getRequiresTileEntity(world, pos)) {
+				TileEntitySpecies speciesTE = DTRegistries.speciesTE.create();
+				world.setTileEntity(pos.down(), speciesTE);
+				speciesTE.setSpecies(this);
+			}
+			
 			return true;
 		}
 		
@@ -522,6 +566,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public SoundType getSaplingSound() {
 		return SoundType.PLANT;
 	}
+	
 	
 	///////////////////////////////////////////
 	//DIRT
@@ -637,6 +682,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, BlockState soilBlockState) {
 		return isAcceptableSoil(world, pos, soilBlockState);
 	}
+	
 	
 	//////////////////////////////
 	// GROWTH
@@ -1006,6 +1052,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return false;
 	}
 	
+	
 	//////////////////////////////
 	// INTERACTIVE
 	//////////////////////////////
@@ -1098,6 +1145,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 	}
 	
+	
 	///////////////////////////////////////////
 	// MEGANESS
 	///////////////////////////////////////////
@@ -1110,6 +1158,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return Species.NULLSPECIES;
 	}
 	
+	
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
@@ -1117,6 +1166,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
 		return getFamily().selectAnimationHandler(fallingEntity);
 	}
+	
 	
 	//////////////////////////////
 	// BONSAI POT
@@ -1131,6 +1181,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public BlockBonsaiPot getBonzaiPot() {
 		return DTRegistries.blockBonsaiPot;
 	}
+	
 	
 	//////////////////////////////
 	// WORLDGEN

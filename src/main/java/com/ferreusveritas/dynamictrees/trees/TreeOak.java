@@ -140,12 +140,14 @@ public class TreeOak extends TreeFamilyVanilla {
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
-	public class SpeciesAppleOak extends SpeciesRare {
+	public class SpeciesAppleOak extends Species {
 		
 		private static final String speciesName = "apple";
 		
 		public SpeciesAppleOak(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
+			
+			setRequiresTileEntity(true);
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);

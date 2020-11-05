@@ -73,7 +73,9 @@ public class TreeJungle extends TreeFamilyVanilla {
 		
 		SpeciesMegaJungle(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
-
+			
+			setRequiresTileEntity(true);
+			
 			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.JUNGLE));
 			
