@@ -1,19 +1,20 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.google.common.base.Predicates;
 import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -22,13 +23,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class AnimationHandlerFallover implements IAnimationHandler {
 
