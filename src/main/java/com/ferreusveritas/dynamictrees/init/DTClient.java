@@ -44,6 +44,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
@@ -63,6 +64,7 @@ public class DTClient {
 	public static void discoverWoodColors() {
 		
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString());
+		Random rand = new Random();
 		
 		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodColor = 0xFFF1AE;//For roots
@@ -70,7 +72,7 @@ public class DTClient {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
 					IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
-					List<BakedQuad> quads = model.getQuads(state, Direction.DOWN, null); //We get the BOTTOM face of the log model
+					List<BakedQuad> quads = model.getQuads(state, Direction.DOWN, rand, EmptyModelData.INSTANCE); //We get the BOTTOM face of the log model
 					ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that top face
 					if(!resloc.toString().isEmpty()) {
 						TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));

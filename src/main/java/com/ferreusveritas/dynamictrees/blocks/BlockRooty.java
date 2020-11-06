@@ -149,14 +149,8 @@ public class BlockRooty extends Block implements ITreePart {
 
 	@Nonnull
 	@Override
-	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		return primitiveDirt.getItem(worldIn, pos, primitiveDirt.getDefaultState());
-	}
-
-	@Nonnull
-	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		return primitiveDirt.getDrops(primitiveDirt.getDefaultState(), builder);
+		return primitiveDirt.getDefaultState().getDrops(builder);
 	}
 
 	@Override
@@ -166,7 +160,7 @@ public class BlockRooty extends Block implements ITreePart {
 
 	@Override
 	public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
-		return (float) (primitiveDirt.getBlockHardness(blockState, worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
+		return (float) (primitiveDirt.getDefaultState().getBlockHardness(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
 	}
 
 	@Override

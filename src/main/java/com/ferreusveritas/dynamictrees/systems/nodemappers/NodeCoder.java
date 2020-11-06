@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
+import java.util.ArrayList;
+
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
 
 public class NodeCoder implements INodeInspector {
 	

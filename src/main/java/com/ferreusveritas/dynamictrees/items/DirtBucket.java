@@ -47,39 +47,39 @@ public class DirtBucket extends Item {
 			if (raytrace instanceof BlockRayTraceResult && raytrace.getType() == RayTraceResult.Type.BLOCK) {
 				blockRayTraceResult = (BlockRayTraceResult) raytrace;
 			} else {
-				return new ActionResult(ActionResultType.FAIL, itemStack);
+				return new ActionResult<>(ActionResultType.FAIL, itemStack);
 			}
 		}
 		if (DTConfigs.dirtBucketPlacesDirt.get()) {
 			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
-				return new ActionResult(ActionResultType.PASS, itemStack);
+				return new ActionResult<>(ActionResultType.PASS, itemStack);
 			}
 			else {
 				
 				BlockPos blockpos = blockRayTraceResult.getPos();
 				
 				if (!world.isBlockModifiable(player, blockpos)) {
-					return new ActionResult(ActionResultType.FAIL, itemStack);
+					return new ActionResult<>(ActionResultType.FAIL, itemStack);
 				}
 				else {
 					boolean isReplacable = world.getBlockState(blockpos).getMaterial().isReplaceable();
 					BlockPos workingBlockPos = isReplacable && blockRayTraceResult.getFace() == Direction.UP ? blockpos : blockpos.offset(blockRayTraceResult.getFace());
 					
 					if (!player.canPlayerEdit(workingBlockPos, blockRayTraceResult.getFace(), itemStack)) {
-						return new ActionResult(ActionResultType.FAIL, itemStack);
+						return new ActionResult<>(ActionResultType.FAIL, itemStack);
 					}
 					else if (this.tryPlaceContainedDirt(player, world, workingBlockPos)) {
 						//						player.addStat(Stats.BLOCK_USED.getObjectUseStats(this));
-						return !player.isCreative() ? new ActionResult(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult(ActionResultType.SUCCESS, itemStack);
+						return !player.isCreative() ? new ActionResult<>(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(ActionResultType.SUCCESS, itemStack);
 					}
 					else {
-						return new ActionResult(ActionResultType.FAIL, itemStack);
+						return new ActionResult<>(ActionResultType.FAIL, itemStack);
 					}
 				}
 			}
 		}
 		else {
-			return new ActionResult(ActionResultType.PASS, itemStack);
+			return new ActionResult<>(ActionResultType.PASS, itemStack);
 		}
 	}
 	

@@ -119,7 +119,7 @@ public class Staff extends Item {
 		
 		//Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			Species species = TreeHelper.getExactSpecies(context.getWorld().getBlockState(rootPos), context.getWorld(), rootPos);
+			Species species = TreeHelper.getExactSpecies(context.getWorld(), rootPos);
 			if(species.isValid()) {
 				if(!context.getPlayer().isSneaking()) {
 					String code = new JoCode(context.getWorld(), rootPos, context.getPlayer().getHorizontalFacing()).toString();
@@ -314,9 +314,9 @@ public class Staff extends Item {
 	 */
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap multimap = super.getAttributeModifiers(equipmentSlot);
-		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
+		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
+		if (slot == EquipmentSlotType.MAINHAND) {
 			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
 			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
 		}

@@ -49,7 +49,7 @@ public class DropCreatorStorage implements IDropCreatorStorage {
 	
 	@Override
 	public Map<ResourceLocation, IDropCreator> getDropCreators() {
-		return new HashMap(dropCreators);
+		return new HashMap<ResourceLocation, IDropCreator>(dropCreators);
 	}
 	
 	private List<ItemStack> makeDropListIfNull(List<ItemStack> dropList) {

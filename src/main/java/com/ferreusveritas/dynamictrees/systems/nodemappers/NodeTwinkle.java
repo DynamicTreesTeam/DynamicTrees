@@ -1,18 +1,16 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import java.util.Random;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.init.DTClient;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class NodeTwinkle implements INodeInspector {
 	
