@@ -31,12 +31,10 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext.Builder;
+import net.minecraftforge.common.IPlantable;
 
-//TODO: 1.14.4  Tile Entity is eliminated and each species has it's own sapling block state
-//TODO: 1.14.4  Implement IPlantable
-
-public class BlockDynamicSapling extends Block implements IGrowable {
-
+public class BlockDynamicSapling extends Block implements IGrowable, IPlantable {
+	
 	protected Species species;
 	
 	public BlockDynamicSapling(Species species) {
@@ -44,36 +42,36 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 		setRegistryName( "dynamic_" + species.getRegistryName().getPath() + "_sapling");
 		this.species = species;
 	}
-
+	
 	
 	///////////////////////////////////////////
 	// TREE INFORMATION
 	///////////////////////////////////////////
-
+	
 	public Species getSpecies() {
 		return species;
 	}
-
+	
 	@Override
 	public boolean canGrow(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
 		return getSpecies().canGrowWithBoneMeal((World) world, pos);
 	}
-
+	
 	@Override
 	public boolean canUseBonemeal(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		return getSpecies().canUseBoneMealNow(world, rand, pos);
 	}
-
+	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-
-
+	
+	
 	@Override
 	public void tick(BlockState state, World world, BlockPos pos, Random rand) {
 		grow(world, rand, pos, state);
 	}
-
+	
 	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(Direction dir: CoordUtils.HORIZONTALS) {
@@ -83,15 +81,15 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 				return false;
 			}
 		}
-
+		
 		//Air above and acceptable soil below
 		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
 	}
-
+	
 	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
 		return canSaplingStay(world, getSpecies(), pos);
 	}
-
+	
 	@Override
 	public void grow(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		if(canBlockStay(world, pos, state)) {
@@ -100,35 +98,35 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 			dropBlock(world, state, pos);
 		}
 	}
-
+	
 	@Override
 	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
 		return getSpecies().getSaplingSound();
 	}
-
+	
 	///////////////////////////////////////////
 	// DROPS
 	///////////////////////////////////////////
-
-
+	
+	
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		if (!canBlockStay(world, pos, state)) {
 			dropBlock(world, state, pos);
 		}
 	}
-
+	
 	protected void dropBlock(World world, BlockState state, BlockPos pos) {
 		world.addEntity(new ItemEntity(world, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, getSpecies().getSeedStack(1)));
 		world.removeBlock(pos, false);
 	}
-
+	
 	@Nonnull
 	@Override
 	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
 		return getSpecies().getSeedStack(1);
 	}
-
+	
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull Builder builder) {
@@ -142,26 +140,31 @@ public class BlockDynamicSapling extends Block implements IGrowable {
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		return getSpecies().getSeedStack(1);
 	}
-
-
+	
+	
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
-
+	
 	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
 		return getSpecies().getSaplingShape();
 	}
-
+	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
+	
 	@Nonnull
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
+	}
+	
+	@Override
+	public BlockState getPlant(IBlockReader world, BlockPos pos) {
+		return species.getSapling().get().getDefaultState();
 	}
 	
 }
