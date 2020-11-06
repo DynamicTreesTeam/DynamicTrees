@@ -1,6 +1,11 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -14,6 +19,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -27,7 +33,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -35,10 +40,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Random;
 
 public class BlockBranchBasic extends BlockBranch {
 	
@@ -148,10 +149,10 @@ public class BlockBranchBasic extends BlockBranch {
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
 	
-	@Deprecated
+	@Override
 	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
 		int radius = getRadius(blockState);
-		float hardness = getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(world, pos) * (radius * radius) / 64.0f * 8.0f;
 		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 		return hardness;
 	}
@@ -324,54 +325,23 @@ public class BlockBranchBasic extends BlockBranch {
 	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (state.getBlock() != this) {
-			return VoxelShapes.empty();
-		}
 		
-		int thisRadius = getRadius(state);
+		int thisRadiusInt = getRadius(state);
+		double radius = thisRadiusInt / 16.0;
+		VoxelShape core = VoxelShapes.create(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 		
-		boolean connectionMade = false;
-		double radius = thisRadius / 16.0;
-		double gap = 0.5 - radius;
-		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
 		for (Direction dir : Direction.values()) {
-			if (getSideConnectionRadius(worldIn, pos, thisRadius, dir) > 0) {
-				connectionMade = true;
+			int sideRadiusInt = Math.min(getSideConnectionRadius(worldIn, pos, thisRadiusInt, dir), thisRadiusInt);
+			double sideRadius = sideRadiusInt / 16.0f;
+			if (sideRadius > 0.0f) {
+				double gap = 0.5f - sideRadius;
+				AxisAlignedBB aabb = new AxisAlignedBB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
 				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
-			}
-		}
-		if (connectionMade) {
-			return VoxelShapes.create(aabb.offset(0.5, 0.5, 0.5));
-		}
-		
-		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
-	}
-	
-	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		boolean hasConnections = false;
-		int thisRadius = getRadius(state);
-		
-		VoxelShape shape = VoxelShapes.empty();
-		
-		for (Direction dir : Direction.values()) {
-			int connRadius = getSideConnectionRadius(worldIn, pos, thisRadius, dir);
-			if (connRadius > 0) {
-				hasConnections = true;
-				double radius = MathHelper.clamp(connRadius, 1, thisRadius) / 16.0;
-				double gap = 0.5 - radius;
-				AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap).offset(0.5, 0.5, 0.5);//.intersect(maxBranchBB);
-				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+				core = VoxelShapes.or(core, VoxelShapes.create(aabb));
 			}
 		}
 		
-		if(!hasConnections) {
-			AxisAlignedBB aabb = new AxisAlignedBB(0.5, 0.5, 0.5, 0.5, 0.5, 0.5).grow(thisRadius);
-			shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
-		}
-		
-		return shape;
+		return core;
 	}
 	
 	@Override
