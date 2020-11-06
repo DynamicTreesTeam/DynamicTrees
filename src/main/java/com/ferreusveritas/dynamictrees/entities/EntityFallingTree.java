@@ -1,5 +1,10 @@
 package com.ferreusveritas.dynamictrees.entities;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
@@ -11,20 +16,21 @@ import com.ferreusveritas.dynamictrees.models.IModelTracker;
 import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -36,12 +42,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.entity.EntityType;
-import net.minecraft.network.IPacket;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.util.*;
 
 ///**
 // *
@@ -172,9 +174,12 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	public void buildClient() {
 		
+		System.out.println("buildClient");
+		
 		CompoundNBT tag = getVoxelData();
 		
 		if(tag.contains("species")) {
+			System.out.println("has species");
 			setupFromNBT(tag);
 			clientBuilt = true;
 		} else {
@@ -212,6 +217,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	}
 	
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
+		
 		normAABB = new AxisAlignedBB(BlockPos.ZERO);
 		
 		for(BlockPos relPos: destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
@@ -223,6 +229,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
 		double grow = Math.max(0, height - (width / 2) ) + 2;
 		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
+		
+		System.out.println("buildAABBFromDestroyData: " + normAABB);
 		
 		return normAABB;
 	}
@@ -466,6 +474,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	@Override
 	public IPacket<?> createSpawnPacket() {
+		System.out.println("createSpawnPacket");
 		return new SSpawnObjectPacket(this);
 	}
 	

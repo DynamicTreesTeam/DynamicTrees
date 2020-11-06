@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 @OnlyIn(Dist.CLIENT)
@@ -42,6 +43,8 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 	@Override
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+		
+		System.out.println("doRender: " + x + " " + y + " " + z);
 		
 		if(!entity.isClientBuilt() || !entity.shouldRender()) {
 			return;
@@ -75,7 +78,7 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 		BlockState fire = Blocks.FIRE.getDefaultState();
 		IBakedModel model = dispatcher.getModelForState(fire);
-		drawBakedQuads(QuadManipulator.getQuads(model, fire), 255, 0xFFFFFFFF);
+		drawBakedQuads(QuadManipulator.getQuads(model, fire, EmptyModelData.INSTANCE), 255, 0xFFFFFFFF);
 		GlStateManager.popMatrix();
 	}
 	

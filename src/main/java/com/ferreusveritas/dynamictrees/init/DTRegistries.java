@@ -131,7 +131,9 @@ public class DTRegistries {
 	
 	public static void setupEntities() {
 		fallingTree = EntityType.Builder.create(EntityFallingTree::new, EntityClassification.MISC)
-				.setShouldReceiveVelocityUpdates(true).setTrackingRange(512).setUpdateInterval(Integer.MAX_VALUE)
+				.setShouldReceiveVelocityUpdates(true)
+				.setTrackingRange(512)
+				.setUpdateInterval(Integer.MAX_VALUE)
 				.build(FALLING_TREE);
 	}
 	

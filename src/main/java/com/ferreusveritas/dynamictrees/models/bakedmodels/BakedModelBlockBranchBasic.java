@@ -39,7 +39,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
 
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
@@ -231,40 +230,6 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		return Collections.emptyList();
 	}
 	
-	private static class Connections implements IModelData{
-		
-		private int[] radii;
-		//		ModelProperty<Integer>[] radii = new ModelProperty<Integer>[6];
-		
-		public Connections (){
-			radii = new int[] {0,0,0,0,0,0};
-		}
-		
-		public void setRadius (Direction dir, int radius){
-			radii[dir.getIndex()] = radius;
-		}
-		
-		public int[] getAllRadii (){
-			return radii;
-		}
-		
-		@Override
-		public boolean hasProperty(ModelProperty<?> prop) {
-			return false;
-		}
-		
-		@Nullable
-		@Override
-		public <T> T getData(ModelProperty<T> prop) {
-			return null;
-		}
-		
-		@Nullable
-		@Override
-		public <T> T setData(ModelProperty<T> prop, T data) {
-			return null;
-		}
-	}
 	
 	/**
 	 * Checks all neighboring tree parts to determine the connection radius for each side of this branch block.

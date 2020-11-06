@@ -18,42 +18,43 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class QuadManipulator {
 	
 	public static final Direction everyFace[] = { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null };
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn) {
-		return getQuads(modelIn, stateIn, Vec3d.ZERO, everyFace, new Random());
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, IModelData modelData) {
+		return getQuads(modelIn, stateIn, Vec3d.ZERO, everyFace, new Random(), modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Direction[] sides) {
-		return getQuads(modelIn, stateIn, Vec3d.ZERO, sides, new Random());
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Direction[] sides, IModelData modelData) {
+		return getQuads(modelIn, stateIn, Vec3d.ZERO, sides, new Random(), modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Random rand) {
-		return getQuads(modelIn, stateIn, Vec3d.ZERO, everyFace, rand);
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Random rand, IModelData modelData) {
+		return getQuads(modelIn, stateIn, Vec3d.ZERO, everyFace, rand, modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Random rand) {
-		return getQuads(modelIn, stateIn, offset, everyFace, rand);
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Random rand, IModelData modelData) {
+		return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset) {
-		return getQuads(modelIn, stateIn, offset, everyFace, new Random());
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, IModelData modelData) {
+		return getQuads(modelIn, stateIn, offset, everyFace, new Random(), modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Direction[] sides) {
-		return getQuads(modelIn, stateIn, offset, sides, new Random());
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Direction[] sides, IModelData modelData) {
+		return getQuads(modelIn, stateIn, offset, sides, new Random(), modelData);
 	}
 	
-	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Direction[] sides, Random rand) {
+	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vec3d offset, Direction[] sides, Random rand, IModelData modelData) {
 		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
 		
 		if(stateIn != null) {
 			for (Direction enumfacing : sides) {
-				outQuads.addAll(modelIn.getQuads(stateIn, enumfacing, rand));
+				outQuads.addAll(modelIn.getQuads(stateIn, enumfacing, rand, modelData));
 			}
 		}
 		
