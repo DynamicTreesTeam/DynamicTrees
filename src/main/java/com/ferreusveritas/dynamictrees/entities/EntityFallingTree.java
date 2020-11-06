@@ -34,7 +34,6 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -44,6 +43,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 ///**
 // *
@@ -174,12 +174,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	public void buildClient() {
 		
-		System.out.println("buildClient");
-		
 		CompoundNBT tag = getVoxelData();
 		
 		if(tag.contains("species")) {
-			System.out.println("has species");
 			setupFromNBT(tag);
 			clientBuilt = true;
 		} else {
@@ -229,8 +226,6 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
 		double grow = Math.max(0, height - (width / 2) ) + 2;
 		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
-		
-		System.out.println("buildAABBFromDestroyData: " + normAABB);
 		
 		return normAABB;
 	}
@@ -474,8 +469,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	@Override
 	public IPacket<?> createSpawnPacket() {
-		System.out.println("createSpawnPacket");
-		return new SSpawnObjectPacket(this);
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {

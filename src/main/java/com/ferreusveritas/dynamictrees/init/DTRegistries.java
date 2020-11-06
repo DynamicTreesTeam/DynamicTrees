@@ -134,6 +134,7 @@ public class DTRegistries {
 				.setShouldReceiveVelocityUpdates(true)
 				.setTrackingRange(512)
 				.setUpdateInterval(Integer.MAX_VALUE)
+				.setCustomClientFactory((spawnEntity, world) -> new EntityFallingTree(fallingTree, world))
 				.build(FALLING_TREE);
 	}
 	
