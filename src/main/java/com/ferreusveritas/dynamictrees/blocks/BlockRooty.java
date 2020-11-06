@@ -161,11 +161,11 @@ public class BlockRooty extends Block implements ITreePart {
 						return;
 					}*/
 					
-					BlockState topBlock = world.getBiome(rootPos).getSurfaceBuilderConfig().getTop();
-					BlockState fillerBlock = world.getBiome(rootPos).getSurfaceBuilderConfig().getUnder();
-					
-					
 					Biome biome = world.getBiome(rootPos);
+					
+					BlockState topBlock = biome.getSurfaceBuilderConfig().getTop();
+					BlockState fillerBlock = biome.getSurfaceBuilderConfig().getUnder();
+					
 					BlockState mimic = primitiveDirt.getDefaultState();//getMimic(world, rootPos);
 					
 					if(mimic == topBlock || mimic == fillerBlock) {
