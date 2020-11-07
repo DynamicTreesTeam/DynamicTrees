@@ -94,6 +94,15 @@ public class Seed extends Item {
 	
 	public boolean doPlanting(World world, BlockPos pos, EntityPlayer planter, ItemStack seedStack) {
 		Species species = getSpecies(seedStack);
+		
+		final Species speciesForLocation = species.getFamily().getSpeciesForLocation(world, pos);
+		
+		// If the species is the common species and the location override is not the common species, do location override.
+		if (species.equals(species.getFamily().getCommonSpecies()) && 
+			!speciesForLocation.equals(species.getFamily().getCommonSpecies())) {
+			species = speciesForLocation;
+		}
+		
 		if(species.plantSapling(world, pos)) {//Do the planting
 			String joCode = getCode(seedStack);
 			if(!joCode.isEmpty()) {
