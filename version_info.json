@@ -1,7 +1,7 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
 	"1.12.2": {
-		"1.12.2-0.9.21": "New Fetaures:\n- Make season manager position sensitive for more complex climate models(such as TFC)\nBug Fixes:\n- Fix species for location saplin transition problem(only affects certain add-ons)\n- Re-add deprecated function for compatibility with primitive mobs\n- Re-add deprecated addAcceptableSoil as an empty function for compatibility with underground biomes\n",
+		"1.12.2-0.9.21": "New Features:\n- Make season manager position sensitive for more complex climate models(such as TFC)\nBug Fixes:\n- Fix species for location saplin transition problem(only affects certain add-ons)\n- Re-add deprecated function for compatibility with primitive mobs\n- Re-add deprecated addAcceptableSoil as an empty function for compatibility with underground biomes\n",
 		"1.12.2-0.9.20": "New Features:\n- Greatly improve resistance to rare distorted tree models during worldgen\n- Enhanced rooty dirt mimic capabilities with new DirtHelper system\n- Admin commands to remove trees from chunks or clean up orphaned nodes\nBug Fixes:\n- Fix Tooltip crash\n- Fix nether generation density issues for add-on mods\nInternal:\n- Removed some deprecated methods\n",
 		"1.12.2-0.9.19": "New Features:\n-Add support API functionality for Add-ons\n Bug Fixes:\n-Fixed stack overflow crash",
 		"1.12.2-0.9.18": "New Features:\n- Created soil registry system.",
