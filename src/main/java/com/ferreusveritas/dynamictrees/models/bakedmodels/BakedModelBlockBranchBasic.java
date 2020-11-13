@@ -9,11 +9,13 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranchBasic;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
+import com.ferreusveritas.dynamictrees.util.Connections;
 import com.google.common.collect.Maps;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Vector3f;
@@ -33,7 +35,6 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -238,21 +239,8 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	@Nonnull
 	@Override
 	public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
-		
-		Connections connections = new Connections();
-		
-		if(state.getBlock() instanceof BlockBranchBasic) {
-			BlockBranchBasic thisBranch = (BlockBranchBasic) state.getBlock();
-			int coreRadius = thisBranch.getRadius(state);
-			for(Direction dir: Direction.values()) {
-				BlockPos deltaPos = pos.offset(dir);
-				BlockState neighborBlockState = world.getBlockState(deltaPos);
-				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, thisBranch, dir, coreRadius);
-				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
-			}
-		}
-		
-		return connections;
+		Block block = state.getBlock();
+		return block instanceof BlockBranch ? new ModelConnections(((BlockBranch) block).getConnectionData(world, pos, state)) : new ModelConnections();
 	}
 	
 	/**

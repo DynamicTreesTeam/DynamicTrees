@@ -1,5 +1,15 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -18,8 +28,10 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -40,16 +52,14 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class
 BlockBranch extends Block implements ITreePart, IFutureBreakable {
@@ -150,6 +160,23 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	// RENDERING
 	///////////////////////////////////////////
 	
+	public Connections getConnectionData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+		
+		Connections connections = new Connections();
+		
+		if(state.getBlock().equals(this)) {
+			int coreRadius = getRadius(state);
+			for(Direction dir: Direction.values()) {
+				BlockPos deltaPos = pos.offset(dir);
+				BlockState neighborBlockState = world.getBlockState(deltaPos);
+				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
+				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
+			}
+		}
+		
+		return connections;
+	}
+	
 	@Override
 	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
 		return false;
@@ -236,7 +263,7 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 		
 		//Calculate main trunk height
 		int trunkHeight = 1;
-		for(BlockPos iter = new BlockPos(0, 1, 0); extStateMapper.getExtStateMap().containsKey(iter); iter = iter.up()) {
+		for(BlockPos iter = new BlockPos(0, 1, 0); extStateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.up()) {
 			trunkHeight++;
 		}
 		
@@ -245,7 +272,7 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 			cutDir = Direction.DOWN;
 		}
 		
-		return new BranchDestructionData(species, extStateMapper.getExtStateMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+		return new BranchDestructionData(species, extStateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
 	}
 	
 	/**

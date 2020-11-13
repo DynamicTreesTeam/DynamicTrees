@@ -46,7 +46,7 @@ public class BranchDestructionData {
 		trunkHeight = 0;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, BlockState> branches, Map<BlockPos, BlockState> leaves, List<BlockBranch.ItemStackPos> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
+	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BlockBranch.ItemStackPos> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -95,28 +95,30 @@ public class BranchDestructionData {
 	// Branches
 	///////////////////////////////////////////////////////////
 	
-	private int[][] convertBranchesToIntArrays(Map<BlockPos, BlockState> branchList) {
+	private int[][] convertBranchesToIntArrays(Map<BlockPos, BranchConnectionData> branchList) {
 		int data1[] = new int[branchList.size()];
 		int data2[] = new int[branchList.size()];
 		int index = 0;
 		
 		//Ensure the origin block is at the first index
-		BlockState origExState = branchList.get(BlockPos.ZERO);
+		BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
+		BlockState origExState = origConnData.getBlockState();
 		if(origExState != null) {
 			data1[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BlockBranch) origExState.getBlock(), origExState);
-			data2[index++] = encodeBranchesConnections(origExState);
+			data2[index++] = encodeBranchesConnections(origConnData.getConnections());
 			branchList.remove(BlockPos.ZERO);
 		}
 		
 		//Encode the remaining blocks
-		for(Entry<BlockPos, BlockState> set : branchList.entrySet()) {
+		for(Entry<BlockPos, BranchConnectionData> set : branchList.entrySet()) {
 			BlockPos relPos = set.getKey();
-			BlockState exState = set.getValue();
+			BranchConnectionData connData = set.getValue();
+			BlockState exState = connData.getBlockState();
 			Block block = exState.getBlock();
 			
 			if(block instanceof BlockBranch && bounds.inBounds(relPos)) { //Place comfortable limits on the system
 				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranch) block, exState);
-				data2[index++] = encodeBranchesConnections(exState);
+				data2[index++] = encodeBranchesConnections(connData.getConnections());
 			}
 		}
 		
@@ -128,16 +130,18 @@ public class BranchDestructionData {
 	}
 	
 	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch branchBlock, BlockState state) {
-		return	((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
+		return ((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
 				encodeRelBlockPos(relPos);
 	}
 	
-	private int encodeBranchesConnections(BlockState exState) {
+	private int encodeBranchesConnections(Connections exState) {
 		int result = 0;
-		//		for(Direction face : Direction.values()) {
-		//			int rad = (int) exState.get(BlockBranch.CONNECTIONS[face.getIndex()]);
-		//			result |= (rad & 0x1F) << (face.getIndex() * 5);//5 bits per face * 6 faces = 30bits
-		//		}
+		int[] radii = exState.getAllRadii();
+		for(Direction face : Direction.values()) {
+			int faceIndex = face.getIndex();
+			int rad = radii[faceIndex];
+			result |= (rad & 0x1F) << (faceIndex * 5);//5 bits per face * 6 faces = 30bits
+		}
 		return result;
 	}
 	

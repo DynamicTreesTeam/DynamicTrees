@@ -8,7 +8,7 @@ import java.util.Map;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.Connections;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.ModelConnections;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
@@ -79,7 +79,7 @@ public class ModelEntityFallingTree extends EntityModel<EntityFallingTree> {
 				int radius = ((BlockBranch) exState.getBlock()).getRadius(exState);
 				float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;
 				IBakedModel branchModel = dispatcher.getModelForState(exState);//Since we source the blockState from the destruction data it will always be the same
-				Connections connections = new Connections(connectionArray);
+				ModelConnections connections = new ModelConnections(connectionArray);
 				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ZERO.offset(cutDir)).scale(offset), new Direction[] { cutDir }, connections));
 				
 				//Draw the rest of the tree/branch
