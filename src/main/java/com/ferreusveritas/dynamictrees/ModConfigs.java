@@ -28,7 +28,6 @@ public class ModConfigs {
 	public static float diseaseChance;
 	public static int maxBranchRotRadius;
 	public static boolean enableAppleTrees;
-	public static boolean enableThickTrees;
 
 	public static boolean isLeavesPassable;
 	public static boolean vanillaLeavesCollision;
