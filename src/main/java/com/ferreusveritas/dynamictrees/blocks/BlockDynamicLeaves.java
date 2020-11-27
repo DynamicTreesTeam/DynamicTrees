@@ -81,7 +81,12 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		setUnlocalizedName(getRegistryName().toString());
 		return this;
 	}
-	
+
+	@Override
+	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+		return getProperties(state).getPrimitiveLeavesItemStack();
+	}
+
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] {HYDRO, TREE, DECAYABLE});
@@ -211,11 +216,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	protected static interface NewLeavesPropertiesHandler {
 		IBlockState getLeaves(World world, BlockPos pos, IBlockState leavesStateWithHydro);
-	}
-	
-	@Override
-	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return getProperties(state).getPrimitiveLeavesItemStack();
 	}
 	
 	@Override
