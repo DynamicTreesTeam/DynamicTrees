@@ -114,6 +114,12 @@ public class BlockTrunkShell extends Block {
 	
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
+		// barretone fix, not calling the log's actual block and copying the value
+		// in case the getHardness somehow gets modified, since this is a fix,
+		// it's better to have a constant instead of a maybe.
+		if (world == null && pos == null) {
+			return 2.0F;
+		}
 		ShellMuse muse = getMuse(world, blockState, pos);
 		return muse != null ? muse.state.getBlock().getBlockHardness(muse.state, world, muse.pos) : 0.0f;
 	}
