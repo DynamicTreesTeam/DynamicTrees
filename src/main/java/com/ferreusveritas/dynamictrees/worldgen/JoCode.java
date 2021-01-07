@@ -1,10 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -16,17 +11,20 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * So named because the base64 codes it generates almost always start with "JO"
@@ -182,7 +180,7 @@ public class JoCode {
 				
 				//Place Growing Leaves Blocks from voxmap
 				for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
-					MutableBlockPos cellPos = cell.getPos();
+					BlockPos.Mutable cellPos = cell.getPos();
 					if(safeBounds.inBounds(cellPos, false)) {
 						BlockState testBlockState = world.getBlockState(cellPos);
 						Block testBlock = testBlockState.getBlock();
@@ -196,7 +194,7 @@ public class JoCode {
 				
 				//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
 				for(Cell cell: leafMap.getAllNonZeroCells()) {
-					MutableBlockPos cellPos = cell.getPos();
+					BlockPos.Mutable cellPos = cell.getPos();
 					if(!safeBounds.inBounds(cellPos, true)) {
 						leafMap.setVoxel(cellPos, (byte) 0);
 					}
@@ -327,10 +325,10 @@ public class JoCode {
 	
 	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome) {
 		
-		if(biome.getDefaultTemperature() < 0.4f) {
-			for ( MutableBlockPos top : leafMap.getTops() ) {
+		if(biome.getTemperature() < 0.4f) {
+			for (BlockPos.Mutable top : leafMap.getTops() ) {
 				if ( world.getBiome(rootPos).doesSnowGenerate(world, rootPos) ) {
-					MutableBlockPos iPos = new MutableBlockPos(top);
+					BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
 					int yOffset = 0;
 					do {
 						BlockState state = world.getBlockState(iPos);

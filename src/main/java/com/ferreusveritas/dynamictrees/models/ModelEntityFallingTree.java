@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
@@ -80,14 +80,14 @@ public class ModelEntityFallingTree extends EntityModel<EntityFallingTree> {
 				float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;
 				IBakedModel branchModel = dispatcher.getModelForState(exState);//Since we source the blockState from the destruction data it will always be the same
 				ModelConnections connections = new ModelConnections(connectionArray);
-				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ZERO.offset(cutDir)).scale(offset), new Direction[] { cutDir }, connections));
+				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(BlockPos.ZERO.offset(cutDir)).scale(offset), new Direction[] { cutDir }, connections));
 				
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {
 					exState = destructionData.getBranchBlockState(index);
 					BlockPos relPos = destructionData.getBranchRelPos(index);
 					destructionData.getConnections(index, connectionArray);
-					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vec3d(relPos), connections.setAllRadii(connectionArray)));
+					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos), connections.setAllRadii(connectionArray)));
 				}
 				
 				//Draw the leaves
@@ -95,12 +95,12 @@ public class ModelEntityFallingTree extends EntityModel<EntityFallingTree> {
 				if(leavesClusters != null) {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
-						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey()), EmptyModelData.INSTANCE));
+						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vector3d(leafLoc.getKey()), EmptyModelData.INSTANCE));
 					}
 				} else {
 					BlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
 					for(BlockPos relPos : destructionData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
-						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vec3d(relPos), EmptyModelData.INSTANCE));
+						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vector3d(relPos), EmptyModelData.INSTANCE));
 					}
 				}
 			}

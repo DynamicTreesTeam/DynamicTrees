@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -10,15 +11,12 @@ import net.minecraft.block.VineBlock;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
-
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 
 public class FeatureGenVine implements IPostGenFeature {
 
@@ -87,7 +85,7 @@ public class FeatureGenVine implements IPostGenFeature {
             if(vineSide != null) {
                 BlockState vineState = vineBlock.getDefaultState().with(vineSide, true);
                 int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
-                MutableBlockPos mPos = new MutableBlockPos(vinePos);
+                BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
                 for(int i = 0; i < len; i++) {
                     if(world.isAirBlock(mPos)) {
                         world.setBlockState(mPos, vineState);

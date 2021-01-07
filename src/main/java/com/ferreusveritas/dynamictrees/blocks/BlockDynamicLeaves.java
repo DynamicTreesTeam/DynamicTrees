@@ -26,6 +26,8 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
@@ -39,11 +41,9 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameters;
-import net.minecraftforge.common.IShearable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -113,7 +113,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		if (rand == null) rand = backupRng;
 		if(rand.nextInt(DTConfigs.treeGrowthFolding.get()) == 0)
 		{
@@ -138,10 +138,10 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 			}
 		}
 	}
-	
+
 	@Override
-	public void tick(BlockState state, World worldIn, @Nonnull BlockPos pos, Random rand) { }
-	
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) { }
+
 	protected void doTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
 		if((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
 			if(getProperties(state).updateTick(worldIn, pos, state, rand)) {
@@ -207,12 +207,12 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	protected interface NewLeavesPropertiesHandler {
 		BlockState getLeaves(World world, BlockPos pos, BlockState leavesStateWithHydro);
 	}
-	
+
 	@Override
-	public float getBlockHardness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		return getProperties(state).getPrimitiveLeaves().getBlockHardness(worldIn, pos);
 	}
-	
+
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		return getProperties(state).getPrimitiveLeavesItemStack();
@@ -262,7 +262,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 			
 			SoundType stepSound = this.getSoundType(world.getBlockState(pos), world, pos, entity);
 			float volume = MathHelper.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
-			world.playSound(entity.posX, entity.posY, entity.posZ, stepSound.getBreakSound(), SoundCategory.BLOCKS, volume, stepSound.getPitch(), false);
+			world.playSound(entity.getPosX(), entity.getPosY(), entity.getPosZ(), stepSound.getBreakSound(), SoundCategory.BLOCKS, volume, stepSound.getPitch(), false);
 			
 			for(int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) > 0); iy++) {
 				if(hasLeaves) {//This layer has leaves that can help break our fall
@@ -306,8 +306,8 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 		}
 	}
 	
-	@Override
-	public void beginLeaveDecay(BlockState state, IWorldReader world, BlockPos pos) { }
+//	@Override
+//	public void beginLeaveDecay(BlockState state, IWorldReader world, BlockPos pos) { }
 	
 	/**
 	 * Checks to see if the location at pos is suitable for new leaves
@@ -499,23 +499,22 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	//////////////////////////////
 	// DROPS
 	//////////////////////////////
-	
+
+
 	@Override
-	public boolean isShearable(ItemStack item, IWorldReader world, BlockPos pos) {
-		System.out.println("isShearable");
+	public boolean isShearable(@Nonnull ItemStack item, World world, BlockPos pos) {
 		return true;
 	}
-	
-	//When the leaves are sheared just return vanilla leaves for usability
+
+	// When the leaves are sheared just return vanilla leaves for usability
 	@Nonnull
 	@Override
-	public List<ItemStack> onSheared(@Nonnull ItemStack item, IWorld world, BlockPos pos, int fortune) {
-		System.out.println("on sheared");
+	public List<ItemStack> onSheared(@Nullable PlayerEntity player, @Nonnull ItemStack item, World world, BlockPos pos, int fortune) {
 		ArrayList<ItemStack> ret = new ArrayList<>();
 		ret.add(getProperties(world.getBlockState(pos)).getPrimitiveLeavesItemStack());
 		return ret;
 	}
-	
+
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ArrayList<ItemStack> ret = new ArrayList<>();

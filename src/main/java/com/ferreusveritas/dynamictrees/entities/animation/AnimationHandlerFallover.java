@@ -18,8 +18,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -45,7 +45,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 
 		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 		if(entity.world.getBlockState(belowBlock).func_224755_d(entity.world, belowBlock, Direction.UP)) {
-			entity.onGround = true;
+			entity.setOnGround(true);
 			return;
 		}
 	}
@@ -55,14 +55,14 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 
 		float fallSpeed = getData(entity).fallSpeed;
 
-		if(entity.onGround) {
+		if(entity.isOnGround()) {
 			float height = (float) entity.getMassCenter().y * 2;
 			fallSpeed += (0.2 / height);
 			addRotation(entity, fallSpeed);
 		}
 
 		entity.setMotion(entity.getMotion().x, entity.getMotion().y - AnimationConstants.TREE_GRAVITY, entity.getMotion().z);
-		entity.posY += entity.getMotion().y;
+		entity.setPosition(entity.getPosX(), entity.getPosY() + entity.getMotion().y, entity.getPosZ());
 
 		{//Handle entire entity falling and collisions with it's base and the ground
 			World world = entity.world;
@@ -71,8 +71,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			if(TreeHelper.isBranch(state)) {
 				radius = ((BlockBranch)state.getBlock()).getRadius(state);
 			}
-			AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
-			BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+			AxisAlignedBB fallBox = new AxisAlignedBB(entity.getPosX() - radius, entity.getPosY(), entity.getPosZ() - radius, entity.getPosX() + radius, entity.getPosY() + 1.0, entity.getPosZ() + radius);
+			BlockPos pos = new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ());
 			BlockState collState = world.getBlockState(pos);
 
 			VoxelShape shape = collState.getCollisionShape(world, pos);
@@ -84,9 +84,9 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			collBox = collBox.offset(pos);
 			if(fallBox.intersects(collBox)) {
 				entity.setMotion(entity.getMotion().x, 0, entity.getMotion().z);
-				entity.posY = collBox.maxY;
-				entity.prevPosY = entity.posY;
-				entity.onGround = true;
+				entity.setPosition(entity.getPosX(), collBox.maxY, entity.getPosZ());
+				entity.prevPosY = entity.getPosY();
+				entity.setOnGround(true);
 			}
 		}
 
@@ -139,9 +139,9 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		int offsetZ = toolDir.getZOffset();
 		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
-		float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
-		float ybase = (float) (entity.posY - (h * 0.5f) + (v * 0.5f));
-		float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float xbase = (float) (entity.getPosX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float ybase = (float) (entity.getPosY() - (h * 0.5f) + (v * 0.5f));
+		float zbase = (float) (entity.getPosZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 
 		int trunkHeight = entity.getDestroyData().trunkHeight;
 		float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
@@ -156,7 +156,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 			float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, maxRadius);
 			AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 
-			if(!entity.world.isCollisionBoxesEmpty(entity, testBB)) {
+			if(!entity.world.hasNoCollisions(entity, testBB)) {
 				return true;
 			}
 		}
@@ -191,9 +191,9 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		int offsetZ = toolDir.getZOffset();
 		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
-		float xbase = (float) (entity.posX + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
-		float ybase = (float) (entity.posY - (h * 0.5f) + (v * 0.5f));
-		float zbase = (float) (entity.posZ + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float xbase = (float) (entity.getPosX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float ybase = (float) (entity.getPosY() - (h * 0.5f) + (v * 0.5f));
+		float zbase = (float) (entity.getPosZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 		int trunkHeight = entity.getDestroyData().trunkHeight;
 		float segX = xbase + h * (trunkHeight - 1) * offsetX;
 		float segY = ybase + v * (trunkHeight - 1);
@@ -201,8 +201,8 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 
 		float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
 
-		Vec3d vec3d1 = new Vec3d(xbase, ybase, zbase);
-		Vec3d vec3d2 = new Vec3d(segX, segY, segZ);
+		Vector3d vec3d1 = new Vector3d(xbase, ybase, zbase);
+		Vector3d vec3d2 = new Vector3d(segX, segY, segZ);
 
 		return world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
 				entity1 -> {
@@ -252,11 +252,11 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		int radius = entity.getDestroyData().getBranchRadius(0);
 
 		Direction toolDir = entity.getDestroyData().toolDir;
-		Vec3d toolVec = new Vec3d(toolDir.getXOffset(), toolDir.getYOffset(), toolDir.getZOffset()).scale(radius / 16.0f);
+		Vector3d toolVec = new Vector3d(toolDir.getXOffset(), toolDir.getYOffset(), toolDir.getZOffset()).scale(radius / 16.0f);
 
 		GlStateManager.translated(-toolVec.x, -toolVec.y, -toolVec.z);
-		GlStateManager.rotated(-yaw, 0, 0, 1);
-		GlStateManager.rotated(pit, 1, 0, 0);
+		GlStateManager.rotatef(-yaw, 0, 0, 1);
+		GlStateManager.rotatef(pit, 1, 0, 0);
 		GlStateManager.translated(toolVec.x, toolVec.y, toolVec.z);
 
 		GlStateManager.translated(-0.5, 0, -0.5);

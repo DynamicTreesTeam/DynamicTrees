@@ -1,21 +1,20 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.Random;
 
 public interface ILeavesProperties {
 
@@ -51,7 +50,7 @@ public interface ILeavesProperties {
 	ICellKit getCellKit();
 
 	@OnlyIn(Dist.CLIENT)
-	int foliageColorMultiplier(BlockState state, IEnviromentBlockReader reader, BlockPos pos);
+	int foliageColorMultiplier(BlockState state, IBlockDisplayReader reader, BlockPos pos);
 
 	/**
 	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update

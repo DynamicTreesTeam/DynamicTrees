@@ -20,7 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.loot.LootContext;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -30,7 +30,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext.Builder;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.IPlantable;
 
 public class BlockDynamicSapling extends Block implements IGrowable, IPlantable {
@@ -65,13 +65,13 @@ public class BlockDynamicSapling extends Block implements IGrowable, IPlantable 
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-	
-	
+
+
 	@Override
-	public void tick(BlockState state, World world, BlockPos pos, Random rand) {
-		grow(world, rand, pos, state);
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+		this.grow(worldIn, rand, pos, state);
 	}
-	
+
 	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(Direction dir: CoordUtils.HORIZONTALS) {
@@ -89,9 +89,9 @@ public class BlockDynamicSapling extends Block implements IGrowable, IPlantable 
 	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
 		return canSaplingStay(world, getSpecies(), pos);
 	}
-	
+
 	@Override
-	public void grow(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public void grow(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		if(canBlockStay(world, pos, state)) {
 			getSpecies().transitionToTree(world, pos);
 		} else {
@@ -129,7 +129,7 @@ public class BlockDynamicSapling extends Block implements IGrowable, IPlantable 
 	
 	@Nonnull
 	@Override
-	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull Builder builder) {
+	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
 		//TODO: Deal with 1.14's new loot drop system.  For now just return a fresh array.
 		List<ItemStack> drops = new ArrayList<>();
 		drops.add(getSpecies().getSeedStack(1));

@@ -16,8 +16,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -71,9 +71,7 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 
 		//Apply motion
 
-		entity.posX += entity.getMotion().x;
-		entity.posY += entity.getMotion().y;
-		entity.posZ += entity.getMotion().z;
+		entity.setPosition(entity.getMotion().x, entity.getMotion().y, entity.getMotion().z);
 		entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch + getData(entity).rotPit);
 		entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw + getData(entity).rotYaw);
 
@@ -83,8 +81,8 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 			radius = ((BlockBranch)state.getBlock()).getRadius(state);
 		}
 		World world = entity.world;
-		AxisAlignedBB fallBox = new AxisAlignedBB(entity.posX - radius, entity.posY, entity.posZ - radius, entity.posX + radius, entity.posY + 1.0, entity.posZ + radius);
-		BlockPos pos = new BlockPos(entity.posX, entity.posY, entity.posZ);
+		AxisAlignedBB fallBox = new AxisAlignedBB(entity.getPosX() - radius, entity.getPosY(), entity.getPosZ() - radius, entity.getPosX() + radius, entity.getPosY() + 1.0, entity.getPosZ() + radius);
+		BlockPos pos = new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ());
 		BlockState collState = world.getBlockState(pos);
 
 		if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && collState.getBlock() != DTRegistries.blockTrunkShell) {
@@ -108,10 +106,10 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 				collBox = collBox.offset(pos);
 				if(fallBox.intersects(collBox)) {
 					entity.setMotion(entity.getMotion().x, 0, entity.getMotion().z);
-					entity.posY = collBox.maxY;
-					entity.prevPosY = entity.posY;
+					entity.setPosition(entity.getPosX(), collBox.maxY, entity.getPosZ());
+					entity.prevPosY = entity.getPosY();
 					entity.landed = true;
-					entity.onGround = true;
+					entity.setOnGround(true);
 					if(entity.onFire) {
 						if(entity.world.isAirBlock(pos.up())) {
 							entity.world.setBlockState(pos.up(), Blocks.FIRE.getDefaultState());
@@ -126,7 +124,7 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 	@Override
 	public void dropPayload(EntityFallingTree entity) {
 		World world = entity.world;
-		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, new BlockPos(entity.posX, entity.posY, entity.posZ), i));
+		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ()), i));
 		entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.getDestroyData().cutPos.add(bis.pos), bis.stack));
 	}
 	
@@ -146,10 +144,10 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
 		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
 
-		Vec3d mc = entity.getMassCenter();
+		Vector3d mc = entity.getMassCenter();
 		GlStateManager.translated(mc.x, mc.y, mc.z);
-		GlStateManager.rotated(-yaw, 0, 1, 0);
-		GlStateManager.rotated(pit, 1, 0, 0);
+		GlStateManager.rotatef(-yaw, 0, 1, 0);
+		GlStateManager.rotatef(pit, 1, 0, 0);
 		GlStateManager.translated(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 	}
 

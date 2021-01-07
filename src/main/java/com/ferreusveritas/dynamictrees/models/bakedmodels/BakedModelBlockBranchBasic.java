@@ -18,7 +18,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockFaceUV;
 import net.minecraft.client.renderer.model.BlockModel;
@@ -35,7 +34,8 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
@@ -238,7 +238,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	 */
 	@Nonnull
 	@Override
-	public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Block block = state.getBlock();
 		return block instanceof BlockBranch ? new ModelConnections(((BlockBranch) block).getConnectionData(world, pos, state)) : new ModelConnections();
 	}
@@ -317,5 +317,10 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	public boolean doesHandlePerspectives() {
 		return false;
 	}
-	
+
+	@Override
+	public boolean isSideLit() {
+		return false;
+	}
+
 }

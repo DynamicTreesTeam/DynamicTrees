@@ -1,49 +1,40 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.List;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.TickPriority;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.*;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Random;
 
 public class BlockTrunkShell extends Block {
 	
@@ -89,7 +80,7 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
 		if(getMuseUnchecked(worldIn, state, pos) == null) {
 			worldIn.removeBlock(pos, false);
 		}
@@ -101,7 +92,7 @@ public class BlockTrunkShell extends Block {
 
 
 	@Override
-	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
+	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		ShellMuse muse = getMuse(world, state, pos);
 		if(muse != null) {
 			return muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest, world.getFluidState(pos));
@@ -111,9 +102,9 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
-	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
-		ShellMuse muse = getMuse(world, blockState, pos);
-		return muse != null ? muse.state.getBlock().getBlockHardness(muse.state, world, muse.pos) : 0.0f;
+	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+		ShellMuse muse = getMuse(worldIn, state, pos);
+		return muse != null ? muse.state.getBlock().getPlayerRelativeBlockHardness(muse.state, player, worldIn, muse.pos) : 0.0f;
 	}
 
 	@Override
@@ -123,8 +114,9 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
-	public float getExplosionResistance(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
+	public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
 		ShellMuse muse = getMuse(world, pos);
+		// TODO: exploder was Entity
 		return muse != null ? muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, exploder, explosion) : 0.0f;
 	}
 
@@ -154,7 +146,7 @@ public class BlockTrunkShell extends Block {
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
 		} else if (block instanceof BlockTrunkShell){ //If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse
-			if (new Vec3d(((BlockTrunkShell)block).getMuseDir(museState, musePos).getOffset()).add(new Vec3d(museDir.getOffset())).lengthSquared() > 2.25){
+			if (new Vector3d(((BlockTrunkShell)block).getMuseDir(museState, musePos).getOffset()).add(new Vector3d(museDir.getOffset())).lengthSquared() > 2.25){
 				return (((BlockTrunkShell)block).getMuseUnchecked(access, museState, musePos, originalPos));
 			}
 		}
@@ -291,13 +283,13 @@ public class BlockTrunkShell extends Block {
 	}
 
 	@Override
-	public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		ShellMuse muse = getMuse(world, pos);
 		if(muse != null) {
 			return muse.state.getBlock().onBlockActivated(muse.state, world, muse.pos, playerIn, hand, hit);
 		}
 
-		return false;
+		return ActionResultType.FAIL;
 	}
 
 	@Override

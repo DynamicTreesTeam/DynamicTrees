@@ -24,14 +24,17 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.PushReaction;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +45,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -93,14 +96,14 @@ public class BlockRooty extends Block implements ITreePart {
 	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
-	
+
 	@Override
-	public void randomTick(BlockState state, World world, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
 		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
-			updateTree(state, world, pos, random, true);
+			updateTree(state, worldIn, pos, random, true);
 		}
 	}
-	
+
 	public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
 		return Direction.UP;
 	}
@@ -194,7 +197,7 @@ public class BlockRooty extends Block implements ITreePart {
 	public BlockState getDecayBlockState(IBlockReader access, BlockPos pos) {
 		return primitiveDirt.getDefaultState();
 	}
-	
+
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
@@ -205,12 +208,12 @@ public class BlockRooty extends Block implements ITreePart {
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		return primitiveDirt.getPickBlock(primitiveDirt.getDefaultState(), target, world, pos, player);
 	}
-	
+
 	@Override
-	public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
+	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		return (float) (primitiveDirt.getDefaultState().getBlockHardness(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
 	}
-	
+
 	@Override
 	public boolean hasComparatorInputOverride(BlockState state) {
 		return true;
@@ -222,8 +225,9 @@ public class BlockRooty extends Block implements ITreePart {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit);
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		// TODO: Ensure ActionResultType is being used correctly.
+		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 	
 	
@@ -392,17 +396,17 @@ public class BlockRooty extends Block implements ITreePart {
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-	
+
 	@Nonnull
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
-	
-	@Override
-	public boolean isSolid(BlockState state) {
-		return true;
-	}
+
+//	@Override
+//	public boolean isSolid(BlockState state) {
+//		return true;
+//	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {

@@ -21,10 +21,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -69,19 +70,19 @@ public class BlockBranchCactus extends BlockBranch {
 		builder.add(ORIGIN, TRUNK);
 	}
 
-	@Override
-	public BlockState getExtendedState(BlockState state, IBlockReader blockAcess, BlockPos pos) {
-		if (state != null) {
-			int thisRadius = getRadius(state);
-
-//			for (Direction dir : Direction.values()) {
-//				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(blockAcess, pos, thisRadius, dir));
-//			}
-			return (BlockState) state;
-		}
-
-		return state;
-	}
+//	@Override
+//	public BlockState getExtendedState(BlockState state, IBlockReader blockAcess, BlockPos pos) {
+//		if (state != null) {
+//			int thisRadius = getRadius(state);
+//
+////			for (Direction dir : Direction.values()) {
+////				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(blockAcess, pos, thisRadius, dir));
+////			}
+//			return (BlockState) state;
+//		}
+//
+//		return state;
+//	}
 
 	///////////////////////////////////////////
 	// TREE INFORMATION
@@ -96,11 +97,10 @@ public class BlockBranchCactus extends BlockBranch {
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
 
-
 	@Override
-	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
-		int radius = getRadius(blockState);
-		float hardness = getFamily().getPrimitiveLog().getBlock().getBlockHardness(blockState, world, pos) * (radius * radius) / 64.0f * 8.0f;
+	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+		int radius = getRadius(state);
+		float hardness = getFamily().getPrimitiveLog().getBlock().getPlayerRelativeBlockHardness(state, player, worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
 		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 		return hardness;
 	}
@@ -123,14 +123,15 @@ public class BlockBranchCactus extends BlockBranch {
 		entityIn.attackEntityFrom(DamageSource.CACTUS, 1.0F);
 	}
 
+	@Nullable
 	@Override
-	public BlockState getStateForPlacement(BlockState state, Direction facing, BlockState state2, IWorld world, BlockPos pos1, BlockPos pos2, Hand hand) {
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		BlockState returnState = this.getDefaultState();
 
-		BlockState adjState = world.getBlockState(pos1.offset(facing.getOpposite()));
-		boolean trunk = (facing == Direction.UP && (adjState.isSolid() || (adjState.getBlock() == this && adjState.get(TRUNK))));
+		BlockState adjState = context.getWorld().getBlockState(context.getPos().offset(context.getFace().getOpposite()));
+		boolean trunk = (context.getFace() == Direction.UP && (adjState.isSolid() || (adjState.getBlock() == this && adjState.get(TRUNK))));
 
-		return returnState.with(TRUNK, trunk).with(ORIGIN, facing != Direction.DOWN ? facing.getOpposite() : Direction.DOWN);
+		return returnState.with(TRUNK, trunk).with(ORIGIN, context.getFace() != Direction.DOWN ? context.getFace().getOpposite() : Direction.DOWN);
 	}
 
 	///////////////////////////////////////////

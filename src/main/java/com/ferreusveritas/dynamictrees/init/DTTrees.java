@@ -13,6 +13,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -64,7 +65,7 @@ public class DTTrees {
 		// In this case, it turns to grass or mycelium like normal dirt
 		RootyBlockHelper.addToRootyBlocksMap(Blocks.DIRT, new BlockRooty(Blocks.DIRT){
 			@Override
-			public void randomTick(BlockState state, World world, BlockPos pos, Random random) {
+			public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 				super.randomTick(state, world, pos, random);
 				
 				Block rootyGrass = RootyBlockHelper.getRootyBlocksMap().get(Blocks.GRASS_BLOCK);

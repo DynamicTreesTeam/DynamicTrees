@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
@@ -9,7 +7,6 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -19,11 +16,13 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.Random;
 
 /**
  * This class provides a means of holding individual properties
@@ -149,7 +148,7 @@ public class LeavesProperties implements ILeavesProperties {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public int foliageColorMultiplier(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
+	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
 		return Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), world, pos, 0);
 	}
 	

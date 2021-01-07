@@ -151,9 +151,9 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	}
 
 	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, float partialTicks) {
-		double posX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
-		double posY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
-		double posZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
+		double posX = entityIn.lastTickPosX + (entityIn.getPosX() - entityIn.lastTickPosX) * (double) partialTicks;
+		double posY = entityIn.lastTickPosY + (entityIn.getPosY() - entityIn.lastTickPosY) * (double) partialTicks;
+		double posZ = entityIn.lastTickPosZ + (entityIn.getPosZ() - entityIn.lastTickPosZ) * (double) partialTicks;
 
 		if (mc.world.getGameTime() % 20 == 0) {
 			this.cleanupExtraDamagedBlocks();

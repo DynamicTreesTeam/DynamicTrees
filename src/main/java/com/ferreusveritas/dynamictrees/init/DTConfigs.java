@@ -165,8 +165,9 @@ public class DTConfigs {
 	@SubscribeEvent
 	public static void onLoad (final ModConfig.Loading configEvent){ }
 	
-	@SubscribeEvent
-	public static void onReload (final ModConfig.ConfigReloading configEvent){ }
+//	@SubscribeEvent
+//	public static void onReload (final ModConfig. configEvent){ }
+
 }
 //		String[] dims = config.getStringList("dimensionsBlacklist", "world", new String[] {"7"}, "Blacklist of dimension numbers for disabling Dynamic Tree worldgen");
 //

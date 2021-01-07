@@ -12,7 +12,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -65,11 +65,11 @@ public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 	protected void commonGen(World world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
 		if (radius <= 2) return;
 
-		Vec3d vTree = new Vec3d(rootPos).add(0.5, 0.5, 0.5);
+		Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
 		for (int i = 0; i < 2; i++) {
 			int rad = MathHelper.clamp(world.rand.nextInt(radius - 2) + 2, 2, radius - 1);
-			Vec3d v = vTree.add(new Vec3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
+			Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
 			BlockPos vPos = new BlockPos(v);
 			if (!safeBounds.inBounds(vPos, true)) continue;
 
@@ -81,8 +81,8 @@ public class FeatureGenBush implements IFullGenFeature, IPostGenFeature {
 				world.setBlockState(pos, logState);
 
 				SimpleVoxmap leafMap = LeafClusters.bush;
-				BlockPos.MutableBlockPos leafPos = new BlockPos.MutableBlockPos();
-				for (BlockPos.MutableBlockPos dPos : leafMap.getAllNonZero()) {
+				BlockPos.Mutable leafPos = new BlockPos.Mutable();
+				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
 						world.setBlockState(leafPos, (secondaryLeavesState == null || random.nextInt(4) != 0) ? leavesState : secondaryLeavesState);

@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -12,7 +11,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -74,7 +73,7 @@ public class BlockSurfaceRoot extends Block {
 		}
 
 		@Override
-		public String getName() {
+		public String getString() {
 			return toString().toLowerCase();
 		}
 
@@ -119,8 +118,8 @@ public class BlockSurfaceRoot extends Block {
 //		return new IProperty<?>[]{ RADIUS };
 //	}
 
-	@Override
-	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
+//	@Override
+//	public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
 //		if (state instanceof BlockState) {
 //			BlockState retval = (BlockState) state;
 //
@@ -138,9 +137,9 @@ public class BlockSurfaceRoot extends Block {
 //
 //			return retval;
 //		}
-
-		return state;
-	}
+//
+//		return state;
+//	}
 
 	public int getRadius(BlockState blockState) {
 		return blockState.getBlock() == this ? blockState.get(RADIUS) : 0;
@@ -297,7 +296,7 @@ public class BlockSurfaceRoot extends Block {
 	}
 
 	@Override
-	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
+	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		BlockState upstate = world.getBlockState(pos.up());
 
 		if(upstate.getBlock() == DTRegistries.blockTrunkShell) {

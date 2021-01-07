@@ -37,7 +37,7 @@ public class DynamicTrees {
 	
 	public static final String MODID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
-	public static final String VERSION = "1.14.4-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
+	public static final String VERSION = "1.16.4-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
 	
 	public static final String OPTAFTER = "after:";
 	public static final String OPTBEFORE = "before:";
@@ -162,47 +162,47 @@ public class DynamicTrees {
 	}
 	
 	private void cancelVanillaTrees () {
-		for (final Biome biome : ForgeRegistries.BIOMES) {
-			biome.getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeature -> {
-				//				LogManager.getLogger().info("Checking if " + ((DecoratedFeatureConfig) configuredFeature.config).feature.feature + " is tree feature.");
-				
-				if (((DecoratedFeatureConfig) configuredFeature.config).feature.feature.toString().toLowerCase().contains("tree")) {
-					//					LogManager.getLogger().info("Removed " + ((DecoratedFeatureConfig) configuredFeature.config).feature.feature.toString() + " from biome " + biome.getRegistryName());
-					return true;
-				}
-				
-				if (((DecoratedFeatureConfig) configuredFeature.config).feature.config instanceof MultipleRandomFeatureConfig) {
-					//if (((DecoratedFeatureConfig) ((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).defaultFeature).feature.feature.toString().toLowerCase().contains("tree")) {
-						//((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).defaultFeature = NullFeature;
-					//}
-					//
-					//((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features.removeIf(feature -> {
-					//if (feature.feature.toString().toLowerCase().contains("tree") || feature.feature.toString().toLowerCase().contains("jungle")) {
-						//LogManager.getLogger().info("Removed " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
-						//return true;
-					//}
-					//
-					//LogManager.getLogger().info("Checked " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
-					//
-					//return false;
-					//});
-					//
-					//if (((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features.size() == 0) {
-					//	return true;
-					//}
-					
-					// Just remove any random feature selectors containing trees for now. Potentially develop above code later.
-					for (ConfiguredRandomFeatureList<?> feature : ((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features) {
-						if (feature.feature.toString().toLowerCase().contains("tree") || feature.feature.toString().toLowerCase().contains("jungle")) {
-							//LogManager.getLogger().info("Removed " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
-							return true;
-						}
-					}
-				}
-				
-				return false;
-			});
-		}
+//		for (final Biome biome : ForgeRegistries.BIOMES) {
+//			biome.getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeature -> {
+//				//				LogManager.getLogger().info("Checking if " + ((DecoratedFeatureConfig) configuredFeature.config).feature.feature + " is tree feature.");
+//
+//				if (((DecoratedFeatureConfig) configuredFeature.config).feature.feature.toString().toLowerCase().contains("tree")) {
+//					//					LogManager.getLogger().info("Removed " + ((DecoratedFeatureConfig) configuredFeature.config).feature.feature.toString() + " from biome " + biome.getRegistryName());
+//					return true;
+//				}
+//
+//				if (((DecoratedFeatureConfig) configuredFeature.config).feature.config instanceof MultipleRandomFeatureConfig) {
+//					//if (((DecoratedFeatureConfig) ((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).defaultFeature).feature.feature.toString().toLowerCase().contains("tree")) {
+//						//((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).defaultFeature = NullFeature;
+//					//}
+//					//
+//					//((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features.removeIf(feature -> {
+//					//if (feature.feature.toString().toLowerCase().contains("tree") || feature.feature.toString().toLowerCase().contains("jungle")) {
+//						//LogManager.getLogger().info("Removed " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
+//						//return true;
+//					//}
+//					//
+//					//LogManager.getLogger().info("Checked " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
+//					//
+//					//return false;
+//					//});
+//					//
+//					//if (((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features.size() == 0) {
+//					//	return true;
+//					//}
+//
+//					// Just remove any random feature selectors containing trees for now. Potentially develop above code later.
+//					for (ConfiguredRandomFeatureList<?> feature : ((MultipleRandomFeatureConfig) ((DecoratedFeatureConfig) configuredFeature.config).feature.config).features) {
+//						if (feature.feature.toString().toLowerCase().contains("tree") || feature.feature.toString().toLowerCase().contains("jungle")) {
+//							//LogManager.getLogger().info("Removed " + feature.feature.toString() + " from biome " + biome.getRegistryName() + ".");
+//							return true;
+//						}
+//					}
+//				}
+//
+//				return false;
+//			});
+//		}
 	}
 	
 	private void clientSetup(final FMLClientSetupEvent event) {

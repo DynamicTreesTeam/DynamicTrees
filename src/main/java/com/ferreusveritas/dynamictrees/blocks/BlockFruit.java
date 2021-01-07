@@ -1,33 +1,27 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.server.ServerWorld;
+
+import java.util.List;
+import java.util.Random;
 
 public class BlockFruit extends Block implements IGrowable {
 	
@@ -41,7 +35,7 @@ public class BlockFruit extends Block implements IGrowable {
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	
 	public static final String name = "fruitapple";
-	public Vec3d itemSpawnOffset = new Vec3d(0.5, 0.6, 0.5);
+	public Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
@@ -63,11 +57,11 @@ public class BlockFruit extends Block implements IGrowable {
 	}
 
 	public void setItemSpawnOffset (float x, float y, float z){
-		itemSpawnOffset = new Vec3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
+		itemSpawnOffset = new Vector3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
 	}
 
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		if (!this.canBlockStay(worldIn, pos, state)) {
 			this.dropBlock(worldIn, pos);
 		}
@@ -107,13 +101,13 @@ public class BlockFruit extends Block implements IGrowable {
 	}
 
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (state.get(AGE) >= 3 ) {
 			this.dropBlock(worldIn, pos);
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 
-		return false;
+		return ActionResultType.FAIL;
 	}
 
 	private void dropBlock(World worldIn, BlockPos pos) {
@@ -154,7 +148,7 @@ public class BlockFruit extends Block implements IGrowable {
 	}
 
 	@Override
-	public void grow(World world, Random rand, BlockPos pos, BlockState state) {
+	public void grow(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
 		int age = state.get(AGE);
 		int newAge = MathHelper.clamp(age + 1, 0, 3);
 		if(newAge != age) {

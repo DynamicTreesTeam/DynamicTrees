@@ -1,10 +1,5 @@
 package com.ferreusveritas.dynamictrees.entities;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
@@ -18,7 +13,6 @@ import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -38,12 +32,17 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 ///**
 // *
@@ -61,8 +60,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	//Needed in client and server
 	protected BranchDestructionData destroyData = new BranchDestructionData();
-	protected Vec3d geomCenter = Vec3d.ZERO;
-	protected Vec3d massCenter = Vec3d.ZERO;
+	protected Vector3d geomCenter = Vector3d.ZERO;
+	protected Vector3d massCenter = Vector3d.ZERO;
 	protected AxisAlignedBB normAABB = new AxisAlignedBB(BlockPos.ZERO);
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
@@ -113,13 +112,11 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		this.payload = payload;
 		this.destroyType = destroyType;
 		this.onFire = destroyType == DestroyType.FIRE;
-		
-		this.posX = cutPos.getX() + 0.5;
-		this.posY = cutPos.getY();
-		this.posZ = cutPos.getZ() + 0.5;
-		
+
+		this.setPosition(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
+
 		int numBlocks = destroyData.getNumBranches();
-		geomCenter = new Vec3d(0, 0, 0);
+		geomCenter = new Vector3d(0, 0, 0);
 		double totalMass = 0;
 		
 		//Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
@@ -130,7 +127,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
 			totalMass += mass;
 			
-			Vec3d relVec = new Vec3d(relPos.getX(), relPos.getY(), relPos.getZ());
+			Vector3d relVec = new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ());
 			geomCenter = geomCenter.add(relVec);
 			massCenter = massCenter.add(relVec.scale(mass));
 		}
@@ -165,10 +162,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			onKillCommand();
 		}
 		destroyType = DestroyType.values()[tag.getInt("destroytype")];
-		geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
-		massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+		geomCenter = new Vector3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
+		massCenter = new Vector3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
 		buildAABBFromDestroyData(destroyData);
-		setBoundingBox(normAABB.offset(posX, posY, posZ));
+		setBoundingBox(normAABB.offset(this.getPosX(), this.getPosY(), this.getPosZ()));
 		onFire = tag.getBoolean("onfire");
 	}
 	
@@ -238,22 +235,20 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		return payload;
 	}
 	
-	public Vec3d getGeomCenter() {
+	public Vector3d getGeomCenter() {
 		return geomCenter;
 	}
 	
-	public Vec3d getMassCenter() {
+	public Vector3d getMassCenter() {
 		return massCenter;
 	}
 	
 	@Override
 	public void setPosition(double x, double y, double z) {
 		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
-		this.posX = x;
-		this.posY = y;
-		this.posZ = z;
+		this.setPositionAndUpdate(x, y, z);
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-		this.setBoundingBox(normAABB != null ? normAABB.offset(posX, posY, posZ) : new AxisAlignedBB(BlockPos.ZERO));
+		this.setBoundingBox(normAABB != null ? normAABB.offset(this.getPosX(), getPosY(), this.getPosZ()) : new AxisAlignedBB(BlockPos.ZERO));
 	}
 	
 	@Override
@@ -273,7 +268,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		
 		handleMotion();
 		
-		setBoundingBox(normAABB.offset(posX, posY, posZ));
+		setBoundingBox(normAABB.offset(this.getPosX(), this.getPosY(), this.getPosZ()));
 		
 		if(shouldDie()) {
 			dropPayLoad();
@@ -423,7 +418,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	//This is shipped off to the clients
 	public void setVoxelData(CompoundNBT tag) {
-		setBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
+		setBoundingBox(buildAABBFromDestroyData(destroyData).offset(this.getPosX(), this.getPosY(), this.getPosZ()));
 		getDataManager().set(voxelDataParameter, tag);
 	}
 	

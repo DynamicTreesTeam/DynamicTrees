@@ -14,7 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -56,10 +55,10 @@ public class TreeHelper {
 		
 		//The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
 		SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
-		Iterable<MutableBlockPos> iterable = iterMap.getAllNonZero();
+		Iterable<BlockPos.Mutable> iterable = iterMap.getAllNonZero();
 		
 		for(int i = 0; i < iterations; i++) {
-			for(MutableBlockPos iPos: iterable) {
+			for(BlockPos.Mutable iPos: iterable) {
 				BlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof BlockDynamicLeaves) {//Special case for leaves

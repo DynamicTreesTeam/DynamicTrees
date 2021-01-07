@@ -20,7 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.Dimension;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class TreeGenerator {
 	}
 
 	public BiomeDataBase getBiomeDataBase(World world) {
-		return getBiomeDataBase(world.getDimension());
+		return getBiomeDataBase(world);
 	}
 
 	public BiomeDataBase getDefaultBiomeDataBase() {

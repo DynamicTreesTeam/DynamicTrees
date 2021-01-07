@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -74,7 +74,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		// Step 1.) Collect already solved discs from surrounding chunks
 		getChunkPoissonDiscs(allDiscs, chunkX, chunkZ);
 		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
-			Vec3i dir = surr.getOffset();
+			Vector3i dir = surr.getOffset();
 			getChunkPoissonDiscs(allDiscs, chunkX + dir.getX(), chunkZ + dir.getZ());
 		}
 		if(debug != null) { debug.collectSolved(allDiscs); }

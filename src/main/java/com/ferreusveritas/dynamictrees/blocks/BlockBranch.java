@@ -42,23 +42,24 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolType;
 
 public abstract class
@@ -148,19 +149,19 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	///////////////////////////////////////////
 	
 	@Deprecated
-	public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		//		if (getRadius(state) > 8){
 		//			setRadius(world, pos, getRadius(state), Direction.DOWN);
 		//		}
 		net.minecraft.item.ItemStack heldItem = player.getHeldItem(hand);
-		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit);
+		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 	
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
 	
-	public Connections getConnectionData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		
 		Connections connections = new Connections();
 		
@@ -177,10 +178,10 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 		return connections;
 	}
 	
-	@Override
-	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		return false;
-	}
+//	@Override
+//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//		return false;
+//	}
 	
 	
 	///////////////////////////////////////////
@@ -321,8 +322,8 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 			for(BlockPos findPos : bounds.expand(3).iterate() ) {
 				BlockState findState = world.getBlockState(findPos);
 				if( familyBranch.getRadius(findState) == primaryThickness ) { //Search for endpoints of the same tree family
-					Iterable<MutableBlockPos> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
-					for(MutableBlockPos leafpos : leaves) {
+					Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
+					for(BlockPos.Mutable leafpos : leaves) {
 						vmap.setVoxel(findPos.getX() + leafpos.getX(), findPos.getY() + leafpos.getY(), findPos.getZ() + leafpos.getZ(), (byte) 0);
 					}
 				}
@@ -332,7 +333,7 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 			
 			//Destroy all family compatible leaves
 			for(Cell cell: vmap.getAllNonZeroCells()) {
-				MutableBlockPos pos = cell.getPos();
+				BlockPos.Mutable pos = cell.getPos();
 				BlockState blockState = world.getBlockState(pos);
 				if( family.isCompatibleGenericLeaves(blockState, world, pos) ) {
 					dropList.clear();
@@ -395,7 +396,8 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 		
 		//Try to get the face being pounded on
-		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(PlayerEntity.REACH_DISTANCE).getValue() : 5.0D;
+		// TODO: Check method of getting player reach distance (ForgeMod.REACH_DISTANCE.get()?)
+		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
 		BlockRayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
 		Direction toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.getFace().getOpposite() : rtResult.getFace()) : Direction.DOWN;
 		
@@ -439,7 +441,7 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	
 	
 	@Override
-	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
+	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		return removedByEntity(state, world, pos, player);
 	}
 	
@@ -476,9 +478,9 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	 */
 	@Nullable
 	public BlockRayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
-		Vec3d vec3d = entity.getEyePosition(partialTicks);
-		Vec3d vec3d1 = entity.getLook(partialTicks);
-		Vec3d vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
+		Vector3d vec3d = entity.getEyePosition(partialTicks);
+		Vector3d vec3d1 = entity.getLook(partialTicks);
+		Vector3d vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
 		return entity.world.rayTraceBlocks(new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
 	}
 	
@@ -578,13 +580,13 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			
 			if(treeEntity != null) {
-				Vec3d expPos = explosion.getPosition();
+				Vector3d expPos = explosion.getPosition();
 				LivingEntity placer = explosion.getExplosivePlacedBy();
 				//Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
-				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity)placer).getPowered() ? 6 : 3) : 4;
+				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity)placer).isCharged() ? 6 : 3) : 4;
 				double distance = Math.sqrt(treeEntity.getDistanceSq(expPos.x, expPos.y, expPos.z));
 				if (distance / size <= 1.0D && distance != 0.0D) {
-					treeEntity.addVelocity((treeEntity.posX - expPos.x) / distance, (treeEntity.posY - expPos.y) / distance, (treeEntity.posZ - expPos.z) / distance);
+					treeEntity.addVelocity((treeEntity.getPosX() - expPos.x) / distance, (treeEntity.getPosY() - expPos.y) / distance, (treeEntity.getPosZ() - expPos.z) / distance);
 				}
 			}
 		}

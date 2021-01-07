@@ -6,16 +6,17 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -42,7 +43,7 @@ public class CoordUtils {
 		NE("ne", Direction.NORTH, Direction.EAST);
 		
 		final private String name;
-		final private Vec3i offset;
+		final private Vector3i offset;
 		
 		private Surround(String name, Direction ... dirs) {
 			this.name = name;
@@ -53,11 +54,11 @@ public class CoordUtils {
 			this.offset = pos;
 		}
 		
-		public String getName() {
+		public String getString() {
 			return name;
 		}
 		
-		public Vec3i getOffset() {
+		public Vector3i getOffset() {
 			return offset;
 		}
 		
@@ -72,7 +73,7 @@ public class CoordUtils {
 	
 	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
 		for(Surround surr: CoordUtils.Surround.values()) {
-			Vec3i dir = surr.getOffset();
+			Vector3i dir = surr.getOffset();
 			if(!world.getChunkProvider().isChunkLoaded(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))){
 				return false;
 			}
@@ -116,10 +117,10 @@ public class CoordUtils {
 	public static RayTraceResult branchRayTrace(World world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
 		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
 
-		Vec3d vOut = new Vec3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
+		Vector3d vOut = new Vector3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
 
-		if(vOut.equals(Vec3d.ZERO)) {
-			vOut = new Vec3d(1, 0, 0);
+		if(vOut.equals(Vector3d.ZERO)) {
+			vOut = new Vector3d(1, 0, 0);
 			spreadHor = 180;
 		}
 
@@ -131,8 +132,8 @@ public class CoordUtils {
 				rotateYaw((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- spreadHor
 				scale(distance); //Vary the view distance
 
-		Vec3d branchVec = new Vec3d(branchPos).add(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
-		Vec3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
+		Vector3d branchVec = new Vector3d(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
+		Vector3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
 
 		if(!safeBounds.inBounds(vantagePos, false) || world.isAirBlock(vantagePos)) {//The observing block must be in free space
@@ -165,24 +166,24 @@ public class CoordUtils {
 	public static BlockRayTraceResult rayTraceBlocks(World world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
 		return getRayTraceVector(context, (fromContext, blockPos) -> {
 			BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.getDefaultState();
-			IFluidState ifluidstate = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.getDefaultState();
-			Vec3d startVec = fromContext.getStartVector();
-			Vec3d endVec = fromContext.getEndVector();
+			FluidState fluidState = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.getDefaultState();
+			Vector3d startVec = fromContext.getStartVector();
+			Vector3d endVec = fromContext.getEndVector();
 			VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, world, blockPos) : VoxelShapes.empty();
 			BlockRayTraceResult blockraytraceresult = world.rayTraceBlocks(startVec, endVec, blockPos, voxelshape, blockstate);
-			VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(ifluidstate, world, blockPos) : VoxelShapes.empty();
+			VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(fluidState, world, blockPos) : VoxelShapes.empty();
 			BlockRayTraceResult blockraytraceresult1 = voxelshape1.rayTrace(startVec, endVec, blockPos);
 			double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult.getHitVec());
 			double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult1.getHitVec());
 			return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
 		}, (context1) -> {
-			Vec3d vec3d = context1.getStartVector().subtract(context1.getEndVector());
+			Vector3d vec3d = context1.getStartVector().subtract(context1.getEndVector());
 			return BlockRayTraceResult.createMiss(context1.getEndVector(), Direction.getFacingFromVector(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context1.getEndVector()));
 		});
 	}
 	static <T> T getRayTraceVector(CustomRayTraceContext context, BiFunction<CustomRayTraceContext, BlockPos, T> biFunction, Function<CustomRayTraceContext, T> function) {
-		Vec3d startVec = context.getStartVector();
-		Vec3d endVec = context.getEndVector();
+		Vector3d startVec = context.getStartVector();
+		Vector3d endVec = context.getEndVector();
 		if (startVec.equals(endVec)) {
 			return function.apply(context);
 		} else {
@@ -195,7 +196,7 @@ public class CoordUtils {
 			int i = MathHelper.floor(lookX);
 			int j = MathHelper.floor(lookY);
 			int k = MathHelper.floor(lookZ);
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(i, j, k);
+			BlockPos.Mutable blockpos$mutableblockpos = new BlockPos.Mutable(i, j, k);
 			T t = biFunction.apply(context, blockpos$mutableblockpos);
 			if (t != null) {
 				return t;
@@ -245,23 +246,23 @@ public class CoordUtils {
 	 * We make a custom ray trace context since vanilla's ray trace context requires an entity (for no reason '-_-)
 	 */
 	private static class CustomRayTraceContext {
-		private final Vec3d startVec;
-		private final Vec3d endVec;
+		private final Vector3d startVec;
+		private final Vector3d endVec;
 		private final net.minecraft.util.math.RayTraceContext.BlockMode blockMode;
 		private final net.minecraft.util.math.RayTraceContext.FluidMode fluidMode;
 
-		public CustomRayTraceContext(Vec3d startVecIn, Vec3d endVecIn, net.minecraft.util.math.RayTraceContext.BlockMode blockModeIn, net.minecraft.util.math.RayTraceContext.FluidMode fluidModeIn) {
+		public CustomRayTraceContext(Vector3d startVecIn, Vector3d endVecIn, net.minecraft.util.math.RayTraceContext.BlockMode blockModeIn, net.minecraft.util.math.RayTraceContext.FluidMode fluidModeIn) {
 			this.startVec = startVecIn;
 			this.endVec = endVecIn;
 			this.blockMode = blockModeIn;
 			this.fluidMode = fluidModeIn;
 		}
 
-		public Vec3d getEndVector() {
+		public Vector3d getEndVector() {
 			return this.endVec;
 		}
 
-		public Vec3d getStartVector() {
+		public Vector3d getStartVector() {
 			return this.startVec;
 		}
 
@@ -269,7 +270,7 @@ public class CoordUtils {
 			return this.blockMode.get(state, world, pos, ISelectionContext.dummy());
 		}
 
-		public VoxelShape getFluidShape(IFluidState state, IBlockReader world, BlockPos pos) {
+		public VoxelShape getFluidShape(FluidState state, IBlockReader world, BlockPos pos) {
 			return this.fluidMode.test(state) ? state.getShape(world, pos) : VoxelShapes.empty();
 		}
 	}
@@ -280,7 +281,7 @@ public class CoordUtils {
 	 * @return The position of the top solid block
 	 */
 	public static BlockPos findGround(World world, BlockPos startPos) {
-		MutableBlockPos pos = new MutableBlockPos(startPos);
+		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
 		
 		//Rise up until we are no longer in a solid block
 		while(world.getBlockState(pos).isSolid()) {

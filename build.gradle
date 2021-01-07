@@ -8,6 +8,17 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
+repositories {
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
+    }
+    maven {
+        url "https://maven.tehnut.info"
+    }
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
@@ -18,8 +29,6 @@ configFile.withReader {
     prop.load(it)
     ext.config = new ConfigSlurper().parse prop
 }
-
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 version = "${config.mc_version}-${config.mod_version}"
 group = config.package_group
@@ -83,28 +92,26 @@ minecraft {
     }
 }
 
-repositories {
-    maven {
-        name 'LDTTeam - Modding'
-        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
-    }
-}
-
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
-    //Adds HWYLA to the dev environment
-    compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
-    compile fg.deobf("mezz.jei:jei-1.14.4:6.0.1.30")
+    // Compile against the Hwyla API, but do not include it at runtime
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2:api")
+    // At runtime, use the full Hwyla jar
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+
+    // Compile JEI API, but don't include in runtime
+    compileOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.65:api")
+    // At runtime, use JEI mod
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.65")
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
                 "Specification-Title": project.name,
                 "Specification-Vendor": "ferreusveritas",
-                "Specification-Version": "${version}", // We are version 1 of ourselves
+                "Specification-Version": "${version}",
                 "Implementation-Title": project.name,
                 "Implementation-Version": "${version}",
                 "Implementation-Vendor" :"ferreusveritas",
@@ -113,10 +120,6 @@ jar {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
 def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
