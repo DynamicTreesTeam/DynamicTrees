@@ -166,8 +166,8 @@ public class BlockRooty extends Block implements ITreePart {
 					
 					Biome biome = world.getBiome(rootPos);
 					
-					BlockState topBlock = biome.getSurfaceBuilderConfig().getTop();
-					BlockState fillerBlock = biome.getSurfaceBuilderConfig().getUnder();
+					BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
+					BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnder();
 					
 					BlockState mimic = primitiveDirt.getDefaultState();//getMimic(world, rootPos);
 					
@@ -397,11 +397,7 @@ public class BlockRooty extends Block implements ITreePart {
 	// RENDERING
 	///////////////////////////////////////////
 
-	@Nonnull
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
+	// isSolid has been moved to Properties, but it seems it is true by default anyway.
 
 //	@Override
 //	public boolean isSolid(BlockState state) {

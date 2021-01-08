@@ -9,15 +9,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class DropEventHandler {
 	
-	@SubscribeEvent
-	public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {
-
-		if(DTConfigs.worldGen.get() && DTConfigs.enableAppleTrees.get()) {
-			if(event.getState().getBlock() instanceof LeavesBlock) {
-				event.getDrops().removeIf(stack -> stack.getItem() == Items.APPLE);
-			}
-		}
-	}
+//	@SubscribeEvent
+//	public void onHarvestDropsEvent(BlockEvent.HarvestDropsEvent event) {
+//		// HarvestDropsEvent was replaced by GlobalLootModifier.
+//		if(DTConfigs.worldGen.get() && DTConfigs.enableAppleTrees.get()) {
+//			if(event.getState().getBlock() instanceof LeavesBlock) {
+//				event.getDrops().removeIf(stack -> stack.getItem() == Items.APPLE);
+//			}
+//		}
+//	}
 
 	
 }

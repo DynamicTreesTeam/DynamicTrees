@@ -26,6 +26,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -148,14 +149,22 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
-	
+
+
 	@Override
-	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
-		int radius = getRadius(blockState);
-		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(world, pos) * (radius * radius) / 64.0f * 8.0f;
-		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-		return hardness;
+	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+		return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
 	}
+
+	// TODO: Find a way to do dynamic block hardness. Seems there is a method that could be overriden but it is in the Block Properties.
+
+//	@Override
+//	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
+//		int radius = getRadius(blockState);
+//		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(world, pos) * (radius * radius) / 64.0f * 8.0f;
+//		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+//		return hardness;
+//	}
 	
 	@Override
 	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {

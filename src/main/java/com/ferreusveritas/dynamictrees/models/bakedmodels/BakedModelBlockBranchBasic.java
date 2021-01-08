@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelRotation;
 import net.minecraft.client.renderer.model.SimpleBakedModel;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -54,10 +55,10 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
 	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes) {
-		this.modelBlock = new BlockModel(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
+		this.modelBlock = new BlockModel(null, null, null, false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, null);
 		
-		TextureAtlasSprite barkIcon = Minecraft.getInstance().getTextureMap().getSprite(barkRes);
-		TextureAtlasSprite ringIcon = Minecraft.getInstance().getTextureMap().getSprite(ringsRes);
+		TextureAtlasSprite barkIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(barkRes);
+		TextureAtlasSprite ringIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(ringsRes);
 		barkParticles = barkIcon;
 		
 		for(int i = 0; i < 8; i++) {
@@ -115,7 +116,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		}
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.EMPTY).setTexture(bark);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock.customData, ItemOverrideList.EMPTY).setTexture(bark);
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
@@ -138,7 +139,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		}
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock, ItemOverrideList.EMPTY).setTexture(icon);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock.customData, ItemOverrideList.EMPTY).setTexture(icon);
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();

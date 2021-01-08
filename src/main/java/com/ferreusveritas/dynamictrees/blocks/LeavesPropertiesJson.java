@@ -1,11 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -15,7 +9,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -28,11 +21,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Random;
 
 public class LeavesPropertiesJson extends LeavesProperties {
 	
@@ -227,7 +226,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 			if(code.startsWith("@")) {
 				code = code.substring(1);
 				if("biome".equals(code)) { //Built in code since we need access to super
-					return (state, world, pos, t) -> world.getBiome(pos).getFoliageColor(pos);
+					return (state, world, pos, t) -> ((IWorld) world).getBiome(pos).getFoliageColor();
 				}
 				IBlockColor blockColor = BlockColorMultipliers.find(code);
 				if(blockColor != null) {

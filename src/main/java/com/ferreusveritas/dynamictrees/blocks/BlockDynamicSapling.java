@@ -155,13 +155,7 @@ public class BlockDynamicSapling extends Block implements IGrowable, IPlantable 
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-	
-	@Nonnull
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
-	
+
 	@Override
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
 		return species.getSapling().get().getDefaultState();

@@ -1,18 +1,10 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.GlStateManager;
-
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -31,6 +23,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
@@ -42,6 +35,14 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.resource.IResourceType;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @OnlyIn(Dist.CLIENT)
 public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloadListener {
@@ -84,20 +85,20 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 		TextureManager textureManager = mc.getTextureManager();
 
 		GlStateManager.enableBlend();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 		textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 		this.drawBlockDamageTexture(mc, textureManager, Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getPartialTicks());
 		textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 		GlStateManager.disableBlend();
 	}
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
-        AtlasTexture texturemap = Minecraft.getInstance().getTextureMap();
+        Function<ResourceLocation, TextureAtlasSprite> spriteGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         for (int i = 0; i < this.destroyBlockIcons.length; ++i) {
-            this.destroyBlockIcons[i] = texturemap.getAtlasSprite("minecraft:blocks/destroy_stage_" + i);
+            this.destroyBlockIcons[i] = spriteGetter.apply(new ResourceLocation("minecraft", "destroy_stage_" + i));
         }
     }
 
@@ -131,7 +132,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	}
 
 	private void preRenderDamagedBlocks() {
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.DST_COLOR.param, GlStateManager.DestFactor.SRC_COLOR.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 0.5F);
 		GlStateManager.polygonOffset(-3.0F, -3.0F);
@@ -198,7 +199,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	}
 
 	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, BlockState state, IWorld world, BlockPos pos) {
-		state = state.getBlock().getExtendedState(state, world, pos);
+		state = state.getBlock().getExtendedState(state, world, pos); // Extended state functionality moved to IModelData
 
 		if (baseModel instanceof ICustomDamageModel) {
 			ICustomDamageModel customDamageModel = (ICustomDamageModel) baseModel;
@@ -210,6 +211,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 			for (Direction facing : Direction.values()) {
 				List<BakedQuad> quadList = Lists.newArrayList();
 				for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, facing, rand)) {
+					// BakedQuadRetextured was removed from Vanilla but could be re-created.
 					quadList.add(new BakedQuadRetextured(quad, texture));
 				}
 				faceQuads.put(facing, quadList);

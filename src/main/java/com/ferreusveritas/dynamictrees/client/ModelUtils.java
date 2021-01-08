@@ -1,10 +1,6 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockPart;
-import net.minecraft.client.renderer.model.BlockPartFace;
-import net.minecraft.client.renderer.model.FaceBakery;
-import net.minecraft.client.renderer.texture.ISprite;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -64,9 +60,9 @@ public class ModelUtils {
 		};
 	}
 	
-	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ISprite sprite, boolean uvlocked) {
+	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation sprite, boolean uvlocked) {
 
-		return new FaceBakery().makeBakedQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, sprite, blockPart.partRotation, uvlocked);
+		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, sprite, blockPart.partRotation, uvlocked);
 	}
 	
 }

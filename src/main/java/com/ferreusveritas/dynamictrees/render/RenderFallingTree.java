@@ -1,15 +1,10 @@
 package com.ferreusveritas.dynamictrees.render;
 
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
-
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.models.ModelEntityFallingTree;
 import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.mojang.blaze3d.platform.GlStateManager;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -27,6 +22,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
@@ -36,10 +34,12 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(EntityFallingTree entity) {
+	public ResourceLocation getEntityTexture(EntityFallingTree entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
-	
+
+	// TODO: Changed to render(...)?
+
 	@Override
 	public void doRender(EntityFallingTree entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
@@ -95,7 +95,7 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 				float r = (float)(color >> 16 & 255) / 255.0F;
 				float g = (float)(color >> 8 & 255) / 255.0F;
 				float b = (float)(color & 255) / 255.0F;
-				if(bakedquad.shouldApplyDiffuseLighting()) {
+				if(bakedquad.applyDiffuseLighting()) {
 					float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedquad.getFace());
 					r *= diffuse;
 					g *= diffuse;
