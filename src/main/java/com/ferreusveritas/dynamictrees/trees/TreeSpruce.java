@@ -11,13 +11,16 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenMound;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenPodzol;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
@@ -45,7 +48,7 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.CONIFEROUS);
 		}
 		
@@ -105,14 +108,11 @@ public class TreeSpruce extends TreeFamilyVanilla {
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.SPRUCE_LEAVES);
 		
 		//This will cause the mega spruce to be planted if the player is in a mega taiga biome
-		addSpeciesLocationOverride(new ISpeciesLocationOverride() {
-			@Override
-			public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
-				if(Species.isOneOfBiomes(access.getBiome(trunkPos), Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA_HILLS)) {
-					return megaSpecies;
-				}
-				return Species.NULLSPECIES;
+		addSpeciesLocationOverride((access, trunkPos) -> {
+			if(Species.isOneOfBiomes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, access.getBiome(trunkPos).getRegistryName()), Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA_HILLS)) {
+				return megaSpecies;
 			}
+			return Species.NULLSPECIES;
 		});
 		
 	}

@@ -63,7 +63,7 @@ public class Seed extends Item implements IPlantable {
 			World world = entityItem.world;
 			if(!world.isRemote) {//Server side only
 				ItemStack seedStack = entityItem.getItem();
-				BlockPos pos = new BlockPos(entityItem);
+				BlockPos pos = new BlockPos(entityItem.getPosition());
 				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(), pos, shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
 				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {

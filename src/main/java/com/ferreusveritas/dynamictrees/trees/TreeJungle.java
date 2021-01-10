@@ -21,10 +21,12 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -60,7 +62,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 		
@@ -102,7 +104,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 		

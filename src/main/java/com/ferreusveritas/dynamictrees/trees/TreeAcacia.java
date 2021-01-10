@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -24,7 +25,7 @@ public class TreeAcacia extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.SAVANNA);
 		}
 		

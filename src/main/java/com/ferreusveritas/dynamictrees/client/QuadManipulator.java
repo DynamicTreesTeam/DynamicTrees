@@ -65,7 +65,7 @@ public class QuadManipulator {
 		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
 		
 		for(BakedQuad inQuad: inQuads) {
-			BakedQuad quadCopy = new BakedQuad(inQuad.getVertexData().clone(), inQuad.getTintIndex(), inQuad.getFace(), inQuad.getSprite(), inQuad.shouldApplyDiffuseLighting(), inQuad.getFormat());
+			BakedQuad quadCopy = new BakedQuad(inQuad.getVertexData().clone(), inQuad.getTintIndex(), inQuad.getFace(), inQuad.getSprite(), inQuad.applyDiffuseLighting(), inQuad.getFormat());
 			int[] vertexData = quadCopy.getVertexData();
 			for(int i = 0; i < vertexData.length; i += inQuad.getFormat().getIntegerSize()) {
 				int pos = 0;

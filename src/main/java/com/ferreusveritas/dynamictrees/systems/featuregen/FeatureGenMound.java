@@ -52,7 +52,7 @@ public class FeatureGenMound implements IPreGenFeature, IPostGenFeature {
 			
 			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.EARTH && initialUnderState.getMaterial() != Material.ROCK)) {
 				Biome biome = world.getBiome(rootPos);
-				initialUnderState = biome.getSurfaceBuilderConfig().getTop();
+				initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
 			}
 			
 			rootPos = rootPos.up();

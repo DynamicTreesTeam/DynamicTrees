@@ -60,6 +60,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -982,7 +983,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		float ugs = (float)(double) DTConfigs.scaleBiomeGrowthRate.get();//universal growth scalar
 		
-		if(ugs == 1.0f || isBiomePerfect(biome)) {
+		if(ugs == 1.0f || isBiomePerfect(getBiomeKey(biome))) {
 			return 1.0f;
 		}
 		
@@ -1006,8 +1007,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param biome The biome being tested
 	 * @return True if biome is "perfect" false otherwise.
 	 */
-	public boolean isBiomePerfect(Biome biome) {
+	public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 		return false;
+	}
+
+	protected final Biome getBiome (final RegistryKey<Biome> biomeKey) {
+		return ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName());
+	}
+
+	protected final RegistryKey<Biome> getBiomeKey (final Biome biome) {
+		return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
 	}
 	
 	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
@@ -1022,9 +1031,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param biomes Multiple biomes to match against
 	 * @return True if a match is found. False if not.
 	 */
-	public static boolean isOneOfBiomes(Biome biomeToCheck, Biome... biomes) {
-		for(Biome biome: biomes) {
-			if(biomeToCheck == biome) {
+	public static boolean isOneOfBiomes(RegistryKey<Biome> biomeToCheck, RegistryKey<Biome>... biomes) {
+		for(RegistryKey<Biome> biome: biomes) {
+			if(biomeToCheck.equals(biome)) {
 				return true;
 			}
 		}

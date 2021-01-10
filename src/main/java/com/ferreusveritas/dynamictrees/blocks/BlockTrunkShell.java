@@ -116,8 +116,7 @@ public class BlockTrunkShell extends Block {
 	@Override
 	public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
 		ShellMuse muse = getMuse(world, pos);
-		// TODO: exploder was Entity
-		return muse != null ? muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, exploder, explosion) : 0.0f;
+		return muse != null ? muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, explosion) : 0.0f;
 	}
 
 	@Override

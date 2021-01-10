@@ -15,7 +15,6 @@ import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.event.BlockBreakAnimationClientHandler;
 import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -29,6 +28,7 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.particles.BasicParticleType;
@@ -55,15 +55,16 @@ public class DTClient {
 		registerEntityRenderers();
 		
 		registerColorHandlers();
-		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
+		// TODO: Fix block break animation. 
+//		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 		
 		LeavesPropertiesJson.postInitClient();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public static void discoverWoodColors() {
-		
-		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = location -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString());
+
+		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		Random rand = new Random();
 		
 		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
@@ -96,6 +97,7 @@ public class DTClient {
 		return access != null && pos != null;
 	}
 
+	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
 		ForgeRegistries.BLOCKS.forEach(block -> {
 			if (block instanceof BlockDynamicSapling || block instanceof BlockRooty || block instanceof BlockBranchCactus) {

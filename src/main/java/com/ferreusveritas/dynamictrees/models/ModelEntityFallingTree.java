@@ -55,7 +55,7 @@ public class ModelEntityFallingTree extends EntityModel<EntityFallingTree> {
 	public static int getBrightness(EntityFallingTree entity) {
 		BranchDestructionData destructionData = entity.getDestroyData();
 		World world = entity.getEntityWorld();
-		return world.getBlockState(destructionData.cutPos).getPackedLightmapCoords(world, destructionData.cutPos);
+		return world.getBlockState(destructionData.cutPos).getLightValue(world, destructionData.cutPos);
 	}
 	
 	public static List<BakedQuad> generateTreeQuads(EntityFallingTree entity) {

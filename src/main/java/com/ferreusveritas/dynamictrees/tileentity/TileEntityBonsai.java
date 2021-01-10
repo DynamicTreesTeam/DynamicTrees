@@ -67,7 +67,7 @@ public class TileEntityBonsai extends TileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT tag) {
+	public void read(BlockState state, CompoundNBT tag) {
 		if(tag.contains("species")) {
 			speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);

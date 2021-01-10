@@ -421,7 +421,8 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 		{
 			NonNullList<ItemStack> woodItemsNonNull = NonNullList.create();
 			woodItemsNonNull.addAll(woodItems);
-			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItemsNonNull, world, cutPos, state, fortune, chance, false, (PlayerEntity) entity);
+			// TODO: No block harvest event any more
+//			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItemsNonNull, world, cutPos, state, fortune, chance, false, (PlayerEntity) entity);
 		}
 		final float finalChance = chance;
 		

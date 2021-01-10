@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.systems.featuregen.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LightType;
@@ -19,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Random;
@@ -59,7 +61,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 			addGenFeature(new FeatureGenMound(5));//Establish mounds
 			addGenFeature(new FeatureGenPredicate(
 				new FeatureGenHugeMushrooms().setMaxShrooms(1).setMaxAttempts(3)//Generate Huge Mushrooms
-				).setBiomePredicate(biome -> biome == Biomes.DARK_FOREST || biome == Biomes.DARK_FOREST_HILLS)//Only allow this feature in roofed forests
+				).setBiomePredicate(biome -> biome == ForgeRegistries.BIOMES.getValue(Biomes.DARK_FOREST.getRegistryName()) || biome == ForgeRegistries.BIOMES.getValue(Biomes.DARK_FOREST_HILLS.getRegistryName()))//Only allow this feature in roofed forests
 			);
 			addGenFeature(new FeatureGenRoots(13).setScaler(getRootScaler()));//Finally Generate Roots
 		}
@@ -72,7 +74,7 @@ public class TreeDarkOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return isOneOfBiomes(biome, Biomes.DARK_FOREST, Biomes.DARK_FOREST_HILLS);
 		};
 		

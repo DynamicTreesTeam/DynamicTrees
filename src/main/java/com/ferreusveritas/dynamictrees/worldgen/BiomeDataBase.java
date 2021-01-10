@@ -69,7 +69,7 @@ public class BiomeDataBase {
 		private Function<Integer, Integer> multipass = defaultMultipass;
 		
 		public BiomeEntry() {
-			biome = Biomes.DEFAULT;
+			biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.getRegistryName());
 			biomeId = -1;
 		}
 		

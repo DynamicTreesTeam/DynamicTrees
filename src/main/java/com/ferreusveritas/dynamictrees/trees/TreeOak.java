@@ -13,8 +13,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -50,7 +52,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FLOWER_FOREST);
 		}
 		
@@ -90,7 +92,7 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return isOneOfBiomes(biome, Biomes.SWAMP, Biomes.SWAMP_HILLS);
 		}
 		
@@ -99,7 +101,7 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			if(soilBlockState.getBlock() == Blocks.WATER) {
 				Biome biome = world.getBiome(pos);
-				if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
+				if(BiomeDictionary.hasType(getBiomeKey(biome), Type.SWAMP)) {
 					BlockPos down = pos.down();
 					if(isAcceptableSoil(world, down, world.getBlockState(down))) {
 						return true;
@@ -163,8 +165,8 @@ public class TreeOak extends TreeFamilyVanilla {
 		}
 		
 		@Override
-		public boolean isBiomePerfect(Biome biome) {
-			return biome == Biomes.PLAINS;
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
+			return biome.equals(Biomes.PLAINS);
 		}
 		
 	}
@@ -211,7 +213,7 @@ public class TreeOak extends TreeFamilyVanilla {
 	@Override
 	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
 		//TODO: Move to location override mechanism
-		if(BiomeDictionary.hasType(world.getBiome(trunkPos), Type.SWAMP)) {
+		if(BiomeDictionary.hasType(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(trunkPos).getRegistryName()), Type.SWAMP)) {
 			return swampSpecies;
 		}
 		

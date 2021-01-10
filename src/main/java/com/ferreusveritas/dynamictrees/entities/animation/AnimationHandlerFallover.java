@@ -44,7 +44,7 @@ public class AnimationHandlerFallover implements IAnimationHandler {
 		EntityFallingTree.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 
 		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
-		if(entity.world.getBlockState(belowBlock).func_224755_d(entity.world, belowBlock, Direction.UP)) {
+		if(entity.world.getBlockState(belowBlock).isSolidSide(entity.world, belowBlock, Direction.UP)) {
 			entity.setOnGround(true);
 			return;
 		}

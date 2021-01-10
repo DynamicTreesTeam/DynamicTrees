@@ -43,7 +43,7 @@ public class EntityLingeringEffector extends Entity {
 	public EntityLingeringEffector(World world, BlockPos pos, ISubstanceEffect effect) {
 		super(EntityType.AREA_EFFECT_CLOUD, world);
 		stepHeight = 1f;
-		submergedHeight = 1f;
+//		submergedHeight = 1f;
 		noClip = true;
 		setBlockPos(pos);
 		setEffect(effect);

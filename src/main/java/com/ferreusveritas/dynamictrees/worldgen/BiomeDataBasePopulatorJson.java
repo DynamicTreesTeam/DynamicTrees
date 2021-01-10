@@ -194,9 +194,9 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		}
 	}
 	
-	public static boolean biomeHasTypes(Biome biome, List<BiomeDictionary.Type> types) {
-		return types.stream().allMatch(t -> BiomeDictionary.hasType(biome, t));
-	}
+//	public static boolean biomeHasTypes(Biome biome, List<BiomeDictionary.Type> types) {
+//		return types.stream().allMatch(t -> BiomeDictionary.hasType(biome, t));
+//	}
 	
 	private class JsonBiomeSelectorData {
 		final IJsonBiomeSelector selector;

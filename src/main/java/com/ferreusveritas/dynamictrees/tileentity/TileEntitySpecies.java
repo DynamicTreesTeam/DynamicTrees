@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -35,16 +36,16 @@ public class TileEntitySpecies extends TileEntity {
 		this.species = species;
 		this.markDirty();
 	}
-	
+
 	@Override
-	public void read(CompoundNBT tag) {
+	public void read(BlockState state, CompoundNBT tag) {
 		if(tag.contains("species")) {
 			ResourceLocation speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
-		super.read(tag);
+		super.read(state, tag);
 	}
-	
+
 	@Nonnull
 	@Override
 	public CompoundNBT write(CompoundNBT tag) {
