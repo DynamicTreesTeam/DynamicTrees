@@ -26,6 +26,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -145,7 +146,8 @@ public class BlockTrunkShell extends Block {
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
 		} else if (block instanceof BlockTrunkShell){ //If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse
-			if (new Vector3d(((BlockTrunkShell)block).getMuseDir(museState, musePos).getOffset()).add(new Vector3d(museDir.getOffset())).lengthSquared() > 2.25){
+			final Vector3i offset = ((BlockTrunkShell)block).getMuseDir(museState, musePos).getOffset();
+			if (new Vector3d(offset.getX(), offset.getY(), offset.getZ()).add(new Vector3d(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSquared() > 2.25){
 				return (((BlockTrunkShell)block).getMuseUnchecked(access, museState, musePos, originalPos));
 			}
 		}

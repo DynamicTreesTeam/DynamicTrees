@@ -59,7 +59,7 @@ public class TextureGenerationHandler {
 				continue;
 			}
 
-			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getNamespace(), String.format("%s/%s%s", event.getMap().getBasePath(), entry.getValue().getPath(), ".png"));
+			ResourceLocation textureLocation = new ResourceLocation(entry.getValue().getNamespace(), String.format("%s/%s%s", event.getMap().getTextureLocation().getPath(), entry.getValue().getPath(), ".png"));
 
 			IResource resource;
 			try {

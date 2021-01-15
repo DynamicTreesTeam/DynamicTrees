@@ -34,10 +34,10 @@ public class ModelBakeEventListener {
 		
 		ResourceLocation barkRes = new ResourceLocation("minecraft", barkTexture);
 		ResourceLocation ringRes = new ResourceLocation("minecraft", ringsTexture);
-		
-		BakedModelBlockBranchBasic bakedModel = new BakedModelBlockBranchBasic(barkRes, ringRes);
-		
+
 		ResourceLocation regName = branch.getRegistryName();
+		
+		BakedModelBlockBranchBasic bakedModel = new BakedModelBlockBranchBasic(regName, barkRes, ringRes);
 		
 		for(int i = 1; i <= 8; i++) {
 			event.getModelRegistry().put(new ModelResourceLocation(regName, "radius=" + i), bakedModel);

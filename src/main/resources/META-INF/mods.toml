@@ -1,62 +1,27 @@
-# This is an example mods.toml file. It contains the data relating to the loading mods.
-# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
-# The overall format is standard TOML format, v0.5.0.
-# Note that there are a couple of TOML lists in this file.
-# Find more information on toml format here:  https://github.com/toml-lang/toml
+license="All rights reserved"
+modLoader="javafml"
+loaderVersion="[35,)"
+issueTrackerURL="https://github.com/ferreusveritas/DynamicTrees/issues"
 
-# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
-modLoader="javafml" #mandatory
-
-# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[35,)" #mandatory (28 is current forge version)
-
-# A URL to refer people to when problems occur with this mod
-issueTrackerURL="https://github.com/ferreusveritas/DynamicTrees/issues" #optional
-
-# A list of mods - how many allowed here is determined by the individual mod loader
-[[mods]] #mandatory
-
-# The modid of the mod
-modId="dynamictrees" #mandatory
-
-# The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${file.jarVersion}" #mandatory
-
- # A display name for the mod
-displayName="Dynamic Trees" #mandatory
-
-# A URL to query for updates for this mod. See the JSON update specification <here>
-# updateJSONURL="http://minecraft.curseforge.com/projects/dynamictrees" #optional
-
-# A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="http://minecraft.curseforge.com/projects/dynamictrees" #optional
-
-# A file name (in the root of the mod JAR) containing a logo for display
-logoFile="logo.png" #optional
-
-# A text field displayed in the mod UI
-credits="MaxHyper/supermassimo for the 1.14.4 Port" #optional
-
-# A text field displayed in the mod UI
-authors="Ferreusveritas" #optional
-
-# The description text for the mod (multi line!) (#mandatory)
+[[mods]]
+modId="dynamictrees"
+version="${file.jarVersion}"
+displayName="Dynamic Trees"
+#updateJSONURL="http://minecraft.curseforge.com/projects/dynamictrees"
+displayURL="http://minecraft.curseforge.com/projects/dynamictrees"
+logoFile="logo.png"
+credits="MaxHyper/supermassimo for the 1.14.4 Port"
+authors="Ferreusveritas"
 description='''
 Progressively growing trees.. forests that spread'''
 
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.dynamictrees]] #optional
-    # the modid of the dependency
-    modId="forge" #mandatory
-    # Does this dependency have to exist - if not, ordering below must be specified
-    mandatory=true #mandatory
-    # The version range of the dependency
-    versionRange="[35,)" #mandatory
-    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+[[dependencies.dynamictrees]]
+    modId="forge"
+    mandatory=true
+    versionRange="[35,)"
     ordering="NONE"
-    # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
-# Here's another dependency
+
 [[dependencies.dynamictrees]]
     modId="minecraft"
     mandatory=true

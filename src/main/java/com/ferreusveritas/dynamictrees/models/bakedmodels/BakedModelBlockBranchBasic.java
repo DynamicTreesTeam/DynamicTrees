@@ -44,9 +44,10 @@ import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
-	
+
 	protected BlockModel modelBlock;
-	
+	protected ResourceLocation modelResLoc;
+
 	TextureAtlasSprite barkParticles;
 	
 	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
@@ -54,9 +55,10 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
-	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes) {
+	public BakedModelBlockBranchBasic(ResourceLocation modelResLoc, ResourceLocation barkRes, ResourceLocation ringsRes) {
 		this.modelBlock = new BlockModel(null, null, null, false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, null);
-		
+		this.modelResLoc = modelResLoc;
+
 		TextureAtlasSprite barkIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(barkRes);
 		TextureAtlasSprite ringIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(ringsRes);
 		barkParticles = barkIcon;
@@ -120,7 +122,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false, this.modelResLoc));
 		}
 		
 		return builder.build();
@@ -143,7 +145,7 @@ public class BakedModelBlockBranchBasic implements IDynamicBakedModel {
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false, this.modelResLoc));
 		}
 		
 		return builder.build();

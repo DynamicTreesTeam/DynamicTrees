@@ -39,6 +39,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraft.world.server.ServerWorld;
 
@@ -60,7 +61,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
 	
 	public BlockDynamicLeaves() {
-		super(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT));
+		super(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
 		this.setDefaultState(this.stateContainer.getBaseState().with(DISTANCE, LeavesProperties.maxHydro).with(PERSISTENT, false));
 		
 	}
@@ -524,7 +525,9 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 			ItemStack handStack = player.getHeldItemMainhand();
 			fortuneLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, handStack);
 		}
-		return getExactSpecies(builder.getWorld(), builder.get(LootParameters.POSITION), getProperties(state)).getLeavesDrops(builder.getWorld(), builder.get(LootParameters.POSITION), ret, fortuneLevel);
+		final Vector3d builderPos = builder.get(LootParameters.field_237457_g_);
+		final BlockPos builderBlockPos = new BlockPos(builderPos.getX(), builderPos.getY(), builderPos.getZ());
+		return getExactSpecies(builder.getWorld(), builderBlockPos, getProperties(state)).getLeavesDrops(builder.getWorld(), builderBlockPos, ret, fortuneLevel);
 	}
 	
 	/**
@@ -575,7 +578,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	//////////////////////////////
 	// RENDERING FUNCTIONS
 	//////////////////////////////
-	
+
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
 		return getProperties(blockState).getRadiusForConnection(blockState, world, pos, from, side, fromRadius);

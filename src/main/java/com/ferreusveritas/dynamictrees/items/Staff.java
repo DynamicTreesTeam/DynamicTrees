@@ -317,10 +317,10 @@ public class Staff extends Item {
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
 		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-		if (slot == EquipmentSlotType.MAINHAND) {
-			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
-			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
-		}
+//		if (slot == EquipmentSlotType.MAINHAND) {
+//			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
+//			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
+//		}
 		return multimap;
 	}
 	
