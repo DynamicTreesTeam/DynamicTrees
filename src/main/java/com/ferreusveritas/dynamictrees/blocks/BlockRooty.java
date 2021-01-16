@@ -62,7 +62,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author ferreusveritas
  *
  */
-public class BlockRooty extends Block implements ITreePart {
+public class BlockRooty extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
 	private final Block primitiveDirt;
@@ -210,7 +210,7 @@ public class BlockRooty extends Block implements ITreePart {
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+	public float getHardness(IBlockReader worldIn, BlockPos pos) {
 		return (float) (primitiveDirt.getDefaultState().getBlockHardness(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
 	}
 

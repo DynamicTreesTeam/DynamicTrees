@@ -48,7 +48,7 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 			return;
 		}
 
-		// bindEntityTexture(entity);
+		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
 
 		ModelEntityFallingTree treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
 
@@ -109,8 +109,7 @@ public class RenderFallingTree extends EntityRenderer<EntityFallingTree> {
 //				buffer.putColorMultiplier(r, g, b, 3);
 //				buffer.putColorMultiplier(r, g, b, 2);
 //				buffer.putColorMultiplier(r, g, b, 1);
-			}
-			else if(bakedQuad.applyDiffuseLighting()) {
+			} else if(bakedQuad.applyDiffuseLighting()) {
 				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
 				// this could be replacement for putColorMultiplier?
 				buffer.color(diffuse, diffuse, diffuse, 4);

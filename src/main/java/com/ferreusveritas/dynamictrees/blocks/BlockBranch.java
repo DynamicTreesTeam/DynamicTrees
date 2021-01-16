@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 
+import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,6 +48,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.Property;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -62,9 +67,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolType;
 
-public abstract class
-BlockBranch extends Block implements ITreePart, IFutureBreakable {
-	
+public abstract class BlockBranch extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
+
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
@@ -73,13 +77,12 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	public BlockBranch(Properties properties, String name){
 		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
 		setRegistryName(name);
-		
 	}
 	
 	public BlockBranch(Material material, String name) {
 		this(Properties.create(material), name);
 	}
-	
+
 	///////////////////////////////////////////
 	// TREE INFORMATION
 	///////////////////////////////////////////
@@ -597,5 +600,5 @@ BlockBranch extends Block implements ITreePart, IFutureBreakable {
 	public final TreePartType getTreePartType() {
 		return TreePartType.BRANCH;
 	}
-	
+
 }

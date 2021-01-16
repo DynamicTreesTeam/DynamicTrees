@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 
+import java.lang.reflect.Field;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
@@ -20,6 +21,8 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
+import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,6 +32,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -55,25 +59,23 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	// Trees are mostly made of wood
 	public BlockBranchBasic(String name) {
-		this(Properties.create(Material.WOOD).hardnessAndResistance(2.0F), name);//Trees are made of wood. Brilliant.
-		this.setDefaultState(this.getDefaultState().with(RADIUS, 1));
-		
+		this(Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
 	}
 	
 	// Useful for more unique subclasses
 	public BlockBranchBasic(Properties properties, String name) {
 		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0), name); //aaaaand they also sound like wood.
-		
+
 		cacheBranchStates();
 	}
-	
+
 	@Nullable
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(RADIUS, 1);
 	}
 	
 	public void cacheBranchStates() {
-		setDefaultState(stateContainer.getBaseState().with(RADIUS, 1));
+		this.setDefaultState(stateContainer.getBaseState().with(RADIUS, 1));
 		
 		branchStates = new BlockState[RADMAX_NORMAL + 1];
 		
@@ -150,22 +152,14 @@ public class BlockBranchBasic extends BlockBranch {
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
 
-
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+	public float getHardness (IBlockReader worldIn, BlockPos pos) {
+		int radius = getRadius(worldIn.getBlockState(pos));
+		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+		return hardness;
 	}
 
-	// TODO: Find a way to do dynamic block hardness. Seems there is a method that could be overriden but it is in the Block Properties.
-
-//	@Override
-//	public float getBlockHardness(BlockState blockState, IBlockReader world, BlockPos pos) {
-//		int radius = getRadius(blockState);
-//		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(world, pos) * (radius * radius) / 64.0f * 8.0f;
-//		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-//		return hardness;
-//	}
-	
 	@Override
 	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
 		int radius = getRadius(world.getBlockState(pos));
@@ -429,5 +423,5 @@ public class BlockBranchBasic extends BlockBranch {
 		
 		return signal;
 	}
-	
+
 }

@@ -94,9 +94,9 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		int radius = getRadius(state);
-		float hardness = getFamily().getPrimitiveLog().getBlock().getPlayerRelativeBlockHardness(state, player, worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+	public float getHardness(IBlockReader worldIn, BlockPos pos) {
+		int radius = getRadius(worldIn.getBlockState(pos));
+		float hardness = getFamily().getPrimitiveLog().getBlock().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
 		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 		return hardness;
 	}
