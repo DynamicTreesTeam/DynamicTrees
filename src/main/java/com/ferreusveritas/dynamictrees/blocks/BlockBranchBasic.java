@@ -55,7 +55,7 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	// Trees are mostly made of wood
 	public BlockBranchBasic(String name) {
-		this(Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
+		this(Properties.create(Material.WOOD).hardnessAndResistance(2.0F), name);//Trees are made of wood. Brilliant.
 		this.setDefaultState(this.getDefaultState().with(RADIUS, 1));
 		
 	}

@@ -43,9 +43,9 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class DTRegistries {
 	
 	///////////////////////////////////////////
-	//BLOCKS
+	// BLOCKS
 	///////////////////////////////////////////
-	//public static Block blockRootyDirtFake;
+
 	public static BlockFruit blockApple;
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
@@ -82,19 +82,14 @@ public class DTRegistries {
 			registry.register(rooty);
 		}
 		
-		registry.registerAll(
-				blockBonsaiPot,
-				blockFruitCocoa,
-				blockApple,
-				blockTrunkShell
-				);
+		registry.registerAll(blockBonsaiPot, blockFruitCocoa, blockApple, blockTrunkShell);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 		
 	}
 	
 	///////////////////////////////////////////
-	//ITEMS
+	// ITEMS
 	///////////////////////////////////////////
 	
 	public static DendroPotion dendroPotion;
@@ -111,18 +106,16 @@ public class DTRegistries {
 	public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
 		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 		
-		ArrayList<Item> treeItems = new ArrayList<Item>();
+		ArrayList<Item> treeItems = new ArrayList<>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 		DTTrees.dynamicCactus.getRegisterableItems(treeItems);
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
-		
-		//        Item.Properties properties = new Item.Properties().group(DTRegistries.dynamicTreesTab);
 	}
 	
 	///////////////////////////////////////////
-	//ENTITIES
+	// ENTITIES
 	///////////////////////////////////////////
 	
 	public final static String FALLING_TREE = "falling_tree";
@@ -148,7 +141,7 @@ public class DTRegistries {
 	}
 	
 	///////////////////////////////////////////
-	//TILE ENTITIES
+	// TILE ENTITIES
 	///////////////////////////////////////////
 	
 	public static TileEntityType<TileEntitySpecies> speciesTE;
@@ -170,9 +163,10 @@ public class DTRegistries {
 	}
 	
 	///////////////////////////////////////////
-	//MISC
+	// MISC
 	///////////////////////////////////////////
-	/**This is the creative tab that holds all DT items*/
+
+	/** This is the creative tab that holds all DT items */
 	public static final ItemGroup dynamicTreesTab = new ItemGroup("dynamictrees") {
 		@Override
 		public ItemStack createIcon() {

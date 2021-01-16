@@ -68,7 +68,7 @@ public class TreeRegistry {
 	}
 
 	public static List<ResourceLocation> getSpeciesDirectory() {
-		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
+		return new ArrayList<>(Species.REGISTRY.getKeys());
 	}
 
 	//////////////////////////////
@@ -111,7 +111,7 @@ public class TreeRegistry {
 	}
 
 	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
-		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<ResourceLocation, Map<ResourceLocation, IDropCreator>>();
+		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<>();
 		dir.put(globalName, globalDropCreatorStorage.getDropCreators());
 		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
 		return dir;

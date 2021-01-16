@@ -50,9 +50,7 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
-	
-	public static boolean passableLeavesModLoaded = false;
-	
+
 	protected static Random backupRng = new Random();
 	
 	//	public static final IntegerProperty DISTANCE = IntegerProperty.create("hydro", 1, 7);
@@ -234,7 +232,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (passableLeavesModLoaded || DTConfigs.isLeavesPassable.get() || isItemPassable(context)){
+		if (DTConfigs.isLeavesPassable.get() || isItemPassable(context)){
 			return VoxelShapes.empty();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
@@ -290,7 +288,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if(entity instanceof ItemEntity || passableLeavesModLoaded || DTConfigs.vanillaLeavesCollision.get()) {
+		if(entity instanceof ItemEntity || DTConfigs.vanillaLeavesCollision.get()) {
 			super.onEntityCollision(state, world, pos, entity);
 		}
 		else {
@@ -627,4 +625,7 @@ public class BlockDynamicLeaves extends LeavesBlock implements ITreePart, IAgeab
 	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
 		return 0.2F;
 	}
+
+
+
 }

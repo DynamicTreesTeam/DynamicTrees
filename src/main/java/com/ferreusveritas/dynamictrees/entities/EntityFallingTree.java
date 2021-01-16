@@ -113,7 +113,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		this.destroyType = destroyType;
 		this.onFire = destroyType == DestroyType.FIRE;
 
-		this.setPosition(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
+		this.setRawPosition(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
 
 		int numBlocks = destroyData.getNumBranches();
 		geomCenter = new Vector3d(0, 0, 0);
@@ -246,7 +246,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	@Override
 	public void setPosition(double x, double y, double z) {
 		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
-		this.setPositionAndUpdate(x, y, z);
+		this.setRawPosition(x, y, z);
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
 		this.setBoundingBox(normAABB != null ? normAABB.offset(this.getPosX(), getPosY(), this.getPosZ()) : new AxisAlignedBB(BlockPos.ZERO));
 	}
@@ -470,11 +470,12 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
-			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
-			if(entity.isAlive()) {
-				world.addEntity(entity);
-			}
-			return entity;
+			// Falling tree currently has severe rendering issues.
+//			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
+//			if(entity.isAlive()) {
+//				world.addEntity(entity);
+//			}
+//			return entity;
 		}
 		
 		return null;
