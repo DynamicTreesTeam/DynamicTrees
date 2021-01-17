@@ -1,5 +1,5 @@
 {
-    "parent": "dynamictrees:block/smartmodel/branch",
+    "loader": "dynamictrees:branch",
     "textures": {
         "bark": "block/oak_log",
         "rings": "block/oak_log_top"

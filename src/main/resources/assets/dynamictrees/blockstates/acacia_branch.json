@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "block/acacia_fence_post" }
+        "": { "model": "dynamictrees:block/acacia_branch" }
     }
 }

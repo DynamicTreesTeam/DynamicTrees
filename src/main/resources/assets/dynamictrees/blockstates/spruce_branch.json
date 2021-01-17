@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"": { "model": "block/goodwood" }
+		"": { "model": "dynamictrees:block/spruce_branch" }
 	}
 }

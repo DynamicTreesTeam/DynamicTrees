@@ -45,8 +45,12 @@ import net.minecraftforge.client.model.data.IModelData;
 @OnlyIn(Dist.CLIENT)
 public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
+	public static final List<BasicBranchBlockBakedModel> INSTANCES = new ArrayList<>();
+
 	protected BlockModel modelBlock;
 	protected ResourceLocation modelResLoc;
+	protected ResourceLocation barkResLoc;
+	protected ResourceLocation ringsResLoc;
 
 	TextureAtlasSprite barkParticles;
 	
@@ -55,30 +59,40 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 	
-	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkRes, ResourceLocation ringsRes) {
+	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
 		this.modelBlock = new BlockModel(null, null, null, false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, null);
-		this.modelResLoc = modelResLoc;
 
-		TextureAtlasSprite barkIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(barkRes);
-		TextureAtlasSprite ringIcon = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(ringsRes);
-		barkParticles = barkIcon;
-		
+		this.modelResLoc = modelResLoc;
+		this.barkResLoc = barkResLoc;
+		this.ringsResLoc = ringsResLoc;
+
+		INSTANCES.add(this);
+	}
+
+	public void setupBakedModels () {
+		TextureAtlasSprite barkTexture = this.getTexture(this.barkResLoc);
+		TextureAtlasSprite ringTexture = this.getTexture(this.ringsResLoc);
+		barkParticles = barkTexture;
+
 		for(int i = 0; i < 8; i++) {
 			int radius = i + 1;
 			if(radius < 8) {
 				for(Direction dir: Direction.values()) {
-					sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkIcon);
+					sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkTexture);
 				}
 			}
-			cores[0][i] = bakeCore(radius, Axis.Y, barkIcon); //DOWN<->UP
-			cores[1][i] = bakeCore(radius, Axis.Z, barkIcon); //NORTH<->SOUTH
-			cores[2][i] = bakeCore(radius, Axis.X, barkIcon); //WEST<->EAST
-			
-			rings[i] = bakeCore(radius, Axis.Y, ringIcon);
+			cores[0][i] = bakeCore(radius, Axis.Y, barkTexture); //DOWN<->UP
+			cores[1][i] = bakeCore(radius, Axis.Z, barkTexture); //NORTH<->SOUTH
+			cores[2][i] = bakeCore(radius, Axis.X, barkTexture); //WEST<->EAST
+
+			rings[i] = bakeCore(radius, Axis.Y, ringTexture);
 		}
-		
 	}
-	
+
+	private TextureAtlasSprite getTexture(ResourceLocation resLoc) {
+		return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resLoc);
+	}
+
 	public IBakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark) {
 		//Work in double units(*2)
 		int dradius = radius * 2;

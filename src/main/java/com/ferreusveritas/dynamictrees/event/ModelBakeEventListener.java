@@ -18,30 +18,7 @@ public class ModelBakeEventListener {
 
 	@SubscribeEvent
 	public static void onModelBake(ModelBakeEvent event) {
-		
-		//TODO: This is garbage, but it's progress
-		bakeBranch(event, DTTrees.OAK, "block/oak_log", "block/oak_log_top");
-		bakeBranch(event, DTTrees.BIRCH, "block/birch_log", "block/birch_log_top");
-		bakeBranch(event, DTTrees.SPRUCE, "block/spruce_log", "block/spruce_log_top");
-		bakeBranch(event, DTTrees.JUNGLE, "block/jungle_log", "block/jungle_log_top");
-		bakeBranch(event, DTTrees.DARK_OAK, "block/dark_oak_log", "block/dark_oak_log_top");
-		bakeBranch(event, DTTrees.ACACIA, "block/acacia_log", "block/acacia_log_top");
+		BasicBranchBlockBakedModel.INSTANCES.forEach(BasicBranchBlockBakedModel::setupBakedModels);
 	}
 
-	public static void bakeBranch(ModelBakeEvent event, String speciesName, String barkTexture, String ringsTexture) {
-		Species species = Species.REGISTRY.getValue(new ResourceLocation(DynamicTrees.MODID, speciesName));
-		Block branch = species.getFamily().getDynamicBranch();
-		
-		ResourceLocation barkRes = new ResourceLocation("minecraft", barkTexture);
-		ResourceLocation ringRes = new ResourceLocation("minecraft", ringsTexture);
-
-		ResourceLocation regName = branch.getRegistryName();
-		
-		BasicBranchBlockBakedModel bakedModel = new BasicBranchBlockBakedModel(regName, barkRes, ringRes);
-		
-		for(int i = 1; i <= 8; i++) {
-			event.getModelRegistry().put(new ModelResourceLocation(regName, "radius=" + i), bakedModel);
-		}
-	}
-	
 }
