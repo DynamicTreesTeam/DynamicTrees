@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-
 import java.util.Random;
 
 import javax.annotation.Nonnull;
