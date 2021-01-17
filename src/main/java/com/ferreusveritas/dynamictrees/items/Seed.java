@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
+import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -152,7 +152,7 @@ public class Seed extends Item implements IPlantable {
 		//Handle Flower Pot interaction
 		BlockState emptyPotState = context.getWorld().getBlockState(context.getPos());
 		if(emptyPotState.getBlock() instanceof FlowerPotBlock && (emptyPotState == emptyPotState.getBlock().getDefaultState()) ) { //Empty Flower Pot of some kind
-			BlockBonsaiPot bonzaiPot = getSpecies().getBonzaiPot();
+			BonsaiPotBlock bonzaiPot = getSpecies().getBonzaiPot();
 			context.getWorld().setBlockState(context.getPos(), bonzaiPot.getDefaultState());
 			if(bonzaiPot.setSpecies(context.getWorld(), getSpecies(), context.getPos()) && bonzaiPot.setPotState(context.getWorld(), emptyPotState, context.getPos())) {
 				context.getItem().shrink(1);

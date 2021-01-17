@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -23,7 +23,7 @@ public class NodeDisease implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(blockState);
+		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
 			if(branch.getRadius(blockState) == 1) {

@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.compat;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -97,8 +97,8 @@ public class WailaBranchHandler implements IComponentProvider{
 		Block block = state.getBlock();
 		
 		//Dereference proxy trunk shell block
-		if(block instanceof BlockTrunkShell) {
-			ShellMuse muse = ((BlockTrunkShell)block).getMuse(world, pos);
+		if(block instanceof TrunkShellBlock) {
+			ShellMuse muse = ((TrunkShellBlock)block).getMuse(world, pos);
 			if(muse != null) {
 				state = muse.state;
 				block = state.getBlock();
@@ -106,8 +106,8 @@ public class WailaBranchHandler implements IComponentProvider{
 			}
 		}
 		
-		if(block instanceof BlockBranch) {
-			BlockBranch branch = (BlockBranch) block;
+		if(block instanceof BranchBlock) {
+			BranchBlock branch = (BranchBlock) block;
 			
 			// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 			NodeNetVolume volumeSum = new NodeNetVolume();

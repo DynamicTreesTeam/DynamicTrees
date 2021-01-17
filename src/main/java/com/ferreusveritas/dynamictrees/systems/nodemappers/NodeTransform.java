@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockState;
@@ -23,7 +23,7 @@ public class NodeTransform implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(blockState);
+		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
 			int radius = branch.getRadius(blockState);
@@ -49,7 +49,7 @@ public class NodeTransform implements INodeInspector {
 				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					BlockState state = world.getBlockState(leavesPos);
 					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
-						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.get(BlockDynamicLeaves.DISTANCE) : 2;
+						int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.get(DynamicLeavesBlock.DISTANCE) : 2;
 						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
 					}
 				}

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenHugeMushroom;
+import com.ferreusveritas.dynamictrees.systems.featuregen.HugeMushroomGenFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 
@@ -15,7 +15,7 @@ public class Mushroom extends Species {
 		this.redcap = redcap;
 		setRegistryName(new ResourceLocation(DynamicTrees.MODID, "mushroom" + (redcap ? "red" : "brn")));
 		setStandardSoils();
-		addGenFeature(new FeatureGenHugeMushroom(redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
+		addGenFeature(new HugeMushroomGenFeature(redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
 	}
 	
 }

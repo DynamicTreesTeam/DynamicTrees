@@ -11,12 +11,12 @@ import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceDeplete;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFreeze;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceGrowth;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceMega;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceTransform;
+import com.ferreusveritas.dynamictrees.systems.substances.DepleteSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.FreezeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.MegaSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
@@ -128,12 +128,12 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		switch (getPotionType(itemStack)) {
 			default:
 			case BIOCHAR: return null;
-			case BURGEONING: return new SubstanceGrowth();
-			case GIGAS: return new SubstanceMega();
-			case DEPLETION: return new SubstanceDeplete().setAmount(15);
-			case FERTILITY: return new SubstanceFertilize().setAmount(15);
-			case PERSISTANCE: return new SubstanceFreeze();
-			case TRANSFORM: return new SubstanceTransform(getTargetSpecies(itemStack));
+			case BURGEONING: return new GrowthSubstance();
+			case GIGAS: return new MegaSubstance();
+			case DEPLETION: return new DepleteSubstance().setAmount(15);
+			case FERTILITY: return new FertilizeSubstance().setAmount(15);
+			case PERSISTANCE: return new FreezeSubstance();
+			case TRANSFORM: return new TransformSubstance(getTargetSpecies(itemStack));
 		}
 	}
 	

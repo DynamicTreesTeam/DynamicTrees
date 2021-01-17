@@ -14,9 +14,9 @@ import net.minecraft.util.Direction;
 public class AnimationHandlers {
 	
 	//This is what is run when the tree felling option is disabled
-	public static final IAnimationHandler voidAnimationHandler = new AnimationHandlerVoid();
+	public static final IAnimationHandler voidAnimationHandler = new VoidAnimationHandler();
 	
-	public static final IAnimationHandler defaultAnimationHandler = new AnimationHandlerPhysics() {
+	public static final IAnimationHandler defaultAnimationHandler = new PhysicsAnimationHandler() {
 		@Override public String getName() { return "default"; };
 		
 		@Override
@@ -29,7 +29,7 @@ public class AnimationHandlers {
 		
 	};
 	
-	public static final IAnimationHandler blastAnimationHandler = new AnimationHandlerPhysics() {
+	public static final IAnimationHandler blastAnimationHandler = new PhysicsAnimationHandler() {
 		@Override public String getName() { return "blast"; };
 		
 		@Override
@@ -43,6 +43,6 @@ public class AnimationHandlers {
 		
 	};
 	
-	public static final IAnimationHandler falloverAnimationHandler = new AnimationHandlerFallover();
+	public static final IAnimationHandler falloverAnimationHandler = new FalloverAnimationHandler();
 	
 }

@@ -40,17 +40,17 @@ public class CellKits {
 
 		private final ICell[] normalCells = {
 				CellNull.NULLCELL,
-				new CellNormal(1),
-				new CellNormal(2),
-				new CellNormal(3),
-				new CellNormal(4),
-				new CellNormal(5),
-				new CellNormal(6),
-				new CellNormal(7)
+				new NormalCell(1),
+				new NormalCell(2),
+				new NormalCell(3),
+				new NormalCell(4),
+				new NormalCell(5),
+				new NormalCell(6),
+				new NormalCell(7)
 		};
 		
 		/** Typical branch with hydration 5 */
-		private final ICell branchCell = new CellNormal(5);
+		private final ICell branchCell = new NormalCell(5);
 		
 		private final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0322, 0x0411, 0x0311, 0x0211});
 		
@@ -85,18 +85,18 @@ public class CellKits {
 	
 	private final ICellKit conifer = new ICellKit() {
 		
-		private final ICell coniferBranch = new CellConiferBranch();
-		private final ICell coniferTopBranch = new CellConiferTopBranch();
+		private final ICell coniferBranch = new ConiferBranchCell();
+		private final ICell coniferTopBranch = new ConiferTopBranchCell();
 
 		private final ICell[] coniferLeafCells = {
 				CellNull.NULLCELL,
-				new CellConiferLeaf(1),
-				new CellConiferLeaf(2),
-				new CellConiferLeaf(3),
-				new CellConiferLeaf(4),
-				new CellConiferLeaf(5),
-				new CellConiferLeaf(6),
-				new CellConiferLeaf(7)
+				new ConiferLeafCell(1),
+				new ConiferLeafCell(2),
+				new ConiferLeafCell(3),
+				new ConiferLeafCell(4),
+				new ConiferLeafCell(5),
+				new ConiferLeafCell(6),
+				new ConiferLeafCell(7)
 		};
 
 		private final BasicSolver coniferSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0211});
@@ -108,7 +108,7 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			if(meta == CellMetadata.CONIFERTOP) {
+			if(meta == MetadataCell.CONIFERTOP) {
 				return coniferTopBranch;
 			}
 			else if(radius == 1) {
@@ -154,13 +154,13 @@ public class CellKits {
 
 		private final ICell[] acaciaLeafCells = {
 				CellNull.NULLCELL,
-				new CellAcaciaLeaf(1),
-				new CellAcaciaLeaf(2),
-				new CellAcaciaLeaf(3),
-				new CellAcaciaLeaf(4),
-				new CellAcaciaLeaf(5),
-				new CellAcaciaLeaf(6),
-				new CellAcaciaLeaf(7)
+				new AcaciaLeafCell(1),
+				new AcaciaLeafCell(2),
+				new AcaciaLeafCell(3),
+				new AcaciaLeafCell(4),
+				new AcaciaLeafCell(5),
+				new AcaciaLeafCell(6),
+				new AcaciaLeafCell(7)
 		};
 
 		private final BasicSolver acaciaSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
@@ -196,17 +196,17 @@ public class CellKits {
 	private final ICellKit dark_oak = new ICellKit() {
 		
 		/** Typical branch with hydration 5 */
-		private final ICell branchCell = new CellNormal(5);
+		private final ICell branchCell = new NormalCell(5);
 		
 		private final ICell[] darkOakLeafCells = {
 				CellNull.NULLCELL,
-				new CellDarkOakLeaf(1),
-				new CellDarkOakLeaf(2),
-				new CellDarkOakLeaf(3),
-				new CellDarkOakLeaf(4),
-				new CellDarkOakLeaf(5),
-				new CellDarkOakLeaf(6),
-				new CellDarkOakLeaf(7)
+				new DarkOakLeafCell(1),
+				new DarkOakLeafCell(2),
+				new DarkOakLeafCell(3),
+				new DarkOakLeafCell(4),
+				new DarkOakLeafCell(5),
+				new DarkOakLeafCell(6),
+				new DarkOakLeafCell(7)
 			}; 
 		
 		private final BasicSolver darkOakSolver = new BasicSolver(new short[] {0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
@@ -287,13 +287,13 @@ public class CellKits {
 		
 		private final ICell[] palmFrondCells = {
 				CellNull.NULLCELL,
-				new CellPalmFrond(1),
-				new CellPalmFrond(2),
-				new CellPalmFrond(3),
-				new CellPalmFrond(4),
-				new CellPalmFrond(5),
-				new CellPalmFrond(6),
-				new CellPalmFrond(7)
+				new PalmFrondCell(1),
+				new PalmFrondCell(2),
+				new PalmFrondCell(3),
+				new PalmFrondCell(4),
+				new PalmFrondCell(5),
+				new PalmFrondCell(6),
+				new PalmFrondCell(7)
 			}; 
 		
 		private final BasicSolver palmSolver = new BasicSolver(new short[]{0x0514, 0x0413, 0x0312, 0x0221});

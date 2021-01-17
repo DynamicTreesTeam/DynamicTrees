@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ public interface ILeavesProperties {
 	/** The type of tree these leaves connect to */
 	ILeavesProperties setTree(TreeFamily tree);
 
-	/** This is needed so the {@link BlockDynamicLeaves} knows if it can pull hydro from a branch */
+	/** This is needed so the {@link DynamicLeavesBlock} knows if it can pull hydro from a branch */
 	TreeFamily getTree();
 
 	/** The primitive(vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
@@ -63,6 +63,6 @@ public interface ILeavesProperties {
 	 */
 	boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand);
 
-	int getRadiusForConnection(BlockState blockState, IBlockReader blockReader, BlockPos pos, BlockBranch from, Direction side, int fromRadius);
+	int getRadiusForConnection(BlockState blockState, IBlockReader blockReader, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
 
 }

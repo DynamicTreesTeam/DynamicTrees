@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlerData;
+import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.entities.animation.DataAnimationHandler;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -76,7 +76,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	public static IAnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
 	
 	public IAnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
-	public AnimationHandlerData animationHandlerData = null;
+	public DataAnimationHandler dataAnimationHandler = null;
 	
 	public enum DestroyType {
 		VOID,
@@ -202,7 +202,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 				BlockPos pos = destroyData.getBranchRelPos(i).add(cutPos);
 				for(Surround dir: Surround.values()) {
 					BlockPos dPos = pos.add(dir.getOffset());
-					if(world.getBlockState(dPos).getBlock() == DTRegistries.blockTrunkShell) {
+					if(world.getBlockState(dPos).getBlock() == DTRegistries.trunkShellBlock) {
 						world.removeBlock(dPos, false);
 					}
 				}
@@ -409,7 +409,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			BlockState belowState = world.getBlockState(rootPos);
 			
 			if(TreeHelper.isRooty(belowState)) {
-				BlockRooty rootyBlock = (BlockRooty) belowState.getBlock();
+				RootyBlock rootyBlock = (RootyBlock) belowState.getBlock();
 				rootyBlock.doDecay(world, rootPos, belowState, getDestroyData().species);
 			}
 		}

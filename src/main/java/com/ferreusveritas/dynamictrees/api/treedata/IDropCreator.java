@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.treedata;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.item.ItemStack;
@@ -17,8 +17,8 @@ public interface IDropCreator {
 	ResourceLocation getName();
 
 	/**
-	 * Gets a list of drops for a {@link BlockDynamicLeaves} when the entire tree is harvested.
-	 * NOT used for individual {@link BlockDynamicLeaves} being directly harvested by hand or tool.
+	 * Gets a list of drops for a {@link DynamicLeavesBlock} when the entire tree is harvested.
+	 * NOT used for individual {@link DynamicLeavesBlock} being directly harvested by hand or tool.
 	 *
 	 * @param world
 	 * @param species
@@ -47,7 +47,7 @@ public interface IDropCreator {
 
 	/**
 	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link BlockDynamicLeaves} directly by hand or with a tool.
+	 * a {@link DynamicLeavesBlock} directly by hand or with a tool.
 	 *
 	 * @param access
 	 * @param species
@@ -61,7 +61,7 @@ public interface IDropCreator {
 
 	/**
 	 * Gets a {@link List} of Logs drops.  Logs drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link BlockBranch} directly by hand or with a tool.
+	 * a {@link BranchBlock} directly by hand or with a tool.
 	 *
 	 * @param world
 	 * @param species

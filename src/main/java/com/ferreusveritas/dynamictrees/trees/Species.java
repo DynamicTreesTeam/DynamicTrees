@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
@@ -21,15 +21,15 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorLogs;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorSeed;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
-import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
+import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
+import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -80,7 +80,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		@Override public Species setSeed(Seed newSeed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
-		@Override public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
+		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 	
 	/**
@@ -121,9 +121,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	protected Seed seed = null;
 	/** A blockState that will turn itself into this tree */
-	protected BlockDynamicSapling saplingBlock = null;
+	protected DynamicSaplingBlock saplingBlock = null;
 	/** A place to store what drops from the species. Similar to a loot table */
-	protected IDropCreatorStorage dropCreatorStorage = new DropCreatorStorage();
+	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
@@ -173,7 +173,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
-		addDropCreator(new DropCreatorLogs());
+		addDropCreator(new LogDropCreator());
 	}
 	
 	public boolean isValid() {
@@ -304,11 +304,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Typically called in the constructor
 	 */
 	public Species setupStandardSeedDropping() {
-		addDropCreator(new DropCreatorSeed());
+		addDropCreator(new SeedDropCreator());
 		return this;
 	}
 	public Species setupStandardSeedDropping(float rarity) {
-		addDropCreator(new DropCreatorSeed(rarity));
+		addDropCreator(new SeedDropCreator(rarity));
 		return this;
 	}
 	
@@ -317,11 +317,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * for a custom seed item.
 	 */
 	public Species setupCustomSeedDropping(ItemStack customSeed) {
-		addDropCreator(new DropCreatorSeed().setCustomSeedDrop(customSeed));
+		addDropCreator(new SeedDropCreator().setCustomSeedDrop(customSeed));
 		return this;
 	}
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
-		addDropCreator(new DropCreatorSeed(rarity).setCustomSeedDrop(customSeed));
+		addDropCreator(new SeedDropCreator(rarity).setCustomSeedDrop(customSeed));
 		return this;
 	}
 	
@@ -338,8 +338,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	/**
-	 * Gets a list of drops for a {@link BlockDynamicLeaves} when the entire tree is harvested.
-	 * NOT used for individual {@link BlockDynamicLeaves} being directly harvested by hand or tool.
+	 * Gets a list of drops for a {@link DynamicLeavesBlock} when the entire tree is harvested.
+	 * NOT used for individual {@link DynamicLeavesBlock} being directly harvested by hand or tool.
 	 *
 	 * @param world
 	 * @param leafPos
@@ -369,7 +369,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	/**
 	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link BlockDynamicLeaves} directly by hand or with a tool.
+	 * a {@link DynamicLeavesBlock} directly by hand or with a tool.
 	 *
 	 * @param access
 	 * @param breakPos
@@ -386,7 +386,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	/**
 	 * Gets a {@link List} of Logs drops.  Logs drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link BlockBranch} directly by hand or with a tool.
+	 * a {@link BranchBlock} directly by hand or with a tool.
 	 *
 	 * @param world
 	 * @param breakPos
@@ -456,7 +456,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	//SAPLING
 	///////////////////////////////////////////
 	
-	public Species setSapling(BlockDynamicSapling sapling) {
+	public Species setSapling(DynamicSaplingBlock sapling) {
 		saplingBlock = sapling;
 		return this;
 	}
@@ -466,11 +466,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * in the appropriate registries.
 	 */
 	public Species generateSapling() {
-		setSapling(new BlockDynamicSapling(this));
+		setSapling(new DynamicSaplingBlock(this));
 		return this;
 	}
 	
-	public Optional<BlockDynamicSapling> getSapling() {
+	public Optional<DynamicSaplingBlock> getSapling() {
 		return Optional.ofNullable(saplingBlock);
 	}
 	
@@ -483,7 +483,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 */
 	public boolean plantSapling(IWorld world, BlockPos pos) {
 		if(saplingBlock != null) {
-			if(world.getBlockState(pos).getMaterial().isReplaceable() && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+			if(world.getBlockState(pos).getMaterial().isReplaceable() && DynamicSaplingBlock.canSaplingStay(world, this, pos)) {
 				world.setBlockState(pos, saplingBlock.getDefaultState(), 3);
 				return true;
 			}
@@ -519,7 +519,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			
 			if(getRequiresTileEntity(world, pos)) {
-				TileEntitySpecies speciesTE = DTRegistries.speciesTE.create();
+				SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
 				world.setTileEntity(pos.down(), speciesTE);
 				speciesTE.setSpecies(this);
 			}
@@ -554,14 +554,14 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
 		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
-		if (primitiveDirt instanceof BlockRooty)
+		if (primitiveDirt instanceof RootyBlock)
 			return true;
 		if (RootyBlockHelper.getRootyBlocksMap().containsKey(primitiveDirt)){
-			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(BlockRooty.FERTILITY, life));
+			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life));
 			return true;
 		}
 		System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
-		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(BlockRooty.FERTILITY, life));
+		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life));
 		return false;
 	}
 	
@@ -579,7 +579,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public int maxBranchRadius() {
-		return isThick() ? BlockBranchThick.RADMAX_THICK : BlockBranch.RADMAX_NORMAL;
+		return isThick() ? ThickBranchBlock.RADMAX_THICK : BranchBlock.RADMAX_NORMAL;
 	}
 	
 	/**
@@ -648,7 +648,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 */
 	public boolean isAcceptableSoil(IWorld world, BlockPos pos, BlockState soilBlockState) {
 		Block soilBlock = soilBlockState.getBlock();
-		return soilList.contains(soilBlock) || (soilBlock instanceof BlockRooty && soilList.contains(((BlockRooty)soilBlock).getPrimitiveDirt()));
+		return soilList.contains(soilBlock) || (soilBlock instanceof RootyBlock && soilList.contains(((RootyBlock)soilBlock).getPrimitiveDirt()));
 	}
 	
 	/**
@@ -676,15 +676,15 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 *
 	 *
 	 * @param world The world
-	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
+	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param natural Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
-	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
 	 */
-	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -725,10 +725,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * A rot handler.
 	 *
 	 * @param world The world
-	 * @param ends A {@link List} of {@link BlockPos}s of {@link BlockBranch} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} for this {@link TreeFamily}
+	 * @param ends A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link TreeFamily}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
-	 * @param soilLife The soil life of the {@link BlockRooty}
+	 * @param soilLife The soil life of the {@link RootyBlock}
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
 	 */
@@ -740,7 +740,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		while (iter.hasNext()) {
 			BlockPos endPos = iter.next();
 			BlockState branchState = world.getBlockState(endPos);
-			BlockBranch branch = TreeHelper.getBranch(branchState);
+			BranchBlock branch = TreeHelper.getBranch(branchState);
 			if(branch != null) {
 				int radius = branch.getRadius(branchState);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
@@ -771,7 +771,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		
 		if(radius <= 1) {
-			BlockDynamicLeaves leaves = (BlockDynamicLeaves) getLeavesProperties().getDynamicLeavesState().getBlock();
+			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
 			for(Direction dir: upFirst) {
 				if(leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
 					return false;
@@ -780,7 +780,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 		
 		if(rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
-			BlockBranch branch = TreeHelper.getBranch(world.getBlockState(pos));
+			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
 			if(branch != null) {
 				branch.rot(world, pos);
 			}
@@ -794,9 +794,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Provides the chance that a log will rot.
 	 *
 	 * @param world The world
-	 * @param pos The {@link BlockPos} of the {@link BlockBranch}
+	 * @param pos The {@link BlockPos} of the {@link BranchBlock}
 	 * @param rand A random number generator
-	 * @param radius The radius of the {@link BlockBranch}
+	 * @param radius The radius of the {@link BranchBlock}
 	 * @return The chance this will rot. 0.0(never) -> 1.0(always)
 	 */
 	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
@@ -807,17 +807,17 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * The grow handler.
 	 *
 	 * @param world The world
-	 * @param rootyDirt The {@link BlockRooty} that is supporting this tree
-	 * @param rootPos The {@link BlockPos} of the {@link BlockRooty} type in the world
+	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
 	 * @param random A random number generator
 	 * @param natural
 	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
 	 *      If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
-	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree is on)
+	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
 	 */
-	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
 		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.treeGrowthMultiplier.get() * DTConfigs.treeGrowthFolding.get());
 		do {
@@ -872,7 +872,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param signal The grow signal.
 	 * @return
 	 */
-	public Direction selectNewDirection(World world, BlockPos pos, BlockBranch branch, GrowSignal signal) {
+	public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
 		Direction originDir = signal.dir.getOpposite();
 		
 		//prevent branches on the ground
@@ -1050,7 +1050,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		//Bonemeal fertilizes the soil and causes a single growth pulse
 		if( canBoneMeal() && itemStack.getItem() == Items.BONE_MEAL) {
 			
-			return new SubstanceFertilize().setAmount(1).setGrow(true);
+			return new FertilizeSubstance().setAmount(1).setGrow(true);
 		}
 		
 		//Use substance provider interface if it's available
@@ -1077,7 +1077,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		if(effect != null) {
 			if(effect.isLingering()) {
-				world.addEntity(new EntityLingeringEffector(world, rootPos, effect));
+				world.addEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
 			} else {
 				return effect.apply(world, rootPos);
@@ -1091,7 +1091,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Called when a player right clicks a {@link Species} of tree anywhere on it's branches.
 	 *
 	 * @param world The world
-	 * @param rootPos The  {@link BlockPos} of the {@link BlockRooty}
+	 * @param rootPos The  {@link BlockPos} of the {@link RootyBlock}
 	 * @param hitPos The {@link BlockPos} of the {@link Block} that was hit.
 	 * @param state The {@link BlockState} of the hit {@link Block}.
 	 * @param player The {@link PlayerEntity} that hit the {@link Block}
@@ -1161,13 +1161,13 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	//////////////////////////////
 	
 	/**
-	 * Provides the {@link BlockBonsaiPot} for this Species.  A mod can
+	 * Provides the {@link BonsaiPotBlock} for this Species.  A mod can
 	 * derive it's own BonzaiPot subclass if it wants something custom.
 	 *
-	 * @return A {@link BlockBonsaiPot}
+	 * @return A {@link BonsaiPotBlock}
 	 */
-	public BlockBonsaiPot getBonzaiPot() {
-		return DTRegistries.blockBonsaiPot;
+	public BonsaiPotBlock getBonzaiPot() {
+		return DTRegistries.bonsaiPotBlock;
 	}
 	
 	
@@ -1181,7 +1181,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Override to use other methods.
 	 *
 	 * @param world The world
-	 * @param rootPos The position of {@link BlockRooty} this tree is planted in
+	 * @param rootPos The position of {@link RootyBlock} this tree is planted in
 	 * @param biome The biome this tree is generating in
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
@@ -1262,7 +1262,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * could be in the way.
 	 *
 	 * @param world The world
-	 * @param rootPos The position of {@link BlockRooty} this tree will be planted in
+	 * @param rootPos The position of {@link RootyBlock} this tree will be planted in
 	 * @param radius The radius of the generation area
 	 * @param facing The direction the joCode will build the tree
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
@@ -1283,7 +1283,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Use this to add vines, add fruit, fix the soil, add butress roots etc.
 	 *
 	 * @param world The world
-	 * @param rootPos The position of {@link BlockRooty} this tree is planted in
+	 * @param rootPos The position of {@link RootyBlock} this tree is planted in
 	 * @param biome The biome this tree is generating in
 	 * @param radius The radius of the tree generation boundary
 	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints

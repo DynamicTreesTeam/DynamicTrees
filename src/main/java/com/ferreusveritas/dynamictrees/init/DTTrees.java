@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.trees.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -37,9 +36,9 @@ public class DTTrees {
 	
 	public static final String CONIFER = "conifer";
 	
-	public static ArrayList<TreeFamilyVanilla> baseFamilies = new ArrayList<>();
+	public static ArrayList<VanillaTreeFamily> baseFamilies = new ArrayList<>();
 	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
-	public static TreeCactus dynamicCactus;
+	public static Cactus dynamicCactus;
 	
 	/**
 	 * Pay Attn! This should be run after the Dynamic Trees Mod
@@ -48,9 +47,9 @@ public class DTTrees {
 	 */
 	public static void setupTrees() {
 		Species.REGISTRY.register(Species.NULLSPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "null")));
-		Collections.addAll(baseFamilies, new TreeOak(), new TreeSpruce(), new TreeBirch(), new TreeJungle(), new TreeAcacia(), new TreeDarkOak());
+		Collections.addAll(baseFamilies, new OakTree(), new SpruceTree(), new BirchTree(), new JungleTree(), new AcaciaTree(), new DarkOakTree());
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
-		dynamicCactus = new TreeCactus();
+		dynamicCactus = new Cactus();
 		dynamicCactus.registerSpecies(Species.REGISTRY);
 		
 		//Registers a fake species for generating mushrooms
@@ -63,7 +62,7 @@ public class DTTrees {
 	private static void setupVanillaRootyBlocks(){
 		// We add rooty dirt separately to give it special properties.
 		// In this case, it turns to grass or mycelium like normal dirt
-		RootyBlockHelper.addToRootyBlocksMap(Blocks.DIRT, new BlockRooty(Blocks.DIRT){
+		RootyBlockHelper.addToRootyBlocksMap(Blocks.DIRT, new RootyBlock(Blocks.DIRT){
 			@Override
 			public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 				super.randomTick(state, world, pos, random);

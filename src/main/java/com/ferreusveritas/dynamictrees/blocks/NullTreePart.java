@@ -29,7 +29,7 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
 			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
@@ -38,7 +38,7 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
 		return blockState.getBlock().isAir(blockState, blockAccess, pos) ? 1 : 0;
 	}
 	
@@ -58,7 +58,7 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BlockBranch branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 //		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
 		return 0;
 	}

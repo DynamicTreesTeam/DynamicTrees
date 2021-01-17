@@ -24,7 +24,7 @@ import net.minecraft.util.ResourceLocation;
  */
 public class LeavesPaging {
 	
-	private static HashMap<String, List<BlockDynamicLeaves> > modLeavesArray = new HashMap<>();
+	private static HashMap<String, List<DynamicLeavesBlock> > modLeavesArray = new HashMap<>();
 	
 	///////////////////////////////////////////
 	//BLOCK PAGING
@@ -39,18 +39,18 @@ public class LeavesPaging {
 		return modid;
 	}
 	
-	private static BlockDynamicLeaves createLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String name) {
-		BlockDynamicLeaves leaves = createLeavesBlock(modid, name);
+	private static DynamicLeavesBlock createLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String name) {
+		DynamicLeavesBlock leaves = createLeavesBlock(modid, name);
 		leavesProperties.setDynamicLeavesState(leaves.getDefaultState());
 		leaves.setProperties(leavesProperties);
 		return leaves;
 	}
 
-	private static BlockDynamicLeaves createLeavesBlock(@Nullable String modid, String leavesName) {
+	private static DynamicLeavesBlock createLeavesBlock(@Nullable String modid, String leavesName) {
 		String regname = "dynamic_" + leavesName + "_leaves";
 
-		List<BlockDynamicLeaves> map = getLeavesListForModId(modid);
-		BlockDynamicLeaves newLeaves = (BlockDynamicLeaves)new BlockDynamicLeaves().setDefaultNaming(autoModId(modid), regname);
+		List<DynamicLeavesBlock> map = getLeavesListForModId(modid);
+		DynamicLeavesBlock newLeaves = (DynamicLeavesBlock)new DynamicLeavesBlock().setDefaultNaming(autoModId(modid), regname);
 		map.add(newLeaves);
 		return newLeaves;
 	}
@@ -60,10 +60,10 @@ public class LeavesPaging {
 	 *  If the map does not exist then one is created.
 	 *
 	 * @param modid The ModId of the mod accessing this
-	 * @return The map of {@link BlockDynamicLeaves}
+	 * @return The map of {@link DynamicLeavesBlock}
 	 */
-	public static List<BlockDynamicLeaves> getLeavesListForModId(@Nullable String modid) {
-		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new ArrayList<BlockDynamicLeaves>());
+	public static List<DynamicLeavesBlock> getLeavesListForModId(@Nullable String modid) {
+		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new ArrayList<DynamicLeavesBlock>());
 	}
 
 	public static Map<String, ILeavesProperties> buildAll(Object ... leavesProperties) {

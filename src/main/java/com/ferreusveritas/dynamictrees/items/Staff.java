@@ -4,9 +4,9 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -18,7 +18,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -68,7 +67,7 @@ public class Staff extends Item {
 	
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
-		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+		if(state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
 			return 64.0f;
 		}
 		return super.getDestroySpeed(stack, state);
@@ -76,7 +75,7 @@ public class Staff extends Item {
 	
 	@Override
 	public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
-		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+		if(state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
 			if(decUses(stack)) {
 				stack.shrink(1);
 			}
@@ -96,8 +95,8 @@ public class Staff extends Item {
 		BlockPos pos = context.getPos();
 		
 		//Dereference proxy trunk shell
-		if(clickedBlock instanceof BlockTrunkShell) {
-			ShellMuse muse = ((BlockTrunkShell)clickedBlock).getMuse(context.getWorld(), clickedBlockState, context.getPos());
+		if(clickedBlock instanceof TrunkShellBlock) {
+			ShellMuse muse = ((TrunkShellBlock)clickedBlock).getMuse(context.getWorld(), clickedBlockState, context.getPos());
 			if(muse != null) {
 				clickedBlockState = muse.state;
 				pos = muse.pos;
@@ -109,7 +108,7 @@ public class Staff extends Item {
 		BlockPos rootPos = pos;
 		
 		//Check if the tree part is a branch and look for the root node if so
-		BlockBranch branch = TreeHelper.getBranch(treePart);
+		BranchBlock branch = TreeHelper.getBranch(treePart);
 		if(branch != null) {
 			MapSignal signal = branch.analyse(clickedBlockState, context.getWorld(), pos, null, new MapSignal());//Analyze entire tree network to find root node
 			if(signal.found) {

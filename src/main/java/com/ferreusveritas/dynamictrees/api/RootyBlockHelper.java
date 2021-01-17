@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
 import net.minecraft.block.Block;
 
 import java.util.*;
 
 public class RootyBlockHelper {
 
-    private static Map<Block, BlockRooty> rootyBlocksMap = new HashMap<>();
-    private static LinkedList<BlockRooty> rootyBlocksList;
+    private static Map<Block, RootyBlock> rootyBlocksMap = new HashMap<>();
+    private static LinkedList<RootyBlock> rootyBlocksList;
 
     /** THIS MUST BE CALLED BEFORE addToRootyBlocksMap
      *
@@ -31,7 +31,7 @@ public class RootyBlockHelper {
      * @param rootyBlock rooty dirt that should represent the primitive dirt
      * @return
      */
-    public static boolean addToRootyBlocksMap (Block primitiveSoil, BlockRooty rootyBlock){
+    public static boolean addToRootyBlocksMap (Block primitiveSoil, RootyBlock rootyBlock){
         if (rootyBlocksMap.containsKey(primitiveSoil))
             return false;
         rootyBlocksMap.put(primitiveSoil, rootyBlock);
@@ -39,20 +39,20 @@ public class RootyBlockHelper {
     }
 
     public static boolean addToRootyBlocksMap (Block primitiveSoil){
-        return addToRootyBlocksMap(primitiveSoil, new BlockRooty(primitiveSoil));
+        return addToRootyBlocksMap(primitiveSoil, new RootyBlock(primitiveSoil));
     }
 
-    public static Map<Block, BlockRooty> getRootyBlocksMap() {
+    public static Map<Block, RootyBlock> getRootyBlocksMap() {
         return rootyBlocksMap;
     }
 
-    public static LinkedList<BlockRooty> generateListForRegistry(boolean forceRemap){
+    public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap){
         if (rootyBlocksList == null){
             rootyBlocksList = new LinkedList<>();
             forceRemap = true;
         }
         if (forceRemap){
-            for (BlockRooty rooty : rootyBlocksMap.values()){
+            for (RootyBlock rooty : rootyBlocksMap.values()){
                 if (!rootyBlocksList.contains(rooty)){
                     rootyBlocksList.add(rooty);
                 }

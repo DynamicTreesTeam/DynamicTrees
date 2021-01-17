@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -37,7 +37,7 @@ public class ModelBakeEventListener {
 
 		ResourceLocation regName = branch.getRegistryName();
 		
-		BakedModelBlockBranchBasic bakedModel = new BakedModelBlockBranchBasic(regName, barkRes, ringRes);
+		BasicBranchBlockBakedModel bakedModel = new BasicBranchBlockBakedModel(regName, barkRes, ringRes);
 		
 		for(int i = 1; i <= 8; i++) {
 			event.getModelRegistry().put(new ModelResourceLocation(regName, "radius=" + i), bakedModel);

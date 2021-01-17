@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.util.BranchConnectionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
 
@@ -33,7 +33,7 @@ public class NodeExtState implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
-		BlockBranch branch = TreeHelper.getBranch(blockState);
+		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null) {
 			Connections connData = branch.getConnectionData(world, pos, blockState);

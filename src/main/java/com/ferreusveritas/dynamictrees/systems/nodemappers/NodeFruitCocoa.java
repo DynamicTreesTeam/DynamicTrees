@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -27,7 +27,7 @@ public class NodeFruitCocoa implements INodeInspector {
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
 			if((hashCode % 97) % 29 == 0) {
-				BlockBranch branch = TreeHelper.getBranch(blockState);
+				BranchBlock branch = TreeHelper.getBranch(blockState);
 				if(branch != null && branch.getRadius(blockState) == 8) {
 					int side = (hashCode % 4) + 2;
 					Direction dir = Direction.byIndex(side);

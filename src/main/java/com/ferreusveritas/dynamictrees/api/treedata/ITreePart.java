@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -43,7 +43,7 @@ public interface ITreePart {
 	* @param from The branch making the request
 	* @return Probability weight used to determine if the growth path will take this block as a path next.
 	*/
-	int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from);
+	int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from);
 
 	/**
 	* The radius of the part that a neighbor is expected to connect with
@@ -54,7 +54,7 @@ public interface ITreePart {
 	* @param fromRadius The radius of the branch requesting connection data
 	* @return Radius of the connection point to this block from the branch
 	*/
-	int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BlockBranch from, Direction side, int fromRadius);
+	int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
 
 	/**
 	* Used to get the radius of branches.. all other treeparts will/should return 0
@@ -104,7 +104,7 @@ public interface ITreePart {
 	* @param radius The radius of the branch requesting support
 	* @return Neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) )
 	*/
-	int branchSupport(BlockState blockState, IBlockReader blockAccess, BlockBranch branch, BlockPos pos, Direction dir, int radius);
+	int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 
 	public enum TreePartType {
 		NULL,//Not an official tree part

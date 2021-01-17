@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
@@ -22,7 +22,7 @@ public class BranchDestructionData {
 	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
 	public final int[] destroyedBranchesConnections;//Encoded branch shapes
 	public final int[] destroyedLeaves;//Encoded leaves relative positions
-	public final List<BlockBranch.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
+	public final List<BranchBlock.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
 	public final float woodVolume;//A summation of all of the wood voxels that was harvested
 	public final Direction cutDir;//The face that was connected to the remaining body of the tree or the rooty block
@@ -46,7 +46,7 @@ public class BranchDestructionData {
 		trunkHeight = 0;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BlockBranch.ItemStackPos> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
+	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, float volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -104,7 +104,7 @@ public class BranchDestructionData {
 		BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
 		BlockState origExState = origConnData.getBlockState();
 		if(origExState != null) {
-			data1[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BlockBranch) origExState.getBlock(), origExState);
+			data1[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origExState.getBlock(), origExState);
 			data2[index++] = encodeBranchesConnections(origConnData.getConnections());
 			branchList.remove(BlockPos.ZERO);
 		}
@@ -116,8 +116,8 @@ public class BranchDestructionData {
 			BlockState exState = connData.getBlockState();
 			Block block = exState.getBlock();
 			
-			if(block instanceof BlockBranch && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				data1[index] = encodeBranchesRadiusPos(relPos, (BlockBranch) block, exState);
+			if(block instanceof BranchBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
+				data1[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, exState);
 				data2[index++] = encodeBranchesConnections(connData.getConnections());
 			}
 		}
@@ -129,7 +129,7 @@ public class BranchDestructionData {
 		return new int[][] { data1, data2 };
 	}
 	
-	private int encodeBranchesRadiusPos(BlockPos relPos, BlockBranch branchBlock, BlockState state) {
+	private int encodeBranchesRadiusPos(BlockPos relPos, BranchBlock branchBlock, BlockState state) {
 		return ((branchBlock.getRadius(state) & 0x1F) << 24) | //Radius 0 - 31
 				encodeRelBlockPos(relPos);
 	}
@@ -162,7 +162,7 @@ public class BranchDestructionData {
 	}
 	
 	public BlockState getBranchBlockState(int index) {
-		BlockBranch branch = (BlockBranch)species.getFamily().getDynamicBranch();
+		BranchBlock branch = (BranchBlock)species.getFamily().getDynamicBranch();
 		if(branch != null) {
 			int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
 			return branch.getStateForRadius(radius);
@@ -213,16 +213,16 @@ public class BranchDestructionData {
 			BlockState state = set.getValue();
 			Block block = state.getBlock();
 			
-			if(block instanceof BlockDynamicLeaves && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				data[index++] = encodeLeaves(relPos, (BlockDynamicLeaves) block, state);
+			if(block instanceof DynamicLeavesBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
+				data[index++] = encodeLeaves(relPos, (DynamicLeavesBlock) block, state);
 			}
 		}
 		
 		return Arrays.copyOf(data, index);//Shrink down the array
 	}
 	
-	private int encodeLeaves(BlockPos relPos, BlockDynamicLeaves block, BlockState state) {
-		return	(state.get(BlockDynamicLeaves.DISTANCE) << 24) | encodeRelBlockPos(relPos);
+	private int encodeLeaves(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
+		return	(state.get(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
 	}
 	
 	public int getNumLeaves() {

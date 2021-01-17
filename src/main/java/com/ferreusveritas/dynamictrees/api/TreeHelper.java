@@ -36,7 +36,7 @@ public class TreeHelper {
 	 */
 	public static void growPulse(World world, BlockPos rootPos) {
 		BlockState rootyState = world.getBlockState(rootPos);
-		BlockRooty dirt = TreeHelper.getRooty(rootyState);
+		RootyBlock dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
 			dirt.updateTree(rootyState, world, rootPos, world.rand, false);
 			ageVolume(world, rootPos, 8, 32, 1, SafeChunkBounds.ANY);//blindly age a cuboid volume
@@ -61,7 +61,7 @@ public class TreeHelper {
 			for(BlockPos.Mutable iPos: iterable) {
 				BlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
-				if(block instanceof BlockDynamicLeaves) {//Special case for leaves
+				if(block instanceof DynamicLeavesBlock) {//Special case for leaves
 					int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
 					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);//Get new values from neighbors
 					if(newHydro == -1) {
@@ -137,8 +137,8 @@ public class TreeHelper {
 		
 		BlockState blockState = world.getBlockState(pos);
 		
-		if(blockState.getBlock() == DTRegistries.blockTrunkShell) {
-			BlockTrunkShell.ShellMuse muse = ((BlockTrunkShell)blockState.getBlock()).getMuse(world, blockState, pos);
+		if(blockState.getBlock() == DTRegistries.trunkShellBlock) {
+			TrunkShellBlock.ShellMuse muse = ((TrunkShellBlock)blockState.getBlock()).getMuse(world, blockState, pos);
 			if(muse != null) {
 				return muse.pos;
 			}
@@ -150,8 +150,8 @@ public class TreeHelper {
 	public static Species getCommonSpecies(World world, BlockPos pos) {
 		pos = dereferenceTrunkShell(world, pos);
 		BlockState state = world.getBlockState(pos);
-		if (state.getBlock() instanceof BlockBranch) {
-			BlockBranch branch = (BlockBranch) state.getBlock();
+		if (state.getBlock() instanceof BranchBlock) {
+			BranchBlock branch = (BranchBlock) state.getBlock();
 			return branch.getFamily().getCommonSpecies();
 		}
 		
@@ -264,7 +264,7 @@ public class TreeHelper {
 	 * @return true if a root block was found.
 	 */
 	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
-		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
+		RootyBlock dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {
 			dirt.startAnalysis(world, rootPos, signal);
 			return true;
@@ -298,22 +298,22 @@ public class TreeHelper {
 	//Branches
 	
 	public final static boolean isBranch(Block block) {
-		return block instanceof BlockBranch;//Oh shuddap you java purists.. this is minecraft!
+		return block instanceof BranchBlock;//Oh shuddap you java purists.. this is minecraft!
 	}
 	
 	public final static boolean isBranch(BlockState state) {
 		return state != null && isBranch(state.getBlock());
 	}
 	
-	public final static BlockBranch getBranch(Block block) {
-		return isBranch(block) ? (BlockBranch)block : null;
+	public final static BranchBlock getBranch(Block block) {
+		return isBranch(block) ? (BranchBlock)block : null;
 	}
 	
-	public final static BlockBranch getBranch(ITreePart treepart) {
-		return treepart instanceof BlockBranch ? (BlockBranch)treepart : null;
+	public final static BranchBlock getBranch(ITreePart treepart) {
+		return treepart instanceof BranchBlock ? (BranchBlock)treepart : null;
 	}
 	
-	public final static BlockBranch getBranch(BlockState state) {
+	public final static BranchBlock getBranch(BlockState state) {
 		return getBranch(state.getBlock());
 	}
 	
@@ -322,60 +322,60 @@ public class TreeHelper {
 		return getTreePart(state).getRadius(state);
 	}
 	
-	public final static Optional<BlockBranch> getBranchOpt(Block block) {
-		return isBranch(block) ? Optional.of((BlockBranch)block) : Optional.empty();
+	public final static Optional<BranchBlock> getBranchOpt(Block block) {
+		return isBranch(block) ? Optional.of((BranchBlock)block) : Optional.empty();
 	}
 	
-	public final static Optional<BlockBranch> getBranchOpt(BlockState state) {
-		return isBranch(state.getBlock()) ? Optional.of((BlockBranch)state.getBlock()) : Optional.empty();
+	public final static Optional<BranchBlock> getBranchOpt(BlockState state) {
+		return isBranch(state.getBlock()) ? Optional.of((BranchBlock)state.getBlock()) : Optional.empty();
 	}
 	
-	public final static Optional<BlockBranch> getBranchOpt(ITreePart treepart) {
-		return treepart instanceof BlockBranch ? Optional.of((BlockBranch)treepart) : Optional.empty();
+	public final static Optional<BranchBlock> getBranchOpt(ITreePart treepart) {
+		return treepart instanceof BranchBlock ? Optional.of((BranchBlock)treepart) : Optional.empty();
 	}
 	
 	
 	//Leaves
 	
 	public final static boolean isLeaves(Block block) {
-		return block instanceof BlockDynamicLeaves;
+		return block instanceof DynamicLeavesBlock;
 	}
 	
 	public final static boolean isLeaves(BlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
 	
-	public final static BlockDynamicLeaves getLeaves(Block block) {
-		return isLeaves(block) ? (BlockDynamicLeaves)block : null;
+	public final static DynamicLeavesBlock getLeaves(Block block) {
+		return isLeaves(block) ? (DynamicLeavesBlock)block : null;
 	}
 	
-	public final static BlockDynamicLeaves getLeaves(ITreePart treepart) {
-		return treepart instanceof BlockDynamicLeaves ? (BlockDynamicLeaves)treepart : null;
+	public final static DynamicLeavesBlock getLeaves(ITreePart treepart) {
+		return treepart instanceof DynamicLeavesBlock ? (DynamicLeavesBlock)treepart : null;
 	}
 	
-	public final static BlockDynamicLeaves getLeaves(BlockState state) {
+	public final static DynamicLeavesBlock getLeaves(BlockState state) {
 		return getLeaves(state.getBlock());
 	}
 	
 	//Rooty
 	
 	public final static boolean isRooty(Block block) {
-		return block instanceof BlockRooty;
+		return block instanceof RootyBlock;
 	}
 	
 	public final static boolean isRooty(BlockState blockState) {
 		return isRooty(blockState.getBlock());
 	}
 	
-	public final static BlockRooty getRooty(Block block) {
-		return isRooty(block) ? (BlockRooty)block : null;
+	public final static RootyBlock getRooty(Block block) {
+		return isRooty(block) ? (RootyBlock)block : null;
 	}
 	
-	public final static BlockRooty getRooty(ITreePart treepart) {
-		return treepart instanceof BlockRooty ? (BlockRooty)treepart : null;
+	public final static RootyBlock getRooty(ITreePart treepart) {
+		return treepart instanceof RootyBlock ? (RootyBlock)treepart : null;
 	}
 	
-	public final static BlockRooty getRooty(BlockState blockState) {
+	public final static RootyBlock getRooty(BlockState blockState) {
 		return getRooty(blockState.getBlock());
 	}
 	

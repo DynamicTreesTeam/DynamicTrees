@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
@@ -91,7 +91,7 @@ public class CoordUtils {
 	 * 
 	 * @param world The world
 	 * @param treePos The block position of the {@link TreeFamily} trunk base.
-	 * @param branchPos The {@link BlockPos} of a {@link BlockBranch} selected as a fruit target
+	 * @param branchPos The {@link BlockPos} of a {@link BranchBlock} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is BlockPos.ZERO
 	 */
 	public static BlockPos getRayTraceFruitPos(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {

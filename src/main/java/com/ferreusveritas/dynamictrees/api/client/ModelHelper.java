@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.blocks.BlockSurfaceRoot;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -14,45 +14,42 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ModelHelper {
 
 	/**
 	 * Registers models associated with the tree.
-	 * At the moment this only deals with {@link BlockBranch} blocks
+	 * At the moment this only deals with {@link BranchBlock} blocks
 	 *
 	 * @param tree
 	 */
 	public static void regModel(TreeFamily tree) {
-		BlockBranch blockBranch = tree.getDynamicBranch();
-		ModelResourceLocation modelLocation = getCreateBranchModel(blockBranch, tree.autoCreateBranch());
+		BranchBlock branchBlock = tree.getDynamicBranch();
+		ModelResourceLocation modelLocation = getCreateBranchModel(branchBlock, tree.autoCreateBranch());
 
-		setGenericStateMapper(blockBranch, modelLocation);
-		if(blockBranch instanceof BlockBranchThick) {
-			setGenericStateMapper(((BlockBranchThick) blockBranch).otherBlock, modelLocation);
+		setGenericStateMapper(branchBlock, modelLocation);
+		if(branchBlock instanceof ThickBranchBlock) {
+			setGenericStateMapper(((ThickBranchBlock) branchBlock).otherBlock, modelLocation);
 		}
 
-		BlockSurfaceRoot surfaceRoot = tree.getSurfaceRoots();
+		SurfaceRootBlock surfaceRoot = tree.getSurfaceRoots();
 		if(surfaceRoot != null) {
 	//		ModelLoader.setCustomStateMapper(surfaceRoot, new StateMap.Builder().ignore(surfaceRoot.getIgnorableProperties()).build());
 		}
 	}
 
-	private static ModelResourceLocation getCreateBranchModel(BlockBranch blockBranch, boolean automatic) {
-		return automatic ? getCreateBranchModelAuto(blockBranch) : getCreateBranchModelManual(blockBranch);
+	private static ModelResourceLocation getCreateBranchModel(BranchBlock branchBlock, boolean automatic) {
+		return automatic ? getCreateBranchModelAuto(branchBlock) : getCreateBranchModelManual(branchBlock);
 	}
 
-	private static ModelResourceLocation getCreateBranchModelAuto(BlockBranch blockBranch) {
+	private static ModelResourceLocation getCreateBranchModelAuto(BranchBlock branchBlock) {
 		return new ModelResourceLocation(new ResourceLocation(DynamicTrees.MODID, "branch"), "");
 	}
 
-	private static ModelResourceLocation getCreateBranchModelManual(BlockBranch blockBranch) {
-		ResourceLocation family = blockBranch.getFamily().getName();
+	private static ModelResourceLocation getCreateBranchModelManual(BranchBlock branchBlock) {
+		ResourceLocation family = branchBlock.getFamily().getName();
 		ResourceLocation resloc = new ResourceLocation(family.getNamespace(), family.getPath() + "branch");
 		return new ModelResourceLocation(resloc , null);
 	}
@@ -67,8 +64,8 @@ public class ModelHelper {
 		if(block != Blocks.AIR) {
 			regModel(Item.getItemFromBlock(block));
 		}
-		if (block instanceof BlockBranchThick) {
-			Item item = Item.BLOCK_TO_ITEM.get(((BlockBranchThick) block).otherBlock);
+		if (block instanceof ThickBranchBlock) {
+			Item item = Item.BLOCK_TO_ITEM.get(((ThickBranchBlock) block).otherBlock);
 			regModel(item, 0, block.getRegistryName());
 		}
 	}

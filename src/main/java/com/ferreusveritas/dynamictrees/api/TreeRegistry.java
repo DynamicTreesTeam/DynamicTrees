@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
@@ -22,7 +22,7 @@ import java.util.Map;
 */
 public class TreeRegistry {
 
-	public static final IDropCreatorStorage globalDropCreatorStorage = new DropCreatorStorage();
+	public static final IDropCreatorStorage globalDropCreatorStorage = new StorageDropCreator();
 	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>();
 	private static HashMap<ResourceLocation, IGrowthLogicKit> growthLogicKitRegistry = new HashMap<>();
 

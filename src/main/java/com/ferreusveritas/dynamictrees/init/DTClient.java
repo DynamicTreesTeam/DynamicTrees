@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
-import com.ferreusveritas.dynamictrees.render.RenderFallingTree;
+import com.ferreusveritas.dynamictrees.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
@@ -97,7 +97,7 @@ public class DTClient {
 	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
 		ForgeRegistries.BLOCKS.forEach(block -> {
-			if (block instanceof BlockDynamicSapling || block instanceof BlockRooty || block instanceof BlockBranchCactus) {
+			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof CactusBranchBlock) {
 				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
 			}
 		});
@@ -113,11 +113,11 @@ public class DTClient {
 		final BlockColors blockColors = Minecraft.getInstance().getBlockColors();
 		
 		//Register Rooty Colorizers
-		for (BlockRooty roots : RootyBlockHelper.generateListForRegistry(false)){
+		for (RootyBlock roots : RootyBlockHelper.generateListForRegistry(false)){
 			blockColors.register((state, world, pos, tintIndex) -> {
 				switch(tintIndex) {
 					case 0: return blockColors.getColor(roots.getPrimitiveDirt().getDefaultState(), world, pos, tintIndex);
-					case 1: return state.getBlock() instanceof BlockRooty ? roots.rootColor(state, world, pos) : white;
+					case 1: return state.getBlock() instanceof RootyBlock ? roots.rootColor(state, world, pos) : white;
 					default: return white;
 				}
 			}, roots
@@ -125,8 +125,8 @@ public class DTClient {
 		}
 		
 		//Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(DTRegistries.blockBonsaiPot, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BlockBonsaiPot)
-				? DTRegistries.blockBonsaiPot.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+		ModelHelper.regColorHandler(DTRegistries.bonsaiPotBlock, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
+				? DTRegistries.bonsaiPotBlock.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		//ITEMS
 		
@@ -147,9 +147,9 @@ public class DTClient {
 		}
 		
 		//Register GrowingLeavesBlocks Colorizers
-		for(BlockDynamicLeaves leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MODID)) {
+		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MODID)) {
 			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->
-			TreeHelper.isLeaves(state.getBlock()) ? ((BlockDynamicLeaves) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
+			TreeHelper.isLeaves(state.getBlock()) ? ((DynamicLeavesBlock) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
 			);
 		}
 		
@@ -167,7 +167,7 @@ public class DTClient {
 	}
 	
 	private static void registerEntityRenderers() {
-		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.fallingTree, new RenderFallingTree.Factory());
+		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.fallingTree, new FallingTreeRenderer.Factory());
 	}
 	
 	private static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
@@ -197,8 +197,8 @@ public class DTClient {
 		if(world.isRemote) {
 			Random random = world.rand;
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
-			if(treePart instanceof BlockDynamicLeaves) {
-				BlockDynamicLeaves leaves = (BlockDynamicLeaves) treePart;
+			if(treePart instanceof DynamicLeavesBlock) {
+				DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
 				ILeavesProperties leavesProperties = leaves.getProperties(blockState);
 				int color = getFoliageColor(leavesProperties, world, blockState, pos);
 				float r = (color >> 16 & 255) / 255.0F;

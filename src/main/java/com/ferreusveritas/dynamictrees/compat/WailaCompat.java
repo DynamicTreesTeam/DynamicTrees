@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.compat;
 
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
@@ -17,8 +17,8 @@ public class WailaCompat implements IWailaPlugin {
 		WailaBranchHandler branchHandler = new WailaBranchHandler();
 		WailaRootyHandler rootyHandler = new WailaRootyHandler();
 
-		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, BlockBranch.class);
-		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, BlockTrunkShell.class);
-		registrar.registerComponentProvider(rootyHandler, TooltipPosition.BODY, BlockRooty.class);
+		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, BranchBlock.class);
+		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, TrunkShellBlock.class);
+		registrar.registerComponentProvider(rootyHandler, TooltipPosition.BODY, RootyBlock.class);
 	}
 }

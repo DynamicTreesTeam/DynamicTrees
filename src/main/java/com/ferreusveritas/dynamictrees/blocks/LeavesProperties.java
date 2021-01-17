@@ -94,7 +94,7 @@ public class LeavesProperties implements ILeavesProperties {
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.getDefaultState();
 		for(int i = 1; i <= maxHydro; i++) {
-			dynamicLeavesBlockHydroStates[i] = state.with(BlockDynamicLeaves.DISTANCE, i);
+			dynamicLeavesBlockHydroStates[i] = state.with(DynamicLeavesBlock.DISTANCE, i);
 		}
 		
 		return this;
@@ -156,7 +156,7 @@ public class LeavesProperties implements ILeavesProperties {
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
 	
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BlockBranch from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
 	}
 

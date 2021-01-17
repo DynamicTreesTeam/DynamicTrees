@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 @OnlyIn(Dist.CLIENT)
 public class ModelTrackerCacheEntityFallingTree {
 	
-	public static Map<Integer, ModelEntityFallingTree> modelMap = new ConcurrentHashMap<>();
+	public static Map<Integer, FallingTreeEntityModel> modelMap = new ConcurrentHashMap<>();
 	
-	public static ModelEntityFallingTree getModel(EntityFallingTree entity) {
-		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new ModelEntityFallingTree(entity) );
+	public static FallingTreeEntityModel getModel(EntityFallingTree entity) {
+		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new FallingTreeEntityModel(entity) );
 	}
 	
 	public static void cleanupModels(World world, EntityFallingTree entity) {

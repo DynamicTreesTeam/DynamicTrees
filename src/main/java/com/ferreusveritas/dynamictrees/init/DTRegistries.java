@@ -9,19 +9,19 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntityBonsai;
-import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
+import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
+import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -46,20 +46,20 @@ public class DTRegistries {
 	// BLOCKS
 	///////////////////////////////////////////
 
-	public static BlockFruit blockApple;
-	public static BlockFruitCocoa blockFruitCocoa;
-	public static BlockBonsaiPot blockBonsaiPot;
-	public static BlockTrunkShell blockTrunkShell;
+	public static FruitBlock blockApple;
+	public static CocoaFruitBlock cocoaFruitBlock;
+	public static BonsaiPotBlock bonsaiPotBlock;
+	public static TrunkShellBlock trunkShellBlock;
 	
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 	
 	public static final CommonBlockStates blockStates = new CommonBlockStates();
 	
 	public static void setupBlocks() {
-		blockBonsaiPot = new BlockBonsaiPot();//Bonsai Pot
-		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
-		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
-		blockTrunkShell = new BlockTrunkShell();
+		bonsaiPotBlock = new BonsaiPotBlock();//Bonsai Pot
+		cocoaFruitBlock = new CocoaFruitBlock();//Modified Cocoa pods
+		blockApple = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
+		trunkShellBlock = new TrunkShellBlock();
 		
 		setupLeavesProperties();
 	}
@@ -78,11 +78,11 @@ public class DTRegistries {
 		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 		
-		for (BlockRooty rooty : RootyBlockHelper.generateListForRegistry(false)){
+		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false)){
 			registry.register(rooty);
 		}
 		
-		registry.registerAll(blockBonsaiPot, blockFruitCocoa, blockApple, blockTrunkShell);
+		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, blockApple, trunkShellBlock);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 		
@@ -144,21 +144,21 @@ public class DTRegistries {
 	// TILE ENTITIES
 	///////////////////////////////////////////
 	
-	public static TileEntityType<TileEntitySpecies> speciesTE;
-	public static TileEntityType<TileEntityBonsai> bonsaiTE;
+	public static TileEntityType<SpeciesTileEntity> speciesTE;
+	public static TileEntityType<BonsaiTileEntity> bonsaiTE;
 	
 	public static void setupTileEntities() {
-		LinkedList<BlockRooty> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
+		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
 		System.out.println(rootyDirts.get(0));
-		speciesTE = TileEntityType.Builder.create(TileEntitySpecies::new, rootyDirts.toArray(new BlockRooty[0])).build(null);
-		bonsaiTE = TileEntityType.Builder.create(TileEntityBonsai::new, blockBonsaiPot).build(null);
+		speciesTE = TileEntityType.Builder.create(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
+		bonsaiTE = TileEntityType.Builder.create(BonsaiTileEntity::new, bonsaiPotBlock).build(null);
 	}
 	
 	@SubscribeEvent
 	public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
 		setupTileEntities();
 		
-		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(blockBonsaiPot.getRegistryName()));
+		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(bonsaiPotBlock.getRegistryName()));
 		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "tile_entity_species")));
 	}
 	

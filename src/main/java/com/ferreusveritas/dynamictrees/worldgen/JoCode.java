@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -48,7 +48,7 @@ public class JoCode {
 	 * @param facing A final rotation applied to the code after creation
 	 */
 	public JoCode(World world, BlockPos rootPos, Direction facing) {
-		Optional<BlockBranch> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
+		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
 		
 		if(branch.isPresent()) {
 			NodeCoder coder = new NodeCoder();
@@ -166,7 +166,7 @@ public class JoCode {
 			
 			//Fix branch thicknesses and map out leaf locations
 			BlockState treeState = world.getBlockState(treePos);
-			BlockBranch branch = TreeHelper.getBranch(treeState);
+			BranchBlock branch = TreeHelper.getBranch(treeState);
 			if(branch != null) {//If a branch exists then the growth was successful
 				ILeavesProperties leavesProperties = species.getLeavesProperties();
 				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));

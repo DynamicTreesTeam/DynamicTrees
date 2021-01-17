@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -21,12 +21,12 @@ public class NodeShrinker implements INodeInspector {
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		
-		BlockBranch branch = TreeHelper.getBranch(blockState);
+		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null) {
 			radius = branch.getRadius(blockState);
-			if(radius > BlockBranch.RADMAX_NORMAL) {
-				branch.setRadius(world, pos, BlockBranch.RADMAX_NORMAL, fromDir);
+			if(radius > BranchBlock.RADMAX_NORMAL) {
+				branch.setRadius(world, pos, BranchBlock.RADMAX_NORMAL, fromDir);
 			}
 		}
 		

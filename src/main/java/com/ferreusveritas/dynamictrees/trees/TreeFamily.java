@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
-import com.ferreusveritas.dynamictrees.cells.CellMetadata;
+import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -39,8 +39,8 @@ import java.util.Objects;
 /**
  * This structure describes a Tree Family whose member Species all have a common wood type.
  *
-* A {@link TreeFamily} is more or less just a definition of {@link BlockBranch} blocks.
-* It also defines the cellular automata function of the {@link BlockBranch}.  It defines the type of wood that
+* A {@link TreeFamily} is more or less just a definition of {@link BranchBlock} blocks.
+* It also defines the cellular automata function of the {@link BranchBlock}.  It defines the type of wood that
 * the tree is made of and consequently what kind of log you get when you cut it down.
 *
 * A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
@@ -69,7 +69,7 @@ public class TreeFamily {
 
 	//Branches
 	/** The dynamic branch used by this tree family */
-	private BlockBranch dynamicBranch;
+	private BranchBlock dynamicBranch;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
 	private Block primitiveLog = Blocks.AIR;
 
@@ -171,13 +171,13 @@ public class TreeFamily {
 	///////////////////////////////////////////
 
 	/**
-	 * Used to register the blocks this tree uses.  Mainly just the {@link BlockBranch}
+	 * Used to register the blocks this tree uses.  Mainly just the {@link BranchBlock}
 	 * We intentionally leave out leaves since they are shared between trees
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		if(isThick()) {
 			//TODO: This goes away as branch block will be flattened
-			BlockBranchThick branch = (BlockBranchThick) getDynamicBranch();
+			ThickBranchBlock branch = (ThickBranchBlock) getDynamicBranch();
 			blockList.add(branch.getPairSide(false));
 			blockList.add(branch.getPairSide(true));
 		} else {
@@ -203,7 +203,7 @@ public class TreeFamily {
 
 		if(isThick()) {
 			//An ItemBlock must be registered in order for Waila to work properly
-			branch = ((BlockBranchThick) branch).getPairSide(true);
+			branch = ((ThickBranchBlock) branch).getPairSide(true);
 			itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
 		}
 
@@ -230,19 +230,19 @@ public class TreeFamily {
 	 *
 	 * @return the branch to be created
 	 */
-	public BlockBranch createBranch() {
+	public BranchBlock createBranch() {
 		String branchName = this.getName() + "_branch";
-		return isThick() ? new BlockBranchThick(branchName) : new BlockBranchBasic(branchName);
+		return isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
 	}
 
-	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
+	protected TreeFamily setDynamicBranch(BranchBlock gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setFamily(this);//Link the branch back to the tree
 
 		return this;
 	}
 
-	public BlockBranch getDynamicBranch() {
+	public BranchBlock getDynamicBranch() {
 		return dynamicBranch;
 	}
 
@@ -325,16 +325,16 @@ public class TreeFamily {
 	//BRANCHES
 	///////////////////////////////////////////
 
-	public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BlockBranch branch) {
+	public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
 		int radius = branch.getRadius(blockState);
-		int meta = CellMetadata.NONE;
+		int meta = MetadataCell.NONE;
 		if(hasConiferVariants && radius == 1) {
 			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
-				meta = CellMetadata.CONIFERTOP;
+				meta = MetadataCell.CONIFERTOP;
 			}
 		}
 
-		return CellMetadata.radiusAndMeta(radius, meta);
+		return MetadataCell.radiusAndMeta(radius, meta);
 	}
 
 	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
@@ -351,7 +351,7 @@ public class TreeFamily {
 	// SURFACE ROOTS
 	///////////////////////////////////////////
 
-	public BlockSurfaceRoot getSurfaceRoots() {
+	public SurfaceRootBlock getSurfaceRoots() {
 		return null;
 	}
 
@@ -368,7 +368,7 @@ public class TreeFamily {
 	///////////////////////////////////////////
 
 	public boolean isCompatibleDynamicLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		BlockDynamicLeaves leaves = TreeHelper.getLeaves(blockState);
+		DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
 		return (leaves != null) && this == leaves.getFamily(blockState, blockAccess, pos);
 	}
 
@@ -386,7 +386,7 @@ public class TreeFamily {
 
 		Block block = blockState.getBlock();
 
-		if(!(block instanceof BlockDynamicLeaves) && block instanceof LeavesBlock) {
+		if(!(block instanceof DynamicLeavesBlock) && block instanceof LeavesBlock) {
 			for(IConnectable connectable : vanillaConnectables) {
 				if(connectable.isConnectable(blockState)) {
 					return true;
