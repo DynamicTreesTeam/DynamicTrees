@@ -205,35 +205,6 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (state.getBlock() != this) {
-			return VoxelShapes.empty();
-		}
-
-		int thisRadius = getRadius(state);
-
-		boolean connectionMade = false;
-		double radius = thisRadius / 16.0;
-		double gap = 0.5 - radius;
-		AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 0, 0, 0).grow(radius);
-		int numConnections = 0;
-		for (Direction dir : Direction.values()) {
-			if (getSideConnectionRadius(worldIn, pos, thisRadius, dir) > 0) {
-				connectionMade = true;
-				numConnections ++;
-				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
-			}
-		}
-		if (!state.get(TRUNK) && numConnections == 1 && state.get(ORIGIN).getAxis().isHorizontal()) {
-			aabb = aabb.expand(Direction.UP.getXOffset() * gap, Direction.UP.getYOffset() * gap, Direction.UP.getZOffset() * gap);
-		}
-		if (connectionMade) {
-			return VoxelShapes.create(aabb.offset(0.5, 0.5, 0.5));
-		}
-		return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius));
-	}
-
-	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		int thisRadius = getRadius(state);
 
 		VoxelShape shape = VoxelShapes.empty();

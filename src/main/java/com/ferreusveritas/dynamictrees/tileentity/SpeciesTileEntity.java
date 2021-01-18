@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.tileentity;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -8,6 +9,8 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
@@ -52,10 +55,20 @@ public class SpeciesTileEntity extends TileEntity {
 		tag.putString("species", species.getRegistryName().toString());
 		return super.write(tag);
 	}
-	
-	@Nonnull
-	@Override
-	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
-		return null;
+
+	@Nullable
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 0, this.getUpdateTag());
 	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+		read(getBlockState(), pkt.getNbtCompound());
+	}
+
+	@Override
+	public CompoundNBT getUpdateTag() {
+		return write(new CompoundNBT());
+	}
+
 }

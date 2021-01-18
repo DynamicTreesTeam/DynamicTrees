@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -29,6 +31,7 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
@@ -63,12 +66,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
+	public static final BooleanProperty VARIANT = BooleanProperty.create("variant");
 	private final Block primitiveDirt;
 	
 	public RootyBlock(Block primitiveDirt) {
 		super(Properties.from(primitiveDirt).tickRandomly());
 		setRegistryName("rooty_"+ primitiveDirt.getRegistryName().getPath()); //ModLoadingContext.get().getActiveNamespace();
-		
+		setDefaultState(getDefaultState().with(FERTILITY, 0).with(VARIANT, false));
 		this.primitiveDirt = primitiveDirt;
 	}
 	
@@ -82,17 +86,25 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FERTILITY);
+		builder.add(FERTILITY).add(VARIANT);
 	}
 	
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-	
-	
+
+
+	@Nullable
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		if (state.get(VARIANT))
+			return new SpeciesTileEntity();
+		return null;
+	}
+
 	@Override
 	public boolean hasTileEntity(BlockState state) {
-		return true;
+		return state.get(VARIANT);
 	}
 
 	@Override
@@ -256,7 +268,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public void setSoilLife(World world, BlockPos rootPos, int life) {
 		Species species = getSpecies(world.getBlockState(rootPos), world, rootPos);
-		world.setBlockState(rootPos, getDefaultState().with(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
+		BlockState currentState = world.getBlockState(rootPos);
+		world.setBlockState(rootPos, currentState.with(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
 		world.notifyNeighborsOfStateChange(rootPos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
 		setSpecies(world, rootPos, species);
 		
@@ -358,7 +371,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		TreeFamily tree = getFamily(state, world, rootPos);
 		
 		SpeciesTileEntity rootyDirtTE = getTileEntitySpecies(world, rootPos);
-		
+
 		if(rootyDirtTE != null) {
 			Species species = rootyDirtTE.getSpecies();
 			if(species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
@@ -394,13 +407,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-
-	// isSolid has been moved to Properties, but it seems it is true by default anyway.
-
-//	@Override
-//	public boolean isSolid(BlockState state) {
-//		return true;
-//	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {

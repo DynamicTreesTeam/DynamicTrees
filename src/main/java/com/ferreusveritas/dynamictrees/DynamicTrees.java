@@ -98,16 +98,16 @@ public class DynamicTrees {
 		jungle,
 		dark_oak,
 		acacia;
-		
+
 		public Block getLog() {
 			switch(this) {
-				case acacia: return Blocks.ACACIA_LOG;
-				case birch: return Blocks.BIRCH_LOG;
-				case dark_oak: return Blocks.DARK_OAK_LOG;
-				case jungle: return Blocks.JUNGLE_LOG;
+				default:
 				case oak: return Blocks.OAK_LOG;
+				case birch: return Blocks.BIRCH_LOG;
 				case spruce: return Blocks.SPRUCE_LOG;
-				default: return Blocks.OAK_LOG;
+				case jungle: return Blocks.JUNGLE_LOG;
+				case dark_oak: return Blocks.DARK_OAK_LOG;
+				case acacia: return Blocks.ACACIA_LOG;
 			}
 		}
 	}

@@ -10,14 +10,14 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
-import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IDataAccessor;
-import mcp.mobius.waila.api.IPluginConfig;
-import mcp.mobius.waila.api.RenderableTextComponent;
+import mcp.mobius.waila.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class WailaBranchHandler implements IComponentProvider{
+public class WailaBranchHandler implements IComponentProvider { //IServerDataProvider<String>
 	
 	private BlockPos lastPos = BlockPos.ZERO;
 	private Species lastSpecies = Species.NULLSPECIES;
@@ -118,6 +118,11 @@ public class WailaBranchHandler implements IComponentProvider{
 		
 		return 0;
 	}
+
+//	@Override
+//	public void appendServerData(CompoundNBT compoundNBT, ServerPlayerEntity serverPlayerEntity, World world, String string) {
+//		compoundNBT.putString("species", string);
+//	}
 
 	private Species getWailaSpecies(World world, BlockPos pos) {
 		return TreeHelper.getBestGuessSpecies(world, pos);

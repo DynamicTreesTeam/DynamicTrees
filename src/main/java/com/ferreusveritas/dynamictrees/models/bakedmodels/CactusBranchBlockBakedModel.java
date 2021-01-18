@@ -90,8 +90,8 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
         int centerY = 16 + (dir.getYOffset() * move);
         int centerZ = 16 + (dir.getZOffset() * move);
 
-        Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
-        Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
+        Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, (centerY - halfSizeY) / 2, (centerZ - halfSizeZ) / 2);
+        Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, (centerY + halfSizeY) / 2, (centerZ + halfSizeZ) / 2);
 
         boolean negative = dir.getAxisDirection() == AxisDirection.NEGATIVE;
         if (dir.getAxis() == Axis.Z) { // North/South

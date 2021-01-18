@@ -551,17 +551,17 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////
-	
+
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
 		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
 		if (primitiveDirt instanceof RootyBlock)
 			return true;
 		if (RootyBlockHelper.getRootyBlocksMap().containsKey(primitiveDirt)){
-			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life));
+			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
 			return true;
 		}
 		System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
-		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life));
+		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
 		return false;
 	}
 	
