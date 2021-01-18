@@ -34,7 +34,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     }
 
     public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
-        return new CactusBranchBlockModelGeometry(barkResLoc, ringsResLoc);
+        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 
     private ResourceLocation convertStrToResLoc (final String resLocStr) {
