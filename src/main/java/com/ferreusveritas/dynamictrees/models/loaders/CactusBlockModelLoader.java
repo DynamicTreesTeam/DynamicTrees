@@ -14,7 +14,7 @@ import net.minecraftforge.client.model.IModelLoader;
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
-public final class CactusBlockModelLoader extends BranchBlockModelLoader {
+public class CactusBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
     public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {

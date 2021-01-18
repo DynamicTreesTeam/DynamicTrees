@@ -14,7 +14,7 @@ import java.util.function.Function;
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
-public final class CactusBranchBlockModelGeometry extends BranchBlockModelGeometry {
+public class CactusBranchBlockModelGeometry extends BranchBlockModelGeometry {
 
     public CactusBranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
         super(barkResLoc, ringsResLoc);

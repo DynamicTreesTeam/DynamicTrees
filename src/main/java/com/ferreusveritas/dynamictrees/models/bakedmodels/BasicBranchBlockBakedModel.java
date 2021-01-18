@@ -115,7 +115,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, false, this.modelResLoc));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, ModelRotation.X0_Y0, this.modelResLoc));
 		}
 		
 		return builder.build();
@@ -138,7 +138,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false, this.modelResLoc));
+			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
 		}
 		
 		return builder.build();
@@ -214,7 +214,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 						int connRadius = connections[idx];
 						//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 						if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
-							quadsList.addAll(sleeves[idx][connRadius-1].getQuads((BlockState)state, face, rand, extraData));
+							quadsList.addAll(sleeves[idx][connRadius-1].getQuads(state, face, rand, extraData));
 						}
 					}
 				}

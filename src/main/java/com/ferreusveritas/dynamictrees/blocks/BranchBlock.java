@@ -22,6 +22,7 @@ import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -43,6 +44,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockDisplayReader;
@@ -169,13 +172,17 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		return connections;
 	}
-	
+
 //	@Override
-//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return false;
+//	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//		return 0.2f;
 //	}
-	
-	
+
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
+	}
+
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
@@ -354,36 +361,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		volume *= DTConfigs.treeHarvestMultiplier.get();// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, ret, volume);
 	}
-	
-	//	/*
-	//	1.10.2 Simplified Block Harvesting Logic Flow(for no silk touch)
-	//
-	//	tryHarvestBlock {
-	//		canHarvest = canHarvestBlock() <- (ForgeHooks.canHarvestBlock occurs in here)
-	//		removed = removeBlock(canHarvest) {
-	//			removedByPlayer() {
-	//				onBlockHarvested()
-	//				world.setBlockState() <- block is set to air here
-	//			}
-	//		}
-	//
-	//		if (removed) harvestBlock() {
-	//			fortune = getEnchantmentLevel(FORTUNE)
-	//			dropBlockAsItem(fortune) {
-	//				dropBlockAsItemWithChance(fortune) {
-	//					items = getDrops(fortune) {
-	//						getItemDropped(fortune) {
-	//							Item.getItemFromBlock(this) <- (Standard block behavior)
-	//						}
-	//					}
-	//					ForgeEventFactory.fireBlockHarvesting(items) <- (BlockEvent.HarvestDropsEvent)
-	//					(for all items) -> spawnAsEntity(item)
-	//				}
-	//			}
-	//		}
-	//	}
-	//	*/
-	
+
 	@Override
 	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
 		

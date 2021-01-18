@@ -63,8 +63,8 @@ public class ModelUtils {
 		};
 	}
 	
-	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation modelRotation, boolean shade, ResourceLocation modelResLoc) {
-		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, modelRotation, blockPart.partRotation, shade, modelResLoc);
+	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation modelRotation, ResourceLocation modelResLoc) {
+		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, modelRotation, blockPart.partRotation, true, modelResLoc);
 	}
 
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {

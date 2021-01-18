@@ -173,7 +173,7 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
         for (Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
             Direction face = e.getKey();
-            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, false, this.modelResLoc));
+            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), (dir == face) ? top : bark, face, ModelRotation.X0_Y0, this.modelResLoc));
         }
         float minV = negative ? 16 - halfSize : 0;
         float maxV = negative ? 16 : halfSize;
@@ -336,7 +336,7 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
 
         for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
             Direction face = e.getKey();
-            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, false, this.modelResLoc));
+            builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
         }
 
         return builder.build();

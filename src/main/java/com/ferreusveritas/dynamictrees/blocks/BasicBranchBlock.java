@@ -174,17 +174,7 @@ public class BasicBranchBlock extends BranchBlock {
 		this.fireSpreadSpeed = fireSpreadSpeed;
 		return this;
 	}
-	
-	
-	///////////////////////////////////////////
-	// RENDERING
-	///////////////////////////////////////////
-	
-	public boolean isSolid(BlockState state) {
-		return getRadius(state) >= RADMAX_NORMAL;
-	}
-	
-	
+
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
