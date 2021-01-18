@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.geomtry;
+package com.ferreusveritas.dynamictrees.models.geometry;
 
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
 import com.mojang.datafixers.util.Pair;
@@ -6,6 +6,8 @@ import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 
@@ -17,12 +19,13 @@ import java.util.function.Function;
 /**
  * @author Harley O'Connor
  */
-public final class BasicBranchBlockGeometry implements IModelGeometry<BasicBranchBlockGeometry> {
+@OnlyIn(Dist.CLIENT)
+public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModelGeometry> {
 
-    private final ResourceLocation barkResLoc;
-    private final ResourceLocation ringsResLoc;
+    protected final ResourceLocation barkResLoc;
+    protected final ResourceLocation ringsResLoc;
 
-    public BasicBranchBlockGeometry (ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
+    public BranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
         this.barkResLoc = barkResLoc;
         this.ringsResLoc = ringsResLoc;
     }

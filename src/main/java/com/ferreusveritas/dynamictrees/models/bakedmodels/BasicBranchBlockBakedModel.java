@@ -1,34 +1,13 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.BasicBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import com.google.common.collect.Maps;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockFaceUV;
-import net.minecraft.client.renderer.model.BlockModel;
-import net.minecraft.client.renderer.model.BlockPart;
-import net.minecraft.client.renderer.model.BlockPartFace;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.ModelRotation;
-import net.minecraft.client.renderer.model.SimpleBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -41,6 +20,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
@@ -70,8 +53,8 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 	}
 
 	public void setupBakedModels () {
-		TextureAtlasSprite barkTexture = this.getTexture(this.barkResLoc);
-		TextureAtlasSprite ringTexture = this.getTexture(this.ringsResLoc);
+		TextureAtlasSprite barkTexture = ModelUtils.getTexture(this.barkResLoc);
+		TextureAtlasSprite ringTexture = ModelUtils.getTexture(this.ringsResLoc);
 		barkParticles = barkTexture;
 
 		for(int i = 0; i < 8; i++) {
@@ -87,10 +70,6 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
 			rings[i] = bakeCore(radius, Axis.Y, ringTexture);
 		}
-	}
-
-	private TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-		return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resLoc);
 	}
 
 	public IBakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark) {

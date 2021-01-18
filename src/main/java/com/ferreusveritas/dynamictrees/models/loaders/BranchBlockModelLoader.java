@@ -1,17 +1,20 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
-import com.ferreusveritas.dynamictrees.models.geomtry.BasicBranchBlockGeometry;
-import com.google.gson.JsonArray;
+import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
+import com.ferreusveritas.dynamictrees.models.geometry.CactusBranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelLoader;
 
 /**
  * @author Harley O'Connor
  */
-public final class BasicBranchBlockModelLoader implements IModelLoader<BasicBranchBlockGeometry> {
+@OnlyIn(Dist.CLIENT)
+public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeometry> {
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
@@ -19,7 +22,7 @@ public final class BasicBranchBlockModelLoader implements IModelLoader<BasicBran
     }
 
     @Override
-    public BasicBranchBlockGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
         // TODO: Document json errors here.
 
         final JsonObject textures = modelContents.getAsJsonObject("textures");
@@ -27,7 +30,11 @@ public final class BasicBranchBlockModelLoader implements IModelLoader<BasicBran
         final String barkResLocStr = textures.get("bark").getAsString();
         final String ringsResLocStr = textures.get("rings").getAsString();
 
-        return new BasicBranchBlockGeometry(this.convertStrToResLoc(barkResLocStr), this.convertStrToResLoc(ringsResLocStr));
+        return this.getModelGeometry(this.convertStrToResLoc(barkResLocStr), this.convertStrToResLoc(ringsResLocStr));
+    }
+
+    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
+        return new CactusBranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 
     private ResourceLocation convertStrToResLoc (final String resLocStr) {

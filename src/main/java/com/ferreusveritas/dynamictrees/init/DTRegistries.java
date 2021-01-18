@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
@@ -26,6 +27,7 @@ import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -119,15 +121,20 @@ public class DTRegistries {
 	///////////////////////////////////////////
 	
 	public final static String FALLING_TREE = "falling_tree";
+	public final static String LINGERING_EFFECTOR = "lingering_effector";
 	
 	public static EntityType<EntityFallingTree> fallingTree;
-	
+	public static EntityType<LingeringEffectorEntity> lingeringEffector;
+
 	public static void setupEntities() {
 		fallingTree = EntityType.Builder.create(EntityFallingTree::new, EntityClassification.MISC)
 				.setShouldReceiveVelocityUpdates(true)
 				.setTrackingRange(512)
 				.setUpdateInterval(Integer.MAX_VALUE)
 				.setCustomClientFactory((spawnEntity, world) -> new EntityFallingTree(fallingTree, world))
+				.build(FALLING_TREE);
+
+		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)
 				.build(FALLING_TREE);
 	}
 	
@@ -137,7 +144,8 @@ public class DTRegistries {
 		
 		IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
 		
-		registry.register(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MODID, FALLING_TREE)));
+		registry.registerAll(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MODID, FALLING_TREE)),
+				lingeringEffector.setRegistryName(new ResourceLocation(DynamicTrees.MODID, LINGERING_EFFECTOR)));
 	}
 	
 	///////////////////////////////////////////

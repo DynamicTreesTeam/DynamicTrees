@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.*;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -64,5 +66,9 @@ public class ModelUtils {
 	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation modelRotation, boolean shade, ResourceLocation modelResLoc) {
 		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, modelRotation, blockPart.partRotation, shade, modelResLoc);
 	}
-	
+
+	public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
+		return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resLoc);
+	}
+
 }

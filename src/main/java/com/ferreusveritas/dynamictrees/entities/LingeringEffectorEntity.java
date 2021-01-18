@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -11,39 +12,22 @@ import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 
 public class LingeringEffectorEntity extends Entity {
 
-	@Override
-	protected void registerData() {
-
-	}
-
-	@Override
-	protected void readAdditional(@Nonnull CompoundNBT compound) {
-
-	}
-
-	@Override
-	protected void writeAdditional(@Nonnull CompoundNBT compound) {
-
-	}
-
-	@Override
-	public IPacket<?> createSpawnPacket() {
-		return new SSpawnObjectPacket(this);
-	}
-
 	public BlockPos blockPos;
 	public ISubstanceEffect effect;
-	public boolean extended;
+
+	public LingeringEffectorEntity(EntityType<?> entityTypeIn, World worldIn) {
+		super(entityTypeIn, worldIn);
+	}
 
 	public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
-		super(EntityType.AREA_EFFECT_CLOUD, world);
+		this(DTRegistries.lingeringEffector, world);
 		stepHeight = 1f;
-//		submergedHeight = 1f;
 		noClip = true;
 		setBlockPos(pos);
 		setEffect(effect);
@@ -76,7 +60,13 @@ public class LingeringEffectorEntity extends Entity {
 	}
 
 	@Override
-	public void read(CompoundNBT compound) { }
+	protected void registerData() {}
+
+	@Override
+	protected void readAdditional(CompoundNBT compound) {}
+
+	@Override
+	protected void writeAdditional(CompoundNBT compound) { }
 
 	@Override
 	public void tick() {
@@ -93,6 +83,11 @@ public class LingeringEffectorEntity extends Entity {
 				onKillCommand();
 			}
 		}
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 
 	@Override

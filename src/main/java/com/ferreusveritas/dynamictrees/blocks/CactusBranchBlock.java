@@ -265,7 +265,7 @@ public class CactusBranchBlock extends BranchBlock {
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		return 0;
+		return this.getRadius(blockState);
 	}
 
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {

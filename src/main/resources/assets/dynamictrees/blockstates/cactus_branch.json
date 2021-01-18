@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "block/cactus" }
+        "": { "model": "dynamictrees:block/cactus_branch" }
     }
 }
