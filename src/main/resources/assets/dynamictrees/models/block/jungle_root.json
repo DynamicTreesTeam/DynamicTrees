@@ -1,7 +1,6 @@
 {
-  "parent": "dynamictrees:block/smartmodel/branch",
+  "loader": "dynamictrees:root",
   "textures": {
-    "bark": "blocks/log_jungle",
-    "rings": "blocks/log_jungle_top"
+    "bark": "block/jungle_log"
   }
 }

@@ -145,7 +145,7 @@ public class JungleTree extends VanillaTreeFamily {
 		super(DynamicTrees.VanillaWoodTypes.jungle);
 		canSupportCocoa = true;
 
-		surfaceRootBlock = new SurfaceRootBlock(Material.WOOD, getName() + "root");
+		surfaceRootBlock = new SurfaceRootBlock(Material.WOOD, getName() + "_root");
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.JUNGLE_LEAVES);
 	}

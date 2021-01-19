@@ -24,16 +24,24 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     @Override
     public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
         // TODO: Document json errors here.
+        final JsonObject textures = this.getTexturesObject(modelContents);
 
-        final JsonObject textures = modelContents.getAsJsonObject("textures");
-
-        final String barkResLocStr = textures.get("bark").getAsString();
-        final String ringsResLocStr = textures.get("rings").getAsString();
-
-        return this.getModelGeometry(this.convertStrToResLoc(barkResLocStr), this.convertStrToResLoc(ringsResLocStr));
+        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures));
     }
 
-    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
+    protected JsonObject getTexturesObject (JsonObject modelContents) {
+        return modelContents.getAsJsonObject("textures");
+    }
+
+    protected ResourceLocation getBarkResLoc (JsonObject texturesContents) {
+        return this.convertStrToResLoc(texturesContents.get("bark").getAsString());
+    }
+
+    protected ResourceLocation getRingsResLoc (JsonObject texturesContents) {
+        return this.convertStrToResLoc(texturesContents.get("rings").getAsString());
+    }
+
+    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
         return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 

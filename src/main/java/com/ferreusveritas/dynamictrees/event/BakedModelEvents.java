@@ -2,9 +2,12 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.CactusBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.RootBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.CactusBlockModelLoader;
+import com.ferreusveritas.dynamictrees.models.loaders.RootBlockModelLoader;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -23,12 +26,12 @@ public final class BakedModelEvents {
     public static void onModelRegistryEvent(ModelRegistryEvent event) {
         ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "branch"), new BranchBlockModelLoader());
         ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "cactus"), new CactusBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "root"), new RootBlockModelLoader());
     }
 
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent event) {
-        BasicBranchBlockBakedModel.INSTANCES.forEach(BasicBranchBlockBakedModel::setupBakedModels);
-        CactusBranchBlockBakedModel.INSTANCES.forEach(CactusBranchBlockBakedModel::setupBakedModels);
+        BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
     }
 
 }

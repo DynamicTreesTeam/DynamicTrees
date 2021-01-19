@@ -97,7 +97,9 @@ public class DynamicTrees {
 		birch,
 		jungle,
 		dark_oak,
-		acacia;
+		acacia,
+		warped,
+		crimson;
 
 		public Block getLog() {
 			switch(this) {
@@ -108,6 +110,8 @@ public class DynamicTrees {
 				case jungle: return Blocks.JUNGLE_LOG;
 				case dark_oak: return Blocks.DARK_OAK_LOG;
 				case acacia: return Blocks.ACACIA_LOG;
+				case warped: return Blocks.WARPED_STEM;
+				case crimson: return Blocks.CRIMSON_STEM;
 			}
 		}
 	}

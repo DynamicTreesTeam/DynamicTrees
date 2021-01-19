@@ -21,7 +21,6 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 
@@ -30,16 +29,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
-public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
+public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
-    public static final List<CactusBranchBlockBakedModel> INSTANCES = new ArrayList<>();
-
-    protected BlockModel blockModel;
-    protected ResourceLocation modelResLoc;
-    protected ResourceLocation barkResLoc;
-    protected ResourceLocation ringsResLoc;
-
-    TextureAtlasSprite barkParticles;
+    private TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
     private IBakedModel sleeves[][] = new IBakedModel[6][2];
@@ -49,19 +41,13 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
     private IBakedModel sleeveTopSpikes;
 
     public CactusBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        this.blockModel = new BlockModel(null, null, null, false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, null);
-
-        this.modelResLoc = modelResLoc;
-        this.barkResLoc = barkResLoc;
-        this.ringsResLoc = ringsResLoc;
-
-        INSTANCES.add(this);
+        super (modelResLoc, barkResLoc, ringsResLoc);
     }
-    
-    public void setupBakedModels () {
-        TextureAtlasSprite barkTexture = ModelUtils.getTexture(this.barkResLoc);
+
+    @Override
+    public void setupModels () {
+        this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
         TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
-        barkParticles = barkTexture;
 
         for (int i = 0; i < 2; i++) {
             int radius = i + 4;
@@ -707,7 +693,7 @@ public class CactusBranchBlockBakedModel implements IDynamicBakedModel {
     }
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return barkParticles;
+        return barkTexture;
     }
 
     @Override

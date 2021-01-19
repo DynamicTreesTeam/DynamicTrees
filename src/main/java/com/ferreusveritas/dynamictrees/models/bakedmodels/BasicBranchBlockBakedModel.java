@@ -18,7 +18,6 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 
 import javax.annotation.Nonnull;
@@ -26,36 +25,23 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
-public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
+public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
-	public static final List<BasicBranchBlockBakedModel> INSTANCES = new ArrayList<>();
-
-	protected BlockModel modelBlock;
-	protected ResourceLocation modelResLoc;
-	protected ResourceLocation barkResLoc;
-	protected ResourceLocation ringsResLoc;
-
-	TextureAtlasSprite barkParticles;
+	private TextureAtlasSprite barkTexture;
 	
 	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
 	private IBakedModel[][] sleeves = new IBakedModel[6][7];
 	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
-	
+
 	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-		this.modelBlock = new BlockModel(null, null, null, false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, null);
-
-		this.modelResLoc = modelResLoc;
-		this.barkResLoc = barkResLoc;
-		this.ringsResLoc = ringsResLoc;
-
-		INSTANCES.add(this);
+		super(modelResLoc, barkResLoc, ringsResLoc);
 	}
 
-	public void setupBakedModels () {
-		TextureAtlasSprite barkTexture = ModelUtils.getTexture(this.barkResLoc);
+	@Override
+	public void setupModels () {
+		this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
 		TextureAtlasSprite ringTexture = ModelUtils.getTexture(this.ringsResLoc);
-		barkParticles = barkTexture;
 
 		for(int i = 0; i < 8; i++) {
 			int radius = i + 1;
@@ -111,7 +97,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 		}
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock.customData, ItemOverrideList.EMPTY).setTexture(bark);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).setTexture(bark);
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
@@ -134,7 +120,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 		}
 		
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(modelBlock.customData, ItemOverrideList.EMPTY).setTexture(icon);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).setTexture(icon);
 		
 		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
 			Direction face = e.getKey();
@@ -290,7 +276,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 	}
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
-		return barkParticles;
+		return barkTexture;
 	}
 	
 	@Override

@@ -68,20 +68,6 @@ public class CactusBranchBlock extends BranchBlock {
 		builder.add(ORIGIN, TRUNK);
 	}
 
-//	@Override
-//	public BlockState getExtendedState(BlockState state, IBlockReader blockAcess, BlockPos pos) {
-//		if (state != null) {
-//			int thisRadius = getRadius(state);
-//
-////			for (Direction dir : Direction.values()) {
-////				retval = retval.with(CONNECTIONS[dir.getIndex()], getSideConnectionRadius(blockAcess, pos, thisRadius, dir));
-////			}
-//			return (BlockState) state;
-//		}
-//
-//		return state;
-//	}
-
 	///////////////////////////////////////////
 	// TREE INFORMATION
 	///////////////////////////////////////////

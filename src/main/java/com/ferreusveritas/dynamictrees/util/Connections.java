@@ -4,7 +4,7 @@ import net.minecraft.util.Direction;
 
 public class Connections {
 	
-	private int[] radii;
+	protected int[] radii;
 	
 	public Connections (){
 		radii = new int[] {0,0,0,0,0,0};
