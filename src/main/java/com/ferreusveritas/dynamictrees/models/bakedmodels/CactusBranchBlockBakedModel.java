@@ -34,10 +34,10 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
     private TextureAtlasSprite barkTexture;
 
     // Not as many baked models as normal branches, although each model has more quads. Still less quads in total, though.
-    private IBakedModel sleeves[][] = new IBakedModel[6][2];
-    private IBakedModel cores[][] = new IBakedModel[3][2]; // 2 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    private IBakedModel rings[] = new IBakedModel[2]; // 2 Cores with the ring textures on all 6 sides
-    private IBakedModel coreSpikes[] = new IBakedModel[2]; // 2 cores with only the spikey edges
+    private IBakedModel[][] sleeves = new IBakedModel[6][2];
+    private IBakedModel[][] cores = new IBakedModel[3][2]; // 2 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    private IBakedModel[] rings = new IBakedModel[2]; // 2 Cores with the ring textures on all 6 sides
+    private IBakedModel[] coreSpikes = new IBakedModel[2]; // 2 cores with only the spikey edges
     private IBakedModel sleeveTopSpikes;
 
     public CactusBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
@@ -481,25 +481,25 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
 
         builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, minV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posFrom.getZ() / 16f - 0.002f), 14, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f - 0.002f), 16, maxV, bark));
+                v(posTo, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, minV,
+                v(posTo, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, minV,
+                v(posFrom, posTo, posFrom, 0, - 0.0625f, - 0.002f), 14, maxV,
+                v(posFrom, posTo, posFrom, 0, + 0.0625f, - 0.002f), 16, maxV, bark));
         builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f - 0.0625f, posTo.getZ() / 16f + 0.002f), 14, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.0625f, posTo.getZ() / 16f + 0.002f), 16, minV, bark));
+                v(posFrom, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, maxV,
+                v(posFrom, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, maxV,
+                v(posTo, posTo, posTo, 0, - 0.0625f, + 0.002f), 14, minV,
+                v(posTo, posTo, posTo, 0, + 0.0625f, + 0.002f), 16, minV, bark));
         builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f + 0.0625f), 16, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posTo.getZ() / 16f - 0.0625f), 14, minV, bark));
+                v(posFrom, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, maxV,
+                v(posFrom, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, maxV,
+                v(posTo, posTo, posTo, 0, + 0.002f, + 0.0625f), 16, minV,
+                v(posTo, posTo, posTo, 0, + 0.002f, - 0.0625f), 14, minV, bark));
         builder.addFaceQuad(Direction.UP, this.createQuad(
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, maxV,
-                v(posFrom.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, maxV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f + 0.0625f), 2, minV,
-                v(posTo.getX() / 16f, posTo.getY() / 16f + 0.002f, posFrom.getZ() / 16f - 0.0625f), 0, minV, bark));
+                v(posFrom, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, maxV,
+                v(posFrom, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, maxV,
+                v(posTo, posTo, posFrom, 0, + 0.002f, + 0.0625f), 2, minV,
+                v(posTo, posTo, posFrom, 0, + 0.002f, - 0.0625f), 0, minV, bark));
 
         builder.addFaceQuad(Direction.UP, this.createQuad(
                 v(posFrom.getX() / 16f - 0.002f, posTo.getY() / 16f + 0.0625f, posFrom.getZ() / 16f), 16, minV,
@@ -549,6 +549,9 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
         }
     }
 
+    private Vector3d v(Vector3f xVec, Vector3f yVec, Vector3f zVec, float xOffset, float yOffset, float zOffset){
+        return v(xVec.getX() / 16f + xOffset, yVec.getY() / 16f + yOffset, zVec.getZ() / 16f + zOffset);
+    }
     private Vector3d v(float x, float y, float z) {
         return new Vector3d(x, y, z);
     }
