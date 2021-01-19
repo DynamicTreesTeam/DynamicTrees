@@ -4,10 +4,11 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.CactusBranchBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
@@ -71,7 +72,7 @@ public class Cactus extends TreeFamily {
 			envFactor(Type.SANDY, 1.05f);
 			
 			clearAcceptableSoils();
-			addAcceptableSoil(Blocks.SAND, Blocks.RED_SAND);
+			addAcceptableSoils(DirtHelper.SANDLIKE);
 		}
 		
 		@Override

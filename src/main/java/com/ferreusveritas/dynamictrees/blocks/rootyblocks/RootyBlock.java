@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,10 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;

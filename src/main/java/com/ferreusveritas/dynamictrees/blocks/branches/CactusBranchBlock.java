@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;

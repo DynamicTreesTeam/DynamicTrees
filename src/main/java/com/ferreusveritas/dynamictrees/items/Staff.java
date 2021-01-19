@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;

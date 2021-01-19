@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.google.gson.JsonElement;

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.animation.DataAnimationHandler;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;

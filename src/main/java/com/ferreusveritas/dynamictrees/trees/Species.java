@@ -11,6 +11,9 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -20,7 +23,9 @@ import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
@@ -109,8 +114,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	protected float growthRate = 1.0f;
 	/** Ideal soil longevity [default = 8]*/
 	protected int soilLongevity = 8;
-	
-	protected HashSet<Block> soilList = new HashSet<Block>();
+	/** The tags for the types of soil the tree can be planted on**/
+	protected int soilTypeFlags = 0;
 	
 	private boolean requiresTileEntity = false;
 	
@@ -556,12 +561,12 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
 		if (primitiveDirt instanceof RootyBlock)
 			return true;
-		if (RootyBlockHelper.getRootyBlocksMap().containsKey(primitiveDirt)){
-			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
+		if (RootyBlockHelper.isBlockRegistered(primitiveDirt)){
+			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
 			return true;
 		}
 		System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
-		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlocksMap().get(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
+		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlock(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
 		return false;
 	}
 	
@@ -581,61 +586,44 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public int maxBranchRadius() {
 		return isThick() ? ThickBranchBlock.RADMAX_THICK : BranchBlock.RADMAX_NORMAL;
 	}
-	
-	/**
-	 * Adds blocks to the acceptable soil list.
-	 *
-	 * @param soilBlocks
-	 */
-	public Species addAcceptableSoil(Block... soilBlocks) {
-		Collections.addAll(soilList, soilBlocks);
+
+	public Species addAcceptableSoils(String ... soilTypes) {
+		soilTypeFlags |= DirtHelper.getSoilFlags(soilTypes);
 		return this;
 	}
-	
-	/**
-	 * Removes blocks from the acceptable soil list.
-	 *
-	 * @param soilBlocks
-	 */
-	public Species remAcceptableSoil(Block... soilBlocks) {
-		for(Block block : soilBlocks) {
-			soilList.remove(block);
-		}
-		return this;
-	}
-	
+
 	/**
 	 * Will clear the acceptable soils list.  Useful for
 	 * making trees that can only be planted in abnormal
 	 * substrates.
 	 */
 	public Species clearAcceptableSoils() {
-		soilList.clear();
+		soilTypeFlags = 0;
 		return this;
 	}
-	
-	/**
-	 * Retrieve a clone of the acceptable soils list.
-	 * Editing this set will not affect the original list.
-	 * Should only be used for config purposes and is not
-	 * recommended for realtime gameplay operations.
-	 *
-	 * @return A clone of the acceptable soils list.
-	 */
-	public Set<Block> getAcceptableSoils() {
-		return (Set<Block>) soilList.clone();
-	}
-	
+
 	/**
 	 * This is run by the Species class itself to set the standard
 	 * blocks available to be used as planting substrate. Developer
 	 * may override this entirely or just modify the list at a
 	 * later time.
 	 */
-	protected final void setStandardSoils() {
-		addAcceptableSoil(Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.GRASS_BLOCK, Blocks.FARMLAND, Blocks.MYCELIUM);
+	protected void setStandardSoils() {
+		addAcceptableSoils(DirtHelper.DIRTLIKE);
 	}
-	
+
+	/**
+	 * Soil acceptability tester.  Mostly to test if the block is dirt but could
+	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
+	 * species.
+	 *
+	 * @param soilBlockState
+	 * @return
+	 */
+	public boolean isAcceptableSoil(BlockState soilBlockState) {
+		return DirtHelper.isSoilAcceptable(soilBlockState.getBlock(), soilTypeFlags);
+	}
+
 	/**
 	 * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could
 	 * be overridden to allow gravel, sand, or whatever makes sense for the tree
@@ -647,10 +635,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @return
 	 */
 	public boolean isAcceptableSoil(IWorld world, BlockPos pos, BlockState soilBlockState) {
-		Block soilBlock = soilBlockState.getBlock();
-		return soilList.contains(soilBlock) || (soilBlock instanceof RootyBlock && soilList.contains(((RootyBlock)soilBlock).getPrimitiveDirt()));
+		return isAcceptableSoil(soilBlockState);
 	}
-	
+
 	/**
 	 * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
 	 *

@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.featuregen;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;

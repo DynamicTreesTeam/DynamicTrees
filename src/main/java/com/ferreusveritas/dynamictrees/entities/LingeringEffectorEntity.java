@@ -1,20 +1,17 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
-import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
-
-import javax.annotation.Nonnull;
 
 public class LingeringEffectorEntity extends Entity {
 

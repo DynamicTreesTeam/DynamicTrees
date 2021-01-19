@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat;
 
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 
 import mcp.mobius.waila.api.IRegistrar;

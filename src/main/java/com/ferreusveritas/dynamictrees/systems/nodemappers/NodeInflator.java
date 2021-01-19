@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.BlockState;

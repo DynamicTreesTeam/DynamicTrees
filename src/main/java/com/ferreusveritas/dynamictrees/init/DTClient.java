@@ -1,12 +1,14 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.branches.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.render.FallingTreeRenderer;
@@ -185,7 +187,18 @@ public class DTClient {
 			particle.setColor(r, g, b);
 		}
 	}
-	
+
+	public static void spawnParticles(World world, BasicParticleType particleType, BlockPos pos, int numParticles, Random random) {
+		spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
+	}
+	public static void spawnParticles(World world, BasicParticleType particleType, int x, int y, int z, int numParticles, Random random) {
+		for (int i1 = 0; i1 < numParticles; ++i1) {
+			double mx = random.nextGaussian() * 0.02D;
+			double my = random.nextGaussian() * 0.02D;
+			double mz = random.nextGaussian() * 0.02D;
+			DTClient.spawnParticle(world, particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
+		}
+	}
 	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
 	public static void spawnParticle(World world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
 		if(world.isRemote) {

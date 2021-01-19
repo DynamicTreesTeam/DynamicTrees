@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFreezer;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;

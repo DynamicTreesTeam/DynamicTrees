@@ -25,7 +25,7 @@ public class NodeTwinkle implements INodeInspector {
 	@Override
 	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		if(world.isRemote && TreeHelper.isBranch(blockState)) {
-			spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, world.rand);
+			DTClient.spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, world.rand);
 		}
 		return false;
 	}
@@ -33,15 +33,6 @@ public class NodeTwinkle implements INodeInspector {
 	@Override
 	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
 		return false;
-	}
-	
-	public static void spawnParticles(World world, BasicParticleType particleType, int x, int y, int z, int numParticles, Random random) {
-		for (int i1 = 0; i1 < numParticles; ++i1) {
-			double mx = random.nextGaussian() * 0.02D;
-			double my = random.nextGaussian() * 0.02D;
-			double mz = random.nextGaussian() * 0.02D;
-			DTClient.spawnParticle(world, particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
-		}
 	}
 	
 }

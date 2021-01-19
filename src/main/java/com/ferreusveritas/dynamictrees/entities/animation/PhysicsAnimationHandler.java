@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.entities.animation;
 import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.platform.GlStateManager;

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.compat;
 
 import java.util.List;
 
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.IDataAccessor;

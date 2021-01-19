@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;

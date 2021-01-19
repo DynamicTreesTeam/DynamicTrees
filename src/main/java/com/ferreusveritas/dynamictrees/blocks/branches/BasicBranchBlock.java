@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import java.util.Random;
 
@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -19,10 +20,7 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -53,11 +51,11 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	// Trees are mostly made of wood
 	public BasicBranchBlock(String name) {
-		this(Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
+		this(AbstractBlock.Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
 	}
 	
 	// Useful for more unique subclasses
-	public BasicBranchBlock(Properties properties, String name) {
+	public BasicBranchBlock(AbstractBlock.Properties properties, String name) {
 		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0), name); //aaaaand they also sound like wood.
 
 		cacheBranchStates();

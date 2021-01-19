@@ -1,6 +1,7 @@
-package com.ferreusveritas.dynamictrees.api;
+package com.ferreusveritas.dynamictrees.systems;
 
-import com.ferreusveritas.dynamictrees.blocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import net.minecraft.block.Block;
 
 import java.util.*;
@@ -10,40 +11,26 @@ public class RootyBlockHelper {
     private static Map<Block, RootyBlock> rootyBlocksMap = new HashMap<>();
     private static LinkedList<RootyBlock> rootyBlocksList;
 
-    /** THIS MUST BE CALLED BEFORE addToRootyBlocksMap
-     *
-     * @param blockToExcempt this is the block that does not need a custom rooty dirt
-     * @param defaultTo blockToExcempt will get defaultTo's rooty dirt instead.
-     * @return
-     */
-    public static boolean excemptBlock(Block blockToExcempt, Block defaultTo){
-        if (rootyBlocksMap.containsKey(blockToExcempt))
-            return false; //block was already rootified
-        if (!rootyBlocksMap.containsKey(defaultTo)){
-            addToRootyBlocksMap(defaultTo); //default isnt found, so we create it
-        }
-        rootyBlocksMap.put(blockToExcempt, rootyBlocksMap.get(defaultTo));
-        return true;
-    }
-
     /**
      * @param primitiveSoil normal block that trees can be planted on
      * @param rootyBlock rooty dirt that should represent the primitive dirt
      * @return
      */
     public static boolean addToRootyBlocksMap (Block primitiveSoil, RootyBlock rootyBlock){
-        if (rootyBlocksMap.containsKey(primitiveSoil))
+        if (rootyBlocksMap.containsKey(primitiveSoil)){
+            System.err.println("Attempted to register " + rootyBlock + " as the rooty block of " + primitiveSoil + " but it already had one.");
             return false;
+        }
         rootyBlocksMap.put(primitiveSoil, rootyBlock);
+        DirtHelper.registerSoil(rootyBlock, primitiveSoil);
         return true;
     }
 
-    public static boolean addToRootyBlocksMap (Block primitiveSoil){
-        return addToRootyBlocksMap(primitiveSoil, new RootyBlock(primitiveSoil));
+    public static boolean isBlockRegistered (Block block){
+        return rootyBlocksMap.containsKey(block);
     }
-
-    public static Map<Block, RootyBlock> getRootyBlocksMap() {
-        return rootyBlocksMap;
+    public static RootyBlock getRootyBlock (Block block){
+        return rootyBlocksMap.get(block);
     }
 
     public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap){

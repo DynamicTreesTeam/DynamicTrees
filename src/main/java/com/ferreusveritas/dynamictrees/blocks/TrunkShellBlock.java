@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;

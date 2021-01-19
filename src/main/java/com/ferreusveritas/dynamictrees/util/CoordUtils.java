@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.blocks.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;

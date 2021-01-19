@@ -1,6 +1,9 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.IMusable;
+import com.ferreusveritas.dynamictrees.blocks.SurfaceRootBlock;
+import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
