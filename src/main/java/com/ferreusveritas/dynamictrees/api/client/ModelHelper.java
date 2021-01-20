@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.api.client;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.SurfaceRootBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

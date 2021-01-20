@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -58,7 +58,8 @@ public class LeavesProperties implements ILeavesProperties {
 	protected ICellKit cellKit;
 	protected TreeFamily tree = TreeFamily.NULLFAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
-	
+	protected FoliageTypes foliage;
+
 	private LeavesProperties() {}
 	
 	public LeavesProperties(BlockState primitiveLeaves) {
@@ -77,6 +78,7 @@ public class LeavesProperties implements ILeavesProperties {
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.air;
 		this.primitiveLeavesItemStack = primitiveLeavesItemStack != null ? primitiveLeavesItemStack : ItemStack.EMPTY;
 		this.cellKit = cellKit;
+		this.foliage = FoliageTypes.LEAVES;
 	}
 	
 	@Override
@@ -146,6 +148,9 @@ public class LeavesProperties implements ILeavesProperties {
 	public ICellKit getCellKit() {
 		return cellKit;
 	}
+
+	@Override
+	public FoliageTypes getFoliageType() { return foliage; }
 
 	@Override
 	@OnlyIn(Dist.CLIENT)

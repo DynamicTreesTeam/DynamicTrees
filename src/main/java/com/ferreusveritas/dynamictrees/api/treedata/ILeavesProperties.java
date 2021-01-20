@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -49,6 +49,9 @@ public interface ILeavesProperties {
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
 
+	/** Determines if the block is leaves or part of a giant mushroom */
+	FoliageTypes getFoliageType();
+
 	@OnlyIn(Dist.CLIENT)
 	int foliageColorMultiplier(BlockState state, IBlockDisplayReader reader, BlockPos pos);
 
@@ -65,4 +68,9 @@ public interface ILeavesProperties {
 
 	int getRadiusForConnection(BlockState blockState, IBlockReader blockReader, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
 
+	enum FoliageTypes {
+		LEAVES,
+		FUNGUS,
+		WART
+	}
 }

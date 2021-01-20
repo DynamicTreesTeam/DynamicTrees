@@ -40,7 +40,7 @@ public class DTTrees {
 	 */
 	public static void setupTrees() {
 		Species.REGISTRY.register(Species.NULLSPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "null")));
-		Collections.addAll(baseFamilies, new OakTree(), new SpruceTree(), new BirchTree(), new JungleTree(), new AcaciaTree(), new DarkOakTree());
+		Collections.addAll(baseFamilies, new OakTree(), new SpruceTree(), new BirchTree(), new JungleTree(), new AcaciaTree(), new DarkOakTree(), new CrimsonFungus(), new WarpedFungus());
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
 		dynamicCactus = new Cactus();
 		dynamicCactus.registerSpecies(Species.REGISTRY);

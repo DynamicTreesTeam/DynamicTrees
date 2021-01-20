@@ -13,9 +13,9 @@ import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.blocks.TrunkShellBlock;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
-import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
@@ -35,7 +35,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -64,27 +63,6 @@ public class DTRegistries {
 		cocoaFruitBlock = new CocoaFruitBlock();//Modified Cocoa pods
 		blockApple = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		trunkShellBlock = new TrunkShellBlock();
-		
-		setupLeavesProperties();
-	}
-	
-	public static void setupLeavesProperties() {
-		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
-		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
-	}
-	
-	@SubscribeEvent
-	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
-		
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
-		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
-		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
-
-		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, blockApple, trunkShellBlock);
-		
-		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
 		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRTLIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRTLIKE);
@@ -106,6 +84,27 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHERLIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHERLIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.ENDLIKE);
+
+		setupLeavesProperties();
+	}
+	
+	public static void setupLeavesProperties() {
+		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
+		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
+	}
+	
+	@SubscribeEvent
+	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
+		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
+		
+		ArrayList<Block> treeBlocks = new ArrayList<Block>();
+		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
+		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
+
+		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, blockApple, trunkShellBlock);
+		
+		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
 		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false)){
 			registry.register(rooty);

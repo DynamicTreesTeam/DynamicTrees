@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -57,15 +57,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 
 	protected static Random backupRng = new Random();
 	
-	//	public static final IntegerProperty DISTANCE = IntegerProperty.create("hydro", 1, 7);
-	//	public static final BooleanProperty PERSISTENT = BooleanProperty.create("flowering");
-	
 	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
 	
 	public DynamicLeavesBlock() {
-		super(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
+		this(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
+	}
+	public DynamicLeavesBlock(Properties properties) {
+		super(properties);
 		this.setDefaultState(this.stateContainer.getBaseState().with(DISTANCE, LeavesProperties.maxHydro).with(PERSISTENT, false));
-		
 	}
 	
 	public Block setDefaultNaming(String modid, String name) {

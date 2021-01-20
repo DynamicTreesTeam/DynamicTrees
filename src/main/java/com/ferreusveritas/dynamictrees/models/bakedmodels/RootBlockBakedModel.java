@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
-import com.ferreusveritas.dynamictrees.blocks.SurfaceRootBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;

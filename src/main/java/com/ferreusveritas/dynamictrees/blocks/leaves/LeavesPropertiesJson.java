@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
@@ -67,10 +67,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 					}
 				} else
 				if("leaves".equals(key)) {
-					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-						getPrimitiveLeaves(element.getAsString()).assignTo(this);
-					} else
-					if(element.isJsonObject()) {
+					if((element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) || element.isJsonObject()) {
 						getPrimitiveLeaves(element.getAsString()).assignTo(this);
 					}
 				} else
@@ -99,6 +96,11 @@ public class LeavesPropertiesJson extends LeavesProperties {
 				if("fireSpreadSpeed".equals(key)) {
 					if(element.isJsonPrimitive()) {
 						fireSpreadSpeed = element.getAsInt();
+					}
+				} else
+				if("foliageType".equals(key)) {
+					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+						foliage = FoliageTypes.valueOf(element.getAsString().toUpperCase());
 					}
 				}
 			}

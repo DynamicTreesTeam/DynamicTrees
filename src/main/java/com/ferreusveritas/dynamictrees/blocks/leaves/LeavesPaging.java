@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.blocks;
+package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -37,18 +37,45 @@ public class LeavesPaging {
 		return modid;
 	}
 	
-	private static DynamicLeavesBlock createLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String name) {
-		DynamicLeavesBlock leaves = createLeavesBlock(modid, name);
+	private static DynamicLeavesBlock createLeavesBlock(@Nullable String modid, @Nonnull ILeavesProperties leavesProperties, String name, ILeavesProperties.FoliageTypes type) {
+		DynamicLeavesBlock leaves;
+		switch (type){
+			default:
+			case LEAVES:
+				leaves = createLeavesBlock(modid, name);
+				break;
+			case FUNGUS:
+				leaves = createFungusBlock(modid, name);
+				break;
+			case WART:
+				leaves = createWartBlock(modid, name);
+		}
 		leavesProperties.setDynamicLeavesState(leaves.getDefaultState());
 		leaves.setProperties(leavesProperties);
 		return leaves;
 	}
 
 	private static DynamicLeavesBlock createLeavesBlock(@Nullable String modid, String leavesName) {
-		String regname = "dynamic_" + leavesName + "_leaves";
+		String regname = leavesName + "_leaves";
 
 		List<DynamicLeavesBlock> map = getLeavesListForModId(modid);
 		DynamicLeavesBlock newLeaves = (DynamicLeavesBlock)new DynamicLeavesBlock().setDefaultNaming(autoModId(modid), regname);
+		map.add(newLeaves);
+		return newLeaves;
+	}
+	private static DynamicFungusBlock createFungusBlock(@Nullable String modid, String leavesName) {
+		String regname = leavesName + "_cap";
+
+		List<DynamicLeavesBlock> map = getLeavesListForModId(modid);
+		DynamicFungusBlock newLeaves = (DynamicFungusBlock)new DynamicFungusBlock().setDefaultNaming(autoModId(modid), regname);
+		map.add(newLeaves);
+		return newLeaves;
+	}
+	private static DynamicWartBlock createWartBlock(@Nullable String modid, String leavesName) {
+		String regname = leavesName + "_wart";
+
+		List<DynamicLeavesBlock> map = getLeavesListForModId(modid);
+		DynamicWartBlock newLeaves = (DynamicWartBlock)new DynamicWartBlock().setDefaultNaming(autoModId(modid), regname);
 		map.add(newLeaves);
 		return newLeaves;
 	}
@@ -84,7 +111,7 @@ public class LeavesPaging {
 				newLp = new LeavesPropertiesJson((String) obj);
 			}
 
-			createLeavesBlock(modid, newLp, (String)obj);
+			createLeavesBlock(modid, newLp, (String)obj, newLp.getFoliageType());
 			leafMap.put(label, newLp);
 		}
 
@@ -111,7 +138,10 @@ public class LeavesPaging {
 				String label = entry.getKey();
 				JsonObject jsonObj = entry.getValue().getAsJsonObject();
 				ILeavesProperties newLp = new LeavesPropertiesJson(jsonObj);
-				createLeavesBlock(modid, newLp, label);
+				ILeavesProperties.FoliageTypes type = ILeavesProperties.FoliageTypes.LEAVES;
+				if (jsonObj.has("foliageType"))
+					type = ILeavesProperties.FoliageTypes.valueOf(jsonObj.get("foliageType").getAsString().toUpperCase());
+				createLeavesBlock(modid, newLp, label, type);
 				leafMap.put(label, newLp);
 			}
 		}

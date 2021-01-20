@@ -70,11 +70,14 @@ public class Cactus extends TreeFamily {
 			envFactor(Type.SNOWY, 0.25f);
 			envFactor(Type.COLD, 0.5f);
 			envFactor(Type.SANDY, 1.05f);
-			
-			clearAcceptableSoils();
+
+		}
+
+		@Override
+		protected void setStandardSoils() {
 			addAcceptableSoils(DirtHelper.SANDLIKE);
 		}
-		
+
 		@Override
 		public JoCode getJoCode(String joCodeString) {
 			return new JoCodeCactus(joCodeString);
