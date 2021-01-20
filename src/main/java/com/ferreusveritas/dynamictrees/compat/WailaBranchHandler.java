@@ -38,10 +38,12 @@ public class WailaBranchHandler implements IWailaDataProvider {
 	@Override
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 				
-		if(WailaOther.invalidate) {
+		if(WailaOther.invalid) {
 			lastPos = BlockPos.ORIGIN;
 			lastSpecies = Species.NULLSPECIES;
 			lastVolume = 0;
+			
+			WailaOther.invalid = false;
 		}
 		
 		NBTTagCompound nbtData = accessor.getNBTData();

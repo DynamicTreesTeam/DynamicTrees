@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictrees.compat;
 
 public class WailaOther {
 	
-	public static boolean invalidate = false;
+	public static boolean invalid = false;
 	
 	public static void invalidateWailaPosition() {
-		invalidate = true;
+		invalid = true;
 	}
 	
 }
