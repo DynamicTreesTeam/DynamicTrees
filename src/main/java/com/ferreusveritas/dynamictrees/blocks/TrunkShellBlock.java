@@ -42,7 +42,7 @@ public class TrunkShellBlock extends Block {
 	
 	public static final EnumProperty<Surround> COREDIR = EnumProperty.create("coredir", Surround.class);
 	
-	public static final String defaultName = "trunkshell";
+	public static final String defaultName = "trunk_shell";
 	
 	public static class ShellMuse {
 		public final BlockState state;
@@ -247,12 +247,6 @@ public class TrunkShellBlock extends Block {
 		return getMuse(access, state, pos) == null;
 	}
 
-//	@Override
-//	public EnumBlockRenderType getRenderType(BlockState state) {
-//		return EnumBlockRenderType.INVISIBLE;
-//	}
-
-
 	@Override
 	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
 		ShellMuse muse = getMuse(world, pos);
@@ -308,22 +302,6 @@ public class TrunkShellBlock extends Block {
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.INVISIBLE;
 	}
-
-	//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-
-//	@Override
-//	public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face) {
-//		return BlockFaceShape.UNDEFINED;
-//	}
-
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {

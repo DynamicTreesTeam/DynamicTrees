@@ -471,11 +471,11 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
 			// Falling tree currently has severe rendering issues.
-//			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
-//			if(entity.isAlive()) {
-//				world.addEntity(entity);
-//			}
-//			return entity;
+			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
+			if(entity.isAlive()) {
+				world.addEntity(entity);
+			}
+			return entity;
 		}
 		
 		return null;

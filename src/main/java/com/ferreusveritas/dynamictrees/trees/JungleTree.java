@@ -64,7 +64,12 @@ public class JungleTree extends VanillaTreeFamily {
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
-		
+
+		@Override
+		public Species getMegaSpecies() {
+			return megaSpecies;
+		}
+
 	}
 	
 	
@@ -133,7 +138,12 @@ public class JungleTree extends VanillaTreeFamily {
 		
 		@Override
 		public boolean isThick() {
-			return false;
+			return true;
+		}
+
+		@Override
+		public boolean isMega() {
+			return true;
 		}
 
 	}
@@ -164,11 +174,6 @@ public class JungleTree extends VanillaTreeFamily {
 	
 	@Override
 	public boolean isThick() {
-		return true;
-	}
-	
-	@Override
-	public boolean autoCreateBranch() {
 		return true;
 	}
 

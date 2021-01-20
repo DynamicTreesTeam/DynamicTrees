@@ -27,7 +27,7 @@ import java.util.*;
 @OnlyIn(Dist.CLIENT)
 public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
-	private TextureAtlasSprite barkTexture;
+	protected TextureAtlasSprite barkTexture;
 	
 	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
 	private IBakedModel[][] sleeves = new IBakedModel[6][7];
@@ -161,6 +161,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			List<BakedQuad> quadsList = new ArrayList<>(24);
 			
 			int coreRadius = getRadius(state);
+
+			if (coreRadius > 8) return Collections.emptyList();
 			
 			int[] connections = new int[] {0,0,0,0,0,0};
 			if (extraData instanceof Connections){

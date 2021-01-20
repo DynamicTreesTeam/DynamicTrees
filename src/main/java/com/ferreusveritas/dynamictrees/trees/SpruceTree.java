@@ -13,7 +13,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
@@ -57,6 +59,15 @@ public class SpruceTree extends VanillaTreeFamily {
 			super(treeFamily.getName(), treeFamily);
 		}
 
+		@Override
+		public Species getMegaSpecies() {
+			return megaSpecies;
+		}
+
+	}
+
+	protected boolean isLocationForMega(World world, BlockPos trunkPos) {
+		return Species.isOneOfBiomes(Species.getBiomeKey(world.getBiome(trunkPos)), Biomes.GIANT_TREE_TAIGA, Biomes.GIANT_TREE_TAIGA_HILLS);
 	}
 
 	public class MegaSpruceSpecies extends BaseSpruceSpecies {
@@ -93,8 +104,19 @@ public class SpruceTree extends VanillaTreeFamily {
 		
 		@Override
 		public boolean isThick() {
-			return false;
+			return true;
 		}
+
+		@Override
+		public boolean isMega() {
+			return true;
+		}
+
+		@Override
+		public boolean getRequiresTileEntity(World world, BlockPos pos) {
+			return !isLocationForMega(world, pos);
+		}
+
 	}
 	
 	Species megaSpecies;
@@ -128,11 +150,7 @@ public class SpruceTree extends VanillaTreeFamily {
 	
 	@Override
 	public boolean isThick() {
-		return false;
-	}
-	
-	@Override
-	public boolean autoCreateBranch() {
 		return true;
 	}
+
 }

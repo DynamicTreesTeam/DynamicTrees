@@ -1,13 +1,11 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.CactusBranchBlockBakedModel;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.RootBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.CactusBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.RootBlockModelLoader;
+import com.ferreusveritas.dynamictrees.models.loaders.ThickBranchBlockModelLoader;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -27,6 +25,7 @@ public final class BakedModelEvents {
         ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "branch"), new BranchBlockModelLoader());
         ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "cactus"), new CactusBlockModelLoader());
         ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "root"), new RootBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "thick_branch"), new ThickBranchBlockModelLoader());
     }
 
     @SubscribeEvent

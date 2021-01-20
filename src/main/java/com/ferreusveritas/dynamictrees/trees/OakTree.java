@@ -224,9 +224,5 @@ public class OakTree extends VanillaTreeFamily {
 	public boolean isThick() {
 		return false;
 	}
-	
-	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
+
 }

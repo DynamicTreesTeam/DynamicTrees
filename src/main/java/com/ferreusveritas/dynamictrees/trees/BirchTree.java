@@ -61,10 +61,5 @@ public class BirchTree extends VanillaTreeFamily {
 	public void createSpecies() {
 		setCommonSpecies(new BirchSpecies(this));
 	}
-	
-	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
-	
+
 }
