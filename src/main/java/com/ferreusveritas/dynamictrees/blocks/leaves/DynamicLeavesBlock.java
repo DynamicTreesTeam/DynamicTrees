@@ -71,7 +71,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		setRegistryName(modid, name);
 		return this;
 	}
-	
+
 	@Override
 	public boolean ticksRandomly(BlockState state) {
 		return !state.get(PERSISTENT);
@@ -212,7 +212,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		return getProperties(state).getPrimitiveLeaves().getBlockHardness(worldIn, pos);
+		return getProperties(state).getPrimitiveLeaves().getPlayerRelativeBlockHardness(player, worldIn, pos);
 	}
 
 	@Override

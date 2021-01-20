@@ -44,9 +44,5 @@ public class WarpedFungus extends VanillaTreeFamily {
 	public void createSpecies() {
 		setCommonSpecies(new WarpedSpecies(this));
 	}
-	
-	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
+
 }

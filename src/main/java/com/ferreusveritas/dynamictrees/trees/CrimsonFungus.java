@@ -44,9 +44,5 @@ public class CrimsonFungus extends VanillaTreeFamily {
 	public void createSpecies() {
 		setCommonSpecies(new CrimsonSpecies(this));
 	}
-	
-	@Override
-	public boolean autoCreateBranch() {
-		return true;
-	}
+
 }

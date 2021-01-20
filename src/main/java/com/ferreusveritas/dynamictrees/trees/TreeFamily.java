@@ -387,7 +387,7 @@ public class TreeFamily {
 
 		Block block = blockState.getBlock();
 
-		if(!(block instanceof DynamicLeavesBlock) && block instanceof LeavesBlock) {
+		if(!(block instanceof DynamicLeavesBlock)) {
 			for(IConnectable connectable : vanillaConnectables) {
 				if(connectable.isConnectable(blockState)) {
 					return true;
