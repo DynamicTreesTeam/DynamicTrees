@@ -131,14 +131,9 @@ public class DarkOakTree extends VanillaTreeFamily {
 	
 	@Override
 	public boolean isThick() {
-		return false;
-	}
-	
-	@Override
-	public boolean autoCreateBranch() {
 		return true;
 	}
-	
+
 	@Override
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList = super.getRegisterableBlocks(blockList);

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.api.client;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
@@ -27,7 +26,7 @@ public class ModelHelper {
 	 */
 	public static void regModel(TreeFamily tree) {
 		BranchBlock branchBlock = tree.getDynamicBranch();
-		ModelResourceLocation modelLocation = getCreateBranchModel(branchBlock, tree.autoCreateBranch());
+		ModelResourceLocation modelLocation = getBranchModelResourceLocation(branchBlock);
 
 		setGenericStateMapper(branchBlock, modelLocation);
 		if(branchBlock instanceof ThickBranchBlock) {
@@ -40,18 +39,10 @@ public class ModelHelper {
 		}
 	}
 
-	private static ModelResourceLocation getCreateBranchModel(BranchBlock branchBlock, boolean automatic) {
-		return automatic ? getCreateBranchModelAuto(branchBlock) : getCreateBranchModelManual(branchBlock);
-	}
-
-	private static ModelResourceLocation getCreateBranchModelAuto(BranchBlock branchBlock) {
-		return new ModelResourceLocation(new ResourceLocation(DynamicTrees.MODID, "branch"), "");
-	}
-
-	private static ModelResourceLocation getCreateBranchModelManual(BranchBlock branchBlock) {
+	private static ModelResourceLocation getBranchModelResourceLocation(BranchBlock branchBlock) {
 		ResourceLocation family = branchBlock.getFamily().getName();
 		ResourceLocation resloc = new ResourceLocation(family.getNamespace(), family.getPath() + "branch");
-		return new ModelResourceLocation(resloc , null);
+		return new ModelResourceLocation(resloc, null);
 	}
 
 	public static void setGenericStateMapper(Block block, ModelResourceLocation modelLocation) {

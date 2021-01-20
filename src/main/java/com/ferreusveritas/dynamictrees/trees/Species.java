@@ -49,6 +49,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
@@ -560,16 +561,35 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	///////////////////////////////////////////
 
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		Block primitiveDirt = world.getBlockState(rootPos).getBlock();
-		if (primitiveDirt instanceof RootyBlock)
-			return true;
-		if (RootyBlockHelper.isBlockRegistered(primitiveDirt)){
-			world.setBlockState(rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
-			return true;
+		Block dirt = world.getBlockState(rootPos).getBlock();
+
+		if (!RootyBlockHelper.isBlockRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+			System.err.println("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
+			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, life);
+			return false;
 		}
-		System.err.println("Rooty Dirt block NOT FOUND for soil "+ primitiveDirt.getRegistryName()); //default to dirt and print error
-		world.setBlockState(rootPos, RootyBlockHelper.getRootyBlock(Blocks.DIRT).getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, requiresTileEntity));
-		return false;
+
+		if (dirt instanceof RootyBlock) {
+			this.placeRootyDirtBlock(world, rootPos, ((RootyBlock) dirt).getPrimitiveDirt(), life);
+		} else if (RootyBlockHelper.isBlockRegistered(dirt)) {
+			this.placeRootyDirtBlock(world, rootPos, dirt, life);
+		}
+
+		TileEntity tileEntity = world.getTileEntity(rootPos);
+		if (tileEntity instanceof SpeciesTileEntity) {
+			SpeciesTileEntity speciesTE = (SpeciesTileEntity) tileEntity;
+			speciesTE.setSpecies(this);
+		}
+
+		return true;
+	}
+
+	private void placeRootyDirtBlock (World world, BlockPos rootPos, Block primitiveDirt, int life) {
+		this.placeRootyDirtBlock(world, rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt), life);
+	}
+
+	private void placeRootyDirtBlock (World world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
+		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, this.getRequiresTileEntity(world, rootPos)));
 	}
 	
 	public Species setSoilLongevity(int longevity) {
@@ -1000,11 +1020,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return false;
 	}
 
-	protected final Biome getBiome (final RegistryKey<Biome> biomeKey) {
+	protected static Biome getBiome (final RegistryKey<Biome> biomeKey) {
 		return ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName());
 	}
 
-	protected final RegistryKey<Biome> getBiomeKey (final Biome biome) {
+	protected static RegistryKey<Biome> getBiomeKey (final Biome biome) {
 		return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
 	}
 	

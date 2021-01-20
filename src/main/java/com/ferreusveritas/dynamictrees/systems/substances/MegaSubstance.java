@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.ParticleTypes;
@@ -28,7 +29,7 @@ public class MegaSubstance implements ISubstanceEffect{
 
 			if(dirt.getSpecies(blockState, world, rootPos) == megaSpecies) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.DRAGON_BREATH, 8);
-				// WailaOther.invalidateWailaPosition();
+				WailaOther.invalidateWailaPosition();
 				return true;
 			};
 		}

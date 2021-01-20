@@ -43,7 +43,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	public ThickBranchBlock(Properties properties, String name) {
 		this(properties, name, false);
-		otherBlock = new ThickBranchBlock(properties, name + "x", true);
+		otherBlock = new ThickBranchBlock(properties, name + "_thick", true);
 		otherBlock.otherBlock = this;
 
 		cacheBranchThickStates();

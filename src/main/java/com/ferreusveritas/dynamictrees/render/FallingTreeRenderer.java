@@ -44,30 +44,30 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 	public void render(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
 		super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
 
-		if(!entity.isClientBuilt() || !entity.shouldRender()) {
-			return;
-		}
-
-		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
-
-		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
-
-		int brightnessIn = FallingTreeEntityModel.getBrightness(entity);
-
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(entity.getPosX(), entity.getPosY(), entity.getPosZ());
-
-		if(entity.onFire) {
-			renderFire(matrixStack);
-		}
-
-		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
-
-		drawBakedQuads(treeModel.getQuads(), matrixStack, brightnessIn, treeModel.getLeavesColor());
-
-		GlStateManager.popMatrix();
-		GlStateManager.enableLighting();
+//		if(!entity.isClientBuilt() || !entity.shouldRender()) {
+//			return;
+//		}
+//
+//		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
+//
+//		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
+//
+//		int brightnessIn = FallingTreeEntityModel.getBrightness(entity);
+//
+//		GlStateManager.disableLighting();
+//		GlStateManager.pushMatrix();
+//		GlStateManager.translated(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+//
+//		if(entity.onFire) {
+//			renderFire(matrixStack);
+//		}
+//
+//		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
+//
+//		drawBakedQuads(treeModel.getQuads(), matrixStack, brightnessIn, treeModel.getLeavesColor());
+//
+//		GlStateManager.popMatrix();
+//		GlStateManager.enableLighting();
 	}
 
 	private void renderFire(MatrixStack matrixStack) {

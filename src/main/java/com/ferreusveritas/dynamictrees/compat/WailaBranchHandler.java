@@ -31,6 +31,14 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 
 	@Override
 	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
+		if(WailaOther.invalid) {
+			lastPos = BlockPos.ZERO;
+			lastSpecies = Species.NULLSPECIES;
+			lastVolume = 0;
+
+			WailaOther.invalid = false;
+		}
+
 		CompoundNBT nbtData = accessor.getServerData();
 		BlockPos pos = accessor.getPosition();
 		Species species = Species.NULLSPECIES;

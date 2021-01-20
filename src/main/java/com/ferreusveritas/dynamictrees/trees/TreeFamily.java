@@ -255,10 +255,6 @@ public class TreeFamily {
 		return false;
 	}
 
-	public boolean autoCreateBranch() {
-		return false;
-	}
-
 	@OnlyIn(Dist.CLIENT)
 	public int getWoodColor() {
 		return woodColor;
