@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class NodeFruitCocoa implements INodeInspector {
@@ -21,8 +22,9 @@ public class NodeFruitCocoa implements INodeInspector {
 		this.worldGen = worldGen;
 		return this;
 	}
-	
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+
+	@Override
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
@@ -45,7 +47,7 @@ public class NodeFruitCocoa implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 

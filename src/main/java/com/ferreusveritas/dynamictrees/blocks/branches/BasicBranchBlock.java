@@ -34,6 +34,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
@@ -104,8 +105,9 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	// WORLD UPDATE
 	///////////////////////////////////////////
-	
-	public boolean checkForRot(World world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
+
+	@Override
+	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
 			return false;//Bail out if not in rapid mode and the rot chance fails
@@ -197,7 +199,7 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	@Override
-	public int setRadius(World world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
 		destroyMode = DynamicTrees.EnumDestroyMode.SETRADIUS;
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -371,7 +373,7 @@ public class BasicBranchBlock extends BranchBlock {
 	 * Java does a pretty good job of managing the stack on its own.
 	 */
 	@Override
-	public MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice

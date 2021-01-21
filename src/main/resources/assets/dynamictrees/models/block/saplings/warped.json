@@ -1,28 +1,8 @@
-{   "parent": "block/block",
+{
+    "parent": "dynamictrees:block/smartmodel/sapling",
     "textures": {
-        "particle": "block/cactus_side",
-        "side": "block/cactus_side",
-        "top": "block/cactus_top",
-		"bottom": "block/cactus_bottom"
-    },
-    "display": {
-        "fixed": {
-            "rotation": [ 0, 90, 0 ],
-            "translation": [ 0, 0, 0 ],
-            "scale": [ 0.5, 0.5, 0.5 ]
-        }
-    },
-    "elements": [
-					{	"from": [ 6, 0, 6 ],
-            "to": [ 10, 8, 10 ],
-            "faces": {
-                "down":  { "uv": [ 6, 6, 10, 10 ], "texture": "#bottom", "cullface": "down"},
-                "up":    { "uv": [ 6, 6, 10, 10 ], "texture": "#top"},
-                "north": { "uv": [ 6, 0, 10, 8 ], "texture": "#side"},
-                "south": { "uv": [ 6, 0, 10, 8 ], "texture": "#side"},
-                "west":  { "uv": [ 6, 0, 10, 8 ], "texture": "#side"},
-                "east":  { "uv": [ 6, 0, 10, 8 ], "texture": "#side"}
-            }
-        }
-    ]
+        "particle": "block/warped_wart_block",
+        "log": "block/warped_stem",
+        "leaves": "block/warped_wart_block"
+    }
 }

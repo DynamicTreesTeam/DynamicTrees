@@ -19,6 +19,7 @@ import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class TreeHelper {
 	 * @param leafMap The voxel map of hydrovalues to use as a iterator
 	 * @param iterations The number of times to age the map
 	 */
-	public static void ageVolume(World world, SimpleVoxmap leafMap, int iterations, SafeChunkBounds safeBounds){
+	public static void ageVolume(IWorld world, SimpleVoxmap leafMap, int iterations, SafeChunkBounds safeBounds){
 		
 		//The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
 		SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
@@ -67,7 +68,7 @@ public class TreeHelper {
 				Block block = blockState.getBlock();
 				if(block instanceof DynamicLeavesBlock) {//Special case for leaves
 					int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
-					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);//Get new values from neighbors
+					int newHydro = ((IAgeable)block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Get new values from neighbors
 					if(newHydro == -1) {
 						//Leaf block died.  Take it out of the leafMap and iterMap
 						leafMap.setVoxel(iPos, (byte) 0);
@@ -89,7 +90,7 @@ public class TreeHelper {
 					}
 				}
 				else if(block instanceof IAgeable) {//Treat as just a regular ageable block
-					((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);
+					((IAgeable)block).age(world, iPos, blockState, world.getRandom(), safeBounds);
 				} else {//You're not supposed to be here
 					leafMap.setVoxel(iPos, (byte) 0);
 					iterMap.setVoxel(iPos, (byte) 0);
@@ -109,7 +110,7 @@ public class TreeHelper {
 	 * @param height The height of the cuboid volume
 	 * @param iterations The number of times to age the volume
 	 */
-	public static void ageVolume(World world, BlockPos treePos, int halfWidth, int height, int iterations, SafeChunkBounds safeBounds){
+	public static void ageVolume(IWorld world, BlockPos treePos, int halfWidth, int height, int iterations, SafeChunkBounds safeBounds){
 		//Slow and dirty iteration over a cuboid volume.  Try to avoid this by using a voxmap if you can
 		Iterable<BlockPos> iterable = BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
 		for(int i = 0; i < iterations; i++) {
@@ -117,7 +118,7 @@ public class TreeHelper {
 				BlockState blockState = world.getBlockState(iPos);
 				Block block = blockState.getBlock();
 				if(block instanceof IAgeable) {
-					((IAgeable)block).age(world, iPos, blockState, world.rand, safeBounds);//Treat as just a regular ageable block
+					((IAgeable)block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Treat as just a regular ageable block
 				}
 			}
 		}
@@ -286,7 +287,7 @@ public class TreeHelper {
 		return isTreePart(blockState.getBlock());
 	}
 	
-	public final static boolean isTreePart(World blockAccess, BlockPos pos) {
+	public final static boolean isTreePart(IWorld blockAccess, BlockPos pos) {
 		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
 	

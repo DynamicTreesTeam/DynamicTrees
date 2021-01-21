@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -22,15 +23,15 @@ public class CocoaGenFeature implements IPostGenFeature, IPostGrowFeature {
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-		if(world.rand.nextInt() % 8 == 0) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+		if(world.getRandom().nextInt() % 8 == 0) {
 			addCocoa(world, rootPos, true);
 			return true;
 		}
 		return false;
 	}
 
-	private void addCocoa(World world, BlockPos rootPos, boolean worldGen) {
+	private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
 //		TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa().setWorldGen(worldGen)));
 	}
 

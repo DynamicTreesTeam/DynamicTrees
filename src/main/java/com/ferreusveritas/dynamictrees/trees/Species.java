@@ -62,10 +62,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
@@ -83,7 +80,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
-		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
+		@Override public boolean generate(ISeedReader world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public Species setSeed(Seed newSeed) { return this; }
@@ -258,7 +255,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	//Rare species require TileEntity Storage
-	public boolean getRequiresTileEntity(World world, BlockPos pos) {
+	public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
 		return requiresTileEntity;
 	}
 	
@@ -575,7 +572,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	//DIRT
 	///////////////////////////////////////////
 
-	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
+	public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int life) {
 		Block dirt = world.getBlockState(rootPos).getBlock();
 
 		if (!RootyBlockHelper.isBlockRegistered(dirt) && !(dirt instanceof RootyBlock)) {
@@ -599,12 +596,12 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return true;
 	}
 
-	private void placeRootyDirtBlock (World world, BlockPos rootPos, Block primitiveDirt, int life) {
+	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int life) {
 		this.placeRootyDirtBlock(world, rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt), life);
 	}
 
-	private void placeRootyDirtBlock (World world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
-		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, this.getRequiresTileEntity(world, rootPos)));
+	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
+		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, this.getRequiresTileEntity(world, rootPos)), 3);
 	}
 	
 	public Species setSoilLongevity(int longevity) {
@@ -683,7 +680,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, BlockState soilBlockState) {
+	public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
 		return isAcceptableSoil(world, pos, soilBlockState);
 	}
 	
@@ -756,7 +753,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
 	 */
-	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
+	public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
@@ -767,8 +764,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			BranchBlock branch = TreeHelper.getBranch(branchState);
 			if(branch != null) {
 				int radius = branch.getRadius(branchState);
-				float rotChance = rotChance(world, endPos, world.rand, radius);
-				if(branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, safeBounds != SafeChunkBounds.ANY) || radius != 1) {
+				float rotChance = rotChance(world, endPos, world.getRandom(), radius);
+				if(branch.checkForRot(world, endPos, this, radius, world.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != 1) {
 					if(safeBounds != SafeChunkBounds.ANY) { //worldgen
 						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
 					}
@@ -792,7 +789,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param rapid True if this rot is happening under a generation scenario as opposed to natural tree updates
 	 * @return true if the branch should rot
 	 */
-	public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		
 		if(radius <= 1) {
 			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
@@ -823,7 +820,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param radius The radius of the {@link BranchBlock}
 	 * @return The chance this will rot. 0.0(never) -> 1.0(always)
 	 */
-	public float rotChance(World world, BlockPos pos, Random rand, int radius) {
+	public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
 		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
 	}
 	
@@ -1035,11 +1032,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return false;
 	}
 
-	protected static Biome getBiome (final RegistryKey<Biome> biomeKey) {
+	public static Biome getBiome (final RegistryKey<Biome> biomeKey) {
 		return ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName());
 	}
 
-	protected static RegistryKey<Biome> getBiomeKey (final Biome biome) {
+	public static RegistryKey<Biome> getBiomeKey (final Biome biome) {
 		return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
 	}
 	
@@ -1222,7 +1219,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(ISeedReader world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		
 		if(genFeatureOverride != null) {
 			return genFeatureOverride.generate(world, rootPos, this, biome, random, radius, safeBounds);
@@ -1305,7 +1302,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param joCode The joCode that will be used to grow the tree
 	 * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
 	 */
-	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
+	public BlockPos preGeneration(IWorld world, BlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(preGenFeatures != null) {
 			for(IPreGenFeature feature: preGenFeatures) {
 				rootPos = feature.preGeneration(world, rootPos, this, radius, facing, safeBounds, joCode);
@@ -1326,7 +1323,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
 	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
-	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public void postGeneration(IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(postGenFeatures != null) {
 			for(IPostGenFeature feature: postGenFeatures) {
 				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState);

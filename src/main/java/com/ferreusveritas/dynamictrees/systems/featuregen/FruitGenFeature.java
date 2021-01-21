@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -54,11 +55,11 @@ public class FruitGenFeature implements IPostGrowFeature, IPostGenFeature {
 	}
 
     @Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(!endPoints.isEmpty()) {
 			int qty = getQuantity(true);
 			for(int i = 0; i < qty; i++) {
-				BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
+				BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
 				addFruit(world, species, rootPos.up(), endPoint, true, false, safeBounds);
 			}
 			return true;
@@ -87,7 +88,7 @@ public class FruitGenFeature implements IPostGrowFeature, IPostGenFeature {
 		return true;
 	}
 
-	protected void addFruit(World world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds) {
+	protected void addFruit(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ZERO) {
 			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
@@ -97,7 +98,7 @@ public class FruitGenFeature implements IPostGrowFeature, IPostGenFeature {
 				} else {
 					setState = worldGen ? ripeFruitState : unripeFruitState;
 				}
-				world.setBlockState(fruitPos, setState);
+				world.setBlockState(fruitPos, setState, 3);
 			}
 		}
 	}

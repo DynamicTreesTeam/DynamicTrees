@@ -46,10 +46,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolType;
 
@@ -123,7 +120,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * 		True if this rot is happening under a generation scenario as opposed to natural tree updates
 	 * @return true if the branch was destroyed because of rot
 	 */
-	public abstract boolean checkForRot(World world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
+	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
 	
 	public static int setSupport(int branches, int leaves) {
 		return ((branches & 0xf) << 4) | (leaves & 0xf);
@@ -191,9 +188,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return 1;
 	}
 	
-	public abstract int setRadius(World world, BlockPos pos, int radius, Direction originDir, int flags);
+	public abstract int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags);
 	
-	public int setRadius(World world, BlockPos pos, int radius, Direction originDir) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir) {
 		return setRadius(world, pos, radius, originDir, 2);
 	}
 	
@@ -280,7 +277,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param world
 	 * @param pos
 	 */
-	public void rot(World world, BlockPos pos) {
+	public void rot(IWorld world, BlockPos pos) {
 		breakDeliberate(world, pos, DynamicTrees.EnumDestroyMode.ROT);
 	}
 	
@@ -520,7 +517,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param world
 	 * @param pos
 	 */
-	public void breakDeliberate(World world, BlockPos pos, DynamicTrees.EnumDestroyMode mode) {
+	public void breakDeliberate(IWorld world, BlockPos pos, DynamicTrees.EnumDestroyMode mode) {
 		destroyMode = mode;
 		world.removeBlock(pos, false);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;

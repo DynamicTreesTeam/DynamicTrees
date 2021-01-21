@@ -26,6 +26,7 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 
+import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -37,6 +38,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -215,6 +217,13 @@ public class DTRegistries {
 		public final BlockState podzol = Blocks.PODZOL.getDefaultState();
 		public final BlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final BlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
+	}
+
+	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();
+
+	@SubscribeEvent
+	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
+//		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
 	}
 	
 }

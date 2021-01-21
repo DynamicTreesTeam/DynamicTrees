@@ -14,6 +14,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -45,7 +47,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 	 * @return The modified position of the rooty dirt that is one block higher
 	 */
 	@Override
-	public BlockPos preGeneration(World world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
+	public BlockPos preGeneration(IWorld world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(radius >= moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//worldgen test
 			BlockState initialDirtState = world.getBlockState(rootPos);
 			BlockState initialUnderState = world.getBlockState(rootPos.down());
@@ -59,7 +61,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 			
 			for(Cell cell: moundMap.getAllNonZeroCells()) {
 				BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
-				world.setBlockState(rootPos.add(cell.getPos()), placeState);
+				world.setBlockState(rootPos.add(cell.getPos()), placeState, 3);
 			}
 		}
 		
@@ -72,7 +74,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 */
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
 			BlockPos treePos = rootPos.up();
 			BlockState belowState = world.getBlockState(rootPos.down());
@@ -82,8 +84,8 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.RADMAX_NORMAL) {
 				for(Surround dir: Surround.values()) {
 					BlockPos dPos = rootPos.add(dir.getOffset());
-					world.setBlockState(dPos, initialDirtState);
-					world.setBlockState(dPos.down(), belowState);
+					world.setBlockState(dPos, initialDirtState, 3);
+					world.setBlockState(dPos.down(), belowState, 3);
 				}
 				return true;
 			}

@@ -24,6 +24,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
@@ -70,7 +71,7 @@ public class SurfaceRootBlock extends Block {
 		return blockState.getBlock() == this ? blockState.get(RADIUS) : 0;
 	}
 
-	public int setRadius(World world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		return radius;
 	}

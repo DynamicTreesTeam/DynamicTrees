@@ -10,6 +10,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -113,12 +115,12 @@ public class HugeMushroomGenFeature implements IFullGenFeature {
 	}
 	
 	//Override this for custom mushroom heights
-	protected int getMushroomHeight(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	protected int getMushroomHeight(IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		return this.height > 0 ? this.height : random.nextInt(9) + 2;
 	}
 	
 	@Override
-	public boolean generate(World world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 
 		BlockPos genPos = rootPos.up();
 

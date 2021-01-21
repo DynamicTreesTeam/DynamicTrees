@@ -37,10 +37,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.FoliageColors;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -57,7 +59,6 @@ public class DTClient {
 		registerEntityRenderers();
 		
 		registerColorHandlers();
-		// TODO: Fix block break animation. 
 //		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 		
 		LeavesPropertiesJson.postInitClient();
@@ -194,7 +195,7 @@ public class DTClient {
 	public static void spawnParticles(World world, BasicParticleType particleType, BlockPos pos, int numParticles, Random random) {
 		spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
 	}
-	public static void spawnParticles(World world, BasicParticleType particleType, int x, int y, int z, int numParticles, Random random) {
+	public static void spawnParticles(IWorld world, BasicParticleType particleType, int x, int y, int z, int numParticles, Random random) {
 		for (int i1 = 0; i1 < numParticles; ++i1) {
 			double mx = random.nextGaussian() * 0.02D;
 			double my = random.nextGaussian() * 0.02D;
@@ -203,8 +204,8 @@ public class DTClient {
 		}
 	}
 	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
-	public static void spawnParticle(World world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
-		if(world.isRemote) {
+	public static void spawnParticle(IWorld world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
+		if(world.isRemote()) {
 			world.addParticle(particleType, x, y, z, mx, my, mz);
 		}
 	}

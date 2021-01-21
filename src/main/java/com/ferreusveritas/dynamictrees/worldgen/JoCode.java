@@ -18,6 +18,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -143,7 +145,7 @@ public class JoCode {
 	 * @param facing Direction of tree
 	 * @param radius Constraint radius
 	 */
-	public void generate(World world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+	public void generate(IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
@@ -231,7 +233,7 @@ public class JoCode {
 	 * @param disabled
 	 * @return
 	 */
-	protected int generateFork(World world, Species species, int codePos, BlockPos pos, boolean disabled) {
+	protected int generateFork(IWorld world, Species species, int codePos, BlockPos pos, boolean disabled) {
 		
 		while(codePos < instructions.length) {
 			int code = getCode(codePos);
@@ -252,7 +254,7 @@ public class JoCode {
 		return codePos;
 	}
 	
-	protected boolean setBlockForGeneration(World world, Species species, BlockPos pos, Direction dir, boolean careful) {
+	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
 		if(world.getBlockState(pos).getMaterial().isReplaceable() && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
@@ -312,7 +314,7 @@ public class JoCode {
 		
 	}
 	
-	protected boolean isClearOfNearbyBranches(World world, BlockPos pos, Direction except) {
+	protected boolean isClearOfNearbyBranches(IWorld world, BlockPos pos, Direction except) {
 		
 		for(Direction dir: Direction.values()) {
 			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.offset(dir))) != null) {
@@ -323,7 +325,7 @@ public class JoCode {
 		return true;
 	}
 	
-	protected void addSnow(SimpleVoxmap leafMap, World world, BlockPos rootPos, Biome biome) {
+	protected void addSnow(SimpleVoxmap leafMap, IWorld world, BlockPos rootPos, Biome biome) {
 		
 		if(biome.getTemperature() < 0.4f) {
 			for (BlockPos.Mutable top : leafMap.getTops() ) {

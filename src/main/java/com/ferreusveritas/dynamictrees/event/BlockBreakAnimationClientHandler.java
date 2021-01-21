@@ -1,9 +1,11 @@
 //package com.ferreusveritas.dynamictrees.event;
 //
-//import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
+//import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+//import com.ferreusveritas.dynamictrees.client.BakedQuadRetextured;
 //import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 //import com.google.common.collect.Lists;
 //import com.google.common.collect.Maps;
+//import com.mojang.blaze3d.matrix.MatrixStack;
 //import com.mojang.blaze3d.platform.GlStateManager;
 //import net.minecraft.block.BlockRenderType;
 //import net.minecraft.block.BlockState;
@@ -13,7 +15,6 @@
 //import net.minecraft.client.renderer.DestroyBlockProgress;
 //import net.minecraft.client.renderer.Tessellator;
 //import net.minecraft.client.renderer.model.BakedQuad;
-//import net.minecraft.client.renderer.model.BakedQuadRetextured;
 //import net.minecraft.client.renderer.model.IBakedModel;
 //import net.minecraft.client.renderer.model.SimpleBakedModel;
 //import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -26,13 +27,12 @@
 //import net.minecraft.util.ResourceLocation;
 //import net.minecraft.util.math.BlockPos;
 //import net.minecraft.util.math.MathHelper;
-//import net.minecraft.world.ISeedReader;
 //import net.minecraft.world.IWorld;
-//import net.minecraft.world.World;
 //import net.minecraftforge.api.distmarker.Dist;
 //import net.minecraftforge.api.distmarker.OnlyIn;
 //import net.minecraftforge.client.event.RenderWorldLastEvent;
 //import net.minecraftforge.client.model.data.EmptyModelData;
+//import net.minecraftforge.client.model.data.IModelData;
 //import net.minecraftforge.event.world.WorldEvent;
 //import net.minecraftforge.eventbus.api.SubscribeEvent;
 //import net.minecraftforge.resource.IResourceType;
@@ -89,7 +89,7 @@
 //		GlStateManager.enableBlend();
 //		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 //		textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-//		this.drawBlockDamageTexture(mc, textureManager, Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getPartialTicks());
+//		this.drawBlockDamageTexture(mc, textureManager, Tessellator.getInstance(), Tessellator.getInstance().getBuffer(), mc.getRenderViewEntity(), event.getMatrixStack(), event.getPartialTicks());
 //		textureManager.getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 //		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 //		GlStateManager.disableBlend();
@@ -153,7 +153,7 @@
 //		GlStateManager.popMatrix();
 //	}
 //
-//	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, float partialTicks) {
+//	private void drawBlockDamageTexture(Minecraft mc, TextureManager renderEngine, Tessellator tessellatorIn, BufferBuilder bufferBuilderIn, Entity entityIn, MatrixStack matrixStack, float partialTicks) {
 //		double posX = entityIn.lastTickPosX + (entityIn.getPosX() - entityIn.lastTickPosX) * (double) partialTicks;
 //		double posY = entityIn.lastTickPosY + (entityIn.getPosY() - entityIn.lastTickPosY) * (double) partialTicks;
 //		double posZ = entityIn.lastTickPosZ + (entityIn.getPosZ() - entityIn.lastTickPosZ) * (double) partialTicks;
@@ -166,8 +166,9 @@
 //			renderEngine.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 //			this.preRenderDamagedBlocks();
 //			bufferBuilderIn.begin(7, DefaultVertexFormats.BLOCK);
-//			bufferBuilderIn.setTranslation(-posX, -posY, -posZ);
-//			bufferBuilderIn.noColor();
+////			bufferBuilderIn.setTranslation(-posX, -posY, -posZ);
+////			bufferBuilderIn.noColor();
+//			matrixStack.translate(-posX, -posY, -posZ);
 //
 //			for (Entry<Integer, DestroyBlockProgress> entry : BlockBreakAnimationClientHandler.damagedBranches.entrySet()) {
 //				DestroyBlockProgress destroyblockprogress = entry.getValue();
@@ -180,30 +181,30 @@
 //					BlockBreakAnimationClientHandler.damagedBranches.remove(entry.getKey());
 //				} else {
 //					BlockState state = mc.world.getBlockState(pos);
-//					if(state.getBlock() instanceof BlockBranch) {
+//					if(state.getBlock() instanceof BranchBlock) {
 //						int k1 = destroyblockprogress.getPartialBlockDamage();
 //						TextureAtlasSprite textureatlassprite = this.destroyBlockIcons[k1];
 //						BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
 //						if (state.getRenderType() == BlockRenderType.MODEL) {
-//							state = state.getExtendedState(mc.world, pos);
 //							IBakedModel baseModel = blockrendererdispatcher.getBlockModelShapes().getModel(state);
 //							IBakedModel damageModel = getDamageModel(baseModel, textureatlassprite, state, mc.world, pos);
-//							blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, bufferBuilderIn, true, mc.world.rand, mc.world.getSeed(), damageModel.getModelData(mc.world, pos, state, EmptyModelData.INSTANCE));
+//							blockrendererdispatcher.getBlockModelRenderer().renderModel(mc.world, damageModel, state, pos, matrixStack, bufferBuilderIn, true, mc.world.rand, 0, 0, damageModel.getModelData(mc.world, pos, state, EmptyModelData.INSTANCE));
 //						}
 //					}
 //				}
 //			}
 //
 //			tessellatorIn.draw();
-//			bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
+////			bufferBuilderIn.setTranslation(0.0D, 0.0D, 0.0D);
+//			matrixStack.translate(0, 0, 0);
 //			this.postRenderDamagedBlocks();
 //		}
 //	}
 //
 //	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, BlockState state, IWorld world, BlockPos pos) {
-//		state = state.getBlock().getExtendedState(state, world, pos); // Extended state functionality moved to IModelData
 //
 //		if (baseModel instanceof ICustomDamageModel) {
+//			IModelData modelData = baseModel.getModelData(world, pos, state, EmptyModelData.INSTANCE);
 //			ICustomDamageModel customDamageModel = (ICustomDamageModel) baseModel;
 //			long rand = MathHelper.getPositionRandom(pos);
 //
@@ -212,20 +213,19 @@
 //
 //			for (Direction facing : Direction.values()) {
 //				List<BakedQuad> quadList = Lists.newArrayList();
-//				for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, facing, rand)) {
-//					// BakedQuadRetextured was removed from Vanilla but could be re-created.
+//				for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, facing, rand, baseModel.getModelData(world, pos, state, modelData))) {
 //					quadList.add(new BakedQuadRetextured(quad, texture));
 //				}
 //				faceQuads.put(facing, quadList);
 //			}
-//			for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, null, rand)) {
+//			for (BakedQuad quad : customDamageModel.getCustomDamageQuads(state, null, rand, modelData)) {
 //				generalQuads.add(new BakedQuadRetextured(quad, texture));
 //			}
 //
 //			return new SimpleBakedModel(generalQuads, faceQuads, baseModel.isAmbientOcclusion(state), baseModel.isSideLit(), baseModel.isGui3d(), baseModel.getParticleTexture(), baseModel.getItemCameraTransforms(), baseModel.getOverrides());
 //		}
 //
-//		return (new SimpleBakedModel.Builder(state, baseModel, texture, world.getRandom(), world.getSeed())).build();
+//		return baseModel;
 //	}
 //
 //

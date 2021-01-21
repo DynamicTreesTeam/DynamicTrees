@@ -16,6 +16,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -223,7 +224,7 @@ public class FruitBlock extends Block implements IGrowable {
 		return getDefaultState().with(AGE, age);
 	}
 
-	public int getAgeForWorldGen(World world, BlockPos pos) {
+	public int getAgeForWorldGen(IWorld world, BlockPos pos) {
 		return 3;
 	}
 

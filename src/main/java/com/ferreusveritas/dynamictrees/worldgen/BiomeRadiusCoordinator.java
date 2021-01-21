@@ -1,6 +1,7 @@
 //package com.ferreusveritas.dynamictrees.worldgen;
 //
 //import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
+//import net.minecraft.util.SharedSeedRandom;
 //import net.minecraft.util.math.BlockPos;
 //import net.minecraft.util.math.MathHelper;
 //import net.minecraft.world.World;
@@ -19,7 +20,7 @@
 //	protected Function<Integer, Integer> chunkMultipass;
 //
 //	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, World world) {
-//		noiseGenerator = new PerlinNoiseGenerator(new Random(96), 1);
+//		noiseGenerator = new PerlinNoiseGenerator(new SharedSeedRandom(96), 1);
 //		this.world = world;
 //		this.treeGenerator = treeGenerator;
 //	}
@@ -34,7 +35,7 @@
 //
 //		double scale = 128;//Effectively scales up the noisemap
 //		Biome biome = world.getBiome(new BlockPos(x + 8, 0, z + 8));//Placement is offset by +8,+8
-//		double noiseDensity = (noiseGenerator.getValue(x / scale, z / scale) + 1D) / 2.0D;//Gives 0.0 to 1.0
+//		double noiseDensity = (noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D;//Gives 0.0 to 1.0
 //		double density = treeGenerator.getBiomeDataBase(world).getDensity(biome).getDensity(world.rand, noiseDensity);
 //		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 //

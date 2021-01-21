@@ -17,6 +17,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -57,11 +58,11 @@ public class OakTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 4 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 4) {
-					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom);//Change branch to a mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol);//Change rooty dirt to Podzol
+					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom, 3);//Change branch to a mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}
@@ -97,7 +98,7 @@ public class OakTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, BlockState soilBlockState) {
+		public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
 			
 			if(soilBlockState.getBlock() == Blocks.WATER) {
 				Biome biome = world.getBiome(pos);
@@ -125,11 +126,11 @@ public class OakTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 4 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 4) {
-					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom);//Change branch to a mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol);//Change rooty dirt to Podzol
+					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom, 3);//Change branch to a mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}
@@ -178,6 +179,7 @@ public class OakTree extends VanillaTreeFamily {
 		super(DynamicTrees.VanillaWoodTypes.oak);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.OAK_LEAVES);
+		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.BEE_NEST);
 	}
 	
 	@Override
@@ -211,7 +213,7 @@ public class OakTree extends VanillaTreeFamily {
 	 * a common oak acorn.
 	 */
 	@Override
-	public Species getSpeciesForLocation(World world, BlockPos trunkPos) {
+	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
 		//TODO: Move to location override mechanism
 		if(BiomeDictionary.hasType(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(trunkPos).getRegistryName()), Type.SWAMP)) {
 			return swampSpecies;

@@ -32,6 +32,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -97,7 +99,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
+		public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
 			return false;
 		}
 		
@@ -213,7 +215,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public void generate(World world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+		public void generate(IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 			BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
 			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 			
@@ -242,7 +244,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public boolean setBlockForGeneration(World world, Species species, BlockPos pos, Direction dir, boolean careful) {
+		public boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
 			BlockState defaultBranchState = species.getFamily().getDynamicBranch().getDefaultState();
 			if (world.getBlockState(pos).getMaterial().isReplaceable()) {
 				boolean trunk = false;

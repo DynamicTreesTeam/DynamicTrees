@@ -1,6 +1,17 @@
-package com.ferreusveritas.dynamictrees.systems.poissondisc;
-
-public class PoissonDiscProviderUniversal {
+//package com.ferreusveritas.dynamictrees.systems.poissondisc;
+//
+//import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
+//import com.ferreusveritas.dynamictrees.event.PoissonDiscProviderCreateEvent;
+//import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+//import net.minecraft.world.Dimension;
+//import net.minecraft.world.World;
+//import net.minecraftforge.common.MinecraftForge;
+//
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
+//
+//public class PoissonDiscProviderUniversal {
 //
 //	Map<Dimension, IPoissonDiscProvider> providerMap = new HashMap<>();
 //
@@ -41,4 +52,4 @@ public class PoissonDiscProviderUniversal {
 //		getProvider(world).unloadChunkPoissonData(chunkX, chunkY, chunkZ);
 //	}
 //
-}
+//}

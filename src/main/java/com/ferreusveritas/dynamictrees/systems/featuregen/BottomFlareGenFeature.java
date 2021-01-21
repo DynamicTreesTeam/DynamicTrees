@@ -6,6 +6,8 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -23,7 +25,7 @@ public class BottomFlareGenFeature implements IPostGenFeature, IPostGrowFeature{
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		flareBottom(world, rootPos, species);
 		return true;
 	}
@@ -35,7 +37,7 @@ public class BottomFlareGenFeature implements IPostGenFeature, IPostGrowFeature{
 	 * @param rootPos The position of the rooty dirt block of the tree
 	 * @return The radius of the bottom trunk section after operation
 	 */
-	public void flareBottom(World world, BlockPos rootPos, Species species) {
+	public void flareBottom(IWorld world, BlockPos rootPos, Species species) {
 //		TreeFamily family = species.getFamily();
 //
 //		//Put a cute little flare on the bottom of the dark oaks

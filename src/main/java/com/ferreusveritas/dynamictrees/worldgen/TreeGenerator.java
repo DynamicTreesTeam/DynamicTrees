@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 
 import java.util.Map;
 
@@ -18,6 +17,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.Dimension;
@@ -31,9 +32,9 @@ public class TreeGenerator {
 
 	protected final BiomeDataBase defaultBiomeDataBase;
 	public static final BiomeDataBase DIMENSIONBLACKLISTED = new BiomeDataBase();
-	protected final PoissonDiscProviderUniversal circleProvider;
+//	protected final PoissonDiscProviderUniversal circleProvider;
 	protected final RandomXOR random = new RandomXOR();
-	protected final Map<Dimension, BiomeDataBase> dimensionMap = new HashMap<>();
+	protected final Map<ResourceLocation, BiomeDataBase> dimensionMap = new HashMap<>();
 
 	public static void setup() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
@@ -44,33 +45,33 @@ public class TreeGenerator {
 	public TreeGenerator() {
 		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
 		defaultBiomeDataBase = new BiomeDataBase();
-		circleProvider = new PoissonDiscProviderUniversal();
+//		circleProvider = new PoissonDiscProviderUniversal();
 	}
 
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
 	}
 
-	public BiomeDataBase getBiomeDataBase(Dimension dimension) {
-		return dimensionMap.getOrDefault(dimension, getDefaultBiomeDataBase());
+	public BiomeDataBase getBiomeDataBase(ResourceLocation dimensionLocation) {
+		return dimensionMap.getOrDefault(dimensionLocation, getDefaultBiomeDataBase());
 	}
 
 	public BiomeDataBase getBiomeDataBase(World world) {
-		return getBiomeDataBase(world);
+		return getBiomeDataBase(world.getDimensionKey().getLocation());
 	}
 
 	public BiomeDataBase getDefaultBiomeDataBase() {
 		return defaultBiomeDataBase;
 	}
 
-	public void linkDimensionToDataBase(Dimension dimension, BiomeDataBase dBase) {
-		dimensionMap.put(dimension, dBase);
+	public void linkDimensionToDataBase(ResourceLocation dimensionLocation, BiomeDataBase dBase) {
+		dimensionMap.put(dimensionLocation, dBase);
 	}
 
-	public void BlackListDimension(Dimension dimension) {
-		System.out.println("DynamicTrees Applying BlackListed Dimension: " + dimension.toString());
-		dimensionMap.put(dimension, DIMENSIONBLACKLISTED);
-	}
+//	public void BlackListDimension(Dimension dimension) {
+//		System.out.println("DynamicTrees Applying BlackListed Dimension: " + dimension.toString());
+//		dimensionMap.put(dimension, DIMENSIONBLACKLISTED);
+//	}
 
 	public void clearAllBiomeDataBases() {
 		dimensionMap.clear();
@@ -107,11 +108,11 @@ public class TreeGenerator {
 
 	}
 
-	public PoissonDiscProviderUniversal getCircleProvider() {
-		return circleProvider;
-	}
+//	public PoissonDiscProviderUniversal getCircleProvider() {
+//		return circleProvider;
+//	}
 
-	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
+	public void makeWoolCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
 		makeWoolCircle(world, circle, h, resultType, safeBounds, 0);
 	}
 
@@ -119,7 +120,7 @@ public class TreeGenerator {
 		return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color+"_wool")).getDefaultState();
 	}
 
-	public void makeWoolCircle(World world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
+	public void makeWoolCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
 
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
@@ -137,7 +138,7 @@ public class TreeGenerator {
 		}
 	}
 
-	public EnumGeneratorResult makeTree(World world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
+	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 
 		circle.add(8, 8);//Move the circle into the "stage"
 

@@ -104,7 +104,7 @@ public class Seed extends Item implements IPlantable {
 		
 		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
 		if(DTConfigs.seedOnlyForest.get() && treeGen != null) {
-			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
+//			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
 		}
 		
 		float accum = 1.0f;

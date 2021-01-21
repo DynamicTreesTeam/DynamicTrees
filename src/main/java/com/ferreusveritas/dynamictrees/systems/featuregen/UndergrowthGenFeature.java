@@ -8,13 +8,14 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 public class UndergrowthGenFeature implements IPostGenFeature {
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 //		if(safeBounds != SafeChunkBounds.ANY && radius > 2) {//worldgen
 //
 //			Vec3d vTree = new Vec3d(rootPos).add(0.5, 0.5, 0.5);

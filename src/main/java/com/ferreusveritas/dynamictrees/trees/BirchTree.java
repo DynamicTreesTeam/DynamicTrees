@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -37,10 +38,10 @@ public class BirchTree extends VanillaTreeFamily {
 		};
 		
 		@Override
-		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 4 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 4) {
-					world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState());//Change branch to a brown mushroom
+					world.setBlockState(pos, Blocks.BROWN_MUSHROOM.getDefaultState(), 3);//Change branch to a brown mushroom
 					world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 3);//Change rooty dirt to dirt
 				}
 				return true;

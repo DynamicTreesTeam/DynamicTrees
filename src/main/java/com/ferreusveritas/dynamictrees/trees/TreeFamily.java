@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -135,7 +136,7 @@ public class TreeFamily {
 	 * @param trunkPos
 	 * @return
 	 */
-	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
+	public Species getSpeciesForLocation(IWorld access, BlockPos trunkPos) {
 		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
 			Species species = override.getSpeciesForLocation(access, trunkPos);
 			if(species.isValid()) {
@@ -152,7 +153,7 @@ public class TreeFamily {
 	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 
 	public interface ISpeciesLocationOverride {
-		Species getSpeciesForLocation(World access, BlockPos trunkPos);
+		Species getSpeciesForLocation(IWorld access, BlockPos trunkPos);
 	}
 
 	///////////////////////////////////////////
@@ -385,7 +386,7 @@ public class TreeFamily {
 		return false;
 	}
 
-	public boolean isCompatibleGenericLeaves(BlockState blockState, World blockAccess, BlockPos pos) {
+	public boolean isCompatibleGenericLeaves(BlockState blockState, IWorld blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
 

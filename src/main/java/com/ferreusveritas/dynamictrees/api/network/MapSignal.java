@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.api.network;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -32,14 +33,14 @@ public class MapSignal {
 		}
 	}
 
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		for(INodeInspector inspector: nodeInspectors) {
 			inspector.run(blockState, world, pos, fromDir);
 		}
 		return false;
 	}
 
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		for(INodeInspector inspector: nodeInspectors) {
 			inspector.returnRun(blockState, world, pos, fromDir);
 		}

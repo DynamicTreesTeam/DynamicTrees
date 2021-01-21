@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -17,14 +18,14 @@ import java.util.List;
  */
 public class SpeciesPostGenerationEvent extends Event {
 	
-	private final World world;
+	private final IWorld world;
 	private final Species species;
 	private final BlockPos rootPos;
 	private final List<BlockPos> endPoints;
 	private final SafeChunkBounds safeBounds;
 	private final BlockState initialDirtState;
 	
-	public SpeciesPostGenerationEvent(World world, Species species, BlockPos rootPos, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public SpeciesPostGenerationEvent(IWorld world, Species species, BlockPos rootPos, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		this.world = world;
 		this.species = species;
 		this.rootPos = rootPos;
@@ -33,7 +34,7 @@ public class SpeciesPostGenerationEvent extends Event {
 		this.initialDirtState = initialDirtState;
 	}
 	
-	public World getWorld() {
+	public IWorld getWorld() {
 		return world;
 	}
 	
