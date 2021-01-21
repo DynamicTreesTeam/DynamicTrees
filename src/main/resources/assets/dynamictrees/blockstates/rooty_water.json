@@ -1,0 +1,6 @@
+{
+	"multipart": [
+		{   "apply": { "model": "block/water" }},
+		{	"apply": { "model": "dynamictrees:block/roots" }}
+	]
+}

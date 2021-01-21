@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.entities;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -20,6 +21,8 @@ public class LingeringEffectorEntity extends Entity {
 
 	public LingeringEffectorEntity(EntityType<?> entityTypeIn, World worldIn) {
 		super(entityTypeIn, worldIn);
+		this.blockPos = BlockPos.ZERO;
+		this.effect = new GrowthSubstance();
 	}
 
 	public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
@@ -32,6 +35,8 @@ public class LingeringEffectorEntity extends Entity {
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
 			for(LingeringEffectorEntity effector : world.getEntitiesWithinAABB(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
+				if (effector.getEffect() == null) continue;
+
 				if(effector.getBlockPos().equals(pos) && effector.getEffect().getName().equals(effect.getName())) {
 					effector.onKillCommand();//Kill old effector if it's the same
 				}

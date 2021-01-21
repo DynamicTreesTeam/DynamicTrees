@@ -3,10 +3,13 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CocoaBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class NodeFruitCocoa implements INodeInspector {
@@ -21,8 +24,9 @@ public class NodeFruitCocoa implements INodeInspector {
 		this.worldGen = worldGen;
 		return this;
 	}
-	
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+
+	@Override
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		
 		if(!finished) {
 			int hashCode = CoordUtils.coordHashCode(pos, 1);
@@ -32,10 +36,10 @@ public class NodeFruitCocoa implements INodeInspector {
 					int side = (hashCode % 4) + 2;
 					Direction dir = Direction.byIndex(side);
 					BlockPos deltaPos = pos.offset(dir);
-//					if (world.isAirBlock(deltaPos)) {
-//						BlockState cocoaState = ModRegistries.blockFruitCocoa.getStateForPlacement(world, deltaPos, dir, 0, 0, 0, 0, null);
-//						world.setBlockState(deltaPos, cocoaState.withProperty(BlockCocoa.AGE, worldGen ? 2 : 0), 2);
-//					}
+					if (world.isAirBlock(deltaPos)) {
+						if (!dir.getAxis().isHorizontal()) dir = Direction.NORTH;
+						world.setBlockState(deltaPos, DTRegistries.cocoaFruitBlock.getDefaultState().with(CocoaBlock.HORIZONTAL_FACING, dir.getOpposite()).with(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
+					}
 				} else {
 					finished = true;
 				}
@@ -45,7 +49,7 @@ public class NodeFruitCocoa implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 

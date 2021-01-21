@@ -26,6 +26,7 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 
+import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -37,6 +38,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -49,7 +51,7 @@ public class DTRegistries {
 	// BLOCKS
 	///////////////////////////////////////////
 
-	public static FruitBlock blockApple;
+	public static FruitBlock appleBlock;
 	public static CocoaFruitBlock cocoaFruitBlock;
 	public static BonsaiPotBlock bonsaiPotBlock;
 	public static TrunkShellBlock trunkShellBlock;
@@ -61,7 +63,7 @@ public class DTRegistries {
 	public static void setupBlocks() {
 		bonsaiPotBlock = new BonsaiPotBlock();//Bonsai Pot
 		cocoaFruitBlock = new CocoaFruitBlock();//Modified Cocoa pods
-		blockApple = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
+		appleBlock = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		trunkShellBlock = new TrunkShellBlock();
 
 		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRTLIKE);
@@ -106,7 +108,7 @@ public class DTRegistries {
 		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 
-		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, blockApple, trunkShellBlock);
+		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
@@ -160,7 +162,7 @@ public class DTRegistries {
 				.build(FALLING_TREE);
 
 		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)
-				.build(FALLING_TREE);
+				.build(LINGERING_EFFECTOR);
 	}
 	
 	@SubscribeEvent
@@ -215,6 +217,13 @@ public class DTRegistries {
 		public final BlockState podzol = Blocks.PODZOL.getDefaultState();
 		public final BlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final BlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
+	}
+
+	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();
+
+	@SubscribeEvent
+	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
+		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
 	}
 	
 }

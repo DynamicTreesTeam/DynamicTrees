@@ -12,7 +12,7 @@ import net.minecraft.world.IWorldReader;
 
 public class CocoaFruitBlock extends CocoaBlock {
 	
-	public static final String name = "fruitcocoa";
+	public static final String name = "cocoa_fruit";
 	
 	public CocoaFruitBlock() {
 		this(name);

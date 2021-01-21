@@ -5,12 +5,13 @@ import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public interface ICustomDamageModel {
 	
-	public List<BakedQuad> getCustomDamageQuads(BlockState blockState, Direction side, long rand);
+	public List<BakedQuad> getCustomDamageQuads(BlockState blockState, Direction side, long rand, IModelData modelData);
 
 }

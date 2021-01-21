@@ -23,6 +23,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -91,7 +92,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	}
 
 	@Override
-	public int setRadius(World world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
 
 		if (updateTrunkShells(world, pos, radius, flags)){
 			return super.setRadius(world, pos, radius, originDir, flags);
@@ -107,7 +108,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
 	}
 
-	private boolean updateTrunkShells (World world, BlockPos pos, int radius, int flags){
+	private boolean updateTrunkShells (IWorld world, BlockPos pos, int radius, int flags){
 		//If the radius is <= 8 then we can just set the block as normal and move on
 		if(radius <= RADMAX_NORMAL) {
 			return true;
@@ -166,7 +167,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 		return Math.min(RADMAX_NORMAL, connectionRadius);
 	}
 
-	public ReplaceableState getReplaceability(World world, BlockPos pos, BlockPos corePos) {
+	public ReplaceableState getReplaceability(IWorld world, BlockPos pos, BlockPos corePos) {
 
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();

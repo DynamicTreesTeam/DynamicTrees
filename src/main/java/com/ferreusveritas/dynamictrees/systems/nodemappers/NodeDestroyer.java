@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
@@ -46,7 +47,7 @@ public class NodeDestroyer implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

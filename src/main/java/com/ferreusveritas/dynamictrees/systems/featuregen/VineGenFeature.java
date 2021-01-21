@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -53,11 +54,11 @@ public class VineGenFeature implements IPostGenFeature {
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(safeBounds != SafeChunkBounds.ANY) {//worldgen
 			if(!endPoints.isEmpty()) {
 				for(int i = 0; i < qty; i++) {
-					BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
+					BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
 					addVine(world, species, rootPos, endPoint, safeBounds);
 				}
 				return true;
@@ -67,7 +68,7 @@ public class VineGenFeature implements IPostGenFeature {
 		return false;
 	}
 
-	protected void addVine(World world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+	protected void addVine(IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 
 	    BlockRayTraceResult result;
         {
@@ -84,11 +85,11 @@ public class VineGenFeature implements IPostGenFeature {
             BooleanProperty vineSide = vineMap[result.getFace().getOpposite().getIndex()];
             if(vineSide != null) {
                 BlockState vineState = vineBlock.getDefaultState().with(vineSide, true);
-                int len = MathHelper.clamp(world.rand.nextInt(maxLength) + 3, 3, maxLength);
+                int len = MathHelper.clamp(world.getRandom().nextInt(maxLength) + 3, 3, maxLength);
                 BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
                 for(int i = 0; i < len; i++) {
                     if(world.isAirBlock(mPos)) {
-                        world.setBlockState(mPos, vineState);
+                        world.setBlockState(mPos, vineState, 3);
                         mPos.setY(mPos.getY() - 1);
                     } else {
                         break;

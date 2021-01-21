@@ -19,9 +19,13 @@ public class BiomeDataBase {
 	};
 	
 	//A reasonably fast 16x16 sparse array 
-	private final BiomeEntry table[][] = new BiomeEntry[16][];
+	private final BiomeEntry[][] table = new BiomeEntry[16][];
 	
 	public BiomeEntry getEntry(Biome biome) {
+		if (biome != null) {
+			return new BiomeEntry(biome);
+		}
+
 //		if(biome != null) {
 //			int biomeId = Biome.getIdForBiome(biome);//This should only return 0 - 255 because of Minecraft limitations
 //			if (biomeId >= 0 && biomeId <= 255 ) {//Enforce 0-255 for biome id to account for misbehaving mods like Mystcraft
@@ -58,7 +62,6 @@ public class BiomeDataBase {
 	
 	public static class BiomeEntry {
 		private final Biome biome;
-		private final int biomeId;
 		private IChanceSelector chanceSelector = (rnd, spc, rad) -> EnumChance.UNHANDLED;
 		private IDensitySelector densitySelector = (rnd, nd) -> -1;
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
@@ -70,22 +73,16 @@ public class BiomeDataBase {
 		
 		public BiomeEntry() {
 			biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.getRegistryName());
-			biomeId = -1;
 		}
 		
-		public BiomeEntry(Biome biome, int biomeId) {
+		public BiomeEntry(Biome biome) {
 			this.biome = biome;
-			this.biomeId = biomeId;
 		}
 		
 		public Biome getBiome() {
 			return biome;
 		}
-		
-		public int getBiomeId() {
-			return biomeId;
-		}
-		
+
 		public IChanceSelector getChanceSelector() {
 			return chanceSelector;
 		}

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class NodeSpecies implements INodeInspector {
@@ -14,7 +15,7 @@ public class NodeSpecies implements INodeInspector {
 	private Species determination = Species.NULLSPECIES;
 	
 	@Override
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		
 		ITreePart treePart = TreeHelper.getTreePart(blockState);
 
@@ -35,7 +36,7 @@ public class NodeSpecies implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

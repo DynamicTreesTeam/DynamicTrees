@@ -10,6 +10,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class NodeTwinkle implements INodeInspector {
@@ -23,15 +24,15 @@ public class NodeTwinkle implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
-		if(world.isRemote && TreeHelper.isBranch(blockState)) {
-			DTClient.spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, world.rand);
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+		if(world.isRemote() && TreeHelper.isBranch(blockState)) {
+			DTClient.spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, world.getRandom());
 		}
 		return false;
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

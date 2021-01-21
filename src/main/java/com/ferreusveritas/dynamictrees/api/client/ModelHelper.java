@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.Block;
@@ -30,7 +29,7 @@ public class ModelHelper {
 
 		setGenericStateMapper(branchBlock, modelLocation);
 
-		SurfaceRootBlock surfaceRoot = tree.getSurfaceRoots();
+		SurfaceRootBlock surfaceRoot = tree.getSurfaceRoot();
 		if(surfaceRoot != null) {
 	//		ModelLoader.setCustomStateMapper(surfaceRoot, new StateMap.Builder().ignore(surfaceRoot.getIgnorableProperties()).build());
 		}

@@ -18,6 +18,8 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
@@ -94,9 +96,9 @@ public class CoordUtils {
 	 * @param branchPos The {@link BlockPos} of a {@link BranchBlock} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is BlockPos.ZERO
 	 */
-	public static BlockPos getRayTraceFruitPos(World world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+	public static BlockPos getRayTraceFruitPos(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
 
-		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.rand.nextInt(3), safeBounds);
+		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.getRandom().nextInt(3), safeBounds);
 
 		if(result != null) {
 			BlockPos hitPos = new BlockPos(result.getHitVec());
@@ -114,7 +116,7 @@ public class CoordUtils {
 	}
 	
 	
-	public static RayTraceResult branchRayTrace(World world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
+	public static RayTraceResult branchRayTrace(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
 		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
 
 		Vector3d vOut = new Vector3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
@@ -124,8 +126,8 @@ public class CoordUtils {
 			spreadHor = 180;
 		}
 
-		float deltaYaw = (world.rand.nextFloat() * spreadHor * 2) - spreadHor;
-		float deltaPitch = (world.rand.nextFloat() * -spreadVer);// must be greater than -90 degrees(and less than 90) for the tangent function.
+		float deltaYaw = (world.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
+		float deltaPitch = (world.getRandom().nextFloat() * -spreadVer);// must be greater than -90 degrees(and less than 90) for the tangent function.
 		vOut = vOut.normalize(). //Normalize to unit vector
 				add(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to spreadVer degrees
 				normalize(). //Re-normalize to unit vector
@@ -163,7 +165,7 @@ public class CoordUtils {
 	 * @param context
 	 * @return
 	 */
-	public static BlockRayTraceResult rayTraceBlocks(World world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
+	public static BlockRayTraceResult rayTraceBlocks(IWorld world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
 		return getRayTraceVector(context, (fromContext, blockPos) -> {
 			BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.getDefaultState();
 			FluidState fluidState = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.getDefaultState();
@@ -280,7 +282,7 @@ public class CoordUtils {
 	 * @param startPos The starting position
 	 * @return The position of the top solid block
 	 */
-	public static BlockPos findGround(World world, BlockPos startPos) {
+	public static BlockPos findGround(IWorld world, BlockPos startPos) {
 		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
 		
 		//Rise up until we are no longer in a solid block

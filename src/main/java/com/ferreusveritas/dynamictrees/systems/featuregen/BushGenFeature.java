@@ -13,6 +13,8 @@ import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -48,27 +50,27 @@ public class BushGenFeature implements IFullGenFeature, IPostGenFeature {
 	}
 
 	@Override
-	public boolean generate(World world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		commonGen(world, rootPos, species, random, radius, safeBounds);
 		return true;
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(safeBounds != SafeChunkBounds.ANY && biomePredicate.test(biome)) {
-			commonGen(world, rootPos, species, world.rand, radius, safeBounds);
+			commonGen(world, rootPos, species, world.getRandom(), radius, safeBounds);
 			return true;
 		}
 		return false;
 	}
 
-	protected void commonGen(World world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
+	protected void commonGen(IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
 		if (radius <= 2) return;
 
 		Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
 		for (int i = 0; i < 2; i++) {
-			int rad = MathHelper.clamp(world.rand.nextInt(radius - 2) + 2, 2, radius - 1);
+			int rad = MathHelper.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
 			Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
 			BlockPos vPos = new BlockPos(v);
 			if (!safeBounds.inBounds(vPos, true)) continue;
@@ -78,14 +80,14 @@ public class BushGenFeature implements IFullGenFeature, IPostGenFeature {
 
 			pos = pos.up();
 			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
-				world.setBlockState(pos, logState);
+				world.setBlockState(pos, logState, 3);
 
 				SimpleVoxmap leafMap = LeafClusters.bush;
 				BlockPos.Mutable leafPos = new BlockPos.Mutable();
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						world.setBlockState(leafPos, (secondaryLeavesState == null || random.nextInt(4) != 0) ? leavesState : secondaryLeavesState);
+						world.setBlockState(leafPos, (secondaryLeavesState == null || random.nextInt(4) != 0) ? leavesState : secondaryLeavesState, 3);
 					}
 				}
 			}

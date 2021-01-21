@@ -4,6 +4,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class SafeChunkBounds {
@@ -43,7 +45,7 @@ public class SafeChunkBounds {
 		center = null;
 	}
 	
-	public SafeChunkBounds(World world, ChunkPos pos) {
+	public SafeChunkBounds(ISeedReader world, ChunkPos pos) {
 		center = pos;
 
 		for(Tile t : tiles) {
@@ -83,7 +85,7 @@ public class SafeChunkBounds {
 		int tileZ = (chunkZ - center.z + 1);
 		if ( ((tileX | tileZ) & 0xFFFFFFFC) == 0 ) {//Quick way to test if tileX and tileZ are both 0 - 3
 			int index = tileX + (tileZ * 4);
-			return (!gap && chunkBounds[index] != BlockBounds.INVALID) ? true : chunkBounds[index].inBounds(pos);
+			return !gap && chunkBounds[index] != BlockBounds.INVALID || chunkBounds[index].inBounds(pos);
 		}
 		return false;
 	}
@@ -94,11 +96,11 @@ public class SafeChunkBounds {
 		return inBounds(min, gap) && inBounds(max, gap) && inBounds(new BlockPos(min.getX(), 0, max.getZ()), gap) && inBounds(new BlockPos(max.getX(), 0, min.getZ()), gap);
 	}
 	
-	public void setBlockState(World world, BlockPos pos, BlockState state, boolean gap) {
+	public void setBlockState(IWorld world, BlockPos pos, BlockState state, boolean gap) {
 		setBlockState(world, pos, state, 3, gap);
 	}
 	
-	public void setBlockState(World world, BlockPos pos, BlockState state, int flags, boolean gap) {
+	public void setBlockState(IWorld world, BlockPos pos, BlockState state, int flags, boolean gap) {
 		if(inBounds(pos, gap)) {
 			world.setBlockState(pos, state, flags);
 		}

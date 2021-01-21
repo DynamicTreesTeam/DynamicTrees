@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 /**
@@ -22,7 +23,7 @@ public class NodeDisease implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
@@ -35,7 +36,7 @@ public class NodeDisease implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

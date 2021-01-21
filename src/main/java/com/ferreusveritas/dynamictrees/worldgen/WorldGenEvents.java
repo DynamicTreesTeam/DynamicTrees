@@ -1,9 +1,11 @@
-package com.ferreusveritas.dynamictrees.event;
+package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.*;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
@@ -11,7 +13,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
  */
 public final class WorldGenEvents {
 
-//    private static final List<String> knownTreeFeatureNames = Arrays.asList("oak", "dark_oak", "birch", "acacia", "spruce", "pine", "jungle_tree", "fancy_oak", "jungle_tree_no_vine", "mega_jungle_tree", "mega_spruce", "mega_pine", "super_birch_bees_0002", "swamp_tree", "oak_bees_0002", "oak_bees_002", "oak_bees_005", "birch_bees_0002", "birch_bees_002", "birch_bees_005", "fancy_oak_bees_0002", "fancy_oak_bees_002", "fancy_oak_bees_005", "forest_flower_trees", "trees_shattered_savanna", "trees_savanna", "trees_birch", "trees_mountain_edge", "trees_mountain", "trees_water", "birch_other", "plain_vegetation", "trees_jungle_edge", "trees_giant_spruce", "trees_giant", "trees_jungle");
+//    @SubscribeEvent(priority = EventPriority.HIGH)
+//    public void addDynamicTrees (final BiomeLoadingEvent event) {
+//        if (event.getCategory() == Biome.Category.NETHER || event.getCategory() == Biome.Category.THEEND) return;
+//
+//        event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
+//    }
 
     /**
      * This is not an ideal way of removing trees, but it's the best way I've currently found.
@@ -29,6 +36,9 @@ public final class WorldGenEvents {
         // Loop through all vegetal features of current biome and remove if algorithm determines it contains a tree feature.
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
+
+            if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
+
             final IFeatureConfig featureConfig = ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config;
 
             /*  The following code removes vanilla trees from the biome's generator.

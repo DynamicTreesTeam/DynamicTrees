@@ -28,51 +28,51 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 	};
 
 	private ISpeciesSelector createStaticSpeciesSelector(String speciesName) {
-//		if(isDefault(speciesName)) {
-//			return new StaticSpeciesSelector();
-//		}
-//		Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-//		if(species != Species.NULLSPECIES) {
-//			return new StaticSpeciesSelector(new SpeciesSelection(species));
-//		}
-//
+		if(isDefault(speciesName)) {
+			return new StaticSpeciesSelector();
+		}
+		Species species = TreeRegistry.findSpeciesSloppy(speciesName);
+		if(species != Species.NULLSPECIES) {
+			return new StaticSpeciesSelector(new SpeciesSelection(species));
+		}
+
 		return null;
 	}
 	
 	private ISpeciesSelector readSpeciesSelector(JsonObject mainObject) {
 
-//		JsonElement staticElement = mainObject.get("static");
-//		if(staticElement != null && staticElement.isJsonPrimitive()) {
-//			return createStaticSpeciesSelector(staticElement.getAsString());
-//		}
-//
-//		JsonElement randomElement = mainObject.get("random");
-//		if(randomElement != null && randomElement.isJsonObject()) {
-//			RandomSpeciesSelector rand = new RandomSpeciesSelector();
-//			for(Entry<String, JsonElement> entry : randomElement.getAsJsonObject().entrySet()) {
-//				String speciesName = entry.getKey();
-//				JsonElement speciesElement = entry.getValue();
-//				int weight = 0;
-//				if(speciesElement.isJsonPrimitive() && speciesElement.getAsJsonPrimitive().isNumber()) {
-//					weight = speciesElement.getAsJsonPrimitive().getAsInt();
-//					if(weight > 0) {
-//						if(isDefault(speciesName)) {
-//							rand.add(weight);
-//						} else {
-//							Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-//							if(species != Species.NULLSPECIES) {
-//								rand.add(species, weight);
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			if(rand.getSize() > 0) {
-//				return rand;
-//			}
-//		}
-//
+		JsonElement staticElement = mainObject.get("static");
+		if(staticElement != null && staticElement.isJsonPrimitive()) {
+			return createStaticSpeciesSelector(staticElement.getAsString());
+		}
+
+		JsonElement randomElement = mainObject.get("random");
+		if(randomElement != null && randomElement.isJsonObject()) {
+			RandomSpeciesSelector rand = new RandomSpeciesSelector();
+			for(Entry<String, JsonElement> entry : randomElement.getAsJsonObject().entrySet()) {
+				String speciesName = entry.getKey();
+				JsonElement speciesElement = entry.getValue();
+				int weight = 0;
+				if(speciesElement.isJsonPrimitive() && speciesElement.getAsJsonPrimitive().isNumber()) {
+					weight = speciesElement.getAsJsonPrimitive().getAsInt();
+					if(weight > 0) {
+						if(isDefault(speciesName)) {
+							rand.add(weight);
+						} else {
+							Species species = TreeRegistry.findSpeciesSloppy(speciesName);
+							if(species != Species.NULLSPECIES) {
+								rand.add(species, weight);
+							}
+						}
+					}
+				}
+			}
+
+			if(rand.getSize() > 0) {
+				return rand;
+			}
+		}
+
 		return null;
 	}
 	

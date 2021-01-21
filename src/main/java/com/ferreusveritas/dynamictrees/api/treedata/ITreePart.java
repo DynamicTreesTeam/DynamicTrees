@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.systems.*;
 
@@ -81,7 +82,7 @@ public interface ITreePart {
 	* @param signal The Mapping Signal object to gather data and/or perform operations
 	* @return
 	*/
-	MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal);
+	MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal);
 
 	/**
 	* Get the appropriate {@link TreeFamily} this block is used to build.

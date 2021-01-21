@@ -21,16 +21,16 @@ public class JsonMath {
 		
 		this.biome = biome;
 		
-//		if(mathElement.isJsonObject()) {
-//			JsonObject mathObject = mathElement.getAsJsonObject();
-//
-//			for(Entry<String, JsonElement> entry : mathObject.entrySet()) {
-//				rootOp = processElement(entry.getKey(), entry.getValue());
-//				if(rootOp != null) {
-//					return;
-//				}
-//			}
-//		}
+		if(mathElement.isJsonObject()) {
+			JsonObject mathObject = mathElement.getAsJsonObject();
+
+			for(Entry<String, JsonElement> entry : mathObject.entrySet()) {
+				rootOp = processElement(entry.getKey(), entry.getValue());
+				if(rootOp != null) {
+					return;
+				}
+			}
+		}
 	}
 	
 	private MathOperator getVariable(String name) {
@@ -50,64 +50,64 @@ public class JsonMath {
 		return null;
 	}
 	
-//	private MathOperator processElement(String key, JsonElement value) {
-//
-//		EnumMathFunction op = EnumMathFunction.getFunction(key);
-//
-//		ArrayList<MathOperator> paramList = new ArrayList<>();
-//		Species speciesArg = Species.NULLSPECIES;
-//
-//		//If the value is an array then these are the parameters for this operation
-//		if(value.isJsonArray()) {
-//			for(JsonElement parameter : value.getAsJsonArray()) {
-//				MathOperator m = null;
-//				if(parameter.isJsonObject()) {
-//					Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
-//					m = processElement(entry.getKey(), entry.getValue());
-//				} else
-//				if (parameter.isJsonPrimitive()) {
-//					if(parameter.getAsJsonPrimitive().isNumber()) {
-//						m = new Const(parameter.getAsFloat());
-//					} else
-//					if(parameter.getAsJsonPrimitive().isString()) {
-//						String name = parameter.getAsString();
-//						MathOperator var = getVariable(name);
-//						if(var != null) {
-//							m = var;
-//						}
-//						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULLSPECIES) {
-//							speciesArg = TreeRegistry.findSpeciesSloppy(name);
-//						}
-//					}
-//				}
-//
-//				if(m != null) {
-//					paramList.add(m);
-//				}
-//
-//			}
-//		}
-//
-//		MathOperator paramArray[] = paramList.toArray(new MathOperator[0]);
-//
-//		switch(op) {
-//			case NOISE: return new Noise();
-//			case RAND: return new Rand();
-//			case TREES: return new Trees(biome);
-//			case RADIUS: return new Radius();
-//			case ADD: return new Adder(paramArray);
-//			case SUB: return new Subtractor(paramArray);
-//			case MUL: return new Multiplier(paramArray);
-//			case DIV: return new Divider(paramArray);
-//			case MAX: return new Maximum(paramArray);
-//			case MIN: return new Minimum(paramArray);
-//			case IFGT: return new IfGreaterThan(paramArray);
-//			case SPECIES: return speciesArg != Species.NULLSPECIES ? new IfSpecies(speciesArg, paramArray) : null;
-//			case DEBUG: return new Debug(paramArray);
-//			default: return null;
-//		}
-//
-//	}
+	private MathOperator processElement(String key, JsonElement value) {
+
+		EnumMathFunction op = EnumMathFunction.getFunction(key);
+
+		ArrayList<MathOperator> paramList = new ArrayList<>();
+		Species speciesArg = Species.NULLSPECIES;
+
+		//If the value is an array then these are the parameters for this operation
+		if(value.isJsonArray()) {
+			for(JsonElement parameter : value.getAsJsonArray()) {
+				MathOperator m = null;
+				if(parameter.isJsonObject()) {
+					Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
+					m = processElement(entry.getKey(), entry.getValue());
+				} else
+				if (parameter.isJsonPrimitive()) {
+					if(parameter.getAsJsonPrimitive().isNumber()) {
+						m = new Const(parameter.getAsFloat());
+					} else
+					if(parameter.getAsJsonPrimitive().isString()) {
+						String name = parameter.getAsString();
+						MathOperator var = getVariable(name);
+						if(var != null) {
+							m = var;
+						}
+						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULLSPECIES) {
+							speciesArg = TreeRegistry.findSpeciesSloppy(name);
+						}
+					}
+				}
+
+				if(m != null) {
+					paramList.add(m);
+				}
+
+			}
+		}
+
+		MathOperator paramArray[] = paramList.toArray(new MathOperator[0]);
+
+		switch(op) {
+			case NOISE: return new Noise();
+			case RAND: return new Rand();
+			case TREES: return new Trees(biome);
+			case RADIUS: return new Radius();
+			case ADD: return new Adder(paramArray);
+			case SUB: return new Subtractor(paramArray);
+			case MUL: return new Multiplier(paramArray);
+			case DIV: return new Divider(paramArray);
+			case MAX: return new Maximum(paramArray);
+			case MIN: return new Minimum(paramArray);
+			case IFGT: return new IfGreaterThan(paramArray);
+			case SPECIES: return speciesArg != Species.NULLSPECIES ? new IfSpecies(speciesArg, paramArray) : null;
+			case DEBUG: return new Debug(paramArray);
+			default: return null;
+		}
+
+	}
 	
 	public float apply(Random random, float noise) {
 		MathContext mc = new MathContext(noise, random);
@@ -189,7 +189,7 @@ public class JsonMath {
 			return 0;
 		}
 
-		//		@Override
+//		@Override
 //		public float apply(MathContext mc) {
 //			return MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, -1.0f, 1.0f);//Gives -1.0 to 1.0
 //		}

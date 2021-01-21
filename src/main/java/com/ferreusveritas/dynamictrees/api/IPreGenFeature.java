@@ -5,6 +5,8 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public interface IPreGenFeature extends IGenFeature {
@@ -21,6 +23,6 @@ public interface IPreGenFeature extends IGenFeature {
 	 * @param joCode The JoCode that will be used to generate this tree
 	 * @return The modified position of the rooty dirt
 	 */
-	public BlockPos preGeneration(World world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode);
+	public BlockPos preGeneration(IWorld world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode);
 
 }

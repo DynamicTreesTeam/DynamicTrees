@@ -1,5 +1,5 @@
-package com.ferreusveritas.dynamictrees.worldgen;
-
+//package com.ferreusveritas.dynamictrees.worldgen;
+//
 //import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 //import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 //import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
@@ -14,6 +14,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //import net.minecraft.world.World;
 //import net.minecraft.world.WorldType;
 //import net.minecraft.world.chunk.Chunk;
+//import net.minecraft.world.chunk.IChunk;
 //import net.minecraft.world.chunk.IChunkProvider;
 //import net.minecraft.world.gen.IChunkGenerator;
 //import net.minecraftforge.fml.common.IWorldGenerator;
@@ -98,11 +99,10 @@ package com.ferreusveritas.dynamictrees.worldgen;
 //
 //	}
 //
-//	@Override
-//	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-//		if(world.getWorldType() == WorldType.FLAT) {
-//			return;
-//		}
+//	public IChunk generate(int i, int k, IChunk chunk) {
+////		if(chunk.getWorldForge(). == WorldType.FLAT) {
+////			return;
+////		}
 //		TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 //		BiomeDataBase dbase = treeGenerator.getBiomeDataBase(world);
 //		if(dbase != TreeGenerator.DIMENSIONBLACKLISTED) {

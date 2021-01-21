@@ -187,7 +187,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 	}
 
     @Override
-    public List<BakedQuad> getCustomDamageQuads(BlockState blockState, Direction side, long randSeed) {
+    public List<BakedQuad> getCustomDamageQuads(BlockState blockState, Direction side, long randSeed, IModelData modelData) {
         int coreRadius = getRadius(blockState);
         Random rand = new Random();
         rand.setSeed(randSeed);
@@ -199,8 +199,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 
         List<BakedQuad> quadsList = new LinkedList<>();
 
-        quadsList.addAll(trunksBark[coreRadius - 9].getQuads(blockState, side, rand));
-        quadsList.addAll(trunksTopBark[coreRadius - 9].getQuads(blockState, side, rand));
+        quadsList.addAll(trunksBark[coreRadius - 9].getQuads(blockState, side, rand, modelData));
+        quadsList.addAll(trunksTopBark[coreRadius - 9].getQuads(blockState, side, rand, modelData));
 
         return quadsList;
     }

@@ -15,6 +15,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -94,11 +95,11 @@ public class DarkOakTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public boolean rot(World world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 2 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 6) {
-					world.setBlockState(pos, DTRegistries.blockStates.redMushroom);//Change branch to a red mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol);//Change rooty dirt to Podzol
+					world.setBlockState(pos, DTRegistries.blockStates.redMushroom, 3);//Change branch to a red mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}
@@ -112,14 +113,10 @@ public class DarkOakTree extends VanillaTreeFamily {
 		}
 		
 	}
-	
-	SurfaceRootBlock surfaceRootBlock;
-	
+
 	public DarkOakTree() {
 		super(DynamicTrees.VanillaWoodTypes.dark_oak);
 		hasConiferVariants = true;
-		
-		surfaceRootBlock = new SurfaceRootBlock(Material.WOOD, getName() + "_root");
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.DARK_OAK_LEAVES);
 	}
@@ -135,15 +132,8 @@ public class DarkOakTree extends VanillaTreeFamily {
 	}
 
 	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList = super.getRegisterableBlocks(blockList);
-		blockList.add(surfaceRootBlock);
-		return blockList;
+	public boolean hasSurfaceRoot() {
+		return true;
 	}
-	
-	@Override
-	public SurfaceRootBlock getSurfaceRoots() {
-		return surfaceRootBlock;
-	}
-	
+
 }

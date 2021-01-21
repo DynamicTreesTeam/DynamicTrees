@@ -17,6 +17,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -67,7 +68,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 	}
 
 	@Override
-	public boolean postGeneration(World world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 
 		BlockPos treePos = rootPos.up();
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
@@ -79,7 +80,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 	}
 
 
-	public boolean startRoots(World world, BlockPos treePos, Species species, int trunkRadius) {
+	public boolean startRoots(IWorld world, BlockPos treePos, Species species, int trunkRadius) {
 		int hash = CoordUtils.coordHashCode(treePos, 2);
 		SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
 		nextRoot(world, rootMap, treePos, species, trunkRadius, BlockPos.ZERO, 0, -1, null, 0);
@@ -103,7 +104,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 		return true;
 	}
 
-	protected void nextRoot(World world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, BlockPos pos, int height, int levelCount, Direction fromDir, int radius) {
+	protected void nextRoot(IWorld world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, BlockPos pos, int height, int levelCount, Direction fromDir, int radius) {
 
 		for(int depth = 0; depth < 2; depth++) {
 			BlockPos currPos = trunkPos.add(pos).up(height - depth);
@@ -114,7 +115,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 
 			if(pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
 				if(radius > 0) {
-					species.getFamily().getSurfaceRoots().setRadius(world, currPos, radius, fromDir, 3);
+					species.getFamily().getSurfaceRoot().setRadius(world, currPos, radius, fromDir, 3);
 				}
 				if(onNormalCube) {
 					for(Direction dir: CoordUtils.HORIZONTALS) {
@@ -137,7 +138,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 
 	}
 
-	protected boolean isReplaceableWithRoots(World world, BlockState placeState, BlockPos pos) {
+	protected boolean isReplaceableWithRoots(IWorld world, BlockState placeState, BlockPos pos) {
 		Block block = placeState.getBlock();
 		if(block == Blocks.AIR || block == DTRegistries.trunkShellBlock) {
 			return true;

@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class NodeNetVolume implements INodeInspector {
@@ -14,7 +15,7 @@ public class NodeNetVolume implements INodeInspector {
 	private int volume;//number of voxels(1x1x1 pixels) of wood accumulated from network analysis
 	
 	@Override
-	public boolean run(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		if(TreeHelper.isBranch(blockState)) {
 			int radius = TreeHelper.getTreePart(blockState).getRadius(blockState);
 			volume += radius * radius * 64;//Integrate volume of this tree part into the total volume calculation
@@ -23,7 +24,7 @@ public class NodeNetVolume implements INodeInspector {
 	}
 	
 	@Override
-	public boolean returnRun(BlockState blockState, World world, BlockPos pos, Direction fromDir) {
+	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
 	

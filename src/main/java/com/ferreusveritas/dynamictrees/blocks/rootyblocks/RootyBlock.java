@@ -45,6 +45,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
@@ -320,7 +321,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @param signal
 	 * @return
 	 */
-	public MapSignal startAnalysis(World world, BlockPos rootPos, MapSignal signal) {
+	public MapSignal startAnalysis(IWorld world, BlockPos rootPos, MapSignal signal) {
 		Direction dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
 		BlockState treeState = world.getBlockState(treePos);
@@ -336,7 +337,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public MapSignal analyse(BlockState blockState, World world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		
 		signal.root = pos;
@@ -357,7 +358,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULLFAMILY;
 	}
 	
-	private SpeciesTileEntity getTileEntitySpecies(World world, BlockPos pos) {
+	private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
 		return (SpeciesTileEntity) world.getTileEntity(pos);
 	}
 	
@@ -367,7 +368,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * Otherwise we'll just make it report whatever {@link DynamicTrees} the above
 	 * {@link BranchBlock} says it is.
 	 */
-	public Species getSpecies(BlockState state, World world, BlockPos rootPos) {
+	public Species getSpecies(BlockState state, IWorld world, BlockPos rootPos) {
 		
 		TreeFamily tree = getFamily(state, world, rootPos);
 		

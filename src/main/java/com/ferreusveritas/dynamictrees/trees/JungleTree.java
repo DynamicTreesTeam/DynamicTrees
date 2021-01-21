@@ -111,14 +111,7 @@ public class JungleTree extends VanillaTreeFamily {
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
-		
-		/*protected BiFunction<Integer, Integer, Integer> getRootScaler() {
-			return (inRadius, trunkRadius) -> {
-				float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-				return (int) (inRadius * scale);
-			};
-		}*/
-		
+
 		//Mega jungle are just jungle trees under special circumstances..  So they have the same seeds
 		@Override
 		public ItemStack getSeedStack(int qty) {
@@ -149,13 +142,10 @@ public class JungleTree extends VanillaTreeFamily {
 	}
 	
 	Species megaSpecies;
-	SurfaceRootBlock surfaceRootBlock;
-	
+
 	public JungleTree() {
 		super(DynamicTrees.VanillaWoodTypes.jungle);
 		canSupportCocoa = true;
-
-		surfaceRootBlock = new SurfaceRootBlock(Material.WOOD, getName() + "_root");
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.JUNGLE_LEAVES);
 	}
@@ -178,15 +168,8 @@ public class JungleTree extends VanillaTreeFamily {
 	}
 
 	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList = super.getRegisterableBlocks(blockList);
-		blockList.add(surfaceRootBlock);
-		return blockList;
-	}
-
-	@Override
-	public SurfaceRootBlock getSurfaceRoots() {
-		return surfaceRootBlock;
+	public boolean hasSurfaceRoot() {
+		return true;
 	}
 
 	@Override

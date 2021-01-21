@@ -18,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -30,12 +31,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +78,10 @@ public class TreeFamily {
 	//Branches
 	/** The dynamic branch used by this tree family */
 	private BranchBlock dynamicBranch;
+	/** The dynamic branch's block item */
+	private Item dynamicBranchItem;
+	/** The surface root used by this tree family */
+	private SurfaceRootBlock surfaceRoot;
 	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
 	private Block primitiveLog = Blocks.AIR;
 
@@ -103,7 +110,12 @@ public class TreeFamily {
 	public TreeFamily(ResourceLocation name) {
 		this.name = name;
 
-		setDynamicBranch(createBranch());
+		this.setDynamicBranch(createBranch()).setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+
+		if (this.hasSurfaceRoot()) {
+			this.setSurfaceRoot(this.createSurfaceRoot());
+		}
+
 		stick = Items.STICK;
 		createSpecies();
 	}
@@ -135,7 +147,7 @@ public class TreeFamily {
 	 * @param trunkPos
 	 * @return
 	 */
-	public Species getSpeciesForLocation(World access, BlockPos trunkPos) {
+	public Species getSpeciesForLocation(IWorld access, BlockPos trunkPos) {
 		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
 			Species species = override.getSpeciesForLocation(access, trunkPos);
 			if(species.isValid()) {
@@ -152,7 +164,7 @@ public class TreeFamily {
 	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 
 	public interface ISpeciesLocationOverride {
-		Species getSpeciesForLocation(World access, BlockPos trunkPos);
+		Species getSpeciesForLocation(IWorld access, BlockPos trunkPos);
 	}
 
 	///////////////////////////////////////////
@@ -181,6 +193,9 @@ public class TreeFamily {
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(getDynamicBranch());
+		if (this.hasSurfaceRoot()) {
+			blockList.add(getSurfaceRoot());
+		}
 		
 		getCommonSpecies().getSapling().ifPresent(blockList::add);
 		
@@ -197,7 +212,7 @@ public class TreeFamily {
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		//Register an itemBlock for the branch block
 		Block branch = getDynamicBranch();
-		itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
+		itemList.add(this.dynamicBranchItem);
 
 		getCommonSpecies().getSeed().ifPresent(itemList::add);
 
@@ -227,6 +242,10 @@ public class TreeFamily {
 		return isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
 	}
 
+	public Item createBranchItem (@Nonnull BranchBlock branch) {
+		return new BlockItem(branch, new Item.Properties()).setRegistryName(branch.getRegistryName());
+	}
+
 	protected TreeFamily setDynamicBranch(BranchBlock gBranch) {
 		dynamicBranch = gBranch;//Link the tree to the branch
 		dynamicBranch.setFamily(this);//Link the branch back to the tree
@@ -234,8 +253,17 @@ public class TreeFamily {
 		return this;
 	}
 
+	protected TreeFamily setDynamicBranchItem (Item branchItem) {
+		this.dynamicBranchItem = branchItem;
+		return this;
+	}
+
 	public BranchBlock getDynamicBranch() {
 		return dynamicBranch;
+	}
+
+	public Item getDynamicBranchItem() {
+		return dynamicBranchItem;
 	}
 
 	public boolean isThick() {
@@ -339,8 +367,22 @@ public class TreeFamily {
 	// SURFACE ROOTS
 	///////////////////////////////////////////
 
-	public SurfaceRootBlock getSurfaceRoots() {
-		return null;
+	public boolean hasSurfaceRoot () {
+		return false;
+	}
+
+	public SurfaceRootBlock createSurfaceRoot () {
+		String surfaceRootName = this.getName() + "_root";
+		return new SurfaceRootBlock(surfaceRootName, this.getDynamicBranchItem());
+	}
+
+	public SurfaceRootBlock getSurfaceRoot() {
+		return this.surfaceRoot;
+	}
+
+	protected TreeFamily setSurfaceRoot (SurfaceRootBlock surfaceRoot) {
+		this.surfaceRoot = surfaceRoot;
+		return this;
 	}
 
 	///////////////////////////////////////////
@@ -385,7 +427,7 @@ public class TreeFamily {
 		return false;
 	}
 
-	public boolean isCompatibleGenericLeaves(BlockState blockState, World blockAccess, BlockPos pos) {
+	public boolean isCompatibleGenericLeaves(BlockState blockState, IWorld blockAccess, BlockPos pos) {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
 
