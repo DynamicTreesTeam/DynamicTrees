@@ -268,7 +268,7 @@ public class TreeHelper {
 	 * @param signal The signal carrying the inspectors
 	 * @return true if a root block was found.
 	 */
-	public static boolean startAnalysisFromRoot(World world, BlockPos rootPos, MapSignal signal) {
+	public static boolean startAnalysisFromRoot(IWorld world, BlockPos rootPos, MapSignal signal) {
 		RootyBlock dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if(dirt != null) {
 			dirt.startAnalysis(world, rootPos, signal);

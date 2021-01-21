@@ -11,6 +11,8 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -38,7 +40,13 @@ public class SurfaceRootBlock extends Block {
 
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
 
-	public SurfaceRootBlock(Material material, String name) {
+	private final Item branchItem;
+
+	public SurfaceRootBlock(String name, Item branchItem) {
+		this(Material.WOOD, name, branchItem);
+	}
+
+	public SurfaceRootBlock(Material material, String name, Item branchItem) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
@@ -46,6 +54,7 @@ public class SurfaceRootBlock extends Block {
 				.sound(SoundType.WOOD));
 
 		this.setRegistryName(name);
+		this.branchItem = branchItem;
 	}
 
 	public class RootConnection {
@@ -56,6 +65,11 @@ public class SurfaceRootBlock extends Block {
 			this.level = level;
 			this.radius = radius;
 		}
+	}
+
+	@Override
+	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
+		return new ItemStack(this.branchItem);
 	}
 
 	///////////////////////////////////////////

@@ -35,7 +35,7 @@ public class FruitBlock extends Block implements IGrowable {
 	
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	
-	public static final String name = "fruitapple";
+	public static final String name = "apple_fruit";
 	public Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;

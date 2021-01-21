@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +16,7 @@ import net.minecraft.world.server.ServerWorld;
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
     public DynamicWartBlock() {
-        super(Properties.create(Material.ORGANIC).hardnessAndResistance(1.0F).sound(SoundType.WART).tickRandomly());
+        super(Properties.create(Material.PLANTS, MaterialColor.RED).sound(SoundType.WART).tickRandomly());
     }
 
     @Override

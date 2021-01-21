@@ -51,7 +51,7 @@ public class DTRegistries {
 	// BLOCKS
 	///////////////////////////////////////////
 
-	public static FruitBlock blockApple;
+	public static FruitBlock appleBlock;
 	public static CocoaFruitBlock cocoaFruitBlock;
 	public static BonsaiPotBlock bonsaiPotBlock;
 	public static TrunkShellBlock trunkShellBlock;
@@ -63,7 +63,7 @@ public class DTRegistries {
 	public static void setupBlocks() {
 		bonsaiPotBlock = new BonsaiPotBlock();//Bonsai Pot
 		cocoaFruitBlock = new CocoaFruitBlock();//Modified Cocoa pods
-		blockApple = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
+		appleBlock = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		trunkShellBlock = new TrunkShellBlock();
 
 		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRTLIKE);
@@ -108,7 +108,7 @@ public class DTRegistries {
 		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
 
-		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, blockApple, trunkShellBlock);
+		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
@@ -223,7 +223,7 @@ public class DTRegistries {
 
 	@SubscribeEvent
 	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
-//		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
+		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
 	}
 	
 }

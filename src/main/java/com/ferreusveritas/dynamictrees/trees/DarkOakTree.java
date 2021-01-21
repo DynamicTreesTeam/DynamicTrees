@@ -113,14 +113,10 @@ public class DarkOakTree extends VanillaTreeFamily {
 		}
 		
 	}
-	
-	SurfaceRootBlock surfaceRootBlock;
-	
+
 	public DarkOakTree() {
 		super(DynamicTrees.VanillaWoodTypes.dark_oak);
 		hasConiferVariants = true;
-		
-		surfaceRootBlock = new SurfaceRootBlock(Material.WOOD, getName() + "_root");
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.DARK_OAK_LEAVES);
 	}
@@ -136,15 +132,8 @@ public class DarkOakTree extends VanillaTreeFamily {
 	}
 
 	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		blockList = super.getRegisterableBlocks(blockList);
-		blockList.add(surfaceRootBlock);
-		return blockList;
+	public boolean hasSurfaceRoot() {
+		return true;
 	}
-	
-	@Override
-	public SurfaceRootBlock getSurfaceRoots() {
-		return surfaceRootBlock;
-	}
-	
+
 }

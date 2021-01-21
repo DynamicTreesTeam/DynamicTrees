@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -124,7 +126,12 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
         GroundFinder groundFinder = new GroundFinder();
         BlockPos groundPos = groundFinder.findOverworldGround(world, pos);
 
-        speciesSelection.getSpecies().generate(world, groundPos, world.getBiome(pos), rand, 8, new SafeChunkBounds(world, world.getChunk(pos).getPos()));
+        Species species = speciesSelection.getSpecies();
+
+        // For now, default to oak as biome data base doesn't work.
+        if (!species.isValid()) species = TreeRegistry.findSpecies(new ResourceLocation(DynamicTrees.MODID, "oak"));
+
+        species.generate(world, groundPos, world.getBiome(pos), rand, 8, new SafeChunkBounds(world, world.getChunk(pos).getPos()));
 
         return true;
     }

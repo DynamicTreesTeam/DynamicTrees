@@ -321,7 +321,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @param signal
 	 * @return
 	 */
-	public MapSignal startAnalysis(World world, BlockPos rootPos, MapSignal signal) {
+	public MapSignal startAnalysis(IWorld world, BlockPos rootPos, MapSignal signal) {
 		Direction dir = getTrunkDirection(world, rootPos);
 		BlockPos treePos = rootPos.offset(dir);
 		BlockState treeState = world.getBlockState(treePos);

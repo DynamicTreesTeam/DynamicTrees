@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
@@ -162,7 +161,7 @@ public class OakTree extends VanillaTreeFamily {
 			generateSeed();
 			generateSapling();
 			
-			addGenFeature(new FruitGenFeature(DTRegistries.blockApple).setRayDistance(4));
+			addGenFeature(new FruitGenFeature(DTRegistries.appleBlock).setRayDistance(4));
 		}
 		
 		@Override

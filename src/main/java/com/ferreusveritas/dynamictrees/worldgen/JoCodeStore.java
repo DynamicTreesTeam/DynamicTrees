@@ -56,7 +56,7 @@ public class JoCodeStore {
 			}
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			DynamicTrees.getLogger().warn("No JoCode file found for species \"" + species + "\" at location: " + filename);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
