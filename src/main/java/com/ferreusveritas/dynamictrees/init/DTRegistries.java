@@ -72,7 +72,7 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.FARMLAND, DirtHelper.DIRTLIKE, Blocks.DIRT);
 		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SANDLIKE);
 		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SANDLIKE);
-		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
+//		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
 		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATERLIKE);
 //		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARDCLAYLIKE);
 //		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARDCLAYLIKE);
@@ -81,8 +81,12 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUSLIKE);
 		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHERLIKE, new SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM));
 		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHERLIKE);
+		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHERLIKE);
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHERLIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHERLIKE);
+		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHERSOILLIKE);
+		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHERSOILLIKE);
+		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHERSOILLIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.ENDLIKE);
 
 		setupLeavesProperties();

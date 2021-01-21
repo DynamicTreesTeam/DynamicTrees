@@ -1,19 +1,4 @@
 {
-  "block.dynamictrees.rooty_dirt":"Tierra con raices",
-  "block.dynamictrees.rooty_coarse_dirt":"Tierra infértil con raices",
-  "block.dynamictrees.rooty_grass_block":"Pasto con raices",
-  "block.dynamictrees.rooty_podzol":"Podsol con raices",
-  "block.dynamictrees.rooty_mycelium":"Micelio con raices",
-  "block.dynamictrees.rooty_sand":"Arena con raices",
-  "block.dynamictrees.rooty_red_sand":"Arena roja con raices",
-
-  "block.dynamictrees.dynamic_oak_leaves":"Hojas de roble",
-  "block.dynamictrees.dynamic_spruce_leaves":"Hojas de abeto",
-  "block.dynamictrees.dynamic_birch_leaves":"Hojas de abedúl",
-  "block.dynamictrees.dynamic_jungle_leaves":"Hojas de jungla",
-  "block.dynamictrees.dynamic_dark_oak_leaves":"Hojas de roble oscuro",
-  "block.dynamictrees.dynamic_acacia_leaves":"Hojas de acacia",
-
   "block.dynamictrees.oak_branch":"Roble",
   "block.dynamictrees.spruce_branch":"Abeto",
   "block.dynamictrees.birch_branch":"Abedúl",
@@ -21,6 +6,8 @@
   "block.dynamictrees.dark_oak_branch":"Roble oscuro",
   "block.dynamictrees.acacia_branch":"Acacia",
   "block.dynamictrees.cactus_branch":"Cactus",
+  "block.dynamictrees.crimson_branch":"Hongo carmesí",
+  "block.dynamictrees.warped_branch":"Hongo distorsionado",
 
   "item.dynamictrees.oak_seed":"Bellota de roble",
   "item.dynamictrees.spruce_seed":"Piña de abeto",

@@ -1,0 +1,6 @@
+{
+	"multipart": [
+		{   "apply": { "model": "block/soul_soil" }},
+		{	"apply": { "model": "dynamictrees:block/roots" }}
+	]
+}

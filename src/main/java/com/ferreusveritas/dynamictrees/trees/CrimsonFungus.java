@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -25,7 +26,7 @@ public class CrimsonFungus extends VanillaTreeFamily {
 
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.FUNGUSLIKE);
+			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.NETHERSOILLIKE);
 		}
 
 		@Override
@@ -33,10 +34,17 @@ public class CrimsonFungus extends VanillaTreeFamily {
 			return BiomeDictionary.hasType(biome, Type.NETHER);
 		}
 
+		@Override
+		public SoundType getSaplingSound() {
+			return SoundType.FUNGUS;
+		}
 	}
 
 	public CrimsonFungus() {
-		super(DynamicTrees.VanillaWoodTypes.crimson);
+		this(DynamicTrees.VanillaWoodTypes.crimson);
+	}
+	public CrimsonFungus(DynamicTrees.VanillaWoodTypes type) {
+		super(type);
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.NETHER_WART_BLOCK);
 	}
 	

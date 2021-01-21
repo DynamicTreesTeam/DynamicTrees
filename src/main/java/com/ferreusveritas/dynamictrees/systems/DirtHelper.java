@@ -13,6 +13,7 @@ public class DirtHelper {
     public static final String GRAVELLIKE = "gravellike";
     public static final String WATERLIKE = "waterlike";
     public static final String NETHERLIKE = "netherlike";
+    public static final String NETHERSOILLIKE = "nethersoillike";
     public static final String ENDLIKE = "endlike";
     public static final String MUDLIKE = "mudlike";
     public static final String HARDCLAYLIKE = "hardclaylike";
@@ -31,6 +32,7 @@ public class DirtHelper {
         createNewAdjective(GRAVELLIKE);
         createNewAdjective(WATERLIKE);
         createNewAdjective(NETHERLIKE);
+        createNewAdjective(NETHERSOILLIKE);
         createNewAdjective(ENDLIKE);
         createNewAdjective(MUDLIKE);
         createNewAdjective(HARDCLAYLIKE);
@@ -47,7 +49,7 @@ public class DirtHelper {
     }
 
     public static void registerSoil(Block block, String adjName) {
-        registerSoil(block, adjName, RootyBlockHelper.isBlockRegistered(block)?null:new RootyBlock(block));
+        registerSoil(block, adjName, RootyBlockHelper.isBlockRegistered(block)?RootyBlockHelper.getRootyBlock(block):new RootyBlock(block));
     }
     public static void registerSoil(Block block, String adjName, Block rootyDirtSubstitute) {
         if (!RootyBlockHelper.isBlockRegistered(rootyDirtSubstitute)){
@@ -60,8 +62,11 @@ public class DirtHelper {
         if(adjectiveMap.containsKey(adjName)) {
             int flag = adjectiveMap.get(adjName);
             registerSoil(block, flag);
-            if (rootyDirt != null)
-                RootyBlockHelper.addToRootyBlocksMap(block, rootyDirt);
+            if (rootyDirt != null){
+                if (!RootyBlockHelper.isBlockRegistered(rootyDirt))
+                    RootyBlockHelper.addToRootyBlocksMap(block, rootyDirt);
+                registerSoil(rootyDirt, flag);
+            }
         } else {
             System.err.println("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
         }
@@ -71,7 +76,7 @@ public class DirtHelper {
     }
     public static void registerSoil(Block block, Block copyFlagsFrom) {
         if (dirtMap.containsKey(copyFlagsFrom))
-            dirtMap.put(block, dirtMap.get(copyFlagsFrom));
+            registerSoil(block, dirtMap.get(copyFlagsFrom));
         else
             System.err.println("Flags from " + copyFlagsFrom + " not found while registering soil block: " + block);
     }

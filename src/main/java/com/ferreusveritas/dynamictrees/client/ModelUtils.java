@@ -68,7 +68,10 @@ public class ModelUtils {
 	}
 
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-		return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resLoc);
+		return getTexture(resLoc, AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+	}
+	public static TextureAtlasSprite getTexture(ResourceLocation resLoc, ResourceLocation atlasResLoc) {
+		return Minecraft.getInstance().getAtlasSpriteGetter(atlasResLoc).apply(resLoc);
 	}
 
 }

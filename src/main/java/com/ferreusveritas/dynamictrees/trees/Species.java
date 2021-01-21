@@ -46,6 +46,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -143,8 +144,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	protected List<IPreGenFeature> preGenFeatures;
 	protected List<IPostGenFeature> postGenFeatures;
 	protected List<IPostGrowFeature> postGrowFeatures;
-	
-	public int saplingModelId;
+
+	private String unlocalizedName = "";
 	
 	/**
 	 * Constructor only used by NULLSPECIES
@@ -174,6 +175,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 */
 	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
 		setRegistryName(name);
+		setUnlocalizedName(name.toString());
 		this.treeFamily = treeFamily;
 		setLeavesProperties(leavesProperties);
 		
@@ -196,6 +198,19 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public TreeFamily getFamily() {
 		return treeFamily;
+	}
+
+	public Species setUnlocalizedName(String name) {
+		unlocalizedName = name;
+		return this;
+	}
+
+	public String getLocalizedName() {
+		return I18n.format(this.getUnlocalizedName());
+	}
+
+	public String getUnlocalizedName() {
+		return "species." + this.unlocalizedName;
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -537,7 +552,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		return false;
 	}
-	
+
 	public VoxelShape getSaplingShape() {
 		return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f));
 	}
@@ -1141,7 +1156,19 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			}
 		}
 	}
-	
+
+	/**
+	 * The Waila body is the part of the Waila display that shows the species and log/stick count
+	 *
+	 * @return true if the tree uses the default Waila body display. False if it has a custom one (disabling DT's display)
+	 */
+	public boolean useDefaultWailaBody (){
+		return true;
+	}
+
+	public boolean showSpeciesOnWaila (){
+		return this != getFamily().getCommonSpecies();
+	}
 	
 	///////////////////////////////////////////
 	// MEGANESS

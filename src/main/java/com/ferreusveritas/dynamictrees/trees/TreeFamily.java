@@ -180,14 +180,7 @@ public class TreeFamily {
 	 * We intentionally leave out leaves since they are shared between trees
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		if(isThick()) {
-			//TODO: This goes away as branch block will be flattened
-			ThickBranchBlock branch = (ThickBranchBlock) getDynamicBranch();
-			blockList.add(branch.getPairSide(false));
-			blockList.add(branch.getPairSide(true));
-		} else {
-			blockList.add(getDynamicBranch());
-		}
+		blockList.add(getDynamicBranch());
 		
 		getCommonSpecies().getSapling().ifPresent(blockList::add);
 		
@@ -205,12 +198,6 @@ public class TreeFamily {
 		//Register an itemBlock for the branch block
 		Block branch = getDynamicBranch();
 		itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
-
-		if(isThick()) {
-			//An ItemBlock must be registered in order for Waila to work properly
-			branch = ((ThickBranchBlock) branch).getPairSide(true);
-			itemList.add(new BlockItem(branch, new Item.Properties()).setRegistryName(Objects.requireNonNull(branch.getRegistryName())));
-		}
 
 		getCommonSpecies().getSeed().ifPresent(itemList::add);
 

@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.client;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -21,25 +23,13 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	private final ResourceLocation baseRingLocationAlternate;
 
 	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, ResourceLocation spriteName, ResourceLocation baseRingLocation) {
-		super(atlasTexture, new Info(spriteName, 32, 32, AnimationMetadataSection.EMPTY), 0, 32, 32, 0, 0, new NativeImage(32, 32, false));
+		super(atlasTexture, new Info(spriteName, 16, 16, AnimationMetadataSection.EMPTY), 0, 48*3, 48*3, 16, 16, new NativeImage(48, 48, false));
 
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = null;
-	}
 
-//	/**
-//	 * Given these two resources attempt to figure out which is the ringed texture.
-//	 *
-//	 * @param spriteName
-//	 * @param baseRingLocation
-//	 * @param baseRingLocationAlternate
-//	 */
-//	public ThickRingTextureAtlasSprite(ResourceLocation spriteName, ResourceLocation baseRingLocation, ResourceLocation baseRingLocationAlternate) {
-//		super(spriteName, 32, 32);
-//
-//		this.baseRingLocation = baseRingLocation;
-//		this.baseRingLocationAlternate = baseRingLocationAlternate;
-//	}
+		load();
+	}
 
 	@Override
 	public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
@@ -81,7 +71,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		PixelBuffer wide = new PixelBuffer(u * 14, u *  1);
 		PixelBuffer tall = new PixelBuffer(u *  1, u * 14);
 
-		int samples[] = new int[4];
+		int[] samples = new int[4];
 
 		//Sample top and bottom border
 		pixbuf.blit(wide, u * -1, u * -0);
@@ -106,8 +96,8 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		int innerColor = TextureUtils.avgColors(samples);
 
 		//Decompose pixels into an RGBA array
-		int cA[] = TextureUtils.decompose(borderColor);
-		int cB[] = TextureUtils.decompose(innerColor);
+		int[] cA = TextureUtils.decompose(borderColor);
+		int[] cB = TextureUtils.decompose(innerColor);
 
 		//Find the delta of the rgb components between the border and the middle, ingore alpha channel
 		int delR = cB[0] - cA[0];
@@ -118,31 +108,23 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		return delR * delR + delG * delG + delB * delB;
 	}
 
-	@Override
-	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-		TextureAtlasSprite baseTexture = textureGetter.apply(solveRingTexture(textureGetter));
-		int srcWidth = baseTexture.getWidth();
-		int srcHeight = baseTexture.getHeight();
-
-		int width = srcWidth * 3;
-		int height = srcHeight * 3;
+	private void load(){
+		Function<ResourceLocation, TextureAtlasSprite> getter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+		TextureAtlasSprite baseTexture = getter.apply(solveRingTexture(getter));
 
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
-		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
+		//PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 
-		NativeImage frame = new NativeImage(width, height, false);
+		NativeImage frame = basePixbuf.toNativeImage();
 
 		this.frames[0] = frame;
 		this.uploadMipmaps();
-
-//		// Load the pixels into the TextureAtlasSprite
-//		int mipmapLevels = baseTexture.getFrameCount();
-//		int[][] textureData = new int[mipmapLevels][];
-//		textureData[0] = majPixbuf.pixels;// only generate texture data for the first mipmap level, let Minecraft handle the rest
-//		this.setFramesTextureData(Lists.<int[][]>newArrayList(textureData));
-
-		return false;
 	}
+
+//	@Override
+//	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+//		return true;
+//	}
 
 	private PixelBuffer createMajorTexture(PixelBuffer baseBuffer) {
 
@@ -154,8 +136,8 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		PixelBuffer majPixbuf = new PixelBuffer(w, h);
 
 		//Compile a set of texture component pieces from the antecedent
-		PixelBuffer corners[] = new PixelBuffer[4];
-		PixelBuffer edges[] = new PixelBuffer[4];
+		PixelBuffer[] corners = new PixelBuffer[4];
+		PixelBuffer[] edges = new PixelBuffer[4];
 		for(int i = 0; i < 4; i++) {
 			corners[i] = new PixelBuffer(6 * scale, 6 * scale);
 			edges[i] = new PixelBuffer(4 * scale, 6 * scale);
@@ -170,10 +152,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 			int edge = 2;
 			int pixbufSel = 0;
 			for(Direction dir : CoordUtils.HORIZONTALS) { //SWNE
-				Direction out = dir;
 				Direction ovr = dir.rotateY();
-				int offX = out.getXOffset();
-				int offY = out.getZOffset();
+				int offX = dir.getXOffset();
+				int offY = dir.getZOffset();
 				int compX = (offX == 1 ? -6 : 0) + (dir.getAxis() == Axis.Z ? -2 : 0);
 				int compY = (offY == 1 ? -6 : 0) + (dir.getAxis() == Axis.X ? -2 : 0);
 				int startX = offX * (14 + nesting * 6);
@@ -192,8 +173,8 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		}
 
 		//Create corners
-		int cornerX[] = new int[]{ -1,  1,  1, -1 };
-		int cornerY[] = new int[]{ -1, -1,  1,  1 };
+		int[] cornerX = new int[]{ -1,  1,  1, -1 };
+		int[] cornerY = new int[]{ -1, -1,  1,  1 };
 		antPixbuf.blit(majPixbuf, 16 * scale, 16 * scale);
 		for(int nesting = 1; nesting < 4; nesting++) {
 			for(int corner = 0; corner < 4; corner++) {

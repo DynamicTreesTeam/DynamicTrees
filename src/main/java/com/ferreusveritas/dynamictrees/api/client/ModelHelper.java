@@ -29,9 +29,6 @@ public class ModelHelper {
 		ModelResourceLocation modelLocation = getBranchModelResourceLocation(branchBlock);
 
 		setGenericStateMapper(branchBlock, modelLocation);
-		if(branchBlock instanceof ThickBranchBlock) {
-			setGenericStateMapper(((ThickBranchBlock) branchBlock).otherBlock, modelLocation);
-		}
 
 		SurfaceRootBlock surfaceRoot = tree.getSurfaceRoots();
 		if(surfaceRoot != null) {
@@ -54,10 +51,6 @@ public class ModelHelper {
 	public static void regModel(Block block) {
 		if(block != Blocks.AIR) {
 			regModel(Item.getItemFromBlock(block));
-		}
-		if (block instanceof ThickBranchBlock) {
-			Item item = Item.BLOCK_TO_ITEM.get(((ThickBranchBlock) block).otherBlock);
-			regModel(item, 0, block.getRegistryName());
 		}
 	}
 

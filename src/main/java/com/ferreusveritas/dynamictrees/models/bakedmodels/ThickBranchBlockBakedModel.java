@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
+import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -46,15 +48,19 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 	public void setupModels() {
 		super.setupModels();
 
-		TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
-		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(this.thickRingsResLoc);
+		TextureAtlasSprite ringsTexture = ModelUtils.getTexture(ringsResLoc);
+		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc);
 
-		for (int i = 0; i < 16; i++) {
-			int radius = i + 9;
+		if (thickRingsTexture == null){
+			thickRingsTexture = ringsTexture;
+		}
+
+		for (int i = 0; i < ThickBranchBlock.RADMAX_THICK-ThickBranchBlock.RADMAX_NORMAL; i++) {
+			int radius = i + ThickBranchBlock.RADMAX_NORMAL + 1;
 			trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);
 			trunksTopBark[i] = bakeTrunkBark(radius, this.barkTexture, false);
-			trunksTopRings[i] = bakeTrunkRings(radius, /*DTConfigs.fancyThickRings.get() ? thickRingsTexture : */ringsTexture, Direction.UP);
-			trunksBotRings[i] = bakeTrunkRings(radius, /*DTConfigs.fancyThickRings.get() ? thickRingsTexture : */ringsTexture, Direction.DOWN);
+			trunksTopRings[i] = bakeTrunkRings(radius, DTConfigs.fancyThickRings.get() ? thickRingsTexture : ringsTexture, Direction.UP);
+			trunksBotRings[i] = bakeTrunkRings(radius, DTConfigs.fancyThickRings.get() ? thickRingsTexture : ringsTexture, Direction.DOWN);
 		}
 	}
 

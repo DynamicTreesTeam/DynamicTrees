@@ -5,6 +5,6 @@
 	"jungle":	{"leaves":"minecraft:jungle_leaves", "light":12 },
 	"acacia":	{"leaves":"minecraft:acacia_leaves", "cellkit":"acacia", "smother":2 },
 	"dark_oak":	{"leaves":"minecraft:dark_oak_leaves", "cellkit":"dark_oak", "smother":3 },
-	"crimson":	{"leaves":"minecraft:nether_wart_block", "light":4, "foliageType": "wart" },
-	"warped":	{"leaves":"minecraft:warped_wart_block", "light":4, "foliageType": "wart" }
+	"crimson":	{"leaves":"minecraft:nether_wart_block", "light":0, "foliageType": "wart" },
+	"warped":	{"leaves":"minecraft:warped_wart_block", "light":0, "foliageType": "wart" }
 }

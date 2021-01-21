@@ -13,12 +13,14 @@ import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 import mcp.mobius.waila.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -58,6 +60,10 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 			species = getWailaSpecies(accessor.getWorld(), pos);
 		}
 
+		if (!species.useDefaultWailaBody()){
+			return;
+		}
+
 		if(!lastPos.equals(pos)) {
 			lastVolume = getTreeVolume(accessor.getWorld(), pos);
 		}
@@ -67,7 +73,13 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 		lastPos = pos;
 
 		if(species != Species.NULLSPECIES) {
-			tooltip.add(new StringTextComponent("Species: " + species.getRegistryName().getPath()));
+			if(species.showSpeciesOnWaila()) {
+				tooltip.add(new StringTextComponent("Species: " + species.getLocalizedName()));
+			}
+
+			if(Minecraft.getInstance().gameSettings.advancedItemTooltips) {
+				tooltip.add(new StringTextComponent(TextFormatting.DARK_GRAY + species.getRegistryName().toString()));
+			}
 
 			ItemStack seedStack = species.getSeedStack(1);
 

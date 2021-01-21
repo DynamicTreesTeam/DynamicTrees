@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.models.geometry;
 
-import com.ferreusveritas.dynamictrees.event.TextureGenerationHandler;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.CactusBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.ThickBranchBlockBakedModel;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,7 +22,7 @@ public class ThickBranchBlockModelGeometry extends BranchBlockModelGeometry {
     public ThickBranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
         super(barkResLoc, ringsResLoc);
 
-        this.thickRingsResLoc = TextureGenerationHandler.addRingTextureLocation(ringsResLoc);
+        this.thickRingsResLoc = ThickRingAtlasTextureManager.addRingTextureLocation(ringsResLoc);
     }
 
     @Override

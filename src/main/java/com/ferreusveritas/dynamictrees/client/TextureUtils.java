@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.client;
 
 import java.util.Arrays;
 
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class TextureUtils {
@@ -38,7 +39,17 @@ public class TextureUtils {
 			this.h = other.h;
 			this.pixels = Arrays.copyOf(other.pixels, other.pixels.length);
 		}
-		
+
+		public NativeImage toNativeImage (){
+			NativeImage image = new NativeImage(w, h, false);
+			for (int x=0; x<w; x++) {
+				for (int y=0; y<h; y++) {
+					image.setPixelRGBA(x, y, getPixel(x, y));
+				}
+			}
+			return image;
+		}
+
 		public int calcPos(int offX, int offY) {
 			return offY * w + offX;
 		}

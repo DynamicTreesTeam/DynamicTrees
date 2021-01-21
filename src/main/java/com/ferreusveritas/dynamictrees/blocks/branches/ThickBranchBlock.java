@@ -10,6 +10,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -25,17 +26,16 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //TODO: 1.14.4 This gets flattened into the normal block branch with radius 1 - 32 and eliminated 
 
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 //	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
-	public static final int RADMAX_THICK = 32;
+	public static final int RADMAX_THICK = 24;
 
-	protected static final IntegerProperty RADIUSNYBBLE = IntegerProperty.create("radius", 0, 15); //39 ?
-	protected final boolean extended;
-	public ThickBranchBlock otherBlock;
+	protected static final IntegerProperty RADIUSDOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
 	public ThickBranchBlock(String name) {
 		this(Properties.create(Material.WOOD),name);
@@ -43,20 +43,13 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	public ThickBranchBlock(Properties properties, String name) {
 		this(properties, name, false);
-		otherBlock = new ThickBranchBlock(properties, name + "_thick", true);
-		otherBlock.otherBlock = this;
 
 		cacheBranchThickStates();
 	}
 
 	protected ThickBranchBlock(Properties properties, String name, boolean extended) {
 		super(properties, name);
-		this.setDefaultState(this.getDefaultState().with(RADIUSNYBBLE, 1));
-		this.extended = extended;
-	}
-
-	public ThickBranchBlock getPairSide(boolean ext) {
-		return extended ^ ext ? otherBlock : this;
+		this.setDefaultState(this.getDefaultState().with(RADIUSDOUBLE, 1));
 	}
 
 	public TrunkShellBlock getTrunkShell (){
@@ -68,95 +61,60 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	public void cacheBranchStates() { }
 
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUSNYBBLE);
+		builder.add(RADIUSDOUBLE);
 	}
 
 	public void cacheBranchThickStates() {
-		setDefaultState(this.getStateContainer().getBaseState().with(RADIUSNYBBLE, 0));
+		setDefaultState(this.getStateContainer().getBaseState().with(RADIUSDOUBLE, 1));
 
-		if(!extended) {
-			branchStates = new BlockState[RADMAX_THICK + 1];
-			otherBlock.branchStates = branchStates;
+		branchStates = new BlockState[RADMAX_THICK + 1];
 
-			//Cache the branch blocks states for rapid lookup
-			branchStates[0] = Blocks.AIR.getDefaultState();
+		//Cache the branch blocks states for rapid lookup
+		branchStates[0] = Blocks.AIR.getDefaultState();
 
-			for(int radius = 1; radius <= RADMAX_THICK; radius++) {
-				branchStates[radius] = getPairSide(radius > 16).getDefaultState().with(ThickBranchBlock.RADIUSNYBBLE, (radius - 1) & 0x0f);
-			}
+		for(int radius = 1; radius <= RADMAX_THICK; radius++) {
+			branchStates[radius] = getDefaultState().with(ThickBranchBlock.RADIUSDOUBLE, radius);
 		}
 	}
-//
-//	public IProperty<?>[] getIgnorableProperties() {
-//		return new IProperty<?>[]{ RADIUSNYBBLE };
-//	}
 
-
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		if(extended) {
-			return this.otherBlock.getPickBlock(otherBlock.getDefaultState(), target, world, pos, player);
-		}
-
-		return super.getPickBlock(state, target, world, pos, player);
+	@Nullable
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(RADIUSDOUBLE, 1);
 	}
-
-	@Override
-	public void setFamily(TreeFamily tree) {
-		super.setFamily(tree);
-		if (!extended) otherBlock.setFamily(tree);
-	}
-
-	///////////////////////////////////////////
-	// BLOCKSTATES
-	///////////////////////////////////////////
-
-//	//////////////////////////////////////////////////
-//	//The following is highly experimental code
-//	//////////////////////////////////////////////////
-//	class StateImplementationCachedRadius extends StateImplementation {
-//		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap < IProperty<?>, Comparable<? >> propertiesIn) { super(blockIn, propertiesIn); }
-//		protected StateImplementationCachedRadius(Block blockIn, ImmutableMap<IProperty<?>, Comparable<?>> propertiesIn, ImmutableTable<IProperty<?>, Comparable<?>, BlockState> propertyValueTable) { super(blockIn, propertiesIn, propertyValueTable); }
-//
-//		private int radius = -1;
-//		int getRadius() {
-//			return radius;
-//		}
-//	}
-//
-//	class BlockStateContainerCustom extends BlockStateContainer {
-//		public BlockStateContainerCustom(Block blockIn, IProperty<?>... properties) { this(blockIn, properties, null); }
-//		protected BlockStateContainerCustom(Block blockIn, IProperty<?>[] properties, ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties) { super(blockIn, properties, unlistedProperties); }
-//
-//		@Override
-//		protected StateImplementation createState(Block block, ImmutableMap<IProperty<?>, Comparable<?>> properties, ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties) {
-//			return new StateImplementationCachedRadius(block, properties);
-//		}
-//	}
-//	//////////////////////////////////////////////////
-//	//end highly experimental code
-//	//////////////////////////////////////////////////
-
 
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
 
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? MathHelper.clamp(blockState.get(RADIUSNYBBLE) + (((ThickBranchBlock)blockState.getBlock()).extended ? 17 : 1), 1, getMaxRadius()) : 0;
+		return blockState.getBlock() == this ? MathHelper.clamp(blockState.get(RADIUSDOUBLE), 1, getMaxRadius()) : 0;
 	}
 
 	@Override
 	public int setRadius(World world, BlockPos pos, int radius, Direction originDir, int flags) {
 
-		//If the radius is <= 8 then we can just set the block as normal and move on
-		if(radius <= RADMAX_NORMAL) {
+		if (updateTrunkShells(world, pos, radius, flags)){
 			return super.setRadius(world, pos, radius, originDir, flags);
+		} else {
+			return super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
 		}
 
-		ReplaceableState repStates[] = new ReplaceableState[8];
+	}
+
+	@Override
+	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+		updateTrunkShells(worldIn, pos, getRadius(state), 6);
+		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
+	}
+
+	private boolean updateTrunkShells (World world, BlockPos pos, int radius, int flags){
+		//If the radius is <= 8 then we can just set the block as normal and move on
+		if(radius <= RADMAX_NORMAL) {
+			return true;
+		}
 
 		boolean setable = true;
+		ReplaceableState[] repStates = new ReplaceableState[8];
 
 		for(Surround dir : Surround.values()) {
 			BlockPos dPos = pos.add(dir.getOffset());
@@ -169,8 +127,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 		}
 
 		if(setable) {
-			int setRadius = super.setRadius(world, pos, radius, originDir, flags);
-
 			for(Surround dir : Surround.values()) {
 				BlockPos dPos = pos.add(dir.getOffset());
 				ReplaceableState rep = repStates[dir.ordinal()];
@@ -178,16 +134,14 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 					world.setBlockState(dPos, getTrunkShell().getDefaultState().with(TrunkShellBlock.COREDIR, dir.getOpposite()), flags);
 				}
 			}
-			return setRadius;
-		} else {
-			return super.setRadius(world, pos, RADMAX_NORMAL, originDir, flags);
+			return true;
 		}
-
+		return false;
 	}
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		if (from == this || from == this.otherBlock) {
+		if (from == this) {
 			return getRadius(blockState);
 		}
 

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.CactusBlockModelLoader;
@@ -30,6 +31,8 @@ public final class BakedModelEvents {
 
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent event) {
+        //ThickRingAtlasTextureManager.uploadToAtlas();
+
         BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
     }
 
