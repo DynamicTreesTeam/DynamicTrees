@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
  * @author Harley O'Connor
  */
 @Mod.EventBusSubscriber(modid = DynamicTrees.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class BakedModelEvents {
+public final class BakedModelEventHandler {
 
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelRegistryEvent event) {

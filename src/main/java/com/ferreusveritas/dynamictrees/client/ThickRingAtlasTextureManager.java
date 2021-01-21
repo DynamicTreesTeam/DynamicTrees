@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.*;
 import java.util.function.Function;
 
-@Mod.EventBusSubscriber(modid = DynamicTrees.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ThickRingAtlasTextureManager {
 
     /**
@@ -32,11 +31,9 @@ public class ThickRingAtlasTextureManager {
 		thickRingTextures.put(ringsRes, outputRes);
 		return outputRes;
 	}
-    @SubscribeEvent
-    public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-        for(ResourceLocation resloc : thickRingTextures.values()){
-            event.addSprite(resloc);
-        }
+
+	public static Collection<ResourceLocation> getThickRingResourceLocations (){
+	    return thickRingTextures.values();
     }
 
 //

@@ -513,18 +513,22 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 		return false;
 	}
-	
+
+	//This is for the sapling.
+	//If false is returned the sapling will not grow and bonemeal will not work
+	public boolean canSaplingGrow(World world, BlockPos pos) {return true;}
+
 	//This is for the sapling.
 	//If false is returned then nothing happens.
 	//If true is returned canUseBoneMealNow is run then the bonemeal is consumed regardless of it's return.
-	public boolean canGrowWithBoneMeal(World world, BlockPos pos) {
-		return canBoneMeal();
+	public boolean canSaplingUseBoneMeal(World world, BlockPos pos) {
+		return canBoneMeal() && canSaplingGrow(world, pos);
 	}
 	
 	//This is for the sapling.
 	//Return weather or not the bonemealing should cause growth
-	public boolean canUseBoneMealNow(World world, Random rand, BlockPos pos) {
-		return canBoneMeal();
+	public boolean canSaplingGrowBoneMeal(World world, Random rand, BlockPos pos) {
+		return canBoneMeal() && canSaplingGrow(world, pos);
 	}
 	
 	//This is for the tree itself.
