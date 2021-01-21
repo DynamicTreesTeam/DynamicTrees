@@ -162,7 +162,7 @@ public class DTRegistries {
 				.build(FALLING_TREE);
 
 		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)
-				.build(FALLING_TREE);
+				.build(LINGERING_EFFECTOR);
 	}
 	
 	@SubscribeEvent

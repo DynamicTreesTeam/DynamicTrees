@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
@@ -174,6 +175,7 @@ public class DTClient {
 	
 	private static void registerEntityRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.fallingTree, new FallingTreeRenderer.Factory());
+		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.lingeringEffector, new LingeringEffectorRenderer.Factory());
 	}
 	
 	private static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {

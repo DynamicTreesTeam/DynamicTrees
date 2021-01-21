@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A storage class for {@link JoCode} objects.
@@ -39,7 +37,7 @@ public class JoCodeStore {
 	
 	public void addCodesFromFile(Species species, String filename) {
 		try {
-			Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Loading Tree Codes for species \"" + species + "\" from file: " + filename);
+			DynamicTrees.getLogger().debug("Loading Tree Codes for species \"" + species + "\" from file: " + filename);
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
 			if(stream != null) {
 				InputStreamReader streamReader = new InputStreamReader(stream, "UTF-8");
