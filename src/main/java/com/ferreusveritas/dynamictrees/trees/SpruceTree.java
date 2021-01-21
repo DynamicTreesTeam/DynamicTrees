@@ -128,12 +128,7 @@ public class SpruceTree extends VanillaTreeFamily {
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.SPRUCE_LEAVES);
 		
 		//This will cause the mega spruce to be planted if the player is in a mega taiga biome
-		addSpeciesLocationOverride((access, trunkPos) -> {
-			if(Species.isOneOfBiomes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, access.getBiome(trunkPos).getRegistryName()), Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA_HILLS)) {
-				return megaSpecies;
-			}
-			return Species.NULLSPECIES;
-		});
+		addSpeciesLocationOverride((world, trunkPos) -> isLocationForMega(world, trunkPos) ? megaSpecies : Species.NULLSPECIES);
 		
 	}
 	

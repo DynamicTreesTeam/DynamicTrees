@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 
 import java.util.Map;
@@ -9,6 +12,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumC
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -17,11 +21,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.Dimension;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
@@ -32,9 +33,9 @@ public class TreeGenerator {
 
 	protected final BiomeDataBase defaultBiomeDataBase;
 	public static final BiomeDataBase DIMENSIONBLACKLISTED = new BiomeDataBase();
-//	protected final PoissonDiscProviderUniversal circleProvider;
+	protected final PoissonDiscProviderUniversal circleProvider;
 	protected final RandomXOR random = new RandomXOR();
-	protected final Map<ResourceLocation, BiomeDataBase> dimensionMap = new HashMap<>();
+	protected final Map<DimensionType, BiomeDataBase> dimensionMap = new HashMap<>();
 
 	public static void setup() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
@@ -45,27 +46,27 @@ public class TreeGenerator {
 	public TreeGenerator() {
 		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
 		defaultBiomeDataBase = new BiomeDataBase();
-//		circleProvider = new PoissonDiscProviderUniversal();
+		circleProvider = new PoissonDiscProviderUniversal();
 	}
 
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
 	}
 
-	public BiomeDataBase getBiomeDataBase(ResourceLocation dimensionLocation) {
-		return dimensionMap.getOrDefault(dimensionLocation, getDefaultBiomeDataBase());
+	public BiomeDataBase getBiomeDataBase(DimensionType dimensionType) {
+		return dimensionMap.getOrDefault(dimensionType, getDefaultBiomeDataBase());
 	}
 
-	public BiomeDataBase getBiomeDataBase(World world) {
-		return getBiomeDataBase(world.getDimensionKey().getLocation());
+	public BiomeDataBase getBiomeDataBase(IWorld world) {
+		return getBiomeDataBase(world.getDimensionType());
 	}
 
 	public BiomeDataBase getDefaultBiomeDataBase() {
 		return defaultBiomeDataBase;
 	}
 
-	public void linkDimensionToDataBase(ResourceLocation dimensionLocation, BiomeDataBase dBase) {
-		dimensionMap.put(dimensionLocation, dBase);
+	public void linkDimensionToDataBase(DimensionType dimensionType, BiomeDataBase dBase) {
+		dimensionMap.put(dimensionType, dBase);
 	}
 
 //	public void BlackListDimension(Dimension dimension) {
@@ -108,9 +109,9 @@ public class TreeGenerator {
 
 	}
 
-//	public PoissonDiscProviderUniversal getCircleProvider() {
-//		return circleProvider;
-//	}
+	public PoissonDiscProviderUniversal getCircleProvider() {
+		return circleProvider;
+	}
 
 	public void makeWoolCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
 		makeWoolCircle(world, circle, h, resultType, safeBounds, 0);
@@ -159,15 +160,14 @@ public class TreeGenerator {
 
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 
-		SpeciesSelection speciesSelection = biomeEntry.getSpeciesSelector().getSpecies(pos, dirtState, random);
+		BiomePropertySelectors.ISpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+		SpeciesSelection speciesSelection = speciesSelector.getSpecies(pos, dirtState, random);
 		if(speciesSelection.isHandled()) {
 			Species species = speciesSelection.getSpecies();
 			if(species.isValid()) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if(species.generate(world, pos, biome, random, circle.radius, safeBounds)) {
-							result = EnumGeneratorResult.GENERATED;
-						} else {
+						if(!species.generate(world, pos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.FAILGENERATION;
 						}
 					} else {

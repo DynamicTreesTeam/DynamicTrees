@@ -119,19 +119,13 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-		BiomeDataBase biomeDataBase = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
-		BiomeDataBase.BiomeEntry biomeEntry = biomeDataBase.getEntry(world.getBiome(pos));
-		BiomePropertySelectors.SpeciesSelection speciesSelection = biomeEntry.getSpeciesSelector().getSpecies(pos, world.getBlockState(pos), rand);
+		final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
+    	BiomeDataBase biomeDataBase = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
 
-        GroundFinder groundFinder = new GroundFinder();
-        BlockPos groundPos = groundFinder.findOverworldGround(world, pos);
-
-        Species species = speciesSelection.getSpecies();
-
-        // For now, default to oak as biome data base doesn't work.
-        if (!species.isValid()) species = TreeRegistry.findSpecies(new ResourceLocation(DynamicTrees.MODID, "oak"));
-
-        species.generate(world, groundPos, world.getBiome(pos), rand, 8, new SafeChunkBounds(world, world.getChunk(pos).getPos()));
+		final ChunkPos chunkPos = world.getChunk(pos).getPos();
+		final SafeChunkBounds chunkBounds = new SafeChunkBounds(world, chunkPos);
+		treeGenerator.getCircleProvider().getPoissonDiscs(world, chunkPos.x, 0, chunkPos.z).forEach(c ->
+				DynamicTrees.getLogger().debug(treeGenerator.makeTree(world, biomeDataBase, c, new GroundFinder(), chunkBounds)));
 
         return true;
     }

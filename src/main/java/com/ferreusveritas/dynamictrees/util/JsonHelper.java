@@ -17,7 +17,7 @@ public class JsonHelper {
 		String filename = "assets/" + jsonLocation.getNamespace() + "/" + jsonLocation.getPath();
 		InputStream in = new LeavesPaging().getClass().getClassLoader().getResourceAsStream(filename);
 		if(in == null) {
-			Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Could not open resource " + filename);
+			DynamicTrees.getLogger().fatal("Could not open resource " + filename);
 			return null;
 		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));

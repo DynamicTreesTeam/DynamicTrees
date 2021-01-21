@@ -107,7 +107,6 @@ public class BiomePropertySelectors {
 			decisionTable.add(new Entry(new SpeciesSelection(), weight));
 			totalWeight += weight;
 			return this;
-
 		}
 
 		@Override

@@ -2,10 +2,12 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.HashMap;
 import java.util.function.Function;
 
 public class BiomeDataBase {
@@ -20,11 +22,20 @@ public class BiomeDataBase {
 	
 	//A reasonably fast 16x16 sparse array 
 	private final BiomeEntry[][] table = new BiomeEntry[16][];
-	
+	private final HashMap<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
+
 	public BiomeEntry getEntry(Biome biome) {
-		if (biome != null) {
-			return new BiomeEntry(biome);
+		if (biome == null) {
+			return BADENTRY;
 		}
+
+		ResourceLocation biomeResLoc = biome.getRegistryName();
+
+		if (!this.biomeEntries.containsKey(biomeResLoc)) {
+			this.biomeEntries.put(biomeResLoc, new BiomeEntry(biome));
+		}
+
+		return this.biomeEntries.get(biomeResLoc);
 
 //		if(biome != null) {
 //			int biomeId = Biome.getIdForBiome(biome);//This should only return 0 - 255 because of Minecraft limitations
@@ -40,7 +51,6 @@ public class BiomeDataBase {
 //				return entry != BADENTRY ? entry : (list[biomeId & 0x0f] = new BiomeEntry(biome, biomeId));
 //			}
 //		}
-		return BADENTRY;
 	}
 	
 	public void clear() {
@@ -187,6 +197,7 @@ public class BiomeDataBase {
 					} );
 					break;
 			}
+//			biomeEntries.put(biome, entry);
 		}
 		return this;
 	}

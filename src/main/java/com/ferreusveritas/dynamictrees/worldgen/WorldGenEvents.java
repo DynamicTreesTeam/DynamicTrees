@@ -13,12 +13,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
  */
 public final class WorldGenEvents {
 
-//    @SubscribeEvent(priority = EventPriority.HIGH)
-//    public void addDynamicTrees (final BiomeLoadingEvent event) {
-//        if (event.getCategory() == Biome.Category.NETHER || event.getCategory() == Biome.Category.THEEND) return;
-//
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void addDynamicTrees (final BiomeLoadingEvent event) {
+        if (event.getCategory() == Biome.Category.NETHER || event.getCategory() == Biome.Category.THEEND) return;
+
 //        event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
-//    }
+    }
 
     /**
      * This is not an ideal way of removing trees, but it's the best way I've currently found.
