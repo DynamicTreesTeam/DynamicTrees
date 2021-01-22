@@ -187,11 +187,12 @@ public class DynamicTrees {
 		if(DTConfigs.replaceVanillaSapling.get()) {
 			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
 		}
-		
+
+		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
+
 		//Conveniently accessible disaster(Optional World Generation)
 		if(WorldGenRegistry.isWorldGenEnabled()) {
-			//GameRegistry.registerWorldGenerator(new WorldGeneratorTrees(), 20);
-			//MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
+			MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 		}
 	}
 

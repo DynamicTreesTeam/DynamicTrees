@@ -338,8 +338,13 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
 		BlockPos deltaPos = pos.offset(side);
-		BlockState blockState = blockAccess.getBlockState(deltaPos);
-		return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+		try {
+			BlockState blockState = blockAccess.getBlockState(deltaPos);
+			return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
+			System.out.println("X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
+			return 0;
+		}
 	}
 	
 	

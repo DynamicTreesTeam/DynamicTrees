@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -22,6 +23,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -210,9 +212,9 @@ public class JoCode {
 					return;//The entire tree rotted away before it had a chance
 				}
 				
-				//				//Allow for special decorations by the tree itself
-				//				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-				//				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
+				// Allow for special decorations by the tree itself
+				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 				
 				//Add snow to parts of the tree in chunks where snow was already placed
 				addSnow(leafMap, world, rootPos, biome);

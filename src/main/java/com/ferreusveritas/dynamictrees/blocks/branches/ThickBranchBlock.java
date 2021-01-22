@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.event.SafeChunkEvents;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -152,19 +153,25 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	@Override
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
 		BlockPos deltaPos = pos.offset(side);
-		BlockState blockState = blockAccess.getBlockState(deltaPos);
 
-		int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+		try {
 
-		if (radius > 8) {
-			if (side == Direction.DOWN) {
-				return connectionRadius >= radius ? 1 : 0;
-			} else if (side == Direction.UP) {
-				return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
+			BlockState blockState = blockAccess.getBlockState(deltaPos);
+			int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+
+			if (radius > 8) {
+				if (side == Direction.DOWN) {
+					return connectionRadius >= radius ? 1 : 0;
+				} else if (side == Direction.UP) {
+					return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
+				}
 			}
-		}
 
-		return Math.min(RADMAX_NORMAL, connectionRadius);
+			return Math.min(RADMAX_NORMAL, connectionRadius);
+		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
+			System.out.println("X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
+			return 0;
+		}
 	}
 
 	public ReplaceableState getReplaceability(IWorld world, BlockPos pos, BlockPos corePos) {

@@ -36,21 +36,6 @@ public class BiomeDataBase {
 		}
 
 		return this.biomeEntries.get(biomeResLoc);
-
-//		if(biome != null) {
-//			int biomeId = Biome.getIdForBiome(biome);//This should only return 0 - 255 because of Minecraft limitations
-//			if (biomeId >= 0 && biomeId <= 255 ) {//Enforce 0-255 for biome id to account for misbehaving mods like Mystcraft
-//				BiomeEntry list[] = table[biomeId >> 4];
-//				if(list == null) {
-//					list = table[biomeId >> 4] = new BiomeEntry[16];
-//					for(int i = 0; i < 16; i++) {
-//						list[i] = BADENTRY;
-//					}
-//				}
-//				BiomeEntry entry = list[biomeId & 0x0f];
-//				return entry != BADENTRY ? entry : (list[biomeId & 0x0f] = new BiomeEntry(biome, biomeId));
-//			}
-//		}
 	}
 	
 	public void clear() {

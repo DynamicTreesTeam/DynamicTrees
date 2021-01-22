@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import com.ferreusveritas.dynamictrees.event.SafeChunkEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -7,6 +8,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkStatus;
 
 public class SafeChunkBounds {
 	
@@ -15,7 +17,7 @@ public class SafeChunkBounds {
 		public boolean inBounds(BlockPos pos, boolean gap) { return true; }
 	};
 	
-	protected static final Tile tiles[] = new Tile[16];
+	protected static final Tile[] tiles = new Tile[16];
 	
 	protected static class Tile {
 		public final ChunkPos pos;
@@ -39,7 +41,7 @@ public class SafeChunkBounds {
 	}
 	
 	private final ChunkPos center;
-	private BlockBounds chunkBounds[] = new BlockBounds[16];
+	private final BlockBounds[] chunkBounds = new BlockBounds[16];
 	
 	protected SafeChunkBounds() {
 		center = null;
@@ -50,7 +52,7 @@ public class SafeChunkBounds {
 
 		for(Tile t : tiles) {
 			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
-			boolean c = world.getChunkProvider().isChunkLoaded(new ChunkPos(cp.x, cp.z));
+			boolean c = world.getChunkProvider().getChunk(cp.x, cp.z, ChunkStatus.EMPTY, false) != null;
 			chunkBounds[t.index] = c ? new BlockBounds(cp) : BlockBounds.INVALID;
 		}
 
