@@ -44,15 +44,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-///**
-// *
-// * @author ferreusveritas
-// *
-// */
+/**
+ *
+ * @author ferreusveritas
+ *
+ */
 public class EntityFallingTree extends Entity implements IModelTracker {
-	
-	
-	
+
 	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_NBT);
 	
 	//Not needed in client

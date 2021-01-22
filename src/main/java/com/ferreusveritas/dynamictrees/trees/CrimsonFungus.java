@@ -30,7 +30,7 @@ public class CrimsonFungus extends VanillaTreeFamily {
 
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.FUNGUSLIKE);
+			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.NETHERSOILLIKE);
 		}
 
 		@Override

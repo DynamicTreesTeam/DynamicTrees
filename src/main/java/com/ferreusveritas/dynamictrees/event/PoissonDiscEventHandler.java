@@ -32,16 +32,12 @@ public class PoissonDiscEventHandler {
 	@SubscribeEvent
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
         IWorld world = event.getWorld();
-        try { // This can randomly start throwing NullPointers. Haven't figured out why yet.
-			if (!world.isRemote()) {
-				byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
-				PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
+		if (world != null && !world.isRemote()) {
+			byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
+			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
 
-				final ChunkPos chunkPos = event.getChunk().getPos();
-				cp.setChunkPoissonData(world, chunkPos.x, 0, chunkPos.z, circleData);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			final ChunkPos chunkPos = event.getChunk().getPos();
+			cp.setChunkPoissonData(world, chunkPos.x, 0, chunkPos.z, circleData);
 		}
 	}
 

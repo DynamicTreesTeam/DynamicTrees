@@ -47,6 +47,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -61,6 +62,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
@@ -70,6 +72,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -391,16 +394,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
 	 * a {@link DynamicLeavesBlock} directly by hand or with a tool.
 	 *
-	 * @param access
+	 * @param world
 	 * @param breakPos
 	 * @param dropList
 	 * @param fortune
 	 * @return
 	 */
-	public List<ItemStack> getLeavesDrops(World access, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
-		Random random = access instanceof World ? ((World)access).rand : new Random();
-		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
-		return dropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
+	public List<ItemStack> getLeavesDrops(World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+		Random random = world != null ? world.rand : new Random();
+		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
+		return dropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
 	}
 	
 	
@@ -414,12 +417,12 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param volume
 	 * @return
 	 */
-	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, float volume) {
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, float volume, ItemStack handStack) {
 		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
 	
-	public class LogsAndSticks {
+	public static class LogsAndSticks {
 		public final int logs;
 		public final int sticks;
 		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
@@ -432,7 +435,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	/**
-	 *
 	 * @param world
 	 * @param endPoints
 	 * @param rootPos
@@ -452,18 +454,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
 						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
 						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos, SafeChunkBounds.ANY);
-						
-						//						if(itemPos != BlockPos.ZERO) {
-						//							ItemEntity itemEntity = new ItemEntity(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
-						//							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
-						//							float distAngle = 15;//The spread angle(center to edge)
-						//							float launchSpeed = 4;//Blocks(meters) per second
-						//							motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f);
-						//							itemEntity.motionX = motion.x;
-						//							itemEntity.motionY = motion.y;
-						//							itemEntity.motionZ = motion.z;
-						//							return world.spawnEntity(itemEntity);
-						//						}
+
+						if(itemPos != BlockPos.ZERO) {
+							ItemEntity itemEntity = new ItemEntity(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+							Vector3d motion = new Vector3d(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vector3d(treePos.getX(), treePos.getY(), treePos.getZ()));
+							float distAngle = 15;//The spread angle(center to edge)
+							float launchSpeed = 4;//Blocks(meters) per second
+							motion = new Vector3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed/20f);
+							itemEntity.setMotion(motion.x, motion.y, motion.z);
+							return world.addEntity(itemEntity);
+						}
 					}
 				}
 			}
@@ -560,7 +560,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	//This is used to load the sapling model
 	public ResourceLocation getSaplingName() {
-		return getRegistryName();
+		if (getRegistryName() == null) return null;
+		return new ResourceLocation(getRegistryName().getNamespace(), getRegistryName().getPath() + "_sapling");
 	}
 	
 	public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {
@@ -586,7 +587,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 
 		if (dirt instanceof RootyBlock) {
-			this.placeRootyDirtBlock(world, rootPos, ((RootyBlock) dirt).getPrimitiveDirt(), life);
+			this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, life);
 		} else if (RootyBlockHelper.isBlockRegistered(dirt)) {
 			this.placeRootyDirtBlock(world, rootPos, dirt, life);
 		}
@@ -781,7 +782,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
 	
-	static private final Direction upFirst[] = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+	static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 	
 	/**
 	 * Handle rotting branches
@@ -905,7 +906,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			return Direction.UP;
 		}
 		
-		int probMap[] = new int[6];//6 directions possible DUNSWE
+		int[] probMap = new int[6];//6 directions possible DUNSWE
 		
 		//Probability taking direction into account
 		probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability(): 0;//Favor up
@@ -931,7 +932,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	/** Species can override the probability map here **/
-	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int probMap[]) {
+	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
 		return getGrowthLogicKit().directionManipulation(world, pos, this, radius, signal, probMap);
 	}
 	
@@ -978,8 +979,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		return false;
 	}
-	
-	
+
+
 	//////////////////////////////
 	// BIOME HANDLING
 	//////////////////////////////

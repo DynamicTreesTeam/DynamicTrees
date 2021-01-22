@@ -44,29 +44,29 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 	public void render(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
 		super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
 
-//		if(!entity.isClientBuilt() || !entity.shouldRender()) {
-//			return;
-//		}
-//
-//		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
-//
-//		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
-//
-//		int brightnessIn = FallingTreeEntityModel.getBrightness(entity);
-//
+		if(!entity.isClientBuilt() || !entity.shouldRender()) {
+			return;
+		}
+
+		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
+
+		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
+
+		int brightnessIn = FallingTreeEntityModel.getBrightness(entity);
+
 //		GlStateManager.disableLighting();
-//		GlStateManager.pushMatrix();
+		GlStateManager.pushMatrix();
 //		GlStateManager.translated(entity.getPosX(), entity.getPosY(), entity.getPosZ());
-//
-//		if(entity.onFire) {
-//			renderFire(matrixStack);
-//		}
-//
-//		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
-//
-//		drawBakedQuads(treeModel.getQuads(), matrixStack, brightnessIn, treeModel.getLeavesColor());
-//
-//		GlStateManager.popMatrix();
+
+		if(entity.onFire) {
+			renderFire(matrixStack);
+		}
+
+		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
+
+		drawBakedQuads(treeModel.getQuads(), matrixStack, brightnessIn, treeModel.getLeavesColor());
+
+		GlStateManager.popMatrix();
 //		GlStateManager.enableLighting();
 	}
 
@@ -100,27 +100,18 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 					g *= diffuse;
 					b *= diffuse;
 				}
-				// this could be replacement for putColorMultiplier?
+
 				buffer.color(r, g, b, 4);
 				buffer.color(r, g, b, 3);
 				buffer.color(r, g, b, 2);
 				buffer.color(r, g, b, 1);
-//				buffer.putColorMultiplier(r, g, b, 4);
-//				buffer.putColorMultiplier(r, g, b, 3);
-//				buffer.putColorMultiplier(r, g, b, 2);
-//				buffer.putColorMultiplier(r, g, b, 1);
 			} else if(bakedQuad.applyDiffuseLighting()) {
 				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
-				// this could be replacement for putColorMultiplier?
+
 				buffer.color(diffuse, diffuse, diffuse, 4);
 				buffer.color(diffuse, diffuse, diffuse, 3);
 				buffer.color(diffuse, diffuse, diffuse, 2);
 				buffer.color(diffuse, diffuse, diffuse, 1);
-
-//				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
-//				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);
-//				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 2);
-//				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 1);
 			}
 			
 		}

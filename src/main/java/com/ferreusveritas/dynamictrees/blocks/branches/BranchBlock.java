@@ -351,11 +351,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
-	
+
 	public List<net.minecraft.item.ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume) {
-		List<net.minecraft.item.ItemStack> ret = new ArrayList<net.minecraft.item.ItemStack>();//A list for storing all the dead tree guts
+		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
+	}
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume, ItemStack handStack) {
+		List<ItemStack> ret = new ArrayList<net.minecraft.item.ItemStack>();//A list for storing all the dead tree guts
 		volume *= DTConfigs.treeHarvestMultiplier.get();// For cheaters.. you know who you are.
-		return species.getLogsDrops(world, pos, ret, volume);
+		return species.getLogsDrops(world, pos, ret, volume, handStack);
 	}
 
 	@Override
@@ -375,7 +378,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
-		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor);
+		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor, heldItem);
 		
 		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
 			entity.setActiveHand(Hand.MAIN_HAND);//Players do things with hands.

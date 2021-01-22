@@ -172,26 +172,25 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 				BlockState newState = world.getBlockState(rootPos);
 				
 				if(!TreeHelper.isRooty(newState)) { //Make sure we're not still a rooty block
-					/*if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
-						return;
-					}*/
-					
-					Biome biome = world.getBiome(rootPos);
-					
-					BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
-					BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnder();
-					
-					BlockState mimic = primitiveDirt.getDefaultState();//getMimic(world, rootPos);
-					
-					if(mimic == topBlock || mimic == fillerBlock) {
-						world.setBlockState(rootPos, mimic);
-					}
-					else if(topBlock.getMaterial() == newState.getMaterial()) {
-						world.setBlockState(rootPos, topBlock);
-					}
-					else if(fillerBlock.getMaterial() == newState.getMaterial()) {
-						world.setBlockState(rootPos, fillerBlock);
-					}
+					world.setBlockState(rootPos, getDecayBlockState(world, rootPos));
+//					if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
+//						return;
+//					}
+//					Biome biome = world.getBiome(rootPos);
+//
+//					BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
+//					BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnder();
+
+
+//					if(mimic == topBlock || mimic == fillerBlock) {
+//						world.setBlockState(rootPos, mimic);
+//					}
+//					else if(topBlock.getMaterial() == newState.getMaterial()) {
+//						world.setBlockState(rootPos, topBlock);
+//					}
+//					else if(fillerBlock.getMaterial() == newState.getMaterial()) {
+//						world.setBlockState(rootPos, fillerBlock);
+//					}
 				}
 			}
 		}

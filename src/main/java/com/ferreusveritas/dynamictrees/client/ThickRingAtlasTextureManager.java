@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -32,11 +33,15 @@ public class ThickRingAtlasTextureManager {
 		return outputRes;
 	}
 
-	public static Collection<ResourceLocation> getThickRingResourceLocations (){
-	    return thickRingTextures.values();
+	public static Set<Map.Entry<ResourceLocation, ResourceLocation>> getThickRingResourceLocations (){
+	    return thickRingTextures.entrySet();
     }
 
-//
+    public static void generateThickRingTexture (SimpleReloadableResourceManager manager, ResourceLocation originalResLoc, ResourceLocation thickResLoc){
+		//this is were i would run my thick branch stitcher... IF I HAD ONE! D:<
+		System.out.println("BZZZZ ... beep boop ... stitching " + thickResLoc + " (not really)");
+	}
+
 //	public static void uploadToAtlas (){
 //        List<TextureAtlasSprite> sprites = new LinkedList<>();
 //        for (Map.Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()){
