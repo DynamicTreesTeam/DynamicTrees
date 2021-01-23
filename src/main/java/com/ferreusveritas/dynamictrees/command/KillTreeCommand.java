@@ -37,4 +37,9 @@ public final class KillTreeCommand extends SubCommand {
         return 0;
     }
 
+    @Override
+    protected int getPermissionLevel() {
+        return 2;
+    }
+
 }

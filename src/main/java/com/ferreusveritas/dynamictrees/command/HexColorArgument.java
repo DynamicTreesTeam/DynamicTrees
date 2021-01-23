@@ -41,4 +41,5 @@ public final class HexColorArgument implements ArgumentType<String> {
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         return ISuggestionProvider.suggest(Arrays.asList("00FFFF"), builder);
     }
+
 }

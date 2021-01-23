@@ -32,10 +32,17 @@ public final class GrowPulseCommand extends SubCommand {
             return 0;
         }
 
-        // TODO: Find out why this isn't working.
-        if (part.isRootNode()) TreeHelper.growPulse(world, pos);
+        BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+
+        if (!rootPos.equals(BlockPos.ZERO))
+            TreeHelper.growPulse(world, rootPos);
 
         return 1;
+    }
+
+    @Override
+    protected int getPermissionLevel() {
+        return 2;
     }
 
 }

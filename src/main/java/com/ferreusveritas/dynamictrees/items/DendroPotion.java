@@ -102,7 +102,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		this.setRegistryName(name);
 	}
 	
-	private ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {
+	public ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {
 		potionStack.getOrCreateTag().putInt(INDEX_TAG_KEY, potionIndex);
 		return potionStack;
 	}
@@ -140,13 +140,12 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public Species getTargetSpecies(ItemStack itemStack) {
 		if (itemStack.hasTag()){
 			final CompoundNBT nbtTag = itemStack.getTag();
-			
+
 			if (nbtTag.contains(TREE_TAG_KEY)) {
-				String targetTree = nbtTag.getString(TREE_TAG_KEY);
-				if (!targetTree.equals("")) return TreeRegistry.findSpecies(new ResourceLocation(targetTree));
+				return TreeRegistry.findSpecies(new ResourceLocation(nbtTag.getString(TREE_TAG_KEY)));
 			}
 		}
-		
+
 		return null;
 	}
 	
@@ -213,7 +212,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(species == null) {
 				tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));
 			} else {
-				tooltip.add(new StringTextComponent("§7Transform a tree into a " + species.getLocalizedName() + " tree"));
+				tooltip.add(new StringTextComponent("§7Transform a tree into a §a" + species.getLocalizedName() + " §7tree"));
 			}
 		} else {
 			tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));

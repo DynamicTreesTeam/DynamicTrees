@@ -171,5 +171,17 @@
 			"subterranean": true,
 			"chance": 0.4
 		}
+	},
+	{
+		"select": { "name": "minecraft:crimson_forest" },
+		"apply": {
+			"species": "crimson"
+		}
+	},
+	{
+		"select": { "name": "minecraft:warped_forest" },
+		"apply": {
+			"species": "warped"
+		}
 	}
 ]

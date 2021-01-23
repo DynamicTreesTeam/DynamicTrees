@@ -53,4 +53,9 @@ public final class SetTreeCommand extends SubCommand {
         return 1;
     }
 
+    @Override
+    protected int getPermissionLevel() {
+        return 2;
+    }
+
 }

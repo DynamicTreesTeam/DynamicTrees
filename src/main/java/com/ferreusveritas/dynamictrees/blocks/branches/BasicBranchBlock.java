@@ -41,8 +41,6 @@ import net.minecraftforge.common.ToolType;
 
 public class BasicBranchBlock extends BranchBlock {
 	
-	protected static final VoxelShape SHAPE_NORMAL = Block.makeCuboidShape(5.0D, 5.0D, 5.0D, 11.0D, 11.0D, 11.0D);
-	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
 	
 	protected BlockState[] branchStates;

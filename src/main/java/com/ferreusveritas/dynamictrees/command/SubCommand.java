@@ -34,42 +34,62 @@ public abstract class SubCommand {
     protected RequiredArgumentBuilder<CommandSource, ?> extraArguments = null;
 
     /**
-     * Use this to set the name of the command.
+     * Returns the name of the command.
      *
      * @return - Name of command.
      */
     protected abstract String getName ();
 
     /**
+     * Returns the permission level required to use the command.
+     *
+     * @return Permission level required.
+     */
+    protected abstract int getPermissionLevel ();
+
+    /**
      * Call this method on valid command execution (when all arguments are given).
      * Implement it to include command logic.
      *
-     * @param context - Context of the command.
-     * @return - Integer value which is returned to ArgumentBuilder.executes.
+     * @param context Context of the command.
+     * @return Integer value which is returned to ArgumentBuilder.executes.
      */
     protected abstract int execute (CommandContext<CommandSource> context);
 
     public ArgumentBuilder<CommandSource, ?> register() {
         LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName());
 
-        if (this.defaultToExecute) subCommandBuilder.executes(this::execute);
+        subCommandBuilder.requires(commandSource -> commandSource.hasPermissionLevel(this.getPermissionLevel()));
+
+        if (this.defaultToExecute)
+            subCommandBuilder.executes(this::execute);
 
         ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
 
         if (this.takesCoordinates) {
-            if (this.executesWithCoordinates) subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(this::execute);
+            if (this.executesWithCoordinates)
+                subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(this::execute);
             else subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3());
         }
 
         if (this.extraArguments != null) {
-            if (subSubCommandBuilder == null) subSubCommandBuilder = this.extraArguments;
+            if (subSubCommandBuilder == null)
+                subSubCommandBuilder = this.extraArguments;
             else subSubCommandBuilder.then(this.extraArguments);
         }
 
-        if (subSubCommandBuilder == null) return subCommandBuilder;
+        if (subSubCommandBuilder == null)
+            return subCommandBuilder;
+
         return subCommandBuilder.then(subSubCommandBuilder);
     }
 
+    /**
+     * Sends a message to the command sender.
+     *
+     * @param context The command context.
+     * @param message The message to send.
+     */
     protected void sendMessage (CommandContext<CommandSource> context, ITextComponent message) {
         context.getSource().sendFeedback(message, true);
     }

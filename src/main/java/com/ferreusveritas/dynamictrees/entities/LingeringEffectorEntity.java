@@ -16,8 +16,8 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public class LingeringEffectorEntity extends Entity {
 
-	public BlockPos blockPos;
-	public ISubstanceEffect effect;
+	private BlockPos blockPos;
+	private ISubstanceEffect effect;
 
 	public LingeringEffectorEntity(EntityType<?> entityTypeIn, World worldIn) {
 		super(entityTypeIn, worldIn);
@@ -27,16 +27,14 @@ public class LingeringEffectorEntity extends Entity {
 
 	public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
 		this(DTRegistries.lingeringEffector, world);
-		stepHeight = 1f;
-		noClip = true;
-		setBlockPos(pos);
-		setEffect(effect);
+		this.stepHeight = 1f;
+		this.noClip = true;
+		this.setBlockPos(pos);
+		this.effect = effect;
 
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
 			for(LingeringEffectorEntity effector : world.getEntitiesWithinAABB(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
-				if (effector.getEffect() == null) continue;
-
 				if(effector.getBlockPos().equals(pos) && effector.getEffect().getName().equals(effect.getName())) {
 					effector.onKillCommand();//Kill old effector if it's the same
 				}
@@ -51,10 +49,6 @@ public class LingeringEffectorEntity extends Entity {
 
 	public BlockPos getBlockPos() {
 		return blockPos;
-	}
-
-	public void setEffect(ISubstanceEffect effect) {
-		this.effect = effect;
 	}
 
 	public ISubstanceEffect getEffect() {
@@ -92,9 +86,9 @@ public class LingeringEffectorEntity extends Entity {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 
-	@Override
-	public boolean isInRangeToRenderDist(double distance) {
-		return false;//Effectively make this entity invisible
-	}
+//	@Override
+//	public boolean isInRangeToRenderDist(double distance) {
+//		return false; // Effectively make this entity invisible
+//	}
 
 }

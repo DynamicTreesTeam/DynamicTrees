@@ -7,6 +7,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class DTCommand {
@@ -14,17 +15,10 @@ public final class DTCommand {
     private final List<SubCommand> subCommands = new ArrayList<>();
 
     public DTCommand() {
-        // Register sub-commands. To add new sub-commands add to the list here.
-        this.subCommands.add(new RepopCommand());
-        this.subCommands.add(new GetTreeCommand());
-        this.subCommands.add(new GrowPulseCommand());
-        this.subCommands.add(new KillTreeCommand());
-        this.subCommands.add(new SpeciesListCommand());
-        this.subCommands.add(new SoilLifeCommand());
-        this.subCommands.add(new SetTreeCommand());
-        this.subCommands.add(new RotateJoCodeCommand());
-        this.subCommands.add(new CreateStaffCommand());
-        this.subCommands.add(new SetCoordXorCommand());
+        // Registers sub-commands.
+        Collections.addAll(subCommands, new RepopCommand(), new GetTreeCommand(), new GrowPulseCommand(), new KillTreeCommand(), new SpeciesListCommand(),
+                new SoilLifeCommand(), new SetTreeCommand(), new RotateJoCodeCommand(), new CreateStaffCommand(), new SetCoordXorCommand(),
+                new CreateTransformPotionCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
@@ -39,7 +33,7 @@ public final class DTCommand {
         LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(dtCommandBuilder);
 
         // Create 'dynamictrees' alias.
-        dispatcher.register(Commands.literal("dynamictrees")
+        dispatcher.register(Commands.literal(CommandConstants.COMMAND_ALIAS)
                 .requires(commandSource -> commandSource.hasPermissionLevel(2))
                 .redirect(dtCommand)
         );

@@ -188,7 +188,7 @@ public class DynamicTrees {
 			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
 		}
 
-		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
+//		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
 
 		//Conveniently accessible disaster(Optional World Generation)
 		if(WorldGenRegistry.isWorldGenEnabled()) {
