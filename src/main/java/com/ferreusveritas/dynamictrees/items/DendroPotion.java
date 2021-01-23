@@ -35,6 +35,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponentUtils;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -48,26 +49,24 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public static final String name = "dendro_potion";
 	
 	public enum DendroPotionType {
-		BIOCHAR(    0, true, "biochar",     0x27231c, "Base tree potion for brewing"),
-		DEPLETION(  1, true, "depletion",	  0x76be6d, "Destroys tree soil fertility"),
-		GIGAS( 2, true, "gigas",  0xe3901d, "Allows a tree to become mega size"),
-		BURGEONING( 3, true, "burgeoning",  0xa9bebe, "Quickly grow a tree"),
-		FERTILITY(  4, true, "fertility",   0x4ad400, "Fully fertilizes tree soil"),
-		PERSISTANCE(5, true, "persistance", 0x389aff, "Stops tree from changing"),
-		TRANSFORM(  6, true, "transform",   0x7fb8a4, "Base tree potion for brewing transformations");
+		BIOCHAR(    0, true, "biochar",     0x27231c),
+		DEPLETION(  1, true, "depletion",	  0x76be6d),
+		GIGAS( 2, true, "gigas",  0xe3901d),
+		BURGEONING( 3, true, "burgeoning",  0xa9bebe),
+		FERTILITY(  4, true, "fertility",   0x4ad400),
+		PERSISTANCE(5, true, "persistance", 0x389aff),
+		TRANSFORM(  6, true, "transform",   0x7fb8a4);
 		
 		private final int index;
 		private final boolean active;
 		private final String name;
 		private final int color;
-		private final String lore;
-		
-		DendroPotionType(int index, boolean active, String name, int color, String lore) {
+
+		DendroPotionType(int index, boolean active, String name, int color) {
 			this.index = index;
 			this.active = active;
 			this.name = name;
 			this.color = color;
-			this.lore = lore;
 		}
 		
 		PotionItem p;
@@ -88,8 +87,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			return color;
 		}
 		
-		public String getLore() {
-			return lore;
+		public ITextComponent getDescription() {
+			return new TranslationTextComponent("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : ""));
 		}
 	};
 	
@@ -210,12 +209,12 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		if (potionType == DendroPotionType.TRANSFORM) {
 			Species species = getTargetSpecies(stack);
 			if(species == null) {
-				tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));
+				tooltip.add(getPotionType(stack).getDescription());
 			} else {
-				tooltip.add(new StringTextComponent("§7Transform a tree into a §a" + species.getLocalizedName() + " §7tree"));
+				tooltip.add(new TranslationTextComponent("potion.transform.description", species.getLocalizedName()));
 			}
 		} else {
-			tooltip.add(new StringTextComponent("§7" + getPotionType(stack).getLore()));
+			tooltip.add(getPotionType(stack).getDescription());
 		}
 	}
 	

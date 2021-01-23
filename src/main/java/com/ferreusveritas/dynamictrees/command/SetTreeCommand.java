@@ -25,7 +25,6 @@ public final class SetTreeCommand extends SubCommand {
         this.defaultToExecute = false;
 
         // Register extra arguments.
-        // TODO: Get arguments within execute() so we aren't getting all the args in this.
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
                 .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
                         .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer())

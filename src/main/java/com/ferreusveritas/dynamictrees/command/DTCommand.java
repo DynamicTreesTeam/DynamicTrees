@@ -26,10 +26,10 @@ public final class DTCommand {
         LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.<CommandSource>literal(CommandConstants.COMMAND)
                 .requires(commandSource -> commandSource.hasPermissionLevel(2));
 
-        // Add DT sub-commands.
+        // Add sub-commands.
         for (SubCommand subCommand : this.subCommands) dtCommandBuilder = dtCommandBuilder.then(subCommand.register());
 
-        // Register DT command.
+        // Register command.
         LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(dtCommandBuilder);
 
         // Create 'dynamictrees' alias.

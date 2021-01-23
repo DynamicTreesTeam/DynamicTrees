@@ -42,7 +42,6 @@
   "item.dynamictrees.dendro_potion.biochar":"Biochar Base Potion",
   "item.dynamictrees.dendro_potion.depletion":"Potion of Depletion",
   "item.dynamictrees.dendro_potion.gigas": "Potion of Gigas",
-  "item.dynamictrees.dendro_potion.defoliance":"Potion of Defoliance",
   "item.dynamictrees.dendro_potion.burgeoning":"Potion of Burgeoning",
   "item.dynamictrees.dendro_potion.fertility":"Potion of Fertility",
   "item.dynamictrees.dendro_potion.persistance":"Potion of Persistance",
@@ -55,7 +54,16 @@
   "commands.dynamictrees.repop.run": "§aRepopulating worldgen database.",
   "commands.dynamictrees.gettree.success": "§aSpecies: §b%s §aJoCode: §b%s",
   "commands.dynamictrees.gettree.failure": "§cCould not find tree species at this position.",
-  "commands.dynamictrees.error.unknownspecies": "§cUnknown species '%s'",
+  "commands.dynamictrees.error.unknownspecies": "§cUnknown species '§4%s§c'.",
   "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s",
-  "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s"
+  "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s",
+
+  "potion.biochar.description": "§7Base tree potion for brewing",
+  "potion.depletion.description": "§7Destroys tree soil fertility",
+  "potion.gigas.description": "§7Allows a tree to become mega size",
+  "potion.burgeoning.description": "§7Quickly grow a tree",
+  "potion.fertility.description": "§7Fully fertilizes tree soil",
+  "potion.persistance.description": "§7Stops tree from changing",
+  "potion.transform.description": "§7Transform a tree into a §a%s §7tree",
+  "potion.transform.description.empty": "§7Base tree potion for brewing transformations"
 }
