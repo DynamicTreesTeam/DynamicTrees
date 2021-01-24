@@ -57,6 +57,8 @@
   "commands.dynamictrees.error.unknownspecies": "§cUnknown species '§4%s§c'.",
   "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s",
   "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s",
+  "commands.dynamictrees.transform.speciesequal": "§cTargeted species is the same as given species.",
+  "commands.dynamictrees.transform.success": "§aSuccessfully transformed species §b%s §ato species §b%s§a.",
 
   "potion.biochar.description": "§7Base tree potion for brewing",
   "potion.depletion.description": "§7Destroys tree soil fertility",

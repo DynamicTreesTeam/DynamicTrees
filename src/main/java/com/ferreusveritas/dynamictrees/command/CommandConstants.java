@@ -18,6 +18,7 @@ public final class CommandConstants {
     public static final String CREATE_STAFF = "createstaff";
     public static final String SET_COORD_XOR = "setcoordxor";
     public static final String CREATE_TRANSFORM_POTION = "createtransformpotion";
+    public static final String TRANSFORM = "transform";
 
     // Extra arguments.
     public static final String LOCATION_ARGUMENT = "location";

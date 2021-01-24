@@ -22,9 +22,9 @@ public class PoissonDiscEventHandler {
 	/** We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:( */
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
-        ServerWorld world = (ServerWorld) event.getWorld();
+        IWorld world = event.getWorld();
 		if(!world.isRemote()) {
-			TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld(world);//clears the circles
+			TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld((ServerWorld) world);//clears the circles
 		}
 	}
 

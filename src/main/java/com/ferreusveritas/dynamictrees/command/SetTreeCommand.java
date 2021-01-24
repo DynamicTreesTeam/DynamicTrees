@@ -43,7 +43,7 @@ public final class SetTreeCommand extends SubCommand {
         final int turns = IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT);
         final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
 
-        if (species == Species.NULLSPECIES) {
+        if (!species.isValid()) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
