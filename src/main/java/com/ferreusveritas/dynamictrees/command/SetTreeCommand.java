@@ -25,7 +25,6 @@ public final class SetTreeCommand extends SubCommand {
         this.defaultToExecute = false;
 
         // Register extra arguments.
-        // TODO: Get arguments within execute() so we aren't getting all the args in this.
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
                 .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
                         .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer())
@@ -44,13 +43,18 @@ public final class SetTreeCommand extends SubCommand {
         final int turns = IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT);
         final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
 
-        if (species == Species.NULLSPECIES) {
+        if (!species.isValid()) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
 
         species.getJoCode(joCode).rotate(Direction.byHorizontalIndex(turns)).setCareful(true).generate(context.getSource().getWorld(), species, pos.offset(Direction.DOWN), context.getSource().getWorld().getBiome(pos), Direction.SOUTH, 8, SafeChunkBounds.ANY);
         return 1;
+    }
+
+    @Override
+    protected int getPermissionLevel() {
+        return 2;
     }
 
 }

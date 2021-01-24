@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.render;
 
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.entity.EntityRenderer;

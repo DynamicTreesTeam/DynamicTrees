@@ -20,8 +20,6 @@ public class BiomeDataBase {
 		@Override public void setSubterraneanBiome(boolean is) {}
 	};
 	
-	//A reasonably fast 16x16 sparse array 
-	private final BiomeEntry[][] table = new BiomeEntry[16][];
 	private final HashMap<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
 
 	public BiomeEntry getEntry(Biome biome) {
@@ -29,19 +27,13 @@ public class BiomeDataBase {
 			return BADENTRY;
 		}
 
-		ResourceLocation biomeResLoc = biome.getRegistryName();
-
-		if (!this.biomeEntries.containsKey(biomeResLoc)) {
-			this.biomeEntries.put(biomeResLoc, new BiomeEntry(biome));
-		}
-
-		return this.biomeEntries.get(biomeResLoc);
+		return this.biomeEntries.computeIfAbsent(biome.getRegistryName(), k -> new BiomeEntry(biome));
 	}
 	
 	public void clear() {
-		for(int i = 0; i < 16; i++) {
-			table[i] = null;
-		}
+//		for(int i = 0; i < 16; i++) {
+//			table[i] = null;
+//		}
 	}
 	
 	public boolean isValid() {

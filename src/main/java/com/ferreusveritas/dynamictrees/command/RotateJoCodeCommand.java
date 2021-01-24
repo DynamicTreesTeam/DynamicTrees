@@ -36,4 +36,9 @@ public final class RotateJoCodeCommand extends SubCommand {
         return 0;
     }
 
+    @Override
+    protected int getPermissionLevel() {
+        return 0;
+    }
+
 }

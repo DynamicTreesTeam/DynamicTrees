@@ -1,16 +1,11 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-
-import java.util.Map;
-
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -21,11 +16,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.*;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class TreeGenerator {
 
@@ -35,7 +33,7 @@ public class TreeGenerator {
 	public static final BiomeDataBase DIMENSIONBLACKLISTED = new BiomeDataBase();
 	protected final PoissonDiscProviderUniversal circleProvider;
 	protected final RandomXOR random = new RandomXOR();
-	protected final Map<DimensionType, BiomeDataBase> dimensionMap = new HashMap<>();
+	protected final Map<ResourceLocation, BiomeDataBase> dimensionMap = new HashMap<>();
 
 	public static void setup() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
@@ -53,20 +51,20 @@ public class TreeGenerator {
 		return INSTANCE;
 	}
 
-	public BiomeDataBase getBiomeDataBase(DimensionType dimensionType) {
-		return dimensionMap.getOrDefault(dimensionType, getDefaultBiomeDataBase());
+	public BiomeDataBase getBiomeDataBase(ResourceLocation dimLoc) {
+		return dimensionMap.getOrDefault(dimLoc, getDefaultBiomeDataBase());
 	}
 
-	public BiomeDataBase getBiomeDataBase(IWorld world) {
-		return getBiomeDataBase(world.getDimensionType());
+	public BiomeDataBase getBiomeDataBase(ServerWorld world) {
+		return getBiomeDataBase(world.getDimensionKey().getLocation());
 	}
 
 	public BiomeDataBase getDefaultBiomeDataBase() {
 		return defaultBiomeDataBase;
 	}
 
-	public void linkDimensionToDataBase(DimensionType dimensionType, BiomeDataBase dBase) {
-		dimensionMap.put(dimensionType, dBase);
+	public void linkDimensionToDataBase(ResourceLocation dimLoc, BiomeDataBase dBase) {
+		dimensionMap.put(dimLoc, dBase);
 	}
 
 //	public void BlackListDimension(Dimension dimension) {
@@ -80,7 +78,7 @@ public class TreeGenerator {
 	}
 
 	public boolean validateBiomeDataBases() {
-		return defaultBiomeDataBase.isValid() && dimensionMap.values().stream().allMatch(db -> db.isValid());
+		return defaultBiomeDataBase.isValid() && dimensionMap.values().stream().allMatch(BiomeDataBase::isValid);
 	}
 
 	/**

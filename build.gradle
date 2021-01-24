@@ -23,7 +23,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-ext.configFile = file "build.properties"
+ext.configFile = file "gradle.properties"
 configFile.withReader {
     def prop = new Properties()
     prop.load(it)

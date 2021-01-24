@@ -15,9 +15,9 @@ public final class WorldGenEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
-        if (event.getCategory() == Biome.Category.NETHER || event.getCategory() == Biome.Category.THEEND) return;
+        if (event.getCategory() == Biome.Category.THEEND) return;
 
-        event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
+//        event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
     }
 
     /**
@@ -34,6 +34,22 @@ public final class WorldGenEvents {
         if (!event.getName().getNamespace().equals("minecraft") || event.getCategory().equals(Biome.Category.THEEND)) return;
 
         // Loop through all vegetal features of current biome and remove if algorithm determines it contains a tree feature.
+        if (event.getCategory().equals(Biome.Category.NETHER)) {
+            this.removeNetherFeatures(event);
+        } else {
+            this.removeOverworldFeatures(event);
+        }
+    }
+
+    private void removeNetherFeatures (final BiomeLoadingEvent event) {
+        event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
+            final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
+            if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
+            return ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config instanceof HugeFungusConfig;
+        });
+    }
+
+    private void removeOverworldFeatures (final BiomeLoadingEvent event) {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
 
@@ -46,9 +62,7 @@ public final class WorldGenEvents {
                 so these are currently removed from world gen too. The list is immutable so they can't be removed individually,
                 but one (unclean) solution may be to add the non-tree features back to the generator. */
 
-            if (featureConfig instanceof HugeFungusConfig) {
-                return true; // Removes huge fungus from the nether.
-            } else if (featureConfig instanceof MultipleRandomFeatureConfig) {
+            if (featureConfig instanceof MultipleRandomFeatureConfig) {
                 // Removes feature if it contains trees.
                 return doesContainTrees((MultipleRandomFeatureConfig) featureConfig);
             } else if (featureConfig instanceof DecoratedFeatureConfig) {

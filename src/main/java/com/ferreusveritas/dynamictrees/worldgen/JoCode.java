@@ -187,10 +187,9 @@ public class JoCode {
 					BlockPos.Mutable cellPos = cell.getPos();
 					if(safeBounds.inBounds(cellPos, false)) {
 						BlockState testBlockState = world.getBlockState(cellPos);
-						Block testBlock = testBlockState.getBlock();
-						//if(testBlock.isReplaceable()) {
-						world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
-						//}
+						if(testBlockState.getMaterial().isReplaceable()) {
+							world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
+						}
 					} else {
 						leafMap.setVoxel(cellPos, (byte) 0);
 					}

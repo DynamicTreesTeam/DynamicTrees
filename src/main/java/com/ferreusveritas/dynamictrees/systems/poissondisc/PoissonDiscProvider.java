@@ -26,7 +26,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 	private IPoissonDebug debug;
 	
 	public PoissonDiscProvider(IRadiusCoordinator radCoord) {
-		chunkDiscs = new HashMap<ChunkPos, PoissonDiscChunkSet>();
+		chunkDiscs = new HashMap<>();
 		radiusCoordinator = radCoord;
 	}
 	

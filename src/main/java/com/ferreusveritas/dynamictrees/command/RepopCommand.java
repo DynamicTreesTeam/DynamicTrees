@@ -19,4 +19,9 @@ public final class RepopCommand extends SubCommand {
         return 1;
     }
 
+    @Override
+    protected int getPermissionLevel() {
+        return 0;
+    }
+
 }

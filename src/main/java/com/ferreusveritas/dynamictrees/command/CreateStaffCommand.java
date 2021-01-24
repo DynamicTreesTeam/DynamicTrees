@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommandUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -44,39 +45,36 @@ public final class CreateStaffCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        try {
-            BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-            String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
-            final int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
-            final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+        BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
+        final int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
+        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
 
-            if (species == Species.NULLSPECIES) {
-                this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
-                return 0;
-            }
-
-            if (!colour.startsWith("#")) colour = "#" + colour;
-
-            ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
-            DTRegistries.treeStaff.setSpecies(wandStack, species)
-                    .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
-                    .setColor(wandStack, colour)
-                    .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))
-                    .setMaxUses(wandStack, maxUses)
-                    .setUses(wandStack, maxUses);
-
-            while (!context.getSource().getWorld().isAirBlock(pos)) pos = pos.up();
-
-            World world = context.getSource().getWorld();
-            ItemEntity entityItem = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, wandStack);
-            entityItem.setMotion(0, 0, 0);
-            world.addEntity(entityItem);
-        } catch (IllegalArgumentException e) {
-            this.sendMessage(context, new StringTextComponent("§cHmm... That wasn't meant to happen... (An unknown error has occurred.)"));
+        // Ensure species given exists.
+        if (!species.isValid()) {
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
 
+        if (!colour.startsWith("#"))
+            colour = "#" + colour;
+
+        ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
+        DTRegistries.treeStaff.setSpecies(wandStack, species)
+                .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
+                .setColor(wandStack, colour)
+                .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))
+                .setMaxUses(wandStack, maxUses)
+                .setUses(wandStack, maxUses);
+
+        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack);
+
         return 1;
+    }
+
+    @Override
+    protected int getPermissionLevel() {
+        return 2;
     }
 
 }

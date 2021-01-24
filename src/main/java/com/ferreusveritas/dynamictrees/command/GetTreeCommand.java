@@ -28,7 +28,7 @@ public final class GetTreeCommand extends SubCommand {
         final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
         Species species = TreeHelper.getBestGuessSpecies(world, pos);
 
-        if (species == Species.NULLSPECIES) {
+        if (!species.isValid()) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }
@@ -38,6 +38,11 @@ public final class GetTreeCommand extends SubCommand {
         this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.success", species.toString(), code));
 
         return 1;
+    }
+
+    @Override
+    protected int getPermissionLevel() {
+        return 0;
     }
 
 }

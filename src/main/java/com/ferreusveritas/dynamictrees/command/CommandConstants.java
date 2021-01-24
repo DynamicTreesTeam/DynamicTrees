@@ -4,6 +4,7 @@ public final class CommandConstants {
 
     // Base command.
     public static final String COMMAND = "dt";
+    public static final String COMMAND_ALIAS = "dynamictrees";
 
     // Sub-commands.
     public static final String REPOPULATE = "repop";
@@ -16,12 +17,15 @@ public final class CommandConstants {
     public static final String ROTATE_JO_CODE = "rotatejocode";
     public static final String CREATE_STAFF = "createstaff";
     public static final String SET_COORD_XOR = "setcoordxor";
+    public static final String CREATE_TRANSFORM_POTION = "createtransformpotion";
+    public static final String TRANSFORM = "transform";
 
     // Extra arguments.
     public static final String LOCATION_ARGUMENT = "location";
     public static final String JO_CODE_ARGUMENT = "joCode";
     public static final String TURNS_ARGUMENT = "turns";
     public static final String SPECIES_ARGUMENT = "species";
+    public static final String TREE_FAMILY_ARGUMENT = "treeFamily";
     public static final String SOIL_LIFE_ARGUMENT = "soilLife";
     public static final String COLOR_ARGUMENT = "color";
     public static final String READ_ONLY_ARGUMENT = "readOnly";
