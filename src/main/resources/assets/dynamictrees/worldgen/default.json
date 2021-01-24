@@ -165,7 +165,7 @@
 		}
 	},
 	{
-		"__comment": "Flag nether as being subterranean even though we don't generate there",
+		"__comment": "Flag nether as being subterranean",
 		"select": { "name": "minecraft:.*", "type": "nether" },
 		"apply": {
 			"subterranean": true,
