@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
@@ -52,7 +53,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			while(radiusCoordinator.runPass(chunkX, chunkZ, i++)) {
 				output = generatePoissonDiscs(random, chunkX, chunkZ);
 			}
-			
+
 			return output;
 		}
 	}
@@ -69,8 +70,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		allDiscs.clear();
 		unsolvedDiscs.clear();
 		if(debug != null) { debug.begin(chunkX, chunkZ); }
-		
-		
+
 		// Step 1.) Collect already solved discs from surrounding chunks
 		getChunkPoissonDiscs(allDiscs, chunkX, chunkZ);
 		for(CoordUtils.Surround surr: CoordUtils.Surround.values()) {
@@ -79,7 +79,6 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		}
 		if(debug != null) { debug.collectSolved(allDiscs); }
 
-		
 		// Step 2.) Do edge masking
 		int chunkXStart = chunkX << 4;
 		int chunkZStart = chunkZ << 4;
@@ -88,8 +87,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			c.edgeMask(chunkXStart, chunkZStart);
 		}
 		if(debug != null) { debug.doEdgeMasking(allDiscs); }
-		
-		
+
 		// Step 3.) Mask out circles against one another
 		for(int i = 0; i < allDiscs.size() - 1; i++) {
 			for(int j = i + 1; j < allDiscs.size(); j++) {
@@ -97,8 +95,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			}
 		}
 		if(debug != null) { debug.maskSolvedDiscs(allDiscs); }
-		
-		
+
 		// Step 4.) Handle no existing circles by creating a single circle to build off of
 		if(allDiscs.size() == 0) {
 			int x = chunkXStart + random.nextInt(16);
@@ -110,14 +107,13 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			if(debug != null) { debug.createRootDisc(allDiscs, rootDisc); }
 		}
 		
-		
 		// Step 5.) Gather the unsolved circles into a list
 		PoissonDiscHelper.gatherUnsolved(unsolvedDiscs, allDiscs);
 		if(debug != null) { debug.gatherUnsolved(unsolvedDiscs, allDiscs); }
 
 		
 		int count = 0;//This counter is used to make sure we don't endlessly generate for an unsolvable set
-		
+
 		//Keep solving all unsolved disc until there aren't any more to solve.
 		while(!unsolvedDiscs.isEmpty()) {
 			
@@ -126,14 +122,14 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			// Step 6.) Pick a random disc from the pool of unsolved discs this will be the master disc
 			PoissonDisc master = unsolvedDiscs.get(0);//Any circle will do.  May as well be the first.
 			if(debug != null) { debug.pickMasterDisc(master, unsolvedDiscs, allDiscs); }
-			
+
 			//The goal here is to try both directions and prefer the direction that creates an intersection with an existing disc
 			PoissonDisc slave = null; 
 			Vec2i slavePos = null;
 			int radius = 0;
 			for(int dir = 0; dir <= 1; dir++) {
 				boolean CCW = dir == 0;
-				
+
 				// Step 7.) Use the master disc and it's free arc angle to find the radius of the new tangential disc
 				float angle = CCW ? (float)master.getFreeAngleCCW() : (float)master.getFreeAngleCW();
 				//System.out.println("dir: " + (CCW ? "CCW" : "CW") + ", angle: " + (angle * 180 / Math.PI));
@@ -141,7 +137,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 				double dz = master.z + (MathHelper.cos(angle) * master.radius * 1.5);
 				radius = radiusCoordinator.getRadiusAtCoords((int)dx, (int)dz);
 				if(debug != null) { debug.getRadius(master, radius, unsolvedDiscs, allDiscs); }
-				
+
 				// Step 8.) Create a second disc tangential to the master disc.
 				slave = PoissonDiscHelper.findSecondDisc(master, radius, true, CCW);
 				slavePos = new Vec2i(slave);//Cache slave position
@@ -151,7 +147,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 					break;
 				}
 			}
-			
+
 			// Step 9.) Mask off the master so it won't happen again.
 			master.arc |= 1 << master.getFreeBitCW();//Clear specific arc bit for good measure
 			PoissonDiscHelper.maskDiscs(master, slave, true);
@@ -227,7 +223,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			}
 			
 		}
-		
+
 		//Add circles to circle set
 		PoissonDiscChunkSet cSet = getChunkDiscSet(chunkX, chunkZ);
 		cSet.generated = true;
@@ -238,7 +234,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			}
 		}
 		
-		return cSet.getDiscs(new ArrayList<PoissonDisc>(16), chunkX, chunkZ);
+		return cSet.getDiscs(new ArrayList<>(16), chunkX, chunkZ);
 	}
 	
 	private boolean doesDiscIntersectWith(PoissonDisc disc, List<PoissonDisc> others) {

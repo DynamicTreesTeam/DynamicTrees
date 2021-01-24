@@ -32,16 +32,12 @@ public class PoissonDiscProviderUniversal {
 	}
 
 	public IPoissonDiscProvider getProvider(ServerWorld world) {
-		final ResourceLocation dimLoc = world.getDimensionKey().getLocation();
-//		DynamicTrees.getLogger().debug("Attempting to get provider for " + dimLoc + ".");
-		IPoissonDiscProvider poissonDiscProvider = providerMap.computeIfAbsent(dimLoc, k -> createCircleProvider(world));
-//		DynamicTrees.getLogger().debug(((PoissonDiscProvider) poissonDiscProvider).chunkDiscs.size());
-		return poissonDiscProvider;
+		return providerMap.computeIfAbsent(world.getDimensionKey().getLocation(), k -> createCircleProvider(world));
 	}
 
-	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, int chunkX, int chunkY, int chunkZ) {
+	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, int chunkX, int chunkZ) {
 		IPoissonDiscProvider provider = getProvider(world);
-		return provider.getPoissonDiscs(chunkX, chunkY, chunkZ);
+		return provider.getPoissonDiscs(chunkX, 0, chunkZ);
 	}
 
 	public void loadWorld(ServerWorld world) {
