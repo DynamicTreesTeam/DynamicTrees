@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,7 +18,7 @@ public class VoidAnimationHandler implements IAnimationHandler {
 	}
 	
 	@Override
-	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) { }
+	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack) { }
 	
 	@Override
 	public void initMotion(EntityFallingTree entity) {

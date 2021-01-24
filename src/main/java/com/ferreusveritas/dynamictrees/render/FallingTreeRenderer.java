@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -18,11 +19,13 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import org.lwjgl.opengl.GL11;
 
@@ -54,30 +57,27 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 
 		int brightnessIn = FallingTreeEntityModel.getBrightness(entity);
 
-//		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-//		GlStateManager.translated(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+		matrixStack.push();
 
 		if(entity.onFire) {
 			renderFire(matrixStack);
 		}
 
-		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
+		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks, matrixStack);
 
 		drawBakedQuads(treeModel.getQuads(), matrixStack, brightnessIn, treeModel.getLeavesColor());
 
-		GlStateManager.popMatrix();
-//		GlStateManager.enableLighting();
+		matrixStack.pop();
 	}
 
 	private void renderFire(MatrixStack matrixStack) {
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(-0.5f, 0.0f, -0.5f);
+		matrixStack.push();
+		matrixStack.translate(-0.5f, 0.0f, -0.5f);
 		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 		BlockState fire = Blocks.FIRE.getDefaultState();
 		IBakedModel model = dispatcher.getModelForState(fire);
 		drawBakedQuads(QuadManipulator.getQuads(model, fire, EmptyModelData.INSTANCE), matrixStack,255, 0xFFFFFFFF);
-		GlStateManager.popMatrix();
+		matrixStack.pop();
 	}
 	
 	//TODO: Convert to IBakedModel and eliminate this mess
@@ -90,29 +90,29 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 		for(BakedQuad bakedQuad : inQuads) {
 			buffer.addVertexData(matrixStack.getLast(), bakedQuad, bakedQuad.getVertexData()[0], bakedQuad.getVertexData()[1], bakedQuad.getVertexData()[2], brightness, color, false);
 
-			if (bakedQuad.hasTintIndex()) {
-				float r = (float)(color >> 16 & 255) / 255.0F;
-				float g = (float)(color >> 8 & 255) / 255.0F;
-				float b = (float)(color & 255) / 255.0F;
-				if(bakedQuad.applyDiffuseLighting()) {
-					float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
-					r *= diffuse;
-					g *= diffuse;
-					b *= diffuse;
-				}
-
-				buffer.color(r, g, b, 4);
-				buffer.color(r, g, b, 3);
-				buffer.color(r, g, b, 2);
-				buffer.color(r, g, b, 1);
-			} else if(bakedQuad.applyDiffuseLighting()) {
-				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
-
-				buffer.color(diffuse, diffuse, diffuse, 4);
-				buffer.color(diffuse, diffuse, diffuse, 3);
-				buffer.color(diffuse, diffuse, diffuse, 2);
-				buffer.color(diffuse, diffuse, diffuse, 1);
-			}
+//			if (bakedQuad.hasTintIndex()) {
+//				float r = (float)(color >> 16 & 255) / 255.0F;
+//				float g = (float)(color >> 8 & 255) / 255.0F;
+//				float b = (float)(color & 255) / 255.0F;
+//				if(bakedQuad.applyDiffuseLighting()) {
+//					float diffuse = LightUtil.diffuseLight(bakedQuad.getFace());
+//					r *= diffuse;
+//					g *= diffuse;
+//					b *= diffuse;
+//				}
+//
+//				buffer.color(r, g, b, 4);
+//				buffer.color(r, g, b, 3);
+//				buffer.color(r, g, b, 2);
+//				buffer.color(r, g, b, 1);
+//			} else if(bakedQuad.applyDiffuseLighting()) {
+//				float diffuse = LightUtil.diffuseLight(bakedQuad.getFace());
+//
+//				buffer.color(diffuse, diffuse, diffuse, 4);
+//				buffer.color(diffuse, diffuse, diffuse, 3);
+//				buffer.color(diffuse, diffuse, diffuse, 2);
+//				buffer.color(diffuse, diffuse, diffuse, 1);
+//			}
 			
 		}
 		

@@ -246,7 +246,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
 		this.setRawPosition(x, y, z);
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-		this.setBoundingBox(normAABB != null ? normAABB.offset(this.getPosX(), getPosY(), this.getPosZ()) : new AxisAlignedBB(BlockPos.ZERO));
+		this.setBoundingBox(normAABB != null ? normAABB.offset(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.block.Block;
@@ -17,7 +18,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -140,15 +143,16 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
 		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
 		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
 
 		Vector3d mc = entity.getMassCenter();
-		GlStateManager.translated(mc.x, mc.y, mc.z);
-		GlStateManager.rotatef(-yaw, 0, 1, 0);
-		GlStateManager.rotatef(pit, 1, 0, 0);
-		GlStateManager.translated(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
+		matrixStack.translate(mc.x, mc.y, mc.z);
+		matrixStack.rotate(new Quaternion(new Vector3f(0, 1, 0), -yaw, true));
+		matrixStack.rotate(new Quaternion(new Vector3f(1, 0, 0), pit, true));
+		matrixStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.);
+
 	}
 
 	@Override

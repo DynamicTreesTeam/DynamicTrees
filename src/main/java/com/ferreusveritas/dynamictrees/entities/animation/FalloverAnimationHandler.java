@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.block.Block;
@@ -19,7 +20,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -242,7 +245,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks) {
+	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
 
 		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
 		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
@@ -254,12 +257,13 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		Direction toolDir = entity.getDestroyData().toolDir;
 		Vector3d toolVec = new Vector3d(toolDir.getXOffset(), toolDir.getYOffset(), toolDir.getZOffset()).scale(radius / 16.0f);
 
-		GlStateManager.translated(-toolVec.x, -toolVec.y, -toolVec.z);
-		GlStateManager.rotatef(-yaw, 0, 0, 1);
-		GlStateManager.rotatef(pit, 1, 0, 0);
-		GlStateManager.translated(toolVec.x, toolVec.y, toolVec.z);
+		matrixStack.translate(-toolVec.x, -toolVec.y, -toolVec.z);
+		matrixStack.rotate(new Quaternion(new Vector3f(0, 0, 1), -yaw, true));
+		matrixStack.rotate(new Quaternion(new Vector3f(1, 0, 0), pit, true));
+		matrixStack.translate(toolVec.x, toolVec.y, toolVec.z);
 
-		GlStateManager.translated(-0.5, 0, -0.5);
+		matrixStack.translate(-0.5, 0, -0.5);
+
 	}
 
 	@Override
