@@ -88,7 +88,7 @@ public class JsonMath {
 			}
 		}
 
-		MathOperator paramArray[] = paramList.toArray(new MathOperator[0]);
+		MathOperator[] paramArray = paramList.toArray(new MathOperator[0]);
 
 		switch(op) {
 			case NOISE: return new Noise();
