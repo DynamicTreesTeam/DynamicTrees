@@ -76,18 +76,18 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 		if(destructionData.getNumBranches() > 0) {
 
 			BlockState exState = destructionData.getBranchBlockState(0);
-			destructionData.getConnections(0, connectionArray);
 			if(exState != null) {
 				//Draw the ring texture cap on the cut block
-				for(Direction face: Direction.values()) {
-					connectionArray[face.getIndex()] = face == cutDir.getOpposite() ? 8 : 0;
-				}
 				int radius = ((BranchBlock) exState.getBlock()).getRadius(exState);
 				float offset = (8 - Math.min(radius, BranchBlock.RADMAX_NORMAL) ) / 16f;
 				IBakedModel branchModel = dispatcher.getModelForState(exState);//Since we source the blockState from the destruction data it will always be the same
-				ModelConnections connections = new ModelConnections(connectionArray);
 				BlockPos offsetPos = BlockPos.ZERO.offset(cutDir);
-				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[] { cutDir }, connections));
+				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)));
+
+				for(Direction face: Direction.values()) {
+					connectionArray[face.getIndex()] = face == cutDir.getOpposite() ? 8 : 0;
+				}
+				ModelConnections connections = new ModelConnections(connectionArray);
 
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {

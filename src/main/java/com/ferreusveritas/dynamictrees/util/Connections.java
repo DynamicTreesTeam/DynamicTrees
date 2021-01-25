@@ -26,6 +26,5 @@ public class Connections {
 		this.radii = radii;
 		return this;
 	}
-	
 
 }

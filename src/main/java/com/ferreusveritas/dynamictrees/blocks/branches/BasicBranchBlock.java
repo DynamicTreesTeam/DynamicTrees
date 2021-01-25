@@ -329,13 +329,6 @@ public class BasicBranchBlock extends BranchBlock {
 		return core;
 	}
 
-//	@Override
-//	public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		int thisRadiusInt = getRadius(state);
-//		double radius = thisRadiusInt / 16.0;
-//		return VoxelShapes.create(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-//	}
-
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		return getRadius(blockState);

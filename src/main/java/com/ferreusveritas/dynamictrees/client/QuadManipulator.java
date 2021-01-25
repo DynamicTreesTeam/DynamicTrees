@@ -23,13 +23,13 @@ import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
 public class QuadManipulator {
-	
+
 	public static final Direction everyFace[] = { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null };
 	
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, IModelData modelData) {
 		return getQuads(modelIn, stateIn, Vector3d.ZERO, everyFace, new Random(), modelData);
 	}
-	
+
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Direction[] sides, IModelData modelData) {
 		return getQuads(modelIn, stateIn, Vector3d.ZERO, sides, new Random(), modelData);
 	}
@@ -37,11 +37,11 @@ public class QuadManipulator {
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Random rand, IModelData modelData) {
 		return getQuads(modelIn, stateIn, Vector3d.ZERO, everyFace, rand, modelData);
 	}
-	
+
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vector3d offset, Random rand, IModelData modelData) {
 		return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
 	}
-	
+
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vector3d offset, IModelData modelData) {
 		return getQuads(modelIn, stateIn, offset, everyFace, new Random(), modelData);
 	}

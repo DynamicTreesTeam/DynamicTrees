@@ -4,13 +4,14 @@ import javax.annotation.Nullable;
 
 import com.ferreusveritas.dynamictrees.util.Connections;
 
+import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 public class ModelConnections extends Connections implements IModelData {
-	
-	//ModelProperty<Integer>[] radii = new ModelProperty<Integer>[6];
-	
+
+	protected Direction ringOnly = null;
+
 	public ModelConnections() { }
 	
 	public ModelConnections(Connections connections) {
@@ -20,7 +21,11 @@ public class ModelConnections extends Connections implements IModelData {
 	public ModelConnections(int[] radii) {
 		super(radii);
 	}
-	
+
+	public ModelConnections(Direction ringDir) {
+		ringOnly = ringDir;
+	}
+
 	public ModelConnections setAllRadii (int[] radii){
 		return (ModelConnections) super.setAllRadii(radii);
 	}
@@ -41,5 +46,10 @@ public class ModelConnections extends Connections implements IModelData {
 	public <T> T setData(ModelProperty<T> prop, T data) {
 		return null;
 	}
-	
+
+
+	public Direction getRingOnly(){
+		return ringOnly;
+	}
+
 }

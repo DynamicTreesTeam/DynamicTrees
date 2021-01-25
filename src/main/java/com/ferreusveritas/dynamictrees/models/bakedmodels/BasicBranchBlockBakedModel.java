@@ -157,8 +157,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
 
-
-		if (state != null) {
+		if (state != null && side == null) {
 			List<BakedQuad> quadsList = new ArrayList<>(24);
 
 			int coreRadius = getRadius(state);
@@ -166,32 +165,37 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			if (coreRadius > 8) return Collections.emptyList();
 
 			int[] connections = new int[] {0,0,0,0,0,0};
-			if (extraData instanceof Connections){
-				connections = ((Connections) extraData).getAllRadii();
+			Direction ringOnly = null;
+			if (extraData instanceof ModelConnections){
+				connections = ((ModelConnections) extraData).getAllRadii();
+				ringOnly = ((ModelConnections) extraData).getRingOnly();
 			}
 
-			//Count number of connections
-			int numConnections = 0;
-			for(int i: connections) {
-				numConnections += (i != 0) ? 1: 0;
-			}
+			if (ringOnly == null){
 
-			//The source direction is the biggest connection from one of the 6 directions
-			Direction sourceDir = getSourceDir(coreRadius, connections);
-			if(sourceDir == null) {
-				sourceDir = Direction.DOWN;
-			}
-			int coreDir = resolveCoreDir(sourceDir);
+				//Count number of connections
+				int numConnections = 0;
+				for(int i: connections) {
+					numConnections += (i != 0) ? 1: 0;
+				}
 
-			//This is for drawing the rings on a terminating branch
-			Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+				//The source direction is the biggest connection from one of the 6 directions
+				Direction sourceDir = getSourceDir(coreRadius, connections);
+				if(sourceDir == null) {
+					sourceDir = Direction.DOWN;
+				}
+				int coreDir = resolveCoreDir(sourceDir);
 
-			if (side == null){
+				//This is for drawing the rings on a terminating branch
+				Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+
 				for(Direction face  : Direction.values()) {
 					//Get quads for core model
 					if(coreRadius != connections[face.getIndex()]) {
 						if(coreRingDir == null || coreRingDir != face) {
 							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
+						} else {
+							quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
 						}
 					}
 
@@ -209,12 +213,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 				}
 			} else {
-				//Get quads for rings model
-				if(coreRadius != connections[side.getIndex()]) {
-					if(!(coreRingDir == null || coreRingDir != side)) {
-						quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand, extraData));
-					}
-				}
+				//Get quads for rings. Used by the falling tree animation.
+				quadsList.addAll(rings[coreRadius-1].getQuads(state, ringOnly, rand, extraData));
 			}
 			return quadsList;
 		}

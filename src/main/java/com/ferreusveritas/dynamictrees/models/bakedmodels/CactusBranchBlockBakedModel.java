@@ -566,66 +566,72 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
             int coreRadius = this.getRadius(state);
 
             int[] connections = new int[] {0,0,0,0,0,0};
-            if (extraData instanceof Connections){
-                connections = ((Connections) extraData).getAllRadii();
+            Direction ringOnly = null;
+            if (extraData instanceof ModelConnections){
+                connections = ((ModelConnections) extraData).getAllRadii();
+                ringOnly = ((ModelConnections) extraData).getRingOnly();
             }
 
-            //Count number of connections
-            int numConnections = 0;
-            for(int i: connections) {
-                numConnections += (i != 0) ? 1: 0;
-            }
-
-            boolean extraUpSleeve = false;
-            if (coreRadius == 4 && numConnections == 1 && state.get(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
-                connections[1] = 4;
-                extraUpSleeve = true;
-            }
-
-            //The source direction is the biggest connection from one of the 6 directions
-            Direction sourceDir = getSourceDir(coreRadius, connections);
-            if(sourceDir == null) {
-                sourceDir = Direction.DOWN;
-            }
-            int coreDir = resolveCoreDir(sourceDir);
-
-            // This is for drawing the rings on a terminating branch
-            Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
-
-            for (Direction face : Direction.values()) {
-                //Get quads for core model
-                if (coreRadius != connections[face.getIndex()]) {
-                    if (coreRingDir == null || coreRingDir != face) {
-                        quadsList.addAll(cores[coreDir][coreRadius - 4].getQuads(state, face, rand, extraData));
-                    } else {
-                        quadsList.addAll(rings[coreRadius - 4].getQuads(state, face, rand, extraData));
-                    }
+            if (ringOnly == null){
+                //Count number of connections
+                int numConnections = 0;
+                for(int i: connections) {
+                    numConnections += (i != 0) ? 1: 0;
                 }
 
-                // Get quads for core spikes
-                for (Direction dir : Direction.values()) {
-                    if (coreRadius > connections[dir.getIndex()]) {
-                        for (BakedQuad quad : coreSpikes[coreRadius - 4].getQuads(state, dir, rand, extraData)) {
-                            if (coreRadius > connections[quad.getFace().getIndex()]) {
-                                quadsList.add(quad);
+                boolean extraUpSleeve = false;
+                if (coreRadius == 4 && numConnections == 1 && state.get(CactusBranchBlock.ORIGIN).getAxis().isHorizontal()) {
+                    connections[1] = 4;
+                    extraUpSleeve = true;
+                }
+
+                //The source direction is the biggest connection from one of the 6 directions
+                Direction sourceDir = getSourceDir(coreRadius, connections);
+                if(sourceDir == null) {
+                    sourceDir = Direction.DOWN;
+                }
+                int coreDir = resolveCoreDir(sourceDir);
+
+                // This is for drawing the rings on a terminating branch
+                Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+
+                for (Direction face : Direction.values()) {
+                    //Get quads for core model
+                    if (coreRadius != connections[face.getIndex()]) {
+                        if (coreRingDir == null || coreRingDir != face) {
+                            quadsList.addAll(cores[coreDir][coreRadius - 4].getQuads(state, face, rand, extraData));
+                        } else {
+                            quadsList.addAll(rings[coreRadius - 4].getQuads(state, face, rand, extraData));
+                        }
+                    }
+
+                    // Get quads for core spikes
+                    for (Direction dir : Direction.values()) {
+                        if (coreRadius > connections[dir.getIndex()]) {
+                            for (BakedQuad quad : coreSpikes[coreRadius - 4].getQuads(state, dir, rand, extraData)) {
+                                if (coreRadius > connections[quad.getFace().getIndex()]) {
+                                    quadsList.add(quad);
+                                }
                             }
+                        }
+                    }
+
+                    // Get quads for sleeves models
+                    for (Direction connDir : Direction.values()) {
+                        int idx = connDir.getIndex();
+                        int connRadius = connections[idx];
+                        // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+                        if (connRadius >= 4 && ((connDir == Direction.UP && connRadius == 4 && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
+                            quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(state, face, rand, extraData));
                         }
                     }
                 }
 
-                // Get quads for sleeves models
-                for (Direction connDir : Direction.values()) {
-                    int idx = connDir.getIndex();
-                    int connRadius = connections[idx];
-                    // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-                    if (connRadius >= 4 && ((connDir == Direction.UP && connRadius == 4 && extraUpSleeve) || face != connDir || connDir == Direction.DOWN)) {
-                        quadsList.addAll(sleeves[idx][connRadius - 4].getQuads(state, face, rand, extraData));
-                    }
+                if (extraUpSleeve) {
+                    quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, rand, extraData));
                 }
-            }
-
-            if (extraUpSleeve) {
-                quadsList.addAll(sleeveTopSpikes.getQuads(state, Direction.UP, rand, extraData));
+            } else {
+                quadsList.addAll(rings[coreRadius - 4].getQuads(state, ringOnly, rand, extraData));
             }
 
             return quadsList;

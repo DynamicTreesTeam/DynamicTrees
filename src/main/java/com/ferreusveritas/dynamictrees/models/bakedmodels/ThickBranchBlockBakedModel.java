@@ -154,26 +154,30 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
-		if (state == null) return Collections.emptyList();
+		if (state == null || side != null) return Collections.emptyList();
 
 		int coreRadius = this.getRadius(state);
 
 		if (coreRadius <= BranchBlock.RADMAX_NORMAL)
-			return super.getQuads(state, side, rand, extraData);
+			return super.getQuads(state, null, rand, extraData);
 
 		coreRadius = MathHelper.clamp(coreRadius, 9, 24);
 
 		List<BakedQuad> quads = new ArrayList<>(30);
 
 		int[] connections = new int[] {0,0,0,0,0,0};
-		if (extraData instanceof Connections){
-			connections = ((Connections) extraData).getAllRadii();
+		Direction ringOnly = null;
+		if (extraData instanceof ModelConnections){
+			connections = ((ModelConnections) extraData).getAllRadii();
+			ringOnly = ((ModelConnections) extraData).getRingOnly();
 		}
 
-		if (side == null){
+		if (ringOnly == null){
 			for (Direction face : Direction.values()) {
 				quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
-
+				if (connections[0] < 1) {
+					quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, side, rand, extraData));
+				}
 				if (connections[1] < 1) {
 					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
 				} else if (connections[1] < coreRadius && face == Direction.UP) {
@@ -181,9 +185,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 				}
 			}
 		} else {
-			if (connections[0] < 1) {
-				quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, side, rand, extraData));
-			}
+			quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, ringOnly, rand, extraData));
 		}
 
 		return quads;

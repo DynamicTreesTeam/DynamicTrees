@@ -74,7 +74,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 
 		//Apply motion
 
-		entity.setPosition(entity.getMotion().x, entity.getMotion().y, entity.getMotion().z);
+		entity.setPosition(entity.getPosX() + entity.getMotion().x, entity.getPosY() + entity.getMotion().y, entity.getPosZ() + entity.getMotion().z);
 		entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch + getData(entity).rotPit);
 		entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw + getData(entity).rotYaw);
 
