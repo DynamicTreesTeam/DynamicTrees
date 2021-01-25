@@ -64,7 +64,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	public BranchBlock(Properties properties, String name){
 		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
-		setRegistryName(name);
+		this.setRegistryName(name);
 	}
 	
 	public BranchBlock(Material material, String name) {

@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
@@ -40,9 +39,6 @@ public class JsonMath {
 		if(EnumMathFunction.RAND.name.equals(name)) {
 			return new Rand();
 		}
-		if(EnumMathFunction.TREES.name.equals(name)) {
-			return new Trees(biome);
-		} else 
 		if(EnumMathFunction.RADIUS.name.equals(name)) {
 			return new Radius();
 		}
@@ -93,7 +89,6 @@ public class JsonMath {
 		switch(op) {
 			case NOISE: return new Noise();
 			case RAND: return new Rand();
-			case TREES: return new Trees(biome);
 			case RADIUS: return new Radius();
 			case ADD: return new Adder(paramArray);
 			case SUB: return new Subtractor(paramArray);
@@ -175,27 +170,7 @@ public class JsonMath {
 		}
 		
 	}
-	
-	public static class Trees implements MathOperator {
 
-		private final Biome biome;
-
-		public Trees(Biome biome) {
-			this.biome = biome;
-		}
-
-		@Override
-		public float apply(MathContext mc) {
-			return 0;
-		}
-
-//		@Override
-//		public float apply(MathContext mc) {
-//			return MathHelper.clamp(biome.decorator.treesPerChunk / 10.0f, -1.0f, 1.0f);//Gives -1.0 to 1.0
-//		}
-
-	}
-	
 	public static class Radius implements MathOperator {
 
 		@Override
@@ -458,7 +433,6 @@ public class JsonMath {
 		CONST,
 		NOISE,
 		RAND,
-		TREES,
 		RADIUS,
 		ADD,
 		SUB,

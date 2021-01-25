@@ -1,10 +1,10 @@
 {
-	"oak":		{"leaves":"minecraft:oak_leaves" },
-	"spruce":	{"leaves":"minecraft:spruce_leaves", "color":"@spruce", "smother":3, "cellkit":"conifer" },
-	"birch":	{"leaves":"minecraft:birch_leaves", "color":"@birch" },
-	"jungle":	{"leaves":"minecraft:jungle_leaves", "light":12 },
-	"acacia":	{"leaves":"minecraft:acacia_leaves", "cellkit":"acacia", "smother":2 },
-	"dark_oak":	{"leaves":"minecraft:dark_oak_leaves", "cellkit":"dark_oak", "smother":3 },
-	"crimson":	{"leaves":"minecraft:nether_wart_block", "light":0, "foliageType": "wart" },
-	"warped":	{"leaves":"minecraft:warped_wart_block", "light":0, "foliageType": "wart" }
+	"oak":		{ "leaves": "minecraft:oak_leaves" },
+	"spruce":	{ "leaves": "minecraft:spruce_leaves", "color": "@spruce", "smother": 3, "cellkit":"conifer" },
+	"birch":	{ "leaves": "minecraft:birch_leaves", "color": "@birch" },
+	"jungle":	{ "leaves": "minecraft:jungle_leaves", "light": 12 },
+	"acacia":	{ "leaves": "minecraft:acacia_leaves", "cellkit": "acacia", "smother": 2 },
+	"dark_oak":	{ "leaves": "minecraft:dark_oak_leaves", "cellkit": "dark_oak", "smother": 3 },
+	"crimson":	{ "leaves": "minecraft:nether_wart_block", "light": 0, "foliageType": "wart", "fireSpreadSpeed": 0, "flammability": 0 },
+	"warped":	{ "leaves": "minecraft:warped_wart_block", "light": 0, "foliageType": "wart", "fireSpreadSpeed": 0, "flammability": 0 }
 }

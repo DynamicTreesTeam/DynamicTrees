@@ -5,7 +5,6 @@
 		"apply": {
 			"cancelvanilla": true,
 			"species" : "oak",
-			"density" : { "math" : { "mul": [ "trees", "noise" ] } },
 			"chance" : "standard"
 		}
 	},
@@ -26,6 +25,7 @@
 					"birch" : 1
 				}
 			},
+			"density": 1,
 			"chance": 1.0,
 			"forestness" : 1.0
 		}
@@ -58,19 +58,23 @@
 		"select": { "type": "swamp", "name": "minecraft:.*" },
 		"apply": {
 			"species" : "swamp_oak",
+			"density": [ 0.2 ],
 			"chance": 0.75
 		}
 	},
 	{
 		"select": { "type": "savanna", "name": "minecraft:.*" },
 		"apply": {
-			"species" : "acacia"
+			"species" : "acacia",
+			"density": [ 0.01 ],
+			"chance": 0.2
 		}
 	},
 	{
 		"select": { "type": "jungle", "name": "minecraft:.*" },
 		"apply": {
 			"species" : "jungle",
+			"density": [ 0.4 ],
 			"forestness" : 1.0
 		}
 	},
@@ -142,7 +146,8 @@
 					"oak" : 24,
 					"apple" : 1
 				}
-			}
+			},
+			"density": [ 0.05 ]
 		}
 	},
 	{
