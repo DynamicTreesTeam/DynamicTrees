@@ -41,7 +41,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -392,7 +391,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
-		damageAxe(entity, heldItem, getRadius(state), woodVolume);
+		damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
 	}
 	
 	// We override the standard behavior because we need to preserve the tree network structure to calculate
@@ -445,9 +444,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	
-	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NodeNetVolume.Volume woodVolume) {
+	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NodeNetVolume.Volume woodVolume, boolean forBlockBreak) {
 		
-		if(heldItem != null && (heldItem.getItem() instanceof AxeItem || heldItem.getItem().getToolTypes(heldItem).contains(ToolType.AXE))) {
+		if(heldItem != null && this.isAxe(heldItem)) {
 			
 			int damage;
 			
@@ -463,13 +462,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					damage = (int) woodVolume.getTotalVolume();
 					break;
 			}
-			
-			damage--;//Minecraft already damaged the tool by one unit
+
+			if (forBlockBreak)
+				damage--; // Minecraft already damaged the tool by one unit
+
 			if(damage > 0) {
 				heldItem.damageItem(damage, entity, LivingEntity::tick);
 			}
 		}
 		
+	}
+
+	protected boolean isAxe (ItemStack stack) {
+		return stack.getItem() instanceof AxeItem || stack.getItem().getToolTypes(stack).contains(ToolType.AXE);
 	}
 	
 	@Override

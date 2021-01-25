@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 
@@ -26,6 +27,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -304,18 +306,25 @@ public class BasicBranchBlock extends BranchBlock {
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		ActionResultType resultType = super.onBlockActivated(state, world, pos, player, hand, hit);
 
-		if (!this.isStripped(state) && player.getHeldItem(hand).getItem() instanceof AxeItem) {
-			int radius = this.getRadius(state);
-			world.setBlockState(pos, state.with(STRIPPED, true).with(this instanceof ThickBranchBlock ? ThickBranchBlock.RADIUS_DOUBLE : RADIUS, radius > 1 ? radius - 1 : radius));
-			resultType = ActionResultType.SUCCESS;
-
-			if (world.isRemote) {
-				world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
-				WailaOther.invalidateWailaPosition();
-			}
-		}
+		final ItemStack heldItem = player.getHeldItem(hand);
+		if (!this.isStripped(state) && this.isAxe(heldItem))
+			resultType = this.stripBranch(state, world, pos, player, heldItem);
 
 		return resultType;
+	}
+
+	private ActionResultType stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+		int radius = this.getRadius(state);
+		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2f, 0), false);
+		world.setBlockState(pos, state.with(STRIPPED, true)
+				.with(this instanceof ThickBranchBlock ? ThickBranchBlock.RADIUS_DOUBLE : RADIUS, radius > 1 ? radius - 1 : radius));
+
+		if (world.isRemote) {
+			world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+			WailaOther.invalidateWailaPosition();
+		}
+
+		return ActionResultType.SUCCESS;
 	}
 
 	///////////////////////////////////////////
