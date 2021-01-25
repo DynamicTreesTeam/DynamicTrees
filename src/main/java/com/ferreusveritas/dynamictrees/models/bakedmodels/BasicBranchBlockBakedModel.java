@@ -156,59 +156,66 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
-		
-		if (side == null && state != null) {
+
+
+		if (state != null) {
 			List<BakedQuad> quadsList = new ArrayList<>(24);
-			
+
 			int coreRadius = getRadius(state);
 
 			if (coreRadius > 8) return Collections.emptyList();
-			
+
 			int[] connections = new int[] {0,0,0,0,0,0};
 			if (extraData instanceof Connections){
 				connections = ((Connections) extraData).getAllRadii();
 			}
-			
+
 			//Count number of connections
 			int numConnections = 0;
 			for(int i: connections) {
 				numConnections += (i != 0) ? 1: 0;
 			}
-			
+
 			//The source direction is the biggest connection from one of the 6 directions
 			Direction sourceDir = getSourceDir(coreRadius, connections);
 			if(sourceDir == null) {
 				sourceDir = Direction.DOWN;
 			}
 			int coreDir = resolveCoreDir(sourceDir);
-			
+
 			//This is for drawing the rings on a terminating branch
 			Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
-			
-			for(Direction face  : Direction.values()) {
-				
-				//Get quads for core model
-				if(coreRadius != connections[face.getIndex()]) {
-					if(coreRingDir == null || coreRingDir != face) {
-						quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
-					} else {
-						quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
-					}
-				}
-				//Get quads for sleeves models
-				if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-					for(Direction connDir : Direction.values()) {
-						int idx = connDir.getIndex();
-						int connRadius = connections[idx];
-						//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-						if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
-							quadsList.addAll(sleeves[idx][connRadius-1].getQuads(state, face, rand, extraData));
+
+			if (side == null){
+				for(Direction face  : Direction.values()) {
+					//Get quads for core model
+					if(coreRadius != connections[face.getIndex()]) {
+						if(coreRingDir == null || coreRingDir != face) {
+							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
 						}
 					}
+
+					//Get quads for sleeves models
+					if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
+						for(Direction connDir : Direction.values()) {
+							int idx = connDir.getIndex();
+							int connRadius = Math.min(connections[idx], coreRadius);
+							//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+							if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
+								quadsList.addAll(sleeves[idx][connRadius-1].getQuads(state, face, rand, extraData));
+							}
+						}
+					}
+
 				}
-				
+			} else {
+				//Get quads for rings model
+				if(coreRadius != connections[side.getIndex()]) {
+					if(!(coreRingDir == null || coreRingDir != side)) {
+						quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand, extraData));
+					}
+				}
 			}
-			
 			return quadsList;
 		}
 		

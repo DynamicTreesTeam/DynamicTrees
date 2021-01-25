@@ -1,9 +1,6 @@
 package com.ferreusveritas.dynamictrees.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
@@ -17,14 +14,20 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.pipeline.LightUtil;
+import org.lwjgl.opengl.GL11;
 
 public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 	
@@ -71,11 +74,11 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 		int[] connectionArray = new int[6];
 		
 		if(destructionData.getNumBranches() > 0) {
-			
-			//Draw the ring texture cap on the cut block
+
 			BlockState exState = destructionData.getBranchBlockState(0);
 			destructionData.getConnections(0, connectionArray);
 			if(exState != null) {
+				//Draw the ring texture cap on the cut block
 				for(Direction face: Direction.values()) {
 					connectionArray[face.getIndex()] = face == cutDir.getOpposite() ? 8 : 0;
 				}
@@ -85,7 +88,7 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				ModelConnections connections = new ModelConnections(connectionArray);
 				BlockPos offsetPos = BlockPos.ZERO.offset(cutDir);
 				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[] { cutDir }, connections));
-				
+
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {
 					exState = destructionData.getBranchBlockState(index);
@@ -119,7 +122,22 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-
+	public void render(MatrixStack matrixStack, IVertexBuilder buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+		for(BakedQuad bakedQuad : getQuads()) {
+			float r = 1, g = 1, b = 1;
+			if (bakedQuad.hasTintIndex()) {
+				r = red;
+				g = green;
+				b = blue;
+			}
+			int diffuseAverage = 1;
+			if(bakedQuad.applyDiffuseLighting()) {
+				float diffuse = (LightUtil.diffuseLight(bakedQuad.getFace()) + diffuseAverage) / (diffuseAverage+1);
+				r *= diffuse;
+				g *= diffuse;
+				b *= diffuse;
+			}
+			buffer.addQuad(matrixStack.getLast(), bakedQuad, r, g, b, packedLight, packedOverlay);
+		}
 	}
 }

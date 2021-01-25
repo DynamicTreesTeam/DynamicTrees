@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.render;
+package com.ferreusveritas.dynamictrees.entities.render;
 
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import net.minecraft.client.renderer.culling.ClippingHelper;
