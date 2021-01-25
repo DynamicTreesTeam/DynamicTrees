@@ -39,7 +39,7 @@ import java.util.Random;
 
 public class TrunkShellBlock extends Block {
 	
-	public static final EnumProperty<Surround> COREDIR = EnumProperty.create("coredir", Surround.class);
+	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
 	
 	public static final String defaultName = "trunk_shell";
 	
@@ -77,7 +77,7 @@ public class TrunkShellBlock extends Block {
 	///////////////////////////////////////////
 
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(COREDIR);
+		builder.add(CORE_DIR);
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class TrunkShellBlock extends Block {
 	}
 
 	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {
-		return state.get(COREDIR);
+		return state.get(CORE_DIR);
 	}
 
 	@Nullable
@@ -272,7 +272,7 @@ public class TrunkShellBlock extends Block {
 		if(newState.getBlock() == Blocks.AIR) {
 			Surround surr = findDetachedMuse((World) world, pos);
 			if(surr != null) {
-				world.setBlockState(pos, getDefaultState().with(COREDIR, surr), 1);
+				world.setBlockState(pos, getDefaultState().with(CORE_DIR, surr), 1);
 			}
 		}
 	}

@@ -95,7 +95,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 			Surround surr = Surround.values()[world.rand.nextInt(8)];
 			BlockPos dPos = treePos.add(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-				world.setBlockState(dPos, DTRegistries.trunkShellBlock.getDefaultState().with(TrunkShellBlock.COREDIR, surr.getOpposite()));
+				world.setBlockState(dPos, DTRegistries.trunkShellBlock.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
 			startRoots(world, treePos, species, trunkRadius);

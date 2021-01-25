@@ -115,6 +115,20 @@ public class DynamicTrees {
 				case crimson: return Blocks.CRIMSON_STEM;
 			}
 		}
+
+		public Block getStrippedLog() {
+			switch (this) {
+				default:
+				case oak: return Blocks.STRIPPED_OAK_LOG;
+				case birch: return Blocks.STRIPPED_BIRCH_LOG;
+				case spruce: return Blocks.STRIPPED_SPRUCE_LOG;
+				case jungle: return Blocks.STRIPPED_JUNGLE_LOG;
+				case dark_oak: return Blocks.STRIPPED_DARK_OAK_LOG;
+				case acacia: return Blocks.STRIPPED_ACACIA_LOG;
+				case warped: return Blocks.STRIPPED_WARPED_STEM;
+				case crimson: return Blocks.STRIPPED_CRIMSON_STEM;
+			}
+		}
 	}
 	
 	public enum EnumDestroyMode {

@@ -34,13 +34,16 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 
 	protected final ResourceLocation thickRingsResLoc;
 
-	private IBakedModel[] trunksBark = new IBakedModel[16];//The trunk will always feature bark on it's sides
-	private IBakedModel[] trunksTopBark = new IBakedModel[16];//The trunk will feature bark on it's top when there's more tree on it's surface
-	private IBakedModel[] trunksTopRings = new IBakedModel[16];//The trunk will feature rings on it's top when there's not any tree on it's surface(cut)
-	private IBakedModel[] trunksBotRings = new IBakedModel[16];//The trunk will always feature rings on it's bottom surface(or nothing)
+	private final IBakedModel[] trunksBark = new IBakedModel[16]; // The trunk will always feature bark on its sides.
+	private final IBakedModel[] trunksTopBark = new IBakedModel[16]; // The trunk will feature bark on its top when there's a branch on top of it.
+	private final IBakedModel[] trunksTopRings = new IBakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
+	private final IBakedModel[] trunksBotRings = new IBakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
-	public ThickBranchBlockBakedModel (ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation thickRingsResLoc) {
-		super(modelResLoc, barkResLoc, ringsResLoc);
+	private final IBakedModel[] trunksStripped = new IBakedModel[16]; // The trunk will feature stripped "bark" on its sides if stripped.
+	private final IBakedModel[] trunksStrippedTop = new IBakedModel[16]; // The trunk will feature stripped "bark" on its top when there's a branch on top of it and if stripped.
+
+	public ThickBranchBlockBakedModel (ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc, ResourceLocation thickRingsResLoc) {
+		super(modelResLoc, barkResLoc, ringsResLoc, strippedResLoc);
 		this.thickRingsResLoc = thickRingsResLoc;
 	}
 
@@ -61,6 +64,9 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 			trunksTopBark[i] = bakeTrunkBark(radius, this.barkTexture, false);
 			trunksTopRings[i] = bakeTrunkRings(radius, DTConfigs.fancyThickRings.get() ? thickRingsTexture : ringsTexture, Direction.UP);
 			trunksBotRings[i] = bakeTrunkRings(radius, DTConfigs.fancyThickRings.get() ? thickRingsTexture : ringsTexture, Direction.DOWN);
+
+			trunksStripped[i] = bakeTrunkBark(radius, this.strippedTexture, true);
+			trunksStrippedTop[i] = bakeTrunkBark(radius, this.strippedTexture, false);
 		}
 	}
 
@@ -165,19 +171,38 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 
 		List<BakedQuad> quads = new ArrayList<>(30);
 
+		boolean rootyBlockBelow = false;
+		IBakedModel[] trunksBark = this.trunksBark;
+		IBakedModel[] trunksTopBark = this.trunksTopBark;
+
 		int[] connections = new int[] {0,0,0,0,0,0};
 		if (extraData instanceof Connections){
-			connections = ((Connections) extraData).getAllRadii();
+			Connections connectionsData = (Connections) extraData;
+			connections = connectionsData.getAllRadii();
+			rootyBlockBelow = connectionsData.isRootyBlockBelow();
+
+			if (connectionsData.isStripped()) {
+				trunksBark = this.trunksStripped;
+				trunksTopBark = this.trunksStrippedTop;
+			}
 		}
 
-		if (side == null){
+		if (side == null) {
 			for (Direction face : Direction.values()) {
-				quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+				quads.addAll(trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
 
-				if (connections[1] < 1) {
-					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
-				} else if (connections[1] < coreRadius && face == Direction.UP) {
-					quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+				if (face == Direction.DOWN) {
+					if (rootyBlockBelow) { // Add bottom rings if block below is rooty.
+						quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+					} else if (connections[0] < coreRadius) { // Add bottom bark if branch below has a greater radius (in case a thick branch gets stripped).
+						quads.addAll(trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+					}
+				} else if (face == Direction.UP) {
+					if (connections[1] < 1) { // Add rings to top face if no branch is above.
+						quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+					} else if (connections[1] < coreRadius) { // Add top bark if branch above has a greater radius.
+						quads.addAll(trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+					}
 				}
 			}
 		} else {

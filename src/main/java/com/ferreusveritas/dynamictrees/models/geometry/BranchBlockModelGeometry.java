@@ -24,20 +24,22 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     protected final ResourceLocation barkResLoc;
     protected final ResourceLocation ringsResLoc;
+    protected final ResourceLocation strippedResLoc;
 
-    public BranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
+    public BranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc) {
         this.barkResLoc = barkResLoc;
         this.ringsResLoc = ringsResLoc;
+        this.strippedResLoc = strippedResLoc;
     }
 
     @Override
     public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
-        return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
+        return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.strippedResLoc);
     }
 
     @Override
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        return Arrays.asList(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.barkResLoc), new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.ringsResLoc));
+        return Arrays.asList(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.barkResLoc), new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.ringsResLoc), new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.strippedResLoc));
     }
 
 }

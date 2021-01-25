@@ -2,6 +2,7 @@
     "loader": "dynamictrees:thick_branch",
     "textures": {
         "bark": "block/spruce_log",
-        "rings": "block/spruce_log_top"
+        "rings": "block/spruce_log_top",
+        "stripped": "block/stripped_spruce_log"
     }
 }

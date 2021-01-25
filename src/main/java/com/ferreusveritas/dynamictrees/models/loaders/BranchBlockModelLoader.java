@@ -26,7 +26,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         // TODO: Document json errors here.
         final JsonObject textures = this.getTexturesObject(modelContents);
 
-        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures));
+        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures), this.getStrippedResLoc(textures));
     }
 
     protected JsonObject getTexturesObject (JsonObject modelContents) {
@@ -41,8 +41,12 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         return this.convertStrToResLoc(texturesContents.get("rings").getAsString());
     }
 
-    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
-        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
+    protected ResourceLocation getStrippedResLoc (JsonObject texturesContents) {
+        return this.convertStrToResLoc(texturesContents.get("stripped").getAsString());
+    }
+
+    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc, final ResourceLocation strippedResLoc) {
+        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, strippedResLoc);
     }
 
     private ResourceLocation convertStrToResLoc (final String resLocStr) {

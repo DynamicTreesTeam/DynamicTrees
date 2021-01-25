@@ -31,10 +31,7 @@ import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDisease;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -417,21 +414,23 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param volume
 	 * @return
 	 */
-	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, float volume, ItemStack handStack) {
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NodeNetVolume.Volume volume, ItemStack handStack) {
 		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
 	
 	public static class LogsAndSticks {
 		public final int logs;
+		public final int strippedLogs;
 		public final int sticks;
-		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
+		public LogsAndSticks(int logs, int strippedLogs, int sticks) { this.logs = logs; this.strippedLogs = strippedLogs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
 	}
 	
-	public LogsAndSticks getLogsAndSticks(float volume) {
-		int logs = (int) volume; // Drop vanilla logs or whatever
-		int sticks = (int) ((volume - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
-		return new LogsAndSticks(logs, sticks);
+	public LogsAndSticks getLogsAndSticks(NodeNetVolume.Volume volume) {
+		int logs = (int) volume.getVolume(); // Drop vanilla logs or whatever
+		int strippedLogs = (int) volume.getStrippedVolume();
+		int sticks = (int) ((volume.getTotalVolume() - logs - strippedLogs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		return new LogsAndSticks(logs, strippedLogs, sticks);
 	}
 	
 	/**

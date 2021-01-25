@@ -8,13 +8,13 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 public class ModelConnections extends Connections implements IModelData {
-	
-	//ModelProperty<Integer>[] radii = new ModelProperty<Integer>[6];
-	
+
 	public ModelConnections() { }
 	
 	public ModelConnections(Connections connections) {
 		this.setAllRadii(connections.getAllRadii());
+		this.setRootyBlockBelow(connections.isRootyBlockBelow());
+		this.setStripped(connections.isStripped());
 	}
 	
 	public ModelConnections(int[] radii) {

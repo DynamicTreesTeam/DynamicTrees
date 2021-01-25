@@ -45,7 +45,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		
 		long seed = entity.world.rand.nextLong();
 		Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
-		float mass = entity.getDestroyData().woodVolume;
+		float mass = entity.getDestroyData().woodVolume.getTotalVolume();
 		float inertialMass = MathHelper.clamp(mass, 1, 3);
 		entity.setVelocity(entity.getMotion().x/inertialMass, entity.getMotion().y/inertialMass, entity.getMotion().z/inertialMass);
 		
