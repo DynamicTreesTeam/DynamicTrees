@@ -1,12 +1,16 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.server.ServerWorld;
+import org.spongepowered.asm.mixin.Dynamic;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,15 +32,18 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
 	@Override
 	public int getRadiusAtCoords(int x, int z) {
-
 		int rad = chunkMultipass.apply(pass);
 		if(rad >= 2 && rad <= 8) {
 			return rad;
 		}
 
 		double scale = 128;//Effectively scales up the noisemap
-		Biome biome = world.getBiome(new BlockPos(x + 8, 0, z + 8));//Placement is offset by +8,+8
+//		DynamicTrees.getLogger().debug("Getting biome at " + (x + 8) + " " + (z + 8) + ".");
+		// Seems that getting the biome at a position sometimes causes a server freeze. Weird.
+		Biome biome = world.getNoiseBiomeRaw(x + 8, 0, z + 8);//Placement is offset by +8,+8
+//		DynamicTrees.getLogger().debug("Obtained biome " + biome.getRegistryName() + ".");
 		double noiseDensity = (noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D;//Gives 0.0 to 1.0
+//		DynamicTrees.getLogger().debug("Obtained noise.");
 		double density = treeGenerator.getBiomeDataBase(world).getDensity(biome).getDensity(world.getRandom(), noiseDensity);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 

@@ -30,7 +30,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 		final ChunkPos chunkPos = world.getChunk(pos).getPos();
 		final SafeChunkBounds chunkBounds = new SafeChunkBounds(world, chunkPos);
 
-		treeGenerator.getCircleProvider().getPoissonDiscs(world.getWorld(), chunkPos.x, 0, chunkPos.z)
+		treeGenerator.getCircleProvider().getPoissonDiscs(world.getWorld(), chunkPos.x, chunkPos.z)
 				.forEach(c -> treeGenerator.makeTree(world, biomeDataBase, c, new GroundFinder(), chunkBounds));
 
         return true;
