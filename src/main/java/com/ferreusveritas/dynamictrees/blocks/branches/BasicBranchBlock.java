@@ -287,6 +287,7 @@ public class BasicBranchBlock extends BranchBlock {
 	// RENDERING
 	///////////////////////////////////////////
 
+	@Override
 	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		return super.getConnectionData(world, pos, state);
 	}

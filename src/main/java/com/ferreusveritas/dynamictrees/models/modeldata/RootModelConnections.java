@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.bakedmodels;
+package com.ferreusveritas.dynamictrees.models.modeldata;
 
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import net.minecraftforge.client.model.data.IModelData;
@@ -7,6 +7,8 @@ import net.minecraftforge.client.model.data.ModelProperty;
 import javax.annotation.Nullable;
 
 /**
+ * Extension of {@link RootConnections} to implement {@link IModelData}, so surface root connections can be transferred to the baked model.
+ *
  * @author Harley O'Connor
  */
 public class RootModelConnections extends RootConnections implements IModelData {

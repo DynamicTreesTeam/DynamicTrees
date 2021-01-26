@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.models.bakedmodels;
+package com.ferreusveritas.dynamictrees.models.modeldata;
 
 import javax.annotation.Nullable;
 
@@ -8,6 +8,9 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
+/**
+ * Extension of {@link Connections} to implement {@link IModelData}, so connections can be transferred to the baked model.
+ */
 public class ModelConnections extends Connections implements IModelData {
 
 	private Direction ringOnly = null;

@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.CactusBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.util.Connections;
+import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
