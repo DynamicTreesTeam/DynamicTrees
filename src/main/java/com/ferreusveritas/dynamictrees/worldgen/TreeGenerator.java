@@ -111,20 +111,19 @@ public class TreeGenerator {
 		return circleProvider;
 	}
 
-	public void makeWoolCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
-		makeWoolCircle(world, circle, h, resultType, safeBounds, 0);
+	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
+		makeConcreteCircle(world, circle, h, resultType, safeBounds, 0);
 	}
 
-	private BlockState getWoolByColor(DyeColor color){
-		return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color+"_wool")).getDefaultState();
+	private BlockState getConcreteByColor(DyeColor color){
+		return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete")).getDefaultState();
 	}
 
-	public void makeWoolCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
-
+	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
 		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), getWoolByColor(DyeColor.byId((circle.x ^ circle.z) & 0xF)), flags, true);
+					safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), getConcreteByColor(DyeColor.byId((circle.x ^ circle.z) & 0xF)), flags, true);
 				}
 			}
 		}
@@ -132,8 +131,8 @@ public class TreeGenerator {
 		if(resultType != EnumGeneratorResult.GENERATED) {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			DyeColor color = resultType.getColor();
-			safeBounds.setBlockState(world, pos, getWoolByColor(color), true);
-			safeBounds.setBlockState(world, pos.up(), getWoolByColor(color), true);
+			safeBounds.setBlockState(world, pos, getConcreteByColor(color), true);
+			safeBounds.setBlockState(world, pos.up(), getConcreteByColor(color), true);
 		}
 	}
 
@@ -183,7 +182,7 @@ public class TreeGenerator {
 
 		//Display wool circles for testing the circle growing algorithm
 		if(DTConfigs.worldGenDebug.get()) {
-			makeWoolCircle(world, circle, pos.getY(), result, safeBounds);
+			makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
 		}
 
 		circle.add(-8, -8);//Move the circle back to normal coords
