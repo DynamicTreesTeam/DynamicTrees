@@ -230,6 +230,8 @@ public class BlockTrunkShell extends Block {
 	
 	@Override
 	public boolean isAir(IBlockState state, IBlockAccess access, BlockPos pos) {
+		if (pos == null) // Mekanism calls isAir with null. We'll just assume that we're not air if it does. 
+			return false;
 		return getMuse(access, state, pos) == null;
 	}
 	
