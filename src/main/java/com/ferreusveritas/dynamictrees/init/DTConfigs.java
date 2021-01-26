@@ -34,8 +34,6 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
 	public static ForgeConfigSpec.BooleanValue enableThickTrees;
 	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
-	public static ForgeConfigSpec.IntValue minRadiusForStrip;
-	public static ForgeConfigSpec.BooleanValue enableStripRadiusReduction;
 	
 	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
 	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
@@ -47,8 +45,11 @@ public class DTConfigs {
 	public static ForgeConfigSpec.DoubleValue fallingTreeDamageMultiplier;
 	public static ForgeConfigSpec.BooleanValue dirtBucketPlacesDirt;
 	public static ForgeConfigSpec.BooleanValue sloppyBreakDrops;
+	public static ForgeConfigSpec.IntValue minRadiusForStrip;
+	public static ForgeConfigSpec.BooleanValue enableStripRadiusReduction;
 	
 	public static ForgeConfigSpec.BooleanValue replaceVanillaSapling;
+	public static ForgeConfigSpec.BooleanValue replaceNyliumFungi;
 	
 	public static ForgeConfigSpec.BooleanValue podzolGen;
 	public static ForgeConfigSpec.BooleanValue worldGen;
@@ -69,7 +70,7 @@ public class DTConfigs {
 		
 		SERVER_BUILDER.comment("Seed settings").push("seeds");
 		seedDropRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-				defineInRange("dropRate", 0.1, 0.0, 1.0);
+				defineInRange("dropRate", 0.01, 0.0, 1.0);
 		seedPlantRate = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
 				defineInRange("plantRate", 1f/6f, 0.0, 1.0);
 		seedTimeToLive = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
@@ -103,10 +104,6 @@ public class DTConfigs {
 				define("enableThickTrees", true);
 		rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
-		minRadiusForStrip = SERVER_BUILDER.comment("The minimum radius a branch must have before its able to be stripped. 8 = Full block size. Set to 0 to disable stripping trees").
-				defineInRange("minRadiusForStrip", 6, 0, 24);
-		enableStripRadiusReduction = SERVER_BUILDER.comment("If enabled stripping a branch will decrease its radius by one").
-				define("enableStripRadiusReduction", true);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
@@ -130,11 +127,17 @@ public class DTConfigs {
 				define("dirtBucketPlacesDirt", true);
 		sloppyBreakDrops = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.")
 				.define("sloppyBreakDrops", false);
+		minRadiusForStrip = SERVER_BUILDER.comment("The minimum radius a branch must have before its able to be stripped. 8 = Full block size. Set to 0 to disable stripping trees").
+				defineInRange("minRadiusForStrip", 6, 0, 24);
+		enableStripRadiusReduction = SERVER_BUILDER.comment("If enabled stripping a branch will decrease its radius by one").
+				define("enableStripRadiusReduction", true);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
 		replaceVanillaSapling = SERVER_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
+		replaceNyliumFungi = SERVER_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
+				define("replaceNyliumFungi", false);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("World settings").push("world");

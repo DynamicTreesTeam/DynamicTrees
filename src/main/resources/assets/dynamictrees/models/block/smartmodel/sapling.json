@@ -1,8 +1,8 @@
 {   "parent": "block/block",
     "textures": {
-        "particle": "block/oak_leaves",
-        "log": "block/oak_log",
-        "leaves": "block/leaves_oak"
+        "particle": "block/stone",
+        "log": "block/stone",
+        "leaves": "block/stone"
     },
     "display": {
         "fixed": {

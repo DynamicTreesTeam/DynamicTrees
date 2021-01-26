@@ -1,0 +1,37 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"cap": "block/stone",
+		"stem": "block/stone",
+		"particle": "block/stone"
+	},
+	"elements": [
+		{
+			"name": "Cap",
+			"from": [4, 5, 4],
+			"to": [12, 8, 12],
+			"faces": {
+				"north": {"uv": [0, 8, 8, 11], "texture": "#cap", "tintindex": 0},
+				"east": {"uv": [0, 13, 8, 16], "texture": "#cap", "tintindex": 0},
+				"south": {"uv": [0, 8, 8, 11], "texture": "#cap", "tintindex": 0},
+				"west": {"uv": [0, 13, 8, 16], "texture": "#cap", "tintindex": 0},
+				"up": {"uv": [0, 0, 8, 8], "texture": "#cap", "tintindex": 0},
+				"down": {"uv": [8, 0, 16, 8], "texture": "#cap", "tintindex": 0}
+			}
+		},
+		{
+			"name": "Stem",
+			"from": [7, 0, 7],
+			"to": [9, 5, 9],
+			"faces": {
+				"north": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"east": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"south": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"west": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"up": {"uv": [11, 11, 13, 13], "texture": "#stem"},
+				"down": {"uv": [11, 14, 13, 16], "texture": "#stem", "cullface": "down"}
+			}
+		}
+	]
+}

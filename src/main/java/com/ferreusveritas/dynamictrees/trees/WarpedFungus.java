@@ -12,29 +12,13 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class WarpedFungus extends VanillaTreeFamily {
+public class WarpedFungus extends CrimsonFungus {
 
-	public class WarpedSpecies extends Species {
+	public class WarpedSpecies extends CrimsonSpecies {
 
 		WarpedSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
-
-			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);
-
-			envFactor(Type.COLD, 0.25f);
-			envFactor(Type.WET, 0.75f);
-
 			setupStandardSeedDropping();
-		}
-
-		@Override
-		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.FUNGUSLIKE);
-		}
-
-		@Override
-		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
-			return BiomeDictionary.hasType(biome, Type.NETHER);
 		}
 
 		@Override
@@ -42,6 +26,7 @@ public class WarpedFungus extends VanillaTreeFamily {
 			BlockState soilState = world.getBlockState(pos.down());
 			return soilState.getBlock() == Blocks.WARPED_NYLIUM || soilState.getBlock() == RootyBlockHelper.getRootyBlock(Blocks.WARPED_NYLIUM);
 		}
+
 	}
 
 	public WarpedFungus() {

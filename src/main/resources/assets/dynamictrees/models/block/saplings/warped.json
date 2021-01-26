@@ -1,8 +1,7 @@
-{
-    "parent": "dynamictrees:block/smartmodel/sapling",
-    "textures": {
-        "particle": "block/warped_wart_block",
-        "log": "block/warped_stem",
-        "leaves": "block/warped_wart_block"
-    }
+{   "parent": "dynamictrees:block/smartmodel/mushroom_flat",
+	"textures": {
+		"cap": "dynamictrees:block/mushroom_warped",
+		"stem": "dynamictrees:block/mushroom_warped",
+		"particle": "dynamictrees:block/mushroom_warped"
+	}
 }

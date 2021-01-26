@@ -1,40 +1,7 @@
-{   "parent": "block/block",
+{   "parent": "dynamictrees:block/smartmodel/mushroom_round",
     "textures": {
-        "particle": "block/red_mushroom_block",
-        "log": "block/mushroom_stem",
-        "leaves": "block/red_mushroom_block"
-    },
-    "display": {
-        "fixed": {
-            "rotation": [ 0, 90, 0 ],
-            "translation": [ 0, 0, 0 ],
-            "scale": [ 0.5, 0.5, 0.5 ]
-        }
-    },
-    "elements": [
-        {   "__comment": "Leaves",
-            "from": [ 5, 4, 5 ],
-            "to": [ 11, 10, 11 ],
-            "faces": {
-                "down":  { "uv": [ 0, 0, 6, 6 ], "texture": "#leaves", "tintindex": 0 },
-                "up":    { "uv": [ 6, 0, 12, 6 ], "texture": "#leaves", "tintindex": 0 },
-                "north": { "uv": [ 5, 5, 11, 11 ], "texture": "#leaves", "tintindex": 0 },
-                "south": { "uv": [ 5, 10, 11, 16 ], "texture": "#leaves", "tintindex": 0 },
-                "west":  { "uv": [ 10, 5, 16, 11 ], "texture": "#leaves", "tintindex": 0 },
-                "east":  { "uv": [ 10, 10, 16, 16 ], "texture": "#leaves", "tintindex": 0 }
-            }
-        },
-        {   "__comment": "Trunk",
-            "from": [ 7, 0, 7 ],
-            "to": [ 9, 5, 9 ],
-            "faces": {
-                "down":  { "uv": [ 7, 7, 9, 9 ], "texture": "#log", "cullface": "down"},
-                "up":    { "uv": [ 7, 7, 9, 9 ], "texture": "#log"},
-                "north": { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
-                "south": { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
-                "west":  { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
-                "east":  { "uv": [ 7, 0, 9, 5 ], "texture": "#log"}
-            }
-        }
-    ]
+        "cap": "dynamictrees:block/mushroom_red",
+        "stem": "dynamictrees:block/mushroom_red",
+        "particle": "dynamictrees:block/mushroom_red"
+    }
 }

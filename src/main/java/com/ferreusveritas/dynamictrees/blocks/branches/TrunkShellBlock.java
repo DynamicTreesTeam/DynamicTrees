@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItemUseContext;
@@ -279,6 +280,16 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public PushReaction getPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
 	}
+
+	@Override
+	public boolean addLandingEffects(BlockState state1, ServerWorld worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+		return false;
+	}
+
+//	@Override
+//	public boolean addRunningEffects(BlockState state, World world, BlockPos pos, Entity entity) {
+//		return false;
+//	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
