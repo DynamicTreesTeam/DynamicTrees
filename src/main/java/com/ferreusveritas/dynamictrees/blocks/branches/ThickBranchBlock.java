@@ -29,7 +29,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	public static final int RADMAX_THICK = 24;
 
-	public static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
+	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
 	public ThickBranchBlock(String name) {
 		this(Properties.create(Material.WOOD),name);
@@ -51,11 +51,11 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	public void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS_DOUBLE, STRIPPED);
+		builder.add(RADIUS_DOUBLE);
 	}
 
 	public void cacheBranchThickStates() {
-		setDefaultState(this.getStateContainer().getBaseState().with(RADIUS_DOUBLE, 1).with(STRIPPED, false));
+		setDefaultState(this.getStateContainer().getBaseState().with(RADIUS_DOUBLE, 1));
 
 		branchStates = new BlockState[RADMAX_THICK + 1];
 

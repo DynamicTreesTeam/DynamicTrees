@@ -14,8 +14,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc, final ResourceLocation strippedResLoc) {
-        return new ThickBranchBlockModelGeometry(barkResLoc, ringsResLoc, strippedResLoc);
+    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
+        return new ThickBranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 
 }

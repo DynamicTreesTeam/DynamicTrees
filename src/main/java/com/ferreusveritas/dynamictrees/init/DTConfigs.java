@@ -34,6 +34,8 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
 	public static ForgeConfigSpec.BooleanValue enableThickTrees;
 	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
+	public static ForgeConfigSpec.IntValue minRadiusForStrip;
+	public static ForgeConfigSpec.BooleanValue enableStripRadiusReduction;
 	
 	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
 	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
@@ -55,7 +57,7 @@ public class DTConfigs {
 	//	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
 	public static ForgeConfigSpec.ConfigValue<List<Integer>> dimensionBlackList;
 	
-	public static ForgeConfigSpec.BooleanValue fancyThickRings;
+	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
 	//	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
 	
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
@@ -93,7 +95,7 @@ public class DTConfigs {
 				defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
 		diseaseChance = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
-		maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to rot away. 8 = Full block size.  Set to 0 to prevent rotting").
+		maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to rot away. 8 = Full block size. Set to 0 to prevent rotting").
 				defineInRange("maxBranchRotRadius", 8, 0, 24);
 		enableAppleTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableAppleTrees", true);
@@ -101,6 +103,10 @@ public class DTConfigs {
 				define("enableThickTrees", true);
 		rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
+		minRadiusForStrip = SERVER_BUILDER.comment("The minimum radius a branch must have before its able to be stripped. 8 = Full block size. Set to 0 to disable stripping trees").
+				defineInRange("minRadiusForStrip", 6, 0, 24);
+		enableStripRadiusReduction = SERVER_BUILDER.comment("If enabled stripping a branch will decrease its radius by one").
+				define("enableStripRadiusReduction", true);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
@@ -147,10 +153,10 @@ public class DTConfigs {
 		
 		COMMON_BUILDER.pop();
 		
-		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
-		fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
-				define("fancyThickRings", true);
-		CLIENT_BUILDER.pop();
+//		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
+//		fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
+//				define("fancyThickRings", true);
+//		CLIENT_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Debug settings for development").push("debug");
 		worldGenDebug = SERVER_BUILDER.comment("Enable to mark tree spawn locations with wool circles.").

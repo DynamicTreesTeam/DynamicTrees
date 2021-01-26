@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
+import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -18,13 +19,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -74,6 +70,8 @@ public class TreeFamily {
 	//Branches
 	/** The dynamic branch used by this tree family */
 	private BranchBlock dynamicBranch;
+	/** The stripped variant of the branch used by this tree family */
+	private BranchBlock dynamicStrippedBranch;
 	/** The dynamic branch's block item */
 	private Item dynamicBranchItem;
 	/** The surface root used by this tree family */
@@ -109,6 +107,10 @@ public class TreeFamily {
 		this.name = name;
 
 		this.setDynamicBranch(createBranch()).setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+
+		if (this.hasStrippedBranch()) {
+			this.setDynamicStrippedBranch(createBranch("_branch_stripped"));
+		}
 
 		if (this.hasSurfaceRoot()) {
 			this.setSurfaceRoot(this.createSurfaceRoot());
@@ -173,6 +175,10 @@ public class TreeFamily {
 
 		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
 
+		if (canStripBranch(state, world, hitPos, player, heldItem)){
+			return stripBranch(state, world, hitPos, player, heldItem);
+		}
+
 		if(rootPos != BlockPos.ZERO) {
 			return TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
 		}
@@ -180,6 +186,22 @@ public class TreeFamily {
 		return false;
 	}
 
+	public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
+		return TreeHelper.getBranch(state).canBeStripped(state, world, pos, player, heldItem);
+	}
+
+	public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
+		if (getDynamicStrippedBranch() != null){
+			getDynamicBranch().stripBranch(state, world, pos, player, heldItem);
+
+			if (world.isRemote) {
+				world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+				WailaOther.invalidateWailaPosition();
+			}
+			return true;
+		}
+		else return false;
+	}
 
 	///////////////////////////////////////////
 	// REGISTRATION
@@ -191,6 +213,8 @@ public class TreeFamily {
 	 * */
 	public List<Block> getRegisterableBlocks(List<Block> blockList) {
 		blockList.add(getDynamicBranch());
+		if (this.hasStrippedBranch())
+			blockList.add(getDynamicStrippedBranch());
 		if (this.hasSurfaceRoot()) {
 			blockList.add(getSurfaceRoot());
 		}
@@ -209,7 +233,6 @@ public class TreeFamily {
 	 */
 	public List<Item> getRegisterableItems(List<Item> itemList) {
 		//Register an itemBlock for the branch block
-		Block branch = getDynamicBranch();
 		itemList.add(this.dynamicBranchItem);
 
 		getCommonSpecies().getSeed().ifPresent(itemList::add);
@@ -236,7 +259,10 @@ public class TreeFamily {
 	 * @return the branch to be created
 	 */
 	public BranchBlock createBranch() {
-		String branchName = this.getName() + "_branch";
+		return createBranch("_branch");
+	}
+	public BranchBlock createBranch(String postfix) {
+		String branchName = this.getName() + postfix;
 		return isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
 	}
 
@@ -244,10 +270,21 @@ public class TreeFamily {
 		return new BlockItem(branch, new Item.Properties()).setRegistryName(branch.getRegistryName());
 	}
 
-	protected TreeFamily setDynamicBranch(BranchBlock gBranch) {
-		dynamicBranch = gBranch;//Link the tree to the branch
+	protected TreeFamily setDynamicBranch(BranchBlock branch) {
+		dynamicBranch = branch;//Link the tree to the branch
 		dynamicBranch.setFamily(this);//Link the branch back to the tree
-
+		dynamicBranch.setCanBeStripped(hasStrippedBranch());//Allow the branch to be stripped if a stripped variant exists
+		return this;
+	}
+	protected TreeFamily setDynamicStrippedBranch(BranchBlock branch) {
+		dynamicStrippedBranch = branch;//Link the tree to the branch
+		dynamicStrippedBranch.setFamily(this);//Link the branch back to the tree
+		dynamicStrippedBranch.setCanBeStripped(false);//Already stripped logs should not be able to be stripped again
+		return this;
+	}
+	protected TreeFamily setDynamicBranches(BranchBlock branch, BranchBlock strippedBranch) {
+		setDynamicBranch(branch);
+		setDynamicStrippedBranch(strippedBranch);
 		return this;
 	}
 
@@ -258,6 +295,9 @@ public class TreeFamily {
 
 	public BranchBlock getDynamicBranch() {
 		return dynamicBranch;
+	}
+	public BranchBlock getDynamicStrippedBranch() {
+		return dynamicStrippedBranch;
 	}
 
 	public Item getDynamicBranchItem() {
@@ -334,22 +374,6 @@ public class TreeFamily {
 		return new ItemStack(this.primitiveLog, qty);
 	}
 
-	public boolean canBeStripped () {
-		return this.primitiveStrippedLog != Blocks.AIR;
-	}
-
-	protected void setPrimitiveStrippedLog(Block primitiveStrippedLog) {
-		this.primitiveStrippedLog = primitiveStrippedLog;
-	}
-
-	public Block getPrimitiveStrippedLog() {
-		return primitiveStrippedLog;
-	}
-
-	public ItemStack getPrmitiveStrippedLogs (int qty) {
-		return new ItemStack (this.primitiveStrippedLog, qty);
-	}
-
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////
@@ -376,6 +400,10 @@ public class TreeFamily {
 		return 2.0f;
 	}
 
+	public boolean hasStrippedBranch(){
+		return true;
+	}
+
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////
@@ -386,7 +414,7 @@ public class TreeFamily {
 
 	public SurfaceRootBlock createSurfaceRoot () {
 		String surfaceRootName = this.getName() + "_root";
-		return new SurfaceRootBlock(surfaceRootName, this.getDynamicBranchItem());
+		return new SurfaceRootBlock(surfaceRootName, this);
 	}
 
 	public SurfaceRootBlock getSurfaceRoot() {

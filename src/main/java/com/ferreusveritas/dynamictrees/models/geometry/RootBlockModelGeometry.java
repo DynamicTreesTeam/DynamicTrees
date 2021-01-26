@@ -19,7 +19,7 @@ import java.util.function.Function;
 public class RootBlockModelGeometry extends BranchBlockModelGeometry {
 
     public RootBlockModelGeometry (ResourceLocation barkResLoc) {
-        super(barkResLoc, null, null);
+        super(barkResLoc, null);
     }
 
     @Override

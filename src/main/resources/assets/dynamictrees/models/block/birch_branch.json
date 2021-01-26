@@ -2,7 +2,6 @@
     "loader": "dynamictrees:branch",
     "textures": {
         "bark": "block/birch_log",
-        "rings": "block/birch_log_top",
-        "stripped": "block/stripped_birch_log"
+        "rings": "block/birch_log_top"
     }
 }

@@ -183,6 +183,11 @@ public class Cactus extends TreeFamily {
 	}
 
 	@Override
+	public boolean hasStrippedBranch() {
+		return false;
+	}
+
+	@Override
 	public float getPrimaryThickness() {
 		return 5.0f;
 	}
@@ -195,12 +200,6 @@ public class Cactus extends TreeFamily {
 	@Override
 	public void createSpecies() {
 		setCommonSpecies(new CactusSpecies(this));
-	}
-
-	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-//		commonSpecies.getSapling().ifPresent(blockList::add);
-		return super.getRegisterableBlocks(blockList);
 	}
 
 	@Override

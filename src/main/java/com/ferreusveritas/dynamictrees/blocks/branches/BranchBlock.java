@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
@@ -38,13 +39,8 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ForgeMod;
@@ -55,12 +51,15 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock.RADIUS;
+
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
+	private boolean canBeStripped;
 	
 	public BranchBlock(Properties properties, String name){
 		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
@@ -69,6 +68,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	public BranchBlock(Material material, String name) {
 		this(Properties.create(material), name);
+	}
+
+	public BranchBlock setCanBeStripped(boolean truth){
+		canBeStripped = truth;
+		return this;
 	}
 
 	///////////////////////////////////////////
@@ -140,13 +144,26 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	@Deprecated
 	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		//		if (getRadius(state) > 8){
-		//			setRadius(world, pos, getRadius(state), Direction.DOWN);
-		//		}
 		net.minecraft.item.ItemStack heldItem = player.getHeldItem(hand);
 		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
-	
+
+	public boolean canBeStripped(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+		int stripRadius = DTConfigs.minRadiusForStrip.get();
+		return stripRadius != 0 && stripRadius <= getRadius(state) && canBeStripped && isAxe(heldItem);
+	}
+
+	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+			int radius = this.getRadius(state);
+			this.damageAxe(player, heldItem, 2, new NodeNetVolume.Volume(1), false);
+			getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return new ItemStack(getFamily().getDynamicBranchItem());
+	}
+
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
@@ -162,9 +179,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				BlockState neighborBlockState = world.getBlockState(deltaPos);
 				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
 				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
-
-				if (dir == Direction.DOWN && neighborBlockState.getBlock() instanceof RootyBlock)
-					connections.setRootyBlockBelow(true);
 			}
 		}
 		

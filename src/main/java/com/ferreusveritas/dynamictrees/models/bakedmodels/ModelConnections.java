@@ -11,13 +11,12 @@ import net.minecraftforge.client.model.data.ModelProperty;
 public class ModelConnections extends Connections implements IModelData {
 
 	private Direction ringOnly = null;
+	protected boolean rootyBlockBelow = false;
 
 	public ModelConnections() { }
 	
 	public ModelConnections(Connections connections) {
 		this.setAllRadii(connections.getAllRadii());
-		this.setRootyBlockBelow(connections.isRootyBlockBelow());
-		this.setStripped(connections.isStripped());
 	}
 	
 	public ModelConnections(int[] radii) {
@@ -52,6 +51,14 @@ public class ModelConnections extends Connections implements IModelData {
 
 	public Direction getRingOnly(){
 		return ringOnly;
+	}
+
+	public boolean isRootyBlockBelow() {
+		return rootyBlockBelow;
+	}
+
+	public void setRootyBlockBelow(boolean rootyBlockBelow) {
+		this.rootyBlockBelow = rootyBlockBelow;
 	}
 
 }

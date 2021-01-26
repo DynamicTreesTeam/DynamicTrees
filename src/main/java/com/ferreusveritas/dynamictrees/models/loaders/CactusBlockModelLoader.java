@@ -23,7 +23,8 @@ public class CactusBlockModelLoader extends BranchBlockModelLoader {
         return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures));
     }
 
-    private BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
+    @Override
+    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
         return new CactusBranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 

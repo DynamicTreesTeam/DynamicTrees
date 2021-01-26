@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import net.minecraft.block.Block;
@@ -20,6 +21,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -40,13 +42,13 @@ public class SurfaceRootBlock extends Block {
 
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
 
-	private final Item branchItem;
+	private final TreeFamily family;
 
-	public SurfaceRootBlock(String name, Item branchItem) {
-		this(Material.WOOD, name, branchItem);
+	public SurfaceRootBlock(String name, TreeFamily family) {
+		this(Material.WOOD, name, family);
 	}
 
-	public SurfaceRootBlock(Material material, String name, Item branchItem) {
+	public SurfaceRootBlock(Material material, String name, TreeFamily family) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
@@ -54,7 +56,7 @@ public class SurfaceRootBlock extends Block {
 				.sound(SoundType.WOOD));
 
 		this.setRegistryName(name);
-		this.branchItem = branchItem;
+		this.family = family;
 	}
 
 	public class RootConnection {
@@ -68,8 +70,8 @@ public class SurfaceRootBlock extends Block {
 	}
 
 	@Override
-	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		return new ItemStack(this.branchItem);
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return new ItemStack(family.getDynamicBranchItem());
 	}
 
 	///////////////////////////////////////////

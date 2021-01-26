@@ -95,12 +95,6 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 						logRender = getRenderable(logStack);
 					}
 				}
-				if (las.strippedLogs > 0) {
-					ItemStack strippedLogStack = species.getFamily().getPrmitiveStrippedLogs(las.strippedLogs);
-					if (!strippedLogStack.isEmpty()) {
-						strippedLogRender = getRenderable(strippedLogStack);
-					}
-				}
 				if(las.sticks > 0) {
 					ItemStack stickStack = species.getFamily().getStick(las.sticks);
 					if (!stickStack.isEmpty()){

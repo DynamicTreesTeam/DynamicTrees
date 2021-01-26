@@ -421,16 +421,14 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public static class LogsAndSticks {
 		public final int logs;
-		public final int strippedLogs;
 		public final int sticks;
-		public LogsAndSticks(int logs, int strippedLogs, int sticks) { this.logs = logs; this.strippedLogs = strippedLogs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
+		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
 	}
 	
 	public LogsAndSticks getLogsAndSticks(NodeNetVolume.Volume volume) {
 		int logs = (int) volume.getVolume(); // Drop vanilla logs or whatever
-		int strippedLogs = (int) volume.getStrippedVolume();
-		int sticks = (int) ((volume.getTotalVolume() - logs - strippedLogs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
-		return new LogsAndSticks(logs, strippedLogs, sticks);
+		int sticks = (int) ((volume.getTotalVolume() - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		return new LogsAndSticks(logs, sticks);
 	}
 	
 	/**

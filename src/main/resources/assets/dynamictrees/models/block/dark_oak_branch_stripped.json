@@ -1,0 +1,7 @@
+{
+  "loader": "dynamictrees:thick_branch",
+  "textures": {
+    "bark": "block/stripped_dark_oak_log",
+    "rings": "block/stripped_dark_oak_log_top"
+  }
+}

@@ -1,9 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -13,27 +9,20 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
-import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.*;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -47,13 +36,12 @@ import java.util.Random;
 public class BasicBranchBlock extends BranchBlock {
 	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
-	protected static final BooleanProperty STRIPPED = BooleanProperty.create("stripped");
 	
 	protected BlockState[] branchStates;
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
-	
+
 	// Trees are mostly made of wood
 	public BasicBranchBlock(String name) {
 		this(AbstractBlock.Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
@@ -67,7 +55,7 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 
 	public void cacheBranchStates() {
-		this.setDefaultState(stateContainer.getBaseState().with(RADIUS, 1).with(STRIPPED, false));
+		this.setDefaultState(stateContainer.getBaseState().with(RADIUS, 1));
 		
 		branchStates = new BlockState[RADMAX_NORMAL + 1];
 		
@@ -83,7 +71,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS, STRIPPED);
+		builder.add(RADIUS);
 	}
 	
 	///////////////////////////////////////////
@@ -172,11 +160,6 @@ public class BasicBranchBlock extends BranchBlock {
 	public BasicBranchBlock setFireSpreadSpeed(int fireSpreadSpeed) {
 		this.fireSpreadSpeed = fireSpreadSpeed;
 		return this;
-	}
-
-	@Override
-	public boolean isStripped(BlockState state) {
-		return state.hasProperty(STRIPPED) ? state.get(STRIPPED) : false;
 	}
 
 	///////////////////////////////////////////
@@ -301,40 +284,11 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 
 	///////////////////////////////////////////
-	// INTERACTION
-	///////////////////////////////////////////
-
-	@Deprecated
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		ActionResultType resultType = super.onBlockActivated(state, world, pos, player, hand, hit);
-
-		final ItemStack heldItem = player.getHeldItem(hand);
-		if (!this.isStripped(state) && this.isAxe(heldItem))
-			resultType = this.stripBranch(state, world, pos, player, heldItem);
-
-		return resultType;
-	}
-
-	private ActionResultType stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-		int radius = this.getRadius(state);
-		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2f, 0), false);
-		world.setBlockState(pos, state.with(STRIPPED, true)
-				.with(this instanceof ThickBranchBlock ? ThickBranchBlock.RADIUS_DOUBLE : RADIUS, radius > 1 ? radius - 1 : radius));
-
-		if (world.isRemote) {
-			world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
-			WailaOther.invalidateWailaPosition();
-		}
-
-		return ActionResultType.SUCCESS;
-	}
-
-	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
 
 	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return super.getConnectionData(world, pos, state).setStripped(this.isStripped(state));
+		return super.getConnectionData(world, pos, state);
 	}
 
 	///////////////////////////////////////////

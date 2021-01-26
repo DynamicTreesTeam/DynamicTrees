@@ -117,10 +117,6 @@ public interface ITreePart {
 
 	TreePartType getTreePartType();
 
-	default boolean isStripped (BlockState state) {
-		return false;
-	}
-
 	default boolean isRootNode() {
 		return false;
 	}

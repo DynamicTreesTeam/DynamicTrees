@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import com.google.common.collect.Maps;
@@ -30,25 +31,18 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	protected TextureAtlasSprite barkTexture;
 	protected TextureAtlasSprite strippedTexture;
 
-	protected final ResourceLocation strippedResLoc;
-
 	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
 	private final IBakedModel[][] sleeves = new IBakedModel[6][7];
 	private final IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
 	private final IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
 
-	private final IBakedModel[][] strippedSleeves = new IBakedModel[6][7];
-	private final IBakedModel[][] strippedCores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-
-	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc) {
+	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
 		super(modelResLoc, barkResLoc, ringsResLoc);
-		this.strippedResLoc = strippedResLoc;
 	}
 
 	@Override
 	public void setupModels () {
 		this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
-		this.strippedTexture = ModelUtils.getTexture(this.strippedResLoc);
 		TextureAtlasSprite ringTexture = ModelUtils.getTexture(this.ringsResLoc);
 
 		for(int i = 0; i < 8; i++) {
@@ -56,16 +50,11 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			if(radius < 8) {
 				for(Direction dir: Direction.values()) {
 					sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkTexture);
-					strippedSleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, strippedTexture);
 				}
 			}
 			cores[0][i] = bakeCore(radius, Axis.Y, barkTexture); //DOWN<->UP
 			cores[1][i] = bakeCore(radius, Axis.Z, barkTexture); //NORTH<->SOUTH
 			cores[2][i] = bakeCore(radius, Axis.X, barkTexture); //WEST<->EAST
-
-			strippedCores[0][i] = bakeCore(radius, Axis.Y, strippedTexture); //DOWN<->UP
-			strippedCores[1][i] = bakeCore(radius, Axis.Z, strippedTexture); //NORTH<->SOUTH
-			strippedCores[2][i] = bakeCore(radius, Axis.X, strippedTexture); //WEST<->EAST
 
 			rings[i] = bakeCore(radius, Axis.Y, ringTexture);
 		}
@@ -178,9 +167,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 			if (coreRadius > 8) return Collections.emptyList();
 
-			IBakedModel[][] cores = this.cores;
-			IBakedModel[][] sleeves = this.sleeves;
-
 			int[] connections = new int[] {0,0,0,0,0,0};
 
 			Direction ringOnly = null;
@@ -188,10 +174,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 				ModelConnections connectionsData = (ModelConnections) extraData;
 				connections = connectionsData.getAllRadii();
 				ringOnly = connectionsData.getRingOnly();
-				if (connectionsData.isStripped()) {
-					sleeves = this.strippedSleeves;
-					cores = this.strippedCores;
-				}
 			}
 
 			if (ringOnly == null){
@@ -254,7 +236,11 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Override
 	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Block block = state.getBlock();
-		return block instanceof BranchBlock ? new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)) : new ModelConnections();
+		if (!(block instanceof BranchBlock)) return new ModelConnections();
+		ModelConnections connections = new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state));
+		if (world.getBlockState(pos.down()).getBlock() instanceof RootyBlock)
+			connections.setRootyBlockBelow(true);
+		return connections;
 	}
 	
 	/**
@@ -301,15 +287,12 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	public boolean isAmbientOcclusion() {
 		return true;
 	}
-	
+
 	@Override
 	public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
 		if (!(data instanceof Connections))
 			return this.getParticleTexture();
-
-		Connections connections = (Connections) data;
-
-		return connections.isStripped() ? this.barkTexture : this.strippedTexture;
+		return this.barkTexture;
 	}
 
 	@Override

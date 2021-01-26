@@ -2,7 +2,6 @@
     "loader": "dynamictrees:branch",
     "textures": {
         "bark": "block/warped_stem",
-        "rings": "block/warped_stem_top",
-        "stripped": "block/stripped_warped_stem"
+        "rings": "block/warped_stem_top"
     }
 }

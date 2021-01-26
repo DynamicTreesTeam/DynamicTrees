@@ -27,11 +27,6 @@ public class LogDropCreator extends DropCreator {
 			dropList.add(species.getFamily().getPrimitiveLogs(Math.min(numLogs, 64)));
 			numLogs -= 64;
 		}
-		int numStrippedLogs = las.strippedLogs;
-		while (numStrippedLogs > 0) {
-			dropList.add(species.getFamily().getPrmitiveStrippedLogs(Math.min(numStrippedLogs, 64)));
-			numStrippedLogs -= 64;
-		}
 		int numSticks = las.sticks;
 		if(numSticks > 0) {
 			dropList.add(species.getFamily().getStick(numSticks));

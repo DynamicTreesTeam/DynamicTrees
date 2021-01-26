@@ -1,0 +1,7 @@
+{
+    "loader": "dynamictrees:branch",
+    "textures": {
+        "bark": "block/stripped_crimson_stem",
+        "rings": "block/stripped_crimson_stem_top"
+    }
+}

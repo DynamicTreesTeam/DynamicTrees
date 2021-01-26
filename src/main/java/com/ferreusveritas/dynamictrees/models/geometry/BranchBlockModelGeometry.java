@@ -22,22 +22,20 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     protected final ResourceLocation barkResLoc;
     protected final ResourceLocation ringsResLoc;
-    protected final ResourceLocation strippedResLoc;
 
-    public BranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc) {
+    public BranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
         this.barkResLoc = barkResLoc;
         this.ringsResLoc = ringsResLoc;
-        this.strippedResLoc = strippedResLoc;
     }
 
     @Override
     public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
-        return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.strippedResLoc);
+        return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
     }
 
     @Override
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        ResourceLocation[] textures = {this.barkResLoc, this.strippedResLoc, this.ringsResLoc};
+        ResourceLocation[] textures = {this.barkResLoc, this.ringsResLoc};
         List<RenderMaterial> renderMaterials = new ArrayList<>();
 
         for (ResourceLocation textureLoc : textures) {
