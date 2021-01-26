@@ -173,7 +173,7 @@ public class TreeFamily {
 
 	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
 
-		BlockPos rootPos = TreeHelper.findRootNode(state, world, hitPos);
+		BlockPos rootPos = TreeHelper.findRootNode(world, hitPos);
 
 		if (canStripBranch(state, world, hitPos, player, heldItem)){
 			return stripBranch(state, world, hitPos, player, heldItem);
@@ -296,6 +296,7 @@ public class TreeFamily {
 	public BranchBlock getDynamicBranch() {
 		return dynamicBranch;
 	}
+
 	public BranchBlock getDynamicStrippedBranch() {
 		return dynamicStrippedBranch;
 	}

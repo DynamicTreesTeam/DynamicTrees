@@ -58,7 +58,7 @@
 		"select": { "type": "swamp", "name": "minecraft:.*" },
 		"apply": {
 			"species" : "swamp_oak",
-			"density": [ 0.2 ],
+			"density": 0.2 ,
 			"chance": 0.75
 		}
 	},
@@ -66,7 +66,7 @@
 		"select": { "type": "savanna", "name": "minecraft:.*" },
 		"apply": {
 			"species" : "acacia",
-			"density": [ 0.01 ],
+			"density": 0.01,
 			"chance": 0.2
 		}
 	},
@@ -74,7 +74,7 @@
 		"select": { "type": "jungle", "name": "minecraft:.*" },
 		"apply": {
 			"species" : "jungle",
-			"density": [ 0.4 ],
+			"density": 0.4,
 			"forestness" : 1.0
 		}
 	},
@@ -181,12 +181,18 @@
 		"select": { "name": "minecraft:crimson_forest" },
 		"apply": {
 			"species": "crimson"
-		}
+		},
+		"density": 1,
+		"chance": 1.0,
+		"forestness" : 1.0
 	},
 	{
 		"select": { "name": "minecraft:warped_forest" },
 		"apply": {
 			"species": "warped"
-		}
+		},
+		"density": 1,
+		"chance": 1.0,
+		"forestness" : 1.0
 	}
 ]

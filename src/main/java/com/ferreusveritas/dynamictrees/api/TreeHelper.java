@@ -134,7 +134,7 @@ public class TreeHelper {
 			return Optional.empty();
 		}
 		pos = dereferenceTrunkShell(world, pos);
-		BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 		return rootPos != BlockPos.ZERO ? Optional.of(new JoCode(world, rootPos, direction)) : Optional.empty();
 	}
 	
@@ -190,10 +190,7 @@ public class TreeHelper {
 	 * @return
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
-		pos = dereferenceTrunkShell(world, pos);
-		BlockState blockState = world.getBlockState(pos);
-		
-		BlockPos rootPos = findRootNode(blockState, world, pos);
+		BlockPos rootPos = findRootNode(world, pos);
 		
 		if(rootPos != BlockPos.ZERO) {
 			BlockState rootyState = world.getBlockState(rootPos);
@@ -220,18 +217,19 @@ public class TreeHelper {
 	/**
 	 * Find the root node of a tree.
 	 *
-	 * @param blockState The blockState of either a branch or root block in world at pos
 	 * @param world The world
 	 * @param pos The position being analyzed
 	 * @return The position of the root node of the tree or BlockPos.ZERO if nothing was found.
 	 */
-	public static BlockPos findRootNode(BlockState blockState, World world, BlockPos pos) {
-		
-		ITreePart treePart = TreeHelper.getTreePart(blockState);
+	public static BlockPos findRootNode(World world, BlockPos pos) {
+
+		pos = dereferenceTrunkShell(world, pos);
+		BlockState state = world.getBlockState(pos);
+		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
 		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
-				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				MapSignal signal = treePart.analyse(state, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 				if(signal.found) {
 					return signal.root;
 				}

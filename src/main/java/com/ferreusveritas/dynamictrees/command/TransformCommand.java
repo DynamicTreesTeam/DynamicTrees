@@ -65,7 +65,7 @@ public final class TransformCommand extends SubCommand {
             return 0;
         }
 
-        final BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+        final BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 
         if (rootPos.equals(BlockPos.ZERO)) {
             return 0; // This should never happen, but just in case we return.

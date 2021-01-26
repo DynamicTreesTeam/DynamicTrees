@@ -45,10 +45,10 @@ public final class CreateStaffCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        BlockPos pos = this.getPositionArg(context);
         String colour = HexColorArgument.getHexString(context, CommandConstants.COLOR_ARGUMENT);
         final int maxUses = IntegerArgumentType.getInteger(context, CommandConstants.MAX_USES_ARGUMENT);
-        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+        final Species species = this.getSpeciesArg(context);
 
         // Ensure species given exists.
         if (!species.isValid()) {
