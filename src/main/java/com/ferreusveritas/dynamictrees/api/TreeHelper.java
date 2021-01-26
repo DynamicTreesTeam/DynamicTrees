@@ -1,23 +1,16 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import java.util.Optional;
-
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
+import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell.ShellMuse;
-import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.Deprecatron;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
@@ -26,6 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.Optional;
 
 public class TreeHelper {
 	
@@ -136,8 +131,7 @@ public class TreeHelper {
 		if(pos == null) {
 			return Optional.empty();
 		}
-		pos = dereferenceTrunkShell(world, pos);
-		BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 		return rootPos != BlockPos.ORIGIN ? Optional.of(new JoCode(world, rootPos, facing)) : Optional.empty();
 	}
 	
@@ -176,11 +170,7 @@ public class TreeHelper {
 	 * @return
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
-		
-		pos = dereferenceTrunkShell(world, pos);
-		IBlockState blockState = world.getBlockState(pos);
-		
-		BlockPos rootPos = findRootNode(blockState, world, pos);
+		BlockPos rootPos = findRootNode(world, pos);
 		if(rootPos != BlockPos.ORIGIN) {
 			IBlockState rootyState = world.getBlockState(rootPos);
 			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
@@ -221,22 +211,37 @@ public class TreeHelper {
 		Species species = getExactSpecies(world, pos);
 		return species == Species.NULLSPECIES ? getCommonSpecies(world, pos) : species;
 	}
-	
+
 	/**
-	 * Find the root node of a tree.
-	 * 
-	 * @param blockState The blockState of either a branch or root block in world at pos
+	 * Old method for finding root node. No longer needs block state as it is obtained
+	 * in the class, but it is here in case any add-ons still use it. 
+	 *
+	 * @param state The block state of either a branch or root block in world at pos
 	 * @param world The world
 	 * @param pos The position being analyzed
 	 * @return The position of the root node of the tree or BlockPos.ORIGIN if nothing was found.
 	 */
-	public static BlockPos findRootNode(IBlockState blockState, World world, BlockPos pos) {
+	@Deprecated
+	public static BlockPos findRootNode (IBlockState state, World world, BlockPos pos) {
+		return findRootNode(world, pos);
+	}
+	
+	/**
+	 * Find the root node of a tree.
+	 * 
+	 * @param world The world
+	 * @param pos The position being analyzed
+	 * @return The position of the root node of the tree or BlockPos.ORIGIN if nothing was found.
+	 */
+	public static BlockPos findRootNode(World world, BlockPos pos) {
 		
-		ITreePart treePart = TreeHelper.getTreePart(blockState);
+		pos = dereferenceTrunkShell(world, pos);
+		IBlockState state = world.getBlockState(pos);
+		ITreePart treePart = TreeHelper.getTreePart(state);
 		
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
-				MapSignal signal = treePart.analyse(blockState, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
+				MapSignal signal = treePart.analyse(state, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
 				if(signal.found) {
 					return signal.root;
 				}

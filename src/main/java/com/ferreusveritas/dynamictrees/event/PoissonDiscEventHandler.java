@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-
 import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.ChunkDataEvent;
@@ -28,7 +27,7 @@ public class PoissonDiscEventHandler {
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
 		World world = event.getWorld();
 		if(!world.isRemote) {
-			byte circleData[] = event.getData().getByteArray("GTCD");
+			byte[] circleData = event.getData().getByteArray("GTCD");
 			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
 			cp.setChunkPoissonData(world, event.getChunk().x, 0, event.getChunk().z, circleData);
 		}
@@ -38,7 +37,7 @@ public class PoissonDiscEventHandler {
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
 		World world = event.getWorld();
 		PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
-		byte circleData[] = cp.getChunkPoissonData(world, event.getChunk().x, 0, event.getChunk().z);
+		byte[] circleData = cp.getChunkPoissonData(world, event.getChunk().x, 0, event.getChunk().z);
 		NBTTagByteArray circleByteArray = new NBTTagByteArray(circleData);
 		event.getData().setTag("GTCD", circleByteArray);//Growing Trees Circle Data
 		

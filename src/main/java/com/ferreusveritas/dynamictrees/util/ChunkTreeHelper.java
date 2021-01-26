@@ -1,17 +1,11 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -20,6 +14,11 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class ChunkTreeHelper {
 	
@@ -46,7 +45,7 @@ public class ChunkTreeHelper {
 			IBlockState state = world.getBlockState(pos);
 			Optional<BlockBranch> branchBlock = TreeHelper.getBranchOpt(state);
 			if(branchBlock.isPresent()) {
-				BlockPos rootPos = TreeHelper.findRootNode(state, world, pos);
+				BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 				if(rootPos == BlockPos.ORIGIN) {// If the root position is the ORIGIN object it means that no root block was found
 					// If the root node isn't found then all nodes are orphan.  Destroy the entire network.
 					BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, EnumFacing.DOWN, true);

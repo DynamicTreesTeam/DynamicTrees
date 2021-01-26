@@ -1,9 +1,6 @@
 package com.ferreusveritas.dynamictrees.command;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -13,6 +10,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class CommandSoilLife extends SubCommand {
 
@@ -44,7 +43,7 @@ public class CommandSoilLife extends SubCommand {
 		
 		BlockPos pos = CommandBase.parseBlockPos(sender, args, 1, false);
 		
-		BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 		if(rootPos != BlockPos.ORIGIN) {
 			IBlockState state = world.getBlockState(rootPos);
 			
