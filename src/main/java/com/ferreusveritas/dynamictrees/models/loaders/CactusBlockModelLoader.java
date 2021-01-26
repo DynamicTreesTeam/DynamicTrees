@@ -17,7 +17,13 @@ import net.minecraftforge.client.model.IModelLoader;
 public class CactusBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc, final ResourceLocation strippedResLoc) {
+    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+        final JsonObject textures = this.getTexturesObject(modelContents);
+
+        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures));
+    }
+
+    private BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
         return new CactusBranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 

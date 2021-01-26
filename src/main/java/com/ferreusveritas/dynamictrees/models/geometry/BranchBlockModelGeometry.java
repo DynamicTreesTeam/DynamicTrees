@@ -11,9 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -39,7 +37,15 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     @Override
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        return Arrays.asList(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.barkResLoc), new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.ringsResLoc), new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.strippedResLoc));
+        ResourceLocation[] textures = {this.barkResLoc, this.strippedResLoc, this.ringsResLoc};
+        List<RenderMaterial> renderMaterials = new ArrayList<>();
+
+        for (ResourceLocation textureLoc : textures) {
+            if (textureLoc != null) // Sub-classes can make unneeded textures null.
+                renderMaterials.add(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, textureLoc));
+        }
+
+        return renderMaterials;
     }
 
 }
