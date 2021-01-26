@@ -173,7 +173,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 		if (state != null && side == null) {
 
 			List<BakedQuad> quadsList = new ArrayList<>(24);
-
+			
 			int coreRadius = getRadius(state);
 
 			if (coreRadius > 8) return Collections.emptyList();
@@ -239,7 +239,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 				//Get quads for rings. Used by the falling tree animation.
 				quadsList.addAll(rings[coreRadius-1].getQuads(state, ringOnly, rand, extraData));
 			}
-
 			return quadsList;
 		}
 

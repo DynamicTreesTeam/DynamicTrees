@@ -27,8 +27,4 @@ public class RootBlockModelGeometry extends BranchBlockModelGeometry {
         return new RootBlockBakedModel(modelLocation, this.barkResLoc);
     }
 
-    @Override
-    public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        return Arrays.asList(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.barkResLoc));
-    }
 }

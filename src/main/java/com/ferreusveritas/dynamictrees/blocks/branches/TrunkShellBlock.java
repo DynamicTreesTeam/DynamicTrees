@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
+import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -37,7 +38,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class TrunkShellBlock extends Block {
+public class TrunkShellBlock extends BlockWithDynamicHardness {
 	
 	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
 	
@@ -106,6 +107,12 @@ public class TrunkShellBlock extends Block {
 	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		ShellMuse muse = getMuse(worldIn, state, pos);
 		return muse != null ? muse.state.getBlock().getPlayerRelativeBlockHardness(muse.state, player, worldIn, muse.pos) : 0.0f;
+	}
+
+	@Override
+	public float getHardness(IBlockReader world, BlockPos pos) {
+		ShellMuse muse = this.getMuse(world, world.getBlockState(pos), pos);
+		return muse != null ? ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(world, pos) : super.getHardness(world, pos);
 	}
 
 	@Override
@@ -195,45 +202,6 @@ public class TrunkShellBlock extends Block {
 			return VoxelShapes.empty();//NULL_AABB;
 		}
 	}
-
-	@Override
-	public VoxelShape getCollisionShape(@Nonnull BlockState state,@Nonnull  IBlockReader reader,@Nonnull  BlockPos pos, ISelectionContext context) {
-		ShellMuse muse = getMuse(reader, state, pos);
-		if(muse != null) {
-			VoxelShape shape = muse.state.getShape(reader, muse.pos);
-			return VoxelShapes.create(shape.getBoundingBox().offset(muse.museOffset).intersect(VoxelShapes.fullCube().getBoundingBox()));
-		} else {
-			return VoxelShapes.empty();//NULL_AABB;
-		}
-	}
-
-	//	@Override
-//	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-//		return super.getCollisionShape(state, worldIn, pos, context);
-//	}
-
-	//	@Override
-//	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
-//		AxisAlignedBB aabb = super.getCollisionBoundingBox(blockState, worldIn, pos);
-//		return aabb == FULL_BLOCK_AABB ? NULL_AABB : aabb;
-//	}
-
-//	@Override
-//	public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState) {
-//		if(entityIn instanceof EntityFallingTree) {
-//			return;
-//		}
-//		super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
-//	}
-
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//    public AxisAlignedBB getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos) {
-//		ShellMuse muse = this.getMuseUnchecked(worldIn, state, pos);
-//        return muse.state.getCollisionShape(worldIn, muse.pos).getBoundingBox().offset(muse.pos);
-//		//return state.getBoundingBox(worldIn, pos).offset(pos);
-//    }
-
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
