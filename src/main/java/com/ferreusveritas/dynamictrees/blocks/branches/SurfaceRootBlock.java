@@ -120,8 +120,6 @@ public class SurfaceRootBlock extends Block {
 
 			if (connection == null) continue;
 
-			DynamicTrees.getLogger().info("Root at pos " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " has radius " + connection.radius + " and connection level " + connection.level + " in direction " + dir.toString() + ".");
-
 			connections.setRadius(dir, connection.radius);
 			connections.setConnectionLevel(dir, connection.level);
 		}
