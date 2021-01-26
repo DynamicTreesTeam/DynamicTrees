@@ -107,7 +107,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 			for(LivingEntity living: elist) {
 				if(!getData(entity).entitiesHit.contains(living)) {
 					getData(entity).entitiesHit.add(living);
-					float damage = entity.getDestroyData().woodVolume * Math.abs(fallSpeed) * 3f;
+					float damage = entity.getDestroyData().woodVolume.getTotalVolume() * Math.abs(fallSpeed) * 3f;
 					if(getData(entity).bounces == 0 && damage > 2) {
 						//System.out.println("damage: " + damage);
 						living.setMotion(

@@ -29,14 +29,14 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 	
 	private BlockPos lastPos = BlockPos.ZERO;
 	private Species lastSpecies = Species.NULLSPECIES;
-	private float lastVolume = 0;
+	private NodeNetVolume.Volume lastVolume = new NodeNetVolume.Volume();
 
 	@Override
 	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
 		if(WailaOther.invalid) {
 			lastPos = BlockPos.ZERO;
 			lastSpecies = Species.NULLSPECIES;
-			lastVolume = 0;
+			lastVolume = new NodeNetVolume.Volume();
 
 			WailaOther.invalid = false;
 		}
@@ -84,15 +84,21 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 			ItemStack seedStack = species.getSeedStack(1);
 
 			RenderableTextComponent seedRender = getRenderable(seedStack);
-			RenderableTextComponent logRender, stickRender;
-			logRender = stickRender = getRenderable(ItemStack.EMPTY);
+			RenderableTextComponent logRender, strippedLogRender, stickRender;
+			logRender = strippedLogRender = stickRender = getRenderable(ItemStack.EMPTY);
 
-			if(lastVolume > 0) {
+			if(lastVolume.getTotalVolume() > 0) {
 				LogsAndSticks las = species.getLogsAndSticks(lastVolume);
 				if(las.logs > 0) {
 					ItemStack logStack = species.getFamily().getPrimitiveLogs(las.logs);
 					if (!logStack.isEmpty()){
 						logRender = getRenderable(logStack);
+					}
+				}
+				if (las.strippedLogs > 0) {
+					ItemStack strippedLogStack = species.getFamily().getPrmitiveStrippedLogs(las.strippedLogs);
+					if (!strippedLogStack.isEmpty()) {
+						strippedLogRender = getRenderable(strippedLogStack);
 					}
 				}
 				if(las.sticks > 0) {
@@ -103,13 +109,13 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 				}
 			}
 
-			RenderableTextComponent renderables = new RenderableTextComponent(seedRender, logRender, stickRender);
+			RenderableTextComponent renderables = new RenderableTextComponent(seedRender, logRender, strippedLogRender, stickRender);
 
 			tooltip.add(renderables);
 		}
 	}
 	
-	private float getTreeVolume(World world, BlockPos pos) {
+	private NodeNetVolume.Volume getTreeVolume(World world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
@@ -129,11 +135,14 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 			// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 			NodeNetVolume volumeSum = new NodeNetVolume();
 			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
-			
-			return (float)(volumeSum.getVolume() * DTConfigs.treeHarvestMultiplier.get());
+
+			NodeNetVolume.Volume volume = volumeSum.getVolume();
+			volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());
+
+			return volume;
 		}
 		
-		return 0;
+		return new NodeNetVolume.Volume();
 	}
 
 //	@Override

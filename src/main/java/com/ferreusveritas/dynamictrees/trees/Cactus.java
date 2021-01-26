@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -59,8 +60,8 @@ public class Cactus extends TreeFamily {
 
 			addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MODID, "cactusseeds")) {
 				@Override
-				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
-					int numLogs = (int) (volume / 2);
+				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
+					int numLogs = (int) (volume.getVolume() / 2);
 					while(numLogs > 0) {
 						dropList.add(species.getSeedStack(Math.min(numLogs, 64)));
 						numLogs -= 64;

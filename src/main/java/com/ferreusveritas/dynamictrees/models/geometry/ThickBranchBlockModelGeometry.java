@@ -19,15 +19,15 @@ public class ThickBranchBlockModelGeometry extends BranchBlockModelGeometry {
 
     protected final ResourceLocation thickRingsResLoc;
 
-    public ThickBranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        super(barkResLoc, ringsResLoc);
+    public ThickBranchBlockModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc) {
+        super(barkResLoc, ringsResLoc, strippedResLoc);
 
         this.thickRingsResLoc = ThickRingAtlasTextureManager.addRingTextureLocation(ringsResLoc);
     }
 
     @Override
     public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
-        return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.thickRingsResLoc);
+        return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.strippedResLoc, this.thickRingsResLoc);
     }
 
 }

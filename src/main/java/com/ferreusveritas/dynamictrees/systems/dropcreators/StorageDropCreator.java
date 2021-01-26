@@ -9,6 +9,7 @@ import java.util.Random;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.item.ItemStack;
@@ -92,7 +93,7 @@ public class StorageDropCreator implements IDropCreatorStorage {
 		return dropList;
 	}
 	
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, float volume) {
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {

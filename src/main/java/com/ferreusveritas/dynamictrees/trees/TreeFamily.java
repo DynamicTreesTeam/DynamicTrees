@@ -78,8 +78,10 @@ public class TreeFamily {
 	private Item dynamicBranchItem;
 	/** The surface root used by this tree family */
 	private SurfaceRootBlock surfaceRoot;
-	/** The primitive(vanilla) log to base the texture, drops, and other behavior from */
+	/** The primitive (vanilla) log to base the texture, drops, and other behavior from */
 	private Block primitiveLog = Blocks.AIR;
+	/** The primitive stripped log to base the texture, drops, and other behavior from */
+	private Block primitiveStrippedLog = Blocks.AIR;
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -329,10 +331,25 @@ public class TreeFamily {
 	 * @return itemStack of requested logs.
 	 */
 	public ItemStack getPrimitiveLogs(int qty) {
-		return new ItemStack(primitiveLog, qty); 
+		return new ItemStack(this.primitiveLog, qty);
 	}
 
-	
+	public boolean canBeStripped () {
+		return this.primitiveStrippedLog != Blocks.AIR;
+	}
+
+	protected void setPrimitiveStrippedLog(Block primitiveStrippedLog) {
+		this.primitiveStrippedLog = primitiveStrippedLog;
+	}
+
+	public Block getPrimitiveStrippedLog() {
+		return primitiveStrippedLog;
+	}
+
+	public ItemStack getPrmitiveStrippedLogs (int qty) {
+		return new ItemStack (this.primitiveStrippedLog, qty);
+	}
+
 	///////////////////////////////////////////
 	//BRANCHES
 	///////////////////////////////////////////

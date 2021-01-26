@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
@@ -40,7 +41,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -133,8 +133,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public static int getLeavesSupport(int support) {
 		return support & 0xf;
 	}
-	
-	//
+
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
@@ -163,18 +162,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				BlockState neighborBlockState = world.getBlockState(deltaPos);
 				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
 				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
+
+				if (dir == Direction.DOWN && neighborBlockState.getBlock() instanceof RootyBlock)
+					connections.setRootyBlockBelow(true);
 			}
 		}
 		
 		return connections;
 	}
-
-
-
-//	@Override
-//	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return 0.2f;
-//	}
 
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
@@ -354,12 +349,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 
-	public List<net.minecraft.item.ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume) {
+	public List<net.minecraft.item.ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume) {
 		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
-	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, float volume, ItemStack handStack) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume, ItemStack handStack) {
 		List<ItemStack> ret = new ArrayList<net.minecraft.item.ItemStack>();//A list for storing all the dead tree guts
-		volume *= DTConfigs.treeHarvestMultiplier.get();// For cheaters.. you know who you are.
+		volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, ret, volume, handStack);
 	}
 
@@ -379,32 +374,24 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		ItemStack heldItem = entity.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		float woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
-		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume * fortuneFactor, heldItem);
+		NodeNetVolume.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
+		woodVolume.multiplyVolume(fortuneFactor);
+		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume, heldItem);
 		
 		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
 			entity.setActiveHand(Hand.MAIN_HAND);//Players do things with hands.
 		}
 		
-		float chance = 1.0f;
-		//Fire the block harvesting event.  For An-Sar's PrimalCore mod :)
-		if (entity instanceof PlayerEntity)
-		{
-			NonNullList<ItemStack> woodItemsNonNull = NonNullList.create();
-			woodItemsNonNull.addAll(woodItems);
-			// TODO: No block harvest event any more
-//			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(woodItemsNonNull, world, cutPos, state, fortune, chance, false, (PlayerEntity) entity);
-		}
-		final float finalChance = chance;
-		
+		final float chance = 1.0f;
+
 		//Build the final wood drop list taking chance into consideration
-		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= finalChance).collect(Collectors.toList());
+		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//This will drop the EntityFallingTree into the world
 		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
-		damageAxe(entity, heldItem, getRadius(state), woodVolume);
+		damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
 	}
 	
 	// We override the standard behavior because we need to preserve the tree network structure to calculate
@@ -457,9 +444,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	
-	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, float woodVolume) {
+	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NodeNetVolume.Volume woodVolume, boolean forBlockBreak) {
 		
-		if(heldItem != null && (heldItem.getItem() instanceof AxeItem || heldItem.getItem().getToolTypes(heldItem).contains(ToolType.AXE))) {
+		if(heldItem != null && this.isAxe(heldItem)) {
 			
 			int damage;
 			
@@ -472,16 +459,22 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					damage = Math.max(1, radius) / 2;
 					break;
 				case VOLUME:
-					damage = (int) woodVolume;
+					damage = (int) woodVolume.getTotalVolume();
 					break;
 			}
-			
-			damage--;//Minecraft already damaged the tool by one unit
+
+			if (forBlockBreak)
+				damage--; // Minecraft already damaged the tool by one unit
+
 			if(damage > 0) {
 				heldItem.damageItem(damage, entity, LivingEntity::tick);
 			}
 		}
 		
+	}
+
+	protected boolean isAxe (ItemStack stack) {
+		return stack.getItem() instanceof AxeItem || stack.getItem().getToolTypes(stack).contains(ToolType.AXE);
 	}
 	
 	@Override
@@ -547,7 +540,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false);
-			float woodVolume = destroyData.woodVolume;
+			NodeNetVolume.Volume woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
 			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			

@@ -28,19 +28,27 @@ import java.util.*;
 public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 	protected TextureAtlasSprite barkTexture;
-	
-	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
-	private IBakedModel[][] sleeves = new IBakedModel[6][7];
-	private IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-	private IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
+	protected TextureAtlasSprite strippedTexture;
 
-	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
+	protected final ResourceLocation strippedResLoc;
+
+	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
+	private final IBakedModel[][] sleeves = new IBakedModel[6][7];
+	private final IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+	private final IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
+
+	private final IBakedModel[][] strippedSleeves = new IBakedModel[6][7];
+	private final IBakedModel[][] strippedCores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+
+	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation strippedResLoc) {
 		super(modelResLoc, barkResLoc, ringsResLoc);
+		this.strippedResLoc = strippedResLoc;
 	}
 
 	@Override
 	public void setupModels () {
 		this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
+		this.strippedTexture = ModelUtils.getTexture(this.strippedResLoc);
 		TextureAtlasSprite ringTexture = ModelUtils.getTexture(this.ringsResLoc);
 
 		for(int i = 0; i < 8; i++) {
@@ -48,11 +56,16 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			if(radius < 8) {
 				for(Direction dir: Direction.values()) {
 					sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkTexture);
+					strippedSleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, strippedTexture);
 				}
 			}
 			cores[0][i] = bakeCore(radius, Axis.Y, barkTexture); //DOWN<->UP
 			cores[1][i] = bakeCore(radius, Axis.Z, barkTexture); //NORTH<->SOUTH
 			cores[2][i] = bakeCore(radius, Axis.X, barkTexture); //WEST<->EAST
+
+			strippedCores[0][i] = bakeCore(radius, Axis.Y, strippedTexture); //DOWN<->UP
+			strippedCores[1][i] = bakeCore(radius, Axis.Z, strippedTexture); //NORTH<->SOUTH
+			strippedCores[2][i] = bakeCore(radius, Axis.X, strippedTexture); //WEST<->EAST
 
 			rings[i] = bakeCore(radius, Axis.Y, ringTexture);
 		}
@@ -158,17 +171,27 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
 
 		if (state != null && side == null) {
+
 			List<BakedQuad> quadsList = new ArrayList<>(24);
 
 			int coreRadius = getRadius(state);
 
 			if (coreRadius > 8) return Collections.emptyList();
 
+			IBakedModel[][] cores = this.cores;
+			IBakedModel[][] sleeves = this.sleeves;
+
 			int[] connections = new int[] {0,0,0,0,0,0};
+
 			Direction ringOnly = null;
 			if (extraData instanceof ModelConnections){
-				connections = ((ModelConnections) extraData).getAllRadii();
-				ringOnly = ((ModelConnections) extraData).getRingOnly();
+				ModelConnections connectionsData = (ModelConnections) extraData;
+				connections = connectionsData.getAllRadii();
+				ringOnly = connectionsData.getRingOnly();
+				if (connectionsData.isStripped()) {
+					sleeves = this.strippedSleeves;
+					cores = this.strippedCores;
+				}
 			}
 
 			if (ringOnly == null){
@@ -196,17 +219,17 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
 						} else {
 							quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
+
 						}
 					}
-
 					//Get quads for sleeves models
-					if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-						for(Direction connDir : Direction.values()) {
+					if (coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
+						for (Direction connDir : Direction.values()) {
 							int idx = connDir.getIndex();
-							int connRadius = Math.min(connections[idx], coreRadius);
+							int connRadius = connections[idx];
 							//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-							if (connRadius > 0  && (connRadius == 1 || face != connDir)) {
-								quadsList.addAll(sleeves[idx][connRadius-1].getQuads(state, face, rand, extraData));
+							if (connRadius > 0 && (connRadius == 1 || face != connDir)) {
+								quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
 							}
 						}
 					}
@@ -216,9 +239,10 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 				//Get quads for rings. Used by the falling tree animation.
 				quadsList.addAll(rings[coreRadius-1].getQuads(state, ringOnly, rand, extraData));
 			}
+
 			return quadsList;
 		}
-		
+
 		return Collections.emptyList();
 	}
 	
@@ -281,8 +305,14 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	
 	@Override
 	public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
-		return getParticleTexture();
+		if (!(data instanceof Connections))
+			return this.getParticleTexture();
+
+		Connections connections = (Connections) data;
+
+		return connections.isStripped() ? this.barkTexture : this.strippedTexture;
 	}
+
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
 		return barkTexture;

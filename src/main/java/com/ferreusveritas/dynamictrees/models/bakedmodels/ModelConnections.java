@@ -10,12 +10,14 @@ import net.minecraftforge.client.model.data.ModelProperty;
 
 public class ModelConnections extends Connections implements IModelData {
 
-	protected Direction ringOnly = null;
+	private Direction ringOnly = null;
 
 	public ModelConnections() { }
 	
 	public ModelConnections(Connections connections) {
 		this.setAllRadii(connections.getAllRadii());
+		this.setRootyBlockBelow(connections.isRootyBlockBelow());
+		this.setStripped(connections.isStripped());
 	}
 	
 	public ModelConnections(int[] radii) {

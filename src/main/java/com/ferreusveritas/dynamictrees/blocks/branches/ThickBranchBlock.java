@@ -1,25 +1,19 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.event.SafeChunkEvents;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -28,30 +22,23 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 //TODO: 1.14.4 This gets flattened into the normal block branch with radius 1 - 32 and eliminated 
 
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
-//	protected static final AxisAlignedBB maxBranchBB = new AxisAlignedBB(-1, 0, -1, 2, 1, 2);
 	public static final int RADMAX_THICK = 24;
 
-	protected static final IntegerProperty RADIUSDOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
+	public static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
 	public ThickBranchBlock(String name) {
 		this(Properties.create(Material.WOOD),name);
 	}
 
 	public ThickBranchBlock(Properties properties, String name) {
-		this(properties, name, false);
+		super(properties, name);
 
 		cacheBranchThickStates();
-	}
-
-	protected ThickBranchBlock(Properties properties, String name, boolean extended) {
-		super(properties, name);
-		this.setDefaultState(this.getDefaultState().with(RADIUSDOUBLE, 1));
 	}
 
 	public TrunkShellBlock getTrunkShell (){
@@ -62,12 +49,13 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	@Override
 	public void cacheBranchStates() { }
 
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUSDOUBLE);
+	@Override
+	public void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(RADIUS_DOUBLE, STRIPPED);
 	}
 
 	public void cacheBranchThickStates() {
-		setDefaultState(this.getStateContainer().getBaseState().with(RADIUSDOUBLE, 1));
+		setDefaultState(this.getStateContainer().getBaseState().with(RADIUS_DOUBLE, 1).with(STRIPPED, false));
 
 		branchStates = new BlockState[RADMAX_THICK + 1];
 
@@ -75,21 +63,17 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 		branchStates[0] = Blocks.AIR.getDefaultState();
 
 		for(int radius = 1; radius <= RADMAX_THICK; radius++) {
-			branchStates[radius] = getDefaultState().with(ThickBranchBlock.RADIUSDOUBLE, radius);
+			branchStates[radius] = getDefaultState().with(ThickBranchBlock.RADIUS_DOUBLE, radius);
 		}
-	}
-
-	@Nullable
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(RADIUSDOUBLE, 1);
 	}
 
 	///////////////////////////////////////////
 	// GROWTH
 	///////////////////////////////////////////
 
+	@Override
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? MathHelper.clamp(blockState.get(RADIUSDOUBLE), 1, getMaxRadius()) : 0;
+		return blockState.getBlock() == this ? MathHelper.clamp(blockState.get(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
 	}
 
 	@Override
@@ -133,7 +117,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 				BlockPos dPos = pos.add(dir.getOffset());
 				ReplaceableState rep = repStates[dir.ordinal()];
 				if(rep == ReplaceableState.REPLACEABLE) {
-					world.setBlockState(dPos, getTrunkShell().getDefaultState().with(TrunkShellBlock.COREDIR, dir.getOpposite()), flags);
+					world.setBlockState(dPos, getTrunkShell().getDefaultState().with(TrunkShellBlock.CORE_DIR, dir.getOpposite()), flags);
 				}
 			}
 			return true;
@@ -181,7 +165,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 		if(block instanceof TrunkShellBlock) {
 			//Determine if this shell belongs to the trunk.  Block otherwise.
-			Surround surr = state.get(TrunkShellBlock.COREDIR);
+			Surround surr = state.get(TrunkShellBlock.CORE_DIR);
 			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
 		}
 
