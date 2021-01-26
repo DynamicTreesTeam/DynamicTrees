@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.util.Connections;
+import com.ferreusveritas.dynamictrees.models.modeldata.RootModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import com.google.common.collect.Maps;
@@ -175,10 +175,11 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		int coreRadius = this.getRadius(state);
 
 		int[] connections = new int[] {0,0,0,0};
-		RootConnections.ConnectionLevel[] connectionLevels = new RootConnections.ConnectionLevel[] {RootConnections.ConnectionLevel.MID, RootConnections.ConnectionLevel.MID, RootConnections.ConnectionLevel.MID, RootConnections.ConnectionLevel.MID};
+		RootConnections.ConnectionLevel[] connectionLevels = RootConnections.PLACEHOLDER_CONNECTION_LEVELS.clone();
 		if (extraData instanceof RootConnections) {
-			connections = ((Connections) extraData).getAllRadii();
-			connectionLevels = ((RootConnections) extraData).getConnectionLevels();
+			RootConnections connectionData = (RootConnections) extraData;
+			connections = connectionData.getAllRadii();
+			connectionLevels = connectionData.getConnectionLevels();
 		}
 
 		for (int i = 0; i < connections.length; i++) {

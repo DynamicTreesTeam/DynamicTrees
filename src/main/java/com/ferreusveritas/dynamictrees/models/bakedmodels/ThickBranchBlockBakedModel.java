@@ -3,10 +3,8 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
-import com.ferreusveritas.dynamictrees.util.Connections;
+import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
@@ -175,10 +173,19 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 		if (ringOnly == null){
 			for (Direction face : Direction.values()) {
 				quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
-				if (connections[1] < 1) {
-					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
-				} else if (connections[1] < coreRadius && face == Direction.UP) {
-					quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+//				if (face == Direction.DOWN) {
+//					if (rootyBlockBelow) { // Add bottom rings if block below is rooty.
+//						quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+//					} else if (connections[0] < coreRadius) { // Add bottom bark if branch below has a greater radius (in case a thick branch gets stripped).
+//						quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+//					}
+//				} else
+				if (face == Direction.UP) {
+					if (connections[1] < 1) {
+						quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+					} else if (connections[1] < coreRadius) {
+						quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+					}
 				}
 			}
 		} else {

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -118,6 +119,8 @@ public class SurfaceRootBlock extends Block {
 			final RootConnection connection = this.getSideConnectionRadius(world, pos, radius, dir);
 
 			if (connection == null) continue;
+
+			DynamicTrees.getLogger().info("Root at pos " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " has radius " + connection.radius + " and connection level " + connection.level + " in direction " + dir.toString() + ".");
 
 			connections.setRadius(dir, connection.radius);
 			connections.setConnectionLevel(dir, connection.level);

@@ -6,8 +6,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
@@ -39,7 +37,9 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
@@ -50,8 +50,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock.RADIUS;
 
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
@@ -154,9 +152,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 
 	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-			int radius = this.getRadius(state);
-			this.damageAxe(player, heldItem, 2, new NodeNetVolume.Volume(1), false);
-			getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
+		int radius = this.getRadius(state);
+		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2f), false);
+		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
 	}
 
 	@Override
