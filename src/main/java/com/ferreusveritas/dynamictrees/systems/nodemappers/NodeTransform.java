@@ -29,7 +29,14 @@ public class NodeTransform implements INodeInspector {
 		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
 			int radius = branch.getRadius(blockState);
 			if(radius > 0) {
-				toSpecies.getFamily().getDynamicBranch().setRadius(world, pos, radius, null);
+				BranchBlock newBranchBlock = toSpecies.getFamily().getDynamicBranch();
+
+				// If the branch is stripped, make the replacement branch stripped.
+				if (fromSpecies.getFamily().getDynamicStrippedBranch().equals(branch)) {
+					newBranchBlock = toSpecies.getFamily().getDynamicStrippedBranch();
+				}
+
+				newBranchBlock.setRadius(world, pos, radius, null);
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}

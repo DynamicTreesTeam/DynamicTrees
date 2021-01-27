@@ -1,13 +1,19 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.command.arguments.Vec3Argument;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 
 public abstract class SubCommand {
 
@@ -92,6 +98,26 @@ public abstract class SubCommand {
      */
     protected void sendMessage (CommandContext<CommandSource> context, ITextComponent message) {
         context.getSource().sendFeedback(message, true);
+    }
+
+    protected BlockPos getPositionArg (CommandContext<CommandSource> context) {
+        return Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+    }
+
+    protected Species getSpeciesArg (CommandContext<CommandSource> context) {
+        return TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+    }
+
+    protected BlockPos getRootPos (CommandContext<CommandSource> context) {
+        return this.getRootPos(context, context.getSource().getWorld());
+    }
+
+    protected BlockPos getRootPos (CommandContext<CommandSource> context, World world) {
+        return this.getRootPos(context, world, this.getPositionArg(context));
+    }
+
+    protected BlockPos getRootPos (CommandContext<CommandSource> context, World world, BlockPos pos) {
+        return TreeHelper.findRootNode(world, pos);
     }
 
 }

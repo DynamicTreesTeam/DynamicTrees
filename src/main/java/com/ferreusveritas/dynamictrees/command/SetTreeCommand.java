@@ -38,10 +38,10 @@ public final class SetTreeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+        final Species species = this.getSpeciesArg(context);
         final String joCode = StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT);
         final int turns = IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT);
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final BlockPos pos = this.getPositionArg(context);
 
         if (!species.isValid()) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));

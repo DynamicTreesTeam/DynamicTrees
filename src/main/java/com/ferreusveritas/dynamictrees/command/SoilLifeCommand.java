@@ -29,8 +29,7 @@ public final class SoilLifeCommand extends SubCommand {
     @Override
     protected int execute(CommandContext<CommandSource> context) {
         final World world = context.getSource().getWorld();
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-        final BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+        final BlockPos rootPos = this.getRootPos(context, world);;
 
         if (rootPos == BlockPos.ZERO) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));

@@ -49,7 +49,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final BlockPos pos = this.getPositionArg(context);
         final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.TREE_FAMILY_ARGUMENT));
 
         // Ensure species given exists.

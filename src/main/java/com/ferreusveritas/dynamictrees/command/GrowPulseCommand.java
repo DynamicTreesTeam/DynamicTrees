@@ -2,7 +2,9 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.math.BlockPos;
@@ -24,15 +26,16 @@ public final class GrowPulseCommand extends SubCommand {
     @Override
     protected int execute(CommandContext<CommandSource> context) {
         final World world = context.getSource().getWorld();
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-        ITreePart part = TreeHelper.getTreePart(world.getBlockState(pos));
+        final BlockPos pos = this.getPositionArg(context);
+        final BlockState state = world.getBlockState(pos);
+        ITreePart part = TreeHelper.getTreePart(state);
 
-        if (part == TreeHelper.nullTreePart) {
+        if (part == TreeHelper.nullTreePart && !(state.getBlock() instanceof TrunkShellBlock)) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }
 
-        BlockPos rootPos = TreeHelper.findRootNode(world.getBlockState(pos), world, pos);
+        BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 
         if (!rootPos.equals(BlockPos.ZERO))
             TreeHelper.growPulse(world, rootPos);

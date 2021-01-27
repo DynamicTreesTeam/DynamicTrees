@@ -25,7 +25,7 @@ public final class GetTreeCommand extends SubCommand {
     @Override
     protected int execute (CommandContext<CommandSource> context) {
         final World world = context.getSource().getWorld();
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final BlockPos pos = this.getPositionArg(context);
         Species species = TreeHelper.getBestGuessSpecies(world, pos);
 
         if (!species.isValid()) {
