@@ -19,7 +19,7 @@ public class FreezeSubstance implements ISubstanceEffect {
  		final RootyBlock dirt = TreeHelper.getRooty(rootyState);
  		final Species species = dirt.getSpecies(rootyState, world, rootPos);
 
- 		if (species != Species.NULLSPECIES && dirt != null) {
+ 		if (species != Species.NULL_SPECIES && dirt != null) {
  			if (world.isRemote) {
  				TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
  			} else {

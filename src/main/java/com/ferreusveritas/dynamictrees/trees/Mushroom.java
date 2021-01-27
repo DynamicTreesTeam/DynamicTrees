@@ -17,5 +17,10 @@ public class Mushroom extends Species {
 		setStandardSoils();
 		addGenFeature(new HugeMushroomGenFeature(redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
 	}
-	
+
+	@Override
+	public boolean isTransformable() {
+		return false;
+	}
+
 }

@@ -28,7 +28,7 @@ public class GroundFinder implements IGroundFinder {
 
 		BlockPos.Mutable pos = new BlockPos.Mutable(start.getX(), 0, start.getZ());
 
-		ArrayList<Integer> layers = new ArrayList();
+		ArrayList<Integer> layers = new ArrayList<>();
 
 		while(inNetherRange(pos)) {
 			while(!isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } //Zip up 4 blocks at a time until we hit air

@@ -30,7 +30,7 @@ public final class TransformCommand extends SubCommand {
         this.defaultToExecute = false;
 
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder)).executes(this::execute);
+                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocs(), builder)).executes(this::execute);
     }
 
     @Override
@@ -47,43 +47,45 @@ public final class TransformCommand extends SubCommand {
     protected int execute(CommandContext<CommandSource> context) {
         final World world = context.getSource().getWorld();
         final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
-        final Species originalSpecies = TreeHelper.getBestGuessSpecies(world, pos);
+        final Species toSpecies = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
 
-        if (!species.isValid()) {
+        if (!toSpecies.isValid()) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
-            return 0;
-        }
-
-        if (!originalSpecies.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
-            return 0;
-        }
-
-        if (species == originalSpecies) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.speciesequal"));
             return 0;
         }
 
         final BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 
         if (rootPos.equals(BlockPos.ZERO)) {
-            return 0; // This should never happen, but just in case we return.
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
+            return 0;
+        }
+
+        final Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
+
+        if (toSpecies == fromSpecies) {
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.speciesequal"));
+            return 0;
+        }
+
+        if (!toSpecies.isTransformable() || !fromSpecies.isTransformable()) {
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.nottransformableerror", !toSpecies.isTransformable() ? toSpecies.getRegistryName() : fromSpecies.getRegistryName()));
+            return 0;
         }
 
         final BlockState rootyState = world.getBlockState(rootPos);
         final RootyBlock rootyBlock = ((RootyBlock) rootyState.getBlock());
 
         // Transform tree.
-        rootyBlock.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(originalSpecies, species)));
+        rootyBlock.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
 
-        if (rootyBlock.getSpecies(rootyState, world, rootPos) != species) {
+        if (rootyBlock.getSpecies(rootyState, world, rootPos) != toSpecies) {
             // Place new rooty dirt block if transforming to species that requires tile entity.
-            species.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
+            toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
         }
 
         this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.success",
-                originalSpecies.getLocalizedName(), species.getLocalizedName()));
+                fromSpecies.getLocalizedName(), toSpecies.getLocalizedName()));
         WailaOther.invalidateWailaPosition();
 
         return 1;

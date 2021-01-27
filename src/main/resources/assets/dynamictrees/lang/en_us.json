@@ -59,6 +59,7 @@
   "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s",
   "commands.dynamictrees.transform.speciesequal": "§cTargeted species is the same as given species.",
   "commands.dynamictrees.transform.success": "§aSuccessfully transformed species §b%s §ato species §b%s§a.",
+  "commands.dynamictrees.transform.nottransformableerror": "§cSpecies §4%s §cis not transformable.",
 
   "potion.biochar.description": "§7Base tree potion for brewing",
   "potion.depletion.description": "§7Destroys tree soil fertility",

@@ -32,7 +32,7 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 			return new StaticSpeciesSelector();
 		}
 		Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-		if(species != Species.NULLSPECIES) {
+		if(species != Species.NULL_SPECIES) {
 			return new StaticSpeciesSelector(new SpeciesSelection(species));
 		}
 
@@ -60,7 +60,7 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 							rand.add(weight);
 						} else {
 							Species species = TreeRegistry.findSpeciesSloppy(speciesName);
-							if(species != Species.NULLSPECIES) {
+							if(species != Species.NULL_SPECIES) {
 								rand.add(species, weight);
 							}
 						}

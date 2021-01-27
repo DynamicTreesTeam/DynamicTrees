@@ -28,14 +28,14 @@ import java.util.List;
 public class WailaBranchHandler implements IComponentProvider { //IServerDataProvider<String>
 	
 	private BlockPos lastPos = BlockPos.ZERO;
-	private Species lastSpecies = Species.NULLSPECIES;
+	private Species lastSpecies = Species.NULL_SPECIES;
 	private NodeNetVolume.Volume lastVolume = new NodeNetVolume.Volume();
 
 	@Override
 	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
 		if(WailaOther.invalid) {
 			lastPos = BlockPos.ZERO;
-			lastSpecies = Species.NULLSPECIES;
+			lastSpecies = Species.NULL_SPECIES;
 			lastVolume = new NodeNetVolume.Volume();
 
 			WailaOther.invalid = false;
@@ -43,7 +43,7 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 
 		CompoundNBT nbtData = accessor.getServerData();
 		BlockPos pos = accessor.getPosition();
-		Species species = Species.NULLSPECIES;
+		Species species = Species.NULL_SPECIES;
 
 		//Attempt to get species from server via NBT data
 		if(nbtData.contains("species")) {
@@ -51,12 +51,12 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 		}
 
 		//Attempt to get species by checking if we're still looking at the same block
-		if(species == Species.NULLSPECIES && lastPos.equals(pos)) {
+		if(species == Species.NULL_SPECIES && lastPos.equals(pos)) {
 			species = lastSpecies;
 		}
 
 		//Attempt to get species from the world as a last resort as the operation can be rather expensive
-		if(species == Species.NULLSPECIES) {
+		if(species == Species.NULL_SPECIES) {
 			species = getWailaSpecies(accessor.getWorld(), pos);
 		}
 
@@ -72,7 +72,7 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 		lastSpecies = species;
 		lastPos = pos;
 
-		if(species != Species.NULLSPECIES) {
+		if(species != Species.NULL_SPECIES) {
 			if(species.showSpeciesOnWaila()) {
 				tooltip.add(new StringTextComponent("Species: " + species.getLocalizedName()));
 			}

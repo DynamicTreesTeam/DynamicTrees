@@ -38,7 +38,7 @@ public class Seed extends Item implements IPlantable {
 	
 	private Species species;//The tree this seed creates
 	
-	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULLSPECIES;}
+	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULL_SPECIES;}
 	
 	public Seed(Species species) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));

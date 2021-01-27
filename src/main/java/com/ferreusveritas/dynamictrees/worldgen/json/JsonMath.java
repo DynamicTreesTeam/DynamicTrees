@@ -51,7 +51,7 @@ public class JsonMath {
 		EnumMathFunction op = EnumMathFunction.getFunction(key);
 
 		ArrayList<MathOperator> paramList = new ArrayList<>();
-		Species speciesArg = Species.NULLSPECIES;
+		Species speciesArg = Species.NULL_SPECIES;
 
 		//If the value is an array then these are the parameters for this operation
 		if(value.isJsonArray()) {
@@ -71,7 +71,7 @@ public class JsonMath {
 						if(var != null) {
 							m = var;
 						}
-						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULLSPECIES) {
+						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULL_SPECIES) {
 							speciesArg = TreeRegistry.findSpeciesSloppy(name);
 						}
 					}
@@ -97,7 +97,7 @@ public class JsonMath {
 			case MAX: return new Maximum(paramArray);
 			case MIN: return new Minimum(paramArray);
 			case IFGT: return new IfGreaterThan(paramArray);
-			case SPECIES: return speciesArg != Species.NULLSPECIES ? new IfSpecies(speciesArg, paramArray) : null;
+			case SPECIES: return speciesArg != Species.NULL_SPECIES ? new IfSpecies(speciesArg, paramArray) : null;
 			case DEBUG: return new Debug(paramArray);
 			default: return null;
 		}

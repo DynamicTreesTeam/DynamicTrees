@@ -37,7 +37,7 @@ public class BonsaiPotBlock extends ContainerBlock {
 	
 	public Species getSpecies(World access, BlockPos pos) {
 		BonsaiTileEntity bonsaiPotTE = getTileEntityBonsai(access, pos);
-		return bonsaiPotTE != null ? bonsaiPotTE.getSpecies() : Species.NULLSPECIES;
+		return bonsaiPotTE != null ? bonsaiPotTE.getSpecies() : Species.NULL_SPECIES;
 	}
 	
 	public boolean setSpecies(World world, Species species, BlockPos pos) {

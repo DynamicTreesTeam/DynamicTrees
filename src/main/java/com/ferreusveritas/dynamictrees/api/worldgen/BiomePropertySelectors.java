@@ -40,7 +40,7 @@ public class BiomePropertySelectors {
 
 		public SpeciesSelection() {
 			handled = false;
-			species = Species.NULLSPECIES;
+			species = Species.NULL_SPECIES;
 		}
 
 		public SpeciesSelection(@Nonnull Species species) {

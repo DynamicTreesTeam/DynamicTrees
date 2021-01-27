@@ -34,7 +34,7 @@ public class BranchDestructionData {
 	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
 	
 	public BranchDestructionData() {
-		species = Species.NULLSPECIES;
+		species = Species.NULL_SPECIES;
 		destroyedBranchesConnections = new int[0];
 		destroyedBranchesRadiusPosition = new int[0];
 		destroyedLeaves = new int[0];

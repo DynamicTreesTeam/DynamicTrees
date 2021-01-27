@@ -54,7 +54,7 @@ public class TreeFamily {
 	
 	public final static TreeFamily NULLFAMILY = new TreeFamily() {
 		@Override public void setCommonSpecies(Species species) {}
-		@Override public Species getCommonSpecies() { return Species.NULLSPECIES; }
+		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
@@ -65,7 +65,7 @@ public class TreeFamily {
 	private final ResourceLocation name;
 
 	@Nonnull
-	protected Species commonSpecies = Species.NULLSPECIES;
+	protected Species commonSpecies = Species.NULL_SPECIES;
 
 	//Branches
 	/** The dynamic branch used by this tree family */

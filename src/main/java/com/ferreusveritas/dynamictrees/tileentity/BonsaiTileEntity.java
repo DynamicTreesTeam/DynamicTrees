@@ -22,7 +22,7 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public class BonsaiTileEntity extends TileEntity {
 	
-	Species species = Species.NULLSPECIES;
+	Species species = Species.NULL_SPECIES;
 	BlockState potState = Blocks.FLOWER_POT.getDefaultState();
 	ResourceLocation speciesName = species.getRegistryName();
 	
@@ -41,7 +41,7 @@ public class BonsaiTileEntity extends TileEntity {
 	//	}
 	
 	public Species getSpecies() {
-		if(species == Species.NULLSPECIES) {
+		if(species == Species.NULL_SPECIES) {
 			species = TreeRegistry.findSpecies(speciesName);
 		}
 		return species;
