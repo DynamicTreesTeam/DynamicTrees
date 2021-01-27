@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommandUtils;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.command.CommandBase;
@@ -100,17 +101,8 @@ public class CommandCreateStaff extends SubCommand {
 						}
 			}
 		}
-		
-		while(!world.isAirBlock(pos)) {
-			pos = pos.up();
-		}
-		
-		EntityItem entityItem = new EntityItem(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-		entityItem.motionX = 0;
-		entityItem.motionY = 0;
-		entityItem.motionZ = 0;
-		world.spawnEntity(entityItem);
 
+		CommandUtils.spawnItemStack(world, pos, stack);
 	}
 
 }

@@ -36,7 +36,7 @@ public class CommandTransform extends SubCommand {
 			case 2:
 			case 3:
 			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
-			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpecies());
+			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpeciesLocs());
 		}
 
 		return super.getTabCompletions(server, sender, args, targetPos);
@@ -48,7 +48,7 @@ public class CommandTransform extends SubCommand {
 		Species toSpecies = null;
 
 		if(args.length < 5) {
-			throw new WrongUsageException("commands.dynamictrees.transform.usage", new Object[0]);
+			throw new WrongUsageException("commands.dynamictrees.transform.usage");
 		}
 
 		for(int arg = 0; arg < args.length; arg++) {

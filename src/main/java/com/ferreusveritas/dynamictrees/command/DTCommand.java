@@ -36,6 +36,7 @@ public class DTCommand extends CommandBase {
 		addSubCommand(new CommandClearOrphaned());
 		addSubCommand(new CommandPurgeTrees());
 		addSubCommand(new CommandTransform());
+		addSubCommand(new CommandCreateTransformPotion());
 	}
 
 	@Override
@@ -43,6 +44,7 @@ public class DTCommand extends CommandBase {
 		return COMMAND;
 	}
 
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
