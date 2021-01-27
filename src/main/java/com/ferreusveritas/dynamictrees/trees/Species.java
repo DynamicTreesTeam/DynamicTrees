@@ -1043,7 +1043,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
-	public static final float defaultSuitability() {
+	public static float defaultSuitability() {
 		return 0.85f;
 	}
 	
@@ -1054,6 +1054,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param biomes Multiple biomes to match against
 	 * @return True if a match is found. False if not.
 	 */
+	@SafeVarargs
 	public static boolean isOneOfBiomes(RegistryKey<Biome> biomeToCheck, RegistryKey<Biome>... biomes) {
 		for(RegistryKey<Biome> biome: biomes) {
 			if(biomeToCheck.equals(biome)) {

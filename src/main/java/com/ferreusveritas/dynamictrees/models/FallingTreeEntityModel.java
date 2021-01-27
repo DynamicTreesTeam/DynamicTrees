@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.models;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -97,12 +99,14 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				if(leavesClusters != null) {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
-						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE));
+						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE);
+						treeQuads.addAll(leavesQuads);
 					}
 				} else {
 					BlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
 					for(BlockPos relPos : destructionData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
-						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE));
+						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE);
+						treeQuads.addAll(leavesQuads);
 					}
 				}
 			}

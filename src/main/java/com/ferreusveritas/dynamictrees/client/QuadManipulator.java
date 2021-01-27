@@ -54,8 +54,8 @@ public class QuadManipulator {
 		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
 		
 		if(stateIn != null) {
-			for (Direction enumfacing : sides) {
-				outQuads.addAll(modelIn.getQuads(stateIn, enumfacing, rand, modelData));
+			for (Direction dir : sides) {
+				outQuads.addAll(modelIn.getQuads(stateIn, dir, rand, modelData));
 			}
 		}
 		
