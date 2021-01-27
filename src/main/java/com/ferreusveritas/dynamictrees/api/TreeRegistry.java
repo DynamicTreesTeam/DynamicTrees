@@ -7,9 +7,11 @@ import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorStorage;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
 
@@ -70,14 +72,36 @@ public class TreeRegistry {
 	}
 
 	/**
-	 * Gets a list of species which can be transformed to
-	 * 
-	 * @return
+	 * @return A list of resource locations for species which can be transformed to other species. 
 	 */
-	public static List<ResourceLocation> getTransformableSpecies () {
+	public static List<ResourceLocation> getTransformableSpeciesLocs() {
 		final List<ResourceLocation> species = getSpeciesDirectory();
 		species.removeIf(resLoc -> !findSpecies(resLoc).isTransformable());
 		return species;
+	}
+
+	/**
+	 * @return All species which can be transformed.
+	 */
+	public static List<Species> getTransformableSpecies() {
+		final List<Species> species = new ArrayList<>();
+		getTransformableSpeciesLocs().forEach(speciesLoc -> species.add(findSpecies(speciesLoc)));
+		return species;
+	}
+
+	/**
+	 * @return All species which can be transformed and have their own seed (so should have a potion recipe created).
+	 */
+	public static List<Species> getPotionTransformableSpecies () {
+		final List<Species> speciesList = getTransformableSpecies();
+		speciesList.removeIf(species -> {
+			TreeFamily family = species.getFamily();
+			
+			// Remove the species if its seed not set, or if it's not the common species and its seed is the same as the common species'. 
+			return (species.getSeedStack(1) == null || species.getSeed() == Seed.NULLSEED) || 
+				(species != family.getCommonSpecies() && species.getSeed() == family.getCommonSpecies().getSeed()); 
+		});
+		return speciesList;
 	}
 
 	//////////////////////////////

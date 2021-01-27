@@ -300,7 +300,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 	/**
 	 * Override and return false on things like cactus species which should not be 
-	 * transformed to/from.
+	 * transformed to/from. If true and this species has it's own seed a transformation
+	 * potion will also be automatically created. 
 	 * 
 	 * @return True if it can be transformed to, false if not. 
 	 */
@@ -335,6 +336,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return A copy of the {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
+		if (seedStack == null)
+			return null;
+		
 		ItemStack stack = seedStack.copy();
 		stack.setCount(MathHelper.clamp(qty, 0, 64));
 		return stack;

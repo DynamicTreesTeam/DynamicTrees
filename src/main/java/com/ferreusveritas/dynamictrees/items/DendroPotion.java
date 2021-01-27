@@ -148,9 +148,13 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		return null;
 	}
 	
-	public ItemStack setTargetTree(ItemStack itemStack, TreeFamily tree) {
+	public ItemStack setTargetTree (ItemStack itemStack, TreeFamily family) {
+		return this.setTargetSpecies(itemStack, family.getCommonSpecies());
+	}
+	
+	public ItemStack setTargetSpecies(ItemStack itemStack, Species species) {
 		NBTTagCompound nbtTag = itemStack.hasTagCompound() ? itemStack.getTagCompound() : new NBTTagCompound();
-		nbtTag.setString("target", tree.getCommonSpecies().getRegistryName().toString());//Only store the common species
+		nbtTag.setString("target", species.getRegistryName().toString());
 		itemStack.setTagCompound(nbtTag);
 		return itemStack;
 	}
@@ -194,9 +198,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				new ItemStack(Items.PRISMARINE_CRYSTALS), //Prismarine Crystals
 				new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()));
 		
-		for(TreeFamily tree : ModTrees.baseFamilies) {
-			ItemStack outputStack = setTargetTree(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree);
-			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), tree.getCommonSpecies().getSeedStack(1), outputStack);
+		for(Species species : TreeRegistry.getPotionTransformableSpecies()) {
+			System.out.println("Registering transform recipe for " + species.getRegistryName() + ".");
+			ItemStack outputStack = setTargetSpecies(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), species);
+			BrewingRecipeRegistry.addRecipe(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), species.getSeedStack(1), outputStack);
 		}
 		
 		return this;

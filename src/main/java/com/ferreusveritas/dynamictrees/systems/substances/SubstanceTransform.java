@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
+import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTransform;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -28,15 +29,18 @@ public class SubstanceTransform implements ISubstanceEffect {
 
 		if (dirt != null && toSpecies != null) {
 			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
-			if (fromSpecies != Species.NULLSPECIES) {
-				if (fromSpecies.getRegistryName() != toSpecies.getRegistryName()) {
-					if (world.isRemote) {
-						TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
-					} else {
-						dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+			if (fromSpecies != Species.NULLSPECIES && fromSpecies.isTransformable() && fromSpecies != toSpecies) {
+				if (world.isRemote) {
+					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
+					WailaOther.invalidateWailaPosition();
+				} else {
+					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+					
+					if (dirt.getSpecies(rootyState, world, rootPos) != toSpecies) {
+						toSpecies.placeRootyDirtBlock(world, rootPos, dirt.getSoilLife(rootyState, world, rootPos));
 					}
-					return true;
 				}
+				return true;
 			}
 		}
 		
