@@ -1,9 +1,6 @@
 package com.ferreusveritas.dynamictrees.api;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
@@ -71,7 +68,18 @@ public class TreeRegistry {
 	public static List<ResourceLocation> getSpeciesDirectory() {
 		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
 	}
-	
+
+	/**
+	 * Gets a list of species which can be transformed to
+	 * 
+	 * @return
+	 */
+	public static List<ResourceLocation> getTransformableSpecies () {
+		final List<ResourceLocation> species = getSpeciesDirectory();
+		species.removeIf(resLoc -> !findSpecies(resLoc).isTransformable());
+		return species;
+	}
+
 	//////////////////////////////
 	// SAPLING HANDLING
 	//////////////////////////////

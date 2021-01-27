@@ -9,16 +9,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SubCommand {
+public abstract class SubCommand {
 	
-	public String getName() {
-		return "";
-	}
+	public abstract String getName();
 	
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		return Collections.<String>emptyList();
+		return Collections.emptyList();
 	}
 	
-	public void execute(World world, ICommandSender sender, String[] args) throws CommandException { }
+	public abstract void execute(World world, ICommandSender sender, String[] args) throws CommandException;
 	
 }

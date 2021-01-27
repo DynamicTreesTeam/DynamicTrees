@@ -58,6 +58,7 @@ commands.dynamictrees.createstaff.usage=/dt createstaff <x> <y> <z> [species] [j
 commands.dynamictrees.growpulse.usage=/dt growpulse <x> <y> <z>
 commands.dynamictrees.killtree.usage=/dt killtree <x> <y> <z>
 commands.dynamictrees.rotatejocode.usage=/dt rotatejocode <joCode> <turns>
+commands.dynamictrees.transform.usage=/dt transform <x> <y> <z> <species>
 
 
 commands.dynamictrees.setree.specieserror=Couldn't find species %s!
@@ -69,5 +70,6 @@ commands.dynamictrees.soillife.lifeerror=%s is not a valid integer
 commands.dynamictrees.soillife.notreeerror=No tree found at %s
 commands.dynamictrees.growpulse.norootyerror=No rooty dirt found at %s
 commands.dynamictrees.rotatejocode.turnserror=%s is not a valid integer
+commands.dynamictrees.transform.nottransformableerror=Species %s is not transformable
 
 death.attack.fallingtree=%1$s was crushed by a falling tree

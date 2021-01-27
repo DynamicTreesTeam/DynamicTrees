@@ -71,7 +71,12 @@ public class TreeCactus extends TreeFamily {
 		protected void setStandardSoils() {
 			addAcceptableSoils(DirtHelper.SANDLIKE);
 		}
-		
+
+		@Override
+		public boolean isTransformable() {
+			return false;
+		}
+
 		@Override
 		public JoCode getJoCode(String joCodeString) {
 			return new JoCodeCactus(joCodeString);

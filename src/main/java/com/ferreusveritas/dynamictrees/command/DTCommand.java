@@ -35,6 +35,7 @@ public class DTCommand extends CommandBase {
 		addSubCommand(new CommandSetCoordXor());
 		addSubCommand(new CommandClearOrphaned());
 		addSubCommand(new CommandPurgeTrees());
+		addSubCommand(new CommandTransform());
 	}
 
 	@Override

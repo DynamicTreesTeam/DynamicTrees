@@ -6,7 +6,10 @@ import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import com.ferreusveritas.dynamictrees.trees.TreeCactus;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,10 +18,14 @@ public class NodeTransform implements INodeInspector {
 	
 	Species fromSpecies;
 	Species toSpecies;
+	TreeFamily toFamily;
+	IBlockState toSpeciesLeaves;
 	
-	public NodeTransform(Species fromTree, Species toTree) {
-		this.fromSpecies = fromTree;
-		this.toSpecies = toTree;
+	public NodeTransform(Species fromSpecies, Species toSpecies) {
+		this.fromSpecies = fromSpecies;
+		this.toSpecies = toSpecies;
+		this.toFamily = toSpecies.getFamily();
+		this.toSpeciesLeaves = toSpecies.getLeavesProperties().getDynamicLeavesState();
 	}
 	
 	@Override
@@ -28,7 +35,8 @@ public class NodeTransform implements INodeInspector {
 		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
 			int radius = branch.getRadius(blockState);
 			if(radius > 0) {
-				toSpecies.getFamily().getDynamicBranch().setRadius(world, pos, radius, null);
+				toFamily.getDynamicBranch().setRadius(world, pos, radius, null);
+					
 				if(radius == 1) {
 					transformSurroundingLeaves(world, pos);
 				}
@@ -50,7 +58,7 @@ public class NodeTransform implements INodeInspector {
 					IBlockState state = world.getBlockState(leavesPos);
 					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
 						int hydro = state.getBlock() instanceof BlockDynamicLeaves ? state.getValue(BlockDynamicLeaves.HYDRO) : 2;
-						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro));
+						world.setBlockState(leavesPos, toSpeciesLeaves == null ? Blocks.AIR.getDefaultState() : toSpeciesLeaves.withProperty(BlockDynamicLeaves.HYDRO, hydro));
 					}
 				}
 			}

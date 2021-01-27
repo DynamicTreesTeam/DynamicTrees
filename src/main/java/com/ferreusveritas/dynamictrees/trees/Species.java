@@ -95,6 +95,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public final static Species NULLSPECIES = new Species() {
 		@Override public Seed getSeed() { return Seed.NULLSEED; }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
+		@Override public boolean isTransformable() { return false; }
 		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(World world, BlockPos pos) { return false; }
 		@Override public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -295,6 +296,16 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public void setRequiresTileEntity(boolean truth) {
 		requiresTileEntity = truth;
+	}
+
+	/**
+	 * Override and return false on things like cactus species which should not be 
+	 * transformed to/from.
+	 * 
+	 * @return True if it can be transformed to, false if not. 
+	 */
+	public boolean isTransformable () {
+		return true;
 	}
 	
 	
