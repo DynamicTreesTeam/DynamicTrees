@@ -3,8 +3,8 @@ itemGroup.dynamictrees=Динамические деревья
 tile.dynamictrees:rootydirt.name=Дёрн с корнями
 tile.dynamictrees:rootysand.name=Песок с корнями
 
-tile.dynamictrees:leaves0.name=Динамическая листва
-tile.dynamictrees:leaves1.name=Динамическая листва
+tile.dynamictrees:leaves0.name=Листва
+tile.dynamictrees:leaves1.name=Листва
 
 tile.dynamictrees:oakbranch.name=Ствол дуба
 tile.dynamictrees:sprucebranch.name=Ствол ели
@@ -13,6 +13,19 @@ tile.dynamictrees:junglebranch.name=Ствол тропического дере
 tile.dynamictrees:darkoakbranch.name=Ствол темного дуба
 tile.dynamictrees:acaciabranch.name=Ствол акации
 tile.dynamictrees:cactusbranch.name=Ствол Кактуса
+
+species.dynamictrees:oak.name=Дуб
+species.dynamictrees:oakswamp.name=Болотный дуб
+species.dynamictrees:spruce.name=Ель
+species.dynamictrees:megaspruce.name=Мега ель
+species.dynamictrees:birch.name=Берёза
+species.dynamictrees:jungle.name=Тропическое
+species.dynamictrees:megajungle.name=Мега тропическое
+species.dynamictrees:darkoak.name=Тёмный дуб
+species.dynamictrees:acacia.name=Акация
+species.dynamictrees:apple.name=Яблоня
+species.dynamictrees:cactus.name=Кактус
+
 
 item.dynamictrees:oakseed.name=Желудь
 item.dynamictrees:spruceseed.name=Еловая шишка
@@ -35,10 +48,26 @@ item.dynamictrees:dirtbucket.name=Ведро земли
 item.dynamictrees:staff.name=Жезл дендролога
 tile.dynamictrees:bonsaipot.name=Бонсай
 
-commands.dynamictrees.usage=/dt <settree|repop> [args]
-commands.dynamictrees.setree.usage=/dt settree <x> <y> <z> <species> [joCode]
-commands.dynamictrees.setree.specieserror=Не могу найти вид %s!
-commands.dynamictrees.repop.usage=/dt repop
 commands.dynamictrees.repop.run=Перезаполнение базы данных генератора деревьев
+
+commands.dynamictrees.setree.specieserror=Не удалось найти виды %s!
+commands.dynamictrees.createstaff.specieserror=Не удалось найти виды %s!
+commands.dynamictrees.createstaff.colorerror=%s не декодируемый цвет
+commands.dynamictrees.createstaff.readonlyerror=%s не является булевым
+commands.dynamictrees.createstaff.maxuseserror=%s не является положительным целым числом
+commands.dynamictrees.soillife.lifeerror=%s не является целым числом
+commands.dynamictrees.soillife.notreeerror=Дерево не найдено по %s
+commands.dynamictrees.growpulse.norootyerror=Дёрн с корнями не найден по %s
+commands.dynamictrees.rotatejocode.turnserror=%s не является целым числом
+commands.dynamictrees.transform.nottransformableerror=Вид %s не может быть трансформирован
+
+potion.biochar.description=§7Базовое зелье для зельеварения
+potion.depletion.description=§7Убирает удобрение почвы дерева
+potion.gigas.description=§7Позволяет дереву стать мега-размера
+potion.burgeoning.description=§7Быстрее вырастит дерево
+potion.fertility.description=§7Полностью удобряет почву дерева
+potion.persistance.description=§7Прекращает изменение дерева
+potion.transform.description=§7Трансформирует дерево в §a%s §7дерево
+potion.transform.description.empty=§7Базовое зелье для зелий трансформации
 
 death.attack.fallingtree=%1$s раздавлен(а) падающим деревом
