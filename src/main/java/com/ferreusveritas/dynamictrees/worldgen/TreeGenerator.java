@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -55,7 +56,7 @@ public class TreeGenerator {
 		return dimensionMap.getOrDefault(dimLoc, getDefaultBiomeDataBase());
 	}
 
-	public BiomeDataBase getBiomeDataBase(ServerWorld world) {
+	public BiomeDataBase getBiomeDataBase(World world) {
 		return getBiomeDataBase(world.getDimensionKey().getLocation());
 	}
 

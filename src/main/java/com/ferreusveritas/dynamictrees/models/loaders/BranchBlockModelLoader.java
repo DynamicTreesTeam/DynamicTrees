@@ -47,7 +47,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
 
     private ResourceLocation convertStrToResLoc (final String resLocStr) {
         if (!resLocStr.contains(":")) return new ResourceLocation("minecraft", resLocStr);
-        return new ResourceLocation(resLocStr.substring(0, resLocStr.indexOf(':')), resLocStr.substring(resLocStr.indexOf(':') + 1));
+        return new ResourceLocation(resLocStr); // Use ResourceLocation.tryCreate for better error feedback.
     }
 
 }

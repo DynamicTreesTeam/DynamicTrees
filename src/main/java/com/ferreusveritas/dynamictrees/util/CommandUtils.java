@@ -10,9 +10,11 @@ import net.minecraft.world.World;
  */
 public final class CommandUtils {
 
-    public static void spawnItemStack (World world, BlockPos pos, ItemStack stack) {
-        while (!world.isAirBlock(pos))
-            pos = pos.up();
+    public static void spawnItemStack (World world, BlockPos pos, ItemStack stack, boolean searchForAir) {
+        if (searchForAir) {
+            while (!world.isAirBlock(pos))
+                pos = pos.up();
+        }
 
         ItemEntity entityItem = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
         entityItem.setMotion(0, 0, 0);

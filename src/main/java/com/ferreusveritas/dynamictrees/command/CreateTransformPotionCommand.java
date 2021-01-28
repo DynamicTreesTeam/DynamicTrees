@@ -55,7 +55,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
-        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack); // Spawn potion in the world.
+        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack, true); // Spawn potion in the world.
 
         return 1;
     }

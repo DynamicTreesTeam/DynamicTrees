@@ -67,7 +67,7 @@ public final class CreateStaffCommand extends SubCommand {
                 .setMaxUses(wandStack, maxUses)
                 .setUses(wandStack, maxUses);
 
-        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack);
+        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack, true);
 
         return 1;
     }

@@ -1209,11 +1209,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	/**
 	 * Provides the {@link BonsaiPotBlock} for this Species.  A mod can
-	 * derive it's own BonzaiPot subclass if it wants something custom.
+	 * derive it's own BonsaiPot subclass if it wants something custom.
 	 *
 	 * @return A {@link BonsaiPotBlock}
 	 */
-	public BonsaiPotBlock getBonzaiPot() {
+	public BonsaiPotBlock getBonsaiPot() {
 		return DTRegistries.bonsaiPotBlock;
 	}
 	

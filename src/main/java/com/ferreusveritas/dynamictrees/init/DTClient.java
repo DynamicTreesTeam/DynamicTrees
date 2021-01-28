@@ -103,7 +103,7 @@ public class DTClient {
 	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
 		ForgeRegistries.BLOCKS.forEach(block -> {
-			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof CactusBranchBlock) {
+			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof CactusBranchBlock || block instanceof BonsaiPotBlock) {
 				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
 			}
 		});
@@ -132,7 +132,7 @@ public class DTClient {
 		
 		//Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(DTRegistries.bonsaiPotBlock, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
-				? DTRegistries.bonsaiPotBlock.getSpecies((World) access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+				? DTRegistries.bonsaiPotBlock.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		//ITEMS
 		

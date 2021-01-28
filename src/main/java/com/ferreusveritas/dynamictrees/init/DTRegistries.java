@@ -76,10 +76,10 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.FARMLAND, DirtHelper.DIRTLIKE, Blocks.DIRT);
 		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SANDLIKE);
 		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SANDLIKE);
-//		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
+		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
 		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATERLIKE);
-//		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARDCLAYLIKE);
-//		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARDCLAYLIKE);
+		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARDCLAYLIKE);
+		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARDCLAYLIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUSLIKE);
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUSLIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUSLIKE);

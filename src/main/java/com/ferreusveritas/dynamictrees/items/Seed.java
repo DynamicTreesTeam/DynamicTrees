@@ -104,7 +104,7 @@ public class Seed extends Item implements IPlantable {
 		
 		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
 		if(DTConfigs.seedOnlyForest.get() && treeGen != null) {
-//			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
+			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
 		}
 		
 		float accum = 1.0f;
@@ -147,19 +147,24 @@ public class Seed extends Item implements IPlantable {
 		}
 		return joCode;
 	}
-	
+
 	public ActionResultType onItemUseFlowerPot(ItemUseContext context) {
-		//Handle Flower Pot interaction
-		BlockState emptyPotState = context.getWorld().getBlockState(context.getPos());
-		if(emptyPotState.getBlock() instanceof FlowerPotBlock && (emptyPotState == emptyPotState.getBlock().getDefaultState()) ) { //Empty Flower Pot of some kind
-			BonsaiPotBlock bonzaiPot = getSpecies().getBonzaiPot();
-			context.getWorld().setBlockState(context.getPos(), bonzaiPot.getDefaultState());
-			if(bonzaiPot.setSpecies(context.getWorld(), getSpecies(), context.getPos()) && bonzaiPot.setPotState(context.getWorld(), emptyPotState, context.getPos())) {
-				context.getItem().shrink(1);
-				return ActionResultType.SUCCESS;
-			}
+		World world = context.getWorld();
+		BlockPos pos = context.getPos();
+		BlockState emptyPotState = world.getBlockState(pos);
+		Block emptyPotBlock = emptyPotState.getBlock();
+
+		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.getDefaultState())
+			return ActionResultType.PASS;
+
+		BonsaiPotBlock bonsaiPot = this.getSpecies().getBonsaiPot();
+		world.setBlockState(pos, bonsaiPot.getDefaultState());
+
+		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.getDefaultState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
+			context.getItem().shrink(1);
+			return ActionResultType.SUCCESS;
 		}
-		
+
 		return ActionResultType.PASS;
 	}
 	
@@ -184,22 +189,25 @@ public class Seed extends Item implements IPlantable {
 		
 		return ActionResultType.PASS;
 	}
-	
+
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		//ItemStack seedStack = Objects.requireNonNull(context.getPlayer()).getHeldItem(context.getHand());
-		
-		//Handle Flower Pot interaction
+	public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+		// Handle flower pot interaction (flower pot cancels on item use so this must be done first).
 		if(onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
-		
-		//Handle Planting Seed interaction
+
+		return ActionResultType.PASS;
+	}
+
+	@Override
+	public ActionResultType onItemUse(ItemUseContext context) {
+		// Handle planting seed interaction.
 		if(onItemUsePlantSeed(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		return ActionResultType.FAIL;
+		return ActionResultType.PASS;
 	}
 	
 	@Override
