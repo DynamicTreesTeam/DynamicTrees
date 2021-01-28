@@ -187,7 +187,9 @@ public class TreeFamily {
 	}
 
 	public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
-		return TreeHelper.getBranch(state).canBeStripped(state, world, pos, player, heldItem);
+		BranchBlock branchBlock = TreeHelper.getBranch(state);
+		if (branchBlock == null) return false;
+		return branchBlock.canBeStripped(state, world, pos, player, heldItem);
 	}
 
 	public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){

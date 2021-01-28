@@ -114,7 +114,7 @@ public class DTRegistries {
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
-		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false)){
+		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MODID)){
 			registry.register(rooty);
 		}
 	}
