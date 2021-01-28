@@ -99,14 +99,28 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				if(leavesClusters != null) {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
-						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE);
-						treeQuads.addAll(leavesQuads);
+						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafState, new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE);
+						for (BakedQuad quad : leavesQuads){
+							Direction quadFace = quad.getFace();
+							if (!(quadFace == Direction.UP || quadFace == Direction.SOUTH || quadFace == Direction.WEST) || !leavesClusters.containsKey(leafLoc.getKey().offset(quadFace))){
+								treeQuads.add(quad);
+							}
+						}
 					}
 				} else {
 					BlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
+					List<BlockPos> relPosList = new LinkedList<>();
 					for(BlockPos relPos : destructionData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
+						relPosList.add(relPos);
+					}
+					for(BlockPos relPos : relPosList) {
 						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE);
-						treeQuads.addAll(leavesQuads);
+						for (BakedQuad quad : leavesQuads){
+							Direction quadFace = quad.getFace();
+								if (!(quadFace == Direction.UP || quadFace == Direction.SOUTH || quadFace == Direction.WEST) || !relPosList.contains(relPos.offset(quadFace))){
+									treeQuads.add(quad);
+								}
+						}
 					}
 				}
 			}
@@ -129,7 +143,7 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				g = green;
 				b = blue;
 			}
-			int diffuseAverage = 1;
+			int diffuseAverage = 3;
 			if(bakedQuad.applyDiffuseLighting()) {
 				float diffuse = (LightUtil.diffuseLight(bakedQuad.getFace()) + diffuseAverage) / (diffuseAverage+1);
 				r *= diffuse;
