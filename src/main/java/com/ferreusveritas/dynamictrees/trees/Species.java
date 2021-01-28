@@ -1082,15 +1082,15 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return value from 0.0(no growth) to 1.0(full growth)
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-		return SeasonHelper.globalSeasonalGrowthFactor(world, rootPos);
+		return ModConfigs.enableSeasonalGrowthFactor ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
 	}
 	
 	public float seasonalSeedDropFactor(World world, BlockPos pos) {
-		return SeasonHelper.globalSeasonalSeedDropFactor(world, pos);
+		return ModConfigs.enableSeasonalSeedDropFactor ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos) : 1.0f;
 	}
 	
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-		return SeasonHelper.globalSeasonalFruitProductionFactor(world, pos);
+		return ModConfigs.enableSeasonalFruitProductionFactor ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos) : 1.0f;
 	}
 	
 	/**

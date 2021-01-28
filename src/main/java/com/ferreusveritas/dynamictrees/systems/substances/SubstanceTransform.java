@@ -29,7 +29,7 @@ public class SubstanceTransform implements ISubstanceEffect {
 
 		if (dirt != null && toSpecies != null) {
 			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
-			if (fromSpecies != Species.NULLSPECIES && fromSpecies.isTransformable() && fromSpecies != toSpecies) {
+			if (fromSpecies.isTransformable() && fromSpecies != toSpecies) {
 				if (world.isRemote) {
 					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
 					WailaOther.invalidateWailaPosition();

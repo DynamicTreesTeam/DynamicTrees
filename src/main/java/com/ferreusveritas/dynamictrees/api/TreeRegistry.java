@@ -68,7 +68,7 @@ public class TreeRegistry {
 	}
 	
 	public static List<ResourceLocation> getSpeciesDirectory() {
-		return new ArrayList<ResourceLocation>(Species.REGISTRY.getKeys());
+		return new ArrayList<>(Species.REGISTRY.getKeys());
 	}
 
 	/**

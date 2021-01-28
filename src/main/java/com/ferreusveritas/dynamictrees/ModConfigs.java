@@ -52,6 +52,10 @@ public class ModConfigs {
 	
 	public static boolean worldGenDebug;
 	
+	public static boolean enableSeasonalSeedDropFactor;
+	public static boolean enableSeasonalGrowthFactor;
+	public static boolean enableSeasonalFruitProductionFactor;
+	
 	public static void preInit(FMLPreInitializationEvent event) {
 		
 		configDirectory = event.getModConfigurationDirectory();
@@ -112,6 +116,11 @@ public class ModConfigs {
 		
 		//Debug
 		worldGenDebug = config.getBoolean("worldGenDebug", "debug", false, "Enable to mark tree spawn locations with wool circles.");
+
+		// Serene seasons integration options. At some point this may be made fully configurable via json files. 
+		enableSeasonalSeedDropFactor = config.getBoolean("enableSeasonalSeedDropFactor", "integration", true, "If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).");
+		enableSeasonalGrowthFactor = config.getBoolean("enableSeasonalGrowthFactor", "integration", true, "If enabled, growth rates will be multiplied based on the current season (requires serene seasons).");
+		enableSeasonalFruitProductionFactor = config.getBoolean("enableSeasonalFruitProductionFactor", "integration", true, "If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).");
 		
 		config.save();
 	}
