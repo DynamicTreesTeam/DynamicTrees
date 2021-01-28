@@ -69,15 +69,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 
 public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraftforge.registries.IForgeRegistryEntry<Species> {
 	
-	public final static Species NULLSPECIES = new Species() {
+	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
+		@Override public boolean isTransformable() { return false; }
 		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(ISeedReader world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -184,7 +184,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public boolean isValid() {
-		return this != NULLSPECIES;
+		return this != NULL_SPECIES;
 	}
 	
 	public void ifValid(Consumer<Species> c) {
@@ -262,8 +262,19 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public void setRequiresTileEntity(boolean truth) {
 		requiresTileEntity = truth;
 	}
-	
-	
+
+	/**
+	 * Override and return false on things like cactus species which should not be
+	 * transformed to/from. If true and this species has it's own seed a transformation
+	 * potion will also be automatically created.
+	 *
+	 * @return True if it can be transformed to, false if not.
+	 */
+	public boolean isTransformable () {
+		return true;
+	}
+
+
 	///////////////////////////////////////////
 	//LEAVES
 	///////////////////////////////////////////
@@ -1179,7 +1190,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public Species getMegaSpecies() {
-		return Species.NULLSPECIES;
+		return Species.NULL_SPECIES;
 	}
 	
 	

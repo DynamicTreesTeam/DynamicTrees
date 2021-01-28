@@ -11,7 +11,6 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.ResourceLocationArgument;
-import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -30,16 +29,8 @@ public final class CreateTransformPotionCommand extends SubCommand {
         this.executesWithCoordinates = false;
         this.defaultToExecute = false;
 
-        final Set<ResourceLocation> speciesResLocs = new HashSet<>(Species.REGISTRY.getKeys());
-
-        // Only suggest common species (they usually share their name with the tree family).
-        speciesResLocs.removeIf(speciesResLoc -> {
-            final Species species = TreeRegistry.findSpecies(speciesResLoc);
-            return !species.getFamily().getCommonSpecies().equals(species);
-        });
-
         this.extraArguments = Commands.argument(CommandConstants.TREE_FAMILY_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(speciesResLocs, builder)).executes(this::execute);
+                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocs(), builder)).executes(this::execute);
     }
 
     @Override
@@ -58,13 +49,11 @@ public final class CreateTransformPotionCommand extends SubCommand {
             return 0;
         }
 
-        final TreeFamily family = species.getFamily();
-
         final DendroPotion dendroPotion = DTRegistries.dendroPotion;
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);
 
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
-        dendroPotion.setTargetTree(dendroPotionStack, family); // Tell it to set the target tree to the selected family.
+        dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
         CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack); // Spawn potion in the world.
 

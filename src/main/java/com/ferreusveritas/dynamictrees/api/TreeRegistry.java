@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
@@ -64,11 +65,43 @@ public class TreeRegistry {
 			}
 		}
 
-		return Species.NULLSPECIES;
+		return Species.NULL_SPECIES;
 	}
 
 	public static List<ResourceLocation> getSpeciesDirectory() {
 		return new ArrayList<>(Species.REGISTRY.getKeys());
+	}
+
+	/**
+	 * @return A list of resource locations for species which can be transformed to other species.
+	 */
+	public static List<ResourceLocation> getTransformableSpeciesLocs() {
+		final List<ResourceLocation> species = getSpeciesDirectory();
+		species.removeIf(resLoc -> !findSpecies(resLoc).isTransformable());
+		return species;
+	}
+
+	/**
+	 * @return All species which can be transformed.
+	 */
+	public static List<Species> getTransformableSpecies() {
+		final List<Species> species = new ArrayList<>();
+		getTransformableSpeciesLocs().forEach(speciesLoc -> species.add(findSpecies(speciesLoc)));
+		return species;
+	}
+
+	/**
+	 * @return All species which can be transformed and have their own seed (so should have a potion recipe created).
+	 */
+	public static List<Species> getPotionTransformableSpecies () {
+		final List<Species> speciesList = getTransformableSpecies();
+		speciesList.removeIf(species -> {
+			TreeFamily family = species.getFamily();
+
+			// Remove the species if it doesn't have seeds, or if it's not the common species and its seed is the same as the common species'.
+			return !species.hasSeed() || (species != family.getCommonSpecies() && species.getSeed() == family.getCommonSpecies().getSeed());
+		});
+		return speciesList;
 	}
 
 	//////////////////////////////

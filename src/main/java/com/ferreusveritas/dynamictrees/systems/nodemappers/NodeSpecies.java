@@ -8,11 +8,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 public class NodeSpecies implements INodeInspector {
 	
-	private Species determination = Species.NULLSPECIES;
+	private Species determination = Species.NULL_SPECIES;
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
@@ -21,7 +20,7 @@ public class NodeSpecies implements INodeInspector {
 
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
-				if(determination == Species.NULLSPECIES) {
+				if(determination == Species.NULL_SPECIES) {
 					determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
 				}
 				break;

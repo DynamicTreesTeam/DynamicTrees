@@ -82,6 +82,11 @@ public class Cactus extends TreeFamily {
 		}
 
 		@Override
+		public boolean isTransformable() {
+			return false;
+		}
+
+		@Override
 		public JoCode getJoCode(String joCodeString) {
 			return new JoCodeCactus(joCodeString);
 		}

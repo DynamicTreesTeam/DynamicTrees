@@ -178,7 +178,7 @@ public class Staff extends Item {
 	public Staff setSpecies(ItemStack itemStack, Species species) {
 		String name;
 
-		if (species == Species.NULLSPECIES) name = "null";
+		if (species == Species.NULL_SPECIES) name = "null";
 		else name = species.toString();
 
 		itemStack.getOrCreateTag().putString(TREE, name);
@@ -199,7 +199,7 @@ public class Staff extends Item {
 			//			Species species = TreeRegistry.findSpeciesSloppy("oak");
 			//			setSpecies(itemStack, species);
 			//			return species;
-			return Species.NULLSPECIES;
+			return Species.NULL_SPECIES;
 		}
 	}
 	

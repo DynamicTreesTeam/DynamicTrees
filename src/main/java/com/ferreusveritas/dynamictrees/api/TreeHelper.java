@@ -160,7 +160,7 @@ public class TreeHelper {
 			return branch.getFamily().getCommonSpecies();
 		}
 		
-		return Species.NULLSPECIES;
+		return Species.NULL_SPECIES;
 	}
 	
 	/**
@@ -196,7 +196,7 @@ public class TreeHelper {
 			BlockState rootyState = world.getBlockState(rootPos);
 			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
 		}
-		return Species.NULLSPECIES;
+		return Species.NULL_SPECIES;
 	}
 	
 	/**
@@ -211,7 +211,7 @@ public class TreeHelper {
 	 */
 	public static Species getBestGuessSpecies(World world, BlockPos pos) {
 		Species species = getExactSpecies(world, pos);
-		return species == Species.NULLSPECIES ? getCommonSpecies(world, pos) : species;
+		return species == Species.NULL_SPECIES ? getCommonSpecies(world, pos) : species;
 	}
 	
 	/**

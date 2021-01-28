@@ -13,8 +13,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 /**
  * 
@@ -25,7 +23,7 @@ import net.minecraftforge.common.util.LazyOptional;
  */
 public class SpeciesTileEntity extends TileEntity {
 	
-	private Species species = Species.NULLSPECIES;
+	private Species species = Species.NULL_SPECIES;
 	
 	public SpeciesTileEntity() {
 		super(DTRegistries.speciesTE);

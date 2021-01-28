@@ -573,7 +573,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			}
 		}
 		
-		return Species.NULLSPECIES;
+		return Species.NULL_SPECIES;
 	}
 	
 	//////////////////////////////
