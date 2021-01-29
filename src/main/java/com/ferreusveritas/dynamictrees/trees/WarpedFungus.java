@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;

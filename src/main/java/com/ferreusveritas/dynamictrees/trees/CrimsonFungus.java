@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.featuregen.VineGenFeature;
+import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -16,7 +16,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class CrimsonFungus extends VanillaTreeFamily {
@@ -28,7 +27,7 @@ public class CrimsonFungus extends VanillaTreeFamily {
 
 			setupStandardSeedDropping();
 
-			addGenFeature(new VineGenFeature().setVineBlock(Blocks.WEEPING_VINES));
+			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
 		}
 		CrimsonSpecies(ResourceLocation name, TreeFamily family){
 			super(name, family);

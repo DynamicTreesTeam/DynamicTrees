@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FruitGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.VineGenFeature;
+import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -88,7 +88,7 @@ public class OakTree extends VanillaTreeFamily {
 			setupStandardSeedDropping();
 			
 			//Add species features
-			addGenFeature(new VineGenFeature().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(24));//Generate Vines
+			addGenFeature(new VinesGenFeature().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(24));//Generate Vines
 		}
 		
 		@Override

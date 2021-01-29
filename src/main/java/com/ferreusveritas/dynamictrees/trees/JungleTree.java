@@ -4,16 +4,13 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.featuregen.*;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -32,7 +29,6 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -56,7 +52,7 @@ public class JungleTree extends VanillaTreeFamily {
 			
 			//Add species features
 			addGenFeature(new CocoaGenFeature());
-			addGenFeature(new VineGenFeature().setQuantity(16).setMaxLength(16));
+			addGenFeature(new VinesGenFeature());
 			addGenFeature(new UndergrowthGenFeature());
 		}
 		
@@ -93,7 +89,7 @@ public class JungleTree extends VanillaTreeFamily {
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
 			
 			//Add species features
-			addGenFeature(new VineGenFeature().setQuantity(16).setMaxLength(16));
+			addGenFeature(new VinesGenFeature().setQuantity(16).setMaxLength(16));
 			addGenFeature(new BottomFlareGenFeature()); // Flare the bottom
 			addGenFeature(new ClearVolumeGenFeature(8));//Clear a spot for the thick tree trunk
 			addGenFeature(new MoundGenFeature(999));//Place a 3x3 of dirt under thick trees
