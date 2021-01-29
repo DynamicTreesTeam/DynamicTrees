@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.systems;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import net.minecraft.block.Block;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
@@ -34,6 +36,9 @@ public class RootyBlockHelper {
     }
 
     public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap){
+        return generateListForRegistry(forceRemap, null);
+    }
+    public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap, String namespace){
         if (rootyBlocksList == null){
             rootyBlocksList = new LinkedList<>();
             forceRemap = true;
@@ -45,7 +50,13 @@ public class RootyBlockHelper {
                 }
             }
         }
-        return rootyBlocksList;
+        LinkedList<RootyBlock> thisModRootyBlocks = new LinkedList<>();
+        for (RootyBlock block : rootyBlocksList){
+            if (namespace == null || block.getRegistryName().getNamespace().equals(namespace)){
+                thisModRootyBlocks.add(block);
+            }
+        }
+        return thisModRootyBlocks;
     }
 
 }
