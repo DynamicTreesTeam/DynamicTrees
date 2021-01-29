@@ -265,7 +265,9 @@ public class TreeFamily {
 	}
 	public BranchBlock createBranch(String postfix) {
 		String branchName = this.getName() + postfix;
-		return isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
+		BasicBranchBlock branch = isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
+		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
+		return branch;
 	}
 
 	public Item createBranchItem (@Nonnull BranchBlock branch) {
@@ -376,6 +378,9 @@ public class TreeFamily {
 	public ItemStack getPrimitiveLogs(int qty) {
 		return new ItemStack(this.primitiveLog, qty);
 	}
+
+	public boolean isFireProof () { return false; }
+
 
 	///////////////////////////////////////////
 	//BRANCHES

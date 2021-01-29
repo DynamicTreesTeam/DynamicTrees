@@ -106,7 +106,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
 		return getProperties(world.getBlockState(pos)).getFireSpreadSpeed();
 	}
-	
+
+	@Override
+	public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		return getFlammability(state, world, pos, face) > 0 || face == Direction.UP;
+	}
+
 	@Nonnull
 	public BlockState updatePostPlacement(@Nonnull BlockState stateIn, Direction facing, BlockState facingState, @Nonnull IWorld worldIn, @Nonnull BlockPos currentPos, BlockPos facingPos) { return stateIn; }
 	

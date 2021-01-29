@@ -119,7 +119,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	protected int soilTypeFlags = 0;
 	
 	private boolean requiresTileEntity = false;
-	
+
 	//Leaves
 	protected ILeavesProperties leavesProperties;
 	
@@ -273,7 +273,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public boolean isTransformable () {
 		return true;
 	}
-
 
 	///////////////////////////////////////////
 	//LEAVES
@@ -540,7 +539,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public boolean canBoneMeal() {
 		return true;
 	}
-	
+
+	public int saplingFireSpread () { return 0; }
+	public int saplingFlammability () { return 0; }
+
 	public boolean transitionToTree(World world, BlockPos pos) {
 		
 		//Ensure planting conditions are right

@@ -64,6 +64,15 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	// INTERACTION
 	///////////////////////////////////////////
 
+	@Override
+	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		return getSpecies().saplingFireSpread();
+	}
+
+	@Override
+	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		return getSpecies().saplingFlammability();
+	}
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {

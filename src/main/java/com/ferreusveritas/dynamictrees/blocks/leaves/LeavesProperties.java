@@ -59,6 +59,8 @@ public class LeavesProperties implements ILeavesProperties {
 	protected TreeFamily tree = TreeFamily.NULLFAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected FoliageTypes foliage;
+	protected int flammability = 60;// Mimic vanilla leaves
+	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
 
 	private LeavesProperties() {}
 	
@@ -116,6 +118,10 @@ public class LeavesProperties implements ILeavesProperties {
 	@Override
 	public ILeavesProperties setTree(TreeFamily tree) {
 		this.tree = tree;
+		if (tree.isFireProof()){
+			flammability = 0;
+			fireSpreadSpeed = 0;
+		}
 		return this;
 	}
 	
@@ -126,12 +132,12 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public int getFlammability() {
-		return 60;// Mimic vanilla leaves
+		return flammability;
 	}
 	
 	@Override
 	public int getFireSpreadSpeed() {
-		return 30;// Mimic vanilla leaves
+		return fireSpreadSpeed;
 	}
 	
 	@Override

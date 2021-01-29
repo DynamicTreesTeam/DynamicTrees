@@ -42,8 +42,6 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	private int smotherLeavesMax = 4;
 	private JsonObject jsonObj;
 	private boolean connectAnyRadius = false;
-	private int flammability = 60;// Mimic vanilla leaves
-	private int fireSpreadSpeed = 30;// Mimic vanilla leaves
 
 	public LeavesPropertiesJson(String jsonData) {
 		this(getJsonObject(jsonData));

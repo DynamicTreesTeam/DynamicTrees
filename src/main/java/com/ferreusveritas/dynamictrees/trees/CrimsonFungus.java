@@ -76,4 +76,8 @@ public class CrimsonFungus extends VanillaTreeFamily {
 		setCommonSpecies(new CrimsonSpecies(this));
 	}
 
+	@Override
+	public boolean isFireProof() {
+		return true;
+	}
 }
