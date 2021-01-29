@@ -187,7 +187,7 @@ public class JoCode {
 					BlockPos.Mutable cellPos = cell.getPos();
 					if(safeBounds.inBounds(cellPos, false)) {
 						BlockState testBlockState = world.getBlockState(cellPos);
-						if(testBlockState.getMaterial().isReplaceable()) {
+						if(testBlockState.canBeReplacedByLeaves(world, cellPos)) {
 							world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
 						}
 					} else {
@@ -256,7 +256,7 @@ public class JoCode {
 	}
 	
 	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
-		if(world.getBlockState(pos).getMaterial().isReplaceable() && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+		if(world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
 		}

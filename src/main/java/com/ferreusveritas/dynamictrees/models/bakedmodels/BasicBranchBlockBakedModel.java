@@ -30,7 +30,6 @@ import java.util.*;
 public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 	protected TextureAtlasSprite barkTexture;
-	protected TextureAtlasSprite strippedTexture;
 
 	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
 	private final IBakedModel[][] sleeves = new IBakedModel[6][7];
@@ -287,13 +286,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Override
 	public boolean isAmbientOcclusion() {
 		return true;
-	}
-
-	@Override
-	public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
-		if (!(data instanceof Connections))
-			return this.getParticleTexture();
-		return this.barkTexture;
 	}
 
 	@Override

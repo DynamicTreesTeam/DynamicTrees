@@ -14,7 +14,6 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.Connections;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
@@ -49,7 +48,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	// Useful for more unique subclasses
 	public BasicBranchBlock(AbstractBlock.Properties properties, String name) {
-		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0), name); //aaaaand they also sound like wood.
+		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0).sound(SoundType.WOOD), name); //aaaaand they also sound like wood.
 
 		cacheBranchStates();
 	}
@@ -283,14 +282,6 @@ public class BasicBranchBlock extends BranchBlock {
 		return signal;
 	}
 
-	///////////////////////////////////////////
-	// RENDERING
-	///////////////////////////////////////////
-
-	@Override
-	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return super.getConnectionData(world, pos, state);
-	}
 
 	///////////////////////////////////////////
 	// PHYSICAL BOUNDS

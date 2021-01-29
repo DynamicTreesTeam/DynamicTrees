@@ -2,6 +2,6 @@
     "loader": "dynamictrees:branch",
     "textures": {
         "bark": "block/acacia_log",
-        "rings": "block/acacia_log_top",
+        "rings": "block/acacia_log_top"
     }
 }

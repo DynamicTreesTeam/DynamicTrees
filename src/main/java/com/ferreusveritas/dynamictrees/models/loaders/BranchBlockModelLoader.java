@@ -1,14 +1,18 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.ferreusveritas.dynamictrees.models.geometry.CactusBranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelLoader;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Harley O'Connor
@@ -17,9 +21,7 @@ import net.minecraftforge.client.model.IModelLoader;
 public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeometry> {
 
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {
-
-    }
+    public void onResourceManagerReload(IResourceManager resourceManager) { }
 
     @Override
     public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
@@ -45,9 +47,14 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 
+    @Nullable
     private ResourceLocation convertStrToResLoc (final String resLocStr) {
-        if (!resLocStr.contains(":")) return new ResourceLocation("minecraft", resLocStr);
-        return new ResourceLocation(resLocStr); // Use ResourceLocation.tryCreate for better error feedback.
+        try {
+            return new ResourceLocation(resLocStr);
+        } catch (ResourceLocationException e) {
+            DynamicTrees.getLogger().fatal("Failed to create resource location with following info: " + e.getMessage());
+        }
+        return null;
     }
 
 }

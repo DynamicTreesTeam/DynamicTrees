@@ -5,7 +5,7 @@ import net.minecraft.util.DamageSource;
 public class TreeDamageSource extends DamageSource {
 	
 	public TreeDamageSource() {
-		super("fallingtree");
+		super("falling_tree");
 	}
 	
 }

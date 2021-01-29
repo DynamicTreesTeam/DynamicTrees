@@ -56,7 +56,8 @@ public class CactusBranchBlock extends BranchBlock {
 		super(Properties.create(Material.CACTUS)
 				.sound(SoundType.CLOTH)
 				.harvestTool(ToolType.AXE)
-				.harvestLevel(0), name);
+				.harvestLevel(0)
+				.sound(SoundType.CLOTH), name);
 
 		setDefaultState(this.getStateContainer().getBaseState().with(TRUNK, true).with(ORIGIN, Direction.DOWN));
 	}
