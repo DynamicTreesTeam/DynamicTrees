@@ -68,5 +68,7 @@
   "potion.fertility.description": "§7Fully fertilizes tree soil",
   "potion.persistance.description": "§7Stops tree from changing",
   "potion.transform.description": "§7Transform a tree into a §a%s §7tree",
-  "potion.transform.description.empty": "§7Base tree potion for brewing transformations"
+  "potion.transform.description.empty": "§7Base tree potion for brewing transformations",
+
+  "death.attack.falling_tree": "%1$s was crushed by a falling tree"
 }
