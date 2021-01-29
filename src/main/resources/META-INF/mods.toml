@@ -10,7 +10,7 @@ displayName="Dynamic Trees"
 #updateJSONURL="http://minecraft.curseforge.com/projects/dynamictrees"
 displayURL="http://minecraft.curseforge.com/projects/dynamictrees"
 logoFile="logo.png"
-credits="MaxHyper/supermassimo for the 1.14.4 Port"
+credits="MaxHyper/Supermassimo & Harley O' Connor for the 1.16 Port"
 authors="Ferreusveritas"
 description='''
 Progressively growing trees.. forests that spread'''
@@ -25,6 +25,6 @@ Progressively growing trees.. forests that spread'''
 [[dependencies.dynamictrees]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4]"
+    versionRange="[1.16.4,1.16.5]"
     ordering="NONE"
     side="BOTH"
