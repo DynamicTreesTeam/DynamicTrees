@@ -1,0 +1,6 @@
+{
+	"multipart": [
+		{   "apply": { "model": "block/white_terracotta" }},
+		{	"apply": { "model": "dynamictrees:block/roots" }}
+	]
+}

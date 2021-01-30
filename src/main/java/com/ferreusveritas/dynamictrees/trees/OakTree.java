@@ -56,7 +56,7 @@ public class OakTree extends VanillaTreeFamily {
 		
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
-			return isOneOfBiomes(biome, Biomes.FOREST, Biomes.FLOWER_FOREST);
+			return BiomeDictionary.hasType(biome, Type.FOREST) && BiomeDictionary.hasType(biome, Type.OVERWORLD);
 		}
 		
 		@Override
@@ -96,7 +96,7 @@ public class OakTree extends VanillaTreeFamily {
 		
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
-			return isOneOfBiomes(biome, Biomes.SWAMP, Biomes.SWAMP_HILLS);
+			return BiomeDictionary.hasType(biome, Type.SWAMP);
 		}
 		
 		@Override

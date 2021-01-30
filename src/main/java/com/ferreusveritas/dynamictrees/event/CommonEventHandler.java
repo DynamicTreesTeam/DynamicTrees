@@ -29,9 +29,9 @@ public class CommonEventHandler {
 		}
 		
 		if(WorldGenRegistry.isWorldGenEnabled() && !event.getWorld().isRemote()) {
-//			if(!WorldGenRegistry.validateBiomeDataBases()) {
+			if(!WorldGenRegistry.validateBiomeDataBases()) {
 				WorldGenRegistry.populateDataBase();
-//			}
+			}
 		}
 		
 		//		event.getWorld().addEventListener(new WorldListener(event.getWorld(), event.getWorld().ser()));

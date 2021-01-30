@@ -14,6 +14,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -42,7 +43,7 @@ public class CrimsonFungus extends VanillaTreeFamily {
 
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.DIRTLIKE, DirtHelper.NETHERSOILLIKE, DirtHelper.FUNGUSLIKE);
+			addAcceptableSoils(DirtHelper.DIRT_LIKE, DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE);
 		}
 
 		@Override

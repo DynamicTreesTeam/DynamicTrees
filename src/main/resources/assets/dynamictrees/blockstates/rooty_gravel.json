@@ -1,0 +1,6 @@
+{
+	"multipart": [
+		{   "apply": { "model": "block/gravel" }},
+		{	"apply": { "model": "dynamictrees:block/roots" }}
+	]
+}

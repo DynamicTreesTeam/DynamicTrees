@@ -9,6 +9,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.Random;
 
@@ -25,12 +26,21 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
 		final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
-    	BiomeDataBase biomeDataBase = treeGenerator.getBiomeDataBase(world.getWorld());
+		final ServerWorld serverWorld = world.getWorld();
 
+    	// Do not generate if the current dimension is blacklisted.
+        if (treeGenerator.isDimensionBlacklisted(serverWorld.getDimensionKey().getLocation()))
+            return false;
+
+        // Grab biome data base for dimension.
+        final BiomeDataBase biomeDataBase = treeGenerator.getBiomeDataBase(serverWorld);
+
+        // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
 		final ChunkPos chunkPos = world.getChunk(pos).getPos();
 		final SafeChunkBounds chunkBounds = new SafeChunkBounds(world, chunkPos);
 
-		treeGenerator.getCircleProvider().getPoissonDiscs(world.getWorld(), chunkPos.x, chunkPos.z)
+		// Generate trees.
+		treeGenerator.getCircleProvider().getPoissonDiscs(world.getWorld(), chunkPos)
 				.forEach(c -> treeGenerator.makeTree(world, biomeDataBase, c, new GroundFinder(), chunkBounds));
 
         return true;

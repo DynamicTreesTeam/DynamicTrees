@@ -3,7 +3,7 @@
 		"__comment" : "Start by making any vanilla minecraft biome default to oak",
 		"select": { "name": "minecraft:.*" },
 		"apply": {
-			"cancelvanilla": true,
+			"cancel_vanilla": true,
 			"species" : "oak",
 			"chance" : "standard"
 		}
@@ -88,7 +88,6 @@
 					"mushroombrn" : 3
 				}
 			},
-			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.25 ] }, 0.25 ] } },
 			"chance": 0.66
 		}
 	},
@@ -180,19 +179,19 @@
 	{
 		"select": { "name": "minecraft:crimson_forest" },
 		"apply": {
-			"species": "crimson"
-		},
-		"density": 1,
-		"chance": 1.0,
-		"forestness" : 1.0
+			"species": "crimson",
+			"density": 1,
+			"chance": 1.0,
+			"forestness" : 1.0
+		}
 	},
 	{
 		"select": { "name": "minecraft:warped_forest" },
 		"apply": {
-			"species": "warped"
-		},
-		"density": 1,
-		"chance": 1.0,
-		"forestness" : 1.0
+			"species": "warped",
+			"density": 1,
+			"chance": 1.0,
+			"forestness" : 1.0
+		}
 	}
 ]

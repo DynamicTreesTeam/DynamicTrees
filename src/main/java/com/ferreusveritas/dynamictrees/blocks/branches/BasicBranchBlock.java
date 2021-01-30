@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
+import com.ferreusveritas.dynamictrees.event.SafeChunkEvents;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IntegerProperty;
@@ -299,7 +301,6 @@ public class BasicBranchBlock extends BranchBlock {
 	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-
 		int thisRadiusInt = getRadius(state);
 		double radius = thisRadiusInt / 16.0;
 		VoxelShape core = VoxelShapes.create(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
@@ -325,11 +326,12 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
 		BlockPos deltaPos = pos.offset(side);
+
 		try {
 			BlockState blockState = blockAccess.getBlockState(deltaPos);
 			return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			System.out.println("X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
+			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
 			return 0;
 		}
 	}

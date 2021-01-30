@@ -68,30 +68,30 @@ public class DTRegistries {
 		appleBlock = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		trunkShellBlock = new TrunkShellBlock();
 
-		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRTLIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM));
-		DirtHelper.registerSoil(Blocks.COARSE_DIRT, DirtHelper.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.PODZOL, DirtHelper.DIRTLIKE);
-		DirtHelper.registerSoil(Blocks.FARMLAND, DirtHelper.DIRTLIKE, Blocks.DIRT);
-		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SANDLIKE);
-		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SANDLIKE);
-		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVELLIKE);
-		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATERLIKE);
-		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARDCLAYLIKE);
-		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARDCLAYLIKE);
-		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUSLIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUSLIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUSLIKE);
-		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHERLIKE, new SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM));
-		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHERLIKE);
-		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHERLIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHERLIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHERLIKE);
-		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHERSOILLIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHERSOILLIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHERSOILLIKE);
-		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.ENDLIKE);
+		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRT_LIKE);
+		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRT_LIKE);
+		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRT_LIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM));
+		DirtHelper.registerSoil(Blocks.COARSE_DIRT, DirtHelper.DIRT_LIKE);
+		DirtHelper.registerSoil(Blocks.PODZOL, DirtHelper.DIRT_LIKE);
+		DirtHelper.registerSoil(Blocks.FARMLAND, DirtHelper.DIRT_LIKE, Blocks.DIRT);
+		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SAND_LIKE);
+		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SAND_LIKE);
+		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVEL_LIKE);
+		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATER_LIKE);
+		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARD_CLAY_LIKE);
+		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARD_CLAY_LIKE);
+		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUS_LIKE);
+		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUS_LIKE);
+		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUS_LIKE);
+		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHER_LIKE, new SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM));
+		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHER_LIKE);
+		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHER_LIKE);
+		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_LIKE);
+		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_LIKE);
+		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHER_SOIL_LIKE);
+		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
+		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
+		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
 
 		setupLeavesProperties();
 	}

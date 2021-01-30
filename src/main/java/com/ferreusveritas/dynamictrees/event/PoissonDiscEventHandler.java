@@ -36,7 +36,7 @@ public class PoissonDiscEventHandler {
 			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
 
 			final ChunkPos chunkPos = event.getChunk().getPos();
-			cp.setChunkPoissonData((ServerWorld) world, chunkPos.x, chunkPos.z, circleData);
+			cp.setChunkPoissonData((ServerWorld) world, chunkPos, circleData);
 		}
 	}
 
@@ -45,12 +45,12 @@ public class PoissonDiscEventHandler {
 		ServerWorld world = (ServerWorld) event.getWorld();
 		PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
         final ChunkPos chunkPos = event.getChunk().getPos();
-        byte[] circleData = cp.getChunkPoissonData(world, chunkPos.x, chunkPos.z);
+        byte[] circleData = cp.getChunkPoissonData(world, chunkPos);
 		event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
 
 		// This has helped eliminate some chunk data but hasn't prevented freezing.
 		if (!world.getChunkProvider().isChunkLoaded(chunkPos))
-			cp.unloadChunkPoissonData(world, chunkPos.x, chunkPos.z);
+			cp.unloadChunkPoissonData(world, chunkPos);
 	}
 
 }

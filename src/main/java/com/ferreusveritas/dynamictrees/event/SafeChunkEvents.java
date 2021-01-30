@@ -1,8 +1,12 @@
 package com.ferreusveritas.dynamictrees.event;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.*;
@@ -14,30 +18,35 @@ import java.util.*;
  */
 public final class SafeChunkEvents {
 
-    private static final Map<IWorld, List<ChunkPos>> loadedChunks = new HashMap<>();
+    private static final Map<ResourceLocation, List<ChunkPos>> loadedChunks = new HashMap<>();
+
+    @SubscribeEvent
+    public void onWorldUnload (WorldEvent.Unload event) {
+        if (!(event.getWorld() instanceof World))
+            return;
+
+        loadedChunks.remove(((World) event.getWorld()).getDimensionKey().getLocation());
+    }
 
     @SubscribeEvent
     public void onChunkLoad (ChunkEvent.Load event) {
-        final IWorld world = event.getWorld();
-        final ChunkPos chunkPos = event.getChunk().getPos();
+        if (!(event.getWorld() instanceof World))
+            return;
 
-        if (!loadedChunks.containsKey(world)) {
-            loadedChunks.put(world, new ArrayList<>(Arrays.asList(chunkPos)));
-        } else loadedChunks.get(world).add(chunkPos);
+        loadedChunks.computeIfAbsent(((World) event.getWorld()).getDimensionKey().getLocation(), k ->
+                new ArrayList<>(Collections.singletonList(event.getChunk().getPos())));
     }
 
     @SubscribeEvent
     public void onChunkUnload (ChunkEvent.Unload event) {
-        final IWorld world = event.getWorld();
-        final ChunkPos chunkPos = event.getChunk().getPos();
+        if (!(event.getWorld() instanceof World))
+            return;
 
-        if (!loadedChunks.containsKey(world)) return;
-
-        loadedChunks.get(world).remove(chunkPos);
+        loadedChunks.remove(((World) event.getWorld()).getDimensionKey().getLocation()).remove(event.getChunk().getPos());
     }
 
-    public static boolean isChunkLoaded (IWorld world, ChunkPos chunkPos) {
-        return loadedChunks.containsKey(world) && loadedChunks.get(world).contains(chunkPos);
+    public static boolean isChunkLoaded (World world, ChunkPos chunkPos) {
+        return loadedChunks.containsKey(world.getDimensionKey().getLocation()) && loadedChunks.get(world.getDimensionKey().getLocation()).contains(chunkPos);
     }
 
 }

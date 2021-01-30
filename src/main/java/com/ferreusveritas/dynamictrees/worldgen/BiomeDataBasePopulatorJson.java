@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
@@ -28,7 +29,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static final String DENSITY = "density";
 	public static final String CHANCE = "chance";
 	
-	public static final String CANCELVANILLA = "cancelvanilla";
+	public static final String CANCEL_VANILLA = "cancel_vanilla";
 	public static final String MULTIPASS = "multipass";
 	public static final String SUBTERRANEAN = "subterranean";
 	public static final String FORESTNESS = "forestness";
@@ -41,7 +42,8 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static final String NAME = "name";
 	public static final String TYPE = "type";
 	
-	private JsonElement jsonElement;
+	private final JsonElement jsonElement;
+	private final String fileName;
 	
 	private static Map<String, IJsonBiomeSelector> jsonBiomeSelectorMap = new HashMap<>();
 	private static Map<String, IJsonBiomeApplier> jsonBiomeApplierMap = new HashMap<>();
@@ -103,10 +105,10 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 
 			event.register(CHANCE, new JsonBiomePropertyApplierChance());
 
-			event.register(CANCELVANILLA, (dbase, element, biome) -> {
+			event.register(CANCEL_VANILLA, (dbase, element, biome) -> {
 				if(element.isJsonPrimitive()) {
 					boolean cancel = element.getAsBoolean();
-					//System.out.println("Biome " + (cancel ? "cancelled" : "uncancelled") + " for vanilla: " + biome);
+					DynamicTrees.getLogger().debug("Biome " + (cancel ? "cancelled" : "uncancelled") + " for vanilla: " + biome);
 					dbase.setCancelVanillaTreeGen(biome, cancel);
 				}
 			});
@@ -116,7 +118,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 					boolean multipass = element.getAsBoolean();
 
 					if(multipass) {
-						//System.out.println("Biome set for multipass: " + biome);
+						DynamicTrees.getLogger().debug("Biome set for multipass: " + biome);
 
 						//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
 						//by filling in gaps in the generation with smaller trees
@@ -135,7 +137,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			event.register(SUBTERRANEAN,  (dbase, element, biome) -> {
 				if(element.isJsonPrimitive()) {
 					boolean subterranean = element.getAsBoolean();
-					//System.out.println("Biome set to subterranean: " + biome);
+					DynamicTrees.getLogger().debug("Biome set to subterranean: " + biome);
 					dbase.setIsSubterranean(biome, subterranean);
 				}
 			});
@@ -143,7 +145,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			event.register(FORESTNESS, (dbase, element, biome) -> {
 				if(element.isJsonPrimitive()) {
 					float forestness = element.getAsFloat();
-					//System.out.println("Forestness set for biome: " + biome + " at " + forestness);
+					DynamicTrees.getLogger().debug("Forestness set for biome: " + biome + " at " + forestness);
 					dbase.setForestness(biome, forestness);
 				}
 			});
@@ -152,7 +154,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 				if(element.isJsonPrimitive()) {
 					boolean blacklist = element.getAsBoolean();
 					if(blacklist) {
-						//System.out.println("Blacklisted biome: " + biome);
+						DynamicTrees.getLogger().debug("Blacklisted biome: " + biome);
 						blacklistedBiomes.add(biome);
 					} else {
 						blacklistedBiomes.remove(biome);
@@ -173,11 +175,12 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	}
 	
 	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
-		this(JsonHelper.load(jsonLocation));
+		this(JsonHelper.load(jsonLocation), "default.json");
 	}
 	
-	public BiomeDataBasePopulatorJson(JsonElement jsonElement) {
+	public BiomeDataBasePopulatorJson(JsonElement jsonElement, String fileName) {
 		this.jsonElement = jsonElement;
+		this.fileName = fileName;
 	}
 	
 	@Override
@@ -256,7 +259,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 									if(selector != null) {
 										selectors.add(new JsonBiomeSelectorData(selector, selectElement.getValue()));
 									} else {
-										System.err.println("Json Error: Undefined selector property \"" + selectorName + "\"");
+										DynamicTrees.getLogger().error("Json Error: Undefined selector property \"" + selectorName + "\" in " + this.fileName + ".");
 									}
 								}
 							}
@@ -272,14 +275,14 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 										if(applier != null) {
 											appliers.add(new JsonBiomeApplierData(applier, selectElement.getValue()));
 										} else {
-											System.err.println("Json Error: Undefined applier property \"" + applierName + "\"");
+											DynamicTrees.getLogger().error("Json Error: Undefined applier property \"" + applierName + "\" in " + this.fileName + ".");
 										}
 									}
 								}
 							}
 						}
 						else {
-							System.err.println("Json Error: Undefined operation \"" + key + "\"");
+							DynamicTrees.getLogger().error("Json Error: Undefined operation \"" + key + "\" in " + this.fileName + ".");
 						}
 			}
 			

@@ -20,21 +20,22 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class TreeGenerator {
 
 	protected static TreeGenerator INSTANCE;
 
 	protected final BiomeDataBase defaultBiomeDataBase;
-	public static final BiomeDataBase DIMENSIONBLACKLISTED = new BiomeDataBase();
 	protected final PoissonDiscProviderUniversal circleProvider;
 	protected final RandomXOR random = new RandomXOR();
 	protected final Map<ResourceLocation, BiomeDataBase> dimensionMap = new HashMap<>();
+	protected final Set<ResourceLocation> blacklistedDimensions = new HashSet<>();
 
 	public static void setup() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
@@ -68,10 +69,13 @@ public class TreeGenerator {
 		dimensionMap.put(dimLoc, dBase);
 	}
 
-//	public void BlackListDimension(Dimension dimension) {
-//		System.out.println("DynamicTrees Applying BlackListed Dimension: " + dimension.toString());
-//		dimensionMap.put(dimension, DIMENSIONBLACKLISTED);
-//	}
+	public void addBlacklistedDimension (ResourceLocation dimLoc) {
+		blacklistedDimensions.add(dimLoc);
+	}
+
+	public boolean isDimensionBlacklisted (ResourceLocation dimLoc) {
+		return blacklistedDimensions.contains(dimLoc);
+	}
 
 	public void clearAllBiomeDataBases() {
 		dimensionMap.clear();
@@ -89,12 +93,12 @@ public class TreeGenerator {
 	 */
 	public enum EnumGeneratorResult {
 		GENERATED(DyeColor.WHITE),
-		NOTREE(DyeColor.BLACK),
-		UNHANDLEDBIOME(DyeColor.YELLOW),
-		FAILSOIL(DyeColor.BROWN),
-		FAILCHANCE(DyeColor.BLUE),
-		FAILGENERATION(DyeColor.RED),
-		NOGROUND(DyeColor.PURPLE);
+		NO_TREE(DyeColor.BLACK),
+		UNHANDLED_BIOME(DyeColor.YELLOW),
+		FAIL_SOIL(DyeColor.BROWN),
+		FAIL_CHANCE(DyeColor.BLUE),
+		FAIL_GENERATION(DyeColor.RED),
+		NO_GROUND(DyeColor.PURPLE);
 
 		private final DyeColor color;
 
@@ -149,7 +153,7 @@ public class TreeGenerator {
 		pos = groundFinder.findGround(biomeEntry, world, pos);
 
 		if(pos == BlockPos.ZERO) {
-			return EnumGeneratorResult.NOGROUND;
+			return EnumGeneratorResult.NO_GROUND;
 		}
 
 		random.setXOR(pos);
@@ -166,19 +170,19 @@ public class TreeGenerator {
 				if(species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
 						if(!species.generate(world, pos, biome, random, circle.radius, safeBounds)) {
-							result = EnumGeneratorResult.FAILGENERATION;
+							result = EnumGeneratorResult.FAIL_GENERATION;
 						}
 					} else {
-						result = EnumGeneratorResult.FAILCHANCE;
+						result = EnumGeneratorResult.FAIL_CHANCE;
 					}
 				} else {
-					result = EnumGeneratorResult.FAILSOIL;
+					result = EnumGeneratorResult.FAIL_SOIL;
 				}
 			} else {
-				result = EnumGeneratorResult.NOTREE;
+				result = EnumGeneratorResult.NO_TREE;
 			}
 		} else {
-			result = EnumGeneratorResult.UNHANDLEDBIOME;
+			result = EnumGeneratorResult.UNHANDLED_BIOME;
 		}
 
 		//Display wool circles for testing the circle growing algorithm

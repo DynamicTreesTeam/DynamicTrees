@@ -658,7 +658,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * later time.
 	 */
 	protected void setStandardSoils() {
-		addAcceptableSoils(DirtHelper.DIRTLIKE);
+		addAcceptableSoils(DirtHelper.DIRT_LIKE);
 	}
 
 	/**

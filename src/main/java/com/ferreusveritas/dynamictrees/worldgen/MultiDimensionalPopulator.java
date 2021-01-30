@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
@@ -8,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 
 import java.io.File;
 
@@ -20,7 +23,7 @@ import java.io.File;
  */
 public class MultiDimensionalPopulator {
 	
-	public static final String DIM = "dim";
+	public static final String DIMENSION = "dimension";
 	public static final String ACTIVE = "active";
 	public static final String FILES = "files";
 	
@@ -40,31 +43,40 @@ public class MultiDimensionalPopulator {
 					JsonObject obj = element.getAsJsonObject();
 					
 					//Let the json reader handle this and error out as necessary
-					int dim = obj.get(DIM).getAsInt();
+					String dimResLocStr = obj.get(DIMENSION).getAsString();
 					boolean active = obj.get(ACTIVE).getAsBoolean();
 					JsonArray files = obj.get(FILES).getAsJsonArray();
+
+					ResourceLocation dimResLoc = null;
+
+					try {
+						dimResLoc = new ResourceLocation(dimResLocStr);
+					} catch (ResourceLocationException e) {
+						DynamicTrees.getLogger().warn("Json Error: " + e.getMessage() + " In: " + WorldGenRegistry.DIM_GEN_CONFIG_PATH + "");
+					}
+
+					if (dimResLoc == null)
+						return;
 					
 					if(active) {
+						DynamicTrees.getLogger().debug("Loading custom populators for dimension: " + dimResLoc);
 						
-						System.out.println("Loading custom populators for dimension: " + dim);
-						
-						//All new databases get a fresh coat of default population
+						// All new databases get a fresh coat of default population
 						BiomeDataBase database = new BiomeDataBase();
 						
 						defaultPopulator.populate(database);
 						
-						//This creates a link for the dimension id to this new database
-						//						TreeGenerator.getTreeGenerator().linkDimensionToDataBase(new Di, database);
+						// This creates a link for the dimension to this new database
+						TreeGenerator.getTreeGenerator().linkDimensionToDataBase(dimResLoc, database);
 
-						//Apply all of the referred json files
+						// Apply all of the referred json files
 						for(JsonElement filename : files) {
 							if(filename.isJsonPrimitive()) {
-//								File file = new File(DTConfigs.configDirectory.getAbsolutePath() + "/" + filename.getAsString());
-								//Each populator overwrites the results of the previous one in succession
-//								new BiomeDataBasePopulatorJson(JsonHelper.load(file)).populate(database);
+								File file = new File(DTConfigs.configDirectory.getAbsolutePath() + "/" + filename.getAsString());
+								// Each populator overwrites the results of the previous one in succession
+								new BiomeDataBasePopulatorJson(JsonHelper.load(file), file.getName()).populate(database);
 							}
 						}
-						
 					}
 				}
 			}
