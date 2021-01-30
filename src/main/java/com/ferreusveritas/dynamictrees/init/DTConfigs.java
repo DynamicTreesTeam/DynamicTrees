@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.init;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +10,13 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 @Mod.EventBusSubscriber
 public class DTConfigs {
-	
+
+	public static File configDirectory;
+
 	public static ForgeConfigSpec SERVER_CONFIG;
 	public static ForgeConfigSpec COMMON_CONFIG;
 	public static ForgeConfigSpec CLIENT_CONFIG;
@@ -54,16 +58,15 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue podzolGen;
 	public static ForgeConfigSpec.BooleanValue worldGen;
 	public static ForgeConfigSpec.BooleanValue vanillaCactusWorldGen;
-	//	private static ForgeConfigSpec.IntValue dimensionBlacklistCfg;
-	//	public static HashSet<Integer> dimensionBlacklist = new HashSet<Integer>();
-	public static ForgeConfigSpec.ConfigValue<List<Integer>> dimensionBlackList;
+	public static ForgeConfigSpec.ConfigValue<List<String>> dimensionBlackList;
 	
 	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
-	//	public static ForgeConfigSpec.BooleanValue rootyTextureMimicry;
-	
+
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
 	
 	static {
+		configDirectory = new File(FMLPaths.CONFIGDIR.get().toUri());
+
 		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
@@ -172,18 +175,6 @@ public class DTConfigs {
 	}
 	
 	@SubscribeEvent
-	public static void onLoad (final ModConfig.Loading configEvent){ }
-	
-//	@SubscribeEvent
-//	public static void onReload (final ModConfig. configEvent){ }
+	public static void onLoad (final ModConfig.Loading event) { }
 
 }
-//		String[] dims = config.getStringList("dimensionsBlacklist", "world", new String[] {"7"}, "Blacklist of dimension numbers for disabling Dynamic Tree worldgen");
-//
-//		for(String dim : dims) {
-//			try {
-//				int dimValue = Integer.decode(dim);
-//				System.out.println("DynamicTrees BlackListed DimValue: " + dimValue);
-//				dimensionBlacklist.add(dimValue);
-//			} catch (NumberFormatException nfe) {}
-//		}

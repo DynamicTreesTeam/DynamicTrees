@@ -3,22 +3,23 @@ package com.ferreusveritas.dynamictrees.systems;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import net.minecraft.block.Block;
 
 public class DirtHelper {
 
-    public static final String DIRTLIKE = "dirtlike";
-    public static final String SANDLIKE = "sandlike";
-    public static final String GRAVELLIKE = "gravellike";
-    public static final String WATERLIKE = "waterlike";
-    public static final String NETHERLIKE = "netherlike";
-    public static final String NETHERSOILLIKE = "nethersoillike";
-    public static final String ENDLIKE = "endlike";
-    public static final String MUDLIKE = "mudlike";
-    public static final String HARDCLAYLIKE = "hardclaylike";
-    public static final String SLIMELIKE = "slimelike";
-    public static final String FUNGUSLIKE = "funguslike";
+    public static final String DIRT_LIKE = "dirt_like";
+    public static final String SAND_LIKE = "sand_like";
+    public static final String GRAVEL_LIKE = "gravel_like";
+    public static final String WATER_LIKE = "water_like";
+    public static final String NETHER_LIKE = "nether_like";
+    public static final String NETHER_SOIL_LIKE = "nether_soil_like";
+    public static final String END_LIKE = "end_like";
+    public static final String MUD_LIKE = "mud_like";
+    public static final String HARD_CLAY_LIKE = "hard_clay_like";
+    public static final String SLIME_LIKE = "slime_like";
+    public static final String FUNGUS_LIKE = "fungus_like";
 
     private static final Map<String, Integer> adjectiveMap;
     private static final Map<Block, Integer> dirtMap;
@@ -27,17 +28,17 @@ public class DirtHelper {
         adjectiveMap = new HashMap<>();
         dirtMap = new HashMap<>();
 
-        createNewAdjective(DIRTLIKE);
-        createNewAdjective(SANDLIKE);
-        createNewAdjective(GRAVELLIKE);
-        createNewAdjective(WATERLIKE);
-        createNewAdjective(NETHERLIKE);
-        createNewAdjective(NETHERSOILLIKE);
-        createNewAdjective(ENDLIKE);
-        createNewAdjective(MUDLIKE);
-        createNewAdjective(HARDCLAYLIKE);
-        createNewAdjective(SLIMELIKE);
-        createNewAdjective(FUNGUSLIKE);
+        createNewAdjective(DIRT_LIKE);
+        createNewAdjective(SAND_LIKE);
+        createNewAdjective(GRAVEL_LIKE);
+        createNewAdjective(WATER_LIKE);
+        createNewAdjective(NETHER_LIKE);
+        createNewAdjective(NETHER_SOIL_LIKE);
+        createNewAdjective(END_LIKE);
+        createNewAdjective(MUD_LIKE);
+        createNewAdjective(HARD_CLAY_LIKE);
+        createNewAdjective(SLIME_LIKE);
+        createNewAdjective(FUNGUS_LIKE);
     }
 
     public static void createNewAdjective(String adjName) {
@@ -53,7 +54,7 @@ public class DirtHelper {
     }
     public static void registerSoil(Block block, String adjName, Block rootyDirtSubstitute) {
         if (!RootyBlockHelper.isBlockRegistered(rootyDirtSubstitute)){
-            System.err.println("Attempted to use "+rootyDirtSubstitute+" as a rooty dirt substitute for "+ block + " but it had not been registered.");
+            DynamicTrees.getLogger().error("Attempted to use " + rootyDirtSubstitute + " as a rooty dirt substitute for " + block + " but it had not been registered.");
             registerSoil(rootyDirtSubstitute, adjName);
         }
         registerSoil(block, adjName, RootyBlockHelper.getRootyBlock(rootyDirtSubstitute));
@@ -68,7 +69,7 @@ public class DirtHelper {
                 registerSoil(rootyDirt, flag);
             }
         } else {
-            System.err.println("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
+            DynamicTrees.getLogger().error("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
         }
     }
     public static void registerSoil(Block block, int adjFlag) {
@@ -78,7 +79,7 @@ public class DirtHelper {
         if (dirtMap.containsKey(copyFlagsFrom))
             registerSoil(block, dirtMap.get(copyFlagsFrom));
         else
-            System.err.println("Flags from " + copyFlagsFrom + " not found while registering soil block: " + block);
+            DynamicTrees.getLogger().error("Flags from " + copyFlagsFrom + " not found while registering soil block: " + block);
     }
 
     public static boolean isSoilAcceptable(Block block, int soilFlags) {

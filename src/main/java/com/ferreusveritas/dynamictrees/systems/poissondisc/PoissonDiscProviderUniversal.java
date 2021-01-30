@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Dimension;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.IWorld;
@@ -35,9 +36,9 @@ public class PoissonDiscProviderUniversal {
 		return providerMap.computeIfAbsent(world.getDimensionKey().getLocation(), k -> createCircleProvider(world));
 	}
 
-	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, int chunkX, int chunkZ) {
+	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, ChunkPos chunkPos) {
 		IPoissonDiscProvider provider = getProvider(world);
-		return provider.getPoissonDiscs(chunkX, 0, chunkZ);
+		return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
 	}
 
 	public void loadWorld(ServerWorld world) {
@@ -48,16 +49,16 @@ public class PoissonDiscProviderUniversal {
 		providerMap.remove(world.getDimensionKey().getLocation());
 	}
 
-	public void setChunkPoissonData(ServerWorld world, int chunkX, int chunkZ, byte[] circleData) {
-		getProvider(world).setChunkPoissonData(chunkX, 0, chunkZ, circleData);
+	public void setChunkPoissonData(ServerWorld world, ChunkPos chunkPos, byte[] circleData) {
+		getProvider(world).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
 	}
 
-	public byte[] getChunkPoissonData(ServerWorld world, int chunkX, int chunkZ) {
-		return getProvider(world).getChunkPoissonData(chunkX, 0, chunkZ);
+	public byte[] getChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
+		return getProvider(world).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
-	public void unloadChunkPoissonData(ServerWorld world, int chunkX, int chunkZ) {
-		getProvider(world).unloadChunkPoissonData(chunkX, 0, chunkZ);
+	public void unloadChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
+		getProvider(world).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
 }

@@ -15,8 +15,6 @@ public final class WorldGenEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
-        if (event.getCategory() == Biome.Category.THEEND) return;
-
         event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
     }
 
@@ -30,7 +28,8 @@ public final class WorldGenEvents {
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
         if (event.getName() == null) return;
 
-        // Check the current biome is from Minecraft.
+        // Check the current biome is from Minecraft - we'll do extra mod compatibility later.
+        // Unfortunately this event doesn't give the dimension resource location, so we can't access the biome data base from here :(
         if (!event.getName().getNamespace().equals("minecraft") || event.getCategory().equals(Biome.Category.THEEND)) return;
 
         // Loop through all vegetal features of current biome and remove if algorithm determines it contains a tree feature.

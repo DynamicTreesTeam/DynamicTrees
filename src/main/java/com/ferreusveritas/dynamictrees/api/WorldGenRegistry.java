@@ -4,12 +4,15 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDataBaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
+import com.ferreusveritas.dynamictrees.worldgen.MultiDimensionalPopulator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -26,10 +29,10 @@ public class WorldGenRegistry {
 	// BIOME HANDLING FOR WORLDGEN
 	//////////////////////////////
 
-	private static final String RESOURCEPATH = "worldgen/default.json";
-	private static final String CONFIGPATH = "/" + DynamicTrees.MODID;
-	private static final String WORLDGENCONFIGPATH = CONFIGPATH + "/worldgen.json";
-	private static final String DIMGENCONFIGPATH = CONFIGPATH + "/dimensions.json";
+	public static final String RESOURCE_PATH = "worldgen/default.json";
+	public static final String CONFIG_PATH = "/" + DynamicTrees.MODID;
+	public static final String WORLD_GEN_CONFIG_PATH = CONFIG_PATH + "/worldgen.json";
+	public static final String DIM_GEN_CONFIG_PATH = CONFIG_PATH + "/dimensions.json";
 
 	/**
 	 * Mods should use this function to determine if worldgen is enabled for Dynamic Trees
@@ -44,7 +47,7 @@ public class WorldGenRegistry {
 		BiomeDataBasePopulatorRegistryEvent event = new BiomeDataBasePopulatorRegistryEvent();
 
 		//This registers the main populator
-		event.register(new BiomeDataBasePopulatorJson(new ResourceLocation(DynamicTrees.MODID, RESOURCEPATH)));
+		event.register(new BiomeDataBasePopulatorJson(new ResourceLocation(DynamicTrees.MODID, RESOURCE_PATH)));
 
 		//This loads populators from add-ons
 		MinecraftForge.EVENT_BUS.post(event);
@@ -56,71 +59,75 @@ public class WorldGenRegistry {
 	}
 
 	private static void loadCustomDefaultPopulator(BiomeDataBasePopulatorRegistryEvent event) {
+		File file = new File(DTConfigs.configDirectory.getAbsolutePath() + WORLD_GEN_CONFIG_PATH);
 
-//		File file = new File(DTConfigs.configDirectory.getAbsolutePath() + WORLDGENCONFIGPATH);
-//
-//		if(!file.exists()) {
-//			writeBlankJsonArrayToFile(file);
-//		} else {
-//			event.register(new BiomeDataBasePopulatorJson(JsonHelper.load(file)));
-//		}
+		if(!file.exists()) {
+			writeBlankJsonArrayToFile(file);
+		} else {
+			event.register(new BiomeDataBasePopulatorJson(JsonHelper.load(file), file.getName()));
+		}
 	}
 
 	private static void loadMultiDimensionalPopulator(IBiomeDataBasePopulator populator) {
-//
-//		File file = new File(DTConfigs.configDirectory.getAbsolutePath() + DIMGENCONFIGPATH);
-//
-//		if(!file.exists()) {
-//			writeBlankJsonArrayToFile(file);
-//		} else {
-//			new MultiDimensionalPopulator(JsonHelper.load(file), populator);
-//		}
+		File file = new File(DTConfigs.configDirectory.getAbsolutePath() + DIM_GEN_CONFIG_PATH);
+
+		if(!file.exists()) {
+			writeBlankJsonArrayToFile(file);
+		} else {
+			new MultiDimensionalPopulator(JsonHelper.load(file), populator);
+		}
 	}
 
 	private static void writeBlankJsonArrayToFile(File file) {
-//		try {
-//			new File(DTConfigs.configDirectory.getAbsolutePath() + CONFIGPATH).mkdirs();
-//			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
-//			writer.write("[]");//Write the minimal amount of data for the file to be a valid json array.
-//			writer.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			new File(DTConfigs.configDirectory.getAbsolutePath() + CONFIG_PATH).mkdirs();
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
+			writer.write("[]");//Write the minimal amount of data for the file to be a valid json array.
+			writer.close();
+		} catch (Exception e) {
+			DynamicTrees.getLogger().fatal("Error creating placeholder world gen Json files:");
+			e.printStackTrace();
+		}
 	}
 
 	public static void populateDataBase() {
-		if(WorldGenRegistry.isWorldGenEnabled()) {
+		if(!WorldGenRegistry.isWorldGenEnabled()) return;
 
-			BiomeDataBaseJsonCapabilityRegistryEvent capabilityEvent = new BiomeDataBaseJsonCapabilityRegistryEvent();
+		BiomeDataBaseJsonCapabilityRegistryEvent capabilityEvent = new BiomeDataBaseJsonCapabilityRegistryEvent();
 
-			//Register the main Json capabilities
-			BiomeDataBasePopulatorJson.registerJsonCapabilities(capabilityEvent);
+		//Register the main Json capabilities
+		BiomeDataBasePopulatorJson.registerJsonCapabilities(capabilityEvent);
 
-			//Send out an event asking for Json Capabilities to be registered
-			MinecraftForge.EVENT_BUS.post(capabilityEvent);
+		//Send out an event asking for Json Capabilities to be registered
+		MinecraftForge.EVENT_BUS.post(capabilityEvent);
 
-			//Prep the databases by clearing them out
-			TreeGenerator.getTreeGenerator().clearAllBiomeDataBases();
-			BiomeDataBase database = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
+		//Prep the databases by clearing them out
+		TreeGenerator.getTreeGenerator().clearAllBiomeDataBases();
+		BiomeDataBase database = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
 
-			//This collects all available populators and returns an aggregate populator for the lot
-			IBiomeDataBasePopulator biomePopulator = collectDataBasePopulators();
+		//This collects all available populators and returns an aggregate populator for the lot
+		IBiomeDataBasePopulator biomePopulator = collectDataBasePopulators();
 
-			//This is where the main population occurs
-			biomePopulator.populate(database);
+		//This is where the main population occurs
+		biomePopulator.populate(database);
 
-			//Send out an event after the database has been populated
-			MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database, biomePopulator));
+		//Send out an event after the database has been populated
+		MinecraftForge.EVENT_BUS.post(new PopulateDataBaseEvent(database, biomePopulator));
 
-			//Populate custom dimensions if available
-			loadMultiDimensionalPopulator(biomePopulator);
+		//Populate custom dimensions if available
+		loadMultiDimensionalPopulator(biomePopulator);
 
-//			//Blacklist certain dimensions according to the base config
-//			DTConfigs.dimensionBlacklist.forEach(d -> TreeGenerator.getTreeGenerator().BlackListDimension(d));
+		//Blacklist certain dimensions according to the base config
+		DTConfigs.dimensionBlackList.get().forEach(dimLocString -> {
+			try {
+				TreeGenerator.getTreeGenerator().addBlacklistedDimension(new ResourceLocation(dimLocString));
+			} catch (ResourceLocationException e) {
+				DynamicTrees.getLogger().warn("Couldn't get resource location for dimension blacklist in config: " + e.getMessage());
+			}
+		});
 
-			//Cleanup all of the unused static objects
-			BiomeDataBasePopulatorJson.cleanup();
-		}
+		//Cleanup all of the unused static objects
+		BiomeDataBasePopulatorJson.cleanup();
 	}
 
 	public static boolean validateBiomeDataBases() {

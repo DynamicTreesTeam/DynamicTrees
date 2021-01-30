@@ -17,7 +17,6 @@ import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -33,11 +32,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -78,7 +77,7 @@ public class Cactus extends TreeFamily {
 
 		@Override
 		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.SANDLIKE);
+			addAcceptableSoils(DirtHelper.SAND_LIKE);
 		}
 
 		@Override
@@ -101,7 +100,7 @@ public class Cactus extends TreeFamily {
 
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
-			return isOneOfBiomes(biome, Biomes.DESERT, Biomes.DESERT_HILLS, Biomes.DESERT_LAKES);
+			return BiomeDictionary.hasType(biome, Type.DRY) && BiomeDictionary.hasType(biome, Type.SANDY);
 		}
 		
 		@Override
