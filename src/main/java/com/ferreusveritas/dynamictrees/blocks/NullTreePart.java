@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -32,6 +33,11 @@ public class NullTreePart implements ITreePart {
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+		//Twigs connect to the top of Bee nests and Shroomlight. TODO: MAKE DYNAMIC LIST FOR ADDONS
+		if (side == Direction.DOWN){
+			if (blockState.getBlock() == Blocks.BEE_NEST) return 1;
+			if (blockState.getBlock() == Blocks.SHROOMLIGHT) return fromRadius;
+		}
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
 			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
@@ -50,18 +56,18 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public boolean shouldAnalyse() {
-		return false;
+	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		return blockState.getBlock() == Blocks.BEE_NEST || blockState.getBlock() == Blocks.SHROOMLIGHT;
 	}
 	
 	@Override
 	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+		signal.run(blockState, world, pos, fromDir);
 		return signal;
 	}
 	
 	@Override
 	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-//		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
 		return 0;
 	}
 	

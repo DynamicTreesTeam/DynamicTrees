@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.ShroomlightGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -35,6 +36,8 @@ public class CrimsonFungus extends VanillaTreeFamily {
 
 			envFactor(Type.COLD, 0.25f);
 			envFactor(Type.WET, 0.75f);
+
+			addGenFeature(new ShroomlightGenFeature());
 		}
 
 		@Override

@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
+import com.ferreusveritas.dynamictrees.systems.featuregen.BeeNestGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FruitGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.Block;
@@ -47,8 +48,10 @@ public class OakTree extends VanillaTreeFamily {
 			if(DTConfigs.worldGen.get() && !DTConfigs.enableAppleTrees.get()) {//If we've disabled apple trees we still need some way to get apples.
 				addDropCreator(new FruitDropCreator());
 			}
-			
+
 			setupStandardSeedDropping();
+
+			addGenFeature(new BeeNestGenFeature());
 		}
 		
 		@Override

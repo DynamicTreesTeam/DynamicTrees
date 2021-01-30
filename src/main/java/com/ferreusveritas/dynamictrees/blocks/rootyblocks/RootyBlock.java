@@ -246,7 +246,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
 		
 		if(branch.isPresent()) {
-			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true);
+			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true, null);
 			EntityFallingTree.dropTree(world, destroyData, new ArrayList<>(0), EntityFallingTree.DestroyType.ROOT);
 		}
 	}
@@ -331,7 +331,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public boolean shouldAnalyse() {
+	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return true;
 	}
 	

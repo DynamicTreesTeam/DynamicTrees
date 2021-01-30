@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
@@ -292,7 +293,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.enableBranchClimbling.get() && getRadius(state) <= 3;
+		return DTConfigs.enableBranchClimbling.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
 	}
 	
 	@Nonnull
@@ -342,11 +343,6 @@ public class BasicBranchBlock extends BranchBlock {
 		return 32;
 	}
 	
-	@Override
-	public boolean shouldAnalyse() {
-		return true;
-	}
-	
 	/**
 	 * This is a recursive algorithm used to explore the branch network.  It calls a run() function for the signal on the way out
 	 * and a returnRun() on the way back.
@@ -375,7 +371,7 @@ public class BasicBranchBlock extends BranchBlock {
 					BlockState deltaState = world.getBlockState(deltaPos);
 					ITreePart treePart = TreeHelper.getTreePart(deltaState);
 					
-					if(treePart.shouldAnalyse()) {
+					if(treePart.shouldAnalyse(deltaState, world, deltaPos)) {
 						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 						
 						// This should only be true for the originating block when the root node is found

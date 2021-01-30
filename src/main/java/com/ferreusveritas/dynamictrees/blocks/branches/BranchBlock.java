@@ -33,6 +33,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
@@ -157,6 +158,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return new ItemStack(getFamily().getDynamicBranchItem());
 	}
 
+	//this prevents bees and other mobs from getting stuck in branches
+	@Override
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+		return false;
+	}
+
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
@@ -212,7 +219,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * Generally all branch blocks should be analyzed.
 	 */
 	@Override
-	public boolean shouldAnalyse() {
+	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return true;
 	}
 	
@@ -235,7 +242,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree) {
+	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree, LivingEntity entity) {
 
 		BlockState blockState = world.getBlockState(cutPos);
 		NodeSpecies nodeSpecies = new NodeSpecies();
@@ -249,7 +256,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NodeNetVolume volumeSum = new NodeNetVolume();
-		NodeDestroyer destroyer = new NodeDestroyer(species);
+		NodeDestroyer destroyer = new NodeDestroyer(species).setPlayer(entity instanceof PlayerEntity? (PlayerEntity)entity : null);
 		destroyMode = DynamicTrees.EnumDestroyMode.HARVEST;
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -375,7 +382,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		Direction toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.getFace().getOpposite() : rtResult.getFace()) : Direction.DOWN;
 		
 		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false);
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, entity);
 		
 		//Get all of the wood drops
 		ItemStack heldItem = entity.getHeldItemMainhand();
@@ -384,10 +391,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		NodeNetVolume.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		woodVolume.multiplyVolume(fortuneFactor);
 		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume, heldItem);
-		
-		if(entity.getActiveHand() == null) {//What the hell man? I trusted you!
-			entity.setActiveHand(Hand.MAIN_HAND);//Players do things with hands.
-		}
 		
 		final float chance = 1.0f;
 
@@ -418,7 +421,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	protected void sloppyBreak(World world, BlockPos cutPos, DestroyType destroyType) {
 		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, Direction.DOWN, false);
+		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, Direction.DOWN, false, null);
 		
 		//Get all of the wood drops
 		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
@@ -546,7 +549,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		BlockState state = world.getBlockState(pos);
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(world, pos);
-			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false);
+			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
 			NodeNetVolume.Volume woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
 			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);

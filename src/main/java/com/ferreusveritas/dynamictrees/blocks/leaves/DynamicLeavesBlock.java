@@ -24,6 +24,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -240,15 +241,21 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (DTConfigs.isLeavesPassable.get() || isItemPassable(context)){
+		if (DTConfigs.isLeavesPassable.get() || isEntityPassable(context)){
 			return VoxelShapes.empty();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
 		}
 	}
-	
-	public boolean isItemPassable (ISelectionContext context){
-		return (context.getEntity() instanceof ItemEntity && ((ItemEntity)context.getEntity()).getItem().getItem() instanceof Seed);
+	public boolean isEntityPassable(ISelectionContext context){
+		return isEntityPassable(context.getEntity());
+	}
+	public boolean isEntityPassable(Entity entity){
+		if (entity instanceof ItemEntity)
+			return ((ItemEntity)entity).getItem().getItem() instanceof Seed;
+		if (entity instanceof LivingEntity)
+			return entity instanceof BeeEntity;
+		return false;
 	}
 	
 	@Override
@@ -296,7 +303,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if(entity instanceof ItemEntity || DTConfigs.vanillaLeavesCollision.get()) {
+		if(DTConfigs.isLeavesPassable.get() || isEntityPassable(entity)) {
 			super.onEntityCollision(state, world, pos, entity);
 		}
 		else {
@@ -599,7 +606,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	 * Generally Leaves blocks should not be analyzed
 	 */
 	@Override
-	public boolean shouldAnalyse() {
+	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return false;
 	}
 	

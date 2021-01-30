@@ -2,12 +2,12 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.BeeNestGenFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -30,6 +30,8 @@ public class BirchTree extends VanillaTreeFamily {
 			envFactor(Type.FOREST, 1.05f);
 			
 			setupStandardSeedDropping();
+
+			addGenFeature(new BeeNestGenFeature());
 		}
 		
 		@Override

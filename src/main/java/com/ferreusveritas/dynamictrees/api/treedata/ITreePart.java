@@ -71,7 +71,7 @@ public interface ITreePart {
 	 *
 	 * @return
 	 */
-	boolean shouldAnalyse();
+	boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos);
 
 	/**
 	* Configurable general purpose branch network scanner to gather data and/or perform operations
