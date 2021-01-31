@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -28,19 +29,24 @@ public final class WorldGenEvents {
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
         if (event.getName() == null) return;
 
-        // Check the current biome is from Minecraft - we'll do extra mod compatibility later.
-        // Unfortunately this event doesn't give the dimension resource location, so we can't access the biome data base from here :(
-        if (!event.getName().getNamespace().equals("minecraft") || event.getCategory().equals(Biome.Category.THEEND)) return;
+        final BiomeDataBase defaultDataBase = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
 
-        // Loop through all vegetal features of current biome and remove if algorithm determines it contains a tree feature.
-        if (event.getCategory().equals(Biome.Category.NETHER)) {
-            this.removeNetherFeatures(event);
+        if (!defaultDataBase.isPopulated())
+            WorldGenRegistry.populateDataBase();
+
+        // In the future we will have to separate this from the biome data base entirely becuase it's dimension-based
+        // and trees can only be removed biome-based.
+        if (!defaultDataBase.shouldCancelVanillaTreeGen(event.getName())) return;
+
+        // TODO: Make a method of cancelling fungus in modded dimensions - function of biome data base?
+        if (event.getCategory() == Biome.Category.NETHER) {
+            this.removeFungi(event); // This removes any feature who config extends HugeFungusConfig.
         } else {
-            this.removeOverworldFeatures(event);
+            this.removeTrees(event); // This removes any feature whose config extends BaseTreeFeatureConfig.
         }
     }
 
-    private void removeNetherFeatures (final BiomeLoadingEvent event) {
+    private void removeFungi(final BiomeLoadingEvent event) {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
             if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
@@ -48,7 +54,7 @@ public final class WorldGenEvents {
         });
     }
 
-    private void removeOverworldFeatures (final BiomeLoadingEvent event) {
+    private void removeTrees(final BiomeLoadingEvent event) {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
 

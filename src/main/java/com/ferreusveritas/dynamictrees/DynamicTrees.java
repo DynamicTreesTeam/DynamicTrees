@@ -21,7 +21,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -203,7 +202,7 @@ public class DynamicTrees {
 			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
 		}
 
-		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
+//		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
 
 		//Conveniently accessible disaster(Optional World Generation)
 		if(WorldGenRegistry.isWorldGenEnabled()) {

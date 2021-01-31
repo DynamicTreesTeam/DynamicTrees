@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public class BiomeDataBase {
 	
-	public static BiomeEntry BADENTRY = new BiomeEntry() {
+	public static BiomeEntry BAD_ENTRY = new BiomeEntry() {
 		@Override public void setChanceSelector(IChanceSelector chanceSelector) {}
 		@Override public void setDensitySelector(IDensitySelector densitySelector) {}
 		@Override public void setSpeciesSelector(ISpeciesSelector speciesSelector) {}
@@ -23,28 +23,33 @@ public class BiomeDataBase {
 	private final HashMap<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
 
 	public BiomeEntry getEntry(Biome biome) {
-		if (biome == null) {
-			return BADENTRY;
-		}
+		if (biome == null)
+			return BAD_ENTRY;
 
 		return this.biomeEntries.computeIfAbsent(biome.getRegistryName(), k -> new BiomeEntry(biome));
 	}
+
+	public BiomeEntry getEntry (ResourceLocation biomeResLoc) {
+		return this.getEntry(ForgeRegistries.BIOMES.getValue(biomeResLoc));
+	}
 	
 	public void clear() {
-//		for(int i = 0; i < 16; i++) {
-//			table[i] = null;
-//		}
+		this.biomeEntries.clear();
 	}
 	
 	public boolean isValid() {
 		for(Biome biome: ForgeRegistries.BIOMES) {
 			BiomeEntry entry = getEntry(biome);
-			if(entry.getBiome() != biome) {
+			if(!entry.getBiome().getRegistryName().equals(biome.getRegistryName())) {
 				return false;
 			}
 		}
 		
 		return true;
+	}
+
+	public boolean isPopulated () {
+		return this.biomeEntries.size() > 0;
 	}
 	
 	public static class BiomeEntry {
@@ -139,7 +144,11 @@ public class BiomeDataBase {
 	public IDensitySelector getDensity(Biome biome) {
 		return getEntry(biome).densitySelector;
 	}
-	
+
+	public boolean shouldCancelVanillaTreeGen(ResourceLocation biomeResLoc) {
+		return getEntry(biomeResLoc).cancelVanillaTreeGen;
+	}
+
 	public boolean shouldCancelVanillaTreeGen(Biome biome) {
 		return getEntry(biome).cancelVanillaTreeGen;
 	}
