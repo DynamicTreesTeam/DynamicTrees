@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
@@ -38,6 +39,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.Feature;
@@ -92,6 +94,15 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
+
+		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,fromBranch,side,fromRadius)->{
+			if (side == Direction.DOWN) return 1;
+			return 0;
+		});
+		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,fromBranch,side,fromRadius)->{
+			if (side == Direction.DOWN) return fromRadius;
+			return 0;
+		});
 
 		setupLeavesProperties();
 	}

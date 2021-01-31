@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
@@ -33,10 +34,10 @@ public class NullTreePart implements ITreePart {
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		//Twigs connect to the top of Bee nests and Shroomlight. TODO: MAKE DYNAMIC LIST FOR ADDONS
-		if (side == Direction.DOWN){
-			if (blockState.getBlock() == Blocks.BEE_NEST) return 1;
-			if (blockState.getBlock() == Blocks.SHROOMLIGHT) return fromRadius;
+		//Connectable blocks such as bee nests and shroomlight will be handled here.
+		if (BranchConnectables.isBlockConnectable(blockState.getBlock())){
+			int rad = BranchConnectables.getConnectionRadiusForBlock(blockState, blockAccess, pos, from, side, fromRadius);
+			if (rad > 0) return rad;
 		}
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {

@@ -146,7 +146,8 @@
 					"apple" : 1
 				}
 			},
-			"density": [ 0.05 ]
+			"density": [ 0.05 ],
+			"chance": 0.1
 		}
 	},
 	{

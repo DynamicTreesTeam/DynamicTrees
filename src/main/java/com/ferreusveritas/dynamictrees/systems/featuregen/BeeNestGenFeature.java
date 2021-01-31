@@ -23,41 +23,84 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
 
     private static final Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
-    private static final Block nestBlock = Blocks.BEE_NEST;
-    private static final double nestGenerateChancePlains = 0.05f;
-    private static final double nestGenerateChanceFlowerForest = 0.02f;
-    private static final double nestGenerateChanceForest = 0.002f;
-    private static final double nestGrowChance = 0.001f;
+    private Block nestBlock;
+    private BiPredicate<World, BlockPos> canGrowPredicate;
+    private BiFunction<IWorld, BlockPos, Double> worldGenChanceFunction;
+    private int maxHeight = 32;
+
+    private static final double vanillaGenChancePlains = 0.05f;
+    private static final double vanillaGenChanceFlowerForest = 0.02f;
+    private static final double vanillaGenChanceForest = 0.002f;
+    private static final double vanillaGrowChance = 0.001f;
+
+    public BeeNestGenFeature (){
+        this (Blocks.BEE_NEST);
+    }
+
+    public BeeNestGenFeature (Block nestBlock){
+        this(nestBlock, (world, pos)->{
+            if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
+            //Default flower check predicate, straight from the sapling class
+            for(BlockPos blockpos : BlockPos.Mutable.getAllInBoxMutable(pos.down().north(2).west(2), pos.up().south(2).east(2))) {
+                if (world.getBlockState(blockpos).isIn(BlockTags.FLOWERS)) {
+                    return true;
+                }
+            }
+            return false;
+        }, ((world, pos) -> {
+            //Default biome check chance function. Uses vanilla chances
+            RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
+                return vanillaGenChancePlains;
+            if (biomeKey == Biomes.FLOWER_FOREST)
+                return vanillaGenChanceFlowerForest;
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
+                return vanillaGenChanceForest;
+            return 0D;
+        }));
+    }
+
+    public BeeNestGenFeature (Block nestBlock, BiPredicate<World, BlockPos> canGrow, BiFunction<IWorld, BlockPos, Double> worldGenChance){
+        this.nestBlock = nestBlock;
+        this.canGrowPredicate = canGrow;
+        this.worldGenChanceFunction = worldGenChance;
+    }
+
+    public void setCanGrowPredicate (BiPredicate<World, BlockPos> predicate){ this.canGrowPredicate = predicate; }
+    public void setWorldGenChanceFunction (BiFunction<IWorld, BlockPos, Double> function){ this.worldGenChanceFunction = function; }
+
+    public void setMaxHeight (int maxHeight){
+        this.maxHeight = maxHeight;
+    }
 
     @Override
     public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-        if (world.getRandom().nextFloat() > getGenerationChanceForBiome(world, rootPos)) return false;
+        if (world.getRandom().nextFloat() > worldGenChanceFunction.apply(world, rootPos)) return false;
 
-        //TODO: ISeedReader is NOT an instance of World, meaning bees cannot be created
-        if (world instanceof World){
-            return placeBeeNestInValidPlace((World) world, rootPos, 3);
-        }
-
-        return false;
+        return placeBeeNestInValidPlace(world, rootPos, true);
     }
 
     @Override
     public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!hasNearbyFlora(world, rootPos.up()) || world.rand.nextFloat() > nestGrowChance || !natural) return false;
+        if (!natural || !canGrowPredicate.test(world, rootPos.up())) return false;
 
-        return placeBeeNestInValidPlace(world, rootPos, 2 + world.rand.nextInt(2));
+        return placeBeeNestInValidPlace(world, rootPos, false);
     }
 
-    private boolean placeBeeNestInValidPlace(World world, BlockPos rootPos, int beeCount){
+    private boolean placeBeeNestInValidPlace(IWorld world, BlockPos rootPos, boolean worldGen){
         int treeHeight = getTreeHeight(world, rootPos);
         if (nestAlreadyPresent(world, rootPos, treeHeight)) return false;
 
@@ -66,48 +109,49 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
             Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
             Direction chosenDir = chosenSpace.getValue().get(world.getRandom().nextInt(chosenSpace.getValue().size()));
 
-            return placeBeeNestWithBees(world, chosenSpace.getKey(), chosenDir, beeCount);
+            return placeBeeNestWithBees(world, chosenSpace.getKey(), chosenDir, worldGen);
         }
         return false;
     }
 
-    private boolean placeBeeNestWithBees(World world, BlockPos pos, Direction faceDir, int beeCount){
-        world.setBlockState(pos, nestBlock.getDefaultState().with(BeehiveBlock.FACING, faceDir));
+    private boolean placeBeeNestWithBees(IWorld world, BlockPos pos, Direction faceDir, boolean worldGen){
+        int honeyLevel = worldGen? world.getRandom().nextInt(6) : 0;
+        BlockState nestState = nestBlock.getDefaultState();
+        if (nestState.hasProperty(BeehiveBlock.FACING)) nestState = nestState.with(BeehiveBlock.FACING, faceDir);
+        if (nestState.hasProperty(BeehiveBlock.HONEY_LEVEL)) nestState = nestState.with(BeehiveBlock.HONEY_LEVEL, honeyLevel);
+        world.setBlockState(pos, nestState, 2);
         TileEntity tileentity = world.getTileEntity(pos);
         if (tileentity instanceof BeehiveTileEntity) {
             BeehiveTileEntity beehivetileentity = (BeehiveTileEntity)tileentity;
 
-            for(int i = 0; i < Math.min(3, beeCount); ++i) {
-                BeeEntity beeentity = new BeeEntity(EntityType.BEE, world);
-                beehivetileentity.tryEnterHive(beeentity, false, world.rand.nextInt(599));
+            World thisWorld = worldFromIWorld(world);
+            if (thisWorld == null) return false;
+            int beeCount = worldGen? 3 : 2 + world.getRandom().nextInt(2);
+            for(int i = 0; i < beeCount; ++i) {
+                BeeEntity beeentity = new BeeEntity(EntityType.BEE, thisWorld);
+                beehivetileentity.tryEnterHive(beeentity, false, world.getRandom().nextInt(599));
             }
             return true;
         }
         return false;
     }
 
-    private int getTreeHeight (IWorld world, BlockPos rootPos){
-        int treeHeight = 0;
-        BlockPos testPos = rootPos.up();
-        while (TreeHelper.isBranch(world.getBlockState(testPos))){
-            treeHeight++;
-            testPos = testPos.up();
+    private World worldFromIWorld (IWorld iWorld){
+        if (iWorld instanceof WorldGenRegion){
+            return  ((WorldGenRegion)iWorld).getWorld();
+        } else if (iWorld instanceof World){
+            return  (World)iWorld;
         }
-        return treeHeight;
+        return null;
     }
 
-    private double getGenerationChanceForBiome (IWorld world, BlockPos pos){
-        RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(pos).getRegistryName());
-        if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)){
-            return nestGenerateChancePlains;
+    private int getTreeHeight (IWorld world, BlockPos rootPos){
+        for (int i = 1; i<maxHeight; i++){
+            if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
+                return i-1;
+            }
         }
-        if (biomeKey == Biomes.FLOWER_FOREST){
-            return nestGenerateChanceFlowerForest;
-        }
-        if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST)){
-            return nestGenerateChanceForest;
-        }
-        return 0;
+        return maxHeight;
     }
 
     private List<Pair<BlockPos, List<Direction>>> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight){
@@ -140,16 +184,6 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
                 if (world.getBlockState(trunkPos.offset(dir)).getBlock() == nestBlock){
                     return true;
                 }
-            }
-        }
-        return false;
-    }
-
-    //Straight from the sapling class
-    private boolean hasNearbyFlora(IWorld world, BlockPos pos) {
-        for(BlockPos blockpos : BlockPos.Mutable.getAllInBoxMutable(pos.down().north(2).west(2), pos.up().south(2).east(2))) {
-            if (world.getBlockState(blockpos).isIn(BlockTags.FLOWERS)) {
-                return true;
             }
         }
         return false;
