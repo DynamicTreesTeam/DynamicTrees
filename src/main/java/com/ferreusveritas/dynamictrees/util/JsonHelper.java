@@ -1,10 +1,12 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.worldgen.JsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.*;
@@ -34,11 +36,11 @@ public class JsonHelper {
 				return parser.parse(new FileReader(file));
 			}
 			catch (Exception e) {
-				System.err.println("Can't open " + fileName + ": " + e.getMessage());
+				DynamicTrees.getLogger().fatal("Can't open " + fileName + ": " + e.getMessage());
 			}
 		}
 		
 		return null;
 	}
-	
+
 }

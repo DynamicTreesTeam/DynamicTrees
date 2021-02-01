@@ -3,7 +3,6 @@
 		"__comment" : "Start by making any vanilla minecraft biome default to oak",
 		"select": { "name": "minecraft:.*" },
 		"apply": {
-			"cancel_vanilla": true,
 			"species" : "oak",
 			"chance" : "standard"
 		}

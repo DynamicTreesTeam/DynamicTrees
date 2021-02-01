@@ -4,6 +4,6 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 
 public interface IBiomeDataBasePopulator {
 
-	public void populate(BiomeDataBase biomeDataBase);
+	void populate(BiomeDataBase biomeDataBase);
 
 }

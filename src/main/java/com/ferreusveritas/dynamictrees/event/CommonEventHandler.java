@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.event;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 
+import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,13 +29,18 @@ public class CommonEventHandler {
 			DTClient.discoverWoodColors();
 		}
 		
-		if(WorldGenRegistry.isWorldGenEnabled() && !event.getWorld().isRemote()) {
-			if(!WorldGenRegistry.validateBiomeDataBases()) {
-				WorldGenRegistry.populateDataBase();
-			}
+		if (!event.getWorld().isRemote() && WorldGenRegistry.isWorldGenEnabled()) {
+//			if (!WorldGenRegistry.validateBiomeDataBases()) {
+			WorldGenRegistry.populateDataBase();
+//			}
 		}
 		
 		//		event.getWorld().addEventListener(new WorldListener(event.getWorld(), event.getWorld().ser()));
+	}
+
+	@SubscribeEvent
+	public void onWorldUnload (WorldEvent.Unload event) {
+		TreeCancellerJson.INSTANCE = null; // Reset tree canceller Json.
 	}
 	
 }

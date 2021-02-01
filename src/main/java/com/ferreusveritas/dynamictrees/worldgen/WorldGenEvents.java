@@ -1,13 +1,18 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.*;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.Collections;
 
 /**
  * @author Harley O'Connor
@@ -27,34 +32,36 @@ public final class WorldGenEvents {
      */
     @SubscribeEvent
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
-        if (event.getName() == null) return;
+        final ResourceLocation biomeResLoc = event.getName();
 
-        final BiomeDataBase defaultDataBase = TreeGenerator.getTreeGenerator().getDefaultBiomeDataBase();
+        if (biomeResLoc == null) return;
 
-        if (!defaultDataBase.isPopulated())
-            WorldGenRegistry.populateDataBase();
+        // Gets the Json tree canceller.
+        ITreeCanceller treeCanceller = WorldGenRegistry.getJsonTreeCanceller();
 
-        // In the future we will have to separate this from the biome data base entirely becuase it's dimension-based
-        // and trees can only be removed biome-based.
-        if (!defaultDataBase.shouldCancelVanillaTreeGen(event.getName())) return;
+        if (!treeCanceller.shouldCancelFeatures(biomeResLoc))
+            return;
 
-        // TODO: Make a method of cancelling fungus in modded dimensions - function of biome data base?
+        // TODO: Make a tree type in tree canceller for handling this.
         if (event.getCategory() == Biome.Category.NETHER) {
-            this.removeFungi(event); // This removes any feature who config extends HugeFungusConfig.
+            this.removeFungi(event, biomeResLoc, treeCanceller); // This removes any feature whose config extends HugeFungusConfig.
         } else {
-            this.removeTrees(event); // This removes any feature whose config extends BaseTreeFeatureConfig.
+            this.removeTrees(event, biomeResLoc, treeCanceller); // This removes any feature whose config extends BaseTreeFeatureConfig.
         }
     }
 
-    private void removeFungi(final BiomeLoadingEvent event) {
+    private void removeFungi(final BiomeLoadingEvent event, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
             if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
-            return ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config instanceof HugeFungusConfig;
+
+            final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
+            return nextConfiguredFeature.config instanceof HugeFungusConfig &&
+                    treeCanceller.shouldCancelFeature(biomeResLoc, nextConfiguredFeature.feature.getRegistryName());
         });
     }
 
-    private void removeTrees(final BiomeLoadingEvent event) {
+    private void removeTrees(final BiomeLoadingEvent event, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
 
@@ -69,15 +76,17 @@ public final class WorldGenEvents {
 
             if (featureConfig instanceof MultipleRandomFeatureConfig) {
                 // Removes feature if it contains trees.
-                return doesContainTrees((MultipleRandomFeatureConfig) featureConfig);
+                return doesContainTrees((MultipleRandomFeatureConfig) featureConfig, biomeResLoc, treeCanceller);
             } else if (featureConfig instanceof DecoratedFeatureConfig) {
-                final IFeatureConfig nextFeatureConfig = ((DecoratedFeatureConfig) featureConfig).feature.get().config;
+                final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
+                final IFeatureConfig nextFeatureConfig = nextConfiguredFeature.config;
 
-                if (nextFeatureConfig instanceof BaseTreeFeatureConfig) {
+                if (nextFeatureConfig instanceof BaseTreeFeatureConfig && treeCanceller.shouldCancelFeature(biomeResLoc,
+                        nextConfiguredFeature.feature.getRegistryName())) {
                     return true; // Removes any individual trees.
                 } else if (nextFeatureConfig instanceof MultipleRandomFeatureConfig) {
                     // Removes feature if it contains trees.
-                    return doesContainTrees((MultipleRandomFeatureConfig) nextFeatureConfig);
+                    return doesContainTrees((MultipleRandomFeatureConfig) nextFeatureConfig, biomeResLoc, treeCanceller);
                 }
             }
 
@@ -86,17 +95,24 @@ public final class WorldGenEvents {
     }
 
     /**
-     * Checks if the given MultipleRandomFeatureConfig contains trees.
+     * Checks if the given {@link MultipleRandomFeatureConfig} contains trees.
      *
      * @param featureConfig The MultipleRandomFeatureConfig to check.
      * @return True if trees were found.
      */
-    private boolean doesContainTrees (MultipleRandomFeatureConfig featureConfig) {
+    private boolean doesContainTrees (MultipleRandomFeatureConfig featureConfig, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
         for (ConfiguredRandomFeatureList feature : featureConfig.features) {
-            if (feature.feature.get().config instanceof BaseTreeFeatureConfig)
+            ConfiguredFeature<?, ?> currentConfiguredFeature = feature.feature.get();
+            if (currentConfiguredFeature.config instanceof BaseTreeFeatureConfig && treeCanceller.shouldCancelFeature(biomeResLoc,
+                    currentConfiguredFeature.feature.getRegistryName()))
                 return true;
         }
         return false;
+    }
+
+    @SubscribeEvent
+    public void onTreeCancelRegistry(TreeCancelRegistryEvent event) {
+        event.getTreeCanceller().registerCancellations("minecraft", Collections.singletonList("minecraft"));
     }
 
 }
