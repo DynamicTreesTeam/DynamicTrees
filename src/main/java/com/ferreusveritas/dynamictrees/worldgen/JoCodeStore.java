@@ -46,7 +46,7 @@ public class JoCodeStore {
 				while((line = readIn.readLine()) != null) {
 					if((line.length() >= 3) && (line.charAt(0) != '#')) {
 						String[] split = line.split(":");
-						addCode(species, Integer.valueOf(split[0]), split[1]);
+						addCode(species, Integer.parseInt(split[0]), split[1]);
 					}
 				}
 			} else {

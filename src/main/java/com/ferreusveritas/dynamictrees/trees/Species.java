@@ -1265,7 +1265,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * A {@link JoCode} defines the block model of the {@link TreeFamily}
 	 */
 	public void addJoCodes() {
-		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getNamespace() + "/trees/"+ getRegistryName().getPath() + ".txt");
+		joCodeStore.addCodesFromFile(this, "data/" + getRegistryName().getNamespace() + "/trees/jocode/"+ getRegistryName().getPath() + ".txt");
 	}
 	
 	public Species addGenFeature(IGenFeature module) {

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class JsonHelper {
 	
 	public static JsonElement load(ResourceLocation jsonLocation) {
-		String filename = "assets/" + jsonLocation.getNamespace() + "/" + jsonLocation.getPath();
+		String filename = "data/" + jsonLocation.getNamespace() + "/trees/" + jsonLocation.getPath();
 		InputStream in = new LeavesPaging().getClass().getClassLoader().getResourceAsStream(filename);
 		if(in == null) {
 			DynamicTrees.getLogger().fatal("Could not open resource " + filename);

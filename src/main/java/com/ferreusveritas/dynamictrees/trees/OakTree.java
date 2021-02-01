@@ -52,6 +52,7 @@ public class OakTree extends VanillaTreeFamily {
 			setupStandardSeedDropping();
 
 			addGenFeature(new BeeNestGenFeature());
+
 		}
 		
 		@Override
