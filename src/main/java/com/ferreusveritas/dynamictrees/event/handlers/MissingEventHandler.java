@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.event;
+package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import net.minecraft.block.Block;

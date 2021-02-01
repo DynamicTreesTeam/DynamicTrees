@@ -1,6 +1,7 @@
-package com.ferreusveritas.dynamictrees.event;
+package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;

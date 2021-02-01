@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.event;
+package com.ferreusveritas.dynamictrees.event.handlers;
 
 //import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
 //import net.minecraft.block.state.BlockState;

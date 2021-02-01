@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.event;
+package com.ferreusveritas.dynamictrees.util;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
