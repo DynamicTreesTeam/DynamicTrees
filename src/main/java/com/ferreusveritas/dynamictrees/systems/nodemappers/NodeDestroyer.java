@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,7 +30,7 @@ public class NodeDestroyer implements INodeInspector {
 	private PlayerEntity player = null;
 	
 	public NodeDestroyer(Species species) {
-		this.endPoints = new ArrayList<BlockPos>(32);
+		this.endPoints = new ArrayList<>(32);
 		this.species = species;
 	}
 
@@ -43,16 +45,19 @@ public class NodeDestroyer implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		//TODO: MAKE DYNAMIC LIST FOR ADDONS
-		if ((blockState.getBlock() == Blocks.BEE_NEST || blockState.getBlock() == Blocks.SHROOMLIGHT)){
-			if (player != null && world instanceof World){
-				TileEntity te = world.getTileEntity(pos);
-				blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));
-				blockState.getBlock().harvestBlock((World) world, player, pos, blockState, te, player.getHeldItemMainhand());
-			} else {
-				world.removeBlock(pos, false);
-			}
-
+		if (BranchConnectables.isBlockConnectable(blockState.getBlock())){
+//			BlockState fromState = world.getBlockState(pos.offset(fromDir));
+//			BranchBlock fromBranch = TreeHelper.getBranch(fromState);
+//			if (BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromBranch, fromDir, fromBranch.getRadius(fromState)) > 0){
+				if (player != null && world instanceof World){
+					TileEntity te = world.getTileEntity(pos);
+					blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));
+					blockState.getBlock().harvestBlock((World) world, player, pos, blockState, te, player.getHeldItemMainhand());
+				} else {
+					world.removeBlock(pos, false);
+				}
+				return true;
+//			}
 		}
 
 		BranchBlock branch = TreeHelper.getBranch(blockState);

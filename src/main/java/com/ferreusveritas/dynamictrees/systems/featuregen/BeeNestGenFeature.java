@@ -34,7 +34,7 @@ import java.util.function.BiPredicate;
 
 public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    private static final Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+    Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
     private Block nestBlock;
     private BiPredicate<World, BlockPos> canGrowPredicate;
@@ -81,10 +81,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
 
     public void setCanGrowPredicate (BiPredicate<World, BlockPos> predicate){ this.canGrowPredicate = predicate; }
     public void setWorldGenChanceFunction (BiFunction<IWorld, BlockPos, Double> function){ this.worldGenChanceFunction = function; }
-
-    public void setMaxHeight (int maxHeight){
-        this.maxHeight = maxHeight;
-    }
+    public void setMaxHeight (int maxHeight){ this.maxHeight = maxHeight; }
 
     @Override
     public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
@@ -145,6 +142,18 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
         return null;
     }
 
+    private boolean nestAlreadyPresent(IWorld world, BlockPos rootPos, int maxHeight){
+        for (int y = 2; y < maxHeight; y++){
+            BlockPos trunkPos = rootPos.up(y);
+            for (Direction dir : HORIZONTALS){
+                if (world.getBlockState(trunkPos.offset(dir)).getBlock() == nestBlock){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private int getTreeHeight (IWorld world, BlockPos rootPos){
         for (int i = 1; i<maxHeight; i++){
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
@@ -175,17 +184,5 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
             }
         }
         return validSpaces;
-    }
-
-    private boolean nestAlreadyPresent(IWorld world, BlockPos rootPos, int maxHeight){
-        for (int y = 2; y < maxHeight; y++){
-            BlockPos trunkPos = rootPos.up(y);
-            for (Direction dir : HORIZONTALS){
-                if (world.getBlockState(trunkPos.offset(dir)).getBlock() == nestBlock){
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

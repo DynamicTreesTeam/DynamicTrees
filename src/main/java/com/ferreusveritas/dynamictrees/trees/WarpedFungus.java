@@ -20,7 +20,10 @@ public class WarpedFungus extends CrimsonFungus {
 
 		WarpedSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
+
 			setupStandardSeedDropping();
+
+			this.addGenFeature(new VinesGenFeature(Blocks.TWISTING_VINES_PLANT, VinesGenFeature.VineType.FLOOR).setTipBlock(Blocks.TWISTING_VINES).setMaxLength(5).setQuantity(7));
 		}
 
 		@Override
