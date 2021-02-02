@@ -11,13 +11,16 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -56,12 +59,18 @@ public class Staff extends Item {
 	public Staff() {
 		this("staff");
 	}
-	
+
+	private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+
 	public Staff(String name) {
 		super(new Item.Properties().maxStackSize(1)
-				.group(DTRegistries.dynamicTreesTab)
-				.addToolType(ToolType.AXE, 3));
-		setRegistryName(name);
+				.group(DTRegistries.dynamicTreesTab));
+		this.setRegistryName(name);
+
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
+		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
+		this.attributeModifiers = builder.build();
 	}
 	
 	
@@ -86,46 +95,24 @@ public class Staff extends Item {
 	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
-		
+		World world = context.getWorld();
 		ItemStack heldStack = context.getPlayer().getHeldItem(context.getHand());
-		
-		BlockState clickedBlockState = context.getWorld().getBlockState(context.getPos());
-		Block clickedBlock = clickedBlockState.getBlock();
-		
+
 		BlockPos pos = context.getPos();
-		
-		//Dereference proxy trunk shell
-		if(clickedBlock instanceof TrunkShellBlock) {
-			ShellMuse muse = ((TrunkShellBlock)clickedBlock).getMuse(context.getWorld(), clickedBlockState, context.getPos());
-			if(muse != null) {
-				clickedBlockState = muse.state;
-				pos = muse.pos;
-				clickedBlock = clickedBlockState.getBlock();
-			}
-		}
-		
-		ITreePart treePart = TreeHelper.getTreePart(clickedBlock);
-		BlockPos rootPos = pos;
-		
-		//Check if the tree part is a branch and look for the root node if so
-		BranchBlock branch = TreeHelper.getBranch(treePart);
-		if(branch != null) {
-			MapSignal signal = branch.analyse(clickedBlockState, context.getWorld(), pos, null, new MapSignal());//Analyze entire tree network to find root node
-			if(signal.found) {
-				rootPos = signal.root;
-				treePart = TreeHelper.getTreePart(context.getWorld().getBlockState(rootPos));
-			}
-		}
-		
-		//Get the code from a tree or rooty dirt and set it in the staff
+		BlockState state = world.getBlockState(pos);
+
+		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
+		ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
+
+		// Get the code from a tree or rooty dirt and set it in the staff
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
-			Species species = TreeHelper.getExactSpecies(context.getWorld(), rootPos);
+			Species species = TreeHelper.getExactSpecies(world, rootPos);
 			if(species.isValid()) {
 				if(!context.getPlayer().isSneaking()) {
-					String code = new JoCode(context.getWorld(), rootPos, context.getPlayer().getHorizontalFacing()).toString();
+					String code = new JoCode(world, rootPos, context.getPlayer().getHorizontalFacing()).toString();
 					setCode(heldStack, code);
-					if(context.getWorld().isRemote) {//Make sure this doesn't run on the server
-						//						GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
+					if(world.isRemote) { // Make sure this doesn't run on the server
+						Minecraft.getInstance().keyboardListener.setClipboardString(code); // Put the code in the system clipboard to annoy everyone.
 					}
 				}
 				setSpecies(heldStack, species);
@@ -135,8 +122,8 @@ public class Staff extends Item {
 		
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
-		if(species.isValid() && species.isAcceptableSoil(context.getWorld(), pos, clickedBlockState)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(context.getWorld(), species, pos, context.getWorld().getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
+		if(species.isValid() && species.isAcceptableSoil(world, pos, state)) {
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			if(hasMaxUses(heldStack)) {
 				if(decUses(heldStack)) {
 					heldStack.shrink(1);//If the player is in creative this will have no effect.
@@ -154,12 +141,7 @@ public class Staff extends Item {
 	public boolean showDurabilityBar(ItemStack stack) {
 		return hasMaxUses(stack);
 	}
-	
-	//	@Override
-	//	public int getMaxItemUseDuration(ItemStack stack) {
-	//		return super.getMaxItemUseDuration(stack);
-	//	}
-	
+
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
 		double damage = getUses(stack) / (double)getMaxUses(stack);
@@ -196,10 +178,9 @@ public class Staff extends Item {
 		if(nbt.contains(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
-			//			Species species = TreeRegistry.findSpeciesSloppy("oak");
-			//			setSpecies(itemStack, species);
-			//			return species;
-			return Species.NULL_SPECIES;
+			Species species = TreeRegistry.findSpeciesSloppy("oak");
+			setSpecies(itemStack, species);
+			return species;
 		}
 	}
 	
@@ -315,16 +296,7 @@ public class Staff extends Item {
 
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-//		if (slot == EquipmentSlotType.MAINHAND) {
-//			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
-//			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
-//		}
-		return multimap;
+		return slot == EquipmentSlotType.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot, stack);
 	}
-	
-	///////////////////////////////////////////
-	// RENDERING
-	///////////////////////////////////////////
-	
+
 }

@@ -4,10 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.event.handlers.CommonEventHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.PoissonDiscEventHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.ServerEventHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.VanillaSaplingEventHandler;
+import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -18,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DeferredWorkQueue;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -193,12 +191,11 @@ public class DynamicTrees {
 		MinecraftForge.EVENT_BUS.register(new ServerEventHandler());
 		if(DTConfigs.worldGen.get()) {
 			MinecraftForge.EVENT_BUS.register(new WorldGenEvents());
-			MinecraftForge.EVENT_BUS.register(new DropEventHandler());
 		}
 		
-		//if(Loader.isModLoaded("fastleafdecay")) {
-			//MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
-		//}
+		if (ModList.get().isLoaded("fastleafdecay")) {
+			MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
+		}
 		
 		//An event for dealing with Vanilla Saplings
 		if(DTConfigs.replaceVanillaSapling.get()) {

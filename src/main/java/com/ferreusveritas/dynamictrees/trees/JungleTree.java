@@ -52,7 +52,7 @@ public class JungleTree extends VanillaTreeFamily {
 			
 			//Add species features
 			addGenFeature(new CocoaGenFeature());
-			addGenFeature(new VinesGenFeature());
+			addGenFeature(new VinesGenFeature().setQuantity(16).setMaxLength(16));
 			addGenFeature(new UndergrowthGenFeature());
 		}
 		
