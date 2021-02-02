@@ -95,12 +95,12 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
 
-		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,fromBranch,side,fromRadius)->{
+		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,side)->{
 			if (side == Direction.DOWN) return 1;
 			return 0;
 		});
-		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,fromBranch,side,fromRadius)->{
-			if (side == Direction.DOWN) return fromRadius;
+		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,side)->{
+			if (side == Direction.DOWN) return 8;
 			return 0;
 		});
 

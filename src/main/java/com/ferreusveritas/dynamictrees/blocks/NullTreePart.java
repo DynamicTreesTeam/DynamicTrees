@@ -36,7 +36,7 @@ public class NullTreePart implements ITreePart {
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		//Connectable blocks such as bee nests and shroomlight will be handled here.
 		if (BranchConnectables.isBlockConnectable(blockState.getBlock())){
-			int rad = BranchConnectables.getConnectionRadiusForBlock(blockState, blockAccess, pos, from, side, fromRadius);
+			int rad = BranchConnectables.getConnectionRadiusForBlock(blockState, blockAccess, pos, side);
 			if (rad > 0) return rad;
 		}
 		//Twigs connect to Vanilla leaves

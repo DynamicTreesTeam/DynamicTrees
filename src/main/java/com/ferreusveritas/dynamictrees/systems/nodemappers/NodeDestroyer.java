@@ -45,10 +45,8 @@ public class NodeDestroyer implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		if (BranchConnectables.isBlockConnectable(blockState.getBlock())){
-//			BlockState fromState = world.getBlockState(pos.offset(fromDir));
-//			BranchBlock fromBranch = TreeHelper.getBranch(fromState);
-//			if (BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromBranch, fromDir, fromBranch.getRadius(fromState)) > 0){
+		if (BranchConnectables.isBlockConnectable(blockState.getBlock()) &&
+				BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromDir.getOpposite()) > 0){
 				if (player != null && world instanceof World){
 					TileEntity te = world.getTileEntity(pos);
 					blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));
@@ -57,7 +55,6 @@ public class NodeDestroyer implements INodeInspector {
 					world.removeBlock(pos, false);
 				}
 				return true;
-//			}
 		}
 
 		BranchBlock branch = TreeHelper.getBranch(blockState);

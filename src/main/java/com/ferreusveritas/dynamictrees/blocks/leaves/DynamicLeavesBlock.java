@@ -238,14 +238,18 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return VoxelShapes.fullCube();
 	}
-	
+
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		//this is for blocks that check the shape, for example snow.
+		if (context.getEntity() == null) return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
+
 		if (DTConfigs.isLeavesPassable.get() || isEntityPassable(context)){
 			return VoxelShapes.empty();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
 		}
+
 	}
 	public boolean isEntityPassable(ISelectionContext context){
 		return isEntityPassable(context.getEntity());
@@ -319,7 +323,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			entity.setMotion(entity.getMotion().x * 0.25D, entity.getMotion().y, entity.getMotion().z  * 0.25D);//Make travel slow and laborious
 		}
 	}
-	
+
+
+
 //	@Override
 //	public void beginLeaveDecay(BlockState state, IWorldReader world, BlockPos pos) { }
 	

@@ -20,16 +20,16 @@ public class BranchConnectables {
     public static boolean isBlockConnectable (Block block){
         return connectablesMap.containsKey(block);
     }
-    public static int getConnectionRadiusForBlock (BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius){
+    public static int getConnectionRadiusForBlock (BlockState blockState, IBlockReader world, BlockPos pos, Direction side){
         Block block = blockState.getBlock();
         if (connectablesMap.containsKey(block))
-            return connectablesMap.get(block).apply(blockState, world, pos, from, side, fromRadius);
+            return connectablesMap.get(block).apply(blockState, world, pos, side);
         return 0;
     }
 
     public interface RadiusForConnectionFunction {
 
-        int apply (BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
+        int apply (BlockState blockState, IBlockReader world, BlockPos pos, Direction side);
 
     }
 
