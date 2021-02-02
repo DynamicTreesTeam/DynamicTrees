@@ -88,7 +88,7 @@ public class LeavesPaging {
 	 * @return The map of {@link DynamicLeavesBlock}
 	 */
 	public static List<DynamicLeavesBlock> getLeavesListForModId(@Nullable String modid) {
-		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new ArrayList<DynamicLeavesBlock>());
+		return modLeavesArray.computeIfAbsent(autoModId(modid), k -> new ArrayList<>());
 	}
 
 	public static Map<String, ILeavesProperties> buildAll(Object ... leavesProperties) {
@@ -150,16 +150,11 @@ public class LeavesPaging {
 	}
 
 	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
-		return build(autoModId(""), jsonLocation);
-	}
-
-	public static Map<String, ILeavesProperties> build(String modid, ResourceLocation jsonLocation) {
 		JsonElement element = JsonHelper.load(jsonLocation);
 		if(element != null && element.isJsonObject()) {
-			return build(element.getAsJsonObject());
+			return build(jsonLocation.getNamespace(), element.getAsJsonObject());
 		}
-
-		Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + modid + " at " + jsonLocation);
+		Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
 
 		return null;
 	}
