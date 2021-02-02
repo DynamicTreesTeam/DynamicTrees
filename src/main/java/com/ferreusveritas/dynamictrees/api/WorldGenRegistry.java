@@ -31,7 +31,7 @@ public class WorldGenRegistry {
 	//////////////////////////////
 
 	public static final String RESOURCE_PATH = "worldgen/default.json";
-	public static final String CONFIG_PATH = "/" + DynamicTrees.MODID;
+	public static final String CONFIG_PATH = "/" + DynamicTrees.MOD_ID;
 	public static final String WORLD_GEN_CONFIG_PATH = CONFIG_PATH + "/world_gen.json";
 	public static final String DIM_GEN_CONFIG_PATH = CONFIG_PATH + "/dimensions.json";
 	public static final String TREE_CANCELLER_CONFIG_PATH = CONFIG_PATH + "/tree_canceller.json";
@@ -49,7 +49,7 @@ public class WorldGenRegistry {
 		BiomeDataBasePopulatorRegistryEvent event = new BiomeDataBasePopulatorRegistryEvent();
 
 		//This registers the main populator
-		event.register(new BiomeDataBasePopulatorJson(new ResourceLocation(DynamicTrees.MODID, RESOURCE_PATH)));
+		event.register(new BiomeDataBasePopulatorJson(new ResourceLocation(DynamicTrees.MOD_ID, RESOURCE_PATH)));
 
 		//This loads populators from add-ons
 		MinecraftForge.EVENT_BUS.post(event);

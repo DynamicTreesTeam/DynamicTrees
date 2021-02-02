@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen.canceller;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeSelectorJson;
@@ -28,13 +29,14 @@ public class TreeCancellerJson extends BiomeSelectorJson implements ITreeCancell
 
     public static final String AUTO_CANCEL = "auto_cancel";
     public static final String CANCEL_NAMESPACES = "cancel_namespaces";
+    public static final String CANCELLERS = "cancellers";
 
     private final File file;
     private final JsonElement jsonElement;
 
     private boolean autoCancel = true;
 
-    private final Map<ResourceLocation, Set<String>> cancellationEntries = new HashMap<>();
+    private final Map<ResourceLocation, CancellationEntry> cancellationEntries = new HashMap<>();
 
     public TreeCancellerJson (File file, WorldGenRegistry.TreeCancellerJsonCapabilityRegistryEvent event) {
         this.file = file;
@@ -64,6 +66,7 @@ public class TreeCancellerJson extends BiomeSelectorJson implements ITreeCancell
     private void readSection (JsonObject section) {
         List<JsonBiomeSelectorData> selectors = new LinkedList<>();
         Set<String> namespaces = new HashSet<>();
+        Set<String> cancellerIds = new HashSet<>();
 
         for (Map.Entry<String, JsonElement> entry : section.entrySet()) {
             String key = entry.getKey();
@@ -80,7 +83,7 @@ public class TreeCancellerJson extends BiomeSelectorJson implements ITreeCancell
                 if (element.isJsonPrimitive()) {
                     this.autoCancel = element.getAsJsonPrimitive().getAsBoolean();
                 }
-                break; // Custom canceller is a special section, so there's no need to read anything else for this section.
+                return; // Custom canceller is a special section, so there's no need to read anything else for this section.
             } else if (key.equals(CANCEL_NAMESPACES)) {
                 if (element.isJsonArray()) {
                     for (JsonElement namespace : element.getAsJsonArray()) {
@@ -89,16 +92,29 @@ public class TreeCancellerJson extends BiomeSelectorJson implements ITreeCancell
                         }
                     }
                 }
+            } else if (key.equals(CANCELLERS)) {
+                if (element.isJsonArray()) {
+                    for (JsonElement cancellerId : element.getAsJsonArray()) {
+                        if (cancellerId.isJsonPrimitive()) {
+                            cancellerIds.add(cancellerId.getAsString());
+                        }
+                    }
+                }
             }
         }
 
         // Filter biomes by selector predicates
         Stream<Biome> stream = Lists.newArrayList(ForgeRegistries.BIOMES).stream();
-        for(JsonBiomeSelectorData s : selectors) {
+        for (JsonBiomeSelectorData s : selectors) {
             stream = stream.filter(s.getFilter());
         }
 
-        stream.forEach(biome -> this.registerCancellations(biome.getRegistryName(), namespaces.stream().collect(Collectors.toList())));
+        // If no cancellers were set, apply default canceller.
+        if (cancellerIds.size() < 1) {
+            cancellerIds.add(TreeFeatureCancellerRegistry.TREE_CANCELLER);
+        }
+
+        stream.forEach(biome -> this.register(biome.getRegistryName(), Lists.newArrayList(namespaces), Lists.newArrayList(cancellerIds)));
     }
 
     @Override
@@ -108,32 +124,62 @@ public class TreeCancellerJson extends BiomeSelectorJson implements ITreeCancell
 
     @Override
     public boolean shouldCancelFeature(ResourceLocation biomeResLoc, ResourceLocation featureResLoc) {
-        return this.cancellationEntries.get(biomeResLoc).contains(featureResLoc.getNamespace());
+        return this.cancellationEntries.get(biomeResLoc).getNamespaceFeatureCancellations().contains(featureResLoc.getNamespace());
     }
 
     @Override
-    public void registerCancellations(String modIdForBiomes, List<String> namespaces) {
+    public Set<ITreeFeatureCanceller> getFeatureCancellers(ResourceLocation biomeResLoc) {
+        return this.cancellationEntries.get(biomeResLoc).getTreeFeatureCancellerIds().stream().map(TreeFeatureCancellerRegistry::getFeatureCanceller).collect(Collectors.toSet());
+    }
+
+    @Override
+    public void register(String modIdForBiomes, List<String> namespaces, List<String> cancellers) {
         ForgeRegistries.BIOMES.forEach(biome -> {
             ResourceLocation biomeResLoc = biome.getRegistryName();
 
             if (biomeResLoc != null && biomeResLoc.getNamespace().equals(modIdForBiomes))
-                this.registerCancellations(biomeResLoc, namespaces);
+                this.register(biomeResLoc, namespaces, cancellers);
         });
     }
 
     @Override
-    public void registerCancellations(ResourceLocation biomeResLoc, List<String> namespaces) {
+    public void register(ResourceLocation biomeResLoc, List<String> namespaces, List<String> cancellers) {
         if (namespaces.size() < 1)
             return;
 
         if (!this.cancellationEntries.containsKey(biomeResLoc))
-            this.cancellationEntries.put(biomeResLoc, new HashSet<>());
+            this.cancellationEntries.put(biomeResLoc, new CancellationEntry());
 
-        this.cancellationEntries.get(biomeResLoc).addAll(namespaces);
+        CancellationEntry cancellationEntry = this.cancellationEntries.get(biomeResLoc);
+
+        cancellationEntry.getNamespaceFeatureCancellations().addAll(namespaces);
+        cancellationEntry.getTreeFeatureCancellerIds().addAll(cancellers);
     }
 
     public boolean isAutoCancel() {
         return autoCancel;
+    }
+
+    public static class CancellationEntry {
+        private final Set<String> namespaceFeatureCancellations;
+        private final Set<String> treeFeatureCancellerIds;
+
+        public CancellationEntry() {
+            this(new HashSet<>(), new HashSet<>());
+        }
+
+        public CancellationEntry(Set<String> namespaceFeatureCancellations, Set<String> treeFeatureCancellerIds) {
+            this.namespaceFeatureCancellations = namespaceFeatureCancellations;
+            this.treeFeatureCancellerIds = treeFeatureCancellerIds;
+        }
+
+        public Set<String> getNamespaceFeatureCancellations() {
+            return namespaceFeatureCancellations;
+        }
+
+        public Set<String> getTreeFeatureCancellerIds() {
+            return treeFeatureCancellerIds;
+        }
     }
 
 }

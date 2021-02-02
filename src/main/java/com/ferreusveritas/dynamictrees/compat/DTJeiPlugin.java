@@ -26,7 +26,7 @@ public final class DTJeiPlugin implements IModPlugin {
 
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(DynamicTrees.MODID, DynamicTrees.MODID);
+        return new ResourceLocation(DynamicTrees.MOD_ID, DynamicTrees.MOD_ID);
     }
 
     @Override

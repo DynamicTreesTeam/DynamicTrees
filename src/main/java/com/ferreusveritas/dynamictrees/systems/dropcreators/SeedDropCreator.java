@@ -62,7 +62,7 @@ public class SeedDropCreator implements IDropCreator {
 	
 	@Override
 	public ResourceLocation getName() {
-		return new ResourceLocation(DynamicTrees.MODID, "seed");
+		return new ResourceLocation(DynamicTrees.MOD_ID, "seed");
 	}
 	
 	@Override

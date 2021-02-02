@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedM
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 
 /**
- * This hols connection data for branches.
+ * This holds connection data for branches.
  *
  * Mainly used for model data in the form of the sub-class {@link ModelConnections}.
  * The data is obtained and written in {@link BranchBlock} and read by the {@link BasicBranchBlockBakedModel}

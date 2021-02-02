@@ -29,7 +29,7 @@ public class StorageDropCreator implements IDropCreatorStorage {
 	
 	@Override
 	public ResourceLocation getName() {
-		return new ResourceLocation(DynamicTrees.MODID, "storage");
+		return new ResourceLocation(DynamicTrees.MOD_ID, "storage");
 	}
 	
 	@Override

@@ -15,7 +15,7 @@ import java.util.Random;
 public class LogDropCreator extends DropCreator {
 
 	public LogDropCreator() {
-		super(new ResourceLocation(DynamicTrees.MODID, "logs"));
+		super(new ResourceLocation(DynamicTrees.MOD_ID, "logs"));
 	}
 
 	@Override

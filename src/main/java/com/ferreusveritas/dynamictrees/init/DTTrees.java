@@ -34,7 +34,7 @@ public class DTTrees {
 	 * on the Dynamic Sapling
 	 */
 	public static void setupTrees() {
-		Species.REGISTRY.register(Species.NULL_SPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "null")));
+		Species.REGISTRY.register(Species.NULL_SPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null")));
 		Collections.addAll(baseFamilies, new OakTree(), new SpruceTree(), new BirchTree(), new JungleTree(), new AcaciaTree(), new DarkOakTree(), new CrimsonFungus(), new WarpedFungus());
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
 		dynamicCactus = new Cactus();
@@ -49,8 +49,8 @@ public class DTTrees {
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
 		Species.REGISTRY = new RegistryBuilder<Species>()
-				.setName(new ResourceLocation(DynamicTrees.MODID, "species"))
-				.setDefaultKey(new ResourceLocation(DynamicTrees.MODID, "null"))
+				.setName(new ResourceLocation(DynamicTrees.MOD_ID, "species"))
+				.setDefaultKey(new ResourceLocation(DynamicTrees.MOD_ID, "null"))
 				.disableSaving()
 				.setType(Species.class)
 				.setIDRange(0, Integer.MAX_VALUE - 1)

@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
@@ -22,16 +21,16 @@ import net.minecraftforge.fml.common.Mod;
 /**
  * @author Harley O'Connor
  */
-@Mod.EventBusSubscriber(modid = DynamicTrees.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class BakedModelEventHandler {
 
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelRegistryEvent event) {
         // Register model loaders for baked models.
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "branch"), new BranchBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "cactus"), new CactusBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "root"), new RootBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MODID, "thick_branch"), new ThickBranchBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "branch"), new BranchBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "cactus"), new CactusBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "root"), new RootBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "thick_branch"), new ThickBranchBlockModelLoader());
     }
 
     @SubscribeEvent

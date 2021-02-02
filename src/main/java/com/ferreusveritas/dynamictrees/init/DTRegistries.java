@@ -108,7 +108,7 @@ public class DTRegistries {
 	}
 	
 	public static void setupLeavesProperties() {
-		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MODID, "leaves/common.json"));
+		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MOD_ID, "leaves/common.json"));
 		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
 	
@@ -119,13 +119,13 @@ public class DTRegistries {
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
-		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MODID));
+		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
 
-		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MODID)){
+		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MOD_ID)){
 			registry.register(rooty);
 		}
 	}
@@ -187,8 +187,8 @@ public class DTRegistries {
 		
 		IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
 		
-		registry.registerAll(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MODID, FALLING_TREE)),
-				lingeringEffector.setRegistryName(new ResourceLocation(DynamicTrees.MODID, LINGERING_EFFECTOR)));
+		registry.registerAll(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, FALLING_TREE)),
+				lingeringEffector.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, LINGERING_EFFECTOR)));
 	}
 	
 	///////////////////////////////////////////
@@ -209,7 +209,7 @@ public class DTRegistries {
 		setupTileEntities();
 		
 		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(bonsaiPotBlock.getRegistryName()));
-		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MODID, "tile_entity_species")));
+		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tile_entity_species")));
 	}
 	
 	///////////////////////////////////////////

@@ -2,18 +2,15 @@ package com.ferreusveritas.dynamictrees.items;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
@@ -35,7 +32,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -43,24 +39,24 @@ import java.util.List;
 
 /**
  * Try the following in a command block to demonstrate the extra tag functionality.
- * /give @p dynamictrees:staff 1 0 {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
+ * /give @p dynamictrees:staff{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",read_only:1,tree:"dynamictrees:birch",max_uses:16,display:{Name:'[{"text":"Name","italic":false}]'}}
  */
 public class Staff extends Item {
 	
 	public final static String HANDLE = "handle";
 	public final static String COLOR = "color";
 	
-	public final static String READONLY = "readonly";
+	public final static String READ_ONLY = "read_only";
 	public final static String TREE = "tree";
 	public final static String CODE = "code";
 	public final static String USES = "uses";
-	public final static String MAXUSES = "maxuses";
-	
+	public final static String MAX_USES = "max_uses";
+
+	private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+
 	public Staff() {
 		this("staff");
 	}
-
-	private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
 	public Staff(String name) {
 		super(new Item.Properties().maxStackSize(1)
@@ -149,11 +145,11 @@ public class Staff extends Item {
 	}
 
 	public boolean isReadOnly(ItemStack itemStack) {
-		return itemStack.getOrCreateTag().getBoolean(READONLY);
+		return itemStack.getOrCreateTag().getBoolean(READ_ONLY);
 	}
 	
 	public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
-		itemStack.getOrCreateTag().putBoolean(READONLY, readonly);
+		itemStack.getOrCreateTag().putBoolean(READ_ONLY, readonly);
 		return this;
 	}
 	
@@ -205,20 +201,20 @@ public class Staff extends Item {
 	public int getMaxUses(ItemStack itemStack) {
 		CompoundNBT nbt = itemStack.getOrCreateTag();
 		
-		if(nbt.contains(MAXUSES)) {
-			return nbt.getInt(MAXUSES);
+		if(nbt.contains(MAX_USES)) {
+			return nbt.getInt(MAX_USES);
 		}
 		
 		return 0;
 	}
 	
 	public Staff setMaxUses(ItemStack itemStack, int value) {
-		itemStack.getOrCreateTag().putInt(MAXUSES, value);
+		itemStack.getOrCreateTag().putInt(MAX_USES, value);
 		return this;
 	}
 	
 	public boolean hasMaxUses(ItemStack itemStack) {
-		return itemStack.getOrCreateTag().contains(MAXUSES);
+		return itemStack.getOrCreateTag().contains(MAX_USES);
 	}
 	
 	public boolean decUses(ItemStack itemStack) {
@@ -286,7 +282,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
-		tooltip.add(new StringTextComponent("Tree: " + ((species.isValid()) ? species : "none")));
+		tooltip.add(new StringTextComponent("Tree: " + (species.isValid() ? species : "none")));
 		tooltip.add(new StringTextComponent("Code: ").append(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
 	}
 
