@@ -5,12 +5,12 @@ import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.FungusFeatureCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.*;
+import net.minecraft.block.CactusBlock;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
@@ -21,9 +21,12 @@ import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.spongepowered.asm.mixin.Dynamic;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -44,6 +47,8 @@ public final class WorldGenEvents {
      */
     @SubscribeEvent
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
+        // TODO: Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+
         final ResourceLocation biomeResLoc = event.getName();
 
         if (biomeResLoc == null) return;
@@ -74,16 +79,25 @@ public final class WorldGenEvents {
 
     @SubscribeEvent
     public void onTreeCancelRegistry(TreeCancelRegistryEvent event) {
+        // Since removeVanillaTrees will be called on every biome load (so for every world load) and is checking every feature,
+        // we should register the cancellers only for the biomes that need it to keep loading times as low as possible.
+
         final ITreeCanceller treeCanceller = event.getTreeCanceller();
         final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT_ID);
 
-        // This registers the cancellation of all tree features with the namespace "minecraft" from all overworld biomes with the namespace "minecraft".
-        // Or, in other words, cancels all vanilla Minecraft trees from vanilla Minecraft overworld biomes.
-        ForgeRegistries.BIOMES.getEntries().stream().filter(entry -> BiomeDictionary.hasType(entry.getKey(), BiomeDictionary.Type.OVERWORLD))
-                .map(registryKeyEntry -> registryKeyEntry.getKey().getLocation()).forEach(biomeResLoc ->
-                treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER)));
+        // Gets a list of all vanilla Minecraft biome registry keys.
+        final List<RegistryKey<Biome>> vanillaBiomes = ForgeRegistries.BIOMES.getEntries().stream().map(Map.Entry::getKey)
+                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT_ID)).collect(Collectors.toList());
 
-        // This registers the cancellation of giant fungus features from the warped and crimson forest biomes.
+        // This registers the cancellation of all tree features with the namespace "minecraft" from all overworld biomes with the namespace "minecraft".
+        vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD)).forEach(key ->
+                treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER)));
+
+        // This registers the cancellation of all cactus features with the namespace "minecraft" from all sandy biomes with the namespace "minecraft".
+        vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY)).forEach(key ->
+                treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.CACTUS_CANCELLER)));
+
+        // This registers the cancellation of giant fungus features with the namespace "minecraft" from the warped and crimson forest biomes.
         Stream.of(Biomes.WARPED_FOREST, Biomes.CRIMSON_FOREST).map(RegistryKey::getLocation).forEach(biomeResLoc ->
             treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER))
         );
@@ -95,6 +109,9 @@ public final class WorldGenEvents {
 
         // This registers default tree feature canceller, which will cancel any features if their config extends BaseTreeFeatureConfig.
         registry.register(TreeFeatureCancellerRegistry.TREE_CANCELLER, new TreeFeatureCanceller<>(BaseTreeFeatureConfig.class));
+
+        // This registers the tree feature canceller for cacti, which will cancel any BlockCluster features using the CactusBlock class.
+        registry.register(TreeFeatureCancellerRegistry.CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
 
         // This registers the tree feature canceller for fungus, which will cancel any features if their config extends HugeFungusConfig.
         registry.register(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER, new FungusFeatureCanceller<>(HugeFungusConfig.class));
