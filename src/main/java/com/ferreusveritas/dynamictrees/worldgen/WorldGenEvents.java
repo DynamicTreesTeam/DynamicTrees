@@ -9,17 +9,22 @@ import com.ferreusveritas.dynamictrees.worldgen.canceller.FungusFeatureCanceller
 import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.*;
-import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Harley O'Connor
@@ -69,12 +74,19 @@ public final class WorldGenEvents {
 
     @SubscribeEvent
     public void onTreeCancelRegistry(TreeCancelRegistryEvent event) {
-        // TODO: Make a way of applying to a biome type with a specific registry name so we only run fungus cancellers in the nether and only run normal tree cancellers in the overworld.
+        final ITreeCanceller treeCanceller = event.getTreeCanceller();
+        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT_ID);
 
-        // This registers the cancellation of all tree features with the namespace "minecraft" from all biomes with the namespace "minecraft".
-        // Or, in other words, cancels all vanilla Minecraft trees from vanilla Minecraft biomes.
-        event.getTreeCanceller().register(DynamicTrees.MINECRAFT_ID, Collections.singletonList(DynamicTrees.MINECRAFT_ID),
-                Arrays.asList(TreeFeatureCancellerRegistry.TREE_CANCELLER, TreeFeatureCancellerRegistry.FUNGUS_CANCELLER));
+        // This registers the cancellation of all tree features with the namespace "minecraft" from all overworld biomes with the namespace "minecraft".
+        // Or, in other words, cancels all vanilla Minecraft trees from vanilla Minecraft overworld biomes.
+        ForgeRegistries.BIOMES.getEntries().stream().filter(entry -> BiomeDictionary.hasType(entry.getKey(), BiomeDictionary.Type.OVERWORLD))
+                .map(registryKeyEntry -> registryKeyEntry.getKey().getLocation()).forEach(biomeResLoc ->
+                treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER)));
+
+        // This registers the cancellation of giant fungus features from the warped and crimson forest biomes.
+        Stream.of(Biomes.WARPED_FOREST, Biomes.CRIMSON_FOREST).map(RegistryKey::getLocation).forEach(biomeResLoc ->
+            treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER))
+        );
     }
 
     @SubscribeEvent

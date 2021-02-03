@@ -25,7 +25,7 @@ public class FungusFeatureCanceller<T extends IFeatureConfig> implements ITreeFe
         if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
 
         final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
-        return fungusFeatureConfigClass.isInstance(nextConfiguredFeature.config) &&
+        return this.fungusFeatureConfigClass.isInstance(nextConfiguredFeature.config) &&
                 treeCanceller.shouldCancelFeature(biomeResLoc, nextConfiguredFeature.feature.getRegistryName());
     }
 
