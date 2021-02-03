@@ -1,18 +1,33 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.*;
+import net.minecraft.block.CactusBlock;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.spongepowered.asm.mixin.Dynamic;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Harley O'Connor
@@ -32,6 +47,8 @@ public final class WorldGenEvents {
      */
     @SubscribeEvent
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
+        // TODO: Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+
         final ResourceLocation biomeResLoc = event.getName();
 
         if (biomeResLoc == null) return;
@@ -42,77 +59,62 @@ public final class WorldGenEvents {
         if (!treeCanceller.shouldCancelFeatures(biomeResLoc))
             return;
 
-        // TODO: Make a tree type in tree canceller for handling this.
-        if (event.getCategory() == Biome.Category.NETHER) {
-            this.removeFungi(event, biomeResLoc, treeCanceller); // This removes any feature whose config extends HugeFungusConfig.
-        } else {
-            this.removeTrees(event, biomeResLoc, treeCanceller); // This removes any feature whose config extends BaseTreeFeatureConfig.
-        }
-    }
+        // Ensure tree feature cancellers have been registered.
+        TreeFeatureCancellerRegistry.registerCancellers();
 
-    private void removeFungi(final BiomeLoadingEvent event, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
+        // Loop through all vegetal features and remove if found to contain trees.
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
-            final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
-            if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
-
-            final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
-            return nextConfiguredFeature.config instanceof HugeFungusConfig &&
-                    treeCanceller.shouldCancelFeature(biomeResLoc, nextConfiguredFeature.feature.getRegistryName());
-        });
-    }
-
-    private void removeTrees(final BiomeLoadingEvent event, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
-        event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
-            final ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
-
-            if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
-
-            final IFeatureConfig featureConfig = ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config;
-
-            /*  The following code removes vanilla trees from the biome's generator.
-                There may be some problems as MultipleRandomFeatureConfigs store can other features too,
-                so these are currently removed from world gen too. The list is immutable so they can't be removed individually,
-                but one (unclean) solution may be to add the non-tree features back to the generator. */
-
-            if (featureConfig instanceof MultipleRandomFeatureConfig) {
-                // Removes feature if it contains trees.
-                return doesContainTrees((MultipleRandomFeatureConfig) featureConfig, biomeResLoc, treeCanceller);
-            } else if (featureConfig instanceof DecoratedFeatureConfig) {
-                final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
-                final IFeatureConfig nextFeatureConfig = nextConfiguredFeature.config;
-
-                if (nextFeatureConfig instanceof BaseTreeFeatureConfig && treeCanceller.shouldCancelFeature(biomeResLoc,
-                        nextConfiguredFeature.feature.getRegistryName())) {
-                    return true; // Removes any individual trees.
-                } else if (nextFeatureConfig instanceof MultipleRandomFeatureConfig) {
-                    // Removes feature if it contains trees.
-                    return doesContainTrees((MultipleRandomFeatureConfig) nextFeatureConfig, biomeResLoc, treeCanceller);
-                }
+            // Go through each canceller for the current biome and remove the current feature if it shouldCancel returns true.
+            for (ITreeFeatureCanceller canceller : treeCanceller.getFeatureCancellers(biomeResLoc)) {
+                if (canceller.shouldCancel(configuredFeatureSupplier.get(), biomeResLoc, treeCanceller))
+                    return true;
             }
-
             return false;
         });
     }
 
-    /**
-     * Checks if the given {@link MultipleRandomFeatureConfig} contains trees.
-     *
-     * @param featureConfig The MultipleRandomFeatureConfig to check.
-     * @return True if trees were found.
-     */
-    private boolean doesContainTrees (MultipleRandomFeatureConfig featureConfig, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
-        for (ConfiguredRandomFeatureList feature : featureConfig.features) {
-            ConfiguredFeature<?, ?> currentConfiguredFeature = feature.feature.get();
-            if (currentConfiguredFeature.config instanceof BaseTreeFeatureConfig && treeCanceller.shouldCancelFeature(biomeResLoc,
-                    currentConfiguredFeature.feature.getRegistryName()))
-                return true;
-        }
-        return false;
-    }
+    ///////////////////////////////////////////
+    // Registries
+    ///////////////////////////////////////////
 
     @SubscribeEvent
     public void onTreeCancelRegistry(TreeCancelRegistryEvent event) {
-        event.getTreeCanceller().registerCancellations("minecraft", Collections.singletonList("minecraft"));
+        // Since removeVanillaTrees will be called on every biome load (so for every world load) and is checking every feature,
+        // we should register the cancellers only for the biomes that need it to keep loading times as low as possible.
+
+        final ITreeCanceller treeCanceller = event.getTreeCanceller();
+        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT_ID);
+
+        // Gets a list of all vanilla Minecraft biome registry keys.
+        final List<RegistryKey<Biome>> vanillaBiomes = ForgeRegistries.BIOMES.getEntries().stream().map(Map.Entry::getKey)
+                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT_ID)).collect(Collectors.toList());
+
+        // This registers the cancellation of all tree features with the namespace "minecraft" from all overworld biomes with the namespace "minecraft".
+        vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD)).forEach(key ->
+                treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER)));
+
+        // This registers the cancellation of all cactus features with the namespace "minecraft" from all sandy biomes with the namespace "minecraft".
+        vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY)).forEach(key ->
+                treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.CACTUS_CANCELLER)));
+
+        // This registers the cancellation of giant fungus features with the namespace "minecraft" from the warped and crimson forest biomes.
+        Stream.of(Biomes.WARPED_FOREST, Biomes.CRIMSON_FOREST).map(RegistryKey::getLocation).forEach(biomeResLoc ->
+            treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER))
+        );
+    }
+
+    @SubscribeEvent
+    public void onTreeFeatureCancelRegistry(TreeFeatureCancellerRegistry.TreeFeatureCancellerRegistryEvent event) {
+        final TreeFeatureCancellerRegistry registry = event.getFeatureCancellerRegistry();
+
+        // This registers default tree feature canceller, which will cancel any features if their config extends BaseTreeFeatureConfig.
+        registry.register(TreeFeatureCancellerRegistry.TREE_CANCELLER, new TreeFeatureCanceller<>(BaseTreeFeatureConfig.class));
+
+        // This registers the tree feature canceller for cacti, which will cancel any BlockCluster features using the CactusBlock class.
+        registry.register(TreeFeatureCancellerRegistry.CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
+
+        // This registers the tree feature canceller for fungus, which will cancel any features if their config extends HugeFungusConfig.
+        registry.register(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER, new FungusFeatureCanceller<>(HugeFungusConfig.class));
     }
 
 }

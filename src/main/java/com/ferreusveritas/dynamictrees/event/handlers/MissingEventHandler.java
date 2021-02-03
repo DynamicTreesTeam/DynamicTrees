@@ -34,8 +34,8 @@ public class MissingEventHandler {
 			String domain = resLoc.getNamespace();
 			String path = resLoc.getPath();
 			if(domain.equals("growingtrees")) {
-				Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Remapping Missing Block: " + path);
-				Block mappedBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(DynamicTrees.MODID, path));
+				Logger.getLogger(DynamicTrees.MOD_ID).log(Level.CONFIG, "Remapping Missing Block: " + path);
+				Block mappedBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(DynamicTrees.MOD_ID, path));
 				if(mappedBlock != Blocks.AIR) { //Air is what you get when do don't get what you're looking for.
 					assert mappedBlock != null;
 					missing.remap(mappedBlock);
@@ -52,8 +52,8 @@ public class MissingEventHandler {
 			String domain = resLoc.getNamespace();
 			String path = resLoc.getPath();
 			if(domain.equals("growingtrees")) {
-				Logger.getLogger(DynamicTrees.MODID).log(Level.CONFIG, "Remapping Missing Item: " + path);
-				Item mappedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(DynamicTrees.MODID, path));
+				Logger.getLogger(DynamicTrees.MOD_ID).log(Level.CONFIG, "Remapping Missing Item: " + path);
+				Item mappedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(DynamicTrees.MOD_ID, path));
 				if(mappedItem != null) { //Null is what you get when do don't get what you're looking for.
 					missing.remap(mappedItem);
 				}

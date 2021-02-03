@@ -73,7 +73,7 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 	
 	public LeavesProperties(BlockState primitiveLeaves, ItemStack primitiveLeavesItemStack) {
-		this(primitiveLeaves, primitiveLeavesItemStack, TreeRegistry.findCellKit(new ResourceLocation(DynamicTrees.MODID, "deciduous")));
+		this(primitiveLeaves, primitiveLeavesItemStack, TreeRegistry.findCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous")));
 	}
 	
 	public LeavesProperties(BlockState primitiveLeaves, ItemStack primitiveLeavesItemStack, ICellKit cellKit) {

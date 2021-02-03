@@ -35,7 +35,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
@@ -57,7 +56,7 @@ public class Cactus extends TreeFamily {
 
 			generateSapling();
 
-			addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MODID, "cactusseeds")) {
+			addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "cactusseeds")) {
 				@Override
 				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
 					int numLogs = (int) (volume.getVolume() / 2);
@@ -169,7 +168,7 @@ public class Cactus extends TreeFamily {
 	}
 	
 	public Cactus() {
-		super(new ResourceLocation(DynamicTrees.MODID, "cactus"));
+		super(new ResourceLocation(DynamicTrees.MOD_ID, "cactus"));
 		
 		setPrimitiveLog(Blocks.CACTUS);
 		setStick(Items.AIR);

@@ -50,7 +50,7 @@ public class TreeRegistry {
 
 		ResourceLocation resloc = new ResourceLocation(name);
 		if("minecraft".equals(resloc.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
-			resloc = new ResourceLocation(DynamicTrees.MODID, resloc.getPath());//Search DynamicTrees Domain instead
+			resloc = new ResourceLocation(DynamicTrees.MOD_ID, resloc.getPath());//Search DynamicTrees Domain instead
 		}
 
 		//Search specific domain first
@@ -119,7 +119,7 @@ public class TreeRegistry {
 	// DROP HANDLING
 	//////////////////////////////
 
-	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MODID, "global");
+	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MOD_ID, "global");
 
 	/**
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
@@ -165,7 +165,7 @@ public class TreeRegistry {
 	public static ICellKit findCellKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
 		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = new ResourceLocation(DynamicTrees.MODID, kitLocation.getPath());//Default to "dynamictrees" instead
+			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findCellKit(kitLocation);
 	}
@@ -189,7 +189,7 @@ public class TreeRegistry {
 	public static IGrowthLogicKit findGrowthLogicKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
 		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = new ResourceLocation(DynamicTrees.MODID, kitLocation.getPath());//Default to "dynamictrees" instead
+			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findGrowthLogicKit(kitLocation);
 	}

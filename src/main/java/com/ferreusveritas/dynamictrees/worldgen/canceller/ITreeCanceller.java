@@ -1,8 +1,11 @@
 package com.ferreusveritas.dynamictrees.worldgen.canceller;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Harley O'Connor
@@ -28,13 +31,23 @@ public interface ITreeCanceller {
     boolean shouldCancelFeature (ResourceLocation biomeResLoc, ResourceLocation featureResLoc);
 
     /**
-     * Registers cancellations for given mod namespace (ID) features for all biomes in the given
-     * mod ID.
+     * Gets the feature cancellers for the given biome.
+     *
+     * @param biomeResLoc The resource location of the current biome.
+     * @return The set of tree feature cancellers to use.
+     */
+    Set<ITreeFeatureCanceller> getFeatureCancellers (ResourceLocation biomeResLoc);
+
+    /**
+     * Registers default featue canceller for given mod namespace (ID) features for all biomes
+     * in the given mod ID.
      *
      * @param modIdForBiomes The mod ID for the biomes.
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
-    void registerCancellations (String modIdForBiomes, List<String> namespaces);
+    default void register(String modIdForBiomes, List<String> namespaces) {
+        this.register(modIdForBiomes, namespaces, Collections.singletonList("tree"));
+    }
 
     /**
      * Registers cancellations for given mod namespace (ID) features for biome based on the
@@ -43,6 +56,28 @@ public interface ITreeCanceller {
      * @param biomeResLoc The biome registry name.
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
-    void registerCancellations (ResourceLocation biomeResLoc, List<String> namespaces);
+    default void register(ResourceLocation biomeResLoc, List<String> namespaces) {
+        this.register(biomeResLoc, namespaces, Collections.singletonList("tree"));
+    }
+
+    /**
+     * Registers given feature cancellers for given mod namespace (ID) features for all biomes
+     * in the given mod ID.
+     *
+     * @param modIdForBiomes The mod ID for the biomes.
+     * @param namespaces A list of mod namespaces (IDs) to remove features from.
+     * @param cancellers The names of the feature cancellers.
+     */
+    void register(String modIdForBiomes, List<String> namespaces, List<String> cancellers);
+
+    /**
+     * Registers given feature cancellers for given mod namespace (ID) features for biome based
+     * on the given biome registry name.
+     *
+     * @param biomeResLoc The biome registry name.
+     * @param namespaces A list of mod namespaces (IDs) to remove features from.
+     * @param cancellers The names of the feature cancellers.
+     */
+    void register(ResourceLocation biomeResLoc, List<String> namespaces, List<String> cancellers);
 
 }

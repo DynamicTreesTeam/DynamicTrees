@@ -31,7 +31,7 @@ public class LeavesPaging {
 	private static String autoModId(@Nullable String modid) {
 		if(modid == null || "".equals(modid)) {
 //			ModContainer mc = Loader.getClassLoader();
-			modid = DynamicTrees.MODID;
+			modid = DynamicTrees.MOD_ID;
 //			modid = mc == null ? DynamicTrees.MODID : mc.getModId();
 		}
 		return modid;
@@ -154,7 +154,7 @@ public class LeavesPaging {
 		if(element != null && element.isJsonObject()) {
 			return build(jsonLocation.getNamespace(), element.getAsJsonObject());
 		}
-		Logger.getLogger(DynamicTrees.MODID).log(Level.SEVERE, "Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
+		Logger.getLogger(DynamicTrees.MOD_ID).log(Level.SEVERE, "Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
 
 		return null;
 	}

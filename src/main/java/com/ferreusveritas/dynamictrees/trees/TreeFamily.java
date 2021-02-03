@@ -95,7 +95,7 @@ public class TreeFamily {
 	public int woodColor;//For roots
 
 	public TreeFamily() {
-		this.name = new ResourceLocation(DynamicTrees.MODID, "null");
+		this.name = new ResourceLocation(DynamicTrees.MOD_ID, "null");
 	}
 
 	/**

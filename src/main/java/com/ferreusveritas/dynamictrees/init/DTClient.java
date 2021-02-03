@@ -153,7 +153,7 @@ public class DTClient {
 		}
 		
 		//Register GrowingLeavesBlocks Colorizers
-		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MODID)) {
+		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID)) {
 			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->
 			TreeHelper.isLeaves(state.getBlock()) ? ((DynamicLeavesBlock) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
 			);

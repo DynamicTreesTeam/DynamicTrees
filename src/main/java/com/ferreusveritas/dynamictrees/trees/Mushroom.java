@@ -13,7 +13,7 @@ public class Mushroom extends Species {
 	/** @param redcap True to select redcap mushroom.  Otherwise brown cap is selected */
 	public Mushroom(boolean redcap) {
 		this.redcap = redcap;
-		setRegistryName(new ResourceLocation(DynamicTrees.MODID, (redcap ? "red" : "brown") + "_mushroom"));
+		setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, (redcap ? "red" : "brown") + "_mushroom"));
 		setStandardSoils();
 		addGenFeature(new HugeMushroomGenFeature(redcap ? Blocks.RED_MUSHROOM_BLOCK : Blocks.BROWN_MUSHROOM_BLOCK), IGenFeature.FULLGEN);
 	}

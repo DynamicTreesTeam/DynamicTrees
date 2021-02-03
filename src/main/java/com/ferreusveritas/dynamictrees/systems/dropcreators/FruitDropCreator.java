@@ -32,7 +32,7 @@ public class FruitDropCreator extends DropCreator {
 	}
 
 	public FruitDropCreator(float rarity) {
-		super(new ResourceLocation(DynamicTrees.MODID, "apple"));
+		super(new ResourceLocation(DynamicTrees.MOD_ID, "apple"));
 		this.rarity = rarity;
 	}
 

@@ -31,22 +31,24 @@ public class DynamicTrees {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	public static final String MODID = "dynamictrees";
+	public static final String MOD_ID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
 	public static final String VERSION = "1.16.4-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
 	
-	public static final String OPTAFTER = "after:";
-	public static final String OPTBEFORE = "before:";
-	public static final String REQAFTER = "required-after:";
-	public static final String REQBEFORE = "required-before:";
+	public static final String OPT_AFTER = "after:";
+	public static final String OPT_BEFORE = "before:";
+	public static final String REQ_AFTER = "required-after:";
+	public static final String REQ_BEFORE = "required-before:";
 	public static final String NEXT = ";";
 	public static final String AT = "@[";
-	public static final String GREATERTHAN = "@(";
-	public static final String ORGREATER = ",)";
+	public static final String GREATER_THAN = "@(";
+	public static final String OR_GREATER = ",)";
 	
-	//Other mods can use this string to depend on the latest version of Dynamic Trees
-	public static final String DYNAMICTREES_LATEST = MODID + AT + VERSION + ORGREATER;
-	
+	// Other mods can use this string to depend on the latest version of Dynamic Trees
+	public static final String DT_LATEST = MOD_ID + AT + VERSION + OR_GREATER;
+
+	public static final String MINECRAFT_ID = "minecraft";
+
 	//	//Other Add-on Mods
 	//	public static final String DYNAMICTREESBOP = "dynamictreesbop";
 	//	public static final String DYNAMICTREESTC = "dynamictreestc";
