@@ -480,16 +480,6 @@ public class TreeFamily {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
 
-	/**
-	 * This is used for trees that have leaves that are not cubes and require extra blockstate properties such as palm fronds.
-	 * Used for tree felling animation.
-	 *
-	 * @return
-	 */
-	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
-		return null;
-	}
-
 	public ILeavesProperties getCommonLeaves() {
 		return LeavesProperties.NULLPROPERTIES;
 	}

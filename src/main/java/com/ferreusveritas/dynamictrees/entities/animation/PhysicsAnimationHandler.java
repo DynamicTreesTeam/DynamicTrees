@@ -36,11 +36,10 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	HandlerData getData(EntityFallingTree entity) {
 		return entity.dataAnimationHandler instanceof HandlerData ? (HandlerData) entity.dataAnimationHandler : new HandlerData();
 	}
-	
+
 	@Override
 	public void initMotion(EntityFallingTree entity) {
 		entity.dataAnimationHandler = new HandlerData();
-		
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		
 		long seed = entity.world.rand.nextLong();
@@ -151,7 +150,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		matrixStack.translate(mc.x, mc.y, mc.z);
 		matrixStack.rotate(new Quaternion(new Vector3f(0, 1, 0), -yaw, true));
 		matrixStack.rotate(new Quaternion(new Vector3f(1, 0, 0), pit, true));
-		matrixStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.);
+		matrixStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 
 	}
 

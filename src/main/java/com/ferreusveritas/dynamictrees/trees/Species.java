@@ -34,6 +34,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -1203,7 +1204,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
 		return getFamily().selectAnimationHandler(fallingEntity);
 	}
-	
+
+	/**
+	 * This is used for trees that have leaves that are not cubes and require extra blockstate properties such as palm fronds.
+	 * Used for tree felling animation.
+	 *
+	 * @return
+	 */
+	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
+		return null;
+	}
 	
 	//////////////////////////////
 	// BONSAI POT

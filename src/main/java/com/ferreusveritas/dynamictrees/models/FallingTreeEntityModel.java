@@ -95,7 +95,7 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				}
 				
 				//Draw the leaves
-				HashMap<BlockPos, BlockState> leavesClusters = destructionData.species.getFamily().getFellingLeavesClusters(destructionData);
+				HashMap<BlockPos, BlockState> leavesClusters = destructionData.species.getFellingLeavesClusters(destructionData);
 				if(leavesClusters != null) {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
