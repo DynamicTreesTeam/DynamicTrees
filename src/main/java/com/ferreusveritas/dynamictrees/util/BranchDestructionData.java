@@ -1,10 +1,12 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,6 +24,7 @@ public class BranchDestructionData {
 	public final Species species;//The species of the tree that was harvested
 	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
 	public final int[] destroyedBranchesConnections;//Encoded branch shapes
+	public final int[] destroyedBranchesBlockIndex;//Encoded valid branch block index for family
 	public final int[] destroyedLeaves;//Encoded leaves relative positions
 	public final List<BranchBlock.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
@@ -37,6 +40,7 @@ public class BranchDestructionData {
 		species = Species.NULL_SPECIES;
 		destroyedBranchesConnections = new int[0];
 		destroyedBranchesRadiusPosition = new int[0];
+		destroyedBranchesBlockIndex = new int[0];
 		destroyedLeaves = new int[0];
 		leavesDrops = new ArrayList<>(0);
 		endPoints = new int[0];
@@ -52,6 +56,7 @@ public class BranchDestructionData {
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
 		this.destroyedBranchesConnections = encodedBranchData[1];
+		this.destroyedBranchesBlockIndex = encodedBranchData[2];
 		this.destroyedLeaves = convertLeavesToIntArray(leaves);
 		this.leavesDrops = leavesDrops;
 		this.endPoints = convertEndPointsToIntArray(ends);
@@ -66,6 +71,7 @@ public class BranchDestructionData {
 		this.species = TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("species")));
 		this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
 		this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
+		this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock");
 		this.destroyedLeaves = nbt.getIntArray("leaves");
 		this.leavesDrops = new ArrayList<>();
 		this.endPoints = nbt.getIntArray("ends");
@@ -80,6 +86,7 @@ public class BranchDestructionData {
 		tag.putString("species", species.toString());
 		tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
 		tag.putIntArray("branchcon", destroyedBranchesConnections);
+		tag.putIntArray("branchblock", destroyedBranchesBlockIndex);
 		tag.putIntArray("leaves", destroyedLeaves);
 		tag.putIntArray("ends", endPoints);
 		tag.putFloat("volume", woodVolume.getVolume());
@@ -97,16 +104,18 @@ public class BranchDestructionData {
 	///////////////////////////////////////////////////////////
 	
 	private int[][] convertBranchesToIntArrays(Map<BlockPos, BranchConnectionData> branchList) {
-		int data1[] = new int[branchList.size()];
-		int data2[] = new int[branchList.size()];
+		int[] radPosData = new int[branchList.size()];
+		int[] connectionData = new int[branchList.size()];
+		int[] blockIndexData = new int[branchList.size()];
 		int index = 0;
 		
 		//Ensure the origin block is at the first index
 		BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
 		BlockState origExState = origConnData.getBlockState();
 		if(origExState != null) {
-			data1[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origExState.getBlock(), origExState);
-			data2[index++] = encodeBranchesConnections(origConnData.getConnections());
+			radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock)origExState.getBlock(), origExState);
+			connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
+			blockIndexData[index++] = encodeBranchBlocks((BranchBlock)origExState.getBlock());
 			branchList.remove(BlockPos.ZERO);
 		}
 		
@@ -118,16 +127,18 @@ public class BranchDestructionData {
 			Block block = exState.getBlock();
 			
 			if(block instanceof BranchBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				data1[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, exState);
-				data2[index++] = encodeBranchesConnections(connData.getConnections());
+				radPosData[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, exState);
+				connectionData[index] = encodeBranchesConnections(connData.getConnections());
+				blockIndexData[index++] = encodeBranchBlocks((BranchBlock)block);
 			}
 		}
 		
 		//Shrink down the arrays
-		data1 = Arrays.copyOf(data1, index);
-		data2 = Arrays.copyOf(data2, index);
+		radPosData = Arrays.copyOf(radPosData, index);
+		connectionData = Arrays.copyOf(connectionData, index);
+		blockIndexData = Arrays.copyOf(blockIndexData, index);
 		
-		return new int[][] { data1, data2 };
+		return new int[][] { radPosData, connectionData, blockIndexData };
 	}
 	
 	private int encodeBranchesRadiusPos(BlockPos relPos, BranchBlock branchBlock, BlockState state) {
@@ -144,6 +155,10 @@ public class BranchDestructionData {
 			result |= (rad & 0x1F) << (faceIndex * 5);//5 bits per face * 6 faces = 30bits
 		}
 		return result;
+	}
+
+	private int encodeBranchBlocks (BranchBlock branch){
+		return branch.getFamily().getBranchBlockIndex(branch);
 	}
 	
 	public int getNumBranches() {
@@ -163,7 +178,10 @@ public class BranchDestructionData {
 	}
 	
 	public BlockState getBranchBlockState(int index) {
-		BranchBlock branch = (BranchBlock)species.getFamily().getDynamicBranch();
+		if (destroyedBranchesBlockIndex[index] != 0) {
+			System.out.println("a");
+		}
+		BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
 		if(branch != null) {
 			int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
 			return branch.getStateForRadius(radius);

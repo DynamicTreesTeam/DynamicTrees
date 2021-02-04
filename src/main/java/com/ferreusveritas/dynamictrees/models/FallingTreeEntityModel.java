@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -74,11 +75,10 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 
 			BlockState exState = destructionData.getBranchBlockState(0);
 			if(exState != null) {
+				IBakedModel branchModel = dispatcher.getModelForState(exState);
 				//Draw the ring texture cap on the cut block
-				int radius = ((BranchBlock) exState.getBlock()).getRadius(exState);
-				float offset = (8 - Math.min(radius, BranchBlock.RADMAX_NORMAL) ) / 16f;
-				IBakedModel branchModel = dispatcher.getModelForState(exState);//Since we source the blockState from the destruction data it will always be the same
 				BlockPos offsetPos = BlockPos.ZERO.offset(cutDir);
+				float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.RADMAX_NORMAL) ) / 16f;
 				treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)));
 
 				for(Direction face: Direction.values()) {
@@ -88,7 +88,10 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {
+					Block previousBranch = exState.getBlock();
 					exState = destructionData.getBranchBlockState(index);
+					if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
+						branchModel = dispatcher.getModelForState(exState);
 					BlockPos relPos = destructionData.getBranchRelPos(index);
 					destructionData.getConnections(index, connectionArray);
 					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), connections.setAllRadii(connectionArray)));

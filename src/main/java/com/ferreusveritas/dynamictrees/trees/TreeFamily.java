@@ -31,6 +31,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -79,6 +80,9 @@ public class TreeFamily {
 	/** The primitive stripped log to base the texture, drops, and other behavior from */
 	private Block primitiveStrippedLog = Blocks.AIR;
 
+	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
+	private List<BranchBlock> validBranches = new LinkedList<>();
+
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
 	protected boolean hasConiferVariants = false;
@@ -104,6 +108,7 @@ public class TreeFamily {
 	public TreeFamily(ResourceLocation name) {
 		this.name = name;
 
+		//this must be the first branch registered, to have its validBranches index be 0;
 		this.setDynamicBranch(createBranch()).setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
 
 		if (this.hasStrippedBranch()) {
@@ -277,12 +282,14 @@ public class TreeFamily {
 		dynamicBranch = branch;//Link the tree to the branch
 		dynamicBranch.setFamily(this);//Link the branch back to the tree
 		dynamicBranch.setCanBeStripped(hasStrippedBranch());//Allow the branch to be stripped if a stripped variant exists
+		addValidBranches(branch);
 		return this;
 	}
 	protected TreeFamily setDynamicStrippedBranch(BranchBlock branch) {
 		dynamicStrippedBranch = branch;//Link the tree to the branch
 		dynamicStrippedBranch.setFamily(this);//Link the branch back to the tree
 		dynamicStrippedBranch.setCanBeStripped(false);//Already stripped logs should not be able to be stripped again
+		addValidBranches(branch);
 		return this;
 	}
 	protected TreeFamily setDynamicBranches(BranchBlock branch, BranchBlock strippedBranch) {
@@ -409,6 +416,23 @@ public class TreeFamily {
 
 	public boolean hasStrippedBranch(){
 		return true;
+	}
+
+	public void addValidBranches (BranchBlock... branches){
+		validBranches.addAll(Arrays.asList(branches));
+	}
+
+	public int getBranchBlockIndex (BranchBlock block){
+		int index = validBranches.indexOf(block);
+		if (index < 0){
+			DynamicTrees.getLogger().warn("Block " + block + " not valid branch for " + this);
+			return 0;
+		}
+		return index;
+	}
+
+	public BranchBlock getValidBranchBlock (int index) {
+		return validBranches.get(index);
 	}
 
 	///////////////////////////////////////////

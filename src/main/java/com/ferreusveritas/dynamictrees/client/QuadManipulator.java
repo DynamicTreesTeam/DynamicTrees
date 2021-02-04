@@ -51,7 +51,7 @@ public class QuadManipulator {
 	}
 	
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, BlockState stateIn, Vector3d offset, Direction[] sides, Random rand, IModelData modelData) {
-		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
+		ArrayList<BakedQuad> outQuads = new ArrayList<>();
 		
 		if(stateIn != null) {
 			for (Direction dir : sides) {
