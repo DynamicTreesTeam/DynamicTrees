@@ -14,7 +14,6 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,7 +31,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -222,7 +220,8 @@ public class TreeFamily {
 		}
 		
 		getCommonSpecies().getSapling().ifPresent(blockList::add);
-		
+		getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
+
 		return blockList;
 	}
 

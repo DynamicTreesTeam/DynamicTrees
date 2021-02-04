@@ -207,7 +207,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
 		Species species = signal.getSpecies();
 		
-		DynamicLeavesBlock leaves = TreeHelper.getLeaves(species.getLeavesProperties().getDynamicLeavesState());
+		DynamicLeavesBlock leaves =  species.getLeavesBlock().orElse(null);
 		if (leaves != null) {
 			if (fromRadius == 1) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);

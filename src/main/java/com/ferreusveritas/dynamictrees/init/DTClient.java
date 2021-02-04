@@ -152,10 +152,12 @@ public class DTClient {
 			}
 		}
 		
-		//Register GrowingLeavesBlocks Colorizers
+		//Register Leaves Colorizers
 		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID)) {
-			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->
-			TreeHelper.isLeaves(state.getBlock()) ? ((DynamicLeavesBlock) state.getBlock()).getProperties(state).foliageColorMultiplier(state, worldIn, pos) : magenta
+			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->{
+						ILeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
+						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
+					}
 			);
 		}
 		

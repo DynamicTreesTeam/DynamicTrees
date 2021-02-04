@@ -51,6 +51,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		super(DTRegistries.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
+		resolve();
 	}
 	
 	public void resolve() {
@@ -95,17 +96,11 @@ public class LeavesPropertiesJson extends LeavesProperties {
 					if(element.isJsonPrimitive()) {
 						fireSpreadSpeed = element.getAsInt();
 					}
-				} else
-				if("foliageType".equals(key)) {
-					if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-						foliage = FoliageTypes.valueOf(element.getAsString().toUpperCase());
-					}
 				}
 			}
 			
 			jsonObj = null;//Free up json object since it is no longer used
 		}
-		
 	}
 	
 	public static class PrimitiveLeavesComponents {
@@ -146,11 +141,11 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 	
-	public static void resolveAll() {
-		for(LeavesPropertiesJson res: resolutionList) {
-			res.resolve();
-		}
-	}
+//	public static void resolveAll() {
+//		for(LeavesPropertiesJson res: resolutionList) {
+//			res.resolve();
+//		}
+//	}
 	
 	public static void cleanUp() {
 		//Free memory

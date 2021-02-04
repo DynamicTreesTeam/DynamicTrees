@@ -70,6 +70,14 @@ public class DTRegistries {
 		appleBlock = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		trunkShellBlock = new TrunkShellBlock();
 
+		setUpSoils();
+
+		setupConnectables();
+
+		setupLeavesProperties();
+	}
+
+	private static void setUpSoils(){
 		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRT_LIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRT_LIKE);
 		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRT_LIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM));
@@ -94,7 +102,9 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
+	}
 
+	public static void setupConnectables(){
 		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,side)->{
 			if (side == Direction.DOWN) return 1;
 			return 0;
@@ -103,13 +113,10 @@ public class DTRegistries {
 			if (side == Direction.DOWN) return 8;
 			return 0;
 		});
-
-		setupLeavesProperties();
 	}
-	
-	public static void setupLeavesProperties() {
+
+	private static void setupLeavesProperties() {
 		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MOD_ID, "leaves/common.json"));
-		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
 	
 	@SubscribeEvent
@@ -119,7 +126,6 @@ public class DTRegistries {
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
-		treeBlocks.addAll(LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		

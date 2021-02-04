@@ -37,7 +37,7 @@ public class BirchTree extends VanillaTreeFamily {
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return isOneOfBiomes(biome, Biomes.BIRCH_FOREST, Biomes.BIRCH_FOREST_HILLS, Biomes.TALL_BIRCH_FOREST, Biomes.TALL_BIRCH_HILLS);
-		};
+		}
 		
 		@Override
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {

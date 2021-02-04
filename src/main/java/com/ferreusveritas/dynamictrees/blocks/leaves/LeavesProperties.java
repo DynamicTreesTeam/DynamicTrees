@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -58,7 +59,6 @@ public class LeavesProperties implements ILeavesProperties {
 	protected ICellKit cellKit;
 	protected TreeFamily tree = TreeFamily.NULLFAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
-	protected FoliageTypes foliage;
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
 
@@ -80,7 +80,6 @@ public class LeavesProperties implements ILeavesProperties {
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.air;
 		this.primitiveLeavesItemStack = primitiveLeavesItemStack != null ? primitiveLeavesItemStack : ItemStack.EMPTY;
 		this.cellKit = cellKit;
-		this.foliage = FoliageTypes.LEAVES;
 	}
 	
 	@Override
@@ -114,7 +113,13 @@ public class LeavesProperties implements ILeavesProperties {
 	public BlockState getDynamicLeavesState(int hydro) {
 		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)];
 	}
-	
+
+	@Override
+	public boolean hasDynamicLeavesBlock() {
+		if (getDynamicLeavesState() == null) return false;
+		return getDynamicLeavesState().getBlock() instanceof DynamicLeavesBlock;
+	}
+
 	@Override
 	public ILeavesProperties setTree(TreeFamily tree) {
 		this.tree = tree;
@@ -154,9 +159,6 @@ public class LeavesProperties implements ILeavesProperties {
 	public ICellKit getCellKit() {
 		return cellKit;
 	}
-
-	@Override
-	public FoliageTypes getFoliageType() { return foliage; }
 
 	@Override
 	@OnlyIn(Dist.CLIENT)

@@ -36,6 +36,8 @@ public interface ILeavesProperties {
 
 	BlockState getDynamicLeavesState(int distance);
 
+	boolean hasDynamicLeavesBlock();
+
 	int getFlammability();
 
 	int getFireSpreadSpeed();
@@ -48,9 +50,6 @@ public interface ILeavesProperties {
 
 	/** A CellKit for leaves automata */
 	ICellKit getCellKit();
-
-	/** Determines if the block is leaves or part of a giant mushroom */
-	FoliageTypes getFoliageType();
 
 	@OnlyIn(Dist.CLIENT)
 	int foliageColorMultiplier(BlockState state, IBlockDisplayReader reader, BlockPos pos);

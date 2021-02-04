@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicWartBlock;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.featuregen.ShroomlightGenFeature;
@@ -63,6 +66,10 @@ public class CrimsonFungus extends VanillaTreeFamily {
 		@Override
 		public VoxelShape getSaplingShape() {
 			return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.5f, 0.75f));
+		}
+
+		public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
+			return (DynamicLeavesBlock) new DynamicWartBlock(leavesProperties).setRegistryName(getRegistryName() + "_wart");
 		}
 	}
 

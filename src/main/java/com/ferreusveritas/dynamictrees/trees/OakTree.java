@@ -182,7 +182,6 @@ public class OakTree extends VanillaTreeFamily {
 		super(DynamicTrees.VanillaWoodTypes.oak);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.OAK_LEAVES);
-		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.BEE_NEST);
 	}
 	
 	@Override

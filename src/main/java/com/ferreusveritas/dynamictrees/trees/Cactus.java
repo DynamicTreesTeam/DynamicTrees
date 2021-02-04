@@ -2,10 +2,12 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
@@ -176,7 +178,7 @@ public class Cactus extends TreeFamily {
 	
 	@Override
 	public ILeavesProperties getCommonLeaves() {
-		return DTRegistries.leaves.get(getName().getPath());
+		return new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly unbuilt since there's no leaves
 	}
 	
 	@Override

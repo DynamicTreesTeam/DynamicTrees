@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
@@ -40,10 +41,7 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -70,6 +68,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -286,6 +286,24 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public ILeavesProperties getLeavesProperties() {
 		return leavesProperties;
+	}
+
+	public Optional<DynamicLeavesBlock> getLeavesBlock() {
+		DynamicLeavesBlock block = null;
+		if (getLeavesProperties().hasDynamicLeavesBlock()){
+			BlockState leavesState = getLeavesProperties().getDynamicLeavesState();
+			if (leavesState!=null && leavesState.getBlock() instanceof DynamicLeavesBlock)
+				block = (DynamicLeavesBlock) leavesState.getBlock();
+		} else if (getLeavesProperties().getPrimitiveLeaves() != null) {
+			block = createLeavesBlock(getLeavesProperties());
+		}
+		return Optional.ofNullable(block);
+	}
+
+	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
+		DynamicLeavesBlock block = (DynamicLeavesBlock) new DynamicLeavesBlock(leavesProperties).setRegistryName(getRegistryName() + "_leaves");
+		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
+		return block;
 	}
 	
 	///////////////////////////////////////////

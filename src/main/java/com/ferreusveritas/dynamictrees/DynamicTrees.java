@@ -163,15 +163,15 @@ public class DynamicTrees {
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		
-		//		WorldGenRegistry.populateDataBase();
-		// DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
+//		WorldGenRegistry.populateDataBase();
+//		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
 	}
 	
 	@SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event) {
-		LeavesPropertiesJson.resolveAll();
+//		LeavesPropertiesJson.resolveAll();
 		DeferredWorkQueue.runLater(this::registerDendroRecipes);
-		//	   cleanUp();
+//		cleanUp();
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {
