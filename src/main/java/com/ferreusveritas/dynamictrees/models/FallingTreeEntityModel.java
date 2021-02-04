@@ -111,18 +111,20 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 						}
 					}
 				} else {
-					BlockState state = destructionData.species.getLeavesProperties().getDynamicLeavesState();
 					List<BlockPos> relPosList = new LinkedList<>();
 					for(BlockPos relPos : destructionData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
 						relPosList.add(relPos);
 					}
-					for(BlockPos relPos : relPosList) {
-						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(dispatcher.getModelForState(state), state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE);
+					for(int index = 0; index < destructionData.getNumLeaves(); index++) {
+						BlockPos relPos = destructionData.getLeavesRelPos(index);
+						BlockState state = destructionData.getLeavesBlockState(index);
+						IBakedModel leavesModel = dispatcher.getModelForState(state);
+						List<BakedQuad> leavesQuads = QuadManipulator.getQuads(leavesModel, state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE);
 						for (BakedQuad quad : leavesQuads){
 							Direction quadFace = quad.getFace();
-								if (!(quadFace == Direction.UP || quadFace == Direction.SOUTH || quadFace == Direction.WEST) || !relPosList.contains(relPos.offset(quadFace))){
-									treeQuads.add(quad);
-								}
+							if (!(quadFace == Direction.UP || quadFace == Direction.SOUTH || quadFace == Direction.WEST) || !relPosList.contains(relPos.offset(quadFace))){
+								treeQuads.add(quad);
+							}
 						}
 					}
 				}

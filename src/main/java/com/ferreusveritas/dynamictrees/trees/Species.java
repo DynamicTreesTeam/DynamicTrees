@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -123,6 +124,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 	//Leaves
 	protected ILeavesProperties leavesProperties;
+
+	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
+	private List<DynamicLeavesBlock> validLeafBlocks = new LinkedList<>();
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
@@ -302,10 +306,28 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 
 	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
 		DynamicLeavesBlock block = (DynamicLeavesBlock) new DynamicLeavesBlock(leavesProperties).setRegistryName(getRegistryName() + "_leaves");
+		addValidLeafBlocks(block);
 		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
 		return block;
 	}
-	
+
+	public void addValidLeafBlocks (DynamicLeavesBlock... leaves){
+		validLeafBlocks.addAll(Arrays.asList(leaves));
+	}
+
+	public int getLeafBlockIndex (DynamicLeavesBlock block){
+		int index = validLeafBlocks.indexOf(block);
+		if (index < 0){
+			DynamicTrees.getLogger().warn("Block " + block + " not valid leaves for " + this);
+			return 0;
+		}
+		return index;
+	}
+
+	public DynamicLeavesBlock getValidLeafBlock (int index) {
+		return validLeafBlocks.get(index);
+	}
+
 	///////////////////////////////////////////
 	//SEEDS
 	///////////////////////////////////////////

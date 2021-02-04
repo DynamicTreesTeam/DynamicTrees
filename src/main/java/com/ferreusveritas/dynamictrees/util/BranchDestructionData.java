@@ -1,12 +1,10 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -26,6 +24,7 @@ public class BranchDestructionData {
 	public final int[] destroyedBranchesConnections;//Encoded branch shapes
 	public final int[] destroyedBranchesBlockIndex;//Encoded valid branch block index for family
 	public final int[] destroyedLeaves;//Encoded leaves relative positions
+	public final int[] destroyedLeavesBlockIndex;//Encoded leaves relative positions
 	public final List<BranchBlock.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
 	public final NodeNetVolume.Volume woodVolume;//A summation of all of the wood voxels that was harvested
@@ -42,6 +41,7 @@ public class BranchDestructionData {
 		destroyedBranchesRadiusPosition = new int[0];
 		destroyedBranchesBlockIndex = new int[0];
 		destroyedLeaves = new int[0];
+		destroyedLeavesBlockIndex = new int[0];
 		leavesDrops = new ArrayList<>(0);
 		endPoints = new int[0];
 		woodVolume = new NodeNetVolume.Volume();
@@ -57,7 +57,9 @@ public class BranchDestructionData {
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
 		this.destroyedBranchesConnections = encodedBranchData[1];
 		this.destroyedBranchesBlockIndex = encodedBranchData[2];
-		this.destroyedLeaves = convertLeavesToIntArray(leaves);
+		int[][] encodedLeavesData = convertLeavesToIntArray(leaves, species);
+		this.destroyedLeaves = encodedLeavesData[0];
+		this.destroyedLeavesBlockIndex = encodedLeavesData[1];
 		this.leavesDrops = leavesDrops;
 		this.endPoints = convertEndPointsToIntArray(ends);
 		this.woodVolume = volume;
@@ -72,7 +74,8 @@ public class BranchDestructionData {
 		this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
 		this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
 		this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock");
-		this.destroyedLeaves = nbt.getIntArray("leaves");
+		this.destroyedLeaves = nbt.getIntArray("leavespos");
+		this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock");
 		this.leavesDrops = new ArrayList<>();
 		this.endPoints = nbt.getIntArray("ends");
 		this.woodVolume = new NodeNetVolume.Volume(nbt.getFloat("volume"));
@@ -87,7 +90,8 @@ public class BranchDestructionData {
 		tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
 		tag.putIntArray("branchcon", destroyedBranchesConnections);
 		tag.putIntArray("branchblock", destroyedBranchesBlockIndex);
-		tag.putIntArray("leaves", destroyedLeaves);
+		tag.putIntArray("leavespos", destroyedLeaves);
+		tag.putIntArray("leavesblock", destroyedLeavesBlockIndex);
 		tag.putIntArray("ends", endPoints);
 		tag.putFloat("volume", woodVolume.getVolume());
 		tag.putInt("cutx", cutPos.getX());
@@ -178,9 +182,6 @@ public class BranchDestructionData {
 	}
 	
 	public BlockState getBranchBlockState(int index) {
-		if (destroyedBranchesBlockIndex[index] != 0) {
-			System.out.println("a");
-		}
 		BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
 		if(branch != null) {
 			int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
@@ -194,7 +195,7 @@ public class BranchDestructionData {
 		int encodedConnections = destroyedBranchesConnections[index];
 		
 		for(Direction face : Direction.values()) {
-			int rad = (int) (encodedConnections >> (face.getIndex() * 5) & 0x1F);
+			int rad = (encodedConnections >> (face.getIndex() * 5) & 0x1F);
 			connections[face.getIndex()] = MathHelper.clamp(rad, 0, 8);
 		}
 	}
@@ -222,8 +223,9 @@ public class BranchDestructionData {
 	// Leaves
 	///////////////////////////////////////////////////////////
 	
-	private int[] convertLeavesToIntArray(Map<BlockPos, BlockState> leavesList) {
-		int data[] = new int[leavesList.size()];
+	private int[][] convertLeavesToIntArray(Map<BlockPos, BlockState> leavesList, Species species) {
+		int[] posData = new int[leavesList.size()];
+		int[] blockIndexData = new int[leavesList.size()];
 		int index = 0;
 		
 		//Encode the remaining blocks
@@ -233,15 +235,21 @@ public class BranchDestructionData {
 			Block block = state.getBlock();
 			
 			if(block instanceof DynamicLeavesBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				data[index++] = encodeLeaves(relPos, (DynamicLeavesBlock) block, state);
+				posData[index] = encodeLeavesPos(relPos, (DynamicLeavesBlock) block, state);
+				blockIndexData[index++] = encodeLeavesBlocks((DynamicLeavesBlock)block, species);
 			}
 		}
-		
-		return Arrays.copyOf(data, index);//Shrink down the array
+		posData = Arrays.copyOf(posData, index); //Shrink down the array
+		blockIndexData = Arrays.copyOf(blockIndexData, index);
+
+		return new int[][] {posData, blockIndexData};
 	}
 	
-	private int encodeLeaves(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
+	private int encodeLeavesPos(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
 		return	(state.get(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
+	}
+	private int encodeLeavesBlocks (DynamicLeavesBlock block, Species species){
+		return species.getLeafBlockIndex(block);
 	}
 	
 	public int getNumLeaves() {
@@ -263,13 +271,21 @@ public class BranchDestructionData {
 	private int decodeLeavesHydro(int encoded) {
 		return (encoded >> 24) & 0x0F;
 	}
-	
+
+	public BlockState getLeavesBlockState(int index) {
+		DynamicLeavesBlock leaves = species.getValidLeafBlock(destroyedLeavesBlockIndex[index]);
+		if(leaves != null) {
+			return leaves.getDefaultState();
+		}
+		return null;
+	}
+
 	///////////////////////////////////////////////////////////
 	// End Points
 	///////////////////////////////////////////////////////////
 	
 	private int[] convertEndPointsToIntArray(List<BlockPos> endPoints) {
-		int data[] = new int[endPoints.size()];
+		int[] data = new int[endPoints.size()];
 		int index = 0;
 		
 		for(BlockPos relPos : endPoints) {
