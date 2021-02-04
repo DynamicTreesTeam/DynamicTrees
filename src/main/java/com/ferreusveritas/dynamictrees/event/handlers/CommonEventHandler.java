@@ -1,11 +1,15 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.client.TooltipHandler;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -43,5 +47,11 @@ public class CommonEventHandler {
 	public void onWorldUnload (WorldEvent.Unload event) {
 		TreeCancellerJson.INSTANCE = null; // Reset tree canceller Json.
 	}
-	
+
+	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
+	public void onItemTooltipAdded(ItemTooltipEvent event) {
+		TooltipHandler.setupTooltips(event);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
@@ -20,6 +21,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
@@ -169,7 +171,7 @@ public class TreeGenerator {
 			if(species.isValid()) {
 				if(species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if(!species.generate(world, pos, biome, random, circle.radius, safeBounds)) {
+						if(!species.generate(world.getWorld(), world, pos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.FAIL_GENERATION;
 						}
 					} else {

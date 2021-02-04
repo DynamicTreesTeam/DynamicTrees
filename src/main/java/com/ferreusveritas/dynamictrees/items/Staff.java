@@ -119,7 +119,7 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species.isValid() && species.isAcceptableSoil(world, pos, state)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
 			if(hasMaxUses(heldStack)) {
 				if(decUses(heldStack)) {
 					heldStack.shrink(1);//If the player is in creative this will have no effect.

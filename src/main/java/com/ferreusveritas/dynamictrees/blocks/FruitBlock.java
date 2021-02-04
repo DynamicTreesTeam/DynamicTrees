@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -21,11 +24,20 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class FruitBlock extends Block implements IGrowable {
-	
+
+	enum MatureFruitAction {
+		NOTHING,
+		DROP,
+		ROT,
+		CUSTOM
+	}
+
 	protected static final AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[] {
 			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 15/16.0, 9/16.0),
 			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 14/16.0, 9/16.0),
@@ -36,11 +48,18 @@ public class FruitBlock extends Block implements IGrowable {
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	
 	public static final String name = "apple_fruit";
-	public Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
+
+	private static Map<Species, FruitBlock> speciesFruitMap = new HashMap<>();
+
+	public static FruitBlock getFruitBlockForSpecies(Species species) {
+		return speciesFruitMap.getOrDefault(species, null);
+	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
-	
+	protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
+	protected Species species = Species.NULL_SPECIES;
+
 	public FruitBlock() {
 		this(name);
 	}
@@ -58,27 +77,59 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public void setItemSpawnOffset (float x, float y, float z){
-		itemSpawnOffset = new Vector3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
+		this.itemSpawnOffset = new Vector3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
+	}
+
+	public void setSpecies(Species species) {
+		speciesFruitMap.put(species, this);
+		this.species = species;
+	}
+
+	public Species getSpecies() {
+		return species;
 	}
 
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (!this.canBlockStay(worldIn, pos, state)) {
-			this.dropBlock(worldIn, pos);
+	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+		if (!this.canBlockStay(world, pos, state)) {
+			this.dropBlock(world, pos);
+			return;
 		}
-		else {
-			int age = state.get(AGE);
 
-			if (age < 3 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextInt(5) == 0)) {
-				worldIn.setBlockState(pos, state.with(AGE, age + 1), 2);
-				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(worldIn, pos, state);
-			} else
+		int age = state.get(AGE);
+		Float season = SeasonHelper.getSeasonValue(world, pos);
+
+		if(season != null && getSpecies() != null) { //Non-Null means we are season capable
+			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
+				outOfSeasonAction(world, pos);//Destroy the block or similar action
+				return;
+			}
+			if(age == 0 && getSpecies().testFlowerSeasonHold(season)) {
+				return;//Keep fruit at the flower stage
+			}
+		}
+
+		if (age < 3) {
+			boolean doGrow = rand.nextFloat() < getGrowthChance(world, pos);
+			boolean eventGrow = net.minecraftforge.common.ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
+			if(season != null ? doGrow || eventGrow : eventGrow) { //Prevent a seasons mod from canceling the growth, we handle that ourselves
+				world.setBlockState(pos, state.with(AGE, age + 1), 2);
+				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(world, pos, state);
+			}
+		} else {
 			if (age == 3) {
-				if(matureAction(worldIn, pos, state, rand)) {
-					dropBlock(worldIn, pos);
+				switch(matureAction(world, pos, state, rand)) {
+					case NOTHING: break;
+					case DROP: this.dropBlock(world, pos); break;
+					case ROT: world.setBlockState(pos, DTRegistries.blockStates.air); break;
+					case CUSTOM: break;
 				}
 			}
 		}
+	}
+
+	protected float getGrowthChance(World world, BlockPos blockPos) {
+		return 0.2f;
 	}
 
 	/**
@@ -88,10 +139,14 @@ public class FruitBlock extends Block implements IGrowable {
 	 * @param pos The position of the fruit block
 	 * @param state The current blockstate of the fruit
 	 * @param rand A random number generator
-	 * @return true to drop the block. false will keep the fruit intact
+	 * @return MatureFruitAction action to take
 	 */
-	protected boolean matureAction(World world, BlockPos pos, BlockState state, Random rand) {
-		return false;
+	protected MatureFruitAction matureAction(World world, BlockPos pos, BlockState state, Random rand) {
+		return MatureFruitAction.NOTHING;
+	}
+
+	protected void outOfSeasonAction(World world, BlockPos pos) {
+		world.setBlockState(pos, DTRegistries.blockStates.air);
 	}
 
 	@Override
@@ -195,22 +250,6 @@ public class FruitBlock extends Block implements IGrowable {
 		return VoxelShapes.create(FRUIT_AABB[state.get(AGE)]);
 	}
 
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//
-//	/**
-//	 * Used to determine ambient occlusion and culling when rebuilding chunks for render
-//	 */
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-
-//	@Override
-//	public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face) {
-//		return BlockFaceShape.UNDEFINED;
-//	}
-
 	///////////////////////////////////////////
 	// BLOCKSTATE
 	///////////////////////////////////////////
@@ -224,8 +263,16 @@ public class FruitBlock extends Block implements IGrowable {
 		return getDefaultState().with(AGE, age);
 	}
 
-	public int getAgeForWorldGen(IWorld world, BlockPos pos) {
-		return 3;
+	public int getAgeForWorldGen(World world, BlockPos pos) {
+		Float seasonValue = SeasonHelper.getSeasonValue(world, pos);
+		return seasonValue != null ? this.getAgeForSeasonalWorldGen(world, pos, seasonValue) : 3;
+	}
+
+	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, float seasonValue) {
+		if (this.getSpecies().testFlowerSeasonHold(seasonValue)) {
+			return 0;//Fruit is as the flower stage
+		}
+		return Math.min(world.getRandom().nextInt(6), 3);//Half the time the fruit is fully mature
 	}
 
 }

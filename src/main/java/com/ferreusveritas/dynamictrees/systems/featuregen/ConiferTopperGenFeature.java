@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;
@@ -22,7 +21,7 @@ public class ConiferTopperGenFeature implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
 		//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
 		BlockPos highest = Collections.max(endPoints, (a, b) -> a.getY() - b.getY());
 		world.setBlockState(highest.up(1), leavesProperties.getDynamicLeavesState(4), 3);

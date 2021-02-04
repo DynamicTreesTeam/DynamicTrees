@@ -14,9 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
@@ -53,7 +51,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 			BlockState initialUnderState = world.getBlockState(rootPos.down());
 			
 			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.EARTH && initialUnderState.getMaterial() != Material.ROCK)) {
-				Biome biome = world.getBiome(rootPos);
+				Biome biome = world.getNoiseBiomeRaw(rootPos.getX(), rootPos.getY(), rootPos.getZ());
 				initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
 			}
 			
@@ -74,7 +72,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 */
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
 		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
 			BlockPos treePos = rootPos.up();
 			BlockState belowState = world.getBlockState(rootPos.down());

@@ -17,6 +17,9 @@ repositories {
     maven {
         url "https://maven.tehnut.info"
     }
+    maven {
+        url "https://www.cursemaven.com"
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -48,6 +51,9 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+
+            // For Serene Seasons as it uses Mixins
+            properties 'mixin.env.disableRefMap' : 'true'
 
             mods {
                 dynamictrees {
@@ -96,14 +102,17 @@ dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
     // Compile against the Hwyla API, but do not include it at runtime
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2:api")
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}:api")
     // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}")
 
     // Compile JEI API, but don't include in runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.65:api")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}:api")
     // At runtime, use JEI mod
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.65")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}")
+
+    // Use Serene Seasons mod.
+    implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 }
 
 jar {

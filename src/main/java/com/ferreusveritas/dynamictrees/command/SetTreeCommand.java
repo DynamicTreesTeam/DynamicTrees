@@ -14,6 +14,7 @@ import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.Arrays;
 
@@ -48,7 +49,8 @@ public final class SetTreeCommand extends SubCommand {
             return 0;
         }
 
-        species.getJoCode(joCode).rotate(Direction.byHorizontalIndex(turns)).setCareful(true).generate(context.getSource().getWorld(), species, pos.offset(Direction.DOWN), context.getSource().getWorld().getBiome(pos), Direction.SOUTH, 8, SafeChunkBounds.ANY);
+        ServerWorld world = context.getSource().getWorld();
+        species.getJoCode(joCode).rotate(Direction.byHorizontalIndex(turns)).setCareful(true).generate(world, world, species, pos.offset(Direction.DOWN), context.getSource().getWorld().getBiome(pos), Direction.SOUTH, 8, SafeChunkBounds.ANY);
         return 1;
     }
 

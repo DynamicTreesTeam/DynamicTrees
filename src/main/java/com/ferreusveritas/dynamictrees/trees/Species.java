@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -69,8 +70,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -82,7 +81,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		@Override public boolean isTransformable() { return false; }
 		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
-		@Override public boolean generate(ISeedReader world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
+		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
 		@Override public Species setSeed(Seed newSeed) { return this; }
@@ -229,7 +228,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public float getGrowthRate(World world, BlockPos rootPos) {
-		return growthRate;
+		return this.growthRate * this.seasonalGrowthFactor(world, rootPos);
 	}
 	
 	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
@@ -1117,8 +1116,80 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 		return false;
 	}
-	
-	
+
+
+	//////////////////////////////
+	// SEASONAL
+	//////////////////////////////
+
+	protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
+	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
+
+	/**
+	 * Pulls data from the SeasonManager to determine the rate of tree growth
+	 *
+	 * @param world The world
+	 * @param rootPos the BlockPos of the Rooty Dirt
+	 * @return value from 0.0(no growth) to 1.0(full growth)
+	 */
+	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
+		return DTConfigs.enableSeasonalGrowthFactor.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
+	}
+
+	public float seasonalSeedDropFactor(World world, BlockPos pos) {
+		return DTConfigs.enableSeasonalSeedDropFactor.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos) : 1.0f;
+	}
+
+	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
+		return DTConfigs.enableSeasonalFruitProductionFactor.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, false) : 1.0f;
+	}
+
+	/**
+	 * 1 = Spring
+	 * 2 = Summer
+	 * 4 = Autumn
+	 * 8 = Winter
+	 * Values are OR'ed together for the return
+	 */
+	public int getSeasonalTooltipFlags(final World world) {
+		float seasonStart = 0.167f;
+		float seasonEnd = 0.833f;
+		float threshold = 0.75f;
+
+		if(FruitBlock.getFruitBlockForSpecies(this) != null) {
+			int seasonFlags = 0;
+			for(int i = 0; i < 4; i++) {
+				float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonStart) * 64.0f), 0), true);
+				float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonEnd  ) * 64.0f), 0), true);
+				if(Math.min(prod1, prod2) >= threshold) {
+					seasonFlags |= 1 << i;
+				}
+			}
+			return seasonFlags;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * When seasons are active allow a seasonal time range where fruit growth does
+	 * not progress past the flower stage.  This allows for a flowery spring time.
+	 *
+	 * @param min The minimum season value
+	 * @param max The maximum season value
+	 * @return
+	 */
+	public Species setFlowerSeasonHold(float min, float max) {
+		flowerSeasonHoldMin = min;
+		flowerSeasonHoldMax = max;
+		return this;
+	}
+
+	public boolean testFlowerSeasonHold(float seasonValue) {
+		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin, flowerSeasonHoldMax);
+	}
+
+
 	//////////////////////////////
 	// INTERACTIVE
 	//////////////////////////////
@@ -1285,7 +1356,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param radius The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(ISeedReader world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		
 		if(genFeatureOverride != null) {
 			return genFeatureOverride.generate(world, rootPos, this, biome, random, radius, safeBounds);
@@ -1295,7 +1366,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		if(getJoCodeStore() != null) {
 			JoCode code = getJoCodeStore().getRandomCode(radius, random);
 			if(code != null) {
-				code.generate(world, this, rootPos, biome, facing, radius, safeBounds);
+				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;
 			}
 		}
@@ -1381,7 +1452,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * Allows the tree to decorate itself after it has been generated.
 	 * Use this to add vines, add fruit, fix the soil, add butress roots etc.
 	 *
-	 * @param world The world
+	 * @param worldObj The world object
+	 * @param world The world object.
 	 * @param rootPos The position of {@link RootyBlock} this tree is planted in
 	 * @param biome The biome this tree is generating in
 	 * @param radius The radius of the tree generation boundary
@@ -1389,10 +1461,10 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
 	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
-	public void postGeneration(IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(postGenFeatures != null) {
 			for(IPostGenFeature feature: postGenFeatures) {
-				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState);
+				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
 			}
 		}
 	}

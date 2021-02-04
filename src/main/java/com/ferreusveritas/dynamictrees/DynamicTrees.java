@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
@@ -43,7 +44,9 @@ public class DynamicTrees {
 	public static final String AT = "@[";
 	public static final String GREATER_THAN = "@(";
 	public static final String OR_GREATER = ",)";
-	
+
+	public static final String SERENE_SEASONS = "sereneseasons";
+
 	// Other mods can use this string to depend on the latest version of Dynamic Trees
 	public static final String DT_LATEST = MOD_ID + AT + VERSION + OR_GREATER;
 
@@ -162,8 +165,8 @@ public class DynamicTrees {
 		registerCommonEventHandlers();
 		
 		MinecraftForge.EVENT_BUS.register(this);
-		
-//		WorldGenRegistry.populateDataBase();
+
+		CompatHandler.init();
 //		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
 	}
 	

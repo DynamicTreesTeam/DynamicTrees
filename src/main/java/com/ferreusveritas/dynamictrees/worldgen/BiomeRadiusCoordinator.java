@@ -38,12 +38,8 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		}
 
 		double scale = 128;//Effectively scales up the noisemap
-//		DynamicTrees.getLogger().debug("Getting biome at " + (x + 8) + " " + (z + 8) + ".");
-		// Seems that getting the biome at a position sometimes causes a server freeze. Weird.
 		Biome biome = world.getNoiseBiomeRaw(x + 8, 0, z + 8);//Placement is offset by +8,+8
-//		DynamicTrees.getLogger().debug("Obtained biome " + biome.getRegistryName() + ".");
 		double noiseDensity = (noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D;//Gives 0.0 to 1.0
-//		DynamicTrees.getLogger().debug("Obtained noise.");
 		double density = treeGenerator.getBiomeDataBase(world).getDensity(biome).getDensity(world.getRandom(), noiseDensity);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 

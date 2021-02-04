@@ -19,14 +19,16 @@ public class CocoaGenFeature implements IPostGenFeature, IPostGrowFeature {
 
 	@Override
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-		if(soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-			addCocoa(world, rootPos, false);
+		if (soilLife == 0 && world.rand.nextInt() % 16 == 0) {
+			if (species.seasonalFruitProductionFactor(world, treePos) > world.rand.nextFloat()) {
+				this.addCocoa(world, rootPos, false);
+			}
 		}
 		return false;
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
 		if(world.getRandom().nextInt() % 8 == 0) {
 			addCocoa(world, rootPos, true);
 			return true;

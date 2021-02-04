@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
@@ -33,10 +32,10 @@ public class PredicateGenFeature implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		if(!(onlyWorldGen && !worldGen) && biomePredicate.test(biome)) {
-			return feature.postGeneration(world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState);
+			return feature.postGeneration(world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState, seasonValue, seasonFruitProductionFactor);
 		}
 		return false;
 	}

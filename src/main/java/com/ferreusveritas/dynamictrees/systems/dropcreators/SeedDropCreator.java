@@ -67,7 +67,11 @@ public class SeedDropCreator implements IDropCreator {
 	
 	@Override
 	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		if((1 / 64f) * getHarvestRarity() > random.nextFloat()) {//1 in 64 chance to drop a seed on destruction..	
+		float rarity = getHarvestRarity();
+		rarity *= (fortune + 1) / 64f;
+		rarity *= Math.min(species.seasonalSeedDropFactor(world, leafPos) + 0.15f, 1.0);
+
+		if(rarity > random.nextFloat()) {//1 in 64 chance to drop a seed on destruction..
 			dropList.add(getSeedStack(species));
 		}
 		return dropList;
@@ -75,7 +79,7 @@ public class SeedDropCreator implements IDropCreator {
 	
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() > random.nextFloat()) {
+		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
 			dropList.add(getSeedStack(species));
 			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);
@@ -87,7 +91,7 @@ public class SeedDropCreator implements IDropCreator {
 	}
 	
 	@Override
-	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
 		//Hokey fortune stuff here to match Vanilla logic.
 		if (fortune > 0) {
@@ -96,9 +100,17 @@ public class SeedDropCreator implements IDropCreator {
 				chance = 10;
 			}
 		}
-		
+
+		float seasonFactor = 1.0f;
+
+		if(!world.isRemote) {
+			seasonFactor = species.seasonalSeedDropFactor(world, breakPos);
+		}
+
 		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
-			dropList.add(getSeedStack(species));
+			if (seasonFactor > random.nextFloat()) {
+				dropList.add(this.getSeedStack(species));
+			}
 		}
 		
 		return dropList;
