@@ -208,7 +208,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 
 	public String getUnlocalizedName() {
-		return "species." + this.unlocalizedName;
+		return "species." + this.unlocalizedName.replace(':','.');
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
