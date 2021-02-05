@@ -31,6 +31,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -312,8 +313,9 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
-		tooltip.add("Tree: " + ((species != null) ? species : "none"));
-		tooltip.add("Code: §6" + getCode(stack));
+		tooltip.add(getTranslationText("tooltip.woodland_staff.tree") + " " + 
+			((species != null) ? "§a" + species.getLocalizedName() : getTranslationText("tooltip.woodland_staff.tree_not_set")));
+		tooltip.add("JoCode: §6" + getCode(stack));
 	}
 
 	/**
@@ -321,7 +323,7 @@ public class Staff extends Item {
 	 */
 	@Override
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot, ItemStack stack) {
-		Multimap multimap = super.getAttributeModifiers(equipmentSlot, stack);
+		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot, stack);
 		if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
 			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, 0));
 			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, 0));
@@ -329,8 +331,8 @@ public class Staff extends Item {
 		return multimap;
 	}
 
-	///////////////////////////////////////////
-	// RENDERING
-	///////////////////////////////////////////
+	private static String getTranslationText(String path) {
+		return new TextComponentTranslation(path).getUnformattedComponentText();
+	}
 
 }

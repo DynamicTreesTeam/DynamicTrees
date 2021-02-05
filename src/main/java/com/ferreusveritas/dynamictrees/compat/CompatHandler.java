@@ -25,11 +25,9 @@ public class CompatHandler {
 	@Optional.Method(modid = ModConstants.SERENESEASONS)
 	public static void HandleSereneSeasons() {
 		SeasonManager seasonManager = new SeasonManager(
-			world -> {	
-				return SeasonsConfig.isDimensionWhitelisted(world.provider.getDimension()) ?
-					new Tuple(new SeasonProviderSereneSeasons(), new SeasonGrowthCalculatorActive()) :
-					new Tuple(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
-			}
+			world -> SeasonsConfig.isDimensionWhitelisted(world.provider.getDimension()) ?
+				new Tuple<>(new SeasonProviderSereneSeasons(), new SeasonGrowthCalculatorActive()) :
+				new Tuple<>(new SeasonProviderNull(), new SeasonGrowthCalculatorNull())
 		);
 		seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
 		SeasonHelper.setSeasonManager(seasonManager);

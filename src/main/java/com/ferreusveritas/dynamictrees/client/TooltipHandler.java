@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -40,25 +41,29 @@ public class TooltipHandler {
 	
 	public static void applySeasonalTooltips(List<String> tipList, int flags) {
 		if(flags != 0) {
-			tipList.add("Fertile Seasons:");
+			tipList.add(getTranslationText("tooltip.seed.season.fertile_seasons"));
 			
 			if((flags & 15) == 15) {
-				tipList.add(TextFormatting.LIGHT_PURPLE + " Year-Round");
+				tipList.add(getTranslationText("tooltip.seed.season.year_round"));
 			} else {
 				if ((flags & 1) != 0) {
-					tipList.add(TextFormatting.GREEN + " Spring");
+					tipList.add(getTranslationText("tooltip.seed.season.spring"));
 				}
 				if ((flags & 2) != 0) {
-					tipList.add(TextFormatting.YELLOW + " Summer");
+					tipList.add(getTranslationText("tooltip.seed.season.summer"));
 				}
 				if ((flags & 4) != 0) {
-					tipList.add(TextFormatting.GOLD + " Autumn");
+					tipList.add(getTranslationText("tooltip.seed.season.autumn"));
 				}
 				if ((flags & 8) != 0) {
-					tipList.add(TextFormatting.AQUA + " Winter");
+					tipList.add(getTranslationText("tooltip.seed.season.winter"));
 				}
 			}
 		}
+	}
+	
+	private static String getTranslationText(String path) {
+		return new TextComponentTranslation(path).getUnformattedComponentText();
 	}
 	
 }

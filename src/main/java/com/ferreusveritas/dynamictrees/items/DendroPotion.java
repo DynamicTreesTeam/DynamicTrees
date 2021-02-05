@@ -81,7 +81,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		}
 		
 		public String getLore() {
-			return new TextComponentTranslation("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : "")).getUnformattedComponentText();
+			return getTranslationText("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : ""), "");
 		}
 	};
 	
@@ -214,7 +214,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			if(species == null) {
 				tooltip.add(getPotionType(stack).getLore());
 			} else {
-				tooltip.add(new TextComponentTranslation("potion.transform.description", species.getLocalizedName()).getUnformattedComponentText());
+				tooltip.add(getTranslationText("potion.transform.description", species.getLocalizedName()));
 			}
 		} else {
 			tooltip.add(getPotionType(stack).getLore());
@@ -229,6 +229,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	@Override
 	public ItemStack getEmptyContainer() {
 		return new ItemStack(Items.GLASS_BOTTLE);
+	}
+
+	private static String getTranslationText(String path, String... args) {
+		return new TextComponentTranslation(path, (Object[]) args).getUnformattedComponentText();
 	}
 	
 }
