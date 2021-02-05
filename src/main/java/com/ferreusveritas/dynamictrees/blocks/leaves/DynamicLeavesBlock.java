@@ -28,10 +28,12 @@ import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShearsItem;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -538,14 +540,18 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ArrayList<ItemStack> ret = new ArrayList<>();
-		PlayerEntity player = builder.get(LootParameters.LAST_DAMAGE_PLAYER);
+		Entity entity = builder.get(LootParameters.THIS_ENTITY);
+		PlayerEntity player = entity instanceof PlayerEntity? (PlayerEntity)entity : null;
 		int fortuneLevel = 0;
+		final Vector3d builderPos = builder.get(LootParameters.field_237457_g_);
+		final BlockPos builderBlockPos = new BlockPos(builderPos.getX(), builderPos.getY(), builderPos.getZ());
 		if (player != null){
 			ItemStack handStack = player.getHeldItemMainhand();
 			fortuneLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, handStack);
+			if (player.getHeldItemMainhand().getItem() instanceof ShearsItem){
+				return onSheared(player, player.getHeldItemMainhand(), builder.getWorld(), builderBlockPos, fortuneLevel);
+			}
 		}
-		final Vector3d builderPos = builder.get(LootParameters.field_237457_g_);
-		final BlockPos builderBlockPos = new BlockPos(builderPos.getX(), builderPos.getY(), builderPos.getZ());
 		return getExactSpecies(builder.getWorld(), builderBlockPos, getProperties(state)).getLeavesDrops(builder.getWorld(), builderBlockPos, ret, fortuneLevel);
 	}
 	
