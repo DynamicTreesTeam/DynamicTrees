@@ -295,7 +295,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			BlockState leavesState = getLeavesProperties().getDynamicLeavesState();
 			if (leavesState!=null && leavesState.getBlock() instanceof DynamicLeavesBlock)
 				block = (DynamicLeavesBlock) leavesState.getBlock();
-		} else if (getLeavesProperties().getPrimitiveLeaves() != null) {
+		} else if (getLeavesProperties().getPrimitiveLeaves() != null && !getLeavesProperties().getPrimitiveLeaves().getBlock().equals(Blocks.AIR)) {
 			block = createLeavesBlock(getLeavesProperties());
 		}
 		return Optional.ofNullable(block);
