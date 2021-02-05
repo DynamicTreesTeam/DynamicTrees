@@ -220,7 +220,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public void generate(IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+		public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 			BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails
 			species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt
 			
@@ -241,7 +241,7 @@ public class Cactus extends TreeFamily {
 				List<BlockPos> endPoints = endFinder.getEnds();
 				
 				// Allow for special decorations by the tree itself
-				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 			} else { // The growth failed.. turn the soil back to what it was
 				world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);

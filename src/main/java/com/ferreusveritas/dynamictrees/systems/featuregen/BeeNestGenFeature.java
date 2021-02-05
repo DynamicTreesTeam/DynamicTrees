@@ -62,7 +62,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
             return false;
         }, ((world, pos) -> {
             //Default biome check chance function. Uses vanilla chances
-            RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
+            RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Objects.requireNonNull(world.getNoiseBiomeRaw(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
                 return vanillaGenChancePlains;
             if (biomeKey == Biomes.FLOWER_FOREST)
@@ -84,7 +84,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
     public void setMaxHeight (int maxHeight){ this.maxHeight = maxHeight; }
 
     @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
         if (world.getRandom().nextFloat() > worldGenChanceFunction.apply(world, rootPos)) return false;
 
         return placeBeeNestInValidPlace(world, rootPos, true);

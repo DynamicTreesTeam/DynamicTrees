@@ -147,10 +147,10 @@ public class JoCode {
 	 * @param facing Direction of tree
 	 * @param radius Constraint radius
 	 */
-	public void generate(IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 		
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
-		
+
 		//A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);
 		
@@ -212,7 +212,7 @@ public class JoCode {
 				}
 				
 				// Allow for special decorations by the tree itself
-				species.postGeneration(world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+				species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
 				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 				
 				//Add snow to parts of the tree in chunks where snow was already placed
@@ -330,7 +330,7 @@ public class JoCode {
 		
 		if(biome.getTemperature() < 0.4f) {
 			for (BlockPos.Mutable top : leafMap.getTops() ) {
-				if ( world.getBiome(rootPos).doesSnowGenerate(world, rootPos) ) {
+				if ( world.getNoiseBiomeRaw(rootPos.getX(), rootPos.getY(), rootPos.getZ()).doesSnowGenerate(world, rootPos) ) {
 					BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
 					int yOffset = 0;
 					do {

@@ -41,7 +41,7 @@ public class ShroomlightGenFeature implements IPostGenFeature, IPostGrowFeature 
     }
 
     @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
         return placeShroomlightsInValidPlace(world, rootPos, true);
     }
 

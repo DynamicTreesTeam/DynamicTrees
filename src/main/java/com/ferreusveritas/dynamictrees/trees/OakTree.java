@@ -165,7 +165,8 @@ public class OakTree extends VanillaTreeFamily {
 			
 			generateSeed();
 			generateSapling();
-			
+
+			DTRegistries.appleBlock.setSpecies(this);
 			addGenFeature(new FruitGenFeature(DTRegistries.appleBlock).setRayDistance(4));
 		}
 		

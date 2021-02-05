@@ -63,7 +63,11 @@ public class DTConfigs {
 	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
 
 	public static ForgeConfigSpec.BooleanValue worldGenDebug;
-	
+
+	public static ForgeConfigSpec.BooleanValue enableSeasonalSeedDropFactor;
+	public static ForgeConfigSpec.BooleanValue enableSeasonalGrowthFactor;
+	public static ForgeConfigSpec.BooleanValue enableSeasonalFruitProductionFactor;
+
 	static {
 		configDirectory = new File(FMLPaths.CONFIGDIR.get().toUri());
 
@@ -158,9 +162,19 @@ public class DTConfigs {
 				define("dimensionsBlacklist", new ArrayList<>());
 		
 		COMMON_BUILDER.pop();
-		
+
+		COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
+		enableSeasonalSeedDropFactor = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
+				define("enableSeasonalSeedDropFactor", true);
+		enableSeasonalGrowthFactor = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
+				define("enableSeasonalGrowthFactor", true);
+		enableSeasonalFruitProductionFactor = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
+				define("enableSeasonalFruitProductionFactor", true);
+
+		COMMON_BUILDER.pop();
+
 //		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
-//		fancyThickRings = SERVER_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
+//		fancyThickRings = CLIENT_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
 //				define("fancyThickRings", true);
 //		CLIENT_BUILDER.pop();
 		
