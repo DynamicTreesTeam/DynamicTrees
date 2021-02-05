@@ -22,6 +22,7 @@ public class AcaciaTree extends VanillaTreeFamily {
 			envFactor(Type.WET, 0.75f);
 			
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 		}
 		
 		@Override

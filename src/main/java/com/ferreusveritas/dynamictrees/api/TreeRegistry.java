@@ -134,6 +134,9 @@ public class TreeRegistry {
 			return findSpecies(speciesName).addDropCreator(dropCreator);
 		}
 	}
+	public static boolean registerGlobalDropCreator(IDropCreator dropCreator){
+		return registerDropCreator(globalName, dropCreator);
+	}
 
 	public static boolean removeDropCreator(ResourceLocation speciesName, ResourceLocation dropCreatorName) {
 		if(speciesName == null || speciesName.equals(globalName)) {

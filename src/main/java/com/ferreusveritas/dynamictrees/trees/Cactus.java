@@ -178,7 +178,7 @@ public class Cactus extends TreeFamily {
 	
 	@Override
 	public ILeavesProperties getCommonLeaves() {
-		return new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare"));//Explicitly unbuilt since there's no leaves
+		return new LeavesProperties(null, TreeRegistry.findCellKit("bare"));//Explicitly unbuilt since there's no leaves
 	}
 	
 	@Override

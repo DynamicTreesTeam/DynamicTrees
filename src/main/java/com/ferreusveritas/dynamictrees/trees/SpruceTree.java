@@ -39,6 +39,7 @@ public class SpruceTree extends VanillaTreeFamily {
 			envFactor(Type.WET, 0.75f);
 			
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 			
 			//Add species features
 			addGenFeature(new ConiferTopperGenFeature(getLeavesProperties()));

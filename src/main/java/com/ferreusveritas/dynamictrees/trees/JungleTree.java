@@ -49,6 +49,7 @@ public class JungleTree extends VanillaTreeFamily {
 			envFactor(Type.WET, 1.1f);
 			
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 			
 			//Add species features
 			addGenFeature(new CocoaGenFeature());

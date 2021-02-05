@@ -48,7 +48,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 
 	public LeavesPropertiesJson(JsonObject jsonObj) {
-		super(DTRegistries.blockStates.air, ItemStack.EMPTY);//Assigns deciduous cell kit by default
+		super(DTRegistries.blockStates.air);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
 		resolve();
@@ -67,7 +67,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 				} else
 				if("leaves".equals(key)) {
 					if((element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) || element.isJsonObject()) {
-						getPrimitiveLeaves(element.getAsString()).assignTo(this);
+						primitiveLeaves = getPrimitiveLeaves(element.getAsString());
 					}
 				} else
 				if("cellkit".equals(key)) {
@@ -103,30 +103,29 @@ public class LeavesPropertiesJson extends LeavesProperties {
 		}
 	}
 	
-	public static class PrimitiveLeavesComponents {
-		public BlockState state;
-		public ItemStack stack;
-		
-		public PrimitiveLeavesComponents(BlockState state, ItemStack stack) {
-			this.state = state;
-			this.stack = stack;
-		}
-		
-		public void assignTo(LeavesPropertiesJson lpJson) {
-			lpJson.primitiveLeaves = state;
-			lpJson.primitiveLeavesItemStack = stack;
-		}
-	}
+//	public static class PrimitiveLeavesComponents {
+//		public BlockState state;
+//		public ItemStack stack;
+//
+//		public PrimitiveLeavesComponents(BlockState state, ItemStack stack) {
+//			this.state = state;
+//			this.stack = stack;
+//		}
+//
+//		public void assignTo(LeavesPropertiesJson lpJson) {
+//			lpJson.primitiveLeaves = state;
+//			lpJson.primitiveLeavesItemStack = stack;
+//		}
+//	}
 	
-	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
+	private static BlockState getPrimitiveLeaves(String leavesDesc) {
 		Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(leavesDesc));
-		ItemStack stack = ItemStack.EMPTY;
-
-		if(block != Blocks.AIR) {
-			stack = new ItemStack(Item.BLOCK_TO_ITEM.get(block), 1);
-		}
-
-		return new PrimitiveLeavesComponents(block.getDefaultState(), stack);
+//		ItemStack stack = ItemStack.EMPTY;
+//		if(block != Blocks.AIR) {
+//			stack = new ItemStack(Item.BLOCK_TO_ITEM.get(block), 1);
+//		}
+		assert block != null;
+		return block.getDefaultState();
 	}
 	
 	public static JsonObject getJsonObject(String jsonData) {

@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
-public class SeedDropCreator implements IDropCreator {
+public class SeedDropCreator extends DropCreator {
 	
 	protected final float rarity;
 	protected ItemStack customSeed = ItemStack.EMPTY;
@@ -26,6 +26,7 @@ public class SeedDropCreator implements IDropCreator {
 	}
 	
 	public SeedDropCreator(float rarity) {
+		super(new ResourceLocation(DynamicTrees.MOD_ID, "seed"));
 		this.rarity = rarity;
 	}
 	
@@ -58,11 +59,6 @@ public class SeedDropCreator implements IDropCreator {
 		} else {
 			return customSeed;
 		}
-	}
-	
-	@Override
-	public ResourceLocation getName() {
-		return new ResourceLocation(DynamicTrees.MOD_ID, "seed");
 	}
 	
 	@Override
@@ -103,12 +99,5 @@ public class SeedDropCreator implements IDropCreator {
 		
 		return dropList;
 	}
-	
-	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
-		return dropList;
-	}
-	
-	
 	
 }

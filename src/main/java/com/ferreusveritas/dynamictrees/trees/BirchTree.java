@@ -30,6 +30,7 @@ public class BirchTree extends VanillaTreeFamily {
 			envFactor(Type.FOREST, 1.05f);
 			
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 
 			addGenFeature(new BeeNestGenFeature());
 		}

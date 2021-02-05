@@ -55,7 +55,6 @@ public class LeavesProperties implements ILeavesProperties {
 	protected static final int maxHydro = 4;
 
 	protected BlockState primitiveLeaves;
-	protected ItemStack primitiveLeavesItemStack;
 	protected ICellKit cellKit;
 	protected TreeFamily tree = TreeFamily.NULLFAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
@@ -65,20 +64,11 @@ public class LeavesProperties implements ILeavesProperties {
 	private LeavesProperties() {}
 	
 	public LeavesProperties(BlockState primitiveLeaves) {
-		this(primitiveLeaves, new ItemStack(Item.BLOCK_TO_ITEM.get(primitiveLeaves.getBlock())));
+		this(primitiveLeaves, TreeRegistry.findCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous")));
 	}
 	
 	public LeavesProperties(BlockState primitiveLeaves, ICellKit cellKit) {
-		this(primitiveLeaves, new ItemStack(Item.BLOCK_TO_ITEM.get(primitiveLeaves.getBlock())), cellKit);
-	}
-	
-	public LeavesProperties(BlockState primitiveLeaves, ItemStack primitiveLeavesItemStack) {
-		this(primitiveLeaves, primitiveLeavesItemStack, TreeRegistry.findCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous")));
-	}
-	
-	public LeavesProperties(BlockState primitiveLeaves, ItemStack primitiveLeavesItemStack, ICellKit cellKit) {
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.air;
-		this.primitiveLeavesItemStack = primitiveLeavesItemStack != null ? primitiveLeavesItemStack : ItemStack.EMPTY;
 		this.cellKit = cellKit;
 	}
 	
@@ -89,7 +79,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	@Override
 	public ItemStack getPrimitiveLeavesItemStack() {
-		return primitiveLeavesItemStack;
+		return new ItemStack(Item.BLOCK_TO_ITEM.get(getPrimitiveLeaves().getBlock()));
 	}
 	
 	@Override

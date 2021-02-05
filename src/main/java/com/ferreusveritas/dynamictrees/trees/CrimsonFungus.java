@@ -31,6 +31,7 @@ public class CrimsonFungus extends VanillaTreeFamily {
 			this(treeFamily.getName(), treeFamily);
 
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 
 			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
 		}

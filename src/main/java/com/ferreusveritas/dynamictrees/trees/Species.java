@@ -30,9 +30,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
@@ -305,7 +303,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 
 	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
-		DynamicLeavesBlock block = (DynamicLeavesBlock) new DynamicLeavesBlock(leavesProperties).setRegistryName(getRegistryName() + "_leaves");
+		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
+		block.setRegistryName(getRegistryName() + "_leaves");
 		addValidLeafBlocks(block);
 		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
 		return block;
@@ -395,7 +394,12 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		addDropCreator(new SeedDropCreator(rarity).setCustomSeedDrop(customSeed));
 		return this;
 	}
-	
+
+	public Species setupStandardStickDropping() {
+		addDropCreator(new LeavesStickDropCreator(this));
+		return this;
+	}
+
 	public boolean addDropCreator(IDropCreator dropCreator) {
 		return dropCreatorStorage.addDropCreator(dropCreator);
 	}

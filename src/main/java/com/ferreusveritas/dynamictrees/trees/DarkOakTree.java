@@ -55,6 +55,7 @@ public class DarkOakTree extends VanillaTreeFamily {
 			}
 			
 			setupStandardSeedDropping();
+			setupStandardStickDropping();
 			
 			//Add species features
 			addGenFeature(new ClearVolumeGenFeature(6));//Clear a spot for the thick tree trunk
