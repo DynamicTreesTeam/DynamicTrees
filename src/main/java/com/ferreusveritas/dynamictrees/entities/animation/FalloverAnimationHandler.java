@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -107,7 +106,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 			for(LivingEntity living: elist) {
 				if(!getData(entity).entitiesHit.contains(living)) {
 					getData(entity).entitiesHit.add(living);
-					float damage = entity.getDestroyData().woodVolume.getTotalVolume() * Math.abs(fallSpeed) * 3f;
+					float damage = entity.getDestroyData().woodVolume.getVolume() * Math.abs(fallSpeed) * 3f;
 					if(getData(entity).bounces == 0 && damage > 2) {
 						//System.out.println("damage: " + damage);
 						living.setMotion(

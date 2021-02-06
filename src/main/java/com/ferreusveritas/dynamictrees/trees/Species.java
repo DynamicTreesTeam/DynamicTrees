@@ -481,7 +481,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public LogsAndSticks getLogsAndSticks(NodeNetVolume.Volume volume) {
 		int logs = (int) volume.getVolume(); // Drop vanilla logs or whatever
-		int sticks = (int) ((volume.getTotalVolume() - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		int sticks = (int) ((volume.getVolume() - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
 		return new LogsAndSticks(logs, sticks);
 	}
 	

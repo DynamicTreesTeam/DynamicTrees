@@ -149,7 +149,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
 		int radius = this.getRadius(state);
-		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2f), false);
+		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2), false);
 		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
 	}
 
@@ -469,7 +469,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					damage = Math.max(1, radius) / 2;
 					break;
 				case VOLUME:
-					damage = (int) woodVolume.getTotalVolume();
+					damage = (int) woodVolume.getVolume();
 					break;
 			}
 

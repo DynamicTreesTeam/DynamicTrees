@@ -78,7 +78,7 @@ public class BranchDestructionData {
 		this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock");
 		this.leavesDrops = new ArrayList<>();
 		this.endPoints = nbt.getIntArray("ends");
-		this.woodVolume = new NodeNetVolume.Volume(nbt.getFloat("volume"));
+		this.woodVolume = new NodeNetVolume.Volume(nbt.getIntArray("volume"));
 		this.cutPos = new BlockPos(nbt.getInt("cutx"), nbt.getInt("cuty"), nbt.getInt("cutz") );
 		this.cutDir = Direction.values()[MathHelper.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
 		this.toolDir = Direction.values()[MathHelper.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
@@ -93,7 +93,7 @@ public class BranchDestructionData {
 		tag.putIntArray("leavespos", destroyedLeaves);
 		tag.putIntArray("leavesblock", destroyedLeavesBlockIndex);
 		tag.putIntArray("ends", endPoints);
-		tag.putFloat("volume", woodVolume.getVolume());
+		tag.putIntArray("volume", woodVolume.getVolumesArray());
 		tag.putInt("cutx", cutPos.getX());
 		tag.putInt("cuty", cutPos.getY());
 		tag.putInt("cutz", cutPos.getZ());

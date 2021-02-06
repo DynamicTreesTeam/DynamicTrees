@@ -87,7 +87,7 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 			RenderableTextComponent logRender, strippedLogRender, stickRender;
 			logRender = strippedLogRender = stickRender = getRenderable(ItemStack.EMPTY);
 
-			if(lastVolume.getTotalVolume() > 0) {
+			if(lastVolume.getVolume() > 0) {
 				LogsAndSticks las = species.getLogsAndSticks(lastVolume);
 				if(las.logs > 0) {
 					ItemStack logStack = species.getFamily().getPrimitiveLogs(las.logs);
