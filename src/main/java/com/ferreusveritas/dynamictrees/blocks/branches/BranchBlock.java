@@ -32,6 +32,7 @@ import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
@@ -53,6 +54,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
 	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
+	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
 	
 	public BranchBlock(Properties properties, String name){
@@ -363,13 +365,29 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 
-	public List<net.minecraft.item.ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume) {
 		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume, ItemStack handStack) {
 		List<ItemStack> ret = new ArrayList<net.minecraft.item.ItemStack>();//A list for storing all the dead tree guts
 		volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, ret, volume, handStack);
+	}
+
+	public float getPrimitiveLogDrops(float volumeIn, List<ItemStack> drops){
+		int numLogs = (int)volumeIn;
+		for (ItemStack stack : primitiveLogDrops){
+			int num = numLogs * stack.getCount();
+			while(num > 0) {
+				drops.add(new ItemStack(stack.getItem(), Math.min(num, 64)));
+				num -= 64;
+			}
+		}
+		return volumeIn - numLogs;
+	}
+
+	public void setPrimitiveLogDrops (ItemStack... drops){
+		primitiveLogDrops = drops;
 	}
 
 	@Override
@@ -537,7 +555,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public PushReaction getPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
 	}
-	
 	
 	///////////////////////////////////////////
 	// EXPLOSIONS AND FIRE

@@ -24,6 +24,7 @@ public class VanillaTreeFamily extends TreeFamily {
 
 		//Setup tree references
 		setPrimitiveLog(wood.getLog());
+		setPrimitiveStrippedLog(wood.getStrippedLog());
 
 		//Setup common species
 		getCommonSpecies().generateSeed();

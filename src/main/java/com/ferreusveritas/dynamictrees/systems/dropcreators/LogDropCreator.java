@@ -21,11 +21,10 @@ public class LogDropCreator extends DropCreator {
 	@Override
 	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NodeNetVolume.Volume volume) {
 		LogsAndSticks las = species.getLogsAndSticks(volume);
-		
-		int numLogs = las.logs;
-		while(numLogs > 0) {
-			dropList.add(species.getFamily().getPrimitiveLogs(Math.min(numLogs, 64)));
-			numLogs -= 64;
+
+		int numLogs = las.logs.size();
+		if(numLogs > 0) {
+			dropList.addAll(las.logs);
 		}
 		int numSticks = las.sticks;
 		if(numSticks > 0) {

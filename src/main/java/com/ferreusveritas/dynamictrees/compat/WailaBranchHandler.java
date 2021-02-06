@@ -23,7 +23,9 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class WailaBranchHandler implements IComponentProvider { //IServerDataProvider<String>
 	
@@ -83,27 +85,26 @@ public class WailaBranchHandler implements IComponentProvider { //IServerDataPro
 
 			ItemStack seedStack = species.getSeedStack(1);
 
-			RenderableTextComponent seedRender = getRenderable(seedStack);
-			RenderableTextComponent logRender, strippedLogRender, stickRender;
-			logRender = strippedLogRender = stickRender = getRenderable(ItemStack.EMPTY);
+			List<RenderableTextComponent> renderers = new LinkedList<>();
+			renderers.add(getRenderable(seedStack)); //adds seed;
 
 			if(lastVolume.getVolume() > 0) {
 				LogsAndSticks las = species.getLogsAndSticks(lastVolume);
-				if(las.logs > 0) {
-					ItemStack logStack = species.getFamily().getPrimitiveLogs(las.logs);
-					if (!logStack.isEmpty()){
-						logRender = getRenderable(logStack);
+				List<ItemStack> logStacks = las.logs;
+				if (!logStacks.isEmpty()){
+					for (ItemStack logStack : logStacks){
+						renderers.add(getRenderable(logStack));
 					}
 				}
 				if(las.sticks > 0) {
 					ItemStack stickStack = species.getFamily().getStick(las.sticks);
 					if (!stickStack.isEmpty()){
-						stickRender = getRenderable(stickStack);
+						renderers.add(getRenderable(stickStack));
 					}
 				}
 			}
 
-			RenderableTextComponent renderables = new RenderableTextComponent(seedRender, logRender, strippedLogRender, stickRender);
+			RenderableTextComponent renderables = new RenderableTextComponent(renderers.toArray(new RenderableTextComponent[]{}));
 
 			tooltip.add(renderables);
 		}

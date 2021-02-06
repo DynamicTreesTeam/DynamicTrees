@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -52,9 +53,9 @@ public class NodeNetVolume implements INodeInspector {
 			branchVolumes.forEach((a,b)-> b = (int)(b*multiplier));
 		}
 
-		public int[] getVolumesArray(){
-			int[] volumes = new int[maxBranch];
-			for (int i = 0; i<maxBranch; i++){
+		public int[] getRawVolumesArray(){
+			int[] volumes = new int[maxBranch+1];
+			for (int i = 0; i<=maxBranch; i++){
 				int vol = 0;
 				if (branchVolumes.containsKey(i))
 					vol = branchVolumes.get(i);
@@ -78,7 +79,9 @@ public class NodeNetVolume implements INodeInspector {
 			return totalVolume;
 		}
 		public int getRawVolume(int branch){
-			return branchVolumes.get(branch);
+			if (branchVolumes.containsKey(branch))
+				return branchVolumes.get(branch);
+			return 0;
 		}
 
 	}
@@ -88,9 +91,9 @@ public class NodeNetVolume implements INodeInspector {
 	@Override
 	public boolean run(BlockState state, IWorld world, BlockPos pos, Direction fromDir) {
 		if(TreeHelper.isBranch(state)) {
-			ITreePart treePart = TreeHelper.getTreePart(state);
-			int radius = treePart.getRadius(state);
-			volume.addVolume(radius * radius * 64);//Integrate volume of this tree part into the total volume calculation
+			BranchBlock branchBlock = TreeHelper.getBranch(state);
+			int radius = branchBlock.getRadius(state);
+			volume.addVolume(radius * radius * 64, branchBlock.getFamily().getBranchBlockIndex(branchBlock));//Integrate volume of this branch into the total volume calculation
 		}
 		return true;
 	}

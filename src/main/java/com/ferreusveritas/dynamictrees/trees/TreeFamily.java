@@ -361,6 +361,12 @@ public class TreeFamily {
 	 */
 	protected TreeFamily setPrimitiveLog(Block primLog) {
 		primitiveLog = primLog;
+		dynamicBranch.setPrimitiveLogDrops(getPrimitiveLogs(1));
+		return this;
+	}
+	protected TreeFamily setPrimitiveStrippedLog(Block primLog) {
+		primitiveStrippedLog = primLog;
+		dynamicStrippedBranch.setPrimitiveLogDrops(getPrimitiveStripedLogs(1));
 		return this;
 	}
 
@@ -374,6 +380,9 @@ public class TreeFamily {
 	public Block getPrimitiveLog() {
 		return primitiveLog;
 	}
+	public Block getPrimitiveStrippedLog() {
+		return primitiveStrippedLog;
+	}
 
 	/**
 	 * Gets an itemStack of primitive logs of a requested quantity.
@@ -381,8 +390,11 @@ public class TreeFamily {
 	 * @param qty The quantity of logs requested
 	 * @return itemStack of requested logs.
 	 */
-	public ItemStack getPrimitiveLogs(int qty) {
+	private ItemStack getPrimitiveLogs(int qty) {
 		return new ItemStack(this.primitiveLog, qty);
+	}
+	private ItemStack getPrimitiveStripedLogs(int qty) {
+		return new ItemStack(this.primitiveStrippedLog, qty);
 	}
 
 	public boolean isFireProof () { return false; }

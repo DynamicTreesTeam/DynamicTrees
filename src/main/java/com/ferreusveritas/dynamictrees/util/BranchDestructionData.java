@@ -93,7 +93,7 @@ public class BranchDestructionData {
 		tag.putIntArray("leavespos", destroyedLeaves);
 		tag.putIntArray("leavesblock", destroyedLeavesBlockIndex);
 		tag.putIntArray("ends", endPoints);
-		tag.putIntArray("volume", woodVolume.getVolumesArray());
+		tag.putIntArray("volume", woodVolume.getRawVolumesArray());
 		tag.putInt("cutx", cutPos.getX());
 		tag.putInt("cuty", cutPos.getY());
 		tag.putInt("cutz", cutPos.getZ());

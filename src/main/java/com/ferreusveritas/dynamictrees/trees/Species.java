@@ -123,7 +123,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	protected ILeavesProperties leavesProperties;
 
 	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
-	private List<DynamicLeavesBlock> validLeafBlocks = new LinkedList<>();
+	private List<ILeavesProperties> validLeaves = new LinkedList<>();
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
@@ -282,6 +282,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	
 	public Species setLeavesProperties(ILeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
+		addValidLeafBlocks(leavesProperties);
 		return this;
 	}
 	
@@ -304,17 +305,16 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
 		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
 		block.setRegistryName(getRegistryName() + "_leaves");
-		addValidLeafBlocks(block);
 		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
 		return block;
 	}
 
-	public void addValidLeafBlocks (DynamicLeavesBlock... leaves){
-		validLeafBlocks.addAll(Arrays.asList(leaves));
+	public void addValidLeafBlocks (ILeavesProperties... leaves){
+		validLeaves.addAll(Arrays.asList(leaves));
 	}
 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
-		int index = validLeafBlocks.indexOf(block);
+		int index = validLeaves.indexOf(block.properties);
 		if (index < 0){
 			DynamicTrees.getLogger().warn("Block " + block + " not valid leaves for " + this);
 			return 0;
@@ -323,7 +323,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
-		return validLeafBlocks.get(index);
+		return (DynamicLeavesBlock)validLeaves.get(index).getDynamicLeavesState().getBlock();
 	}
 
 	///////////////////////////////////////////
@@ -474,15 +474,26 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 	
 	public static class LogsAndSticks {
-		public final int logs;
+		public List<ItemStack> logs;
 		public final int sticks;
-		public LogsAndSticks(int logs, int sticks) { this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0; };
+		public LogsAndSticks(List<ItemStack> logs, int sticks) {
+			this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0;
+		}
 	}
 	
 	public LogsAndSticks getLogsAndSticks(NodeNetVolume.Volume volume) {
-		int logs = (int) volume.getVolume(); // Drop vanilla logs or whatever
-		int sticks = (int) ((volume.getVolume() - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
-		return new LogsAndSticks(logs, sticks);
+		List<ItemStack> logsList = new LinkedList<>();
+		int[] volArray = volume.getRawVolumesArray();
+		float prevVol = 0;
+		for (int i=0; i< volArray.length; i++){
+			float vol = (volArray[i] / (float)NodeNetVolume.Volume.VOXELSPERLOG);
+			if (vol > 0){
+				vol += prevVol;
+				prevVol = getFamily().getValidBranchBlock(i).getPrimitiveLogDrops(vol, logsList);
+			}
+		}
+		int sticks = (int)(prevVol * 8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		return new LogsAndSticks(logsList, sticks);
 	}
 	
 	/**
