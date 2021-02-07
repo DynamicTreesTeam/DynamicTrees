@@ -31,10 +31,11 @@ public class WorldGenRegistry {
 	//////////////////////////////
 
 	public static final String RESOURCE_PATH = "worldgen/default.json";
-	public static final String CONFIG_PATH = "/" + DynamicTrees.MOD_ID;
-	public static final String WORLD_GEN_CONFIG_PATH = CONFIG_PATH + "/world_gen.json";
-	public static final String DIM_GEN_CONFIG_PATH = CONFIG_PATH + "/dimensions.json";
-	public static final String TREE_CANCELLER_CONFIG_PATH = CONFIG_PATH + "/tree_canceller.json";
+	public static final String CONFIG_DIR_PATH = "/" + DynamicTrees.MOD_ID;
+	public static final String WORLD_GEN_DIR_PATH = CONFIG_DIR_PATH + "/worldgen";
+	public static final String WORLD_GEN_CONFIG_PATH = WORLD_GEN_DIR_PATH + "/world_gen.json";
+	public static final String DIM_GEN_CONFIG_PATH = WORLD_GEN_DIR_PATH + "/dimensions.json";
+	public static final String TREE_CANCELLER_CONFIG_PATH = WORLD_GEN_DIR_PATH + "/tree_canceller.json";
 
 	/**
 	 * Mods should use this function to determine if worldgen is enabled for Dynamic Trees
@@ -91,7 +92,7 @@ public class WorldGenRegistry {
 
 	private static void writeBlankJsonArrayToFile(File file) {
 		try {
-			new File(DTConfigs.configDirectory.getAbsolutePath() + CONFIG_PATH).mkdirs();
+			new File(DTConfigs.configDirectory.getAbsolutePath() + WORLD_GEN_DIR_PATH).mkdirs();
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
 			writer.write("[]");//Write the minimal amount of data for the file to be a valid json array.
 			writer.close();
@@ -103,7 +104,7 @@ public class WorldGenRegistry {
 
 	private static void writeDefaultTreeCanceller (File file) {
 		try {
-			new File(DTConfigs.configDirectory.getAbsolutePath() + CONFIG_PATH).mkdirs();
+			new File(DTConfigs.configDirectory.getAbsolutePath() + WORLD_GEN_DIR_PATH).mkdirs();
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
 			writer.write("[\n" +
 					"  {\n" +

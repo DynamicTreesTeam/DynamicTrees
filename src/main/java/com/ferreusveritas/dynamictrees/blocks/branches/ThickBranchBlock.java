@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -153,7 +154,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 			return Math.min(RADMAX_NORMAL, connectionRadius);
 		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			System.out.println("X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
+			DynamicTrees.getLogger().warn("Tried to get unloaded block X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
 			return 0;
 		}
 	}

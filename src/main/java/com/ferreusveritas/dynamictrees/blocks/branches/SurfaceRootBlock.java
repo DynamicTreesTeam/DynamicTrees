@@ -182,7 +182,7 @@ public class SurfaceRootBlock extends Block {
 					return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
 				}
 			} catch (Exception e) { // Temporary measure until we find a way to solve requesting an out-of-bounds block here.
-				System.out.println("X: " + dPos.getX() + " Y: " + dPos.getY() + " Z: " + dPos.getZ());
+				DynamicTrees.getLogger().warn("Tried to get unloaded block X: " + dPos.getX() + " Y: " + dPos.getY() + " Z: " + dPos.getZ());
 				return null;
 			}
 		}

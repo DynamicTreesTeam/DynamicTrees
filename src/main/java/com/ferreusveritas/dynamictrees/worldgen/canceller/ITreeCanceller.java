@@ -46,7 +46,7 @@ public interface ITreeCanceller {
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
     default void register(String modIdForBiomes, List<String> namespaces) {
-        this.register(modIdForBiomes, namespaces, Collections.singletonList("tree"));
+        this.register(modIdForBiomes, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER));
     }
 
     /**
@@ -57,7 +57,7 @@ public interface ITreeCanceller {
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
     default void register(ResourceLocation biomeResLoc, List<String> namespaces) {
-        this.register(biomeResLoc, namespaces, Collections.singletonList("tree"));
+        this.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER));
     }
 
     /**

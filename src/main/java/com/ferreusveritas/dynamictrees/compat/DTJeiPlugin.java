@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
@@ -45,7 +45,7 @@ public final class DTJeiPlugin implements IModPlugin {
     }
 
     public static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {
-        return factory.createBrewingRecipe(Arrays.asList(ingredientStack), inputStack, output);
+        return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output);
     }
 
 }
