@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
@@ -23,7 +24,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.ModList;
 
 public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
@@ -31,13 +31,18 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public RootyWaterBlock(Block primitiveDirt) {
-        super(Properties.from(primitiveDirt).tickRandomly(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
+        super(Properties.from(primitiveDirt).tickRandomly().setOpaque((a,b,c)->false), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
         setDefaultState(getDefaultState().with(WATERLOGGED, true));
     }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder.add(WATERLOGGED));
+    }
+
+    @Override
+    public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+        return 0;
     }
 
     @Override

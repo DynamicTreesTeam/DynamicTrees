@@ -1,5 +1,5 @@
 {
-	"multipart": [
-		{	"apply": { "model": "dynamictrees:block/roots" }}
-	]
+	"variants": {
+		"": { "model": "dynamictrees:block/roots_water" }
+	}
 }
