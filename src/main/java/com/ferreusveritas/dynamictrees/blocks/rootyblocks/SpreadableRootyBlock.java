@@ -20,6 +20,9 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.util.*;
 
+/**
+ * @author Max Hyper
+ */
 public class SpreadableRootyBlock extends RootyBlock {
 
     private Map<Block, RootyBlock> rootyBlocks;

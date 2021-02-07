@@ -489,7 +489,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 			float vol = (volArray[i] / (float)NodeNetVolume.Volume.VOXELSPERLOG);
 			if (vol > 0){
 				vol += prevVol;
-				prevVol = getFamily().getValidBranchBlock(i).getPrimitiveLogDrops(vol, logsList);
+				prevVol = getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
 			}
 		}
 		int sticks = (int)(prevVol * 8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
@@ -1457,6 +1457,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public BlockPos preGeneration(IWorld world, BlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(preGenFeatures != null) {
 			for(IPreGenFeature feature: preGenFeatures) {
+				if (feature != null)
 				rootPos = feature.preGeneration(world, rootPos, this, radius, facing, safeBounds, joCode);
 			}
 		}
@@ -1479,7 +1480,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(postGenFeatures != null) {
 			for(IPostGenFeature feature: postGenFeatures) {
-				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
+				if (feature != null)
+					feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
 			}
 		}
 	}

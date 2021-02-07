@@ -369,12 +369,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume, ItemStack handStack) {
-		List<ItemStack> ret = new ArrayList<net.minecraft.item.ItemStack>();//A list for storing all the dead tree guts
 		volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());// For cheaters.. you know who you are.
-		return species.getLogsDrops(world, pos, ret, volume, handStack);
+		return species.getLogsDrops(world, pos, new ArrayList<>(), volume, handStack);
 	}
 
-	public float getPrimitiveLogDrops(float volumeIn, List<ItemStack> drops){
+	public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops){
 		int numLogs = (int)volumeIn;
 		for (ItemStack stack : primitiveLogDrops){
 			int num = numLogs * stack.getCount();

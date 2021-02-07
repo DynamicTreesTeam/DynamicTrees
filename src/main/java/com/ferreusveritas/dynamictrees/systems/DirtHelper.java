@@ -52,18 +52,19 @@ public class DirtHelper {
     public static void registerSoil(Block block, String adjName) {
         registerSoil(block, adjName, RootyBlockHelper.isBlockRegistered(block)?RootyBlockHelper.getRootyBlock(block):new RootyBlock(block));
     }
-    public static void registerSoil(Block block, String adjName, Block rootyDirtSubstitute) {
-        if (!RootyBlockHelper.isBlockRegistered(rootyDirtSubstitute)){
-            DynamicTrees.getLogger().error("Attempted to use " + rootyDirtSubstitute + " as a rooty dirt substitute for " + block + " but it had not been registered.");
-            registerSoil(rootyDirtSubstitute, adjName);
+    public static void registerSoil(Block block, String adjName, Block rootyBlockSubstitute) {
+        if (!RootyBlockHelper.isBlockRegistered(rootyBlockSubstitute)){
+            DynamicTrees.getLogger().error("Attempted to use " + rootyBlockSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
+            registerSoil(rootyBlockSubstitute, adjName);
         }
-        registerSoil(block, adjName, RootyBlockHelper.getRootyBlock(rootyDirtSubstitute));
+        registerSoil(block, adjName, RootyBlockHelper.getRootyBlock(rootyBlockSubstitute));
     }
     public static void registerSoil(Block block, String adjName, RootyBlock rootyDirt) {
         if(adjectiveMap.containsKey(adjName)) {
             int flag = adjectiveMap.get(adjName);
             registerSoil(block, flag);
             if (rootyDirt != null){
+                //This creates a new rooty block for the newly registered soil block if one does not exist already.
                 if (!RootyBlockHelper.isBlockRegistered(rootyDirt))
                     RootyBlockHelper.addToRootyBlocksMap(block, rootyDirt);
                 registerSoil(rootyDirt, flag);

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems;
 
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -10,6 +9,11 @@ import net.minecraft.world.IBlockReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Allows branches connect to non-tree blocks
+ *
+ * @author Max Hyper
+ */
 public class BranchConnectables {
 
     private static Map<Block, RadiusForConnectionFunction> connectablesMap = new HashMap<>();

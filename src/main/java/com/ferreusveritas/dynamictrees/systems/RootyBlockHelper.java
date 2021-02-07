@@ -8,6 +8,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
+/**
+ * Dynamically creates rooty blocks
+ *
+ * @author Max Hyper
+ */
 public class RootyBlockHelper {
 
     private static Map<Block, RootyBlock> rootyBlocksMap = new HashMap<>();

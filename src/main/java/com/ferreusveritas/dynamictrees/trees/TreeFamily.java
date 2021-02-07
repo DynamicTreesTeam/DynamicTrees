@@ -94,7 +94,9 @@ public class TreeFamily {
 	public boolean canSupportCocoa = false;
 
 	@OnlyIn(Dist.CLIENT)
-	public int woodColor;//For roots
+	public int woodRingColor;//For rooty blocks
+	@OnlyIn(Dist.CLIENT)
+	public int woodBarkColor;//For rooty water
 
 	public TreeFamily() {
 		this.name = new ResourceLocation(DynamicTrees.MOD_ID, "null");
@@ -109,7 +111,8 @@ public class TreeFamily {
 		this.name = name;
 
 		//this must be the first branch registered, to have its validBranches index be 0;
-		this.setDynamicBranch(createBranch()).setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+		setDynamicBranch(createBranch());
+		setDynamicBranchItem(createBranchItem(dynamicBranch));
 
 		if (this.hasStrippedBranch()) {
 			this.setDynamicStrippedBranch(createBranch("_branch_stripped"));
@@ -292,11 +295,6 @@ public class TreeFamily {
 		addValidBranches(branch);
 		return this;
 	}
-	protected TreeFamily setDynamicBranches(BranchBlock branch, BranchBlock strippedBranch) {
-		setDynamicBranch(branch);
-		setDynamicStrippedBranch(strippedBranch);
-		return this;
-	}
 
 	protected TreeFamily setDynamicBranchItem (Item branchItem) {
 		this.dynamicBranchItem = branchItem;
@@ -320,13 +318,17 @@ public class TreeFamily {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public int getWoodColor() {
-		return woodColor;
+	public int getWoodRingColor() {
+		return woodRingColor;
+	}
+	@OnlyIn(Dist.CLIENT)
+	public int getWoodBarkColor() {
+		return woodBarkColor;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public int getRootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-		return getWoodColor();
+	public int getRootColor(BlockState state, IBlockReader blockAccess, BlockPos pos, boolean getBark) {
+		return getBark? getWoodBarkColor() : getWoodRingColor();
 	}
 
 	/**
@@ -361,12 +363,13 @@ public class TreeFamily {
 	 */
 	protected TreeFamily setPrimitiveLog(Block primLog) {
 		primitiveLog = primLog;
-		dynamicBranch.setPrimitiveLogDrops(getPrimitiveLogs(1));
+		dynamicBranch.setPrimitiveLogDrops(new ItemStack(primLog));
 		return this;
 	}
 	protected TreeFamily setPrimitiveStrippedLog(Block primLog) {
 		primitiveStrippedLog = primLog;
-		dynamicStrippedBranch.setPrimitiveLogDrops(getPrimitiveStripedLogs(1));
+		if (hasStrippedBranch())
+			dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(primLog));
 		return this;
 	}
 
@@ -384,17 +387,13 @@ public class TreeFamily {
 		return primitiveStrippedLog;
 	}
 
-	/**
-	 * Gets an itemStack of primitive logs of a requested quantity.
-	 *
-	 * @param qty The quantity of logs requested
-	 * @return itemStack of requested logs.
-	 */
-	private ItemStack getPrimitiveLogs(int qty) {
-		return new ItemStack(this.primitiveLog, qty);
-	}
-	private ItemStack getPrimitiveStripedLogs(int qty) {
-		return new ItemStack(this.primitiveStrippedLog, qty);
+	private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
+		BranchBlock branchBlock = getValidBranchBlock(branch);
+		List<ItemStack> logs = new LinkedList<>();
+		if (branchBlock != null){
+			branchBlock.getPrimitiveLogs(volume, logs);
+		}
+		return logs;
 	}
 
 	public boolean isFireProof () { return false; }

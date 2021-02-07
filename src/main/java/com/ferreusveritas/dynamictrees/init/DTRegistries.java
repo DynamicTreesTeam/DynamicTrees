@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -42,6 +45,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -87,9 +91,7 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SAND_LIKE);
 		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SAND_LIKE);
 		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVEL_LIKE);
-		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATER_LIKE);
-		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.HARD_CLAY_LIKE);
-		DirtHelper.registerSoil(Blocks.WHITE_TERRACOTTA, DirtHelper.HARD_CLAY_LIKE);
+		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATER_LIKE, new RootyWaterBlock(Blocks.WATER));
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUS_LIKE);
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUS_LIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUS_LIKE);
@@ -110,7 +112,15 @@ public class DTRegistries {
 			return 0;
 		});
 		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,side)->{
-			if (side == Direction.DOWN) return 8;
+			if (side == Direction.DOWN){
+				BlockState branchState = world.getBlockState(pos.offset(Direction.UP));
+				BranchBlock branch = TreeHelper.getBranch(branchState);
+				if (branch != null){
+					return MathHelper.clamp(branch.getRadius(branchState) - 1, 1, 8);
+				} else {
+					return 8;
+				}
+			}
 			return 0;
 		});
 	}

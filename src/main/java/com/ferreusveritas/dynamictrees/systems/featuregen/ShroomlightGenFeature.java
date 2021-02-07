@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.Block;
@@ -19,6 +20,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiPredicate;
 
+/**
+ * Gen feature for shroomlight but works for any block.
+ * Can be fully customized with a custom predicate for natural growth.
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.RadiusForConnectionFunction) makeBlockConnectable}
+ *
+ * @author Max Hyper
+ */
 public class ShroomlightGenFeature implements IPostGenFeature, IPostGrowFeature {
 
     Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
@@ -85,6 +93,7 @@ public class ShroomlightGenFeature implements IPostGenFeature, IPostGrowFeature 
         return maxHeight;
     }
 
+    //Like the BeeNestGenFeature, the valid places are empty blocks under branches next to the trunk.
     private List<BlockPos> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight){
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++){

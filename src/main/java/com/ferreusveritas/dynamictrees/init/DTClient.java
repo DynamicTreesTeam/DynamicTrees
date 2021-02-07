@@ -68,28 +68,34 @@ public class DTClient {
 	public static void discoverWoodColors() {
 
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-		Random rand = new Random();
 		
 		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
-			family.woodColor = 0xFFF1AE;//For roots
+			family.woodRingColor = 0xFFF1AE;
+			family.woodBarkColor = 0xB3A979;
 			if(family != TreeFamily.NULLFAMILY) {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
-					IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
-					List<BakedQuad> quads = model.getQuads(state, Direction.DOWN, rand, EmptyModelData.INSTANCE); //We get the BOTTOM face of the log model
-					ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that top face
-					if(!resloc.toString().isEmpty()) {
-						TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(bakedTextureGetter.apply(resloc));
-						int u = pixbuf.w / 16;
-						TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
-						pixbuf.blit(center, u * -8, u * -8);
-						
-						family.woodColor = center.averageColor();
-					}
+					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
+					//family.woodBarkColor = getFaceColor(state, null, bakedTextureGetter);
+					family.woodBarkColor = family.woodRingColor; //for now until I figure out why it crashes
 				}
 			}
 		}
-		
+	}
+	@OnlyIn(Dist.CLIENT)
+	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
+		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
+		List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE); //We get the BOTTOM face of the log model
+		ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that bottom face
+		if(!resloc.toString().isEmpty()) {
+			TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(textureGetter.apply(resloc));
+			int u = pixbuf.w / 16;
+			TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+			pixbuf.blit(center, u * -8, u * -8);
+
+			return center.averageColor();
+		}
+		return 0;
 	}
 	
 	public void cleanUp() {

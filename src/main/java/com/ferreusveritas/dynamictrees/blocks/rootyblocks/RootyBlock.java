@@ -39,6 +39,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -51,6 +52,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.ModLoadingContext;
 
 
 /**
@@ -72,8 +74,11 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	private final Block primitiveDirt;
 	
 	public RootyBlock(Block primitiveDirt) {
-		super(Properties.from(primitiveDirt).tickRandomly());
-		setRegistryName("rooty_"+ primitiveDirt.getRegistryName().getPath()); //ModLoadingContext.get().getActiveNamespace();
+		this(Properties.from(primitiveDirt).tickRandomly(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt); //ModLoadingContext.get().getActiveNamespace();
+	}
+	public RootyBlock (Properties properties, String name, Block primitiveDirt){
+		super(properties);
+		setRegistryName(new ResourceLocation(ModLoadingContext.get().getActiveNamespace(),name));
 		setDefaultState(getDefaultState().with(FERTILITY, 0).with(VARIANT, false));
 		this.primitiveDirt = primitiveDirt;
 	}
@@ -411,7 +416,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@OnlyIn(Dist.CLIENT)
 	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-		return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos);
+		return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos, false);
 	}
 	
 }

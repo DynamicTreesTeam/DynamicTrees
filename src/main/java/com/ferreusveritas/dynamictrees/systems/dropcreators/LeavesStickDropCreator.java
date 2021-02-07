@@ -10,6 +10,12 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * A drop creator for the sticks that can be harvested from leaves.
+ * Rarity of 1 equals a 1/50 chance of getting between {1 - maxCount} sticks.
+ *
+ * @author Max Hyper
+ */
 public class LeavesStickDropCreator extends DropCreator {
 	ItemStack droppedItem;
 	float rarity;
