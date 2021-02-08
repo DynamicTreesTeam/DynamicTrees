@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class WailaBranchHandler implements IComponentProvider { //IServerDataProvider<String>
+public class WailaBranchHandler implements IComponentProvider {
 	
 	private BlockPos lastPos = BlockPos.ZERO;
 	private Species lastSpecies = Species.NULL_SPECIES;

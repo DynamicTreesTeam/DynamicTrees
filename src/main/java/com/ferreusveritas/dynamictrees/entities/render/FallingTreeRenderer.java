@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -14,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+import org.lwjgl.opengl.GL20;
 
 @OnlyIn(Dist.CLIENT)
 public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
@@ -41,7 +43,7 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 
 		matrixStack.push();
 
-		IVertexBuilder vertexBuilder = buffer.getBuffer(treeModel.getRenderType(this.getEntityTexture(entity)));
+		IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.getEntityCutout(this.getEntityTexture(entity)));
 
 //		if(entity.onFire) {
 //			renderFire(matrixStack, vertexBuilder);
@@ -54,7 +56,7 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
 
-		treeModel.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F);
+		treeModel.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1,1,1, 1.0F);
 
 		matrixStack.pop();
 	}

@@ -201,7 +201,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
 						} else {
 							quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
-
 						}
 					}
 					//Get quads for sleeves models

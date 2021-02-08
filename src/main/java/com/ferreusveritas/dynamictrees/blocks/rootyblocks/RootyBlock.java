@@ -1,13 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -25,7 +17,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.PushReaction;
@@ -48,11 +39,17 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModLoadingContext;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 
 /**
@@ -70,7 +67,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
-	public static final BooleanProperty VARIANT = BooleanProperty.create("variant");
+	public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
 	private final Block primitiveDirt;
 	
 	public RootyBlock(Block primitiveDirt) {
@@ -79,7 +76,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public RootyBlock (Properties properties, String name, Block primitiveDirt){
 		super(properties);
 		setRegistryName(new ResourceLocation(ModLoadingContext.get().getActiveNamespace(),name));
-		setDefaultState(getDefaultState().with(FERTILITY, 0).with(VARIANT, false));
+		setDefaultState(getDefaultState().with(FERTILITY, 0).with(IS_VARIANT, false));
 		this.primitiveDirt = primitiveDirt;
 	}
 	
@@ -93,7 +90,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FERTILITY).add(VARIANT);
+		builder.add(FERTILITY).add(IS_VARIANT);
 	}
 	
 	///////////////////////////////////////////
@@ -104,14 +101,14 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	@Nullable
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (state.get(VARIANT))
+		if (state.get(IS_VARIANT))
 			return new SpeciesTileEntity();
 		return null;
 	}
 
 	@Override
 	public boolean hasTileEntity(BlockState state) {
-		return state.get(VARIANT);
+		return state.get(IS_VARIANT);
 	}
 
 	@Override
@@ -150,7 +147,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			
 			if(!viable) {
 				//TODO: Attempt to destroy what's left of the tree before setting rooty to dirt
-				world.setBlockState(rootPos, getDecayBlockState(world, rootPos), 3);
+				world.setBlockState(rootPos, getDecayBlockState(rootyState, world, rootPos), 3);
 			}
 			
 		}
@@ -165,7 +162,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @param pos The position of the {@link RootyBlock}
 	 * @return
 	 */
-	public BlockState getDecayBlockState(World access, BlockPos pos) {
+	public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
 		return primitiveDirt.getDefaultState();
 	}
 	
@@ -177,7 +174,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 				BlockState newState = world.getBlockState(rootPos);
 				
 				if(!TreeHelper.isRooty(newState)) { //Make sure we're not still a rooty block
-					world.setBlockState(rootPos, getDecayBlockState(world, rootPos));
+					world.setBlockState(rootPos, getDecayBlockState(rootyState, world, rootPos));
 //					if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
 //						return;
 //					}
@@ -199,19 +196,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 				}
 			}
 		}
-	}
-	
-	
-	
-	/**
-	 * This is the state the rooty dirt returns to once it no longer supports a tree structure.
-	 *
-	 * @param access world
-	 * @param pos The position of the {@link RootyBlock}
-	 * @return blockstate that the rooty dirt turns into when decayed
-	 */
-	public BlockState getDecayBlockState(IBlockReader access, BlockPos pos) {
-		return primitiveDirt.getDefaultState();
 	}
 
 	@Nonnull
@@ -413,10 +397,18 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
-	
+
+	public boolean getColorFromBark(){
+		return false;
+	}
+
 	@OnlyIn(Dist.CLIENT)
 	public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-		return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos, false);
+		return getFamily(state, blockAccess, pos).getRootColor(state, getColorFromBark());
+	}
+
+	public boolean fallWithTree (BlockState state, World world, BlockPos pos){
+		return false;
 	}
 	
 }

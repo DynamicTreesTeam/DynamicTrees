@@ -104,7 +104,7 @@ public class OakTree extends VanillaTreeFamily {
 		@Override
 		public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
 			
-			if(soilBlockState.getBlock() == Blocks.WATER) {
+			if(DTConfigs.enableSwampOaksInWater.get() && soilBlockState.getBlock() == Blocks.WATER) {
 				Biome biome = world.getBiome(pos);
 				if(BiomeDictionary.hasType(getBiomeKey(biome), Type.SWAMP)) {
 					BlockPos down = pos.down();

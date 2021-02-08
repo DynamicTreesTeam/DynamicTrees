@@ -162,10 +162,22 @@
 		}
 	},
 	{
-		"__comment": "Redwood taiga, aka mega taiga has giant spruce trees",
-		"select": { "name": "minecraft:.*giant_tree_taiga.*" },
+		"__comment": "Mega taiga has giant spruce trees",
+		"select": { "name": "minecraft:.*giant_spruce_taiga.*" },
 		"apply": {
 			"species" : "mega_spruce"
+		}
+	},
+	{
+		"__comment": "Mega taiga has giant spruce trees, but also is less leaf-dense than giant spruce taiga",
+		"select": { "name": "minecraft:.*giant_tree_taiga.*" },
+		"apply": {
+			"species" : {
+				"random" : {
+					"mega_spruce" : 2,
+					"spruce" : 1
+				}
+			}
 		}
 	},
 	{

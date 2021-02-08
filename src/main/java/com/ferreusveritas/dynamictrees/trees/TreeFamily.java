@@ -318,17 +318,8 @@ public class TreeFamily {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public int getWoodRingColor() {
-		return woodRingColor;
-	}
-	@OnlyIn(Dist.CLIENT)
-	public int getWoodBarkColor() {
-		return woodBarkColor;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public int getRootColor(BlockState state, IBlockReader blockAccess, BlockPos pos, boolean getBark) {
-		return getBark? getWoodBarkColor() : getWoodRingColor();
+	public int getRootColor(BlockState state, boolean getBark) {
+		return getBark? woodBarkColor : woodRingColor;
 	}
 
 	/**

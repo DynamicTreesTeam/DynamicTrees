@@ -293,7 +293,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.enableBranchClimbling.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
+		return DTConfigs.enableBranchClimbing.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
 	}
 	
 	@Nonnull

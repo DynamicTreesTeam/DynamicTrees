@@ -77,5 +77,7 @@
   "tooltip.season.spring": "§aSpring",
   "tooltip.season.summer": "§eSummer",
   "tooltip.season.autumn": "§6Autumn",
-  "tooltip.season.winter": "§bWinter"
+  "tooltip.season.winter": "§bWinter",
+
+  "block.dynamictrees.rooty_water":"Water Roots"
 }

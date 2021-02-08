@@ -671,7 +671,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
-		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.VARIANT, this.getRequiresTileEntity(world, rootPos)), 3);
+		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.IS_VARIANT, this.getRequiresTileEntity(world, rootPos)), 3);
 	}
 	
 	public Species setSoilLongevity(int longevity) {

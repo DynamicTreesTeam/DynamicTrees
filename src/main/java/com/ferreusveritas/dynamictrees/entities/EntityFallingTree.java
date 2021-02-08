@@ -17,6 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
@@ -39,10 +40,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -75,7 +73,10 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	
 	public IAnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
 	public DataAnimationHandler dataAnimationHandler = null;
-	
+
+	//Stores color for tinted quads that aren't the leaves
+	protected Map<BakedQuad, Integer> quadTints = new HashMap<>();
+
 	public enum DestroyType {
 		VOID,
 		HARVEST,
@@ -166,7 +167,18 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		setBoundingBox(normAABB.offset(this.getPosX(), this.getPosY(), this.getPosZ()));
 		onFire = tag.getBoolean("onfire");
 	}
-	
+
+	public Map<BakedQuad, Integer> getQuadTints (){
+		return quadTints;
+	}
+	public void addTintedQuad (int tint, BakedQuad quad){
+		quadTints.put(quad, tint);
+	}
+	public void addTintedQuads (int tint, BakedQuad... quads){
+		for (BakedQuad quad : quads)
+			addTintedQuad(tint, quad);
+	}
+
 	public void buildClient() {
 		
 		CompoundNBT tag = getVoxelData();

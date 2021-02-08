@@ -38,10 +38,11 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
 	public static ForgeConfigSpec.BooleanValue enableThickTrees;
 	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
+	public static ForgeConfigSpec.BooleanValue enableSwampOaksInWater;
 	
 	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
 	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
-	public static ForgeConfigSpec.BooleanValue enableBranchClimbling;
+	public static ForgeConfigSpec.BooleanValue enableBranchClimbing;
 	public static ForgeConfigSpec.BooleanValue canopyCrash;
 	public static ForgeConfigSpec.EnumValue<DynamicTrees.EnumAxeDamage> axeDamageMode;
 	public static ForgeConfigSpec.BooleanValue enableFallingTrees;
@@ -111,6 +112,8 @@ public class DTConfigs {
 				define("enableThickTrees", true);
 		rootyBlockHardnessMultiplier = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
+		enableSwampOaksInWater = SERVER_BUILDER.comment("If enabled swamp oak trees will be able to generate on shallow water with mangrove-like roots").
+				define("enableSwampOaksInWater", true);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
@@ -118,7 +121,7 @@ public class DTConfigs {
 				define("isLeavesPassable", false);
 		vanillaLeavesCollision = SERVER_BUILDER.comment("If enabled player movement on leaves will not be enhanced").
 				define("vanillaLeavesCollision", false);
-		enableBranchClimbling = SERVER_BUILDER.comment("If enabled then thinner branches can be climbed").
+		enableBranchClimbing = SERVER_BUILDER.comment("If enabled then thinner branches can be climbed").
 				define("enableBranchClimbling", true);
 		canopyCrash = SERVER_BUILDER.comment("If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction").
 				define("canopyCrash", true);

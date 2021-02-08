@@ -239,7 +239,7 @@ public class Staff extends Item {
 				}
 			}
 			else if (species.isValid()) {
-				color = species.getFamily().getWoodRingColor();
+				color = species.getFamily().woodBarkColor;
 			}
 			
 			return color;

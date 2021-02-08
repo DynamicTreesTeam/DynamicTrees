@@ -76,8 +76,7 @@ public class DTClient {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
-					//family.woodBarkColor = getFaceColor(state, null, bakedTextureGetter);
-					family.woodBarkColor = family.woodRingColor; //for now until I figure out why it crashes
+					family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
 				}
 			}
 		}
@@ -85,8 +84,14 @@ public class DTClient {
 	@OnlyIn(Dist.CLIENT)
 	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
 		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
-		List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE); //We get the BOTTOM face of the log model
-		ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that bottom face
+		List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE);
+		if (quads.isEmpty()) //if the quad list is empty, means there is no face on that side, so we try with null
+			quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
+		if (quads.isEmpty()) {//if null still returns empty, there is nothing we can do so we just warn and exit
+			DynamicTrees.getLogger().warn("Could not get color of "+face+" side for "+ state.getBlock()+"! Branch needs to be handled manually!");
+			return 0;
+		}
+		ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that selected face
 		if(!resloc.toString().isEmpty()) {
 			TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(textureGetter.apply(resloc));
 			int u = pixbuf.w / 16;

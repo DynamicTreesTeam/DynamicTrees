@@ -2,9 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -20,10 +18,14 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
 
 public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
@@ -31,7 +33,7 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public RootyWaterBlock(Block primitiveDirt) {
-        super(Properties.from(primitiveDirt).tickRandomly().setOpaque((a,b,c)->false), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
+        super(Properties.from(primitiveDirt).tickRandomly(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
         setDefaultState(getDefaultState().with(WATERLOGGED, true));
     }
 
@@ -42,7 +44,7 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
     @Override
     public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -81,10 +83,27 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
         return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
-        return getFamily(state, blockAccess, pos).getRootColor(state, blockAccess, pos, true);
+    public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
+        if (state.hasProperty(WATERLOGGED) && !state.get(WATERLOGGED))
+            return Blocks.AIR.getDefaultState();
+        return super.getDecayBlockState(state,access, pos);
+    }
+
+
+    ///////////////////////////////////////////
+    // RENDERING
+    ///////////////////////////////////////////
+
+    @Override
+    public boolean getColorFromBark() {
+        return true;
+    }
+
+    public boolean fallWithTree (BlockState state, World world, BlockPos pos){
+        //The block is removed when this is checked because it means it got attached to a tree
+        world.setBlockState(pos, getDecayBlockState(state, world, pos));
+        return true;
     }
 
 }

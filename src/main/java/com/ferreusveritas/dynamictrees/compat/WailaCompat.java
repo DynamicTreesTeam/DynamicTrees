@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
@@ -20,5 +21,6 @@ public class WailaCompat implements IWailaPlugin {
 		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, BranchBlock.class);
 		registrar.registerComponentProvider(branchHandler, TooltipPosition.BODY, TrunkShellBlock.class);
 		registrar.registerComponentProvider(rootyHandler, TooltipPosition.BODY, RootyBlock.class);
+		registrar.registerComponentProvider(new WailaRootyWaterHandler(), TooltipPosition.HEAD, RootyWaterBlock.class);
 	}
 }
