@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.client.TooltipHandler;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 
@@ -25,6 +26,10 @@ public class CommonEventHandler {
 	public void onWorldTick(TickEvent.WorldTickEvent event) {
 		if(event.side == LogicalSide.SERVER) {
 			FutureBreak.process(event.world);
+		}
+
+		if(event.type == TickEvent.Type.WORLD && event.phase == TickEvent.Phase.START) {
+			SeasonHelper.updateTick(event.world, event.world.getDayTime());
 		}
 	}
 	
