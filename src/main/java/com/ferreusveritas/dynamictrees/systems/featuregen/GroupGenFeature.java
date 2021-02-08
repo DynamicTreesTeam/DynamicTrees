@@ -16,7 +16,7 @@ public class GroupGenFeature implements IPostGenFeature {
 	private final List<IPostGenFeature> features = new ArrayList<>();
 	
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		for(IPostGenFeature feature : features) {
 			feature.postGeneration(world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState, seasonValue, seasonFruitProductionFactor);
 		}

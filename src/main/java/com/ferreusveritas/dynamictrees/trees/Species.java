@@ -1480,8 +1480,9 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
 		if(postGenFeatures != null) {
 			for(IPostGenFeature feature: postGenFeatures) {
-				if (feature != null)
+				if (feature != null) {
 					feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
+				}
 			}
 		}
 	}

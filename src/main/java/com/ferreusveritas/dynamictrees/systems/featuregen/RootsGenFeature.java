@@ -68,7 +68,7 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 
 		BlockPos treePos = rootPos.up();
 		int trunkRadius = TreeHelper.getRadius(world, treePos);

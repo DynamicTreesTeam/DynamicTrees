@@ -28,7 +28,7 @@ public class CocoaGenFeature implements IPostGenFeature, IPostGrowFeature {
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(world.getRandom().nextInt() % 8 == 0) {
 			addCocoa(world, rootPos, true);
 			return true;

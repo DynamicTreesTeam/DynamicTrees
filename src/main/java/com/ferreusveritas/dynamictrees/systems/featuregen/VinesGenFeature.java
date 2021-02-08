@@ -98,7 +98,7 @@ public class VinesGenFeature implements IPostGenFeature {
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(safeBounds != SafeChunkBounds.ANY) { //worldgen
 			if(!endPoints.isEmpty()) {
 				for(int i = 0; i < qty; i++) {

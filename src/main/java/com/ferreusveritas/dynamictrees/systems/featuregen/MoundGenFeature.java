@@ -72,7 +72,7 @@ public class MoundGenFeature implements IPreGenFeature, IPostGenFeature {
 	 * tree is generated next to a drop off.  Only runs when the radius is greater than 8.
 	 */
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(radius < moundCutoffRadius && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
 			BlockPos treePos = rootPos.up();
 			BlockState belowState = world.getBlockState(rootPos.down());

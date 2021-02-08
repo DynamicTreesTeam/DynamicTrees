@@ -56,7 +56,7 @@ public class FruitGenFeature implements IPostGrowFeature, IPostGenFeature {
 	}
 
     @Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(!endPoints.isEmpty()) {
 			int qty = getQuantity(true);
 			qty *= seasonFruitProductionFactor;
@@ -92,7 +92,7 @@ public class FruitGenFeature implements IPostGrowFeature, IPostGenFeature {
 		return true;
 	}
 
-	protected void addFruit(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, float seasonValue) {
+	protected void addFruit(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
 		if(fruitPos != BlockPos.ZERO) {
 			if ( !enableHash || ( (CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {

@@ -35,11 +35,7 @@ public class SeasonManager implements ISeasonManager {
 			return new SeasonContext(tuple.getA(), tuple.getB());
 		});
 	}
-	
-	public void setProvider(World world, ISeasonProvider provider, ISeasonGrowthCalculator calc) {
-		setProvider(world, provider, calc);
-	}
-	
+
 	public void flushMappings() {
 		seasonContextMap.clear();
 	}

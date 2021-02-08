@@ -27,6 +27,6 @@ public interface IPostGenFeature extends IGenFeature {
 	 * @param seasonFruitProductionFactor The production factor for fruit generation
 	 * @return true if operation succeeded. false otherwise.
 	 */
-	boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor);
+	boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor);
 
 }

@@ -47,7 +47,7 @@ public class HugeMushroomsGenFeature implements IPostGenFeature {
 	}
 	
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
 		if (endPoints.isEmpty() || !worldGen) return false;

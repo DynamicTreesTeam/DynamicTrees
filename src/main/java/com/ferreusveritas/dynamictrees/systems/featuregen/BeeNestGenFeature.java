@@ -92,7 +92,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
     public void setMaxHeight (int maxHeight){ this.maxHeight = maxHeight; }
 
     @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
         if (world.getRandom().nextFloat() > worldGenChanceFunction.apply(world, rootPos)) return false;
 
         return placeBeeNestInValidPlace(world, rootPos, true);

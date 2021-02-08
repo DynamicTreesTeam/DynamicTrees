@@ -268,7 +268,7 @@ public class FruitBlock extends Block implements IGrowable {
 		return seasonValue != null ? this.getAgeForSeasonalWorldGen(world, pos, seasonValue) : 3;
 	}
 
-	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, float seasonValue) {
+	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, Float seasonValue) {
 		if (this.getSpecies().testFlowerSeasonHold(seasonValue)) {
 			return 0;//Fruit is as the flower stage
 		}

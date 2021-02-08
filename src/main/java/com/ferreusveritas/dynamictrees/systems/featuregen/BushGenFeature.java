@@ -54,7 +54,7 @@ public class BushGenFeature implements IFullGenFeature, IPostGenFeature {
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, float seasonValue, float seasonFruitProductionFactor) {
+	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(safeBounds != SafeChunkBounds.ANY && biomePredicate.test(biome)) {
 			commonGen(world, rootPos, species, world.getRandom(), radius, safeBounds);
 			return true;

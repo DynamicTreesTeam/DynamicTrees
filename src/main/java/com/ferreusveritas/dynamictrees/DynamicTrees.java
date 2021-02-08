@@ -34,7 +34,7 @@ public class DynamicTrees {
 	
 	public static final String MOD_ID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
-	public static final String VERSION = "1.16.4-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
+	public static final String VERSION = "1.16.5-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change
 	
 	public static final String OPT_AFTER = "after:";
 	public static final String OPT_BEFORE = "before:";
