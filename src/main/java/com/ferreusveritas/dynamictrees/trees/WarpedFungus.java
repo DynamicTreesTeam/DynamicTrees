@@ -1,26 +1,19 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.featuregen.ClearVolumeGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.MoundGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.Optional;
-
-public class WarpedFungus extends NetherFungusFamily {
+public class WarpedFungus extends NetherTreeFamily {
 
 	public class WarpedSpecies extends BaseNetherFungiSpecies {
 

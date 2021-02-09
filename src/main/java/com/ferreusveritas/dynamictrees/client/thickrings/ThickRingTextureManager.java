@@ -1,30 +1,21 @@
-package com.ferreusveritas.dynamictrees.client;
+package com.ferreusveritas.dynamictrees.client.thickrings;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-public class ThickRingAtlasTextureManager {
+public class ThickRingTextureManager {
 
     /**
      * THIS IS STILL WIP. THICK RINGS ARE NOT YET STITCHED AUTOMATICALLY
      */
 
-//    static AtlasTexture thickRingsAtlasTexture = new AtlasTexture(new ResourceLocation(DynamicTrees.MODID, "textures/atlas/thick_rings.png"));
-//
+    public static ThickRingSpriteUploader spriteUploader;
+
     private static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<>();
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
@@ -37,9 +28,12 @@ public class ThickRingAtlasTextureManager {
 	    return thickRingTextures.entrySet();
     }
 
-    public static void generateThickRingTexture (SimpleReloadableResourceManager manager, ResourceLocation originalResLoc, ResourceLocation thickResLoc){
-		//this is were i would run my thick branch stitcher... IF I HAD ONE! D:<
-		System.out.println("BZZZZ ... beep boop ... stitching " + thickResLoc + " (not really)");
+    public static void generateThickRingTexture (ResourceLocation originalResLoc, ResourceLocation thickResLoc){
+		if (spriteUploader == null){
+			DynamicTrees.getLogger().error("ThickRingSpriteUploader not added yet!");
+			return;
+		}
+		spriteUploader.getTextureAtlas().addThickRingSprite(thickResLoc, originalResLoc);
 	}
 
 //	public static void uploadToAtlas (){

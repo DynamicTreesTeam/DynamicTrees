@@ -2,18 +2,27 @@ package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.client.TooltipHandler;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 
 import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.SimpleReloadableResourceManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class CommonEventHandler {
 	
@@ -57,6 +66,24 @@ public class CommonEventHandler {
 	@OnlyIn(Dist.CLIENT)
 	public void onItemTooltipAdded(ItemTooltipEvent event) {
 		TooltipHandler.setupTooltips(event);
+	}
+
+	@SubscribeEvent
+	public void onResourceReload(final AddReloadListenerEvent event) {
+//		ThickRingTextureManager.spriteUploader = new ThickRingSpriteUploader(Minecraft.getInstance().getTextureManager());
+//		event.addListener(ThickRingTextureManager.spriteUploader);
+
+//        for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingResourceLocations()){
+//            ResourceLocation originalLogResLoc = reslocs.getKey();
+//            ResourceLocation thickLogResLoc = reslocs.getValue();
+//            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
+//
+//            try {
+//                manager.getResource(thickLogResLoc);
+//            } catch (IOException e){
+//                ThickRingTextureManager.generateThickRingTexture(originalLogResLoc, thickLogResLoc);
+//            }
+//        }
 	}
 
 }

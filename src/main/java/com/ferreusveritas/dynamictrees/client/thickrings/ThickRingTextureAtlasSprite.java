@@ -1,5 +1,6 @@
-package com.ferreusveritas.dynamictrees.client;
+package com.ferreusveritas.dynamictrees.client.thickrings;
 
+import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
