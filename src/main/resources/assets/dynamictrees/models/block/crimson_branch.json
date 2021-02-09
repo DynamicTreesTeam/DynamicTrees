@@ -1,5 +1,5 @@
 {
-    "loader": "dynamictrees:branch",
+    "loader": "dynamictrees:thick_branch",
     "textures": {
         "bark": "block/crimson_stem",
         "rings": "block/crimson_stem_top"

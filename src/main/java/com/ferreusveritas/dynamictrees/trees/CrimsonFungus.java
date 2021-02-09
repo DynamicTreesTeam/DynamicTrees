@@ -4,13 +4,17 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicWartBlock;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.ClearVolumeGenFeature;
+import com.ferreusveritas.dynamictrees.systems.featuregen.MoundGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.ShroomlightGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -22,32 +26,18 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
-public class CrimsonFungus extends VanillaTreeFamily {
+import java.util.Optional;
 
-	public class CrimsonSpecies extends Species {
+public class CrimsonFungus extends NetherFungusFamily {
 
-		CrimsonSpecies(TreeFamily treeFamily) {
-			this(treeFamily.getName(), treeFamily);
+	public class CrimsonSpecies extends BaseNetherFungiSpecies {
 
-			setupStandardSeedDropping();
-			setupStandardStickDropping();
-
-			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
-		}
-		CrimsonSpecies(ResourceLocation name, TreeFamily family){
-			super(name, family);
+		CrimsonSpecies(TreeFamily family){
+			super(family.getName(), family);
 			setBasicGrowingParameters(0.3f, 14.0f, 0, 4, 1f);
-
-			envFactor(Type.COLD, 0.25f);
-			envFactor(Type.WET, 0.75f);
-
-			addGenFeature(new ShroomlightGenFeature());
-		}
-
-		@Override
-		protected void setStandardSoils() {
-			addAcceptableSoils(DirtHelper.DIRT_LIKE, DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE);
+			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
 		}
 
 		@Override
@@ -60,35 +50,47 @@ public class CrimsonFungus extends VanillaTreeFamily {
 		}
 
 		@Override
-		public SoundType getSaplingSound() {
-			return SoundType.FUNGUS;
+		public Species getMegaSpecies() {
+			return megaCrimsonSpecies;
+		}
+	}
+
+	public class MegaCrimsonSpecies extends MegaNetherFungiSpecies {
+
+		MegaCrimsonSpecies(TreeFamily treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
+
+			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
+
+			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
 		}
 
 		@Override
-		public VoxelShape getSaplingShape() {
-			return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.5f, 0.75f));
-		}
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) { return isOneOfBiomes(biome, Biomes.CRIMSON_FOREST); }
 
-		public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
-			return (DynamicLeavesBlock) new DynamicWartBlock(leavesProperties).setRegistryName(getRegistryName() + "_wart");
-		}
 	}
 
-	public CrimsonFungus() {
-		this(DynamicTrees.VanillaWoodTypes.crimson);
-		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.NETHER_WART_BLOCK);
-	}
 	public CrimsonFungus(DynamicTrees.VanillaWoodTypes type) {
 		super(type);
+	}
+
+	private Species megaCrimsonSpecies;
+	public CrimsonFungus() {
+		this(DynamicTrees.VanillaWoodTypes.crimson);
+
+		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.NETHER_WART_BLOCK);
 	}
 	
 	@Override
 	public void createSpecies() {
+		megaCrimsonSpecies = new MegaCrimsonSpecies(this);
 		setCommonSpecies(new CrimsonSpecies(this));
 	}
 
 	@Override
-	public boolean isFireProof() {
-		return true;
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		super.registerSpecies(speciesRegistry);
+		speciesRegistry.register(megaCrimsonSpecies);
 	}
+
 }

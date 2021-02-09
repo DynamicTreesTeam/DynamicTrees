@@ -52,12 +52,12 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public boolean canGrow(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
-		return getSpecies().canSaplingUseBoneMeal((World) world, pos);
+		return getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
 	}
 	
 	@Override
 	public boolean canUseBonemeal(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return getSpecies().canSaplingGrowBoneMeal(world, rand, pos);
+		return getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
 	}
 	
 	///////////////////////////////////////////
@@ -76,7 +76,8 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		this.grow(worldIn, rand, pos, state);
+		if (getSpecies().canSaplingGrowNaturally(worldIn, pos))
+			this.grow(worldIn, rand, pos, state);
 	}
 
 	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {

@@ -142,7 +142,7 @@ public class Cactus extends TreeFamily {
 		}
 		
 		@Override
-		public boolean canBoneMeal() {
+		public boolean canBoneMealTree() {
 			return false;
 		}
 		

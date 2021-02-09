@@ -1,28 +1,31 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.featuregen.ClearVolumeGenFeature;
+import com.ferreusveritas.dynamictrees.systems.featuregen.MoundGenFeature;
 import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.IForgeRegistry;
 
-public class WarpedFungus extends CrimsonFungus {
+import java.util.Optional;
 
-	public class WarpedSpecies extends CrimsonSpecies {
+public class WarpedFungus extends NetherFungusFamily {
+
+	public class WarpedSpecies extends BaseNetherFungiSpecies {
 
 		WarpedSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
-
-			setupStandardSeedDropping();
-			setupStandardStickDropping();
 
 			this.addGenFeature(new VinesGenFeature(Blocks.TWISTING_VINES_PLANT, VinesGenFeature.VineType.FLOOR).setTipBlock(Blocks.TWISTING_VINES).setMaxLength(5).setQuantity(7));
 		}
@@ -36,16 +39,43 @@ public class WarpedFungus extends CrimsonFungus {
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) { return isOneOfBiomes(biome, Biomes.WARPED_FOREST); }
 
+		@Override
+		public Species getMegaSpecies() {
+			return megaWarpedSpecies;
+		}
 	}
 
+	public class MegaWarpedSpecies extends MegaNetherFungiSpecies {
+
+		MegaWarpedSpecies(TreeFamily treeFamily) {
+			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
+
+			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
+
+			this.addGenFeature(new VinesGenFeature(Blocks.TWISTING_VINES_PLANT, VinesGenFeature.VineType.FLOOR).setTipBlock(Blocks.TWISTING_VINES).setMaxLength(5).setQuantity(7));
+		}
+
+		@Override
+		public boolean isBiomePerfect(RegistryKey<Biome> biome) { return isOneOfBiomes(biome, Biomes.WARPED_FOREST); }
+
+	}
+
+	private Species megaWarpedSpecies;
 	public WarpedFungus() {
 		super(DynamicTrees.VanillaWoodTypes.warped);
+
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.WARPED_WART_BLOCK);
 	}
 	
 	@Override
 	public void createSpecies() {
+		megaWarpedSpecies = new MegaWarpedSpecies(this);
 		setCommonSpecies(new WarpedSpecies(this));
 	}
 
+	@Override
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		super.registerSpecies(speciesRegistry);
+		speciesRegistry.register(megaWarpedSpecies);
+	}
 }

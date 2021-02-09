@@ -58,6 +58,7 @@ public class TreeFamily {
 		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
+		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
 	};
 	
 	/** Simple name of the tree e.g. "oak" */

@@ -573,26 +573,23 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		return false;
 	}
 
-	//This is for the sapling.
 	//If false is returned the sapling will not grow and bonemeal will not work
 	public boolean canSaplingGrow(World world, BlockPos pos) {return true;}
 
-	//This is for the sapling.
-	//If false is returned then nothing happens.
-	//If true is returned canUseBoneMealNow is run then the bonemeal is consumed regardless of it's return.
-	public boolean canSaplingUseBoneMeal(World world, BlockPos pos) {
-		return canBoneMeal() && canSaplingGrow(world, pos);
+	//Returns whether the sapling should be able to grow without player intervention
+	public boolean canSaplingGrowNaturally(World world, BlockPos pos) {
+		return canSaplingGrow(world, pos);
 	}
-	
-	//This is for the sapling.
-	//Return weather or not the bonemealing should cause growth
-	public boolean canSaplingGrowBoneMeal(World world, Random rand, BlockPos pos) {
-		return canBoneMeal() && canSaplingGrow(world, pos);
+
+	//Returns if sapling should consume bonemeal when used on it.
+	//if true is returned canSaplingUseBoneMeal is then run to determine if the sapling grows or not.
+	public boolean canSaplingConsumeBoneMeal(World world, BlockPos pos) {
+		return canBoneMealTree() && canSaplingGrow(world, pos);
 	}
-	
-	//This is for the tree itself.
-	public boolean canBoneMeal() {
-		return true;
+
+	//Returns whether or not the bonemealing should cause sapling growth.
+	public boolean canSaplingGrowAfterBoneMeal(World world, Random rand, BlockPos pos) {
+		return canBoneMealTree() && canSaplingGrow(world, pos);
 	}
 
 	public int saplingFireSpread () { return 0; }
@@ -951,7 +948,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public IGrowthLogicKit getGrowthLogicKit() {
 		return logicKit;
 	}
-	
+
+	public boolean canBoneMealTree() {
+		return true;
+	}
+
 	/**
 	 * Selects a new direction for the branch(grow) signal to turn to.
 	 * This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
@@ -1212,7 +1213,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
 		//Bonemeal fertilizes the soil and causes a single growth pulse
-		if( canBoneMeal() && itemStack.getItem() == Items.BONE_MEAL) {
+		if( canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
 			
 			return new FertilizeSubstance().setAmount(1).setGrow(true);
 		}
