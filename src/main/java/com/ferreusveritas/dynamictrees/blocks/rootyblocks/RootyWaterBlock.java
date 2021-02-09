@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -53,6 +54,11 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
         if (TreeHelper.isBranch(upState))
             return new ItemStack(TreeHelper.getBranch(upState).getFamily().getDynamicBranchItem());
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public float getHardness(IBlockReader worldIn, BlockPos pos) {
+        return (float) (0.5 * DTConfigs.rootyBlockHardnessMultiplier.get());
     }
 
     @Override
