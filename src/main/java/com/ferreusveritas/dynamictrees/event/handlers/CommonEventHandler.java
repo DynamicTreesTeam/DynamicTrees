@@ -68,22 +68,4 @@ public class CommonEventHandler {
 		TooltipHandler.setupTooltips(event);
 	}
 
-	@SubscribeEvent
-	public void onResourceReload(final AddReloadListenerEvent event) {
-//		ThickRingTextureManager.spriteUploader = new ThickRingSpriteUploader(Minecraft.getInstance().getTextureManager());
-//		event.addListener(ThickRingTextureManager.spriteUploader);
-
-//        for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingResourceLocations()){
-//            ResourceLocation originalLogResLoc = reslocs.getKey();
-//            ResourceLocation thickLogResLoc = reslocs.getValue();
-//            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
-//
-//            try {
-//                manager.getResource(thickLogResLoc);
-//            } catch (IOException e){
-//                ThickRingTextureManager.generateThickRingTexture(originalLogResLoc, thickLogResLoc);
-//            }
-//        }
-	}
-
 }

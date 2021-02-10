@@ -4,6 +4,8 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
@@ -14,8 +16,16 @@ import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGenEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.resources.IResourceManager;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -149,7 +159,10 @@ public class DynamicTrees {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
-		
+
+		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
+
 		CellKits.setup();
 		GrowthLogicKits.setup();
 		TreeGenerator.setup();
@@ -169,7 +182,18 @@ public class DynamicTrees {
 		CompatHandler.init();
 //		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
 	}
-	
+
+	//TODO: thick rings are loading before the resourcelocations are added, need to find an event that fires then.
+	private static void clientStart(IEventBus modEventBus) {
+//		modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
+//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
+//			if (manager instanceof IReloadableResourceManager){
+//				ThickRingSpriteUploader uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+//				((IReloadableResourceManager) manager).addReloadListener(uploader);
+//			}
+//		});
+	}
+
 	@SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event) {
 //		LeavesPropertiesJson.resolveAll();

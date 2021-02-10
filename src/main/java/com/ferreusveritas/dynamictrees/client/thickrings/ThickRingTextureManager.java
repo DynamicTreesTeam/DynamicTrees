@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictrees.client.thickrings;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -14,27 +17,25 @@ public class ThickRingTextureManager {
      * THIS IS STILL WIP. THICK RINGS ARE NOT YET STITCHED AUTOMATICALLY
      */
 
-    public static ThickRingSpriteUploader spriteUploader;
-
-    private static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<>();
+    public static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<>();
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
-		ResourceLocation outputRes = new ResourceLocation(ringsRes.getNamespace(), ringsRes.getPath() + "_thick");
-		thickRingTextures.put(ringsRes, outputRes);
-		return outputRes;
+		ResourceLocation thickRingSet = new ResourceLocation(ringsRes.getNamespace(), ringsRes.getPath() + "_thick");
+		thickRingTextures.put(thickRingSet, ringsRes);
+		return thickRingSet;
 	}
 
-	public static Set<Map.Entry<ResourceLocation, ResourceLocation>> getThickRingResourceLocations (){
-	    return thickRingTextures.entrySet();
+	public static Set<ResourceLocation> getThickRingResourceLocations (){
+	    return thickRingTextures.keySet();
     }
 
-    public static void generateThickRingTexture (ResourceLocation originalResLoc, ResourceLocation thickResLoc){
-		if (spriteUploader == null){
-			DynamicTrees.getLogger().error("ThickRingSpriteUploader not added yet!");
-			return;
-		}
-		spriteUploader.getTextureAtlas().addThickRingSprite(thickResLoc, originalResLoc);
-	}
+//    public static void generateThickRingTexture (ResourceLocation originalResLoc, ResourceLocation thickResLoc){
+//		if (spriteUploader == null){
+//			DynamicTrees.getLogger().error("ThickRingSpriteUploader not added yet!");
+//			return;
+//		}
+//		spriteUploader.getTextureAtlas().addThickRingSprite(originalResLoc, thickResLoc);
+//	}
 
 //	public static void uploadToAtlas (){
 //        List<TextureAtlasSprite> sprites = new LinkedList<>();

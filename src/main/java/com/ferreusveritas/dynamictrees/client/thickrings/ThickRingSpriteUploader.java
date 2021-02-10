@@ -1,26 +1,20 @@
 package com.ferreusveritas.dynamictrees.client.thickrings;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.util.stream.Stream;
 
 @OnlyIn(Dist.CLIENT)
 public class ThickRingSpriteUploader extends ReloadListener<AtlasTexture.SheetData> implements AutoCloseable {
 
     private final ThickRingAtlasTexture textureAtlas;
-    public static final ResourceLocation PATH = new ResourceLocation(DynamicTrees.MOD_ID, "textures/atlas/thick_rings.png");
 
     public ThickRingSpriteUploader(TextureManager textureManagerIn) {
-        textureAtlas = new ThickRingAtlasTexture(PATH);
+        textureAtlas = new ThickRingAtlasTexture();
         textureManagerIn.loadTexture(textureAtlas.getTextureLocation(), textureAtlas);
     }
 
@@ -53,3 +47,15 @@ public class ThickRingSpriteUploader extends ReloadListener<AtlasTexture.SheetDa
     }
 
 }
+
+//public class ThickRingSpriteUploader extends SpriteUploader {
+//
+//    public ThickRingSpriteUploader(TextureManager textureManagerIn) {
+//        super(textureManagerIn, ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE, "thick_rings");
+//    }
+//
+//    @Override
+//    protected Stream<ResourceLocation> getResourceLocations() {
+//        return new LinkedList<ResourceLocation>().stream();
+//    }
+//}

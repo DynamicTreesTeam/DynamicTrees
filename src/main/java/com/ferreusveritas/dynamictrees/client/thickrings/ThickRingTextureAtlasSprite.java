@@ -23,13 +23,17 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	private final ResourceLocation baseRingLocation;
 	private final ResourceLocation baseRingLocationAlternate;
 
-	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, ResourceLocation spriteName, ResourceLocation baseRingLocation) {
-		super(atlasTexture, new Info(spriteName, 16, 16, AnimationMetadataSection.EMPTY), 0, 48*3, 48*3, 16, 16, new NativeImage(48, 48, false));
+	public ThickRingTextureAtlasSprite(AtlasTexture atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidthIn, int atlasHeightIn, int xIn, int yIn, NativeImage imageIn, ResourceLocation baseRingLocation){
+		super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidthIn, atlasHeightIn, xIn, yIn, imageIn);
 
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = null;
 
 		load();
+	}
+
+	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, TextureAtlasSprite.Info spriteInfo, int mipmapLevels, int atlasWidth, int atlasHeight, int x, int y){
+		this(atlasTexture, spriteInfo, mipmapLevels, atlasWidth, atlasHeight, x, y, new NativeImage(atlasWidth, atlasHeight, false), ThickRingTextureManager.thickRingTextures.get(spriteInfo.getSpriteLocation()));
 	}
 
 	@Override
