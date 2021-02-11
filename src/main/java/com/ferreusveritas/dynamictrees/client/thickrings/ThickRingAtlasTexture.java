@@ -94,7 +94,7 @@ public class ThickRingAtlasTexture extends AtlasTexture {
 
         for(ResourceLocation resourcelocation : spriteLocationsIn) {
             if (!MissingTextureSprite.getLocation().equals(resourcelocation)) {
-                ResourceLocation resourcelocation1 = ThickRingTextureManager.thickRingTextures.get(resourcelocation);
+//                ResourceLocation resourcelocation1 = ThickRingTextureManager.thickRingTextures.get(resourcelocation);
 
                 TextureAtlasSprite.Info textureatlassprite$info;
 

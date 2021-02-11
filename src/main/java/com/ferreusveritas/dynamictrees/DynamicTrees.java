@@ -21,6 +21,7 @@ import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -185,13 +186,13 @@ public class DynamicTrees {
 
 	//TODO: thick rings are loading before the resourcelocations are added, need to find an event that fires then.
 	private static void clientStart(IEventBus modEventBus) {
-//		modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
-//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
-//			if (manager instanceof IReloadableResourceManager){
-//				ThickRingSpriteUploader uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
-//				((IReloadableResourceManager) manager).addReloadListener(uploader);
-//			}
-//		});
+		modEventBus.addListener(EventPriority.NORMAL, false, ParticleFactoryRegisterEvent.class, setupEvent -> {
+			IResourceManager manager = Minecraft.getInstance().getResourceManager();
+			if (manager instanceof IReloadableResourceManager){
+				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
+			}
+		});
 	}
 
 	@SuppressWarnings("deprecation")

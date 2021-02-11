@@ -17,6 +17,8 @@ public class ThickRingTextureManager {
      * THIS IS STILL WIP. THICK RINGS ARE NOT YET STITCHED AUTOMATICALLY
      */
 
+	public static ThickRingSpriteUploader uploader;
+
     public static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<>();
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {

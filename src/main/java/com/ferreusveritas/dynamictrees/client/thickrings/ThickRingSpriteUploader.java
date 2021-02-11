@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.client.thickrings;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.ReloadListener;
+import net.minecraft.profiler.EmptyProfiler;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +21,11 @@ public class ThickRingSpriteUploader extends ReloadListener<AtlasTexture.SheetDa
 
     public ThickRingAtlasTexture getTextureAtlas (){
         return textureAtlas;
+    }
+
+    //for testing
+    public void prepareAndApply (IResourceManager resourceManager){
+        apply(prepare(resourceManager, EmptyProfiler.INSTANCE), resourceManager, EmptyProfiler.INSTANCE);
     }
 
     /**
