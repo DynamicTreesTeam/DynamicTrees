@@ -8,12 +8,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -21,19 +23,20 @@ public class TextureStitchEventHandler {
 
     @SubscribeEvent
     public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-//        if (event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_PARTICLES_TEXTURE)) { //Particle atlas is always loaded after block atlas
-//            //System.out.println("AAA");
-//            if (ThickRingTextureManager.uploader != null){
-//                ThickRingTextureManager.uploader.prepareAndApply(Minecraft.getInstance().getResourceManager());
-//            }
-//        }
+        if (!event.getMap().getTextureLocation().equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE)) {
+            return;
+        }
 
-//        if (event.getMap() instanceof ThickRingAtlasTexture) {
-//            for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingResourceLocations()){
-//                ResourceLocation thickLogResLoc = reslocs.getKey();
-//
-//                event.addSprite(thickLogResLoc);
-//            }
-//        }
+        for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingEntrySet()){
+            ResourceLocation originalLogResLoc = reslocs.getKey();
+            ResourceLocation thickLogResLoc = reslocs.getValue();
+            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
+
+            try {
+                manager.getResource(thickLogResLoc);
+            } catch (IOException ignored){ }
+
+            event.addSprite(thickLogResLoc);
+        }
     }
 }

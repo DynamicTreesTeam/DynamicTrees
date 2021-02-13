@@ -8,6 +8,7 @@ import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,17 +20,20 @@ public class ThickRingTextureManager {
 
 	public static ThickRingSpriteUploader uploader;
 
-    public static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<>();
+    public static final BiMap<ResourceLocation, ResourceLocation> thickRingTextures = HashBiMap.create();
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
 		ResourceLocation thickRingSet = new ResourceLocation(ringsRes.getNamespace(), ringsRes.getPath() + "_thick");
-		thickRingTextures.put(thickRingSet, ringsRes);
+		thickRingTextures.put(ringsRes, thickRingSet);
 		return thickRingSet;
 	}
 
 	public static Set<ResourceLocation> getThickRingResourceLocations (){
-	    return thickRingTextures.keySet();
+	    return new HashSet<>(thickRingTextures.values());
     }
+    public static Set<Map.Entry<ResourceLocation, ResourceLocation>> getThickRingEntrySet(){
+		return thickRingTextures.entrySet();
+	}
 
 //    public static void generateThickRingTexture (ResourceLocation originalResLoc, ResourceLocation thickResLoc){
 //		if (spriteUploader == null){

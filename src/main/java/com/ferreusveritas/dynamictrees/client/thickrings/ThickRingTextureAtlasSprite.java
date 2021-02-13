@@ -29,11 +29,18 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = null;
 
-		load();
 	}
 
 	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, TextureAtlasSprite.Info spriteInfo, int mipmapLevels, int atlasWidth, int atlasHeight, int x, int y){
-		this(atlasTexture, spriteInfo, mipmapLevels, atlasWidth, atlasHeight, x, y, new NativeImage(atlasWidth, atlasHeight, false), ThickRingTextureManager.thickRingTextures.get(spriteInfo.getSpriteLocation()));
+		this(atlasTexture, spriteInfo, mipmapLevels, atlasWidth, atlasHeight, x, y, new NativeImage(atlasWidth, atlasHeight, false), ThickRingTextureManager.thickRingTextures.inverse().get(spriteInfo.getSpriteLocation()));
+	}
+
+	private boolean loaded = false;
+	public void loadAtlasTexture (){
+		if (!loaded){
+			load();
+			loaded = true;
+		}
 	}
 
 	@Override
@@ -118,9 +125,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		TextureAtlasSprite baseTexture = getter.apply(solveRingTexture(getter));
 
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
-		//PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
+		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 
-		NativeImage frame = basePixbuf.toNativeImage();
+		NativeImage frame = majPixbuf.toNativeImage();
 
 		this.frames[0] = frame;
 		this.uploadMipmaps();

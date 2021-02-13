@@ -1,6 +1,9 @@
 package com.ferreusveritas.dynamictrees.client.thickrings;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
@@ -21,10 +24,7 @@ import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -44,6 +44,44 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         maximumTextureSize = RenderSystem.maxSupportedTextureSize();
     }
 
+    @Override
+    public TextureAtlasSprite getSprite(ResourceLocation resloc) {
+        TextureAtlasSprite sprite = super.getSprite(resloc);
+        if (sprite instanceof ThickRingTextureAtlasSprite){
+            ((ThickRingTextureAtlasSprite) sprite).loadAtlasTexture();
+        }
+        return sprite;
+    }
+
+//    private List<TreeFamily> getThickTreeFamilies(){
+//        List<TreeFamily> thickFamilies = new LinkedList<>();
+//        for (Species species : Species.REGISTRY.getValues()){
+//            TreeFamily tree = species.getFamily();
+//            if (!thickFamilies.contains(tree) && tree.isThick()){
+//                thickFamilies.add(tree);
+//            }
+//        }
+//        return thickFamilies;
+//    }
+
+    /**
+     * THIS IS TEMPORAL TO TEST
+     * TODO: NOT THIS
+     */
+    private Set<ResourceLocation> fetchThickRings (){
+//        for (TreeFamily tree : getThickTreeFamilies()){
+//            String log = "log";
+//            if (tree.isFireProof())
+//                log = "stem";
+//            ResourceLocation ringResloc = new ResourceLocation("minecraft", "block/"+tree.getName().getPath()+"_"+log+"_top");
+//            ThickRingTextureManager.addRingTextureLocation(ringResloc);
+//            ResourceLocation strippedRingResloc = new ResourceLocation("minecraft", "block/stripped_"+tree.getName().getPath()+"_"+log+"_top");
+//            ThickRingTextureManager.addRingTextureLocation(strippedRingResloc);
+//        }
+//        return ThickRingTextureManager.getThickRingResourceLocations();
+        return new HashSet<>();
+    }
+
     public SheetData stitch(IResourceManager resourceManagerIn, IProfiler profilerIn, int maxMipmapLevelIn) {
         return stitch(resourceManagerIn, null, profilerIn, maxMipmapLevelIn);
     }
@@ -56,7 +94,7 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         int k = 1 << maxMipmapLevelIn;
         profilerIn.endStartSection("extracting_frames");
 
-        Set<ResourceLocation> set = ThickRingTextureManager.getThickRingResourceLocations();
+        Set<ResourceLocation> set = fetchThickRings();
         net.minecraftforge.client.ForgeHooksClient.onTextureStitchedPre(this, set);
 
         for(TextureAtlasSprite.Info textureatlassprite$info : this.makeSprites(resourceManagerIn, set)) {

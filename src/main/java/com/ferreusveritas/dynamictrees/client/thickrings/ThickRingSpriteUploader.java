@@ -23,10 +23,23 @@ public class ThickRingSpriteUploader extends ReloadListener<AtlasTexture.SheetDa
         return textureAtlas;
     }
 
-    //for testing
-    public void prepareAndApply (IResourceManager resourceManager){
-        apply(prepare(resourceManager, EmptyProfiler.INSTANCE), resourceManager, EmptyProfiler.INSTANCE);
-    }
+//    public AtlasTexture.SheetData prepare (IResourceManager resourceManager){
+//        IProfiler profiler = EmptyProfiler.INSTANCE;
+//        profiler.startTick();
+//        profiler.startSection("stitching");
+//        AtlasTexture.SheetData atlastexture$sheetdata = textureAtlas.stitch(resourceManager, profiler, 0);
+//        profiler.endSection();
+//        profiler.endTick();
+//        return atlastexture$sheetdata;
+//    }
+//    public void apply(AtlasTexture.SheetData sheetData) {
+//        IProfiler profiler = EmptyProfiler.INSTANCE;
+//        profiler.startTick();
+//        profiler.startSection("upload");
+//        textureAtlas.upload(sheetData);
+//        profiler.endSection();
+//        profiler.endTick();
+//    }
 
     /**
      * Performs any reloading that can be done off-thread, such as file IO
@@ -53,15 +66,3 @@ public class ThickRingSpriteUploader extends ReloadListener<AtlasTexture.SheetDa
     }
 
 }
-
-//public class ThickRingSpriteUploader extends SpriteUploader {
-//
-//    public ThickRingSpriteUploader(TextureManager textureManagerIn) {
-//        super(textureManagerIn, ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE, "thick_rings");
-//    }
-//
-//    @Override
-//    protected Stream<ResourceLocation> getResourceLocations() {
-//        return new LinkedList<ResourceLocation>().stream();
-//    }
-//}

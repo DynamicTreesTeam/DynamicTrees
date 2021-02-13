@@ -161,8 +161,8 @@ public class DynamicTrees {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
+//		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+//		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
 
 		CellKits.setup();
 		GrowthLogicKits.setup();
@@ -184,16 +184,16 @@ public class DynamicTrees {
 //		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
 	}
 
-	//TODO: thick rings are loading before the resourcelocations are added, need to find an event that fires then.
-	private static void clientStart(IEventBus modEventBus) {
-		modEventBus.addListener(EventPriority.NORMAL, false, ParticleFactoryRegisterEvent.class, setupEvent -> {
-			IResourceManager manager = Minecraft.getInstance().getResourceManager();
-			if (manager instanceof IReloadableResourceManager){
-				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
-				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
-			}
-		});
-	}
+	//TODO: thick ring stitching
+//	private static void clientStart(IEventBus modEventBus) {
+//		modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
+//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
+//			if (manager instanceof IReloadableResourceManager){
+//				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+//				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
+//			}
+//		});
+//	}
 
 	@SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event) {

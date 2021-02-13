@@ -23,6 +23,7 @@ public class ThickBranchBlockModelGeometry extends BranchBlockModelGeometry {
         super(barkResLoc, ringsResLoc);
 
         this.thickRingsResLoc = ThickRingTextureManager.addRingTextureLocation(ringsResLoc);
+        //this.thickRingsResLoc = ThickRingTextureManager.thickRingTextures.get(ringsResLoc);
     }
 
     @Override
