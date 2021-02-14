@@ -1,11 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -491,8 +486,9 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 	
 	public void damageAxe(EntityLivingBase entity, ItemStack heldItem, int radius, float woodVolume) {
+		Set<String> toolClasses = heldItem.getItem().getToolClasses(heldItem);
 		
-		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || heldItem.getItem().getToolClasses(heldItem).contains("axe"))) {
+		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || toolClasses.contains("axe") || toolClasses.contains("mattock"))) {
 			
 			int damage;
 			
