@@ -486,9 +486,12 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 	
 	public void damageAxe(EntityLivingBase entity, ItemStack heldItem, int radius, float woodVolume) {
+		if (heldItem == null) 
+			return;
+		
 		Set<String> toolClasses = heldItem.getItem().getToolClasses(heldItem);
 		
-		if(heldItem != null && (heldItem.getItem() instanceof ItemAxe || toolClasses.contains("axe") || toolClasses.contains("mattock"))) {
+		if(heldItem.getItem() instanceof ItemAxe || toolClasses.contains("axe") || toolClasses.contains("mattock")) {
 			
 			int damage;
 			
