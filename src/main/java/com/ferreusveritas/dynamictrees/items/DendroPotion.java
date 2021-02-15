@@ -117,7 +117,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	public static DendroPotionType getPotionType (ItemStack stack) {
-		return DendroPotionType.values()[stack.getTag().getInt(INDEX_TAG_KEY)];
+		return DendroPotionType.values()[stack.getOrCreateTag().getInt(INDEX_TAG_KEY)];
 	}
 	
 	@Override
@@ -135,12 +135,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	public Species getTargetSpecies(ItemStack itemStack) {
-		if (itemStack.hasTag()){
-			final CompoundNBT nbtTag = itemStack.getTag();
+		final CompoundNBT nbtTag = itemStack.getOrCreateTag();
 
-			if (nbtTag.contains(TREE_TAG_KEY)) {
-				return TreeRegistry.findSpecies(new ResourceLocation(nbtTag.getString(TREE_TAG_KEY)));
-			}
+		if (nbtTag.contains(TREE_TAG_KEY)) {
+			return TreeRegistry.findSpecies(new ResourceLocation(nbtTag.getString(TREE_TAG_KEY)));
 		}
 
 		return null;

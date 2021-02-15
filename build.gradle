@@ -111,6 +111,9 @@ dependencies {
     // At runtime, use JEI mod
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}")
 
+    // At runtime, use Patchouli mod
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
+
     // Use Serene Seasons mod.
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 }
