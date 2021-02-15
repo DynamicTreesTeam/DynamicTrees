@@ -2,7 +2,7 @@
     "name": "Potion of Gigas",
     "icon": "dynamictrees:dendropotion:2",
     "category": "potions",
-	"sortnum": "7",
+	"sortnum": "8",
   "pages": [
 	{
       "type": "brewing",
@@ -21,7 +21,8 @@
           "potions/depletionpotion",
           "potions/fertilitypotion",
           "potions/persistancepotion",
-          "potions/transformationpotion"
+          "potions/transformationpotion",
+		  "potions/basetransformationpotion"
         ]
     }
   ]

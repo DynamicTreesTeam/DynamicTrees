@@ -1,9 +1,9 @@
 {
     "name": "Dirt Bucket",
     "read_by_default": "true",
-    "icon": "forge:bucketfilled{FluidName:'dirt',Amount:1000}",
+    "icon": "dynamictrees:dirtbucket",
     "category": "othermechanics",
-	"sortnum": "1",
+	"sortnum": "2",
   "pages": [
 	{
       "type": "crafting",

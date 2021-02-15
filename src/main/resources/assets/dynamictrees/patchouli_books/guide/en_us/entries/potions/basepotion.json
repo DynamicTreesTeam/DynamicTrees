@@ -21,7 +21,8 @@
           "potions/fertilitypotion",
           "potions/gigaspotion",
           "potions/persistancepotion",
-          "potions/transformationpotion"
+          "potions/transformationpotion",
+		  "potions/basetransformationpotion"
         ]
     }
   ]

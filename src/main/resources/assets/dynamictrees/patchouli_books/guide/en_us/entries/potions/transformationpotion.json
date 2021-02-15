@@ -8,8 +8,8 @@
       "type": "brewing",
       "title": "Potion of Transformation",
       "ingredient": "dynamictrees:oakseed",
-      "bottle": "dynamictrees:dendropotion",
-      "output": "dynamictrees:dendropotion:6",
+      "bottle": "dynamictrees:dendropotion:6",
+      "output": "dynamictrees:dendropotion:6{target:'dynamictrees:oak'}",
       "text": "This potion changes an existing tree into another tree species.$(br2)The species of tree depends on the seed you use in the recipe. The example uses an Oak Acorn."
     },
 	{
@@ -21,7 +21,8 @@
           "potions/depletionpotion",
           "potions/fertilitypotion",
           "potions/gigaspotion",
-          "potions/persistancepotion"
+          "potions/persistancepotion",
+		  "potions/basetransformationpotion"
         ]
     }
   ]

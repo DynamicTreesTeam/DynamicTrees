@@ -2,5 +2,5 @@
 	"name": "Other Mechanics",
 	"sortnum": "3",
 	"description": "These entries go over other mechanics of Dynamic Trees.",
-	"icon": "forge:bucketfilled{FluidName:'dirt',Amount:1000}"
+	"icon": "dynamictrees:staff"
 }
