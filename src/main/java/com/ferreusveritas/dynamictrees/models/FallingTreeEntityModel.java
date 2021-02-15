@@ -76,11 +76,27 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 		if(destructionData.getNumBranches() > 0) {
 			BlockState exState = destructionData.getBranchBlockState(0);
 			if(exState != null) {
+
+				//Draw the rooty block if it is set to fall too
+				BlockPos bottomPos = entity.getPosition().down();
+				BlockState bottomState = entity.world.getBlockState(bottomPos);
+				boolean rootyBlockAdded = false;
+				if (TreeHelper.isRooty(bottomState)){
+					RootyBlock rootyBlock = TreeHelper.getRooty(bottomState);
+					if (rootyBlock.fallWithTree(bottomState,entity.world, bottomPos)){
+						IBakedModel rootyModel = dispatcher.getModelForState(bottomState);
+						List<BakedQuad> quads = QuadManipulator.getQuads(rootyModel, bottomState, new Vector3d(0, -1, 0), EmptyModelData.INSTANCE);
+						treeQuads.addAll(quads);
+						entity.addTintedQuads(destructionData.species.getFamily().getRootColor(bottomState, rootyBlock.getColorFromBark()), quads.toArray(new BakedQuad[]{}));
+						rootyBlockAdded = true;
+					}
+				}
+
 				IBakedModel branchModel = dispatcher.getModelForState(exState);
 				//Draw the ring texture cap on the cut block if the bottom connection is above 0
 				destructionData.getConnections(0, connectionArray);
 				boolean bottomRingsAdded = false;
-				if (connectionArray[cutDir.getIndex()] > 0){
+				if (!rootyBlockAdded && connectionArray[cutDir.getIndex()] > 0){
 					BlockPos offsetPos = BlockPos.ZERO.offset(cutDir);
 					float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.RADMAX_NORMAL) ) / 16f;
 					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)));
@@ -113,19 +129,6 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 						BlockState state = destructionData.getLeavesBlockState(index);
 						IBakedModel leavesModel = dispatcher.getModelForState(state);
 						treeQuads.addAll(QuadManipulator.getQuads(leavesModel, state, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE));
-					}
-				}
-
-				//Draw the rooty block if it is set to fall too
-				BlockPos bottomPos = entity.getPosition().down();
-				BlockState bottomState = entity.world.getBlockState(bottomPos);
-				if (TreeHelper.isRooty(bottomState)){
-					RootyBlock rootyBlock = TreeHelper.getRooty(bottomState);
-					if (rootyBlock.fallWithTree(bottomState,entity.world, bottomPos)){
-						IBakedModel rootyModel = dispatcher.getModelForState(bottomState);
-						List<BakedQuad> quads = QuadManipulator.getQuads(rootyModel, bottomState, new Vector3d(0, -1, 0), EmptyModelData.INSTANCE);
-						treeQuads.addAll(quads);
-						entity.addTintedQuads(destructionData.species.getFamily().getRootColor(bottomState, rootyBlock.getColorFromBark()), quads.toArray(new BakedQuad[]{}));
 					}
 				}
 
