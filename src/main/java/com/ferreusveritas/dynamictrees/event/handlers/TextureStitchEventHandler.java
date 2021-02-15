@@ -1,9 +1,13 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.client.ThickRingAtlasTextureManager;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,20 +27,16 @@ public class TextureStitchEventHandler {
             return;
         }
 
-        for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingAtlasTextureManager.getThickRingResourceLocations()){
+        for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingEntrySet()){
             ResourceLocation originalLogResLoc = reslocs.getKey();
             ResourceLocation thickLogResLoc = reslocs.getValue();
             SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
 
             try {
                 manager.getResource(thickLogResLoc);
-            } catch (IOException e){
-                ThickRingAtlasTextureManager.generateThickRingTexture(manager, originalLogResLoc, thickLogResLoc);
-            }
+            } catch (IOException ignored){ }
 
             event.addSprite(thickLogResLoc);
-
         }
     }
-
 }

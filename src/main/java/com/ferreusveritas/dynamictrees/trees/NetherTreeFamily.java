@@ -22,7 +22,7 @@ import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Optional;
 
-public class NetherFungusFamily extends VanillaTreeFamily {
+public class NetherTreeFamily extends VanillaTreeFamily {
 
     public class BaseNetherFungiSpecies extends Species{
         BaseNetherFungiSpecies(ResourceLocation name, TreeFamily treeFamily) {
@@ -81,7 +81,7 @@ public class NetherFungusFamily extends VanillaTreeFamily {
 
         @Override
         public int maxBranchRadius() {
-            return 24;
+            return 20;
         }
 
         @Override
@@ -101,7 +101,7 @@ public class NetherFungusFamily extends VanillaTreeFamily {
 
     }
 
-    public NetherFungusFamily(DynamicTrees.VanillaWoodTypes wood) {
+    public NetherTreeFamily(DynamicTrees.VanillaWoodTypes wood) {
         super(wood);
     }
 

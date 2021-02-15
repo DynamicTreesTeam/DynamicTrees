@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
@@ -17,6 +19,8 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.Map;
 
 /**
  * @author Harley O'Connor

@@ -1,5 +1,6 @@
-package com.ferreusveritas.dynamictrees.client;
+package com.ferreusveritas.dynamictrees.client.thickrings;
 
+import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
@@ -22,13 +23,24 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	private final ResourceLocation baseRingLocation;
 	private final ResourceLocation baseRingLocationAlternate;
 
-	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, ResourceLocation spriteName, ResourceLocation baseRingLocation) {
-		super(atlasTexture, new Info(spriteName, 16, 16, AnimationMetadataSection.EMPTY), 0, 48*3, 48*3, 16, 16, new NativeImage(48, 48, false));
+	public ThickRingTextureAtlasSprite(AtlasTexture atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidthIn, int atlasHeightIn, int xIn, int yIn, NativeImage imageIn, ResourceLocation baseRingLocation){
+		super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidthIn, atlasHeightIn, xIn, yIn, imageIn);
 
 		this.baseRingLocation = baseRingLocation;
 		this.baseRingLocationAlternate = null;
 
-		load();
+	}
+
+	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, TextureAtlasSprite.Info spriteInfo, int mipmapLevels, int atlasWidth, int atlasHeight, int x, int y){
+		this(atlasTexture, spriteInfo, mipmapLevels, atlasWidth, atlasHeight, x, y, new NativeImage(atlasWidth, atlasHeight, false), ThickRingTextureManager.thickRingTextures.inverse().get(spriteInfo.getSpriteLocation()));
+	}
+
+	private boolean loaded = false;
+	public void loadAtlasTexture (){
+		if (!loaded){
+			load();
+			loaded = true;
+		}
 	}
 
 	@Override
@@ -113,9 +125,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		TextureAtlasSprite baseTexture = getter.apply(solveRingTexture(getter));
 
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
-		//PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
+		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
 
-		NativeImage frame = basePixbuf.toNativeImage();
+		NativeImage frame = majPixbuf.toNativeImage();
 
 		this.frames[0] = frame;
 		this.uploadMipmaps();
