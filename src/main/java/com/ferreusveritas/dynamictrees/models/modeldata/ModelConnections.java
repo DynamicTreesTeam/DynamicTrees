@@ -14,7 +14,6 @@ import net.minecraftforge.client.model.data.ModelProperty;
 public class ModelConnections extends Connections implements IModelData {
 
 	private Direction ringOnly = null;
-	protected boolean rootyBlockBelow = false;
 
 	public ModelConnections() { }
 	
@@ -56,12 +55,16 @@ public class ModelConnections extends Connections implements IModelData {
 		return ringOnly;
 	}
 
-	public boolean isRootyBlockBelow() {
-		return rootyBlockBelow;
+	public void setForceRing(Direction ringSide){
+		ringOnly = ringSide;
 	}
 
-	public void setRootyBlockBelow(boolean rootyBlockBelow) {
-		this.rootyBlockBelow = rootyBlockBelow;
-	}
+//	public boolean isRootyBlockBelow() {
+//		return rootyBlockBelow;
+//	}
+//
+//	public void setRootyBlockBelow(boolean rootyBlockBelow) {
+//		this.rootyBlockBelow = rootyBlockBelow;
+//	}
 
 }

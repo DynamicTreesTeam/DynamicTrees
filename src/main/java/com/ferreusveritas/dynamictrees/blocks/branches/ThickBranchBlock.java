@@ -74,7 +74,9 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? MathHelper.clamp(blockState.get(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
+		if (!(blockState.getBlock() instanceof ThickBranchBlock))
+			return super.getRadius(blockState);
+		return isSameTree(blockState) ? MathHelper.clamp(blockState.get(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
 	}
 
 	@Override
@@ -128,10 +130,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		if (from == this) {
+		if (from instanceof ThickBranchBlock)
 			return getRadius(blockState);
-		}
-
 		return Math.min(getRadius(blockState), RADMAX_NORMAL);
 	}
 
@@ -144,13 +144,13 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 			BlockState blockState = blockAccess.getBlockState(deltaPos);
 			int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 
-			if (radius > 8) {
-				if (side == Direction.DOWN) {
-					return connectionRadius >= radius ? 1 : 0;
-				} else if (side == Direction.UP) {
-					return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
-				}
-			}
+//			if (radius > 8) {
+//				if (side == Direction.DOWN) {
+//					return connectionRadius >= radius ? 1 : 0;
+//				} else if (side == Direction.UP) {
+//					return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
+//				}
+//			}
 
 			return Math.min(RADMAX_NORMAL, connectionRadius);
 		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.

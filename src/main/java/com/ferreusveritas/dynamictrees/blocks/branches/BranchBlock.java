@@ -91,6 +91,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public boolean isSameTree(ITreePart treepart) {
 		return isSameTree(TreeHelper.getBranch(treepart));
 	}
+	public boolean isSameTree(BlockState state) {
+		return isSameTree(TreeHelper.getBranch(state));
+	}
 	
 	/**
 	 * Branches are considered the same if they have the same tree
@@ -173,7 +176,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		
 		Connections connections = new Connections();
-		
+
 		if(state.getBlock().equals(this)) {
 			int coreRadius = getRadius(state);
 			for(Direction dir: Direction.values()) {

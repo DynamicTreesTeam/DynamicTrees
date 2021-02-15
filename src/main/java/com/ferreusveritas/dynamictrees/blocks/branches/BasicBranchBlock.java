@@ -182,7 +182,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? blockState.get(RADIUS) : 0;
+		return isSameTree(blockState) ? blockState.get(RADIUS) : 0;
 	}
 	
 	@Override
@@ -319,7 +319,6 @@ public class BasicBranchBlock extends BranchBlock {
 
 	@Override
 	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-//		return isSameTree(from)?getRadius(blockState):0;
 		return getRadius(blockState);
 	}
 	

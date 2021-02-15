@@ -196,7 +196,7 @@ public class BranchDestructionData {
 		
 		for(Direction face : Direction.values()) {
 			int rad = (encodedConnections >> (face.getIndex() * 5) & 0x1F);
-			connections[face.getIndex()] = MathHelper.clamp(rad, 0, 8);
+			connections[face.getIndex()] = Math.max(0, rad);
 		}
 	}
 	

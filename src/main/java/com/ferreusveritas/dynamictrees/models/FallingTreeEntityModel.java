@@ -79,16 +79,13 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 				IBakedModel branchModel = dispatcher.getModelForState(exState);
 				//Draw the ring texture cap on the cut block if the bottom connection is above 0
 				destructionData.getConnections(0, connectionArray);
+				boolean bottomRingsAdded = false;
 				if (connectionArray[cutDir.getIndex()] > 0){
 					BlockPos offsetPos = BlockPos.ZERO.offset(cutDir);
 					float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.RADMAX_NORMAL) ) / 16f;
 					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)));
+					bottomRingsAdded = true;
 				}
-
-				for(Direction face: Direction.values()) {
-					connectionArray[face.getIndex()] = face == cutDir.getOpposite() ? 8 : 0;
-				}
-				ModelConnections connections = new ModelConnections(connectionArray);
 
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {
@@ -98,7 +95,9 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 						branchModel = dispatcher.getModelForState(exState);
 					BlockPos relPos = destructionData.getBranchRelPos(index);
 					destructionData.getConnections(index, connectionArray);
-					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), connections.setAllRadii(connectionArray)));
+					ModelConnections modelConnections = new ModelConnections(connectionArray);
+					if (index == 0 && bottomRingsAdded) modelConnections.setForceRing(cutDir);
+					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections));
 				}
 				
 				//Draw the leaves
@@ -107,12 +106,6 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 					for(Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
 						treeQuads.addAll(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafState, new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE));
-//						for (BakedQuad quad : leavesQuads){
-//							Direction quadFace = quad.getFace();
-//							if (!(quadFace == Direction.UP || quadFace == Direction.SOUTH || quadFace == Direction.WEST) || !leavesClusters.containsKey(leafLoc.getKey().offset(quadFace))){
-//								treeQuads.add(quad);
-//							}
-//						}
 					}
 				} else {
 					for(int index = 0; index < destructionData.getNumLeaves(); index++) {

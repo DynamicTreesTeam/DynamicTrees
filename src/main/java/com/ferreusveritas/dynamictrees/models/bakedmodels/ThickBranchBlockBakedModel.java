@@ -166,26 +166,37 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 
 		int[] connections = new int[] {0,0,0,0,0,0};
 
-		Direction ringOnly = null;
+		Direction forceRingDir = null;
 		if (extraData instanceof ModelConnections){
 			ModelConnections connectionsData = (ModelConnections) extraData;
 			connections = connectionsData.getAllRadii();
-			ringOnly = connectionsData.getRingOnly();
+			forceRingDir = connectionsData.getRingOnly();
 		}
 
-		if (ringOnly == null){
-			for (Direction face : Direction.values()) {
-				quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
-				if (face == Direction.UP || face == Direction.DOWN) {
-					if (connections[face.getIndex()] < 1) {
-						quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
-					} else if (connections[1] < coreRadius) {
-						quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
-					}
+		//Count number of connections
+		int numConnections = 0;
+		for(int i: connections) {
+			numConnections += (i != 0) ? 1: 0;
+		}
+
+		if (numConnections == 0 && forceRingDir != null){
+			return quads;
+		}
+
+		if (forceRingDir != null){
+			connections[forceRingDir.getIndex()] = 0;
+			quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData));
+		}
+
+		for (Direction face : Direction.values()) {
+			quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+			if (face == Direction.UP || face == Direction.DOWN) {
+				if (connections[face.getIndex()] < 1) {
+					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+				} else if (connections[face.getIndex()] < coreRadius) {
+					quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
 				}
 			}
-		} else {
-			quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, ringOnly, rand, extraData));
 		}
 
 		return quads;

@@ -169,20 +169,22 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 			int[] connections = new int[] {0,0,0,0,0,0};
 
-			Direction ringOnly = null;
+			Direction forceRingDir = null;
 			if (extraData instanceof ModelConnections){
 				ModelConnections connectionsData = (ModelConnections) extraData;
 				connections = connectionsData.getAllRadii();
-				ringOnly = connectionsData.getRingOnly();
+				forceRingDir = connectionsData.getRingOnly();
 			}
 
-			if (ringOnly == null){
+			//Count number of connections
+			int numConnections = 0;
+			for(int i: connections) {
+				numConnections += (i != 0) ? 1: 0;
+			}
 
-				//Count number of connections
-				int numConnections = 0;
-				for(int i: connections) {
-					numConnections += (i != 0) ? 1: 0;
-				}
+			if (numConnections == 0 && forceRingDir != null){
+				quadsList.addAll(rings[coreRadius-1].getQuads(state, forceRingDir, rand, extraData));
+			} else {
 
 				//The source direction is the biggest connection from one of the 6 directions
 				Direction sourceDir = getSourceDir(coreRadius, connections);
@@ -197,7 +199,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 				for(Direction face  : Direction.values()) {
 					//Get quads for core model
 					if(coreRadius != connections[face.getIndex()]) {
-						if(coreRingDir == null || coreRingDir != face) {
+						if((coreRingDir == null || coreRingDir != face)) {
 							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
 						} else {
 							quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
@@ -216,10 +218,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 					}
 
 				}
-			} else {
-				//Get quads for rings. Used by the falling tree animation.
-				quadsList.addAll(rings[coreRadius-1].getQuads(state, ringOnly, rand, extraData));
 			}
+
 			return quadsList;
 		}
 
@@ -236,10 +236,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Block block = state.getBlock();
 		if (!(block instanceof BranchBlock)) return new ModelConnections();
-		ModelConnections connections = new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state));
-		if (world.getBlockState(pos.down()).getBlock() instanceof RootyBlock)
-			connections.setRootyBlockBelow(true);
-		return connections;
+		return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state));
 	}
 	
 	/**
