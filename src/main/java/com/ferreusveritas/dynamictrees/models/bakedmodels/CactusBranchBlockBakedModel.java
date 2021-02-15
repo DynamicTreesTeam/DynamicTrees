@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -69,7 +70,7 @@ public class CactusBranchBlockBakedModel extends BranchBlockBakedModel {
 
     private void putVertex(BakedQuadBuilder builder, Vector3d normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b) {
 
-        final ImmutableList<VertexFormatElement> elements = builder.getVertexFormat().getElements().asList();
+        final ImmutableList<VertexFormatElement> elements = DefaultVertexFormats.BLOCK.getElements().asList();
         for (int j = 0 ; j < elements.size() ; j++) {
             VertexFormatElement e = elements.get(j);
             switch (e.getUsage()) {
