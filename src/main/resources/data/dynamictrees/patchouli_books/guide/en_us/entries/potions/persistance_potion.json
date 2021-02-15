@@ -1,0 +1,29 @@
+{
+    "name": "Potion of Persistance",
+    "icon": "dynamictrees:dendro_potion{potion_index:5}",
+    "category": "potions",
+	"sortnum": "7",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Potion of Persistance",
+      "ingredient": "minecraft:blue_orchid",
+      "bottle": "dynamictrees:dendro_potion",
+      "output": "dynamictrees:dendro_potion{potion_index:5}",
+      "text": "This potion changes an existing tree from growing, rendering it static. Useful if you want the tree to always look the way it does for decoration."
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/base_potion",
+          "potions/burgeoning_potion",
+          "potions/depletion_potion",
+          "potions/fertility_potion",
+          "potions/gigas_potion",
+          "potions/base_transformation_potion",
+          "potions/transformation_potion"
+        ]
+    }
+  ]
+} 

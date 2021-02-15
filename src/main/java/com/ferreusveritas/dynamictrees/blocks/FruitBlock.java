@@ -269,7 +269,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, Float seasonValue) {
-		if (this.getSpecies().testFlowerSeasonHold(seasonValue)) {
+		if (this.getSpecies() != null && this.getSpecies().testFlowerSeasonHold(seasonValue)) {
 			return 0;//Fruit is as the flower stage
 		}
 		return Math.min(world.getRandom().nextInt(6), 3);//Half the time the fruit is fully mature

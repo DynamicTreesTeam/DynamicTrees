@@ -1,0 +1,29 @@
+{
+    "name": "Potion of Fertility",
+    "icon": "dynamictrees:dendro_potion{potion_index:4}",
+    "category": "potions",
+	"sortnum": "4",
+  "pages": [
+	{
+      "type": "brewing",
+      "title": "Potion of Fertility",
+      "ingredient": "minecraft:cod",
+      "bottle": "dynamictrees:dendro_potion",
+      "output": "dynamictrees:dendro_potion{potion_index:4}",
+      "text": "This potion fully fertilizes the soil."
+    },
+	{
+      "type": "relations",
+      "title": "Relations",
+        "entries": [
+          "potions/base_potion",
+          "potions/burgeoning_potion",
+          "potions/depletion_potion",
+          "potions/gigas_potion",
+          "potions/persistance_potion",
+          "potions/base_transformation_potion",
+          "potions/transformation_potion"
+        ]
+    }
+  ]
+} 
