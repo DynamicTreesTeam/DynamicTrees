@@ -1,0 +1,21 @@
+{
+  "itemGroup.dynamictrees": "Árboles Dinámicos",
+
+  "block.dynamictrees.rooty_dirt": "Raíces Terrosas",
+
+  "block.dynamictrees.oak_branch": "Roble Dinámico",
+  "block.dynamictrees.spruce_branch": "Abeto Dinámico",
+  "block.dynamictrees.birch_branch": "Abedul Dinámico",
+  "block.dynamictrees.jungle_branch": "Árbol Dinámico de la Selva",
+  "block.dynamictrees.dark_oak_branch": "Roble Oscuro Dinámico",
+  "block.dynamictrees.acacia_branch": "Árbol de Acacia Dinámico",
+
+  "item.dynamictrees.oak_seed": "Bellota de Roble",
+  "item.dynamictrees.spruce_seed": "Piña de Abeto",
+  "item.dynamictrees.birch_seed": "Semilla de Abedul",
+  "item.dynamictrees.jungle_seed": "Vaina de la Selva",
+  "item.dynamictrees.dark_oak_seed": "Bellota de Roble Oscuro",
+  "item.dynamictrees.acacia_seed": "Semilla de Acacia",
+
+  "item.dynamictrees.staff": "Bastón del Bosque"
+}

@@ -1,4 +1,6 @@
 {
+  "itemGroup.dynamictrees": "Динамические деревья",
+
   "block.dynamictrees.rooty_dirt":"Дёрн с корнями",
   "block.dynamictrees.rooty_coarse_dirt":"Каменистая земля с корнями",
   "block.dynamictrees.rooty_grass_block":"Трава с корнями",
@@ -6,14 +8,7 @@
   "block.dynamictrees.rooty_mycelium":"Мицелий с корнями",
   "block.dynamictrees.rooty_sand":"Песок с корнями",
   "block.dynamictrees.rooty_red_sand":"Красный песок с корнями",
-
-  "block.dynamictrees.dynamic_oak_leaves":"Динамические дубовые листья",
-  "block.dynamictrees.dynamic_spruce_leaves":"Динамическая хвоя",
-  "block.dynamictrees.dynamic_birch_leaves":"Динамические берёзовые листья",
-  "block.dynamictrees.dynamic_jungle_leaves":"Динамические листья тропического дерева",
-  "block.dynamictrees.dynamic_dark_oak_leaves":"Динамические листья тёмного дуба",
-  "block.dynamictrees.dynamic_acacia_leaves":"Динамические листья акации",
-
+  
   "block.dynamictrees.oak_branch":"Динамический дуб",
   "block.dynamictrees.spruce_branch":"Dynamic ель",
   "block.dynamictrees.birch_branch":"Динамическая берёза",
@@ -21,6 +16,18 @@
   "block.dynamictrees.dark_oak_branch":"Динамический тёмный дуб",
   "block.dynamictrees.acacia_branch":"Динамическая акация",
   "block.dynamictrees.cactus_branch":"Динамический кактус",
+
+  "species.dynamictrees.oak": "Дуб",
+  "species.dynamictrees.swamp_oak": "Болотный дуб",
+  "species.dynamictrees.spruce": "Ель",
+  "species.dynamictrees.mega_spruce": "Мега ель",
+  "species.dynamictrees.birch": "Берёза",
+  "species.dynamictrees.jungle": "Тропическое",
+  "species.dynamictrees.mega_jungle": "Мега тропическое",
+  "species.dynamictrees.dark_oak": "Тёмный дуб",
+  "species.dynamictrees.acacia": "Акация",
+  "species.dynamictrees.apple": "Яблоня",
+  "species.dynamictrees.cactus": "Кактус",
 
   "item.dynamictrees.oak_seed":"Жёлудь дуба",
   "item.dynamictrees.spruce_seed":"Еловая шишка",
@@ -34,16 +41,28 @@
   "item.dynamictrees.red_mushroom_seed":"Шапочка красного гриба",
   "item.dynamictrees.chorus_seed":"Семя хоруса",
 
-  "item.dynamictrees.dendro_potion.depletion":"Зелье истощения",
-  "item.dynamictrees.dendro_potion.defoliance":"Зелье дефолианта",
-  "item.dynamictrees.dendro_potion.burgeoning":"Зелье роста",
-  "item.dynamictrees.dendro_potion.fertility":"Зелье плодородия",
-  "item.dynamictrees.dendro_potion.persistance":"Зелье стойкости",
-  "item.dynamictrees.dendro_potion.transform":"Зелье превращения",
+  "item.dynamictrees.dendro_potion.biochar": "Основное зелье",
+  "item.dynamictrees.dendro_potion.depletion": "Зелье истощения",
+  "item.dynamictrees.dendro_potion.burgeoning": "Зелье роста",
+  "item.dynamictrees.dendro_potion.fertility": "Зелье плодородия",
+  "item.dynamictrees.dendro_potion.persistance": "Зелье глубокого сна",
+  "item.dynamictrees.dendro_potion.transform": "Зелье трансформации",
 
   "item.dynamictrees.dirt_bucket":"Ведро грязи",
   "item.dynamictrees.staff":"Лесной посох",
   "item.dynamictrees.bonsai_pot":"Бонсаи горшок",
 
-  "commands.dynamictrees.repop.run": "§aПерезаполнение базы данных генератора деревьев"
+  "commands.dynamictrees.repop.run": "§aПерезаполнение базы данных генератора деревьев",
+  "commands.dynamictrees.transform.nottransformableerror": "Вид %s не может быть трансформирован",
+
+  "potion.biochar.description": "§7Базовое зелье для зельеварения",
+  "potion.depletion.description": "§7Убирает удобрение почвы дерева",
+  "potion.gigas.description": "§7Позволяет дереву стать мега-размера",
+  "potion.burgeoning.description": "§7Быстрее вырастит дерево",
+  "potion.fertility.description": "§7Полностью удобряет почву дерева",
+  "potion.persistance.description": "§7Прекращает изменение дерева",
+  "potion.transform.description": "§7Трансформирует дерево в §a%s §7дерево",
+  "potion.transform.description.empty": "§7Базовое зелье для зелий трансформации",
+
+  "death.attack.falling_tree": "%1$s раздавлен(а) падающим деревом"
 }

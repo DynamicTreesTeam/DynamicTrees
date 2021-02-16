@@ -1,0 +1,38 @@
+{
+  "itemGroup.dynamictrees": "Dynamic Trees",
+
+  "block.dynamictrees.rooty_dirt": "Rotig jord",
+  "block.dynamictrees.rooty_sand": "Rotig sand",
+  
+  "block.dynamictrees.oak_branch": "Dynamiskt ekträd",
+  "block.dynamictrees.spruce_branch": "Dynamiskt granträd",
+  "block.dynamictrees.birch_branch": "Dynamiskt björkträd",
+  "block.dynamictrees.jungle_branch": "Dynamiskt djungelträd",
+  "block.dynamictrees.dark_oak_branch": "Dynamiskt mörkt ekträd",
+  "block.dynamictrees.acacia_branch": "Dynamiskt akaciaträd",
+  "block.dynamictrees.cactus_branch": "Dynamisk kaktus",
+
+  "item.dynamictrees.oak_seed": "Ekollon",
+  "item.dynamictrees.spruce_seed": "Grankotte",
+  "item.dynamictrees.birch_seed": "Björkhänge",
+  "item.dynamictrees.jungle_seed": "Djungelkapsel",
+  "item.dynamictrees.dark_oak_seed": "Mörkt ekollon",
+  "item.dynamictrees.acacia_seed": "Akaciafrö",
+  "item.dynamictrees.apple_seed": "Äppelkärna",
+  "item.dynamictrees.cactus_seed": "Kaktusfrö",
+
+  "item.dynamictrees.dendro_potion.biochar": "Biokolsbrygdbas",
+  "item.dynamictrees.dendro_potion.depletion": "Exploateringsbrygd",
+  "item.dynamictrees.dendro_potion.burgeoning": "Snabbväxtlighetsbrygd",
+  "item.dynamictrees.dendro_potion.fertility": "Fertilitetsbrygd",
+  "item.dynamictrees.dendro_potion.persistance": "Beständighetsbrygd",
+  "item.dynamictrees.dendro_potion.transform": "Omvandlingsbrygd",
+
+  "item.dynamictrees.dirt_bucket": "Jordhink",
+  "item.dynamictrees.staff": "Skogsstav",
+  "block.dynamictrees.bonsai_pot": "Bonsaikruka",
+
+  "commands.dynamictrees.repop.run": "Återuppbygger databasen för världsgeneratorn",
+
+  "death.attack.falling_tree": "%1$s krossades av ett fallande träd"
+}

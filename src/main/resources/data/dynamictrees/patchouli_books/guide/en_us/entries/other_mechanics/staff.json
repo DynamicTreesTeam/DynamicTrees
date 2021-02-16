@@ -2,7 +2,7 @@
   "name": "Woodland Staff",
   "read_by_default": "true",
   "icon": "dynamictrees:staff",
-  "category": "othermechanics",
+  "category": "other_mechanics",
   "sortnum": "1",
   "pages": [
     {

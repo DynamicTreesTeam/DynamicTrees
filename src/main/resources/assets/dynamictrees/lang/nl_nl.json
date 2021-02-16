@@ -1,0 +1,36 @@
+{
+    "itemGroup.dynamictrees": "Dynamische Bomen",
+
+    "block.dynamictrees.rooty_dirt": "Wortelige Grond",
+    "block.dynamictrees.rooty_sand": "Wortelig Zand",
+
+    "block.dynamictrees.oak_branch": "Dynamische Eikenboom",
+    "block.dynamictrees.spruce_branch": "Dynamische Denneboom",
+    "block.dynamictrees.birch_branch": "Dynamische Berkenboom",
+    "block.dynamictrees.jungle_branch": "Dynamische Jungel Boom",
+    "block.dynamictrees.dark_oak_branch": "Dynamische Donkere Eikenboom",
+    "block.dynamictrees.acacia_branch": "Dynamische Acacia Boom",
+    "block.dynamictrees.cactus_branch": "Dynamische Cactus",
+
+    "item.dynamictrees.oak_seed": "Eiken Eikel",
+    "item.dynamictrees.spruce_seed": "Spruce Cone",
+    "item.dynamictrees.birch_seed": "Berken Katje",
+    "item.dynamictrees.jungle_seed": "Jungel Doosvrucht",
+    "item.dynamictrees.dark_oak_seed": "Donker Eiken Eikel",
+    "item.dynamictrees.acacia_seed": "Acacia Zaad",
+    "item.dynamictrees.apple_seed": "Appelpit",
+    "item.dynamictrees.cactus_seed": "Cactus Zaad",
+
+    "item.dynamictrees.dendro_potion.biochar": "Biochar Basis Drank",
+    "item.dynamictrees.dendro_potion.depletion": "Drank van Uitputting",
+    "item.dynamictrees.dendro_potion.burgeoning": "Drank van Ontluiken",
+    "item.dynamictrees.dendro_potion.fertility": "Drank van Vruchtbaarheid",
+    "item.dynamictrees.dendro_potion.persistance": "Drank van Volharding",
+    "item.dynamictrees.dendro_potion.transform": "Drank van Transformatie",
+
+    "item.dynamictrees.dirt_bucket": "Aarden Emmer",
+    "item.dynamictrees.staff": "Bosland Staf",
+    "block.dynamictrees.bonsai_pot": "Bonsai Pot",
+
+    "death.attack.falling_tree": "%1$s was verpletterd door een vallende boom"
+}

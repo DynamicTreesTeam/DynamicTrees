@@ -99,22 +99,23 @@ minecraft {
 }
 
 dependencies {
+    // Not sure if we need this one, what is a "forge" anyway?
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
-    // Compile against the Hwyla API, but do not include it at runtime
+    // Compile Hwyla API, but don't include in runtime.
     compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}:api")
-    // At runtime, use the full Hwyla jar
+    // At runtime, use the full Hwyla mod.
     runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}")
 
-    // Compile JEI API, but don't include in runtime
+    // Compile JEI API, but don't include in runtime.
     compileOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}:api")
-    // At runtime, use JEI mod
+    // At runtime, use the full JEI mod.
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${config.jei_version}")
 
-    // At runtime, use Patchouli mod
+    // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
 
-    // Use Serene Seasons mod.
+    // Compile full Serene Seasons mod and use in runtime.
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
 }
 
