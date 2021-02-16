@@ -6,11 +6,11 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-
 
 public class NodeFreezer implements INodeInspector {
 	
@@ -44,11 +44,11 @@ public class NodeFreezer implements INodeInspector {
 		if (!world.isRemote()/* && !world.restoringBlockSnapshots*/) { // do not drop items while restoring blockstates, prevents item dupe
 			TreeFamily tree = branch.getFamily();
 			BlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
-//			for(BlockPos leavesPos : BlockPos.getAllInBox(twigPos.add(-freezeRadius, -freezeRadius, -freezeRadius), twigPos.add(freezeRadius, freezeRadius, freezeRadius))) {
-//				if(tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
-//					world.setBlockState(leavesPos, primLeaves.with(LeavesBlock.PERSISTENT, true));
-//				}
-//			}
+			BlockPos.getAllInBox(twigPos.add(-freezeRadius, -freezeRadius, -freezeRadius), twigPos.add(freezeRadius, freezeRadius, freezeRadius)).forEach(leavesPos -> {
+				if (tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
+					world.setBlockState(leavesPos, primLeaves.with(LeavesBlock.PERSISTENT, true), 2);
+				}
+			});
 		}
 	}
 	

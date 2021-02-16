@@ -26,6 +26,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
@@ -40,7 +41,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import net.minecraft.block.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
@@ -71,13 +72,14 @@ import net.minecraftforge.registries.IForgeRegistry;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraftforge.registries.IForgeRegistryEntry<Species> {
+public class Species extends ForgeRegistryEntry<Species> {
+
+	private static final JoCodeManager JO_CODE_MANAGER = DTDataPackRegistries.JO_CODE_MANAGER;
 	
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
 		@Override public boolean isTransformable() { return false; }
-		@Override public void addJoCodes() {}
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
@@ -136,9 +138,7 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<BiomeDictionary.Type, Float>();//Environmental factors
-	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
-	protected JoCodeStore joCodeStore = new JoCodeStore(this);
-	
+
 	protected IFullGenFeature genFeatureOverride;
 	protected List<IPreGenFeature> preGenFeatures;
 	protected List<IPostGenFeature> postGenFeatures;
@@ -180,8 +180,6 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		setStandardSoils();
 		
-		//Add JoCode models for worldgen
-		addJoCodes();
 		addDropCreator(new LogDropCreator());
 	}
 	
@@ -1379,8 +1377,8 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		}
 		
 		Direction facing = CoordUtils.getRandomDir(random);
-		if(getJoCodeStore() != null) {
-			JoCode code = getJoCodeStore().getRandomCode(radius, random);
+		if(!JO_CODE_MANAGER.getCodes(this).isEmpty()) {
+			JoCode code = JO_CODE_MANAGER.getRandomCode(this, radius, random);
 			if(code != null) {
 				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;
@@ -1389,22 +1387,11 @@ public class Species extends ForgeRegistryEntry<Species> {//extends net.minecraf
 		
 		return false;
 	}
-	
-	public JoCodeStore getJoCodeStore() {
-		return joCodeStore;
-	}
-	
+
 	public JoCode getJoCode(String joCodeString) {
 		return new JoCode(joCodeString);
 	}
-	
-	/**
-	 * A {@link JoCode} defines the block model of the {@link TreeFamily}
-	 */
-	public void addJoCodes() {
-		joCodeStore.addCodesFromFile(this, "data/" + getRegistryName().getNamespace() + "/trees/jocode/"+ getRegistryName().getPath() + ".txt");
-	}
-	
+
 	public Species addGenFeature(IGenFeature module) {
 		addGenFeature(module, IGenFeature.DEFAULTS);
 		return this;
