@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import javafx.util.Pair;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -26,6 +25,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.BiomeDictionary;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -194,7 +194,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
                         }
                     }
                     if (validDirs.size() > 0){
-                        validSpaces.add(new Pair<>(sidePos, validDirs));
+                        validSpaces.add(Pair.of(sidePos, validDirs));
                     }
                 }
             }
