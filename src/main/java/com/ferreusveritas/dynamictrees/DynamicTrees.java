@@ -37,12 +37,12 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
-@Mod("dynamictrees")
+@Mod(DynamicTrees.MOD_ID)
 public class DynamicTrees {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-	
+
+	// The value here should match an entry in the META-INF/mods.toml file
 	public static final String MOD_ID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
 	public static final String VERSION = "1.16.5-9999.9999.9999z";//Maxed out version to satisfy dependencies during dev, Assigned from gradle during build, do not change

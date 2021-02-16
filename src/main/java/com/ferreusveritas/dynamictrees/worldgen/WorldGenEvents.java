@@ -66,7 +66,7 @@ public final class WorldGenEvents {
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
             // Go through each canceller for the current biome and remove the current feature if it shouldCancel returns true.
             for (ITreeFeatureCanceller canceller : treeCanceller.getFeatureCancellers(biomeResLoc)) {
-                if (canceller.shouldCancel(configuredFeatureSupplier.get(), biomeResLoc, treeCanceller))
+                if (canceller != null && canceller.shouldCancel(configuredFeatureSupplier.get(), biomeResLoc, treeCanceller))
                     return true;
             }
             return false;
@@ -111,7 +111,7 @@ public final class WorldGenEvents {
         registry.register(TreeFeatureCancellerRegistry.TREE_CANCELLER, new TreeFeatureCanceller<>(BaseTreeFeatureConfig.class));
 
         // This registers the tree feature canceller for cacti, which will cancel any BlockCluster features using the CactusBlock class.
-        registry.register(TreeFeatureCancellerRegistry.CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
+//        registry.register(TreeFeatureCancellerRegistry.CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
 
         // This registers the tree feature canceller for fungus, which will cancel any features if their config extends HugeFungusConfig.
         registry.register(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER, new FungusFeatureCanceller<>(HugeFungusConfig.class));

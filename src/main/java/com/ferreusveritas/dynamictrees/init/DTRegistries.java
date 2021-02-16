@@ -135,7 +135,7 @@ public class DTRegistries {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
-		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
+//		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -166,7 +166,7 @@ public class DTRegistries {
 		
 		ArrayList<Item> treeItems = new ArrayList<>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
-		DTTrees.dynamicCactus.getRegisterableItems(treeItems);
+//		DTTrees.dynamicCactus.getRegisterableItems(treeItems);
 		
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));

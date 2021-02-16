@@ -1,23 +1,21 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
-import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
-import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.*;
-import com.ferreusveritas.dynamictrees.blocks.branches.CactusBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
+import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
+import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
@@ -35,8 +33,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -119,7 +115,7 @@ public class DTClient {
 	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
 		ForgeRegistries.BLOCKS.forEach(block -> {
-			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof CactusBranchBlock || block instanceof BonsaiPotBlock) {
+			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof BonsaiPotBlock) {
 				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
 			}
 		});

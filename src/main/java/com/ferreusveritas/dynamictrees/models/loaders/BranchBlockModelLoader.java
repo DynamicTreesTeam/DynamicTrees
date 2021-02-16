@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.models.loaders;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
-import com.ferreusveritas.dynamictrees.models.geometry.CactusBranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
