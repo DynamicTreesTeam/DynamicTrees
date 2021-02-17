@@ -128,6 +128,7 @@ public class WorldGenRegistry {
 	}
 
 	private static void loadJsonTreeCanceller () {
+		DynamicTrees.getLogger().info("Loading Json Tree Canceller");
 		TreeCancellerJsonCapabilityRegistryEvent capabilityEvent = new TreeCancellerJsonCapabilityRegistryEvent();
 
 		// Create the tree canceller.

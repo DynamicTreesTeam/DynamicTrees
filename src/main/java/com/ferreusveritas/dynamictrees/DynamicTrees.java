@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGenEvents;
@@ -175,10 +176,11 @@ public class DynamicTrees {
 		
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-		
+
 		registerCommonEventHandlers();
 		
 		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.register(DTDataPackRegistries.class);
 
 		CompatHandler.init();
 //		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!

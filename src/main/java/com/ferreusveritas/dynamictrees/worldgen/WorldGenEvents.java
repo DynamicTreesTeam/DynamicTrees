@@ -5,11 +5,12 @@ import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.*;
-import net.minecraft.block.CactusBlock;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.FungusFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.GenerationStage;
@@ -21,7 +22,6 @@ import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.spongepowered.asm.mixin.Dynamic;
 
 import java.util.Collections;
 import java.util.List;
@@ -109,9 +109,6 @@ public final class WorldGenEvents {
 
         // This registers default tree feature canceller, which will cancel any features if their config extends BaseTreeFeatureConfig.
         registry.register(TreeFeatureCancellerRegistry.TREE_CANCELLER, new TreeFeatureCanceller<>(BaseTreeFeatureConfig.class));
-
-        // This registers the tree feature canceller for cacti, which will cancel any BlockCluster features using the CactusBlock class.
-//        registry.register(TreeFeatureCancellerRegistry.CACTUS_CANCELLER, new CactusFeatureCanceller<>(CactusBlock.class));
 
         // This registers the tree feature canceller for fungus, which will cancel any features if their config extends HugeFungusConfig.
         registry.register(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER, new FungusFeatureCanceller<>(HugeFungusConfig.class));
