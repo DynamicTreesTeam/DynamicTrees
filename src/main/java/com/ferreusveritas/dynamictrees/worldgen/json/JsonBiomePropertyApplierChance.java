@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen.json;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IChanceSelector;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Operation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -12,7 +12,7 @@ import net.minecraft.world.biome.Biome;
 public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 	
 	@Override
-	public void apply(BiomeDataBase dbase, JsonElement element, Biome biome) {
+	public void apply(BiomeDatabase dbase, JsonElement element, Biome biome) {
 		if(element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
 			dbase.setChanceSelector(biome, readChanceSelector(object, biome), readMethod(object));

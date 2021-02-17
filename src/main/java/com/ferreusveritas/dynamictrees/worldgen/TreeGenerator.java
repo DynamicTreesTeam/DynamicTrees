@@ -1,18 +1,18 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.BiomeEntry;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.BiomeEntry;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
@@ -21,23 +21,17 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class TreeGenerator {
 
 	protected static TreeGenerator INSTANCE;
 
-	protected final BiomeDataBase defaultBiomeDataBase;
 	protected final PoissonDiscProviderUniversal circleProvider;
 	protected final RandomXOR random = new RandomXOR();
-	protected final Map<ResourceLocation, BiomeDataBase> dimensionMap = new HashMap<>();
-	protected final Set<ResourceLocation> blacklistedDimensions = new HashSet<>();
 
 	public static void setup() {
 		if(WorldGenRegistry.isWorldGenEnabled()) {
@@ -47,45 +41,11 @@ public class TreeGenerator {
 
 	public TreeGenerator() {
 		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
-		defaultBiomeDataBase = new BiomeDataBase();
-		circleProvider = new PoissonDiscProviderUniversal();
+		this.circleProvider = new PoissonDiscProviderUniversal();
 	}
 
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
-	}
-
-	public BiomeDataBase getBiomeDataBase(ResourceLocation dimLoc) {
-		return dimensionMap.getOrDefault(dimLoc, getDefaultBiomeDataBase());
-	}
-
-	public BiomeDataBase getBiomeDataBase(World world) {
-		return getBiomeDataBase(world.getDimensionKey().getLocation());
-	}
-
-	public BiomeDataBase getDefaultBiomeDataBase() {
-		return defaultBiomeDataBase;
-	}
-
-	public void linkDimensionToDataBase(ResourceLocation dimLoc, BiomeDataBase dBase) {
-		dimensionMap.put(dimLoc, dBase);
-	}
-
-	public void addBlacklistedDimension (ResourceLocation dimLoc) {
-		blacklistedDimensions.add(dimLoc);
-	}
-
-	public boolean isDimensionBlacklisted (ResourceLocation dimLoc) {
-		return blacklistedDimensions.contains(dimLoc);
-	}
-
-	public void clearAllBiomeDataBases() {
-		dimensionMap.clear();
-		defaultBiomeDataBase.clear();
-	}
-
-	public boolean validateBiomeDataBases() {
-		return defaultBiomeDataBase.isValid() && dimensionMap.values().stream().allMatch(BiomeDataBase::isValid);
 	}
 
 	/**
@@ -143,7 +103,7 @@ public class TreeGenerator {
 		}
 	}
 
-	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDataBase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
+	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 
 		circle.add(8, 8);//Move the circle into the "stage"
 

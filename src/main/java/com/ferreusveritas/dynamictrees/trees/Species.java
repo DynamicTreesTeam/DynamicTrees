@@ -151,7 +151,7 @@ public class Species extends ForgeRegistryEntry<Species> {
 	 */
 	public Species() {
 		this.treeFamily = TreeFamily.NULLFAMILY;
-		this.leavesProperties = LeavesProperties.NULLPROPERTIES;
+		this.leavesProperties = LeavesProperties.NULL_PROPERTIES;
 	}
 	
 	/**

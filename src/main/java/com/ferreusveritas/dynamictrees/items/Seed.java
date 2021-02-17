@@ -7,9 +7,11 @@ import javax.annotation.Nullable;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 
 import net.minecraft.block.Block;
@@ -102,9 +104,9 @@ public class Seed extends Item implements IPlantable {
 		
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
 		
-		TreeGenerator treeGen = TreeGenerator.getTreeGenerator();
-		if(DTConfigs.seedOnlyForest.get() && treeGen != null) {
-			plantChance *= treeGen.getBiomeDataBase(world).getForestness(world.getBiome(pos));
+		if(DTConfigs.seedOnlyForest.get()) {
+			plantChance *= DTDataPackRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.getDimensionKey().getLocation())
+					.getForestness(world.getBiome(pos));
 		}
 		
 		float accum = 1.0f;

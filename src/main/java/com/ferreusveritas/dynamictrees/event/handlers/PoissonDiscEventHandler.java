@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
+import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.math.ChunkPos;
@@ -22,6 +23,9 @@ public class PoissonDiscEventHandler {
 	/** We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:( */
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
+		if (!WorldGenRegistry.isWorldGenEnabled())
+			return;
+
         IWorld world = event.getWorld();
 		if(!world.isRemote()) {
 			TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld((ServerWorld) world);//clears the circles
@@ -30,6 +34,9 @@ public class PoissonDiscEventHandler {
 
 	@SubscribeEvent
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
+		if (!WorldGenRegistry.isWorldGenEnabled())
+			return;
+
         IWorld world = event.getWorld();
 		if (world != null && !world.isRemote()) {
 			byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
@@ -42,6 +49,9 @@ public class PoissonDiscEventHandler {
 
 	@SubscribeEvent
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
+		if (!WorldGenRegistry.isWorldGenEnabled())
+			return;
+
 		ServerWorld world = (ServerWorld) event.getWorld();
 		PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
         final ChunkPos chunkPos = event.getChunk().getPos();

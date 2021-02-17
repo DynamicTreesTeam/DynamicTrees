@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
@@ -21,6 +22,7 @@ import java.util.*;
 
 /**
  * Manages {@link JoCode} objects, reading from datapacks. Can be used to call random JoCodes during worldgen.
+ * Main instance stored in {@link DTDataPackRegistries}.
  *
  * @author Harley O'Connor
  */
@@ -79,6 +81,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
 
     @Override
     protected void apply(Map<ResourceLocation, List<String>> joCodeFiles, IResourceManager resourceManager, IProfiler profiler) {
+        this.joCodes.clear();
+
         joCodeFiles.forEach((resourceLocation, lines) -> {
             Species species = TreeRegistry.findSpecies(resourceLocation);
 
@@ -89,7 +93,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         });
     }
 
-    public void addCode(Species species, int radius, String code) {
+    private void addCode(Species species, int radius, String code) {
         JoCode joCode = species.getJoCode(code).setCareful(false);
 
         // Code reserved for collecting WorldGen JoCodes

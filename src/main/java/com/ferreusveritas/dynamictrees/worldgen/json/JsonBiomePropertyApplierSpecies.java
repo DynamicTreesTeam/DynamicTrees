@@ -6,8 +6,8 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Rando
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.StaticSpeciesSelector;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Operation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.world.biome.Biome;
@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 	
 	@Override
-	public void apply(BiomeDataBase dbase, JsonElement element, Biome biome) {
+	public void apply(BiomeDatabase dbase, JsonElement element, Biome biome) {
 		if(element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
 			dbase.setSpeciesSelector(biome, readSpeciesSelector(object), readMethod(object));

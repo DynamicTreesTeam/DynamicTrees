@@ -5,9 +5,9 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
+import com.ferreusveritas.dynamictrees.api.events.BiomeDatabaseJsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
+import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.json.*;
 import com.google.common.collect.Lists;
@@ -18,7 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class BiomeDataBasePopulatorJson extends BiomeSelectorJson implements IBiomeDataBasePopulator {
+public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBiomeDatabasePopulator {
 	
 	public static final String SPECIES = "species";
 	public static final String DENSITY = "density";
@@ -50,7 +50,7 @@ public class BiomeDataBasePopulatorJson extends BiomeSelectorJson implements IBi
 		blacklistedBiomes = new HashSet<>();
 	}
 	
-	public static void registerJsonCapabilities(WorldGenRegistry.BiomeDataBaseJsonCapabilityRegistryEvent event) {
+	public static void registerJsonCapabilities(BiomeDatabaseJsonCapabilityRegistryEvent event) {
 
 		registerJsonBiomeCapabilities(event); // Registers biome selector capabilities.
 
@@ -111,9 +111,9 @@ public class BiomeDataBasePopulatorJson extends BiomeSelectorJson implements IBi
 
 		event.register(RESET, (dbase, element, biome) -> {
 			dbase.setCancelVanillaTreeGen(biome, false);
-			dbase.setSpeciesSelector(biome, (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection(), BiomeDataBase.Operation.REPLACE);
-			dbase.setDensitySelector(biome, (rnd, nd) -> -1, BiomeDataBase.Operation.REPLACE);
-			dbase.setChanceSelector(biome, (rnd, spc, rad) -> BiomePropertySelectors.EnumChance.UNHANDLED, BiomeDataBase.Operation.REPLACE);
+			dbase.setSpeciesSelector(biome, (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection(), BiomeDatabase.Operation.REPLACE);
+			dbase.setDensitySelector(biome, (rnd, nd) -> -1, BiomeDatabase.Operation.REPLACE);
+			dbase.setChanceSelector(biome, (rnd, spc, rad) -> BiomePropertySelectors.EnumChance.UNHANDLED, BiomeDatabase.Operation.REPLACE);
 			dbase.setForestness(biome, 0.0f);
 			dbase.setIsSubterranean(biome, false);
 			dbase.setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
@@ -121,17 +121,17 @@ public class BiomeDataBasePopulatorJson extends BiomeSelectorJson implements IBi
 
 	}
 	
-	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
-		this(JsonHelper.load(jsonLocation), "default.json");
+	public JsonBiomeDatabasePopulator(ResourceLocation jsonLocation) {
+		this(JsonHelper.load(jsonLocation), "default_old.json");
 	}
 	
-	public BiomeDataBasePopulatorJson(JsonElement jsonElement, String fileName) {
+	public JsonBiomeDatabasePopulator(JsonElement jsonElement, String fileName) {
 		this.jsonElement = jsonElement;
 		this.fileName = fileName;
 	}
 	
 	@Override
-	public void populate(BiomeDataBase biomeDataBase) {
+	public void populate(BiomeDatabase biomeDataBase) {
 		if(jsonElement != null && jsonElement.isJsonArray()) {
 			for(JsonElement sectionElement : jsonElement.getAsJsonArray()) {
 				if(sectionElement.isJsonObject()) {
@@ -151,12 +151,12 @@ public class BiomeDataBasePopulatorJson extends BiomeSelectorJson implements IBi
 			this.elementData = elementData;
 		}
 		
-		void apply(BiomeDataBase dbase, Biome biome) {
+		void apply(BiomeDatabase dbase, Biome biome) {
 			this.applier.apply(dbase, elementData, biome);
 		}
 	}
 
-	private void readSection(JsonObject section, BiomeDataBase dbase) {
+	private void readSection(JsonObject section, BiomeDatabase dbase) {
 		
 		List<JsonBiomeSelectorData> selectors = new LinkedList<>();
 		List<JsonBiomeApplierData> appliers = new LinkedList<>();

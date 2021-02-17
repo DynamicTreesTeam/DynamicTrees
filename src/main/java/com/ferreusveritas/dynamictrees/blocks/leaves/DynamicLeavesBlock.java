@@ -33,7 +33,6 @@ import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -60,7 +59,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 
 	protected static Random backupRng = new Random();
 	
-	public ILeavesProperties properties = LeavesProperties.NULLPROPERTIES;
+	public ILeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
 	
 	public DynamicLeavesBlock() {
 		this(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());

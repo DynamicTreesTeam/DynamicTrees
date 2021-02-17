@@ -1,16 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.server.ServerWorld;
-import org.spongepowered.asm.mixin.Dynamic;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,15 +16,19 @@ import java.util.function.Function;
 
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
+	protected final BiomeDatabaseManager biomeDatabaseManager = DTDataPackRegistries.BIOME_DATABASE_MANAGER;
+
 	public PerlinNoiseGenerator noiseGenerator;
 	protected final TreeGenerator treeGenerator;
 	protected final ServerWorld world;
+	protected final ResourceLocation dimensionRegistryName;
 	protected int pass;
 	protected Function<Integer, Integer> chunkMultipass;
 
 	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ServerWorld world) {
 		this.noiseGenerator = new PerlinNoiseGenerator(new SharedSeedRandom(96), new ArrayList<>(Collections.singletonList(1)));
 		this.world = world;
+		this.dimensionRegistryName = world.getDimensionKey().getRegistryName();
 		this.treeGenerator = treeGenerator;
 	}
 
@@ -40,7 +42,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		double scale = 128;//Effectively scales up the noisemap
 		Biome biome = world.getNoiseBiomeRaw(x + 8, 0, z + 8);//Placement is offset by +8,+8
 		double noiseDensity = (noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = treeGenerator.getBiomeDataBase(world).getDensity(biome).getDensity(world.getRandom(), noiseDensity);
+		double density = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(world.getRandom(), noiseDensity);
 		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
 
 		//Oh Joy. Random can potentially start with the same number for each chunk. Let's just
@@ -58,7 +60,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
 		if(pass == 0) {
 			Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Aim at center of chunk
-			chunkMultipass = treeGenerator.getBiomeDataBase(world).getMultipass(biome);
+			chunkMultipass = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getMultipass(biome);
 		}
 
 		return chunkMultipass.apply(pass) >= 0;

@@ -21,8 +21,7 @@ import java.util.Map;
 
 public class PoissonDiscProviderUniversal {
 
-	// Dimension type works for vanilla but may need to be changed for modded support.
-	Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
+	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
 
 	protected IPoissonDiscProvider createCircleProvider(ServerWorld world) {
 		BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world);
@@ -41,12 +40,8 @@ public class PoissonDiscProviderUniversal {
 		return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
 	}
 
-	public void loadWorld(ServerWorld world) {
-		// TODO Auto-generated method stub
-	}
-
 	public void unloadWorld(ServerWorld world) {
-		providerMap.remove(world.getDimensionKey().getLocation());
+		this.providerMap.remove(world.getDimensionKey().getLocation());
 	}
 
 	public void setChunkPoissonData(ServerWorld world, ChunkPos chunkPos, byte[] circleData) {

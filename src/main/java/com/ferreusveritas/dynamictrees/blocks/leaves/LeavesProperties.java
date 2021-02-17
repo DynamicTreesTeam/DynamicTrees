@@ -36,7 +36,7 @@ import java.util.Random;
  */
 public class LeavesProperties implements ILeavesProperties {
 	
-	public static final LeavesProperties NULLPROPERTIES = new LeavesProperties() {
+	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
 		@Override public ILeavesProperties setTree(TreeFamily tree) { return this; }
 		@Override public TreeFamily getTree() { return TreeFamily.NULLFAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }

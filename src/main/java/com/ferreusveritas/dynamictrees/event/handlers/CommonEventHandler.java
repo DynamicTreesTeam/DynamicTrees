@@ -47,14 +47,6 @@ public class CommonEventHandler {
 		if (event.getWorld().isRemote()){
 			DTClient.discoverWoodColors();
 		}
-		
-		if (!event.getWorld().isRemote() && WorldGenRegistry.isWorldGenEnabled()) {
-//			if (!WorldGenRegistry.validateBiomeDataBases()) {
-			WorldGenRegistry.populateDataBase();
-//			}
-		}
-		
-		//		event.getWorld().addEventListener(new WorldListener(event.getWorld(), event.getWorld().ser()));
 	}
 
 	@SubscribeEvent
