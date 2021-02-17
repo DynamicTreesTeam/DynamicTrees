@@ -44,15 +44,6 @@
 		}
 	},
 	{
-		"__comment" : "This applies to deserts",
-		"select": { "type": "sandy", "name": "minecraft:.*" },
-		"apply": {
-			"species" : "cactus",
-			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-			"chance": 0.075
-		}
-	},
-	{
 		"__comment" : "Generates an alternative oak style in swamps",
 		"select": { "type": "swamp", "name": "minecraft:.*" },
 		"apply": {
@@ -104,14 +95,6 @@
 			"species" : "dark_oak",
 			"density" : { "math": { "div" : [ "noise", 3.0 ] } },
 			"multipass" : true
-		}
-	},
-	{
-		"select": { "name": "minecraft:.*badlands.*" },
-		"apply": {
-			"species" : "cactus",
-			"density" : { "math": { "add" : [ { "mul" : [ "noise", 0.6 ] }, 0.4 ] } },
-			"chance": 0.075
 		}
 	},
 	{
