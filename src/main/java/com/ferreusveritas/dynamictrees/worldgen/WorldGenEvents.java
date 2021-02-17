@@ -93,10 +93,6 @@ public final class WorldGenEvents {
         vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD)).forEach(key ->
                 treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER)));
 
-        // This registers the cancellation of all cactus features with the namespace "minecraft" from all sandy biomes with the namespace "minecraft".
-        vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.SANDY)).forEach(key ->
-                treeCanceller.register(key.getLocation(), namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.CACTUS_CANCELLER)));
-
         // This registers the cancellation of giant fungus features with the namespace "minecraft" from the warped and crimson forest biomes.
         Stream.of(Biomes.WARPED_FOREST, Biomes.CRIMSON_FOREST).map(RegistryKey::getLocation).forEach(biomeResLoc ->
             treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER))

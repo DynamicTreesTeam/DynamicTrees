@@ -20,7 +20,6 @@ public final class TreeFeatureCancellerRegistry {
 
     // Default canceller identifiers.
     public static final String TREE_CANCELLER = "tree";
-    public static final String CACTUS_CANCELLER = "cactus";
     public static final String FUNGUS_CANCELLER = "fungus";
 
     private static TreeFeatureCancellerRegistry INSTANCE = null;
