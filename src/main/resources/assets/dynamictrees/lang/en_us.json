@@ -7,7 +7,6 @@
   "block.dynamictrees.jungle_branch":"Jungle Tree",
   "block.dynamictrees.dark_oak_branch":"Dark Oak Tree",
   "block.dynamictrees.acacia_branch":"Acacia Tree",
-  "block.dynamictrees.cactus_branch":"Cactus",
   "block.dynamictrees.crimson_branch":"Crimson Fungus",
   "block.dynamictrees.warped_branch":"Warped Fungus",
 
@@ -21,7 +20,6 @@
   "species.dynamictrees.dark_oak": "Dark Oak",
   "species.dynamictrees.acacia": "Acacia",
   "species.dynamictrees.apple": "Apple",
-  "species.dynamictrees.cactus": "Cactus",
   "species.dynamictrees.crimson": "Crimson",
   "species.dynamictrees.mega_crimson": "Mega Crimson",
   "species.dynamictrees.warped": "Warped",
@@ -34,12 +32,8 @@
   "item.dynamictrees.dark_oak_seed":"Dark Oak Acorn",
   "item.dynamictrees.acacia_seed":"Acacia Seed",
   "item.dynamictrees.apple_seed":"Apple Pip",
-  "item.dynamictrees.cactus_seed":"Cactus Seed",
   "item.dynamictrees.crimson_seed":"Crimson Cap",
   "item.dynamictrees.warped_seed":"Warped Cap",
-  "item.dynamictrees.brown_mushroom_seed":"Brown Mushroom Cap",
-  "item.dynamictrees.red_mushroom_seed":"Red Mushroom Cap",
-  "item.dynamictrees.chorus_seed":"Chorus Seed",
 
   "item.dynamictrees.dendro_potion.biochar":"Biochar Base Potion",
   "item.dynamictrees.dendro_potion.depletion":"Potion of Depletion",

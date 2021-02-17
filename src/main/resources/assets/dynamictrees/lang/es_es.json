@@ -5,7 +5,6 @@
   "block.dynamictrees.jungle_branch":"Árbol de jungla",
   "block.dynamictrees.dark_oak_branch":"Roble oscuro",
   "block.dynamictrees.acacia_branch":"Acacia",
-  "block.dynamictrees.cactus_branch":"Cactus",
   "block.dynamictrees.crimson_branch":"Hongo carmesí",
   "block.dynamictrees.warped_branch":"Hongo distorsionado",
 
@@ -19,7 +18,6 @@
   "species.dynamictrees.dark_oak": "Roble oscuro",
   "species.dynamictrees.acacia": "Acacia",
   "species.dynamictrees.apple": "Manzana",
-  "species.dynamictrees.cactus": "Cactus",
   "species.dynamictrees.crimson": "Carmesí",
   "species.dynamictrees.warped": "Distorsionado",
 
@@ -30,12 +28,8 @@
   "item.dynamictrees.dark_oak_seed":"Bellota de roble oscuro",
   "item.dynamictrees.acacia_seed":"Semilla de acacia",
   "item.dynamictrees.apple_seed":"Semilla de manzana",
-  "item.dynamictrees.cactus_seed":"Semilla de cactus",
   "item.dynamictrees.crimson_seed":"Tapa carmesí",
   "item.dynamictrees.warped_seed":"Tapa distorsionada",
-  "item.dynamictrees.brown_mushroom_seed":"Tapa de hongo marrón",
-  "item.dynamictrees.red_mushroom_seed":"Tapa de hongo rojo",
-  "item.dynamictrees.chorus_seed":"Semilla coral",
 
   "item.dynamictrees.dendro_potion.biochar":"Poción base de biocarbón",
   "item.dynamictrees.dendro_potion.depletion":"Poción de agotamiento",
