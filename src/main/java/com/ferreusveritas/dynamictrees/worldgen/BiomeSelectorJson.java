@@ -1,16 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.worldgen.JsonCapabilityRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.events.JsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,6 +18,7 @@ import java.util.stream.Collectors;
  *
  * @author Harley O'Connor
  */
+// TODO: AhHhhhHHh. This needs changing.
 public abstract class BiomeSelectorJson {
 
     public static final String SELECT = "select";
@@ -93,7 +92,7 @@ public abstract class BiomeSelectorJson {
         return s.startsWith("__"); // Allow for comments. Comments are any keys starting with "__".
     }
 
-    protected List<BiomeDataBasePopulatorJson.JsonBiomeSelectorData> readSelection(String currentKey, JsonElement currentElement, String fileName) {
+    protected List<JsonBiomeDatabasePopulator.JsonBiomeSelectorData> readSelection(String currentKey, JsonElement currentElement, String fileName) {
         List<JsonBiomeSelectorData> selectors = new ArrayList<>();
 
         if (!currentKey.equals(SELECT) || !currentElement.isJsonObject())
@@ -107,7 +106,7 @@ public abstract class BiomeSelectorJson {
 
             IJsonBiomeSelector selector = jsonBiomeSelectorMap.get(selectorName);
             if(selector != null) {
-                selectors.add(new BiomeDataBasePopulatorJson.JsonBiomeSelectorData(selector, selectElement.getValue()));
+                selectors.add(new JsonBiomeDatabasePopulator.JsonBiomeSelectorData(selector, selectElement.getValue()));
             } else {
                 DynamicTrees.getLogger().error("Json Error: Undefined selector property \"" + selectorName + "\" in " + fileName + ".");
             }

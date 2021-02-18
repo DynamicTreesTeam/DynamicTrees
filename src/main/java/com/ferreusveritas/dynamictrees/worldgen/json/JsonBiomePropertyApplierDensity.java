@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.worldgen.json;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.IDensitySelector;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Operation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,7 +16,7 @@ import java.util.List;
 public class JsonBiomePropertyApplierDensity implements IJsonBiomeApplier {
 	
 	@Override
-	public void apply(BiomeDataBase dbase, JsonElement element, Biome biome) {
+	public void apply(BiomeDatabase dbase, JsonElement element, Biome biome) {
 		if(element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
 			Operation operation = readMethod(object);

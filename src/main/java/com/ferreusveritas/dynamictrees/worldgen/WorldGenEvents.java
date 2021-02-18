@@ -36,6 +36,9 @@ public final class WorldGenEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
+        if (!WorldGenRegistry.isWorldGenEnabled())
+            return;
+
         event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
     }
 
@@ -48,6 +51,8 @@ public final class WorldGenEvents {
     @SubscribeEvent
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
         // TODO: Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+        if (!WorldGenRegistry.isWorldGenEnabled())
+            return;
 
         final ResourceLocation biomeResLoc = event.getName();
 

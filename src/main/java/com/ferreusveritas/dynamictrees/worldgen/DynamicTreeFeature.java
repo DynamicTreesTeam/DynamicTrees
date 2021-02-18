@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -25,15 +26,17 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-		final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
+		final BiomeDatabaseManager biomeDatabaseManager = DTDataPackRegistries.BIOME_DATABASE_MANAGER;
+        final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		final ServerWorld serverWorld = world.getWorld();
+		final ResourceLocation dimensionRegistryName = serverWorld.getDimensionKey().getLocation();
 
     	// Do not generate if the current dimension is blacklisted.
-        if (treeGenerator.isDimensionBlacklisted(serverWorld.getDimensionKey().getLocation()))
+        if (biomeDatabaseManager.isDimensionBlacklisted(dimensionRegistryName))
             return false;
 
         // Grab biome data base for dimension.
-        final BiomeDataBase biomeDataBase = treeGenerator.getBiomeDataBase(serverWorld);
+        final BiomeDatabase biomeDataBase = biomeDatabaseManager.getDimensionDatabase(dimensionRegistryName);
 
         // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
 		final ChunkPos chunkPos = world.getChunk(pos).getPos();

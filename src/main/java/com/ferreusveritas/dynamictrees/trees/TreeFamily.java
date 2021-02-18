@@ -507,7 +507,7 @@ public class TreeFamily {
 	}
 
 	public ILeavesProperties getCommonLeaves() {
-		return LeavesProperties.NULLPROPERTIES;
+		return LeavesProperties.NULL_PROPERTIES;
 	}
 
 	//////////////////////////////

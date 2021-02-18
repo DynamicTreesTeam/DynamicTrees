@@ -59,7 +59,7 @@ public class DTConfigs {
 	public static ForgeConfigSpec.BooleanValue podzolGen;
 	public static ForgeConfigSpec.BooleanValue worldGen;
 	public static ForgeConfigSpec.BooleanValue vanillaCactusWorldGen;
-	public static ForgeConfigSpec.ConfigValue<List<String>> dimensionBlackList;
+	public static ForgeConfigSpec.ConfigValue<List<String>> dimensionBlacklist;
 	
 	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
 
@@ -161,7 +161,7 @@ public class DTConfigs {
 		COMMON_BUILDER.comment("World settings").push("world");
 		worldGen = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
 				define("worldGen", true);
-		dimensionBlackList = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen (tree cancellers need to be configured individually for biomes in dynamictrees/tree_canceller.json)").
+		dimensionBlacklist = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen (tree cancellers need to be configured individually for biomes in dynamictrees/tree_canceller.json)").
 				define("dimensionsBlacklist", new ArrayList<>());
 		
 		COMMON_BUILDER.pop();

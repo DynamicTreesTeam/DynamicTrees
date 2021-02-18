@@ -7,10 +7,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.function.Function;
 
-public class BiomeDataBase {
+public class BiomeDatabase {
 	
 	public static BiomeEntry BAD_ENTRY = new BiomeEntry() {
 		@Override public void setChanceSelector(IChanceSelector chanceSelector) {}
@@ -22,7 +23,7 @@ public class BiomeDataBase {
 	
 	private final HashMap<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
 
-	public BiomeEntry getEntry(Biome biome) {
+	public BiomeEntry getEntry(@Nullable Biome biome) {
 		if (biome == null)
 			return BAD_ENTRY;
 
@@ -161,7 +162,7 @@ public class BiomeDataBase {
 		return getEntry(biome).getMultipass();
 	}
 	
-	public BiomeDataBase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
+	public BiomeDatabase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
 		if(selector != null) {
 			BiomeEntry entry = getEntry(biome);
 			ISpeciesSelector existing = entry.getSpeciesSelector();
@@ -188,7 +189,7 @@ public class BiomeDataBase {
 		return this;
 	}
 	
-	public BiomeDataBase setChanceSelector(Biome biome, IChanceSelector selector, Operation op) {
+	public BiomeDatabase setChanceSelector(Biome biome, IChanceSelector selector, Operation op) {
 		if(selector != null) {
 			BiomeEntry entry = getEntry(biome);
 			IChanceSelector existing = entry.getChanceSelector();
@@ -214,7 +215,7 @@ public class BiomeDataBase {
 		return this;
 	}
 	
-	public BiomeDataBase setDensitySelector(Biome biome, IDensitySelector selector, Operation op) {
+	public BiomeDatabase setDensitySelector(Biome biome, IDensitySelector selector, Operation op) {
 		if(selector != null) {
 			BiomeEntry entry = getEntry(biome);
 			IDensitySelector existing = entry.getDensitySelector();
@@ -240,22 +241,22 @@ public class BiomeDataBase {
 		return this;
 	}
 	
-	public BiomeDataBase setCancelVanillaTreeGen(Biome biome, boolean cancel) {
+	public BiomeDatabase setCancelVanillaTreeGen(Biome biome, boolean cancel) {
 		getEntry(biome).setCancelVanillaTreeGen(cancel);
 		return this;
 	}
 	
-	public BiomeDataBase setIsSubterranean(Biome biome, boolean is) {
+	public BiomeDatabase setIsSubterranean(Biome biome, boolean is) {
 		getEntry(biome).setSubterraneanBiome(is);
 		return this;
 	}
 	
-	public BiomeDataBase setForestness(Biome biome, float forestness) {
+	public BiomeDatabase setForestness(Biome biome, float forestness) {
 		getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.seedMinForestness.get()));
 		return this;
 	}
 	
-	public BiomeDataBase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
+	public BiomeDatabase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
 		getEntry(biome).setMultipass(multipass);
 		return this;
 	}

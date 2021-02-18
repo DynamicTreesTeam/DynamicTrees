@@ -183,7 +183,6 @@ public class DynamicTrees {
 		MinecraftForge.EVENT_BUS.register(DTDataPackRegistries.class);
 
 		CompatHandler.init();
-//		DTTrees.setupExtraSoils(); // TODO: Should this be called here? Where is post-init in this version?!
 	}
 
 	//TODO: thick ring stitching
@@ -221,10 +220,8 @@ public class DynamicTrees {
 	public void registerCommonEventHandlers() {
 		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
 		MinecraftForge.EVENT_BUS.register(new ServerEventHandler());
-		if(DTConfigs.worldGen.get()) {
-			MinecraftForge.EVENT_BUS.register(new WorldGenEvents());
-		}
-		
+		MinecraftForge.EVENT_BUS.register(new WorldGenEvents());
+
 		if (ModList.get().isLoaded("fastleafdecay")) {
 			MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
 		}
@@ -236,10 +233,7 @@ public class DynamicTrees {
 
 //		MinecraftForge.EVENT_BUS.register(new SafeChunkEvents());
 
-		//Conveniently accessible disaster(Optional World Generation)
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
-		}
+		MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 	}
 
 	public static Logger getLogger() {

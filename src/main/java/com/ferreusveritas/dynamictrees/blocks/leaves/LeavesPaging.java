@@ -7,7 +7,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ public class LeavesPaging {
 			String label = leavesProperties[i].toString();
 			Object obj = leavesProperties[i+1];
 
-			ILeavesProperties newLp = LeavesProperties.NULLPROPERTIES;
+			ILeavesProperties newLp = LeavesProperties.NULL_PROPERTIES;
 
 			if(obj instanceof ILeavesProperties) {
 				newLp = (ILeavesProperties) obj;
@@ -80,7 +79,7 @@ public class LeavesPaging {
 	}
 
 	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
-		JsonElement element = JsonHelper.load(jsonLocation);
+		JsonElement element = JsonHelper.load(jsonLocation, JsonHelper.ResourceFolder.TREES);
 		if(element != null && element.isJsonObject()) {
 			return build(element.getAsJsonObject());
 		}

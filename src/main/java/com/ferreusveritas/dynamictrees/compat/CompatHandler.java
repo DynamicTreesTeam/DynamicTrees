@@ -18,11 +18,11 @@ public final class CompatHandler {
 
     public static void init () {
         if (ModList.get().isLoaded(DynamicTrees.SERENE_SEASONS)) {
-            handleSereneSeasons();
+            initSereneSeasons();
         }
     }
 
-    public static void handleSereneSeasons() {
+    public static void initSereneSeasons() {
         SeasonManager seasonManager = new SeasonManager(
                 world -> SeasonsConfig.isDimensionWhitelisted(world.getDimensionKey()) ?
                         new Tuple<>(new SeasonProviderSereneSeasons(), new SeasonGrowthCalculatorActive()) :

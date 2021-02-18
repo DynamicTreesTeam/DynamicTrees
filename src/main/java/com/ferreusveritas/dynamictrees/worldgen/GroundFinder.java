@@ -86,7 +86,7 @@ public class GroundFinder implements IGroundFinder {
 	}
 
 	@Override
-	public BlockPos findGround(BiomeDataBase.BiomeEntry biomeEntry, ISeedReader world, BlockPos start) {
+	public BlockPos findGround(BiomeDatabase.BiomeEntry biomeEntry, ISeedReader world, BlockPos start) {
 		return biomeEntry.isSubterraneanBiome() ? findSubterraneanGround(world, start) : findOverworldGround(world, start);
 	}
 

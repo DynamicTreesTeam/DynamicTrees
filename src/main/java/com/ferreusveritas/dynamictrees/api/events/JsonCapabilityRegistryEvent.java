@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.worldgen;
+package com.ferreusveritas.dynamictrees.api.events;
 
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
