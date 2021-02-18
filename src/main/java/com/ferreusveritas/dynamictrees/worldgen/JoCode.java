@@ -245,7 +245,7 @@ public class JoCode {
 					Direction dir = Direction.byIndex(code);
 					pos = pos.offset(dir);
 					if(!disabled) {
-						disabled = setBlockForGeneration(world, species, pos, dir, careful);
+						disabled = setBlockForGeneration(world, species, pos, dir, careful, codePos + 1 == instructions.length);
 					}
 					codePos++;
 					break;
@@ -255,7 +255,7 @@ public class JoCode {
 		return codePos;
 	}
 	
-	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
+	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
 		if(world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
