@@ -13,6 +13,8 @@ import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,6 +27,8 @@ import java.util.List;
  * NOTICE: Database population has moved to {@link BiomeDatabaseManager}.
  */
 public class WorldGenRegistry {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	//////////////////////////////
 	// BIOME HANDLING FOR WORLDGEN
@@ -65,7 +69,7 @@ public class WorldGenRegistry {
 					"]");
 			writer.close();
 		} catch (Exception e) {
-			DynamicTrees.getLogger().fatal("Error creating tree canceller Json file:");
+			LOGGER.fatal("Error creating tree canceller Json file:");
 			e.printStackTrace();
 		}
 	}

@@ -1,11 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen.canceller;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.SimpleRegistry;
-import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.gen.feature.*;
 
 /**

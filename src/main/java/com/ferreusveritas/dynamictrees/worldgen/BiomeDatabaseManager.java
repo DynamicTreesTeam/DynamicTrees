@@ -19,6 +19,7 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
@@ -33,7 +34,7 @@ import java.util.*;
  */
 public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocation, Map<String, JsonElement>>> {
 
-    private static final Logger LOGGER = DynamicTrees.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String JSON_EXTENSION = ".json";
     private static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
@@ -128,7 +129,7 @@ public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocat
             try {
                 this.blacklistedDimensions.add(new ResourceLocation(resourceLocationString));
             } catch (ResourceLocationException e) {
-                DynamicTrees.getLogger().warn("Couldn't get resource location for dimension blacklist in config: " + e.getMessage());
+                LOGGER.warn("Couldn't get resource location for dimension blacklist in config: " + e.getMessage());
             }
         });
 

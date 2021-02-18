@@ -58,7 +58,6 @@ public class DTConfigs {
 	
 	public static ForgeConfigSpec.BooleanValue podzolGen;
 	public static ForgeConfigSpec.BooleanValue worldGen;
-	public static ForgeConfigSpec.BooleanValue vanillaCactusWorldGen;
 	public static ForgeConfigSpec.ConfigValue<List<String>> dimensionBlacklist;
 	
 	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
@@ -153,9 +152,7 @@ public class DTConfigs {
 		SERVER_BUILDER.comment("World settings").push("world");
 		podzolGen = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
 				define("podzolGen", true);
-		vanillaCactusWorldGen = SERVER_BUILDER.comment("World Generation produces Vanilla cactus as well as Dynamic cactus if world gen replacement is enabled.").
-				define("vanillaCactusWorldGen",false);
-		
+
 		SERVER_BUILDER.pop();
 		
 		COMMON_BUILDER.comment("World settings").push("world");

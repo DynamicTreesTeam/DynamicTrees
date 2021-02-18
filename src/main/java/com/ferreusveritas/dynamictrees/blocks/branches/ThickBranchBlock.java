@@ -21,6 +21,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 
@@ -154,7 +155,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 			return Math.min(RADMAX_NORMAL, connectionRadius);
 		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			DynamicTrees.getLogger().warn("Tried to get unloaded block X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
+			LogManager.getLogger().warn("Tried to get unloaded block X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
 			return 0;
 		}
 	}

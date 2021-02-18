@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -108,7 +109,7 @@ public abstract class BiomeSelectorJson {
             if(selector != null) {
                 selectors.add(new JsonBiomeDatabasePopulator.JsonBiomeSelectorData(selector, selectElement.getValue()));
             } else {
-                DynamicTrees.getLogger().error("Json Error: Undefined selector property \"" + selectorName + "\" in " + fileName + ".");
+                LogManager.getLogger().error("Json Error: Undefined selector property \"" + selectorName + "\" in " + fileName + ".");
             }
         }
 

@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public final class TreeFeatureCancellerRegistry {
     // Default canceller identifiers.
     public static final String TREE_CANCELLER = "tree";
     public static final String FUNGUS_CANCELLER = "fungus";
+    public static final String MUSHROOM_CANCELLER = "mushroom";
 
     private static TreeFeatureCancellerRegistry INSTANCE = null;
 
@@ -40,7 +42,7 @@ public final class TreeFeatureCancellerRegistry {
 
     public void register (String name, ITreeFeatureCanceller treeFeatureCanceller) {
         if (this.cancellers.containsKey(name)) {
-            DynamicTrees.getLogger().error("Tried to register existing tree feature canceller \"" + name + "\"."); return;
+            LogManager.getLogger().error("Tried to register existing tree feature canceller \"" + name + "\"."); return;
         }
 
         this.cancellers.put(name, treeFeatureCanceller);

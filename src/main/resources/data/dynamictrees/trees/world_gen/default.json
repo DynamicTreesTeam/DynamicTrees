@@ -76,8 +76,8 @@
       "apply": {
         "species" : {
           "random" : {
-            "mushroomred" : 4,
-            "mushroombrn" : 3
+            "red_mushroom" : 4,
+            "brown_mushroom" : 3
           }
         },
         "chance": 0.66

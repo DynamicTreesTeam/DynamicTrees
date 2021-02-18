@@ -1,13 +1,16 @@
 package com.ferreusveritas.dynamictrees.systems;
 
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import net.minecraft.block.Block;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import net.minecraft.block.Block;
-
 public class DirtHelper {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String DIRT_LIKE = "dirt_like";
     public static final String SAND_LIKE = "sand_like";
@@ -54,7 +57,7 @@ public class DirtHelper {
     }
     public static void registerSoil(Block block, String adjName, Block rootyBlockSubstitute) {
         if (!RootyBlockHelper.isBlockRegistered(rootyBlockSubstitute)){
-            DynamicTrees.getLogger().error("Attempted to use " + rootyBlockSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
+            LOGGER.error("Attempted to use " + rootyBlockSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
             registerSoil(rootyBlockSubstitute, adjName);
         }
         registerSoil(block, adjName, RootyBlockHelper.getRootyBlock(rootyBlockSubstitute));
@@ -70,7 +73,7 @@ public class DirtHelper {
                 registerSoil(rootyDirt, flag);
             }
         } else {
-            DynamicTrees.getLogger().error("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
+            LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
         }
     }
     public static void registerSoil(Block block, int adjFlag) {
@@ -80,7 +83,7 @@ public class DirtHelper {
         if (dirtMap.containsKey(copyFlagsFrom))
             registerSoil(block, dirtMap.get(copyFlagsFrom));
         else
-            DynamicTrees.getLogger().error("Flags from " + copyFlagsFrom + " not found while registering soil block: " + block);
+            LOGGER.error("Flags from " + copyFlagsFrom + " not found while registering soil block: " + block);
     }
 
     public static boolean isSoilAcceptable(Block block, int soilFlags) {

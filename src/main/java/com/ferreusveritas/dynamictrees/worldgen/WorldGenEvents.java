@@ -5,18 +5,13 @@ import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.FungusFeatureCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCanceller;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeFeatureCancellerRegistry;
+import com.ferreusveritas.dynamictrees.worldgen.canceller.*;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
-import net.minecraft.world.gen.feature.HugeFungusConfig;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.feature.*;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -102,6 +97,11 @@ public final class WorldGenEvents {
         Stream.of(Biomes.WARPED_FOREST, Biomes.CRIMSON_FOREST).map(RegistryKey::getLocation).forEach(biomeResLoc ->
             treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER))
         );
+
+        // This registers the cancellation of huge mushroom features with the namespace "minecraft" from the mushroom island biomes.
+        Stream.of(Biomes.MUSHROOM_FIELDS, Biomes.MUSHROOM_FIELD_SHORE).map(RegistryKey::getLocation).forEach(biomeResLoc ->
+                treeCanceller.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.MUSHROOM_CANCELLER))
+        );
     }
 
     @SubscribeEvent
@@ -113,6 +113,9 @@ public final class WorldGenEvents {
 
         // This registers the tree feature canceller for fungus, which will cancel any features if their config extends HugeFungusConfig.
         registry.register(TreeFeatureCancellerRegistry.FUNGUS_CANCELLER, new FungusFeatureCanceller<>(HugeFungusConfig.class));
+
+        // This registers the tree feature canceller for mushrooms, which will cancel any features if their config extends BigMushroomFeatureConfig.
+        registry.register(TreeFeatureCancellerRegistry.MUSHROOM_CANCELLER, new MushroomFeatureCanceller<>(BigMushroomFeatureConfig.class));
     }
 
 }

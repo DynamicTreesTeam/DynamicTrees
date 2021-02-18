@@ -1,11 +1,8 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
@@ -17,17 +14,8 @@ import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGenEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -35,13 +23,9 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(DynamicTrees.MOD_ID)
 public class DynamicTrees {
-
-	private static final Logger LOGGER = LogManager.getLogger();
 
 	// The value here should match an entry in the META-INF/mods.toml file
 	public static final String MOD_ID = "dynamictrees";
@@ -236,7 +220,4 @@ public class DynamicTrees {
 		MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 	}
 
-	public static Logger getLogger() {
-		return LOGGER;
-	}
 }

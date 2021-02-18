@@ -13,9 +13,17 @@
         "dry": 0.25,
         "wet": 0.75
     },
+    "standard_seed_dropping": true,
+    "standard_stick_dropping": true,
     "features" : [
-        "standardSeedDropping",
-        "coniferTopper",
-        "podzol"
+        {
+            "name": "conifer_topper",
+            "properties": {
+                "leaves_properties": "dynamictrees:spruce"
+            }
+        },
+        {
+            "name": "podzol"
+        }
     ]
 }

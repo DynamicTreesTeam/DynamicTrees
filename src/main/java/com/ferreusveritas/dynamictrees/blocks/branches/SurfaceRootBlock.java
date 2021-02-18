@@ -32,6 +32,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 
@@ -182,7 +183,7 @@ public class SurfaceRootBlock extends Block {
 					return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
 				}
 			} catch (Exception e) { // Temporary measure until we find a way to solve requesting an out-of-bounds block here.
-				DynamicTrees.getLogger().warn("Tried to get unloaded block X: " + dPos.getX() + " Y: " + dPos.getY() + " Z: " + dPos.getZ());
+				LogManager.getLogger().warn("Tried to get unloaded block X: " + dPos.getX() + " Y: " + dPos.getY() + " Z: " + dPos.getZ());
 				return null;
 			}
 		}
