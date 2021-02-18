@@ -2,7 +2,9 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
@@ -13,14 +15,21 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import static com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature.*;
+
 public class CrimsonFungus extends NetherTreeFamily {
+
+	private static final ConfiguredGenFeature<?> WEEPING_VINES_FEATURE = GenFeatures.VINES.with(VINE_TYPE, VinesGenFeature.VineType.CEILING)
+			.with(VINE_BLOCK, Blocks.WEEPING_VINES_PLANT).with(TIP_BLOCK, Blocks.WEEPING_VINES).with(MAX_LENGTH, 5).with(QUANTITY, 7);
 
 	public class CrimsonSpecies extends BaseNetherFungiSpecies {
 
 		CrimsonSpecies(TreeFamily family){
 			super(family.getName(), family);
+
 			setBasicGrowingParameters(0.3f, 14.0f, 0, 4, 1f);
-			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
+
+			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}
 
 		@Override
@@ -45,7 +54,7 @@ public class CrimsonFungus extends NetherTreeFamily {
 
 			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
 
-			this.addGenFeature(new VinesGenFeature(Blocks.WEEPING_VINES_PLANT, VinesGenFeature.VineType.CEILING).setTipBlock(Blocks.WEEPING_VINES).setMaxLength(5).setQuantity(7));
+			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}
 
 		@Override

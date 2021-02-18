@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -54,6 +54,14 @@ public class DTTrees {
 				.setDefaultKey(new ResourceLocation(DynamicTrees.MOD_ID, "null"))
 				.disableSaving()
 				.setType(Species.class)
+				.setIDRange(0, Integer.MAX_VALUE - 1)
+				.create();
+
+		GenFeature.REGISTRY = new RegistryBuilder<GenFeature>()
+				.setName(new ResourceLocation(DynamicTrees.MOD_ID, "gen_feature"))
+				.setDefaultKey(new ResourceLocation(DynamicTrees.MOD_ID, "null"))
+				.disableSaving()
+				.setType(GenFeature.class)
 				.setIDRange(0, Integer.MAX_VALUE - 1)
 				.create();
 		

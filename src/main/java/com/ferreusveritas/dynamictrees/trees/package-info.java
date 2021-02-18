@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package com.ferreusveritas.dynamictrees.trees;
+
+import javax.annotation.ParametersAreNonnullByDefault;

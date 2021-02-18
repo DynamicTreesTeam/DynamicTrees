@@ -1,13 +1,15 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -15,10 +17,14 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
-public class CocoaGenFeature implements IPostGenFeature, IPostGrowFeature {
+public class CocoaGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
+
+	public CocoaGenFeature(ResourceLocation registryName) {
+		super(registryName);
+	}
 
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if (soilLife == 0 && world.rand.nextInt() % 16 == 0) {
 			if (species.seasonalFruitProductionFactor(world, treePos) > world.rand.nextFloat()) {
 				this.addCocoa(world, rootPos, false);
@@ -28,7 +34,7 @@ public class CocoaGenFeature implements IPostGenFeature, IPostGrowFeature {
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(world.getRandom().nextInt() % 8 == 0) {
 			addCocoa(world, rootPos, true);
 			return true;

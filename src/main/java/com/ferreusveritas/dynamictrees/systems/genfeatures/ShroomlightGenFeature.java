@@ -1,16 +1,21 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -27,52 +32,45 @@ import java.util.function.BiPredicate;
  *
  * @author Max Hyper
  */
-public class ShroomlightGenFeature implements IPostGenFeature, IPostGrowFeature {
+public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+    public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = new GenFeatureBlockProperty("shroomlight");
+    public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
 
-    private Block shroomlightBlock;
-    private int maxHeight = 32;
-    private BiPredicate<World, BlockPos> canGrowPredicate;
-    private double worldgenPlaceChance;
+    private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
+    private static final double VANILLA_GROW_CHANCE = .005f;
 
-    private static final double vanillaGrowChance = 0.005f;
-
-    public ShroomlightGenFeature () {
-        this(Blocks.SHROOMLIGHT, 0.4f, (world, blockPos) -> world.getRandom().nextFloat() <= vanillaGrowChance);
-    }
-
-    public ShroomlightGenFeature (Block shroomlightBlock, double worldgenPlaceChance, BiPredicate<World, BlockPos> canGrow) {
-        this.shroomlightBlock = shroomlightBlock;
-        this.worldgenPlaceChance = worldgenPlaceChance;
-        this.canGrowPredicate = canGrow;
+    public ShroomlightGenFeature (ResourceLocation registryName) {
+        super(registryName, SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE);
     }
 
     @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        return placeShroomlightsInValidPlace(world, rootPos, true);
+    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+        return super.createDefaultConfiguration().with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT).with(MAX_HEIGHT, 32)
+                .with(CAN_GROW_PREDICATE, (world, blockPos) -> world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE).with(PLACE_CHANCE, .4f);
     }
 
     @Override
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !canGrowPredicate.test(world, rootPos.up())) return false;
-
-        return placeShroomlightsInValidPlace(world, rootPos, false);
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+        return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, true);
     }
 
-    public void setCanGrowPredicate (BiPredicate<World, BlockPos> predicate){ this.canGrowPredicate = predicate; }
-    public void setMaxHeight (int maxHeight){
-        this.maxHeight = maxHeight;
+    @Override
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.up())) return false;
+
+        return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, false);
     }
 
-    private boolean placeShroomlightsInValidPlace(IWorld world, BlockPos rootPos, boolean worldGen){
-        int treeHeight = getTreeHeight(world, rootPos);
+    private boolean placeShroomlightsInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen){
+        int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
+        Block shroomlightBlock = configuredGenFeature.get(SHROOMLIGHT_BLOCK);
 
         List<BlockPos> validSpaces = findBranchPits(world, rootPos, treeHeight);
         if (validSpaces.size() > 0){
             if (worldGen){
                 for (BlockPos chosenSpace : validSpaces){
-                    if (world.getRandom().nextFloat() <= worldgenPlaceChance)
+                    if (world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE))
                         world.setBlockState(chosenSpace, shroomlightBlock.getDefaultState(), 2);
                 }
             } else {
@@ -84,8 +82,8 @@ public class ShroomlightGenFeature implements IPostGenFeature, IPostGrowFeature 
         return false;
     }
 
-    private int getTreeHeight (IWorld world, BlockPos rootPos){
-        for (int i = 1; i<maxHeight; i++){
+    private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight){
+        for (int i = 1; i < maxHeight; i++) {
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
                 return i-1;
             }

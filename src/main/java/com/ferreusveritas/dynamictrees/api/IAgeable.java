@@ -18,6 +18,6 @@ public interface IAgeable {
 	 * @param rand random number generator
 	 * @return -1 if block was destroyed after the ageing, otherwise the hydro value of the block
 	 */
-	public int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds);
+	int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds);
 	
 }

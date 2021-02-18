@@ -33,6 +33,9 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
@@ -73,7 +76,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class Species extends ForgeRegistryEntry<Species> {
+public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> {
 
 	private static final JoCodeManager JO_CODE_MANAGER = DTDataPackRegistries.JO_CODE_MANAGER;
 	
@@ -126,7 +129,7 @@ public class Species extends ForgeRegistryEntry<Species> {
 	protected ILeavesProperties leavesProperties;
 
 	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
-	private List<ILeavesProperties> validLeaves = new LinkedList<>();
+	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
@@ -140,10 +143,7 @@ public class Species extends ForgeRegistryEntry<Species> {
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<BiomeDictionary.Type, Float>();//Environmental factors
 
-	protected IFullGenFeature genFeatureOverride;
-	protected List<IPreGenFeature> preGenFeatures;
-	protected List<IPostGenFeature> postGenFeatures;
-	protected List<IPostGrowFeature> postGrowFeatures;
+	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
 
 	private String unlocalizedName = "";
 	
@@ -1019,11 +1019,15 @@ public class Species extends ForgeRegistryEntry<Species> {
 	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-		if(postGrowFeatures != null) {
-			for(IPostGrowFeature feature: postGrowFeatures) {
-				feature.postGrow(world, rootPos, treePos, this, soilLife, natural);
-			}
+		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			GenFeature genFeature = configuredGenFeature.getGenFeature();
+
+			if (!(genFeature instanceof IPostGrowFeature))
+				continue;
+
+			((IPostGrowFeature) genFeature).postGrow(configuredGenFeature, world, rootPos, treePos, this, soilLife, natural);
 		}
+
 		return true;
 	}
 	
@@ -1239,7 +1243,7 @@ public class Species extends ForgeRegistryEntry<Species> {
 		
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
-		if(effect != null && (isTransformable() || !(effect instanceof TransformSubstance))) {
+		if(effect != null) {
 			if(effect.isLingering()) {
 				world.addEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
@@ -1373,8 +1377,11 @@ public class Species extends ForgeRegistryEntry<Species> {
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		
-		if(genFeatureOverride != null) {
-			return genFeatureOverride.generate(world, rootPos, this, biome, random, radius, safeBounds);
+		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			GenFeature genFeature = configuredGenFeature.getGenFeature();
+			if (genFeature instanceof IFullGenFeature) {
+				return ((IFullGenFeature) genFeature).generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds);
+			}
 		}
 		
 		Direction facing = CoordUtils.getRandomDir(random);
@@ -1393,44 +1400,28 @@ public class Species extends ForgeRegistryEntry<Species> {
 		return new JoCode(joCodeString);
 	}
 
-	public Species addGenFeature(IGenFeature module) {
-		addGenFeature(module, IGenFeature.DEFAULTS);
+	/**
+	 * Adds the default configuration of the {@link GenFeature} given.
+	 *
+	 * @param feature The {@link GenFeature} to add.
+	 * @return This {@link Species} object.
+	 */
+	public Species addGenFeature(GenFeature feature) {
+		this.genFeatures.add(feature.getDefaultConfiguration());
 		return this;
 	}
-	
-	public Species addGenFeature(IGenFeature module, int allowableFlags) {
-		
-		if(module instanceof IFullGenFeature && (allowableFlags & IGenFeature.FULLGEN) != 0) {
-			genFeatureOverride = (IFullGenFeature) module;
-		}
-		
-		if(module instanceof IPreGenFeature && (allowableFlags & IGenFeature.PREGEN) != 0) {
-			IPreGenFeature feature = (IPreGenFeature) module;
-			if(preGenFeatures == null) {
-				preGenFeatures = new ArrayList<>(1);
-			}
-			preGenFeatures.add(feature);
-		}
-		
-		if(module instanceof IPostGenFeature && (allowableFlags & IGenFeature.POSTGEN) != 0) {
-			IPostGenFeature feature = (IPostGenFeature) module;
-			if(postGenFeatures == null) {
-				postGenFeatures = new ArrayList<>(1);
-			}
-			postGenFeatures.add(feature);
-		}
-		
-		if(module instanceof IPostGrowFeature && (allowableFlags & IGenFeature.POSTGROW) != 0) {
-			IPostGrowFeature feature = (IPostGrowFeature) module;
-			if(postGrowFeatures == null) {
-				postGrowFeatures = new ArrayList<>(1);
-			}
-			postGrowFeatures.add(feature);
-		}
-		
+
+	/**
+	 * Adds a {@link ConfiguredGenFeature} object to this species.
+	 *
+	 * @param configuredGenFeature The {@link ConfiguredGenFeature} to add.
+	 * @return This {@link Species} object.
+	 */
+	public Species addGenFeature(ConfiguredGenFeature<?> configuredGenFeature) {
+		this.genFeatures.add(configuredGenFeature);
 		return this;
 	}
-	
+
 	/**
 	 * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the trunk that
 	 * could be in the way.
@@ -1444,12 +1435,14 @@ public class Species extends ForgeRegistryEntry<Species> {
 	 * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
 	 */
 	public BlockPos preGeneration(IWorld world, BlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-		if(preGenFeatures != null) {
-			for(IPreGenFeature feature: preGenFeatures) {
-				if (feature != null)
-				rootPos = feature.preGeneration(world, rootPos, this, radius, facing, safeBounds, joCode);
-			}
+		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			GenFeature genFeature = configuredGenFeature.getGenFeature();
+
+			if (!(genFeature instanceof IPreGenFeature)) continue;
+
+			rootPos = ((IPreGenFeature) genFeature).preGeneration(configuredGenFeature, world, rootPos, this, radius, facing, safeBounds, joCode);
 		}
+
 		return rootPos;
 	}
 	
@@ -1467,12 +1460,13 @@ public class Species extends ForgeRegistryEntry<Species> {
 	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
 	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-		if(postGenFeatures != null) {
-			for(IPostGenFeature feature: postGenFeatures) {
-				if (feature != null) {
-					feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
-				}
-			}
+		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			GenFeature genFeature = configuredGenFeature.getGenFeature();
+
+			if (!(genFeature instanceof IPostGenFeature)) continue;
+
+			((IPostGenFeature) genFeature).postGeneration(configuredGenFeature, world, rootPos, this, biome, radius, endPoints, safeBounds,
+					initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
 		}
 	}
 	

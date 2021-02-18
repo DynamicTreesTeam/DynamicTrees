@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -7,11 +7,13 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
@@ -19,10 +21,14 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class PodzolGenFeature implements IPostGrowFeature {
-	
+public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
+
+	public PodzolGenFeature(ResourceLocation registryName) {
+		super(registryName);
+	}
+
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if(DTConfigs.podzolGen.get()) {
 			NodeFindEnds endFinder = new NodeFindEnds();
 			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));

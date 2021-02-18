@@ -1,10 +1,15 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
@@ -17,6 +22,7 @@ import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
@@ -31,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 
 /**
  * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
@@ -40,26 +45,25 @@ import java.util.function.BiPredicate;
  *
  * @author Max Hyper
  */
-public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
+public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-
-    private Block nestBlock;
-    private BiPredicate<World, BlockPos> canGrowPredicate;
-    private BiFunction<IWorld, BlockPos, Double> worldGenChanceFunction;
-    private int maxHeight = 32;
+    public static final GenFeatureProperty<Block> NEST_BLOCK = new GenFeatureBlockProperty("nest");
+    public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
     private static final double vanillaGenChanceForest = 0.002f;
     private static final double vanillaGrowChance = 0.001f;
 
-    public BeeNestGenFeature (){
-        this (Blocks.BEE_NEST);
+    private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
+
+    public BeeNestGenFeature (ResourceLocation registryName){
+        super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION);
     }
 
-    public BeeNestGenFeature (Block nestBlock){
-        this(nestBlock, (world, pos)->{
+    @Override
+    public ConfiguredGenFeature<?> createDefaultConfiguration() {
+        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos)->{
             if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
             //Default flower check predicate, straight from the sapling class
             for(BlockPos blockpos : BlockPos.Mutable.getAllInBoxMutable(pos.down().north(2).west(2), pos.up().south(2).east(2))) {
@@ -68,7 +72,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
                 }
             }
             return false;
-        }, ((world, pos) -> {
+        }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             //Default biome check chance function. Uses vanilla chances
             RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Objects.requireNonNull(world.getNoiseBiomeRaw(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
@@ -78,37 +82,29 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
                 return vanillaGenChanceForest;
             return 0D;
-        }));
-    }
-
-    public BeeNestGenFeature (Block nestBlock, BiPredicate<World, BlockPos> canGrow, BiFunction<IWorld, BlockPos, Double> worldGenChance){
-        this.nestBlock = nestBlock;
-        this.canGrowPredicate = canGrow;
-        this.worldGenChanceFunction = worldGenChance;
-    }
-
-    public void setCanGrowPredicate (BiPredicate<World, BlockPos> predicate){ this.canGrowPredicate = predicate; }
-    public void setWorldGenChanceFunction (BiFunction<IWorld, BlockPos, Double> function){ this.worldGenChanceFunction = function; }
-    public void setMaxHeight (int maxHeight){ this.maxHeight = maxHeight; }
-
-    @Override
-    public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (world.getRandom().nextFloat() > worldGenChanceFunction.apply(world, rootPos)) return false;
-
-        return placeBeeNestInValidPlace(world, rootPos, true);
+        });
     }
 
     @Override
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !canGrowPredicate.test(world, rootPos.up())) return false;
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) return false;
 
-        return placeBeeNestInValidPlace(world, rootPos, false);
+        return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, true);
     }
 
-    private boolean placeBeeNestInValidPlace(IWorld world, BlockPos rootPos, boolean worldGen){
-        int treeHeight = getTreeHeight(world, rootPos);
+    @Override
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.up())) return false;
+
+        return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
+    }
+
+    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen){
+        Block nestBlock = configuredGenFeature.get(NEST_BLOCK);
+
+        int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
         //This prevents trees from having multiple bee nests. There should be only one per tree.
-        if (nestAlreadyPresent(world, rootPos, treeHeight)) return false;
+        if (nestAlreadyPresent(world, nestBlock, rootPos, treeHeight)) return false;
 
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
@@ -118,12 +114,12 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
             Direction chosenDir = chosenSpace.getValue().get(world.getRandom().nextInt(chosenSpace.getValue().size()));
 
-            return placeBeeNestWithBees(world, chosenSpace.getKey(), chosenDir, worldGen);
+            return placeBeeNestWithBees(world, nestBlock, chosenSpace.getKey(), chosenDir, worldGen);
         }
         return false;
     }
 
-    private boolean placeBeeNestWithBees(IWorld world, BlockPos pos, Direction faceDir, boolean worldGen){
+    private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen){
         int honeyLevel = worldGen? world.getRandom().nextInt(6) : 0;
         BlockState nestState = nestBlock.getDefaultState();
         if (nestState.hasProperty(BeehiveBlock.FACING)) nestState = nestState.with(BeehiveBlock.FACING, faceDir);
@@ -156,7 +152,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
         return null;
     }
 
-    private boolean nestAlreadyPresent(IWorld world, BlockPos rootPos, int maxHeight){
+    private boolean nestAlreadyPresent(IWorld world, Block nestBlock, BlockPos rootPos, int maxHeight){
         for (int y = 2; y < maxHeight; y++){
             BlockPos trunkPos = rootPos.up(y);
             for (Direction dir : HORIZONTALS){
@@ -168,10 +164,10 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
         return false;
     }
 
-    private int getTreeHeight (IWorld world, BlockPos rootPos){
-        for (int i = 1; i<maxHeight; i++){
+    private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight){
+        for (int i = 1; i < maxHeight; i++) {
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
-                return i-1;
+                return i - 1;
             }
         }
         return maxHeight;
@@ -201,4 +197,7 @@ public class BeeNestGenFeature implements IPostGenFeature, IPostGrowFeature {
         }
         return validSpaces;
     }
+
+    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Double> {}
+
 }

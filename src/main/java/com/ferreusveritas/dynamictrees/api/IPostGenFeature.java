@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.api;
 
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
@@ -9,12 +10,12 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
-public interface IPostGenFeature extends IGenFeature {
+public interface IPostGenFeature {
 
 	/**
 	 * Do post generation operations
 	 *
-	 *
+	 * @param configuredGenFeature The {@link ConfiguredGenFeature}
 	 * @param world The world - use for other things like world.getBiome
 	 * @param rootPos The position of the rooty dirt block
 	 * @param species The species being processed
@@ -27,6 +28,6 @@ public interface IPostGenFeature extends IGenFeature {
 	 * @param seasonFruitProductionFactor The production factor for fruit generation
 	 * @return true if operation succeeded. false otherwise.
 	 */
-	boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor);
+	boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor);
 
 }

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
@@ -19,8 +19,6 @@ public class WarpedFungus extends NetherTreeFamily {
 
 		WarpedSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
-
-			this.addGenFeature(new VinesGenFeature(Blocks.TWISTING_VINES_PLANT, VinesGenFeature.VineType.FLOOR).setTipBlock(Blocks.TWISTING_VINES).setMaxLength(5).setQuantity(7));
 		}
 
 		@Override
@@ -44,8 +42,6 @@ public class WarpedFungus extends NetherTreeFamily {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
 
 			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
-
-			this.addGenFeature(new VinesGenFeature(Blocks.TWISTING_VINES_PLANT, VinesGenFeature.VineType.FLOOR).setTipBlock(Blocks.TWISTING_VINES).setMaxLength(5).setQuantity(7));
 		}
 
 		@Override

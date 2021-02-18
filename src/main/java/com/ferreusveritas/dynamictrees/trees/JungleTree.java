@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.featuregen.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
@@ -52,9 +52,9 @@ public class JungleTree extends VanillaTreeFamily {
 			setupStandardStickDropping();
 			
 			//Add species features
-			addGenFeature(new CocoaGenFeature());
-			addGenFeature(new VinesGenFeature().setQuantity(16).setMaxLength(16));
-			addGenFeature(new UndergrowthGenFeature());
+			this.addGenFeature(GenFeatures.COCOA);
+			this.addGenFeature(GenFeatures.VINES.with(VinesGenFeature.QUANTITY, 16).with(VinesGenFeature.MAX_LENGTH, 16));
+			this.addGenFeature(GenFeatures.UNDERGROWTH);
 		}
 		
 		@Override
@@ -68,8 +68,7 @@ public class JungleTree extends VanillaTreeFamily {
 		}
 
 	}
-	
-	
+
 	public class MegaJungleSpecies extends Species {
 		
 		private static final String speciesName = "mega_jungle";
@@ -90,20 +89,14 @@ public class JungleTree extends VanillaTreeFamily {
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
 			
 			//Add species features
-			addGenFeature(new VinesGenFeature().setQuantity(16).setMaxLength(16));
-			addGenFeature(new BottomFlareGenFeature()); // Flare the bottom
-			addGenFeature(new ClearVolumeGenFeature(8));//Clear a spot for the thick tree trunk
-			addGenFeature(new MoundGenFeature(999));//Place a 3x3 of dirt under thick trees
-			addGenFeature(new RootsGenFeature(9).setScaler(getRootScaler())); // Finally Generate Roots
+			this.addGenFeature(GenFeatures.VINES.getDefaultConfiguration().with(VinesGenFeature.QUANTITY, 16)
+					.with(VinesGenFeature.MAX_LENGTH, 16));
+			this.addGenFeature(GenFeatures.BOTTOM_FLARE.getDefaultConfiguration()); // Flare the bottom
+			this.addGenFeature(GenFeatures.CLEAR_VOLUME.getDefaultConfiguration()); // Clear a spot for the thick tree trunk
+			this.addGenFeature(GenFeatures.MOUND.getDefaultConfiguration().with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999)); // Place a 3x3 of dirt under thick trees
+			this.addGenFeature(GenFeatures.ROOTS.getDefaultConfiguration().with(RootsGenFeature.MIN_TRUNK_RADIUS, 9)); // Finally Generate Roots
 		}
 
-		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
-			return (inRadius, trunkRadius) -> {
-				float scale = MathHelper.clamp(trunkRadius >= 9 ? (trunkRadius / 18f) : 0, 0, 1);
-				return (int) (inRadius * scale);
-			};
-		}
-		
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);

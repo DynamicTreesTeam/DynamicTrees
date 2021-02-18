@@ -5,10 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.ConiferLogic;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.featuregen.ClearVolumeGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.ConiferTopperGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.MoundGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.PodzolGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
@@ -25,7 +22,7 @@ import java.util.Optional;
 
 public class SpruceTree extends VanillaTreeFamily {
 	
-	public class BaseSpruceSpecies extends Species {
+	public static class BaseSpruceSpecies extends Species {
 		
 		BaseSpruceSpecies(ResourceLocation name, TreeFamily treeFamily) {
 			super(name, treeFamily);
@@ -42,8 +39,8 @@ public class SpruceTree extends VanillaTreeFamily {
 			setupStandardStickDropping();
 			
 			//Add species features
-			addGenFeature(new ConiferTopperGenFeature(getLeavesProperties()));
-			addGenFeature(new PodzolGenFeature());
+			this.addGenFeature(GenFeatures.CONIFER_TOPPER.with(ConiferTopperGenFeature.LEAVES_PROPERTIES, this.getLeavesProperties()));
+			this.addGenFeature(GenFeatures.PODZOL);
 		}
 		
 		@Override
@@ -81,8 +78,8 @@ public class SpruceTree extends VanillaTreeFamily {
 			
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
 			
-			addGenFeature(new ClearVolumeGenFeature(8));//Clear a spot for the thick tree trunk
-			addGenFeature(new MoundGenFeature(999));//Place a 3x3 of dirt under thick trees
+			this.addGenFeature(GenFeatures.CLEAR_VOLUME);//Clear a spot for the thick tree trunk
+			this.addGenFeature(GenFeatures.MOUND.with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999));//Place a 3x3 of dirt under thick trees
 		}
 		
 		//Mega spruce are just spruce in a mega taiga..  So they have the same seeds

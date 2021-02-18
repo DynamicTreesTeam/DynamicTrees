@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
@@ -6,17 +6,22 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.TriFunction;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -24,17 +29,23 @@ import net.minecraft.world.biome.Biome;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
+public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
 
-	private int levelLimit = 2;
-	private final int minTrunkRadius;
-	private BiFunction<Integer, Integer, Integer> scaler = (i, j) -> i;
+	public static final GenFeatureProperty<Integer> MIN_TRUNK_RADIUS = GenFeatureProperty.createIntegerProperty("min_trunk_radius");
+	public static final GenFeatureProperty<Integer> LEVEL_LIMIT = GenFeatureProperty.createIntegerProperty("level_limit");
 
-	private SimpleVoxmap rootMaps[];
+	private TriFunction<Integer, Integer, Integer, Integer> scaler = (inRadius, trunkRadius, minTrunkRadius) -> {
+		// TODO: /24f should have a custom value, as JungleTree used 18 in its scaler.
+		float scale = MathHelper.clamp(trunkRadius >= minTrunkRadius ? (trunkRadius / 24f) : 0, 0, 1);
+		return (int) (inRadius * scale);
+	};
 
-	public RootsGenFeature(int minTrunkRadius) {
-		this.minTrunkRadius = minTrunkRadius;
-		rootMaps = createRootMaps();
+	private final SimpleVoxmap[] rootMaps;
+
+	public RootsGenFeature(ResourceLocation registryName) {
+		super(registryName, MIN_TRUNK_RADIUS, LEVEL_LIMIT);
+
+		this.rootMaps = createRootMaps();
 	}
 
 	protected SimpleVoxmap[] createRootMaps() {
@@ -57,54 +68,49 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 		return maps;
 	}
 
-	public RootsGenFeature setLevelLimit(int limit) {
-		this.levelLimit = limit;
-		return this;
-	}
-
-	public RootsGenFeature setScaler(BiFunction<Integer, Integer, Integer> scaler) {
-		this.scaler = scaler;
-		return this;
+	@Override
+	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+		return super.createDefaultConfiguration().with(MIN_TRUNK_RADIUS, 13).with(LEVEL_LIMIT, 2);
 	}
 
 	@Override
-	public boolean postGeneration(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 
 		BlockPos treePos = rootPos.up();
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 
-		if(trunkRadius >= minTrunkRadius) {
-			return startRoots(world, treePos, species, trunkRadius);
+		if (trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
+			return this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
 		}
 		return false;
 	}
 
-
-	public boolean startRoots(IWorld world, BlockPos treePos, Species species, int trunkRadius) {
-		int hash = CoordUtils.coordHashCode(treePos, 2);
-		SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-		nextRoot(world, rootMap, treePos, species, trunkRadius, BlockPos.ZERO, 0, -1, null, 0);
-		return true;
-	}
-
 	@Override
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 
-		if(soilLife > 0 && trunkRadius >= minTrunkRadius) {
+		if(soilLife > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
 			Surround surr = Surround.values()[world.rand.nextInt(8)];
 			BlockPos dPos = treePos.add(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
 				world.setBlockState(dPos, DTRegistries.trunkShellBlock.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
-			startRoots(world, treePos, species, trunkRadius);
+			this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
 		}
 
 		return true;
 	}
 
-	protected void nextRoot(IWorld world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, BlockPos pos, int height, int levelCount, Direction fromDir, int radius) {
+	public boolean startRoots(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
+		int hash = CoordUtils.coordHashCode(treePos, 2);
+		SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
+		this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuredGenFeature.get(MIN_TRUNK_RADIUS), BlockPos.ZERO, 0,
+				-1, null, 0, configuredGenFeature.get(LEVEL_LIMIT));
+		return true;
+	}
+
+	protected void nextRoot(IWorld world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
 
 		for(int depth = 0; depth < 2; depth++) {
 			BlockPos currPos = trunkPos.add(pos).up(height - depth);
@@ -121,13 +127,13 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 					for(Direction dir: CoordUtils.HORIZONTALS) {
 						if(dir != fromDir) {
 							BlockPos dPos = pos.offset(dir);
-							int nextRad = scaler.apply((int) rootMap.getVoxel(dPos), trunkRadius);
+							int nextRad = this.scaler.apply((int) rootMap.getVoxel(dPos), trunkRadius, minTrunkRadius);
 							if(pos != BlockPos.ZERO && nextRad >= radius) {
 								nextRad = radius - 1;
 							}
 							int thisLevelCount = depth == 1 ? 1 : levelCount + 1;
-							if(nextRad > 0 && thisLevelCount <= this.levelLimit) {//Don't go longer than 2 adjacent blocks on a single level
-								nextRoot(world, rootMap, trunkPos, species, trunkRadius, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad);//Recurse here
+							if(nextRad > 0 && thisLevelCount <= levelLimit) {//Don't go longer than 2 adjacent blocks on a single level
+								nextRoot(world, rootMap, trunkPos, species, trunkRadius, minTrunkRadius, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad, levelLimit);//Recurse here
 							}
 						}
 					}
@@ -147,6 +153,10 @@ public class RootsGenFeature implements IPostGrowFeature, IPostGenFeature {
 		Material material = placeState.getMaterial();
 
 		return material.isReplaceable() && material != Material.WATER && material != Material.LAVA;
+	}
+
+	public void setScaler(TriFunction<Integer, Integer, Integer, Integer> scaler) {
+		this.scaler = scaler;
 	}
 
 }

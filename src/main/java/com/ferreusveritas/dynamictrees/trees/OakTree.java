@@ -6,9 +6,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
-import com.ferreusveritas.dynamictrees.systems.featuregen.BeeNestGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.FruitGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,7 +30,7 @@ import java.util.Random;
 
 public class OakTree extends VanillaTreeFamily {
 	
-	public class OakSpecies extends Species {
+	public static class OakSpecies extends Species {
 		
 		OakSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -52,8 +50,7 @@ public class OakTree extends VanillaTreeFamily {
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
 
-			addGenFeature(new BeeNestGenFeature());
-
+			this.addGenFeature(GenFeatures.BEE_NEST);
 		}
 		
 		@Override
@@ -93,7 +90,9 @@ public class OakTree extends VanillaTreeFamily {
 			setupStandardSeedDropping();
 			
 			//Add species features
-			addGenFeature(new VinesGenFeature().setMaxLength(7).setVerSpread(30).setRayDistance(6).setQuantity(24));//Generate Vines
+			this.addGenFeature(GenFeatures.VINES.with(VinesGenFeature.MAX_LENGTH, 7)
+					.with(VinesGenFeature.VERTICAL_SPREAD, 30f).with(VinesGenFeature.RAY_DISTANCE, 6f)
+					.with(VinesGenFeature.QUANTITY, 24)); // Generate Vines
 		}
 		
 		@Override
@@ -147,7 +146,7 @@ public class OakTree extends VanillaTreeFamily {
 	/**
 	 * This species drops no seeds at all.  One must craft the seed from an apple.
 	 */
-	public class AppleOakSpecies extends Species {
+	public static class AppleOakSpecies extends Species {
 		
 		private static final String speciesName = "apple";
 		
@@ -167,7 +166,7 @@ public class OakTree extends VanillaTreeFamily {
 			generateSapling();
 
 			DTRegistries.appleBlock.setSpecies(this);
-			addGenFeature(new FruitGenFeature(DTRegistries.appleBlock).setRayDistance(4));
+			this.addGenFeature(GenFeatures.FRUIT.with(FruitGenFeature.RAY_DISTANCE, 4f));
 		}
 		
 		@Override

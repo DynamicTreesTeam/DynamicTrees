@@ -6,9 +6,10 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicWartBlock;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
-import com.ferreusveritas.dynamictrees.systems.featuregen.ClearVolumeGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.MoundGenFeature;
-import com.ferreusveritas.dynamictrees.systems.featuregen.ShroomlightGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.ClearVolumeGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.MoundGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.ShroomlightGenFeature;
 import net.minecraft.block.SoundType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -24,14 +25,14 @@ import java.util.Optional;
 
 public class NetherTreeFamily extends VanillaTreeFamily {
 
-    public class BaseNetherFungiSpecies extends Species{
+    public static class BaseNetherFungiSpecies extends Species{
         BaseNetherFungiSpecies(ResourceLocation name, TreeFamily treeFamily) {
             super(name, treeFamily);
 
             envFactor(BiomeDictionary.Type.COLD, 0.25f);
             envFactor(BiomeDictionary.Type.WET, 0.75f);
 
-            addGenFeature(new ShroomlightGenFeature());
+            this.addGenFeature(GenFeatures.SHROOMLIGHT.getDefaultConfiguration());
         }
 
         @Override
@@ -65,8 +66,8 @@ public class NetherTreeFamily extends VanillaTreeFamily {
 
             setSoilLongevity(16);//Grows for a while so it can actually get tall
 
-            addGenFeature(new ClearVolumeGenFeature(8));//Clear a spot for the thick tree trunk
-            addGenFeature(new MoundGenFeature(999));//Place a 3x3 of dirt under thick trees
+            this.addGenFeature(GenFeatures.CLEAR_VOLUME);//Clear a spot for the thick tree trunk
+            this.addGenFeature(GenFeatures.MOUND.with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999)); // Place a 3x3 of dirt under thick trees
         }
 
         @Override

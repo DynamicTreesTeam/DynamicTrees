@@ -3,29 +3,27 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
-import com.ferreusveritas.dynamictrees.systems.featuregen.*;
-import net.minecraft.block.Block;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
+
+import static com.ferreusveritas.dynamictrees.systems.genfeatures.BiomePredicateGenFeature.BIOME_PREDICATE;
+import static com.ferreusveritas.dynamictrees.systems.genfeatures.BiomePredicateGenFeature.GEN_FEATURE;
+import static com.ferreusveritas.dynamictrees.systems.genfeatures.HugeMushroomsGenFeature.MAX_ATTEMPTS;
+import static com.ferreusveritas.dynamictrees.systems.genfeatures.HugeMushroomsGenFeature.MAX_MUSHROOMS;
 
 public class DarkOakTree extends VanillaTreeFamily {
 	
@@ -58,23 +56,15 @@ public class DarkOakTree extends VanillaTreeFamily {
 			setupStandardStickDropping();
 			
 			//Add species features
-			addGenFeature(new ClearVolumeGenFeature(6));//Clear a spot for the thick tree trunk
-			addGenFeature(new BottomFlareGenFeature());//Flare the bottom
-			addGenFeature(new MoundGenFeature(5));//Establish mounds
-			addGenFeature(new PredicateGenFeature(
-				new HugeMushroomsGenFeature().setMaxShrooms(1).setMaxAttempts(3)//Generate Huge Mushrooms
-				).setBiomePredicate(biome -> biome == ForgeRegistries.BIOMES.getValue(Biomes.DARK_FOREST.getRegistryName()) || biome == ForgeRegistries.BIOMES.getValue(Biomes.DARK_FOREST_HILLS.getRegistryName()))//Only allow this feature in roofed forests
-			);
-			addGenFeature(new RootsGenFeature(13).setScaler(getRootScaler()));//Finally Generate Roots
+			this.addGenFeature(GenFeatures.CLEAR_VOLUME.with(ClearVolumeGenFeature.HEIGHT, 6)); // Clear a spot for the thick tree trunk.
+			this.addGenFeature(GenFeatures.BOTTOM_FLARE); // Flare the bottom.
+			this.addGenFeature(GenFeatures.MOUND); // Establish mounds.
+			this.addGenFeature(GenFeatures.BIOME_PREDICATE
+					.with(GEN_FEATURE, GenFeatures.HUGE_MUSHROOMS.with(MAX_MUSHROOMS, 1).with(MAX_ATTEMPTS, 3))
+					.with(BIOME_PREDICATE, biome -> isBiomePerfect(getBiomeKey(biome)))); // Generate huge mushrooms.
+			this.addGenFeature(GenFeatures.ROOTS); // Finally generate roots.
 		}
-		
-		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
-			return (inRadius, trunkRadius) -> {
-				float scale = MathHelper.clamp(trunkRadius >= 13 ? (trunkRadius / 24f) : 0, 0, 1);
-				return (int) (inRadius * scale);
-			};
-		}
-		
+
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return isOneOfBiomes(biome, Biomes.DARK_FOREST, Biomes.DARK_FOREST_HILLS);

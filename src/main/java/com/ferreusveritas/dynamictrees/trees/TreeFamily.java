@@ -168,7 +168,7 @@ public class TreeFamily {
 		speciesLocationOverrides.add(override);
 	}
 
-	private LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
+	private final LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 
 	public interface ISpeciesLocationOverride {
 		Species getSpeciesForLocation(IWorld access, BlockPos trunkPos);
@@ -278,7 +278,7 @@ public class TreeFamily {
 		return branch;
 	}
 
-	public Item createBranchItem (@Nonnull BranchBlock branch) {
+	public Item createBranchItem (BranchBlock branch) {
 		return new BlockItem(branch, new Item.Properties()).setRegistryName(branch.getRegistryName());
 	}
 

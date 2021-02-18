@@ -1,6 +1,9 @@
-package com.ferreusveritas.dynamictrees.systems.featuregen;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -9,32 +12,41 @@ import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Random;
+
+import static net.minecraft.block.HugeMushroomBlock.*;
 
 /**
  * Generates a singular huge mushroom
  * 
  * @author ferreusveritas
  */
-public class HugeMushroomGenFeature implements IFullGenFeature {
-		
-	private final Block mushroomType;
+public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeature {
+
+	public static final GenFeatureProperty<Block> MUSHROOM_BLOCK = new GenFeatureBlockProperty("mushroom");
+	public static final GenFeatureProperty<Block> STEM_BLOCK = new GenFeatureBlockProperty("stem");
+
 	private int height = -1;
-	
-	public HugeMushroomGenFeature(Block block) {
-		this.mushroomType = block;
+
+	public HugeMushroomGenFeature(ResourceLocation registryName) {
+		super(registryName, MUSHROOM_BLOCK, STEM_BLOCK);
 	}
-	
-	public HugeMushroomGenFeature() {
-		this.mushroomType = null;
+
+	public HugeMushroomGenFeature(ResourceLocation registryName, GenFeatureProperty<?>... properties) {
+		super(registryName, ArrayUtils.addAll(properties, MUSHROOM_BLOCK, STEM_BLOCK));
 	}
-	
+
+	@Override
+	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+		return super.createDefaultConfiguration().with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK).with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
+	}
+
 	static final SimpleVoxmap brnCap;
 	static final SimpleVoxmap brnCapMedium;
 	static final SimpleVoxmap brnCapSmall;
@@ -120,7 +132,7 @@ public class HugeMushroomGenFeature implements IFullGenFeature {
 	}
 	
 	@Override
-	public boolean generate(IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 
 		BlockPos genPos = rootPos.up();
 
@@ -129,7 +141,7 @@ public class HugeMushroomGenFeature implements IFullGenFeature {
 		BlockState soilState = world.getBlockState(rootPos);
 
 		if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
-			Block mushroomBlock = this.mushroomType;
+			Block mushroomBlock = configuredGenFeature.get(MUSHROOM_BLOCK);
 
 			if (mushroomBlock == null) {
 				mushroomBlock = random.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
@@ -142,9 +154,8 @@ public class HugeMushroomGenFeature implements IFullGenFeature {
 
 			if(safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
 
-				//Check if there's room for a mushroom cap and stem
+				// Check there's room for a mushroom cap and stem.
 				for(BlockPos mutPos : Iterables.concat(BlockPos.getAllInBoxMutable(BlockPos.ZERO.down(capMap.getLenY()), BlockPos.ZERO.down(height - 1)), capMap.getAllNonZero())) {
-					//System.out.println(mutPos);
 					BlockPos dPos = mutPos.add(capPos);
 					BlockState state = world.getBlockState(dPos);
 					if(!state.getMaterial().isReplaceable()) {
@@ -152,24 +163,37 @@ public class HugeMushroomGenFeature implements IFullGenFeature {
 					}
 				}
 
-//				//Construct the mushroom cap from the voxel map
-//				for(SimpleVoxmap.Cell cell: capMap.getAllNonZeroCells()) {
-//					BlockHugeMushroom.EnumType mushroomType = BlockHugeMushroom.EnumType.byMetadata(cell.getValue());
-//					world.setBlockState(capPos.add(cell.getPos()), mushroomBlock.getDefaultState().withProperty(BlockHugeMushroom.VARIANT, mushroomType));
-//				}
-//
-//				//Construct the stem
-//				int stemLen = height - capMap.getLenY();
-//				BlockState stemBlock = mushroomBlock.getDefaultState().with(BlockHugeMushroom.VARIANT, BlockHugeMushroom.EnumType.STEM);
-//				for(int y = 0; y < stemLen; y++) {
-//					world.setBlockState(genPos.up(y), stemBlock);
-//				}
+				BlockState stemState = configuredGenFeature.get(STEM_BLOCK).getDefaultState();
+
+				// Construct the mushroom cap from the voxel map.
+				for(SimpleVoxmap.Cell cell: capMap.getAllNonZeroCells()) {
+					world.setBlockState(capPos.add(cell.getPos()), this.getMushroomStateForValue(mushroomBlock, stemState, cell.getValue()), 2);
+				}
+
+				// Construct the stem.
+				int stemLen = height - capMap.getLenY();
+				for(int y = 0; y < stemLen; y++) {
+					world.setBlockState(genPos.up(y), stemState, 2);
+				}
 
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	// Ignore this messy, semi-working monstrosity.
+	private BlockState getMushroomStateForValue (Block mushroomBlock, BlockState stemBlock, int value) {
+		if (value == 10)
+			return stemBlock;
+
+		return mushroomBlock.getDefaultState()
+				.with(DOWN, false)
+				.with(NORTH, value == 1 || value == 2 || value == 3)
+				.with(SOUTH, value == 7 || value == 8 || value == 9)
+				.with(WEST, value == 1 || value == 4 || value == 7)
+				.with(EAST, value == 3 || value == 6 || value == 9);
 	}
 	
 }
