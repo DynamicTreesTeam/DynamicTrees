@@ -72,6 +72,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -315,7 +316,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
 		int index = validLeaves.indexOf(block.properties);
 		if (index < 0){
-			DynamicTrees.getLogger().warn("Block " + block + " not valid leaves for " + this);
+			LogManager.getLogger().warn("Block " + block + " not valid leaves for " + this);
 			return 0;
 		}
 		return index;

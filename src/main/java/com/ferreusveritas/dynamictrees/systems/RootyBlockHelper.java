@@ -1,13 +1,12 @@
 package com.ferreusveritas.dynamictrees.systems;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import net.minecraft.block.Block;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Dynamically creates rooty blocks
@@ -26,7 +25,7 @@ public class RootyBlockHelper {
      */
     public static boolean addToRootyBlocksMap (Block primitiveSoil, RootyBlock rootyBlock){
         if (rootyBlocksMap.containsKey(primitiveSoil)){
-            DynamicTrees.getLogger().warn("Attempted to register " + rootyBlock + " as the rooty block of " + primitiveSoil + " but it already had one.");
+            LogManager.getLogger().warn("Attempted to register " + rootyBlock + " as the rooty block of " + primitiveSoil + " but it already had one.");
             return false;
         }
         rootyBlocksMap.put(primitiveSoil, rootyBlock);

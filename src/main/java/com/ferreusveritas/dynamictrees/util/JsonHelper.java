@@ -1,13 +1,16 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.google.gson.*;
 import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 
 public class JsonHelper {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	public enum ResourceFolder {
 		ASSETS("assets/"),
@@ -27,10 +30,9 @@ public class JsonHelper {
 
 	public static JsonElement load(ResourceLocation jsonLocation, ResourceFolder resourceFolder) {
 		String filename = resourceFolder.folderName + jsonLocation.getNamespace() + "/" + (resourceFolder == ResourceFolder.DATA ? "trees/" : "") + jsonLocation.getPath();
-		DynamicTrees.getLogger().info(filename);
 		InputStream in = LeavesPaging.class.getClassLoader().getResourceAsStream(filename);
 		if(in == null) {
-			DynamicTrees.getLogger().fatal("Could not open resource " + filename);
+			LOGGER.fatal("Could not open resource " + filename);
 			return null;
 		}
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -47,7 +49,7 @@ public class JsonHelper {
 				return parser.parse(new FileReader(file));
 			}
 			catch (Exception e) {
-				DynamicTrees.getLogger().fatal("Can't open " + fileName + ": " + e.getMessage());
+				LOGGER.fatal("Can't open " + fileName + ": " + e.getMessage());
 			}
 		}
 		

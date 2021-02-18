@@ -29,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -428,7 +429,7 @@ public class TreeFamily {
 	public int getBranchBlockIndex (BranchBlock block){
 		int index = validBranches.indexOf(block);
 		if (index < 0){
-			DynamicTrees.getLogger().warn("Block " + block + " not valid branch for " + this);
+			LogManager.getLogger().warn("Block " + block + " not valid branch for " + this);
 			return 0;
 		}
 		return index;

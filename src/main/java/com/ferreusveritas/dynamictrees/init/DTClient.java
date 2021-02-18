@@ -45,6 +45,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Random;
@@ -89,7 +90,7 @@ public class DTClient {
 		if (quads.isEmpty()) //if the quad list is empty, means there is no face on that side, so we try with null
 			quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
 		if (quads.isEmpty()) {//if null still returns empty, there is nothing we can do so we just warn and exit
-			DynamicTrees.getLogger().warn("Could not get color of "+face+" side for "+ state.getBlock()+"! Branch needs to be handled manually!");
+			LogManager.getLogger().warn("Could not get color of "+face+" side for "+ state.getBlock()+"! Branch needs to be handled manually!");
 			return 0;
 		}
 		ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that selected face

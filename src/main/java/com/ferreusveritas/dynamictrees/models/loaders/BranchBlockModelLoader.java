@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelLoader;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 
@@ -51,7 +52,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         try {
             return new ResourceLocation(resLocStr);
         } catch (ResourceLocationException e) {
-            DynamicTrees.getLogger().fatal("Failed to create resource location with following info: " + e.getMessage());
+            LogManager.getLogger().fatal("Failed to create resource location with following info: " + e.getMessage());
         }
         return null;
     }

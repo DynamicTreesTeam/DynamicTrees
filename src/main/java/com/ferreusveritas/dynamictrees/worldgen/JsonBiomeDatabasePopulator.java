@@ -17,9 +17,13 @@ import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBiomeDatabasePopulator {
-	
+
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	public static final String SPECIES = "species";
 	public static final String DENSITY = "density";
 	public static final String CHANCE = "chance";
@@ -65,7 +69,7 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 				boolean multipass = element.getAsBoolean();
 
 				if(multipass) {
-					DynamicTrees.getLogger().debug("Biome set for multipass: " + biome);
+					LOGGER.debug("Biome set for multipass: " + biome);
 
 					//Enable poisson disc multipass of roofed forests to ensure maximum density even with large trees
 					//by filling in gaps in the generation with smaller trees
@@ -84,7 +88,7 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 		event.register(SUBTERRANEAN,  (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				boolean subterranean = element.getAsBoolean();
-				DynamicTrees.getLogger().debug("Biome set to subterranean: " + biome);
+				LOGGER.debug("Biome set to subterranean: " + biome);
 				dbase.setIsSubterranean(biome, subterranean);
 			}
 		});
@@ -92,7 +96,7 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 		event.register(FORESTNESS, (dbase, element, biome) -> {
 			if(element.isJsonPrimitive()) {
 				float forestness = element.getAsFloat();
-				DynamicTrees.getLogger().debug("Forestness set for biome: " + biome + " at " + forestness);
+				LOGGER.debug("Forestness set for biome: " + biome + " at " + forestness);
 				dbase.setForestness(biome, forestness);
 			}
 		});
@@ -101,7 +105,7 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 			if(element.isJsonPrimitive()) {
 				boolean blacklist = element.getAsBoolean();
 				if(blacklist) {
-					DynamicTrees.getLogger().debug("Blacklisted biome: " + biome);
+					LOGGER.debug("Blacklisted biome: " + biome);
 					blacklistedBiomes.add(biome);
 				} else {
 					blacklistedBiomes.remove(biome);
@@ -186,13 +190,13 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 								if(applier != null) {
 									appliers.add(new JsonBiomeApplierData(applier, selectElement.getValue()));
 								} else {
-									DynamicTrees.getLogger().error("Json Error: Undefined applier property \"" + applierName + "\" in " + this.fileName + ".");
+									LOGGER.error("Json Error: Undefined applier property \"" + applierName + "\" in " + this.fileName + ".");
 								}
 							}
 						}
 					}
 				} else {
-					DynamicTrees.getLogger().error("Json Error: Undefined operation \"" + key + "\" in " + this.fileName + ".");
+					LOGGER.error("Json Error: Undefined operation \"" + key + "\" in " + this.fileName + ".");
 				}
 			}
 			

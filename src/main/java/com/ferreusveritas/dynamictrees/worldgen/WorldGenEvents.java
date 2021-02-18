@@ -64,12 +64,6 @@ public final class WorldGenEvents {
 
         // Loop through all vegetal features and remove if found to contain trees.
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
-            ConfiguredFeature<?, ?> configuredFeature = configuredFeatureSupplier.get();
-
-            if (biomeResLoc.equals(Biomes.MUSHROOM_FIELDS.getLocation())) {
-                DynamicTrees.getLogger().info("Hello");
-            }
-
             // Go through each canceller for the current biome and remove the current feature if it shouldCancel returns true.
             for (ITreeFeatureCanceller canceller : treeCanceller.getFeatureCancellers(biomeResLoc)) {
                 if (canceller != null && canceller.shouldCancel(configuredFeatureSupplier.get(), biomeResLoc, treeCanceller))

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -10,6 +9,8 @@ import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,6 +28,8 @@ import java.util.*;
  * @author Harley O'Connor
  */
 public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, List<String>>> {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TEXT_EXTENSION = ".txt";
     private static final int TEXT_EXTENSION_LENGTH = TEXT_EXTENSION.length();
@@ -72,7 +75,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
                     throw new IllegalStateException("Duplicate data file ignored with ID " + resourceLocation);
                 }
             } catch (IOException | IllegalStateException e) {
-                DynamicTrees.getLogger().error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn);
+                LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn);
             }
         }
 
@@ -120,7 +123,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         }
 
         Collections.sort(arr);
-        DynamicTrees.getLogger().debug(species + ":" + radius + ":" + arr.get(0));
+        LOGGER.debug(species + ":" + radius + ":" + arr.get(0));
     }
 
     /**

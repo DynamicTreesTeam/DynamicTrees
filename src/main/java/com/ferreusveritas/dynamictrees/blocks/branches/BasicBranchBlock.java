@@ -29,6 +29,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ToolType;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -329,7 +330,7 @@ public class BasicBranchBlock extends BranchBlock {
 			BlockState blockState = blockAccess.getBlockState(deltaPos);
 			return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			DynamicTrees.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
+			LogManager.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
 			return 0;
 		}
 	}
