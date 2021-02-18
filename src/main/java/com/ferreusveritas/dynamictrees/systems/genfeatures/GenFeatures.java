@@ -6,7 +6,7 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Stores all {@link GenFeature} objects created by Dynamic Trees.
  *
- * Add-ons can register new {@link GenFeature} objects using <tt>GenFeature.REGISTRY.register</tt>.
+ * <p>Add-ons can register new {@link GenFeature} objects using <tt>GenFeature.REGISTRY.register</tt>.</p>
  *
  * @author Harley O'Connor
  */

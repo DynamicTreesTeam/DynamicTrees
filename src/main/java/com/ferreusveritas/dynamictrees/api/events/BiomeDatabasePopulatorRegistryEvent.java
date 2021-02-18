@@ -10,6 +10,16 @@ public class BiomeDatabasePopulatorRegistryEvent extends Event {
 
     private final List<IBiomeDatabasePopulator> biomePopulators = new ArrayList<>();
 
+    /**
+     * Registers the given populator as the most default default populator. This is mainly
+     * so DT's default populator doesn't override the add-on's.
+     *
+     * @param populator The {@link IBiomeDatabasePopulator} object.
+     */
+    public void registerAsFirst (IBiomeDatabasePopulator populator) {
+        this.biomePopulators.add(0, populator);
+    }
+
     public void register(IBiomeDatabasePopulator populator) {
         this.biomePopulators.add(populator);
     }

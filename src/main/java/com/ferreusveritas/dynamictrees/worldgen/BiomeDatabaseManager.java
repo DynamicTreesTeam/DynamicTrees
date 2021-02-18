@@ -162,10 +162,16 @@ public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocat
             return;
         }
 
+        IBiomeDatabasePopulator populator = new JsonBiomeDatabasePopulator(entries, fileName);
+
         if (replace) {
-            event.replaceAll(new JsonBiomeDatabasePopulator(entries, fileName));
+            event.replaceAll(populator);
         } else {
-            event.register(new JsonBiomeDatabasePopulator(entries, fileName));
+            if (resourceLocation.getNamespace().equals(DynamicTrees.MOD_ID)) {
+                event.registerAsFirst(populator);
+            } else {
+                event.register(populator);
+            }
         }
     }
 
