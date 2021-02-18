@@ -35,6 +35,7 @@ import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -1238,7 +1239,7 @@ public class Species extends ForgeRegistryEntry<Species> {
 		
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
-		if(effect != null) {
+		if(effect != null && (isTransformable() || !(effect instanceof TransformSubstance))) {
 			if(effect.isLingering()) {
 				world.addEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
