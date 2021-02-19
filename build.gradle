@@ -12,6 +12,12 @@ repositories {
 	maven {
 		url "https://maven.tehnut.info"
 	}
+	maven {
+		url "https://www.cursemaven.com"
+	}
+	maven {
+		url = "https://maven.blamejared.com"
+	}
 }
 
 apply plugin: 'idea'
@@ -47,7 +53,7 @@ minecraft {
 	
 	replace("1.12.2-9999.9999.9999z", project.version)
 	replaceIn "ModConstants.java"
-	
+
 	makeObfSourceJar = false
 	
 	if (config.mappings_version)
@@ -55,7 +61,14 @@ minecraft {
 }
 
 dependencies {
-    compile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+	// Compile against full Hwyla jar.
+	compile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+
+	// Compile against Serene Seasons, but don't use at runtime.
+	compileOnly "curse.maven:SereneSeasons-291874:2799213"
+
+	// Use Patchouli at runtime only (for testing the guide book, which is exclusively Json).
+	runtime "vazkii.patchouli:Patchouli:1.0-19.96"
 }
 
 processResources {
