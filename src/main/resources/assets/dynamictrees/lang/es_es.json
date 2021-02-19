@@ -36,12 +36,12 @@
   "item.dynamictrees.dendro_potion.gigas": "Poción de gigantismo",
   "item.dynamictrees.dendro_potion.burgeoning":"Poción de florecimiento",
   "item.dynamictrees.dendro_potion.fertility":"Poción de fertilidad",
-  "item.dynamictrees.dendro_potion.persistance":"Poción de persistencia",
+  "item.dynamictrees.dendro_potion.persistence":"Poción de persistencia",
   "item.dynamictrees.dendro_potion.transform":"Poción de transformación",
 
   "item.dynamictrees.dirt_bucket":"Cubo con Tierra",
   "item.dynamictrees.staff":"Bastón del Bosque",
-  "item.dynamictrees.bonsai_pot":"Maceta de Bonsai",
+  "block.dynamictrees.bonsai_pot":"Maceta de Bonsai",
 
   "commands.dynamictrees.repop.run": "§aRepopulating base de datos de generación del mindo.",
   "commands.dynamictrees.gettree.success": "§aEspecie: §b%s §aJoCode: §b%s",

@@ -1,8 +1,6 @@
 {
   "itemGroup.dynamictrees": "Dynamische Bäume",
 
-  "block.dynamictrees.rootydirt": "Verwurzelte Erde",
-
   "block.dynamictrees.oak_branch": "Dynamische Eiche",
   "block.dynamictrees.spruce_branch": "Dynamische Fichte",
   "block.dynamictrees.birch_branch": "Dynamische Birke",
@@ -22,7 +20,7 @@
   "item.dynamictrees.dendro_potion.depletion": "Trank der Erschöpfung",
   "item.dynamictrees.dendro_potion.burgeoning": "Trank des Aufblühens",
   "item.dynamictrees.dendro_potion.fertility": "Trank der Fruchtbarkeit",
-  "item.dynamictrees.dendro_potion.persistance": "Trank der Beständigkeit",
+  "item.dynamictrees.dendro_potion.persistence": "Trank der Beständigkeit",
   "item.dynamictrees.dendro_potion.transform": "Trank der Transformation",
 
   "item.dynamictrees.dirt_bucket": "Eimer mit Erde",

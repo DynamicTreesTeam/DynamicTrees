@@ -27,9 +27,8 @@ public final class GrowPulseCommand extends SubCommand {
         final World world = context.getSource().getWorld();
         final BlockPos pos = this.getPositionArg(context);
         final BlockState state = world.getBlockState(pos);
-        ITreePart part = TreeHelper.getTreePart(state);
 
-        if (part == TreeHelper.NULL_TREE_PART && !(state.getBlock() instanceof TrunkShellBlock)) {
+        if (TreeHelper.getTreePart(state) == TreeHelper.NULL_TREE_PART && !(state.getBlock() instanceof TrunkShellBlock)) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }

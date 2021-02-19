@@ -1,16 +1,12 @@
 {
     "itemGroup.dynamictrees": "다이나믹 트리",
 
-    "block.dynamictrees.rooty_dirt": "뿌리내려진 흙",
-    "block.dynamictrees.rooty_sand": "뿌리내려진 모래",
-
     "block.dynamictrees.oak_branch": "역동적인 참나무",
     "block.dynamictrees.spruce_branch": "역동적인 가문비나무",
     "block.dynamictrees.birch_branch": "역동적인 자작나무",
     "block.dynamictrees.jungle_branch": "역동적인 정글 나무",
     "block.dynamictrees.dark_oak_branch": "역동적인 검은 참나무",
     "block.dynamictrees.acacia_branch": "역동적인 아카시아 나무",
-    "block.dynamictrees.cactus_branch": "역동적인 선인장",
 
     "item.dynamictrees.oak_seed": "참나무 도토리",
     "item.dynamictrees.spruce_seed": "가문비나무 구과",
@@ -19,13 +15,12 @@
     "item.dynamictrees.dark_oak_seed": "검은 참나무 도토리",
     "item.dynamictrees.acacia_seed": "아카시아 나무 씨앗",
     "item.dynamictrees.apple_seed": "사과 씨앗",
-    "item.dynamictrees.cactus_seed": "선인장 씨앗",
 
     "item.dynamictrees.dendro_potion.biochar": "바이오숯 포션",
     "item.dynamictrees.dendro_potion.depletion": "고갈의 포션",
     "item.dynamictrees.dendro_potion.burgeoning": "급성장의 포션",
     "item.dynamictrees.dendro_potion.fertility": "풍요의 포션",
-    "item.dynamictrees.dendro_potion.persistance": "잔존의 포션",
+    "item.dynamictrees.dendro_potion.persistence": "잔존의 포션",
     "item.dynamictrees.dendro_potion.transform": "변화의 포션",
 
     "item.dynamictrees.dirt_bucket": "흙 양동이",
