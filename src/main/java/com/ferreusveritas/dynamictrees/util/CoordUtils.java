@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.Direction;
@@ -88,7 +89,7 @@ public class CoordUtils {
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
 			return ((IWorldReader) blockReader).isBlockLoaded(pos);
-		} else return blockReader instanceof EmptyBlockReader;
+		} else return blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache;
 	}
 
 	/**

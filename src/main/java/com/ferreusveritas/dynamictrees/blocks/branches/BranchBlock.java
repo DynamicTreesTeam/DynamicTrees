@@ -47,6 +47,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
 	public static final int RADMAX_NORMAL = 8;
@@ -227,7 +228,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return true;
 	}
 	
-	public class ItemStackPos {
+	public static class ItemStackPos {
 		public final ItemStack stack;
 		public final BlockPos pos;
 		
@@ -246,7 +247,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
 	 * @return The volume of the portion of the tree that was destroyed
 	 */
-	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree, LivingEntity entity) {
+	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree, @Nullable final LivingEntity entity) {
 
 		BlockState blockState = world.getBlockState(cutPos);
 		SpeciesNode speciesNode = new SpeciesNode();
@@ -260,7 +261,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NetVolumeNode volumeSum = new NetVolumeNode();
-		DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity? (PlayerEntity)entity : null);
+		DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity ? (PlayerEntity) entity : null);
 		destroyMode = DynamicTrees.EnumDestroyMode.HARVEST;
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -473,33 +474,31 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	
-	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NetVolumeNode.Volume woodVolume, boolean forBlockBreak) {
-		
-		if(heldItem != null && this.isAxe(heldItem)) {
-			
-			int damage;
-			
-			switch(DTConfigs.axeDamageMode.get()) {
-				default:
-				case VANILLA:
-					damage = 1;
-					break;
-				case THICKNESS:
-					damage = Math.max(1, radius) / 2;
-					break;
-				case VOLUME:
-					damage = (int) woodVolume.getVolume();
-					break;
-			}
+	public void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
+		if (heldItem == null || !this.isAxe(heldItem))
+			return;
 
-			if (forBlockBreak)
-				damage--; // Minecraft already damaged the tool by one unit
+		int damage;
 
-			if(damage > 0) {
-				heldItem.damageItem(damage, entity, LivingEntity::tick);
-			}
+		switch(DTConfigs.axeDamageMode.get()) {
+			default:
+			case VANILLA:
+				damage = 1;
+				break;
+			case THICKNESS:
+				damage = Math.max(1, radius) / 2;
+				break;
+			case VOLUME:
+				damage = (int) woodVolume.getVolume();
+				break;
 		}
-		
+
+		if (forBlockBreak)
+			damage--; // Minecraft already damaged the tool by one unit
+
+		if(damage > 0) {
+			heldItem.damageItem(damage, entity, LivingEntity::tick);
+		}
 	}
 
 	protected boolean isAxe (ItemStack stack) {

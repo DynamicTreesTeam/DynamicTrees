@@ -27,7 +27,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
 
@@ -121,7 +120,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 			if(pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
 				if(radius > 0) {
-					species.getFamily().getSurfaceRoot().setRadius(world, currPos, radius, fromDir, 3);
+					species.getFamily().getSurfaceRoot().setRadius(world, currPos, radius, 3);
 				}
 				if(onNormalCube) {
 					for(Direction dir: CoordUtils.HORIZONTALS) {
