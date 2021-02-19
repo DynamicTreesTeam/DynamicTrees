@@ -2,35 +2,28 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.init.DTClient;
 import net.minecraft.block.BlockState;
+import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
-public class NodeShrinker implements INodeInspector {
+public class TwinkleNode implements INodeInspector {
 	
-	private float radius;
-	Species species;
+	private final BasicParticleType particleType;
+	private final int numParticles;
 	
-	public NodeShrinker(Species species) {
-		this.species = species;
+	public TwinkleNode(BasicParticleType type, int num) {
+		particleType = type;
+		numParticles = num;
 	}
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		
-		BranchBlock branch = TreeHelper.getBranch(blockState);
-		
-		if(branch != null) {
-			radius = branch.getRadius(blockState);
-			if(radius > BranchBlock.RADMAX_NORMAL) {
-				branch.setRadius(world, pos, BranchBlock.RADMAX_NORMAL, fromDir);
-			}
+		if(world.isRemote() && TreeHelper.isBranch(blockState)) {
+			DTClient.spawnParticles(world, this.particleType, pos.getX(), pos.getY(), pos.getZ(), this.numParticles, world.getRandom());
 		}
-		
 		return false;
 	}
 	

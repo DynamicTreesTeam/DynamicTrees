@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
@@ -27,14 +27,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 
-public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
+public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
 	protected final List<BakedQuad> quads;
 	protected Map<BakedQuad, Integer> quadTints;
 	protected final int leavesColor;
 	protected final int entityId;
 
-	public FallingTreeEntityModel(EntityFallingTree entity) {
+	public FallingTreeEntityModel(FallingTreeEntity entity) {
 		World world = entity.getEntityWorld();
 		BranchDestructionData destructionData = entity.getDestroyData();
 		Species species = destructionData.species;
@@ -57,14 +57,14 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 		return entityId;
 	}
 	
-	public static int getBrightness(EntityFallingTree entity) {
+	public static int getBrightness(FallingTreeEntity entity) {
 		BranchDestructionData destructionData = entity.getDestroyData();
 		World world = entity.getEntityWorld();
 		// BlockState.getPackedLightmapCoords no longer a method. Temporarily using getLightValue?
 		return world.getBlockState(destructionData.cutPos).getLightValue(world, destructionData.cutPos);
 	}
 	
-	public static List<BakedQuad> generateTreeQuads(EntityFallingTree entity) {
+	public static List<BakedQuad> generateTreeQuads(FallingTreeEntity entity) {
 		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 		BranchDestructionData destructionData = entity.getDestroyData();
 		Direction cutDir = destructionData.cutDir;
@@ -139,7 +139,7 @@ public class FallingTreeEntityModel extends EntityModel<EntityFallingTree> {
 	}
 
 	@Override
-	public void setRotationAngles(EntityFallingTree entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setRotationAngles(FallingTreeEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 
 	}
 

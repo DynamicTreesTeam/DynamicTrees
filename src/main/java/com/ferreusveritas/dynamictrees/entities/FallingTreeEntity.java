@@ -40,6 +40,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -47,9 +48,9 @@ import java.util.*;
  * @author ferreusveritas
  *
  */
-public class EntityFallingTree extends Entity implements IModelTracker {
+public class FallingTreeEntity extends Entity implements IModelTracker {
 
-	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.createKey(EntityFallingTree.class, DataSerializers.COMPOUND_NBT);
+	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.createKey(FallingTreeEntity.class, DataSerializers.COMPOUND_NBT);
 	
 	//Not needed in client
 	protected List<ItemStack> payload = new ArrayList<>(0);
@@ -85,7 +86,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		ROOT
 	}
 	
-	public EntityFallingTree(EntityType<?> entityTypeIn, World worldIn) {
+	public FallingTreeEntity(EntityType<?> entityTypeIn, World worldIn) {
 		super(entityTypeIn, worldIn);
 	}
 	
@@ -99,7 +100,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	 * @param destroyData
 	 * @param payload
 	 */
-	public EntityFallingTree setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
+	public FallingTreeEntity setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
 		this.destroyData = destroyData;
 		if(destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
 			System.err.println("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
@@ -297,7 +298,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		HashSet<BlockPos> toUpdate = new HashSet<>();
 		
 		//Gather a set of all of the block positions that were recently destroyed
-		Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES)).forEach(pos -> destroyed.add(pos));
+		Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES)).forEach(destroyed::add);
 		
 		//Gather a list of all of the non-destroyed blocks surrounding each destroyed block
 		for(BlockPos d: destroyed) {
@@ -377,9 +378,9 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	 * Drops wood materials at the cut position
 	 * Leaves drops fall from their original location
 	 *
-	 * @param entity
+	 * @param entity The {@link FallingTreeEntity} object.
 	 */
-	public static void standardDropLogsPayload(EntityFallingTree entity) {
+	public static void standardDropLogsPayload(FallingTreeEntity entity) {
 		World world = entity.world;
 		if(!world.isRemote) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
@@ -387,7 +388,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		}
 	}
 	
-	public static void standardDropLeavesPayLoad(EntityFallingTree entity) {
+	public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
 		World world = entity.world;
 		if(!world.isRemote) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
@@ -442,15 +443,13 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		setupFromNBT(vox);
 		setVoxelData(vox);
 		
-		if(compound.contains("payload")) {
-			ListNBT list = (ListNBT) compound.get("payload");
-			
-			Iterator<INBT> iter = list.iterator();
-			while(iter.hasNext()) {
-				INBT tag = iter.next();
+		if (compound.contains("payload")) {
+			final ListNBT nbtList = (ListNBT) compound.get("payload");
+
+			for (INBT tag : Objects.requireNonNull(nbtList)) {
 				if(tag instanceof CompoundNBT) {
 					CompoundNBT compTag = (CompoundNBT) tag;
-					payload.add(ItemStack.read(compTag));
+					this.payload.add(ItemStack.read(compTag));
 				}
 			}
 		}
@@ -471,17 +470,18 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 			compound.put("payload", list);
 		}
 	}
-	
+
+	@Nonnull
 	@Override
 	public IPacket<?> createSpawnPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
-	public static EntityFallingTree dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
+	public static FallingTreeEntity dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
 		if(!world.isRemote) {// Only spawn entities server side
 			// Falling tree currently has severe rendering issues.
-			EntityFallingTree entity = new EntityFallingTree(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
+			FallingTreeEntity entity = new FallingTreeEntity(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
 			if(entity.isAlive()) {
 				world.addEntity(entity);
 			}

@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 
 public class GrowthSubstance implements ISubstanceEffect {
 	
-	int duration = 1600;
+	private int duration = 1600;
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {

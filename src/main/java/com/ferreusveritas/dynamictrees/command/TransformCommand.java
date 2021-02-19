@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTransform;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.TransformNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.block.BlockState;
@@ -14,7 +14,6 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.command.arguments.Vec3Argument;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -77,7 +76,7 @@ public final class TransformCommand extends SubCommand {
         final RootyBlock rootyBlock = ((RootyBlock) rootyState.getBlock());
 
         // Transform tree.
-        rootyBlock.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+        rootyBlock.startAnalysis(world, rootPos, new MapSignal(new TransformNode(fromSpecies, toSpecies)));
 
         if (rootyBlock.getSpecies(rootyState, world, rootPos) != toSpecies) {
             // Place new rooty dirt block if transforming to species that requires tile entity.

@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 import mcp.mobius.waila.api.*;
@@ -25,20 +25,19 @@ import net.minecraft.world.World;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class WailaBranchHandler implements IComponentProvider {
 	
 	private BlockPos lastPos = BlockPos.ZERO;
 	private Species lastSpecies = Species.NULL_SPECIES;
-	private NodeNetVolume.Volume lastVolume = new NodeNetVolume.Volume();
+	private NetVolumeNode.Volume lastVolume = new NetVolumeNode.Volume();
 
 	@Override
 	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
 		if(WailaOther.invalid) {
 			lastPos = BlockPos.ZERO;
 			lastSpecies = Species.NULL_SPECIES;
-			lastVolume = new NodeNetVolume.Volume();
+			lastVolume = new NetVolumeNode.Volume();
 
 			WailaOther.invalid = false;
 		}
@@ -110,7 +109,7 @@ public class WailaBranchHandler implements IComponentProvider {
 		}
 	}
 	
-	private NodeNetVolume.Volume getTreeVolume(World world, BlockPos pos) {
+	private NetVolumeNode.Volume getTreeVolume(World world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		
@@ -128,16 +127,16 @@ public class WailaBranchHandler implements IComponentProvider {
 			BranchBlock branch = (BranchBlock) block;
 			
 			// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
-			NodeNetVolume volumeSum = new NodeNetVolume();
+			NetVolumeNode volumeSum = new NetVolumeNode();
 			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
 
-			NodeNetVolume.Volume volume = volumeSum.getVolume();
+			NetVolumeNode.Volume volume = volumeSum.getVolume();
 			volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());
 
 			return volume;
 		}
 		
-		return new NodeNetVolume.Volume();
+		return new NetVolumeNode.Volume();
 	}
 
 //	@Override

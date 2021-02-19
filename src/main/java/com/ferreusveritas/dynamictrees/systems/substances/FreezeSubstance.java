@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFreezer;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FreezerNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.ParticleTypes;
@@ -23,7 +23,7 @@ public class FreezeSubstance implements ISubstanceEffect {
  			if (world.isRemote) {
  				TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
  			} else {
- 				dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFreezer(species)));
+ 				dirt.startAnalysis(world, rootPos, new MapSignal(new FreezerNode(species)));
  				dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
  			}
  			return true;

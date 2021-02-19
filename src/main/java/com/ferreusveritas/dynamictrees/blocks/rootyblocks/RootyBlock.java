@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
@@ -140,7 +140,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			if(species.isValid()) {
 				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
 				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
-				if(treeBase != TreeHelper.nullTreePart) {
+				if(treeBase != TreeHelper.NULL_TREE_PART) {
 					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, natural);
 				}
 			}
@@ -236,7 +236,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		
 		if(branch.isPresent()) {
 			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true, null);
-			EntityFallingTree.dropTree(world, destroyData, new ArrayList<>(0), EntityFallingTree.DestroyType.ROOT);
+			FallingTreeEntity.dropTree(world, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
 		}
 	}
 	

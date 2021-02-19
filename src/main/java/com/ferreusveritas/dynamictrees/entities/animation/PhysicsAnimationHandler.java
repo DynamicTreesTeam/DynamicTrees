@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
@@ -32,12 +32,12 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		float rotPit = 0;
 	}
 	
-	HandlerData getData(EntityFallingTree entity) {
+	HandlerData getData(FallingTreeEntity entity) {
 		return entity.dataAnimationHandler instanceof HandlerData ? (HandlerData) entity.dataAnimationHandler : new HandlerData();
 	}
 
 	@Override
-	public void initMotion(EntityFallingTree entity) {
+	public void initMotion(FallingTreeEntity entity) {
 		entity.dataAnimationHandler = new HandlerData();
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		
@@ -53,11 +53,11 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		Direction cutDir = entity.getDestroyData().cutDir;
 		entity.addVelocity(cutDir.getOpposite().getXOffset() * 0.1,cutDir.getOpposite().getXOffset() * 0.1,cutDir.getOpposite().getXOffset() * 0.1);
 		
-		EntityFallingTree.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
+		FallingTreeEntity.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 	}
 	
 	@Override
-	public void handleMotion(EntityFallingTree entity) {
+	public void handleMotion(FallingTreeEntity entity) {
 		
 		if(entity.landed) {
 			return;
@@ -123,13 +123,13 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	}
 	
 	@Override
-	public void dropPayload(EntityFallingTree entity) {
+	public void dropPayload(FallingTreeEntity entity) {
 		World world = entity.world;
 		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ()), i));
 		entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, entity.getDestroyData().cutPos.add(bis.pos), bis.stack));
 	}
 	
-	public boolean shouldDie(EntityFallingTree entity) {
+	public boolean shouldDie(FallingTreeEntity entity) {
 		boolean dead = entity.landed || entity.ticksExisted > 120;
 		
 		if(dead) {
@@ -141,7 +141,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
+	public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
 		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
 		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
 
@@ -155,7 +155,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldRender(EntityFallingTree entity) {
+	public boolean shouldRender(FallingTreeEntity entity) {
 		return true;
 	}
 }

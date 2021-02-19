@@ -6,15 +6,15 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree.DestroyType;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeDestroyer;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeExtState;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeSpecies;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.StateNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
@@ -32,7 +32,6 @@ import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
@@ -154,7 +153,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
 		int radius = this.getRadius(state);
-		this.damageAxe(player, heldItem, radius / 2, new NodeNetVolume.Volume((radius * radius * 64) / 2), false);
+		this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
 		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
 	}
 
@@ -250,18 +249,18 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree, LivingEntity entity) {
 
 		BlockState blockState = world.getBlockState(cutPos);
-		NodeSpecies nodeSpecies = new NodeSpecies();
-		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(nodeSpecies));// Analyze entire tree network to find root node and species
-		Species species = nodeSpecies.getSpecies();//Get the species from the root node
+		SpeciesNode speciesNode = new SpeciesNode();
+		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(speciesNode));// Analyze entire tree network to find root node and species
+		Species species = speciesNode.getSpecies();//Get the species from the root node
 		
 		// Analyze only part of the tree beyond the break point and map out the extended block states
 		// We can't destroy the branches during this step since we need accurate extended block states that include connections
-		NodeExtState extStateMapper = new NodeExtState(cutPos);
-		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(extStateMapper));
+		StateNode stateMapper = new StateNode(cutPos);
+		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(stateMapper));
 		
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
-		NodeNetVolume volumeSum = new NodeNetVolume();
-		NodeDestroyer destroyer = new NodeDestroyer(species).setPlayer(entity instanceof PlayerEntity? (PlayerEntity)entity : null);
+		NetVolumeNode volumeSum = new NetVolumeNode();
+		DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity? (PlayerEntity)entity : null);
 		destroyMode = DynamicTrees.EnumDestroyMode.HARVEST;
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -275,7 +274,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		//Calculate main trunk height
 		int trunkHeight = 1;
-		for(BlockPos iter = new BlockPos(0, 1, 0); extStateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.up()) {
+		for(BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.up()) {
 			trunkHeight++;
 		}
 		
@@ -284,7 +283,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			cutDir = Direction.DOWN;
 		}
 		
-		return new BranchDestructionData(species, extStateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+		return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
 	}
 	
 	/**
@@ -368,10 +367,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// DROPS AND HARVESTING
 	///////////////////////////////////////////
 
-	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume) {
 		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
-	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NodeNetVolume.Volume volume, ItemStack handStack) {
+	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
 		volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, new ArrayList<>(), volume, handStack);
 	}
@@ -408,7 +407,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		ItemStack heldItem = entity.getHeldItemMainhand();
 		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
-		NodeNetVolume.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
+		NetVolumeNode.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		woodVolume.multiplyVolume(fortuneFactor);
 		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume, heldItem);
 		
@@ -418,7 +417,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//This will drop the EntityFallingTree into the world
-		EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
+		FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
 		//Damage the axe by a prescribed amount
 		damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
@@ -452,7 +451,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		}
 		
 		//This will drop the EntityFallingTree into the world
-		EntityFallingTree.dropTree(world, destroyData, woodDropList, destroyType);
+		FallingTreeEntity.dropTree(world, destroyData, woodDropList, destroyType);
 	}
 	
 	/**
@@ -474,7 +473,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	
-	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NodeNetVolume.Volume woodVolume, boolean forBlockBreak) {
+	public void damageAxe(LivingEntity entity, net.minecraft.item.ItemStack heldItem, int radius, NetVolumeNode.Volume woodVolume, boolean forBlockBreak) {
 		
 		if(heldItem != null && this.isAxe(heldItem)) {
 			
@@ -569,9 +568,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if(state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
-			NodeNetVolume.Volume woodVolume = destroyData.woodVolume;
+			NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
-			EntityFallingTree treeEntity = EntityFallingTree.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
+			FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			
 			if(treeEntity != null) {
 				Vector3d expPos = explosion.getPosition();

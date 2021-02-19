@@ -17,11 +17,11 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
+import net.minecraft.world.gen.WorldGenRegion;
+import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -82,6 +82,26 @@ public class CoordUtils {
 		}
 		
 		return true;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
+		if (blockReader instanceof IWorldReader) {
+			return ((IWorldReader) blockReader).isBlockLoaded(pos);
+		} else return blockReader instanceof EmptyBlockReader;
+	}
+
+	/**
+	 * Gets the {@link BlockState} object at the given position, or null if the block
+	 * wasn't loaded. This is safer because calling getBlockState on an unloaded block
+	 * can cause a crash.
+	 *
+	 * @param blockReader The {@link IBlockReader} object.
+	 * @return The {@link BlockState} object, or null if it's not loaded.
+	 */
+	@Nullable
+	public static BlockState getStateSafe (IBlockReader blockReader, BlockPos blockPos) {
+		return isBlockLoaded(blockReader, blockPos) ? blockReader.getBlockState(blockPos) : null;
 	}
 	
 	public static Direction getRandomDir(Random rand) {

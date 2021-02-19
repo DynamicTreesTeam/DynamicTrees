@@ -13,7 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
@@ -177,15 +177,15 @@ public class DTRegistries {
 	public final static String FALLING_TREE = "falling_tree";
 	public final static String LINGERING_EFFECTOR = "lingering_effector";
 	
-	public static EntityType<EntityFallingTree> fallingTree;
+	public static EntityType<FallingTreeEntity> fallingTree;
 	public static EntityType<LingeringEffectorEntity> lingeringEffector;
 
 	public static void setupEntities() {
-		fallingTree = EntityType.Builder.create(EntityFallingTree::new, EntityClassification.MISC)
+		fallingTree = EntityType.Builder.create(FallingTreeEntity::new, EntityClassification.MISC)
 				.setShouldReceiveVelocityUpdates(true)
 				.setTrackingRange(512)
 				.setUpdateInterval(Integer.MAX_VALUE)
-				.setCustomClientFactory((spawnEntity, world) -> new EntityFallingTree(fallingTree, world))
+				.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(fallingTree, world))
 				.build(FALLING_TREE);
 
 		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)

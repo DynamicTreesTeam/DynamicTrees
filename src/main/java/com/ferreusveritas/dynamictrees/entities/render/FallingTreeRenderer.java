@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.entities.render;
 
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -15,22 +15,21 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import org.lwjgl.opengl.GL20;
 
 @OnlyIn(Dist.CLIENT)
-public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
+public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 	
 	protected FallingTreeRenderer(EntityRendererManager renderManager) {
 		super(renderManager);
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntityFallingTree entity) {
+	public ResourceLocation getEntityTexture(FallingTreeEntity entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 
 	@Override
-	public void render(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
+	public void render(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
 		super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
 
 		if(!entity.isClientBuilt() || !entity.shouldRender()) {
@@ -72,10 +71,10 @@ public class FallingTreeRenderer extends EntityRenderer<EntityFallingTree> {
 //		matrixStack.pop();
 //	}
 
-	public static class Factory implements IRenderFactory<EntityFallingTree> {
+	public static class Factory implements IRenderFactory<FallingTreeEntity> {
 		
 		@Override
-		public EntityRenderer<EntityFallingTree> createRenderFor(EntityRendererManager manager) {
+		public EntityRenderer<FallingTreeEntity> createRenderFor(EntityRendererManager manager) {
 			return new FallingTreeRenderer(manager);
 		}
 		

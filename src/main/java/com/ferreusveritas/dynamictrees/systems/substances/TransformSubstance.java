@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTransform;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.TransformNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.ParticleTypes;
@@ -31,7 +31,7 @@ public class TransformSubstance implements ISubstanceEffect {
 				if (world.isRemote) {
 					TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
 				} else {
-					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+					dirt.startAnalysis(world, rootPos, new MapSignal(new TransformNode(fromSpecies, toSpecies)));
 				}
 				return true;
 			}

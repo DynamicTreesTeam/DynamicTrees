@@ -12,7 +12,7 @@ import net.minecraft.world.IWorld;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NodeNetVolume implements INodeInspector {
+public class NetVolumeNode implements INodeInspector {
 
 	public static final class Volume {
 		public static final int VOXELSPERLOG = 4096; //A log contains 4096 voxels of wood material(16x16x16 pixels)

@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class NodeCoder implements INodeInspector {
+public class CoderNode implements INodeInspector {
 	
 	private class Link {
 		BlockPos pos;
@@ -26,7 +26,7 @@ public class NodeCoder implements INodeInspector {
 	
 	private ArrayList<Link> links;
 	
-	public NodeCoder() {
+	public CoderNode() {
 		links = new ArrayList<Link>();
 	}
 	

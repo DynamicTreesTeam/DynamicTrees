@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFruitCocoa;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.CocoaFruitNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
@@ -36,14 +36,14 @@ public class CocoaGenFeature extends GenFeature implements IPostGenFeature, IPos
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(world.getRandom().nextInt() % 8 == 0) {
-			addCocoa(world, rootPos, true);
+			this.addCocoa(world, rootPos, true);
 			return true;
 		}
 		return false;
 	}
 
 	private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
-		TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeFruitCocoa().setWorldGen(worldGen)));
+		TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
 	}
 
 }

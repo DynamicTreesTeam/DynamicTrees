@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class NodeSpecies implements INodeInspector {
+public class SpeciesNode implements INodeInspector {
 	
 	private Species determination = Species.NULL_SPECIES;
 	

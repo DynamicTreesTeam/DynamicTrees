@@ -15,17 +15,17 @@ import java.util.List;
 * 
 * @author ferreusveritas
 */
-public class NodeFindEnds implements INodeInspector {
+public class FindEndsNode implements INodeInspector {
 	
 	private List<BlockPos> endPoints;
 	private BlockPos last;
 	
-	public NodeFindEnds() { //Array is provided for you
+	public FindEndsNode() { //Array is provided for you
 		this.endPoints = new ArrayList<BlockPos>(32);
 		last = BlockPos.ZERO;
 	}
 	
-	public NodeFindEnds(List<BlockPos> ends) { //Or use your own
+	public FindEndsNode(List<BlockPos> ends) { //Or use your own
 		this.endPoints = ends;
 		last = BlockPos.ZERO;
 	}
