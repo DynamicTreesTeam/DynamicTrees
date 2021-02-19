@@ -165,28 +165,27 @@ public class SurfaceRootBlock extends Block {
 	}
 
 	protected RootConnection getSideConnectionRadius(IBlockReader blockReader, BlockPos pos, int radius, Direction side) {
-		if(side.getAxis().isHorizontal()) {
-			BlockPos dPos = pos.offset(side);
-			try {
-				BlockState blockState = blockReader.getBlockState(dPos);
-				BlockState upState = blockReader.getBlockState(pos.up());
-				RootConnections.ConnectionLevel level = (upState.getBlock() == Blocks.AIR && blockState.isNormalCube(blockReader, dPos)) ? RootConnections.ConnectionLevel.HIGH : (blockState.getBlock() == Blocks.AIR ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
+		if (!side.getAxis().isHorizontal())
+			return null;
 
-				if (level != RootConnections.ConnectionLevel.MID) {
-					dPos = dPos.up(level.getYOffset());
-					blockState = blockReader.getBlockState(dPos);
-				}
+		BlockPos dPos = pos.offset(side);
 
-				if (blockState.getBlock() instanceof SurfaceRootBlock) {
-					return new RootConnection(level, ((SurfaceRootBlock) blockState.getBlock()).getRadius(blockState));
-				} else if (level == RootConnections.ConnectionLevel.MID && TreeHelper.isBranch(blockState) && TreeHelper.getTreePart(blockState).getRadius(blockState) >= 8) {
-					return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
-				}
-			} catch (Exception e) { // Temporary measure until we find a way to solve requesting an out-of-bounds block here.
-				LogManager.getLogger().warn("Tried to get unloaded block X: " + dPos.getX() + " Y: " + dPos.getY() + " Z: " + dPos.getZ());
-				return null;
-			}
+		BlockState state = CoordUtils.getStateSafe(blockReader, dPos);
+		final BlockState upState = CoordUtils.getStateSafe(blockReader, pos.up());
+		final RootConnections.ConnectionLevel level = (upState != null && upState.getBlock() == Blocks.AIR && state != null && state.isNormalCube(blockReader, dPos)) ?
+				RootConnections.ConnectionLevel.HIGH : (state != null && state.getBlock() == Blocks.AIR ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
+
+		if (level != RootConnections.ConnectionLevel.MID) {
+			dPos = dPos.up(level.getYOffset());
+			state = CoordUtils.getStateSafe(blockReader, dPos);
 		}
+
+		if (state != null && state.getBlock() instanceof SurfaceRootBlock) {
+			return new RootConnection(level, ((SurfaceRootBlock) state.getBlock()).getRadius(state));
+		} else if (level == RootConnections.ConnectionLevel.MID && TreeHelper.isBranch(state) && TreeHelper.getTreePart(state).getRadius(state) >= 8) {
+			return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
+		}
+
 		return null;
 	}
 

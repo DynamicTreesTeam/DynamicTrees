@@ -21,24 +21,28 @@ public class MushroomFeatureCanceller<T extends IFeatureConfig> implements ITree
 
     private final Class<T> fungusFeatureConfigClass;
 
-    public MushroomFeatureCanceller(Class<T> fungusFeatureConfigClass) {
+    public MushroomFeatureCanceller(final Class<T> fungusFeatureConfigClass) {
         this.fungusFeatureConfigClass = fungusFeatureConfigClass;
     }
 
     @Override
-    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
+    public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
         if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
 
-        ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
+        final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
+        final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();
+
+        if (featureRegistryName == null)
+            return false;
 
         // Mushrooms come in TwoFeatureChoiceConfigs to select between brown and red.
         if (!(nextConfiguredFeature.config instanceof TwoFeatureChoiceConfig)) return false;
 
         return getConfigs((TwoFeatureChoiceConfig) nextConfiguredFeature.config).stream().anyMatch(this.fungusFeatureConfigClass::isInstance) &&
-                treeCanceller.shouldCancelFeature(biomeResLoc, nextConfiguredFeature.feature.getRegistryName());
+                treeCanceller.shouldCancelFeature(biomeResLoc, featureRegistryName);
     }
 
-    private List<IFeatureConfig> getConfigs (TwoFeatureChoiceConfig twoFeatureConfig) {
+    private List<IFeatureConfig> getConfigs (final TwoFeatureChoiceConfig twoFeatureConfig) {
         return Arrays.asList(twoFeatureConfig.field_227285_a_.get().config, twoFeatureConfig.field_227286_b_.get().config);
     }
 

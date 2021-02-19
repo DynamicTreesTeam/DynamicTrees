@@ -7,16 +7,23 @@ import com.google.gson.JsonObject;
 import net.minecraft.world.biome.Biome;
 
 public interface IJsonBiomeApplier {
+
+	String METHOD = "method";
+	String DEFAULT = "...";
+	String REPLACE = "replace";
+	String BEFORE = "before";
+	String AFTER = "after";
+
+	String STANDARD = "standard";
+	String STATIC = "static";
+	String RANDOM = "random";
+	String MATH = "math";
+	String SCALE = "scale";
 	
-	public static final String DEFAULT = "...";
-	public static final String REPLACE = "replace";
-	public static final String BEFORE = "before";
-	public static final String AFTER = "after";
+	void apply(BiomeDatabase dbase, JsonElement element, Biome biome);
 	
-	public void apply(BiomeDatabase dbase, JsonElement element, Biome biome);
-	
-	public default Operation readMethod(JsonObject object) {
-		JsonElement method = object.get("method");
+	default Operation readMethod(JsonObject object) {
+		JsonElement method = object.get(METHOD);
 		if(method != null && method.isJsonPrimitive() && method.getAsJsonPrimitive().isString()) {
 			String methodName = method.getAsJsonPrimitive().getAsString();
 			
@@ -33,8 +40,8 @@ public interface IJsonBiomeApplier {
 		
 		return Operation.REPLACE;
 	}
-	
-	public default boolean isDefault(String candidate) {
+
+	default boolean isDefault(String candidate) {
 		return DEFAULT.equals(candidate);
 	}
 	

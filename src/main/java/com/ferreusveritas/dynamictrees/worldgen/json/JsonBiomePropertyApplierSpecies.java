@@ -41,12 +41,12 @@ public class JsonBiomePropertyApplierSpecies implements IJsonBiomeApplier {
 	
 	private ISpeciesSelector readSpeciesSelector(JsonObject mainObject) {
 
-		JsonElement staticElement = mainObject.get("static");
+		JsonElement staticElement = mainObject.get(STATIC);
 		if(staticElement != null && staticElement.isJsonPrimitive()) {
 			return createStaticSpeciesSelector(staticElement.getAsString());
 		}
 
-		JsonElement randomElement = mainObject.get("random");
+		JsonElement randomElement = mainObject.get(RANDOM);
 		if(randomElement != null && randomElement.isJsonObject()) {
 			RandomSpeciesSelector rand = new RandomSpeciesSelector();
 			for(Entry<String, JsonElement> entry : randomElement.getAsJsonObject().entrySet()) {

@@ -2,13 +2,13 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeTwinkle;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.TwinkleNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 public class TreeHelper {
 	
-	public static final ITreePart nullTreePart = new NullTreePart();
+	public static final ITreePart NULL_TREE_PART = new NullTreePart();
 	
 	///////////////////////////////////////////
 	//CONVENIENCE METHODS
@@ -253,7 +253,7 @@ public class TreeHelper {
 	 */
 	public static void treeParticles(World world, BlockPos rootPos, BasicParticleType type, int num) {
 		if(world.isRemote) {
-			startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeTwinkle(type, num)));
+			startAnalysisFromRoot(world, rootPos, new MapSignal(new TwinkleNode(type, num)));
 		}
 	}
 	
@@ -277,108 +277,108 @@ public class TreeHelper {
 	
 	//Treeparts
 	
-	public final static boolean isTreePart(Block block) {
+	public static boolean isTreePart(Block block) {
 		return block instanceof ITreePart;
 	}
 	
-	public final static boolean isTreePart(BlockState blockState) {
+	public static boolean isTreePart(BlockState blockState) {
 		return isTreePart(blockState.getBlock());
 	}
 	
-	public final static boolean isTreePart(IWorld blockAccess, BlockPos pos) {
+	public static boolean isTreePart(IWorld blockAccess, BlockPos pos) {
 		return isTreePart(blockAccess.getBlockState(pos).getBlock());
 	}
 	
-	public final static ITreePart getTreePart(Block block) {
-		return isTreePart(block)? (ITreePart)block : nullTreePart;
+	public static ITreePart getTreePart(Block block) {
+		return isTreePart(block)? (ITreePart)block : NULL_TREE_PART;
 	}
 	
-	public final static ITreePart getTreePart(BlockState blockState) {
+	public static ITreePart getTreePart(BlockState blockState) {
 		return getTreePart(blockState.getBlock());
 	}
 	
 	
 	//Branches
 	
-	public final static boolean isBranch(Block block) {
+	public static boolean isBranch(Block block) {
 		return block instanceof BranchBlock;//Oh shuddap you java purists.. this is minecraft!
 	}
 	
-	public final static boolean isBranch(BlockState state) {
+	public static boolean isBranch(BlockState state) {
 		return state != null && isBranch(state.getBlock());
 	}
 	
-	public final static BranchBlock getBranch(Block block) {
+	public static BranchBlock getBranch(Block block) {
 		return isBranch(block) ? (BranchBlock)block : null;
 	}
 	
-	public final static BranchBlock getBranch(ITreePart treepart) {
+	public static BranchBlock getBranch(ITreePart treepart) {
 		return treepart instanceof BranchBlock ? (BranchBlock)treepart : null;
 	}
 	
-	public final static BranchBlock getBranch(BlockState state) {
+	public static BranchBlock getBranch(BlockState state) {
 		return getBranch(state.getBlock());
 	}
 	
-	public final static int getRadius(IBlockReader access, BlockPos pos) {
+	public static int getRadius(IBlockReader access, BlockPos pos) {
 		BlockState state = access.getBlockState(pos);
 		return getTreePart(state).getRadius(state);
 	}
 	
-	public final static Optional<BranchBlock> getBranchOpt(Block block) {
+	public static Optional<BranchBlock> getBranchOpt(Block block) {
 		return isBranch(block) ? Optional.of((BranchBlock)block) : Optional.empty();
 	}
 	
-	public final static Optional<BranchBlock> getBranchOpt(BlockState state) {
+	public static Optional<BranchBlock> getBranchOpt(BlockState state) {
 		return isBranch(state.getBlock()) ? Optional.of((BranchBlock)state.getBlock()) : Optional.empty();
 	}
 	
-	public final static Optional<BranchBlock> getBranchOpt(ITreePart treepart) {
+	public static Optional<BranchBlock> getBranchOpt(ITreePart treepart) {
 		return treepart instanceof BranchBlock ? Optional.of((BranchBlock)treepart) : Optional.empty();
 	}
 	
 	
 	//Leaves
 	
-	public final static boolean isLeaves(Block block) {
+	public static boolean isLeaves(Block block) {
 		return block instanceof DynamicLeavesBlock;
 	}
 	
-	public final static boolean isLeaves(BlockState blockState) {
+	public static boolean isLeaves(BlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
 	
-	public final static DynamicLeavesBlock getLeaves(Block block) {
+	public static DynamicLeavesBlock getLeaves(Block block) {
 		return isLeaves(block) ? (DynamicLeavesBlock)block : null;
 	}
 	
-	public final static DynamicLeavesBlock getLeaves(ITreePart treepart) {
+	public static DynamicLeavesBlock getLeaves(ITreePart treepart) {
 		return treepart instanceof DynamicLeavesBlock ? (DynamicLeavesBlock)treepart : null;
 	}
 	
-	public final static DynamicLeavesBlock getLeaves(BlockState state) {
+	public static DynamicLeavesBlock getLeaves(BlockState state) {
 		return getLeaves(state.getBlock());
 	}
 	
 	//Rooty
 	
-	public final static boolean isRooty(Block block) {
+	public static boolean isRooty(Block block) {
 		return block instanceof RootyBlock;
 	}
 	
-	public final static boolean isRooty(BlockState blockState) {
+	public static boolean isRooty(BlockState blockState) {
 		return isRooty(blockState.getBlock());
 	}
 	
-	public final static RootyBlock getRooty(Block block) {
+	public static RootyBlock getRooty(Block block) {
 		return isRooty(block) ? (RootyBlock)block : null;
 	}
 	
-	public final static RootyBlock getRooty(ITreePart treepart) {
+	public static RootyBlock getRooty(ITreePart treepart) {
 		return treepart instanceof RootyBlock ? (RootyBlock)treepart : null;
 	}
 	
-	public final static RootyBlock getRooty(BlockState blockState) {
+	public static RootyBlock getRooty(BlockState blockState) {
 		return getRooty(blockState.getBlock());
 	}
 	

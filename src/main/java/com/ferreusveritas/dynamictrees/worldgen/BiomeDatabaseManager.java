@@ -75,8 +75,8 @@ public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocat
                         LOGGER.error("Couldn't load data file {} from {} as it's null or empty", resourceLocation, resourceLocationIn);
                     }
                 });
-            } catch (IllegalArgumentException | IOException | JsonParseException jsonparseexception) {
-                LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, jsonparseexception);
+            } catch (IllegalArgumentException | IOException | JsonParseException e) {
+                LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, e);
             }
         }
 
@@ -104,15 +104,15 @@ public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocat
         final Map<ResourceLocation, Map<String, JsonElement>> dimensionDatabasesData = Maps.newHashMap();
 
         // Register the default populators and fetch the dimension populator files.
-        databases.forEach((resourceLocation, jsonFiles) -> {
+        databases.forEach((resourceLocation, jsonFiles) ->
             jsonFiles.forEach((fileName, jsonElement) -> {
                 if (resourceLocation.getPath().equals(DEFAULT_POPULATOR_NAME)) {
                     this.registerDefaultPopulator(event, resourceLocation, fileName, jsonElement);
                 } else {
                     dimensionDatabasesData.put(resourceLocation, jsonFiles);
                 }
-            });
-        });
+            })
+        );
 
         IBiomeDatabasePopulator defaultPopulator = event.getPopulator();
         defaultPopulator.populate(this.defaultDatabase); // Populate the default database.

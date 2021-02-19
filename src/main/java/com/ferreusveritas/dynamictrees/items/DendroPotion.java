@@ -44,15 +44,15 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public static final String INDEX_TAG_KEY = "potion_index";
 	public static final String TREE_TAG_KEY = "target";
-	public static final String name = "dendro_potion";
-	
+	public static final String NAME = "dendro_potion";
+
 	public enum DendroPotionType {
 		BIOCHAR(    0, true, "biochar",     0x27231c),
 		DEPLETION(  1, true, "depletion",	  0x76be6d),
 		GIGAS( 2, true, "gigas",  0xe3901d),
 		BURGEONING( 3, true, "burgeoning",  0xa9bebe),
 		FERTILITY(  4, true, "fertility",   0x4ad400),
-		PERSISTANCE(5, true, "persistance", 0x389aff),
+		PERSISTENCE(5, true, "persistence", 0x389aff),
 		TRANSFORM(  6, true, "transform",   0x7fb8a4);
 		
 		private final int index;
@@ -91,7 +91,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	};
 	
 	public DendroPotion() {
-		this(name);
+		this(NAME);
 	}
 	
 	public DendroPotion(String name) {
@@ -129,7 +129,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			case GIGAS: return new MegaSubstance();
 			case DEPLETION: return new DepleteSubstance().setAmount(15);
 			case FERTILITY: return new FertilizeSubstance().setAmount(15);
-			case PERSISTANCE: return new FreezeSubstance();
+			case PERSISTENCE: return new FreezeSubstance();
 			case TRANSFORM: return new TransformSubstance(getTargetSpecies(itemStack));
 		}
 	}
@@ -157,7 +157,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				this.getRecipe(Items.PUMPKIN_SEEDS, DendroPotionType.GIGAS),
 				this.getRecipe(Items.GHAST_TEAR, DendroPotionType.BURGEONING),
 				this.getRecipe(Items.COD, DendroPotionType.FERTILITY),
-				this.getRecipe(Blocks.BLUE_ORCHID, DendroPotionType.PERSISTANCE),
+				this.getRecipe(Blocks.BLUE_ORCHID, DendroPotionType.PERSISTENCE),
 				this.getRecipe(Items.PRISMARINE_CRYSTALS, DendroPotionType.TRANSFORM));
 
 		for (Species species : TreeRegistry.getPotionTransformableSpecies()) {

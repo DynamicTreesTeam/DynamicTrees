@@ -5,11 +5,9 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -23,18 +21,18 @@ import java.util.List;
 * Destroys all branches on a tree and the surrounding leaves.
 * @author ferreusveritas
 */
-public class NodeDestroyer implements INodeInspector {
+public class DestroyerNode implements INodeInspector {
 	
 	Species species;//Destroy any node that's made of the same kind of wood
 	private List<BlockPos> endPoints;//We always need to track endpoints during destruction
 	private PlayerEntity player = null;
 	
-	public NodeDestroyer(Species species) {
+	public DestroyerNode(Species species) {
 		this.endPoints = new ArrayList<>(32);
 		this.species = species;
 	}
 
-	public NodeDestroyer setPlayer (PlayerEntity player){
+	public DestroyerNode setPlayer (PlayerEntity player){
 		this.player = player;
 		return this;
 	}

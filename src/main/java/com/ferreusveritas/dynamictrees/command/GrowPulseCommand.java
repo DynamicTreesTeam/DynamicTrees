@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -28,9 +27,8 @@ public final class GrowPulseCommand extends SubCommand {
         final World world = context.getSource().getWorld();
         final BlockPos pos = this.getPositionArg(context);
         final BlockState state = world.getBlockState(pos);
-        ITreePart part = TreeHelper.getTreePart(state);
 
-        if (part == TreeHelper.nullTreePart && !(state.getBlock() instanceof TrunkShellBlock)) {
+        if (TreeHelper.getTreePart(state) == TreeHelper.NULL_TREE_PART && !(state.getBlock() instanceof TrunkShellBlock)) {
             this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
             return 0;
         }

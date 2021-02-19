@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public class BiomeDatabase {
@@ -21,7 +22,7 @@ public class BiomeDatabase {
 		@Override public void setSubterraneanBiome(boolean is) {}
 	};
 	
-	private final HashMap<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
+	private final Map<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
 
 	public BiomeEntry getEntry(@Nullable Biome biome) {
 		if (biome == null)
@@ -39,9 +40,11 @@ public class BiomeDatabase {
 	}
 	
 	public boolean isValid() {
-		for(Biome biome: ForgeRegistries.BIOMES) {
-			BiomeEntry entry = getEntry(biome);
-			if(!entry.getBiome().getRegistryName().equals(biome.getRegistryName())) {
+		for (Biome biome: ForgeRegistries.BIOMES) {
+			final BiomeEntry entry = this.getEntry(biome);
+			final ResourceLocation biomeRegistryName = entry.getBiome().getRegistryName();
+
+			if (biomeRegistryName != null && !biomeRegistryName.equals(biome.getRegistryName())) {
 				return false;
 			}
 		}
@@ -162,82 +165,87 @@ public class BiomeDatabase {
 		return getEntry(biome).getMultipass();
 	}
 	
-	public BiomeDatabase setSpeciesSelector(Biome biome, ISpeciesSelector selector, Operation op) {
-		if(selector != null) {
-			BiomeEntry entry = getEntry(biome);
-			ISpeciesSelector existing = entry.getSpeciesSelector();
-			
-			switch (op) {
-				case REPLACE:
-					entry.setSpeciesSelector( selector );
-					break;
-				case SPLICE_BEFORE:
-					entry.setSpeciesSelector( (pos, dirt, rnd) -> {
-						SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
-						return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
-					} );
-					break;
-				case SPLICE_AFTER:
-					entry.setSpeciesSelector( (pos, dirt, rnd) -> {
-						SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
-						return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
-					} );
-					break;
-			}
-//			biomeEntries.put(biome, entry);
+	public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final ISpeciesSelector selector, final Operation op) {
+		if (selector == null)
+			return this;
+
+		final BiomeEntry entry = getEntry(biome);
+		final ISpeciesSelector existing = entry.getSpeciesSelector();
+
+		switch (op) {
+			case REPLACE:
+				entry.setSpeciesSelector( selector );
+				break;
+			case SPLICE_BEFORE:
+				entry.setSpeciesSelector((pos, dirt, rnd) -> {
+					SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
+					return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
+				});
+				break;
+			case SPLICE_AFTER:
+				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
+					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
+					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
+				});
+				break;
 		}
+
 		return this;
 	}
 	
-	public BiomeDatabase setChanceSelector(Biome biome, IChanceSelector selector, Operation op) {
-		if(selector != null) {
-			BiomeEntry entry = getEntry(biome);
-			IChanceSelector existing = entry.getChanceSelector();
-			
-			switch(op) {
-				case REPLACE:
-					entry.setChanceSelector( selector );
-					break;
-				case SPLICE_BEFORE:
-					entry.setChanceSelector( (rnd, spc, rad) -> {
-						EnumChance c = selector.getChance(rnd, spc, rad);
-						return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
-					} );
-					break;
-				case SPLICE_AFTER:
-					entry.setChanceSelector( (rnd, spc, rad) -> {
-						EnumChance c = existing.getChance(rnd, spc, rad);
-						return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
-					} );
-					break;
-			}
+	public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final IChanceSelector selector, final Operation op) {
+		if (selector == null)
+			return this;
+
+		final BiomeEntry entry = getEntry(biome);
+		final IChanceSelector existing = entry.getChanceSelector();
+
+		switch(op) {
+			case REPLACE:
+				entry.setChanceSelector( selector );
+				break;
+			case SPLICE_BEFORE:
+				entry.setChanceSelector( (rnd, spc, rad) -> {
+					EnumChance c = selector.getChance(rnd, spc, rad);
+					return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+				} );
+				break;
+			case SPLICE_AFTER:
+				entry.setChanceSelector( (rnd, spc, rad) -> {
+					EnumChance c = existing.getChance(rnd, spc, rad);
+					return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+				} );
+				break;
 		}
+
 		return this;
 	}
 	
-	public BiomeDatabase setDensitySelector(Biome biome, IDensitySelector selector, Operation op) {
-		if(selector != null) {
-			BiomeEntry entry = getEntry(biome);
-			IDensitySelector existing = entry.getDensitySelector();
-			
-			switch (op) {
-				case REPLACE:
-					entry.setDensitySelector( selector );
-					break;
-				case SPLICE_BEFORE:
-					entry.setDensitySelector( (rnd, nd) -> {
-						double d = selector.getDensity(rnd, nd);
-						return d >= 0 ? d : existing.getDensity(rnd, nd);
-					} );
-					break;
-				case SPLICE_AFTER:
-					entry.setDensitySelector( (rnd, nd) -> {
-						double d = existing.getDensity(rnd, nd);
-						return d >= 0 ? d : selector.getDensity(rnd, nd);
-					} );
-					break;
-			}
+	public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final IDensitySelector selector, final Operation op) {
+		if (selector == null)
+			return this;
+
+		final BiomeEntry entry = getEntry(biome);
+		final IDensitySelector existing = entry.getDensitySelector();
+
+		switch (op) {
+			case REPLACE:
+				entry.setDensitySelector( selector );
+				break;
+			case SPLICE_BEFORE:
+				entry.setDensitySelector( (rnd, nd) -> {
+					double d = selector.getDensity(rnd, nd);
+					return d >= 0 ? d : existing.getDensity(rnd, nd);
+				} );
+				break;
+			case SPLICE_AFTER:
+				entry.setDensitySelector( (rnd, nd) -> {
+					double d = existing.getDensity(rnd, nd);
+					return d >= 0 ? d : selector.getDensity(rnd, nd);
+				} );
+				break;
 		}
+
 		return this;
 	}
 	

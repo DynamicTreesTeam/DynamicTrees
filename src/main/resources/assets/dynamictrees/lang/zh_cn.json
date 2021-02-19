@@ -1,8 +1,6 @@
 {
     "itemGroup.dynamictrees": "有活力的树",
 
-    "block.dynamictrees.rooty_dirt": "多根泥土",
-
     "block.dynamictrees.oak_branch": "有活力的橡木",
     "block.dynamictrees.spruce_branch": "有活力的云杉木",
     "block.dynamictrees.birch_branch": "有活力的白桦木",
@@ -22,7 +20,7 @@
     "item.dynamictrees.dendro_potion.depletion": "枯竭药水",
     "item.dynamictrees.dendro_potion.burgeoning": "生长药水",
     "item.dynamictrees.dendro_potion.fertility": "肥沃药水",
-    "item.dynamictrees.dendro_potion.persistance": "定型药水",
+    "item.dynamictrees.dendro_potion.persistence": "定型药水",
     "item.dynamictrees.dendro_potion.transform": "转生药水",
 
     "item.dynamictrees.dirt_bucket": "泥桶",

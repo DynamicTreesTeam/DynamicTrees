@@ -416,7 +416,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public static boolean isBottom(IWorld world, BlockPos pos) {
 		BlockState belowBlockState = world.getBlockState(pos.down());
 		ITreePart belowTreepart = TreeHelper.getTreePart(belowBlockState);
-		if(belowTreepart != TreeHelper.nullTreePart) {
+		if(belowTreepart != TreeHelper.NULL_TREE_PART) {
 			return belowTreepart.getRadius(belowBlockState) > 1;//False for leaves, twigs, and dirt.  True for stocky branches
 		}
 		return true;//Non-Tree parts below indicate the bottom of stack

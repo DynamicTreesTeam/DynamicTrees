@@ -1,21 +1,12 @@
 {
   "itemGroup.dynamictrees": "Динамічні дерева",
 
-  "block.dynamictrees.rooty_dirt":"Ґрунт з корінням",
-  "block.dynamictrees.rooty_coarse_dirt":"Загрубілий ґрунт з корінням",
-  "block.dynamictrees.rooty_grass_block":"Трава з корінням",
-  "block.dynamictrees.rooty_podzol":"Підзол з корінням",
-  "block.dynamictrees.rooty_mycelium":"Грибниця з корінням",
-  "block.dynamictrees.rooty_sand":"Пісок з корінням",
-  "block.dynamictrees.rooty_red_sand":"Червоний пісок з корінням",
-
   "block.dynamictrees.oak_branch":"Динамічний дуб",
   "block.dynamictrees.spruce_branch":"Динамічна смерека",
   "block.dynamictrees.birch_branch":"Динамічна береза",
   "block.dynamictrees.jungle_branch":"Динамічне тропічне дерево",
   "block.dynamictrees.dark_oak_branch":"Динамічний темний дуб",
   "block.dynamictrees.acacia_branch":"Динамічна акація",
-  "block.dynamictrees.cactus_branch":"Динамічний кактус",
 
   "species.dynamictrees.oak": "Дуб",
   "species.dynamictrees.swamp_oak": "Болотний дуб",
@@ -27,7 +18,6 @@
   "species.dynamictrees.dark_oak": "Темный дуб",
   "species.dynamictrees.acacia": "Акація",
   "species.dynamictrees.apple": "Яблуня",
-  "species.dynamictrees.cactus": "Кактус",
 
   "item.dynamictrees.oak_seed":"Жолудь дуба",
   "item.dynamictrees.spruce_seed":"Шишка смереки",
@@ -36,21 +26,17 @@
   "item.dynamictrees.dark_oak_seed":"Жолудь темного дуба",
   "item.dynamictrees.acacia_seed":"Насіння акації",
   "item.dynamictrees.apple_seed":"Яблучне зернятко",
-  "item.dynamictrees.cactus_seed":"Насіння кактуса",
-  "item.dynamictrees.brown_mushroom_seed":"Шапка коричневого гриба",
-  "item.dynamictrees.red_mushroom_seed":"Шапка червоного гриба",
-  "item.dynamictrees.chorus_seed":"Насіння хорусу",
 
   "item.dynamictrees.dendro_potion.biochar": "Основне зілля",
   "item.dynamictrees.dendro_potion.depletion":"Зілля виснаження",
   "item.dynamictrees.dendro_potion.burgeoning":"Зілля росту",
   "item.dynamictrees.dendro_potion.fertility":"Зілля родючості",
-  "item.dynamictrees.dendro_potion.persistance":"Зілля стійкості",
+  "item.dynamictrees.dendro_potion.persistence":"Зілля стійкості",
   "item.dynamictrees.dendro_potion.transform":"Зілля перетворення",
 
   "item.dynamictrees.dirt_bucket":"Відро бруду",
   "item.dynamictrees.staff":"Лісовий посох",
-  "item.dynamictrees.bonsai_pot":"Горщик бонсай",
+  "block.dynamictrees.bonsai_pot":"Горщик бонсай",
 
   "commands.dynamictrees.repop.run": "Перезаповнення бази даних генератора дерев",
   "commands.dynamictrees.transform.nottransformableerror": "Вид %s не може бути трансформований",
@@ -60,7 +46,7 @@
   "potion.gigas.description": "§7Дозволяє дереву стати мега-розміру",
   "potion.burgeoning.description": "§7Швидше виростить дерево",
   "potion.fertility.description": "§7Повністю удобрює ґрунт дерева",
-  "potion.persistance.description": "§7Припиняє зміну дерева",
+  "potion.persistence.description": "§7Припиняє зміну дерева",
   "potion.transform.description": "§7Трансформує дерево у §a%s §7дерево",
   "potion.transform.description.empty": "§7Базове зілля для зіль трансформації",
 

@@ -12,12 +12,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class NodeFreezer implements INodeInspector {
+public class FreezerNode implements INodeInspector {
 	
 	Species species;
 	private static final int freezeRadius = 3;
 	
-	public NodeFreezer(Species species) {
+	public FreezerNode(Species species) {
 		this.species = species;
 	}
 	

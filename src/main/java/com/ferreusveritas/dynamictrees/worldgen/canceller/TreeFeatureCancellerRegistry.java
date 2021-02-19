@@ -40,7 +40,7 @@ public final class TreeFeatureCancellerRegistry {
         MinecraftForge.EVENT_BUS.post(registryEvent);
     }
 
-    public void register (String name, ITreeFeatureCanceller treeFeatureCanceller) {
+    public void register (final String name, final ITreeFeatureCanceller treeFeatureCanceller) {
         if (this.cancellers.containsKey(name)) {
             LogManager.getLogger().error("Tried to register existing tree feature canceller \"" + name + "\"."); return;
         }
@@ -49,7 +49,7 @@ public final class TreeFeatureCancellerRegistry {
     }
 
     @Nullable
-    public static ITreeFeatureCanceller getFeatureCanceller (String name) {
+    public static ITreeFeatureCanceller getFeatureCanceller (final String name) {
         if (INSTANCE == null)
             return null;
 
@@ -60,7 +60,7 @@ public final class TreeFeatureCancellerRegistry {
 
         private final TreeFeatureCancellerRegistry featureCancellerRegistry;
 
-        public TreeFeatureCancellerRegistryEvent(TreeFeatureCancellerRegistry featureCancellerRegistry) {
+        public TreeFeatureCancellerRegistryEvent(final TreeFeatureCancellerRegistry featureCancellerRegistry) {
             this.featureCancellerRegistry = featureCancellerRegistry;
         }
 

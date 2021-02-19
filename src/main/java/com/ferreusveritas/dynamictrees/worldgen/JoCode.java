@@ -6,20 +6,18 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeCoder;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -33,7 +31,7 @@ import java.util.Optional;
 /**
  * So named because the base64 codes it generates almost always start with "JO"
  * 
- * This class provides methods for storing and recreating tree shapes.
+ * <p>This class provides methods for recreating tree shapes.</p>
  * 
  * @author ferreusveritas
  */
@@ -55,7 +53,7 @@ public class JoCode {
 		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
 		
 		if(branch.isPresent()) {
-			NodeCoder coder = new NodeCoder();
+			CoderNode coder = new CoderNode();
 			//Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
 			branch.get().analyse(world.getBlockState(rootPos), world, rootPos, Direction.DOWN, new MapSignal(coder));
 			instructions = coder.compile(this);
@@ -85,7 +83,7 @@ public class JoCode {
 	/**
 	 * A facing matrix for mapping instructions to different rotations
 	 */
-	private byte dirmap[][] = {
+	private final byte[][] dirmap = {
 			//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
@@ -96,8 +94,8 @@ public class JoCode {
 	};
 	
 	//"Pointers" to the current rotation direction.
-	private byte facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
-	private byte unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] facingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] unfacingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 	
 	/**
 	 * Get the instruction at a locus.
@@ -175,7 +173,7 @@ public class JoCode {
 				ILeavesProperties leavesProperties = species.getLeavesProperties();
 				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 				INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
-				NodeFindEnds endFinder = new NodeFindEnds();//This is responsible for gathering a list of branch end points
+				FindEndsNode endFinder = new FindEndsNode();//This is responsible for gathering a list of branch end points
 				MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
 				branch.analyse(treeState, world, treePos, Direction.DOWN, signal);
 				List<BlockPos> endPoints = endFinder.getEnds();

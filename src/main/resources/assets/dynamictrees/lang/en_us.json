@@ -40,12 +40,12 @@
   "item.dynamictrees.dendro_potion.gigas": "Potion of Gigas",
   "item.dynamictrees.dendro_potion.burgeoning":"Potion of Burgeoning",
   "item.dynamictrees.dendro_potion.fertility":"Potion of Fertility",
-  "item.dynamictrees.dendro_potion.persistance":"Potion of Persistance",
+  "item.dynamictrees.dendro_potion.persistence":"Potion of Persistence",
   "item.dynamictrees.dendro_potion.transform":"Potion of Transformation",
 
   "item.dynamictrees.dirt_bucket":"Dirt Bucket",
   "item.dynamictrees.staff":"Woodland Staff",
-  "item.dynamictrees.bonsai_pot":"Bonsai Pot",
+  "block.dynamictrees.bonsai_pot":"Bonsai Pot",
 
   "commands.dynamictrees.repop.run": "§aRepopulating worldgen database.",
   "commands.dynamictrees.gettree.success": "§aSpecies: §b%s §aJoCode: §b%s",
@@ -62,7 +62,7 @@
   "potion.gigas.description": "§7Allows a tree to become mega size",
   "potion.burgeoning.description": "§7Quickly grow a tree",
   "potion.fertility.description": "§7Fully fertilizes tree soil",
-  "potion.persistance.description": "§7Stops tree from changing",
+  "potion.persistence.description": "§7Stops tree from changing",
   "potion.transform.description": "§7Transform a tree into a §a%s §7tree",
   "potion.transform.description.empty": "§7Base tree potion for brewing transformations",
 

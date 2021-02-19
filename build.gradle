@@ -24,6 +24,7 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'maven-publish'
 
 ext.configFile = file "gradle.properties"
@@ -116,7 +117,7 @@ dependencies {
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
 
     // Compile full Serene Seasons mod and use in runtime.
-    implementation fg.deobf("curse.maven:SereneSeasons-291874:3179424")
+    implementation fg.deobf("curse.maven:SereneSeasons-291874:3202233")
 }
 
 jar {
@@ -133,11 +134,17 @@ jar {
     }
 }
 
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allJava
+}
+
 def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
 }
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -148,5 +155,11 @@ publishing {
         maven {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
     }
 }

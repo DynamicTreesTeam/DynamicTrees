@@ -28,11 +28,11 @@ import javax.annotation.Nullable;
 
 public class BonsaiPotBlock extends ContainerBlock {
 
-	public static final String name = "bonsai_pot";
+	public static final String NAME = "bonsai_pot";
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 	
 	public BonsaiPotBlock() {
-		this(name);
+		this(NAME);
 	}
 	
 	public BonsaiPotBlock(String name) {

@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -29,6 +30,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.*;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.ToolType;
 import org.apache.logging.log4j.LogManager;
 
@@ -255,7 +257,7 @@ public class BasicBranchBlock extends BranchBlock {
 				
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
-				if (treepart != TreeHelper.nullTreePart) {
+				if (treepart != TreeHelper.NULL_TREE_PART) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
 				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.trunkShellBlock) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
@@ -341,15 +343,11 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
-		BlockPos deltaPos = pos.offset(side);
+		final BlockPos deltaPos = pos.offset(side);
+		final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
-		try {
-			BlockState blockState = blockAccess.getBlockState(deltaPos);
-			return TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
-		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			LogManager.getLogger().warn("Tried to get connection info for unloaded block: " + deltaPos.getX() + " " + deltaPos.getY() + " " + deltaPos.getZ());
-			return 0;
-		}
+		// If adjacent block is not loaded assume there is no connection.
+		return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 	}
 	
 	

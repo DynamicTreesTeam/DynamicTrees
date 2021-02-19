@@ -15,7 +15,7 @@ public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 	public void apply(BiomeDatabase dbase, JsonElement element, Biome biome) {
 		if(element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
-			dbase.setChanceSelector(biome, readChanceSelector(object, biome), readMethod(object));
+			dbase.setChanceSelector(biome, readChanceSelector(object), readMethod(object));
 		}
 		else if(element.isJsonPrimitive()) {
 			JsonPrimitive prim = element.getAsJsonPrimitive();
@@ -24,7 +24,7 @@ public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 			}
 			else if(prim.isString()) {
 				String simple = prim.getAsString();
-				if("standard".equals(simple)) {
+				if(STANDARD.equals(simple)) {
 					//Start dropping tree spawn opportunities when the radius gets bigger than 3
 					dbase.setChanceSelector(biome, (rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ? EnumChance.OK : EnumChance.CANCEL, Operation.REPLACE);
 				}
@@ -42,9 +42,9 @@ public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 		return (rnd, spc, rad) -> rnd.nextFloat() < value ? EnumChance.OK : EnumChance.CANCEL;
 	}
 	
-	private IChanceSelector readChanceSelector(JsonObject mainObject, Biome biome) {
+	private IChanceSelector readChanceSelector(JsonObject mainObject) {
 		
-		JsonElement staticElement = mainObject.get("static");
+		JsonElement staticElement = mainObject.get(STATIC);
 		if(staticElement != null && staticElement.isJsonPrimitive()) {
 			if(staticElement.getAsJsonPrimitive().isNumber()) {
 				return createSimpleChanceSelector(staticElement.getAsJsonPrimitive().getAsFloat());
@@ -57,9 +57,9 @@ public class JsonBiomePropertyApplierChance implements IJsonBiomeApplier {
 			}
 		}
 		
-		JsonElement mathElement = mainObject.get("math");
+		JsonElement mathElement = mainObject.get(MATH);
 		if(mathElement != null) {
-			JsonMath m = new JsonMath(mathElement, biome);
+			JsonMath m = new JsonMath(mathElement);
 			return (rnd, spc, rad) -> rnd.nextFloat() < m.apply(rnd, spc, rad) ? EnumChance.OK : EnumChance.CANCEL;
 		}
 		

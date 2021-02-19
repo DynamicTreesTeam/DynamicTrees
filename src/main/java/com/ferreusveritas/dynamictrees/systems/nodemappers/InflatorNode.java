@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class NodeInflator implements INodeInspector {
+public class InflatorNode implements INodeInspector {
 	
 	private float radius;
 	private BlockPos last;
@@ -20,7 +20,7 @@ public class NodeInflator implements INodeInspector {
 	Species species;
 	SimpleVoxmap leafMap;
 	
-	public NodeInflator(Species species, SimpleVoxmap leafMap) {
+	public InflatorNode(Species species, SimpleVoxmap leafMap) {
 		this.species = species;
 		this.leafMap = leafMap;
 		last = BlockPos.ZERO;

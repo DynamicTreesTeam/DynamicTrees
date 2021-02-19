@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -19,7 +18,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
@@ -33,12 +32,10 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -468,7 +465,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param volume
 	 * @return
 	 */
-	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NodeNetVolume.Volume volume, ItemStack handStack) {
+	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
 		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
@@ -481,12 +478,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		}
 	}
 	
-	public LogsAndSticks getLogsAndSticks(NodeNetVolume.Volume volume) {
+	public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
 		List<ItemStack> logsList = new LinkedList<>();
 		int[] volArray = volume.getRawVolumesArray();
 		float prevVol = 0;
 		for (int i=0; i< volArray.length; i++){
-			float vol = (volArray[i] / (float)NodeNetVolume.Volume.VOXELSPERLOG);
+			float vol = (volArray[i] / (float) NetVolumeNode.Volume.VOXELSPERLOG);
 			if (vol > 0){
 				vol += prevVol;
 				prevVol = getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
@@ -804,7 +801,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return A list of all branch endpoints for the {@link TreeFamily}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
-		NodeFindEnds endFinder = new NodeFindEnds();
+		FindEndsNode endFinder = new FindEndsNode();
 		treeBase.analyse(world.getBlockState(treePos), world, treePos, null, new MapSignal(endFinder));
 		return endFinder.getEnds();
 	}
@@ -923,7 +920,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 					if(signal.choked) {
 						soilLife = 0;
 						rootyDirt.setSoilLife(world, rootPos, soilLife);
-						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeShrinker(signal.getSpecies())));
+						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
 					}
 				}
 			}
@@ -1043,7 +1040,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
 		if(soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
-			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new NodeDisease(this)));
+			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
 			return true;
 		}
 		
@@ -1332,7 +1329,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
 	
-	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+	public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
 		return getFamily().selectAnimationHandler(fallingEntity);
 	}
 
@@ -1490,7 +1487,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public INodeInspector getNodeInflator(SimpleVoxmap leafMap) {
-		return new NodeInflator(this, leafMap);
+		return new InflatorNode(this, leafMap);
 	}
 	
 	/**

@@ -24,6 +24,7 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,16 +264,14 @@ public class FruitBlock extends Block implements IGrowable {
 		return getDefaultState().with(AGE, age);
 	}
 
-	public int getAgeForWorldGen(World world, BlockPos pos) {
-		Float seasonValue = SeasonHelper.getSeasonValue(world, pos);
-		return seasonValue != null ? this.getAgeForSeasonalWorldGen(world, pos, seasonValue) : 3;
-	}
+	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
+		if (seasonValue == null)
+			return 3;
 
-	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, Float seasonValue) {
-		if (this.getSpecies() != null && this.getSpecies().testFlowerSeasonHold(seasonValue)) {
-			return 0;//Fruit is as the flower stage
-		}
-		return Math.min(world.getRandom().nextInt(6), 3);//Half the time the fruit is fully mature
+		if (this.getSpecies().testFlowerSeasonHold(seasonValue))
+			return 0; // Fruit is as the flower stage
+
+		return Math.min(world.getRandom().nextInt(6), 3); // Half the time the fruit is fully mature
 	}
 
 }

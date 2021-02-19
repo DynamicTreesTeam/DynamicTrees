@@ -5,19 +5,17 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
-public class NodeTransform implements INodeInspector {
+public class TransformNode implements INodeInspector {
 	
-	Species fromSpecies;
-	Species toSpecies;
+	private final Species fromSpecies;
+	private final Species toSpecies;
 	
-	public NodeTransform(Species fromTree, Species toTree) {
+	public TransformNode(Species fromTree, Species toTree) {
 		this.fromSpecies = fromTree;
 		this.toSpecies = toTree;
 	}

@@ -10,17 +10,13 @@ import net.minecraft.block.CocoaBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
-public class NodeFruitCocoa implements INodeInspector {
+public class CocoaFruitNode implements INodeInspector {
 	
-	boolean finished = false;
-	boolean worldGen = false;
-	
-	public NodeFruitCocoa() {
-	}
-	
-	public NodeFruitCocoa setWorldGen(boolean worldGen) {
+	private boolean finished = false;
+	private boolean worldGen = false;
+
+	public CocoaFruitNode setWorldGen(boolean worldGen) {
 		this.worldGen = worldGen;
 		return this;
 	}

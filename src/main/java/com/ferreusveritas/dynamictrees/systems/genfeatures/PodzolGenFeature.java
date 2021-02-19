@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeFindEnds;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
@@ -30,7 +30,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 	@Override
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
 		if(DTConfigs.podzolGen.get()) {
-			NodeFindEnds endFinder = new NodeFindEnds();
+			FindEndsNode endFinder = new FindEndsNode();
 			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 			List<BlockPos> endPoints = endFinder.getEnds();
 			if(!endPoints.isEmpty()) {

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import net.minecraft.util.Direction;
 
 /**
@@ -20,7 +20,7 @@ public class AnimationHandlers {
 		@Override public String getName() { return "default"; };
 		
 		@Override
-		public void initMotion(EntityFallingTree entity) {
+		public void initMotion(FallingTreeEntity entity) {
 			super.initMotion(entity);
 			
 			Direction cutDir = entity.getDestroyData().cutDir;
@@ -33,11 +33,11 @@ public class AnimationHandlers {
 		@Override public String getName() { return "blast"; };
 		
 		@Override
-		public void initMotion(EntityFallingTree entity) {
+		public void initMotion(FallingTreeEntity entity) {
 			super.initMotion(entity);
 		}
 		
-		public boolean shouldDie(EntityFallingTree entity) {
+		public boolean shouldDie(FallingTreeEntity entity) {
 			return entity.landed || entity.ticksExisted > 200;
 		}
 		

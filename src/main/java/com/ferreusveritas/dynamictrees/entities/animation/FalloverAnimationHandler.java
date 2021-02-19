@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
@@ -36,14 +36,14 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		HashSet<LivingEntity> entitiesHit = new HashSet<>();//A record of the entities that have taken damage to ensure they are only damaged a single time
 	}
 
-	HandlerData getData(EntityFallingTree entity) {
+	HandlerData getData(FallingTreeEntity entity) {
 		return entity.dataAnimationHandler != null ? (HandlerData) entity.dataAnimationHandler : new HandlerData();
 	}
 
 	@Override
-	public void initMotion(EntityFallingTree entity) {
+	public void initMotion(FallingTreeEntity entity) {
 		entity.dataAnimationHandler = new HandlerData();
-		EntityFallingTree.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
+		FallingTreeEntity.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 
 		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
 		if(entity.world.getBlockState(belowBlock).isSolidSide(entity.world, belowBlock, Direction.UP)) {
@@ -53,7 +53,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 	}
 
 	@Override
-	public void handleMotion(EntityFallingTree entity) {
+	public void handleMotion(FallingTreeEntity entity) {
 
 		float fallSpeed = getData(entity).fallSpeed;
 
@@ -132,7 +132,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 	 * @param entity
 	 * @return true if collision is detected
 	 */
-	private boolean testCollision(EntityFallingTree entity) {
+	private boolean testCollision(FallingTreeEntity entity) {
 		Direction toolDir = entity.getDestroyData().toolDir;
 
 		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.rotationYaw : entity.rotationPitch;
@@ -166,7 +166,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		return false;
 	}
 
-	private void addRotation(EntityFallingTree entity, float delta) {
+	private void addRotation(FallingTreeEntity entity, float delta) {
 		Direction toolDir = entity.getDestroyData().toolDir;
 
 		switch(toolDir) {
@@ -181,7 +181,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
 	}
 
-	public List<LivingEntity> testEntityCollision(EntityFallingTree entity) {
+	public List<LivingEntity> testEntityCollision(FallingTreeEntity entity) {
 
 		World world = entity.world;
 
@@ -219,14 +219,14 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 	}
 
 	@Override
-	public void dropPayload(EntityFallingTree entity) {
+	public void dropPayload(FallingTreeEntity entity) {
 		World world = entity.world;
 		BlockPos cutPos = entity.getDestroyData().cutPos;
 		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
 	}
 
 	@Override
-	public boolean shouldDie(EntityFallingTree entity) {
+	public boolean shouldDie(FallingTreeEntity entity) {
 
 		boolean dead =
 			Math.abs(entity.rotationPitch) >= 160 ||
@@ -244,7 +244,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderTransform(EntityFallingTree entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
+	public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
 
 		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
 		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
@@ -267,7 +267,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean shouldRender(EntityFallingTree entity) {
+	public boolean shouldRender(FallingTreeEntity entity) {
 		return true;
 	}
 

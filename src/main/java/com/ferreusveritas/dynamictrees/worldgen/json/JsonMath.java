@@ -4,8 +4,9 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.world.biome.Biome;
+import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -14,12 +15,8 @@ import java.util.Random;
 public class JsonMath {
 	
 	public MathOperator rootOp;
-	private Biome biome;
-	
-	public JsonMath(JsonElement mathElement, Biome biome) {
-		
-		this.biome = biome;
-		
+
+	public JsonMath(JsonElement mathElement) {
 		if(mathElement.isJsonObject()) {
 			JsonObject mathObject = mathElement.getAsJsonObject();
 
@@ -49,6 +46,9 @@ public class JsonMath {
 	private MathOperator processElement(String key, JsonElement value) {
 
 		EnumMathFunction op = EnumMathFunction.getFunction(key);
+
+		if (op == null)
+			return null;
 
 		ArrayList<MathOperator> paramList = new ArrayList<>();
 		Species speciesArg = Species.NULL_SPECIES;
@@ -136,7 +136,7 @@ public class JsonMath {
 		
 	}
 	
-	public static interface MathOperator {
+	public interface MathOperator {
 		float apply(MathContext mc);
 	}
 	
@@ -234,7 +234,7 @@ public class JsonMath {
 				r = r == null ? v : r - v;
 			}
 			
-			return r == null ? 0.0f : r.floatValue();
+			return r == null ? 0.0f : r;
 		}
 	}
 	
@@ -287,7 +287,7 @@ public class JsonMath {
 				r = r == null ? v : r / v;
 			}
 			
-			return r == null ? 0.0f : r.floatValue();
+			return r == null ? 0.0f : r;
 		}
 	}
 
@@ -336,7 +336,7 @@ public class JsonMath {
 				r = r == null ? v : Math.max(r, v);
 			}
 			
-			return r == null ? 0.0f : r.floatValue();
+			return r == null ? 0.0f : r;
 		}
 	}
 	
@@ -363,7 +363,7 @@ public class JsonMath {
 				r = r == null ? v : Math.min(r, v);
 			}
 			
-			return r == null ? 0.0f : r.floatValue();
+			return r == null ? 0.0f : r;
 		}
 	}
 	
@@ -421,7 +421,7 @@ public class JsonMath {
 		public float apply(MathContext mc) {
 			if(functions.length >= 1) {
 				float val = functions[0].apply(mc);
-				System.out.println("Json Debug Value: " + val);
+				LogManager.getLogger().debug("Json Debug Value: " + val);
 				return val;
 			}
 			return 0;
@@ -450,7 +450,8 @@ public class JsonMath {
 		private EnumMathFunction() {
 			this.name = toString().toLowerCase();
 		}
-		
+
+		@Nullable
 		static EnumMathFunction getFunction(String findName) {
 			for(EnumMathFunction fun : EnumMathFunction.values()) {
 				if(fun.name.equals(findName)) {

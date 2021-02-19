@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeNetVolume;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
@@ -27,7 +27,7 @@ public class BranchDestructionData {
 	public final int[] destroyedLeavesBlockIndex;//Encoded leaves relative positions
 	public final List<BranchBlock.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
 	public final int[] endPoints;//Encoded endpoint relative positions
-	public final NodeNetVolume.Volume woodVolume;//A summation of all of the wood voxels that was harvested
+	public final NetVolumeNode.Volume woodVolume;//A summation of all of the wood voxels that was harvested
 	public final Direction cutDir;//The face that was connected to the remaining body of the tree or the rooty block
 	public final Direction toolDir;//The face that was pounded on when breaking the block at cutPos
 	public final BlockPos cutPos;//The absolute(world) position of the block that was cut
@@ -44,14 +44,14 @@ public class BranchDestructionData {
 		destroyedLeavesBlockIndex = new int[0];
 		leavesDrops = new ArrayList<>(0);
 		endPoints = new int[0];
-		woodVolume = new NodeNetVolume.Volume();
+		woodVolume = new NetVolumeNode.Volume();
 		cutDir = Direction.DOWN;
 		toolDir = Direction.DOWN;
 		cutPos = BlockPos.ZERO;
 		trunkHeight = 0;
 	}
 	
-	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NodeNetVolume.Volume volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
+	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
 		this.species = species;
 		int[][] encodedBranchData = convertBranchesToIntArrays(branches);
 		this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -78,7 +78,7 @@ public class BranchDestructionData {
 		this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock");
 		this.leavesDrops = new ArrayList<>();
 		this.endPoints = nbt.getIntArray("ends");
-		this.woodVolume = new NodeNetVolume.Volume(nbt.getIntArray("volume"));
+		this.woodVolume = new NetVolumeNode.Volume(nbt.getIntArray("volume"));
 		this.cutPos = new BlockPos(nbt.getInt("cutx"), nbt.getInt("cuty"), nbt.getInt("cutz") );
 		this.cutDir = Direction.values()[MathHelper.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
 		this.toolDir = Direction.values()[MathHelper.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];

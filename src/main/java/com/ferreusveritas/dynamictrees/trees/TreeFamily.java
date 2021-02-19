@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
-import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import net.minecraft.block.Block;
@@ -486,7 +486,7 @@ public class TreeFamily {
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
 
-	public IAnimationHandler selectAnimationHandler(EntityFallingTree fallingEntity) {
+	public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
 		return fallingEntity.defaultAnimationHandler();
 	}
 
