@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package com.ferreusveritas.dynamictrees.worldgen.json;
+
+import javax.annotation.ParametersAreNonnullByDefault;

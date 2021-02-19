@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.JsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
@@ -42,7 +41,7 @@ public abstract class BiomeSelectorJson {
                 JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
                 if(primitive.isString()) {
                     String biomeMatch = primitive.getAsString();
-                    return b-> b.getRegistryName().toString().matches(biomeMatch);
+                    return b-> b.getRegistryName() != null && b.getRegistryName().toString().matches(biomeMatch);
                 }
             }
 
@@ -53,7 +52,7 @@ public abstract class BiomeSelectorJson {
             if(jsonElement != null) {
                 if (jsonElement.isJsonPrimitive()) {
                     String typeMatch = jsonElement.getAsString();
-                    List<BiomeDictionary.Type> types = Arrays.asList(typeMatch.split(",")).stream().map(BiomeDictionary.Type::getType).collect(Collectors.toList());
+                    List<BiomeDictionary.Type> types = Arrays.stream(typeMatch.split(",")).map(BiomeDictionary.Type::getType).collect(Collectors.toList());
                     return b -> biomeHasTypes(b, types);
                 } else
                 if (jsonElement.isJsonArray()) {

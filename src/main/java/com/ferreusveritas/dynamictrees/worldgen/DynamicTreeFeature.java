@@ -36,7 +36,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
             return false;
 
         // Grab biome data base for dimension.
-        final BiomeDatabase biomeDataBase = biomeDatabaseManager.getDimensionDatabase(dimensionRegistryName);
+        final BiomeDatabase biomeDatabase = biomeDatabaseManager.getDimensionDatabase(dimensionRegistryName);
 
         // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
 		final ChunkPos chunkPos = world.getChunk(pos).getPos();
@@ -44,7 +44,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
 		// Generate trees.
 		treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, chunkPos)
-				.forEach(c -> treeGenerator.makeTree(world, biomeDataBase, c, new GroundFinder(), chunkBounds));
+				.forEach(c -> treeGenerator.makeTree(world, biomeDatabase, c, new GroundFinder(), chunkBounds));
 
         return true;
     }

@@ -32,17 +32,18 @@ public class TreeFeatureCanceller<T extends IFeatureConfig> implements ITreeFeat
 
         if (featureConfig instanceof MultipleRandomFeatureConfig) {
             // Removes configuredFeature if it contains trees.
-            return doesContainTrees((MultipleRandomFeatureConfig) featureConfig, biomeResLoc, treeCanceller);
+            return this.doesContainTrees((MultipleRandomFeatureConfig) featureConfig, biomeResLoc, treeCanceller);
         } else if (featureConfig instanceof DecoratedFeatureConfig) {
             final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) featureConfig).feature.get();
             final IFeatureConfig nextFeatureConfig = nextConfiguredFeature.config;
+            final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();
 
-            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && treeCanceller.shouldCancelFeature(biomeResLoc,
-                    nextConfiguredFeature.feature.getRegistryName())) {
+            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && featureRegistryName != null &&
+                    treeCanceller.shouldCancelFeature(biomeResLoc, featureRegistryName)) {
                 return true; // Removes any individual trees.
             } else if (nextFeatureConfig instanceof MultipleRandomFeatureConfig) {
                 // Removes configuredFeature if it contains trees.
-                return doesContainTrees((MultipleRandomFeatureConfig) nextFeatureConfig, biomeResLoc, treeCanceller);
+                return this.doesContainTrees((MultipleRandomFeatureConfig) nextFeatureConfig, biomeResLoc, treeCanceller);
             }
         }
 
@@ -57,9 +58,11 @@ public class TreeFeatureCanceller<T extends IFeatureConfig> implements ITreeFeat
      */
     private boolean doesContainTrees (MultipleRandomFeatureConfig featureConfig, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
         for (ConfiguredRandomFeatureList feature : featureConfig.features) {
-            ConfiguredFeature<?, ?> currentConfiguredFeature = feature.feature.get();
-            if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.config) && treeCanceller.shouldCancelFeature(biomeResLoc,
-                    currentConfiguredFeature.feature.getRegistryName()))
+            final ConfiguredFeature<?, ?> currentConfiguredFeature = feature.feature.get();
+            final ResourceLocation featureRegistryName = currentConfiguredFeature.feature.getRegistryName();
+
+            if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.config) && featureRegistryName != null &&
+                    treeCanceller.shouldCancelFeature(biomeResLoc, featureRegistryName))
                 return true;
         }
         return false;

@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Handles events relating to world gen, including adding {@link DynamicTreeFeature} objects to
+ * biomes, and registering and calling {@link ITreeFeatureCanceller} objects.
+ *
  * @author Harley O'Connor
  */
 public final class WorldGenEvents {

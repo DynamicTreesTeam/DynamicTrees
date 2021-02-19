@@ -1,12 +1,10 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -19,12 +17,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
 public class TreeGenerator {
 
@@ -34,24 +30,21 @@ public class TreeGenerator {
 	protected final RandomXOR random = new RandomXOR();
 
 	public static void setup() {
-		if(WorldGenRegistry.isWorldGenEnabled()) {
-			new TreeGenerator();
-		}
-	}
-
-	public TreeGenerator() {
-		INSTANCE = this;//Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
-		this.circleProvider = new PoissonDiscProviderUniversal();
+		new TreeGenerator();
 	}
 
 	public static TreeGenerator getTreeGenerator() {
 		return INSTANCE;
 	}
 
+	public TreeGenerator() {
+		INSTANCE = this; // Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
+		this.circleProvider = new PoissonDiscProviderUniversal();
+	}
+
 	/**
-	 * This is for world debugging.
+	 * This is for world gen debugging.
 	 * The colors signify the different tree spawn failure modes.
-	 *
 	 */
 	public enum EnumGeneratorResult {
 		GENERATED(DyeColor.WHITE),
@@ -64,7 +57,7 @@ public class TreeGenerator {
 
 		private final DyeColor color;
 
-		private EnumGeneratorResult(DyeColor color) {
+		EnumGeneratorResult(DyeColor color) {
 			this.color = color;
 		}
 
@@ -83,7 +76,7 @@ public class TreeGenerator {
 	}
 
 	private BlockState getConcreteByColor(DyeColor color){
-		return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete")).getDefaultState();
+		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete"))).getDefaultState();
 	}
 
 	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {

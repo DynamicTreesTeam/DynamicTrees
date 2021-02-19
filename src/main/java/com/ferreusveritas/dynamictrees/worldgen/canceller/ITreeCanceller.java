@@ -18,7 +18,7 @@ public interface ITreeCanceller {
      * @param biomeResLoc The resource location of the current biome.
      * @return True if we should cancel features in this biome, false if not.
      */
-    boolean shouldCancelFeatures (ResourceLocation biomeResLoc);
+    boolean shouldCancelFeatures (final ResourceLocation biomeResLoc);
 
     /**
      * Checks if the given tree feature should be cancelled from the given feature and biome
@@ -28,7 +28,7 @@ public interface ITreeCanceller {
      * @param featureResLoc The resource location of the current tree feature.
      * @return True if we should cancel the feature, false if not.
      */
-    boolean shouldCancelFeature (ResourceLocation biomeResLoc, ResourceLocation featureResLoc);
+    boolean shouldCancelFeature (final ResourceLocation biomeResLoc, final ResourceLocation featureResLoc);
 
     /**
      * Gets the feature cancellers for the given biome.
@@ -36,7 +36,7 @@ public interface ITreeCanceller {
      * @param biomeResLoc The resource location of the current biome.
      * @return The set of tree feature cancellers to use.
      */
-    Set<ITreeFeatureCanceller> getFeatureCancellers (ResourceLocation biomeResLoc);
+    Set<ITreeFeatureCanceller> getFeatureCancellers (final ResourceLocation biomeResLoc);
 
     /**
      * Registers default featue canceller for given mod namespace (ID) features for all biomes
@@ -45,7 +45,7 @@ public interface ITreeCanceller {
      * @param modIdForBiomes The mod ID for the biomes.
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
-    default void register(String modIdForBiomes, List<String> namespaces) {
+    default void register(final String modIdForBiomes, final List<String> namespaces) {
         this.register(modIdForBiomes, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER));
     }
 
@@ -56,7 +56,7 @@ public interface ITreeCanceller {
      * @param biomeResLoc The biome registry name.
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      */
-    default void register(ResourceLocation biomeResLoc, List<String> namespaces) {
+    default void register(final ResourceLocation biomeResLoc, final List<String> namespaces) {
         this.register(biomeResLoc, namespaces, Collections.singletonList(TreeFeatureCancellerRegistry.TREE_CANCELLER));
     }
 
@@ -68,7 +68,7 @@ public interface ITreeCanceller {
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      * @param cancellers The names of the feature cancellers.
      */
-    void register(String modIdForBiomes, List<String> namespaces, List<String> cancellers);
+    void register(final String modIdForBiomes, final List<String> namespaces, final List<String> cancellers);
 
     /**
      * Registers given feature cancellers for given mod namespace (ID) features for biome based
@@ -78,6 +78,6 @@ public interface ITreeCanceller {
      * @param namespaces A list of mod namespaces (IDs) to remove features from.
      * @param cancellers The names of the feature cancellers.
      */
-    void register(ResourceLocation biomeResLoc, List<String> namespaces, List<String> cancellers);
+    void register(final ResourceLocation biomeResLoc, final List<String> namespaces, final List<String> cancellers);
 
 }

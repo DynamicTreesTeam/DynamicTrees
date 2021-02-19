@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
@@ -34,36 +33,37 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
 	@Override
 	public int getRadiusAtCoords(int x, int z) {
-		int rad = chunkMultipass.apply(pass);
+		int rad = this.chunkMultipass.apply(pass);
 		if(rad >= 2 && rad <= 8) {
 			return rad;
 		}
 
-		double scale = 128;//Effectively scales up the noisemap
-		Biome biome = world.getNoiseBiomeRaw(x + 8, 0, z + 8);//Placement is offset by +8,+8
-		double noiseDensity = (noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D;//Gives 0.0 to 1.0
-		double density = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(world.getRandom(), noiseDensity);
-		double size = ((1.0 - density) * 9);//Size is the inverse of density(Gives 0 to 9)
+		final double scale = 128; // Effectively scales up the noisemap
+		final Biome biome = this.world.getNoiseBiomeRaw(x + 8, 0, z + 8); // Placement is offset by +8,+8
 
-		//Oh Joy. Random can potentially start with the same number for each chunk. Let's just
-		//throw this large prime xor hack in there to get it to at least look like it's random.
+		final double noiseDensity = (this.noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
+		final double density = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(this.world.rand, noiseDensity);
+		final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
+
+		// Oh Joy. Random can potentially start with the same number for each chunk. Let's just
+		// throw this large prime xor hack in there to get it to at least look like it's random.
 		int kindaRandom = ((x * 674365771) ^ (z * 254326997)) >> 4;
-		int shakelow =  (kindaRandom & 0x3) % 3;//Produces 0,0,1 or 2
-		int shakehigh = (kindaRandom & 0xc) % 3;//Produces 0,0,1 or 2
+		int shakelow =  (kindaRandom & 0x3) % 3; // Produces 0,0,1 or 2
+		int shakehigh = (kindaRandom & 0xc) % 3; // Produces 0,0,1 or 2
 
-		return MathHelper.clamp((int) size, 2 + shakelow, 8 - shakehigh);//Clamp to tree volume radius range
+		return MathHelper.clamp((int) size, 2 + shakelow, 8 - shakehigh); // Clamp to tree volume radius range
 	}
 
 	@Override
 	public boolean runPass(int chunkX, int chunkZ, int pass) {
 		this.pass = pass;
 
-		if(pass == 0) {
-			Biome biome = world.getBiome(new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8));//Aim at center of chunk
-			chunkMultipass = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getMultipass(biome);
+		if (pass == 0) {
+			final Biome biome = this.world.getNoiseBiomeRaw((chunkX << 4) + 8, 0, (chunkZ << 4) + 8); // Aim at center of chunk
+			this.chunkMultipass = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getMultipass(biome);
 		}
 
-		return chunkMultipass.apply(pass) >= 0;
+		return this.chunkMultipass.apply(pass) >= 0;
 	}
 
 }

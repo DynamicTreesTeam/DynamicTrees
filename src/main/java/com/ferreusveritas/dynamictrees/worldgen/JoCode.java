@@ -33,7 +33,7 @@ import java.util.Optional;
 /**
  * So named because the base64 codes it generates almost always start with "JO"
  * 
- * This class provides methods for storing and recreating tree shapes.
+ * <p>This class provides methods for recreating tree shapes.</p>
  * 
  * @author ferreusveritas
  */
@@ -85,7 +85,7 @@ public class JoCode {
 	/**
 	 * A facing matrix for mapping instructions to different rotations
 	 */
-	private byte dirmap[][] = {
+	private final byte[][] dirmap = {
 			//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
@@ -96,8 +96,8 @@ public class JoCode {
 	};
 	
 	//"Pointers" to the current rotation direction.
-	private byte facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
-	private byte unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] facingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] unfacingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 	
 	/**
 	 * Get the instruction at a locus.
