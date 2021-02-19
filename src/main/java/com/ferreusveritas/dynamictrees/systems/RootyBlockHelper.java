@@ -25,7 +25,7 @@ public class RootyBlockHelper {
      */
     public static boolean addToRootyBlocksMap (Block primitiveSoil, RootyBlock rootyBlock){
         if (rootyBlocksMap.containsKey(primitiveSoil)){
-            LogManager.getLogger().warn("Attempted to register " + rootyBlock + " as the rooty block of " + primitiveSoil + " but it already had one.");
+            LogManager.getLogger().warn("Attempted to register " + rootyBlock + " as the rooty block of " + primitiveSoil + " but it already had " + rootyBlocksMap.get(primitiveSoil));
             return false;
         }
         rootyBlocksMap.put(primitiveSoil, rootyBlock);

@@ -17,6 +17,9 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
@@ -25,13 +28,16 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -274,7 +280,7 @@ public class TreeFamily {
 	}
 	public BranchBlock createBranch(String postfix) {
 		String branchName = this.getName() + postfix;
-		BasicBranchBlock branch = isThick() ? new ThickBranchBlock(branchName) : new BasicBranchBlock(branchName);
+		BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
 		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
 		return branch;
 	}
@@ -391,6 +397,21 @@ public class TreeFamily {
 
 	public boolean isFireProof () { return false; }
 
+	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity){
+		return SoundType.WOOD;
+	}
+
+	public ToolType getBranchHarvestTool(BlockState state){
+		return ToolType.AXE;
+	}
+
+	public int getBranchHarvestLevel(BlockState state){
+		return 0;
+	}
+
+	public Material getBranchMaterial(){
+		return Material.WOOD; //Trees are made of wood. Brilliant.
+	}
 
 	///////////////////////////////////////////
 	//BRANCHES

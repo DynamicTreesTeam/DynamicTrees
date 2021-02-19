@@ -115,12 +115,14 @@ public class BranchDestructionData {
 		
 		//Ensure the origin block is at the first index
 		BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
-		BlockState origExState = origConnData.getBlockState();
-		if(origExState != null) {
-			radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock)origExState.getBlock(), origExState);
-			connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
-			blockIndexData[index++] = encodeBranchBlocks((BranchBlock)origExState.getBlock());
-			branchList.remove(BlockPos.ZERO);
+		if (origConnData != null) {
+			BlockState origExState = origConnData.getBlockState();
+			if(origExState != null) {
+				radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock)origExState.getBlock(), origExState);
+				connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
+				blockIndexData[index++] = encodeBranchBlocks((BranchBlock)origExState.getBlock());
+				branchList.remove(BlockPos.ZERO);
+			}
 		}
 		
 		//Encode the remaining blocks

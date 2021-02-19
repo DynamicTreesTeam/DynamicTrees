@@ -40,8 +40,6 @@ public class WarpedFungus extends NetherTreeFamily {
 
 		MegaWarpedSpecies(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
-
-			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
 		}
 
 		@Override

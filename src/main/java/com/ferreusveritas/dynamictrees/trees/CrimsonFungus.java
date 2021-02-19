@@ -27,8 +27,6 @@ public class CrimsonFungus extends NetherTreeFamily {
 		CrimsonSpecies(TreeFamily family){
 			super(family.getName(), family);
 
-			setBasicGrowingParameters(0.3f, 14.0f, 0, 4, 1f);
-
 			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}
 
@@ -51,8 +49,6 @@ public class CrimsonFungus extends NetherTreeFamily {
 
 		MegaCrimsonSpecies(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
-
-			setBasicGrowingParameters(1f, 25.0f, 7, 20, 0.9f);
 
 			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}

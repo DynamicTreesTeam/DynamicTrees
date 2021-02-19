@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IntegerProperty;
@@ -32,6 +33,7 @@ import net.minecraftforge.common.ToolType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class BasicBranchBlock extends BranchBlock {
@@ -43,16 +45,31 @@ public class BasicBranchBlock extends BranchBlock {
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-	// Trees are mostly made of wood
-	public BasicBranchBlock(String name) {
-		this(AbstractBlock.Properties.create(Material.WOOD), name);//Trees are made of wood. Brilliant.
+	public BasicBranchBlock(Material material, String name) {
+		this(AbstractBlock.Properties.create(material), name);
 	}
 	
 	// Useful for more unique subclasses
 	public BasicBranchBlock(AbstractBlock.Properties properties, String name) {
-		super(properties.sound(SoundType.WOOD).harvestTool(ToolType.AXE).harvestLevel(0).sound(SoundType.WOOD), name); //aaaaand they also sound like wood.
+		super(properties.harvestLevel(0), name);
 
 		cacheBranchStates();
+	}
+
+	@Override
+	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+		return getFamily().getBranchSoundType(state, world, pos, entity);
+	}
+
+	@Nullable
+	@Override
+	public ToolType getHarvestTool(BlockState state) {
+		return getFamily().getBranchHarvestTool(state);
+	}
+
+	@Override
+	public int getHarvestLevel(BlockState state) {
+		return getFamily().getBranchHarvestLevel(state);
 	}
 
 	public void cacheBranchStates() {

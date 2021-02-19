@@ -50,7 +50,8 @@ public class DarkOakLogic implements IGrowthLogicKit {
 			}
 		}
 		
-		return probMap;	}
+		return probMap;
+	}
 
 	@Override
 	public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {

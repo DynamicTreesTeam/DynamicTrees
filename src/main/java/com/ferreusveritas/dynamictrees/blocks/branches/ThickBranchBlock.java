@@ -33,8 +33,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
-	public ThickBranchBlock(String name) {
-		this(Properties.create(Material.WOOD),name);
+	public ThickBranchBlock(Material material, String name) {
+		this(Properties.create(material),name);
 	}
 
 	public ThickBranchBlock(Properties properties, String name) {

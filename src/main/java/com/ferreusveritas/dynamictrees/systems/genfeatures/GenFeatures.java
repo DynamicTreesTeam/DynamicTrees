@@ -28,6 +28,7 @@ public final class GenFeatures {
     public static final GenFeature CLEAR_VOLUME = register(new ClearVolumeGenFeature(regName("clear_volume")));
     public static final GenFeature BOTTOM_FLARE = register(new BottomFlareGenFeature(regName("bottom_flare")));
     public static final GenFeature UNDERGROWTH = register(new UndergrowthGenFeature(regName("undergrowth")));
+    public static final GenFeature CONSISTENT_TRUNK = register(new ConsistentTrunkThicknessGenFeature(regName("consistent_trunk")));
 
     public static final GenFeature PODZOL = register(new PodzolGenFeature(regName("podzol")));
 
