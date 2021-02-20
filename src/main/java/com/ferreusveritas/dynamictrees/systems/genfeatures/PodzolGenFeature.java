@@ -63,7 +63,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 							else
 								if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
 									if(world.getLightFor(LightType.SKY, offPos.up()) <= darkThreshold) {
-										world.setBlockState(offPos, DTRegistries.blockStates.podzol);
+										world.setBlockState(offPos, DTRegistries.blockStates.PODZOL);
 									} else {
 										spreadPodzol(world, pos);
 									}
@@ -85,7 +85,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 			podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
 			podzolish += testBlock instanceof RootyBlock ? 1 : 0;
 			if(podzolish >= 3) {
-				world.setBlockState(pos, DTRegistries.blockStates.podzol);
+				world.setBlockState(pos, DTRegistries.blockStates.PODZOL);
 				break;
 			}
 		}

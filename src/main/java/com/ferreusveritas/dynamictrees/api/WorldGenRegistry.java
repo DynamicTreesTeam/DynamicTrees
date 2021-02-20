@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
 import com.ferreusveritas.dynamictrees.api.events.JsonCapabilityRegistryEvent;
@@ -12,7 +11,6 @@ import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
 import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,8 +18,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * NOTICE: Database population has moved to {@link BiomeDatabaseManager}.
@@ -48,7 +44,7 @@ public class WorldGenRegistry {
 	}
 
 	private static File loadTreeCancellerFile() {
-		File file = new File(DTConfigs.configDirectory.getAbsolutePath() + TREE_CANCELLER_CONFIG_PATH);
+		File file = new File(DTConfigs.CONFIG_DIRECTORY.getAbsolutePath() + TREE_CANCELLER_CONFIG_PATH);
 
 		if (!file.exists())
 			writeDefaultTreeCanceller(file);
@@ -58,7 +54,7 @@ public class WorldGenRegistry {
 
 	private static void writeDefaultTreeCanceller (File file) {
 		try {
-			new File(DTConfigs.configDirectory.getAbsolutePath() + WORLD_GEN_DIR_PATH).mkdirs();
+			new File(DTConfigs.CONFIG_DIRECTORY.getAbsolutePath() + WORLD_GEN_DIR_PATH).mkdirs();
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
 			writer.write("[\n" +
 					"  {\n" +

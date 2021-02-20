@@ -19,6 +19,8 @@ public class WarpedFungus extends NetherTreeFamily {
 
 		WarpedSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
+
+			this.setPrimitiveSapling(Blocks.WARPED_FUNGUS);
 		}
 
 		@Override

@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class TreeHelper {
@@ -303,19 +304,22 @@ public class TreeHelper {
 	public static boolean isBranch(Block block) {
 		return block instanceof BranchBlock;//Oh shuddap you java purists.. this is minecraft!
 	}
-	
-	public static boolean isBranch(BlockState state) {
+
+	public static boolean isBranch(@Nullable final BlockState state) {
 		return state != null && isBranch(state.getBlock());
 	}
-	
+
+	@Nullable
 	public static BranchBlock getBranch(Block block) {
 		return isBranch(block) ? (BranchBlock)block : null;
 	}
-	
+
+	@Nullable
 	public static BranchBlock getBranch(ITreePart treepart) {
 		return treepart instanceof BranchBlock ? (BranchBlock)treepart : null;
 	}
-	
+
+	@Nullable
 	public static BranchBlock getBranch(BlockState state) {
 		return getBranch(state.getBlock());
 	}
@@ -347,15 +351,18 @@ public class TreeHelper {
 	public static boolean isLeaves(BlockState blockState) {
 		return isLeaves(blockState.getBlock());
 	}
-	
+
+	@Nullable
 	public static DynamicLeavesBlock getLeaves(Block block) {
 		return isLeaves(block) ? (DynamicLeavesBlock)block : null;
 	}
-	
+
+	@Nullable
 	public static DynamicLeavesBlock getLeaves(ITreePart treepart) {
 		return treepart instanceof DynamicLeavesBlock ? (DynamicLeavesBlock)treepart : null;
 	}
-	
+
+	@Nullable
 	public static DynamicLeavesBlock getLeaves(BlockState state) {
 		return getLeaves(state.getBlock());
 	}
@@ -369,15 +376,18 @@ public class TreeHelper {
 	public static boolean isRooty(BlockState blockState) {
 		return isRooty(blockState.getBlock());
 	}
-	
+
+	@Nullable
 	public static RootyBlock getRooty(Block block) {
 		return isRooty(block) ? (RootyBlock)block : null;
 	}
-	
+
+	@Nullable
 	public static RootyBlock getRooty(ITreePart treepart) {
 		return treepart instanceof RootyBlock ? (RootyBlock)treepart : null;
 	}
-	
+
+	@Nullable
 	public static RootyBlock getRooty(BlockState blockState) {
 		return getRooty(blockState.getBlock());
 	}

@@ -12,10 +12,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 
 	public LeavesPropertiesJson(JsonObject jsonObj) {
-		super(DTRegistries.blockStates.air);//Assigns deciduous cell kit by default
+		super(DTRegistries.blockStates.AIR);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
 		resolve();
@@ -135,7 +133,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 			return je.getAsJsonObject();
 		}
 		catch (Exception e) {
-			System.err.println(e);
+			LogManager.getLogger().error("Unable parse Json data from Json data string given.");
 			return null;
 		}
 	}

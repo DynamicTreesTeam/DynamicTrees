@@ -50,6 +50,8 @@ public class JungleTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
+
+			this.setPrimitiveSapling(Blocks.JUNGLE_SAPLING);
 			
 			//Add species features
 			this.addGenFeature(GenFeatures.COCOA);

@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  *
  * @author Harley O'Connor
  */
-public final class WorldGenEvents {
+public final class WorldGenEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
@@ -48,7 +48,9 @@ public final class WorldGenEvents {
      */
     @SubscribeEvent
     public void removeVanillaTrees(final BiomeLoadingEvent event) {
-        // TODO: Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+        // Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+        // This may just have to be an unfortunate consequence to Dynamic Trees for now, as without making an overly complex system I can't see any other
+        // way of removing features to rectify this.
         if (!WorldGenRegistry.isWorldGenEnabled())
             return;
 
@@ -86,11 +88,11 @@ public final class WorldGenEvents {
         // we should register the cancellers only for the biomes that need it to keep loading times as low as possible.
 
         final ITreeCanceller treeCanceller = event.getTreeCanceller();
-        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT_ID);
+        final List<String> namespaces = Collections.singletonList(DynamicTrees.MINECRAFT);
 
         // Gets a list of all vanilla Minecraft biome registry keys.
         final List<RegistryKey<Biome>> vanillaBiomes = ForgeRegistries.BIOMES.getEntries().stream().map(Map.Entry::getKey)
-                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT_ID)).collect(Collectors.toList());
+                .filter(key -> key.getLocation().getNamespace().equals(DynamicTrees.MINECRAFT)).collect(Collectors.toList());
 
         // This registers the cancellation of all tree features with the namespace "minecraft" from all overworld biomes with the namespace "minecraft".
         vanillaBiomes.stream().filter(key -> BiomeDictionary.hasType(key, BiomeDictionary.Type.OVERWORLD)).forEach(key ->

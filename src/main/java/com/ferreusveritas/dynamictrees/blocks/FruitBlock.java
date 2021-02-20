@@ -125,7 +125,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockState(pos, DTRegistries.blockStates.air); break;
+					case ROT: world.setBlockState(pos, DTRegistries.blockStates.AIR); break;
 				}
 			}
 		}
@@ -149,7 +149,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockState(pos, DTRegistries.blockStates.air);
+		world.setBlockState(pos, DTRegistries.blockStates.AIR);
 	}
 
 	@Override

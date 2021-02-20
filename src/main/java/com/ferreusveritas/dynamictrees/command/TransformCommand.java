@@ -29,7 +29,7 @@ public final class TransformCommand extends SubCommand {
         this.defaultToExecute = false;
 
         this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocs(), builder)).executes(this::execute);
+                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
     }
 
     @Override

@@ -73,9 +73,7 @@ public class DTRegistries {
 		trunkShellBlock = new TrunkShellBlock();
 
 		setUpSoils();
-
 		setupConnectables();
-
 		setupLeavesProperties();
 	}
 
@@ -133,7 +131,6 @@ public class DTRegistries {
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
-//		DTTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -164,8 +161,7 @@ public class DTRegistries {
 		
 		ArrayList<Item> treeItems = new ArrayList<>();
 		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
-//		DTTrees.dynamicCactus.getRegisterableItems(treeItems);
-		
+
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
 	}
@@ -231,7 +227,7 @@ public class DTRegistries {
 	///////////////////////////////////////////
 
 	/** This is the creative tab that holds all DT items */
-	public static final ItemGroup dynamicTreesTab = new ItemGroup("dynamictrees") {
+	public static final ItemGroup dynamicTreesTab = new ItemGroup(DynamicTrees.MOD_ID) {
 		@Override
 		public ItemStack createIcon() {
 			return TreeRegistry.findSpeciesSloppy(DynamicTrees.VanillaWoodTypes.oak.toString()).getSeedStack(1);
@@ -239,14 +235,14 @@ public class DTRegistries {
 	};
 	
 	public static final class CommonBlockStates {
-		public final BlockState air = Blocks.AIR.getDefaultState();
-		public final BlockState dirt = Blocks.DIRT.getDefaultState();
-		public final BlockState coarsedirt = Blocks.COARSE_DIRT.getDefaultState();
-		public final BlockState sand = Blocks.SAND.getDefaultState();
-		public final BlockState grass = Blocks.GRASS.getDefaultState();
-		public final BlockState podzol = Blocks.PODZOL.getDefaultState();
-		public final BlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
-		public final BlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
+		public final BlockState AIR = Blocks.AIR.getDefaultState();
+		public final BlockState DIRT = Blocks.DIRT.getDefaultState();
+		public final BlockState COARSE_DIRT = Blocks.COARSE_DIRT.getDefaultState();
+		public final BlockState SAND = Blocks.SAND.getDefaultState();
+		public final BlockState GRASS = Blocks.GRASS.getDefaultState();
+		public final BlockState PODZOL = Blocks.PODZOL.getDefaultState();
+		public final BlockState RED_MUSHROOM = Blocks.RED_MUSHROOM.getDefaultState();
+		public final BlockState BROWN_MUSHROOM = Blocks.BROWN_MUSHROOM.getDefaultState();
 	}
 
 	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();

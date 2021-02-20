@@ -117,11 +117,11 @@ public class BranchDestructionData {
 		//Ensure the origin block is at the first index
 		BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
 		if (origConnData != null) {
-			BlockState origExState = origConnData.getBlockState();
-			if(origExState != null) {
-				radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock)origExState.getBlock(), origExState);
+			BlockState origState = origConnData.getBlockState();
+			if(origState != null) {
+				radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock)origState.getBlock(), origState);
 				connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
-				blockIndexData[index++] = encodeBranchBlocks((BranchBlock)origExState.getBlock());
+				blockIndexData[index++] = encodeBranchBlocks((BranchBlock)origState.getBlock());
 				branchList.remove(BlockPos.ZERO);
 			}
 		}
@@ -130,11 +130,11 @@ public class BranchDestructionData {
 		for(Entry<BlockPos, BranchConnectionData> set : branchList.entrySet()) {
 			BlockPos relPos = set.getKey();
 			BranchConnectionData connData = set.getValue();
-			BlockState exState = connData.getBlockState();
-			Block block = exState.getBlock();
+			BlockState state = connData.getBlockState();
+			Block block = state.getBlock();
 			
 			if(block instanceof BranchBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-				radPosData[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, exState);
+				radPosData[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, state);
 				connectionData[index] = encodeBranchesConnections(connData.getConnections());
 				blockIndexData[index++] = encodeBranchBlocks((BranchBlock)block);
 			}

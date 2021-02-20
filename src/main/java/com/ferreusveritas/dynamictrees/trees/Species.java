@@ -135,6 +135,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	protected Seed seed = null;
 	/** A blockState that will turn itself into this tree */
 	protected DynamicSaplingBlock saplingBlock = null;
+	/** The primitive (vanilla) sapling, used for sapling replacements. */
+	protected BlockState primitiveSapling = null;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
 	
@@ -272,6 +274,23 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public boolean isTransformable () {
 		return true;
+	}
+
+	/**
+	 * @return The primitive sapling's {@link BlockState}, for automatic registration of sapling replacers.
+	 */
+	@Nullable
+	public BlockState getPrimitiveSapling () {
+		return this.primitiveSapling;
+	}
+
+	public Species setPrimitiveSapling(Block primitiveSaplingBlock) {
+		return this.setPrimitiveSapling(primitiveSaplingBlock.getDefaultState());
+	}
+
+	public Species setPrimitiveSapling(BlockState primitiveSaplingState) {
+		this.primitiveSapling = primitiveSaplingState;
+		return this;
 	}
 
 	///////////////////////////////////////////
@@ -420,7 +439,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return
 	 */
 	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
-		dropList = TreeRegistry.globalDropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
+		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
 		return dropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
 	}
 	
@@ -435,7 +454,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return
 	 */
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		List<ItemStack> dropList = TreeRegistry.globalDropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
+		List<ItemStack> dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
 		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, dropList, soilLife);
 	}
 	
@@ -451,7 +470,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public List<ItemStack> getLeavesDrops(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
 		Random random = world != null ? world.rand : new Random();
-		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
+		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
 		return dropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
 	}
 	
@@ -467,7 +486,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return
 	 */
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
-		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
 	

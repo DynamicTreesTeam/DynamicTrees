@@ -351,7 +351,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, DTRegistries.blockStates.air, 3);
+					world.setBlockState(imPos, DTRegistries.blockStates.AIR, 3);
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 				}

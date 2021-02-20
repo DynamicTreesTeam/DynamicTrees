@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -68,7 +67,7 @@ public class LeavesProperties implements ILeavesProperties {
 	}
 	
 	public LeavesProperties(BlockState primitiveLeaves, ICellKit cellKit) {
-		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.air;
+		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.AIR;
 		this.cellKit = cellKit;
 	}
 	

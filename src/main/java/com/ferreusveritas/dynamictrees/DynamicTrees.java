@@ -10,11 +10,14 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import com.ferreusveritas.dynamictrees.worldgen.WorldGenEvents;
+import com.ferreusveritas.dynamictrees.worldgen.WorldGenEventHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -41,12 +44,12 @@ public class DynamicTrees {
 	public static final String GREATER_THAN = "@(";
 	public static final String OR_GREATER = ",)";
 
+	public static final String MINECRAFT = "minecraft";
 	public static final String SERENE_SEASONS = "sereneseasons";
+	public static final String FAST_LEAF_DECAY = "fastleafdecay";
 
 	// Other mods can use this string to depend on the latest version of Dynamic Trees
 	public static final String DT_LATEST = MOD_ID + AT + VERSION + OR_GREATER;
-
-	public static final String MINECRAFT_ID = "minecraft";
 
 	//	//Other Add-on Mods
 	//	public static final String DYNAMICTREESBOP = "dynamictreesbop";
@@ -135,18 +138,20 @@ public class DynamicTrees {
 	
 	public enum EnumDestroyMode {
 		SLOPPY,
-		SETRADIUS,
+		SET_RADIUS,
 		HARVEST,
 		ROT,
 		OVERFLOW
 	}
 	
 	public DynamicTrees() {
-		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
-		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
+		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		final ModLoadingContext loadingContext = ModLoadingContext.get();
 
-//		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+		loadingContext.registerConfig(ModConfig.Type.SERVER, DTConfigs.SERVER_CONFIG);
+		loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
+		loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
+
 //		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
 
 		CellKits.setup();
@@ -158,14 +163,10 @@ public class DynamicTrees {
 		
 		DTRegistries.setupEntities();
 		
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+		modEventBus.addListener(this::commonSetup);
+		modEventBus.addListener(this::clientSetup);
 
-		registerCommonEventHandlers();
-		
-		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.register(DTDataPackRegistries.class);
-
+		EventHandlers.registerCommon();
 		CompatHandler.init();
 	}
 
@@ -184,7 +185,14 @@ public class DynamicTrees {
 	private void commonSetup(final FMLCommonSetupEvent event) {
 //		LeavesPropertiesJson.resolveAll();
 		DeferredWorkQueue.runLater(this::registerDendroRecipes);
-//		cleanUp();
+//		this.cleanUp();
+
+		for (Species species : Species.REGISTRY) {
+			final BlockState primitiveSaplingState = species.getPrimitiveSapling();
+
+			if (primitiveSaplingState != null)
+				TreeRegistry.registerSaplingReplacer(primitiveSaplingState, species);
+		}
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {
@@ -199,23 +207,6 @@ public class DynamicTrees {
 		LeavesPropertiesJson.cleanUp();
 		TreeRegistry.cleanupCellKit();
 		TreeRegistry.cleanupGrowthLogicKit();
-	}
-	
-	public void registerCommonEventHandlers() {
-		MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
-		MinecraftForge.EVENT_BUS.register(new ServerEventHandler());
-		MinecraftForge.EVENT_BUS.register(new WorldGenEvents());
-
-		if (ModList.get().isLoaded("fastleafdecay")) {
-			MinecraftForge.EVENT_BUS.register(new LeafUpdateEventHandler());
-		}
-		
-		//An event for dealing with Vanilla Saplings
-		if(DTConfigs.replaceVanillaSapling.get()) {
-			MinecraftForge.EVENT_BUS.register(new VanillaSaplingEventHandler());
-		}
-
-		MinecraftForge.EVENT_BUS.register(new PoissonDiscEventHandler());
 	}
 
 }
