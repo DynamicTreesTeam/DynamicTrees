@@ -1,17 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscProviderCreateEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 

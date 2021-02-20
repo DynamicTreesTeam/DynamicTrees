@@ -24,7 +24,7 @@ import java.util.List;
 public class DestroyerNode implements INodeInspector {
 	
 	Species species;//Destroy any node that's made of the same kind of wood
-	private List<BlockPos> endPoints;//We always need to track endpoints during destruction
+	private final List<BlockPos> endPoints;//We always need to track endpoints during destruction
 	private PlayerEntity player = null;
 	
 	public DestroyerNode(Species species) {

@@ -4,8 +4,8 @@ import net.minecraft.block.BlockState;
 
 public class BranchConnectionData {
 	
-	private BlockState blockState;
-	private Connections connections;
+	private final BlockState blockState;
+	private final Connections connections;
 	
 	public BranchConnectionData(BlockState blockState, Connections connections) {
 		this.blockState = blockState;

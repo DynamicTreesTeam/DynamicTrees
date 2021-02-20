@@ -71,6 +71,7 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -139,7 +140,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
-	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<BiomeDictionary.Type, Float>();//Environmental factors
+	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
 
@@ -448,7 +449,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param fortune
 	 * @return
 	 */
-	public List<ItemStack> getLeavesDrops(World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrops(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
 		Random random = world != null ? world.rand : new Random();
 		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
 		return dropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
@@ -618,6 +619,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	//This is used to load the sapling model
+	@Nullable
 	public ResourceLocation getSaplingName() {
 		if (getRegistryName() == null) return null;
 		return new ResourceLocation(getRegistryName().getNamespace(), getRegistryName().getPath() + "_sapling");
@@ -640,7 +642,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		Block dirt = world.getBlockState(rootPos).getBlock();
 
 		if (!RootyBlockHelper.isBlockRegistered(dirt) && !(dirt instanceof RootyBlock)) {
-			System.err.println("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
+			LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
 			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, life);
 			return false;
 		}
@@ -1210,7 +1212,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	//////////////////////////////
 	// INTERACTIVE
 	//////////////////////////////
-	
+
+	@Nullable
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
 		//Bonemeal fertilizes the soil and causes a single growth pulse
@@ -1266,7 +1269,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param hit The block ray trace of the clicking action
 	 * @return True if action was handled, false otherwise.
 	 */
-	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
 		
 		if (heldItem != null) {//Something in the hand
 			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
@@ -1339,6 +1342,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 *
 	 * @return
 	 */
+	@Nullable
 	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
 		return null;
 	}
@@ -1499,7 +1503,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public int coordHashCode(BlockPos pos) {
 		return CoordUtils.coordHashCode(pos, 2);
 	}
-	
+
+	@Nullable
 	@Override
 	public String toString() {
 		if (getRegistryName() == null){

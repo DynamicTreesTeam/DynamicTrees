@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import javax.annotation.Nullable;
+
 /**
 * A simple bitmap that favors speed over safety.  Consider yourself disclaimed.
 * 
@@ -7,9 +9,9 @@ package com.ferreusveritas.dynamictrees.util;
 */
 public class SimpleBitmap {
 	
-	private int h;
-	private int w;
-	private int bits[];
+	private final int h;
+	private final int w;
+	private int[] bits;
 	
 	public boolean touched;//useful for ruling out entire layers for the voxelmap 
 	
@@ -34,22 +36,18 @@ public class SimpleBitmap {
 	* @param h Height
 	* @param bits The pixels 
 	*/
-	public SimpleBitmap(int w, int h, int[] bits) {
+	public SimpleBitmap(final int w, final int h, @Nullable final int[] bits) {
 		this(w, h);
 		if(bits != null) {
 			int size = Math.min(bits.length, this.h);
-			for(int i = 0; i < size; i++) {
-				this.bits[i] = bits[i];
-			}
+			if (size >= 0) System.arraycopy(bits, 0, this.bits, 0, size);
 		}
 		touched = true;
 	}
 	
 	public SimpleBitmap(SimpleBitmap bmp) {
 		this(bmp.w, bmp.h);
-		for(int i = 0; i < this.bits.length; i++) {
-			this.bits[i] = bmp.bits[i];
-		}
+		System.arraycopy(bmp.bits, 0, this.bits, 0, this.bits.length);
 		touched = bmp.touched;
 	}
 	
@@ -123,7 +121,7 @@ public class SimpleBitmap {
 		}
 	}
 	
-	public void BlitAnd(int relX, int relY, SimpleBitmap src) {
+	public void blitAnd(int relX, int relY, SimpleBitmap src) {
 		if(prepBlit(relX, relY, src)) {
 			if(relX < 0) {
 				relX = -relX;
@@ -183,11 +181,11 @@ public class SimpleBitmap {
 	}
 	
 	public void print() {
-		String buff;
+		StringBuilder buff;
 		for(int y = 0; y < h; y++) {
-			buff = "";
+			buff = new StringBuilder();
 			for(int x = 0; x < w; x++) {
-				buff += isPixelOn(x, y) ? "█" : "░";
+				buff.append(isPixelOn(x, y) ? "█" : "░");
 			}
 			System.out.println(buff);
 		}

@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 public class PoissonDiscPairData {
-	private Vec2i coordData[];
-	private int sectors;
+	private final Vec2i[] coordData;
+	private final int sectors;
 	
-	private static Vec2i coordTable[][][] = new Vec2i[7][7][];
+	private static final Vec2i[][][] coordTable = new Vec2i[7][7][];
 	
 	static { //Yuh.. magic.
 		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
@@ -43,7 +43,7 @@ public class PoissonDiscPairData {
 		int sectors = codeSize * 4;
 		Vec2i[] coord = coordTable[idx1][idx2] = coordTable[idx2][idx1] = new Vec2i[sectors];
 		
-		byte curveData[] = uncompressCurve(codeSize, curveCode);
+		byte[] curveData = uncompressCurve(codeSize, curveCode);
 		
 		for(int sector = 0; sector < sectors; sector++) {
 			int modulus = Math.abs(((sector + codeSize) % (codeSize * 2) ) - codeSize);

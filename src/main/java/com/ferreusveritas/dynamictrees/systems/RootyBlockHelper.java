@@ -15,13 +15,13 @@ import java.util.Map;
  */
 public class RootyBlockHelper {
 
-    private static Map<Block, RootyBlock> rootyBlocksMap = new HashMap<>();
+    private static final Map<Block, RootyBlock> rootyBlocksMap = new HashMap<>();
     private static LinkedList<RootyBlock> rootyBlocksList;
 
     /**
      * @param primitiveSoil normal block that trees can be planted on
      * @param rootyBlock rooty dirt that should represent the primitive dirt
-     * @return
+     * @return True if block was added, false if it already had a rooty block.
      */
     public static boolean addToRootyBlocksMap (Block primitiveSoil, RootyBlock rootyBlock){
         if (rootyBlocksMap.containsKey(primitiveSoil)){
@@ -43,6 +43,7 @@ public class RootyBlockHelper {
     public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap){
         return generateListForRegistry(forceRemap, null);
     }
+
     public static LinkedList<RootyBlock> generateListForRegistry(boolean forceRemap, String namespace){
         if (rootyBlocksList == null){
             rootyBlocksList = new LinkedList<>();

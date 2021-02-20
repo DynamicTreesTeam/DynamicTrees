@@ -58,7 +58,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			{0,0,4,0,0,0,0,0,0,6,7,0,2,0,0,0,0,8,0,3,0,5,7,8,0,6,5,0,3,0,0,8,0,2,1,0,3,0,7,0,0,0,0,4,5,6,0,0,0}
 		};
 
-		SimpleVoxmap maps[] = new SimpleVoxmap[rootData.length];
+		SimpleVoxmap[] maps = new SimpleVoxmap[rootData.length];
 
 		for(int i = 0; i < maps.length; i++) {
 			maps[i] = new SimpleVoxmap(7, 1, 7, rootData[i]).setCenter(new BlockPos(3, 0, 3));

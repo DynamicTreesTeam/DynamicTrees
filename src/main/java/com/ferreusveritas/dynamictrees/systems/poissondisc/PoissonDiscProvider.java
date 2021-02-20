@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
 import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
@@ -36,7 +35,8 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 			random = new RandomXOR(seed);
 		}
 	}
-	
+
+	@SuppressWarnings("unused")
 	public void setDebug(IPoissonDebug debug) {
 		this.debug = debug;
 	}
@@ -59,8 +59,8 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 	}
 	
 	//A set of caches so we needn't create the lists from scratch for every chunk
-	private List<PoissonDisc> discCache1 = new ArrayList<PoissonDisc>(64);//64 is above the typical range to expect for 9 chunks
-	private List<PoissonDisc> discCache2 = new ArrayList<PoissonDisc>(64);
+	private final List<PoissonDisc> discCache1 = new ArrayList<>(64);//64 is above the typical range to expect for 9 chunks
+	private final List<PoissonDisc> discCache2 = new ArrayList<>(64);
 	
 	public List<PoissonDisc> generatePoissonDiscs(Random random, int chunkX, int chunkZ) {
 		
@@ -155,7 +155,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 
 			// Step 10.) Create a list of existing circles that are intersecting with this circle.  List is ordered by penetration depth.
 			int i = 0;
-			Map<Integer, PoissonDisc> intersecting = new TreeMap<Integer, PoissonDisc>();
+			Map<Integer, PoissonDisc> intersecting = new TreeMap<>();
 			for(PoissonDisc c: allDiscs) {
 				if(slave.doCirclesIntersectPadding(c)) {
 					int depth = 16 + (int)c.discPenetration(slave);
@@ -186,7 +186,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 						PoissonDisc c = allDiscs.get(ci);
 						if(slave.doCirclesIntersectPadding(c)){//See if this new circle intersects with any of the existing circles. If it does then..
 							if(debug != null) { debug.thirdCircleCandidateIntersects(master1, master2, slave, c, unsolvedDiscs, allDiscs); }
-							if(c.real || (!c.real && !slave.isInCenterChunk(chunkXStart, chunkZStart)) ) {
+							if(c.real || !slave.isInCenterChunk(chunkXStart, chunkZStart)) {
 								//System.out.println("Discard the slave because it's intersecting with an existing real circle");
 								slave = null;//Discard the circle because it's intersecting with an existing real circle
 								break;//We needn't continue since we've proven that the circle intersects with any circle
@@ -277,7 +277,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 	}
 	
 	private List<PoissonDisc> getChunkPoissonDiscs(int chunkX, int chunkZ) {
-		return getChunkPoissonDiscs(new ArrayList<PoissonDisc>(), chunkX, chunkZ);
+		return getChunkPoissonDiscs(new ArrayList<>(), chunkX, chunkZ);
 	}
 	
 	private List<PoissonDisc> getChunkPoissonDiscs(List<PoissonDisc> discs, int chunkX, int chunkZ) {

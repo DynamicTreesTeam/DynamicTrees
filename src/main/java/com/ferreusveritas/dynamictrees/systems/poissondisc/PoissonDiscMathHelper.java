@@ -40,8 +40,7 @@ public class PoissonDiscMathHelper {
 	*/
 	public static double deltaAngle(double alpha, double beta) {
 		double phi = Math.abs(beta - alpha) % (Math.PI * 2);// This is either the distance or 360 - distance
-		double distance = phi > Math.PI ? (Math.PI * 2) - phi : phi;
-		return distance;
+		return phi > Math.PI ? (Math.PI * 2) - phi : phi;
 	}
 	
 }

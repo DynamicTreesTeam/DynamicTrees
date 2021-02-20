@@ -14,6 +14,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -36,19 +37,19 @@ public class BranchDestructionData {
 	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
 	
 	public BranchDestructionData() {
-		species = Species.NULL_SPECIES;
-		destroyedBranchesConnections = new int[0];
-		destroyedBranchesRadiusPosition = new int[0];
-		destroyedBranchesBlockIndex = new int[0];
-		destroyedLeaves = new int[0];
-		destroyedLeavesBlockIndex = new int[0];
-		leavesDrops = new ArrayList<>(0);
-		endPoints = new int[0];
-		woodVolume = new NetVolumeNode.Volume();
-		cutDir = Direction.DOWN;
-		toolDir = Direction.DOWN;
-		cutPos = BlockPos.ZERO;
-		trunkHeight = 0;
+		this.species = Species.NULL_SPECIES;
+		this.destroyedBranchesConnections = new int[0];
+		this.destroyedBranchesRadiusPosition = new int[0];
+		this.destroyedBranchesBlockIndex = new int[0];
+		this.destroyedLeaves = new int[0];
+		this.destroyedLeavesBlockIndex = new int[0];
+		this.leavesDrops = new ArrayList<>(0);
+		this.endPoints = new int[0];
+		this.woodVolume = new NetVolumeNode.Volume();
+		this.cutDir = Direction.DOWN;
+		this.toolDir = Direction.DOWN;
+		this.cutPos = BlockPos.ZERO;
+		this.trunkHeight = 0;
 	}
 	
 	public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
@@ -202,9 +203,9 @@ public class BranchDestructionData {
 		}
 	}
 	
-	public class BlockStateWithConnections {
-		private BlockState blockState;
-		private int[] connections;
+	public static class BlockStateWithConnections {
+		private final BlockState blockState;
+		private final int[] connections;
 		
 		public BlockStateWithConnections(BlockState blockState) {
 			this.blockState = blockState;
@@ -357,7 +358,7 @@ public class BranchDestructionData {
 		}
 		
 		return new Iterable<BlockPos>() {
-			@Override
+			@Nonnull @Override
 			public Iterator<BlockPos> iterator() {
 				return new AbstractIterator<BlockPos>() {
 					private int index = 0;
@@ -378,14 +379,14 @@ public class BranchDestructionData {
 	private int encodeRelBlockPos(BlockPos relPos) {
 		return	(((relPos.getX() + 64) & 0xFF) << 16) |
 				(((relPos.getY() + 64) & 0xFF) << 8) |
-				(((relPos.getZ() + 64) & 0xFF) << 0) ;
+				(((relPos.getZ() + 64) & 0xFF)) ;
 	}
 	
 	private BlockPos decodeRelPos(int encoded) {
 		return new BlockPos(
 				(((encoded >> 16) & 0xFF) - 64),
 				(((encoded >> 8) & 0xFF) - 64),
-				(((encoded >> 0) & 0xFF) - 64)
+				(((encoded) & 0xFF) - 64)
 				);
 	}
 	
