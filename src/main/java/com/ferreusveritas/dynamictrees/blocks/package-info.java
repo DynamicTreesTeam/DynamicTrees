@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictrees.trees;
+package com.ferreusveritas.dynamictrees.blocks;
 
 import mcp.MethodsReturnNonnullByDefault;
 

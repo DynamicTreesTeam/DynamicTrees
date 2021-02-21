@@ -50,6 +50,8 @@ public class OakTree extends VanillaTreeFamily {
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
 
+			this.setPrimitiveSapling(Blocks.OAK_SAPLING);
+
 			this.addGenFeature(GenFeatures.BEE_NEST);
 		}
 		
@@ -62,8 +64,8 @@ public class OakTree extends VanillaTreeFamily {
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 4 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 4) {
-					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom, 3);//Change branch to a mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
+					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.RED_MUSHROOM : DTRegistries.blockStates.BROWN_MUSHROOM, 3);//Change branch to a mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.PODZOL, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}
@@ -132,8 +134,8 @@ public class OakTree extends VanillaTreeFamily {
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 4 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 4) {
-					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.redMushroom : DTRegistries.blockStates.brownMushroom, 3);//Change branch to a mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
+					world.setBlockState(pos, random.nextInt(3) == 0 ? DTRegistries.blockStates.RED_MUSHROOM : DTRegistries.blockStates.BROWN_MUSHROOM, 3);//Change branch to a mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.PODZOL, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}

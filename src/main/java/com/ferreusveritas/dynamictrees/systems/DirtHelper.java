@@ -55,6 +55,7 @@ public class DirtHelper {
     public static void registerSoil(Block block, String adjName) {
         registerSoil(block, adjName, RootyBlockHelper.isBlockRegistered(block)?RootyBlockHelper.getRootyBlock(block):new RootyBlock(block));
     }
+
     public static void registerSoil(Block block, String adjName, Block rootyBlockSubstitute) {
         if (!RootyBlockHelper.isBlockRegistered(rootyBlockSubstitute)){
             LOGGER.error("Attempted to use " + rootyBlockSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
@@ -62,6 +63,7 @@ public class DirtHelper {
         }
         registerSoil(block, adjName, RootyBlockHelper.getRootyBlock(rootyBlockSubstitute));
     }
+
     public static void registerSoil(Block block, String adjName, RootyBlock rootyDirt) {
         if(adjectiveMap.containsKey(adjName)) {
             int flag = adjectiveMap.get(adjName);
@@ -76,9 +78,11 @@ public class DirtHelper {
             LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
         }
     }
+
     public static void registerSoil(Block block, int adjFlag) {
         dirtMap.compute(block, (k, v) -> (v == null) ? adjFlag : v | adjFlag);
     }
+
     public static void registerSoil(Block block, Block copyFlagsFrom) {
         if (dirtMap.containsKey(copyFlagsFrom))
             registerSoil(block, dirtMap.get(copyFlagsFrom));

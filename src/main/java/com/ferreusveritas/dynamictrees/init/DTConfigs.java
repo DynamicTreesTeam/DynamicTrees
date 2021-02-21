@@ -1,75 +1,77 @@
 package com.ferreusveritas.dynamictrees.init;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-
+import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
+import com.ferreusveritas.dynamictrees.event.handlers.VanillaSaplingEventHandler;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-@Mod.EventBusSubscriber
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+@Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTConfigs {
 
-	public static File configDirectory;
+	public static final File CONFIG_DIRECTORY;
 
-	public static ForgeConfigSpec SERVER_CONFIG;
-	public static ForgeConfigSpec COMMON_CONFIG;
-	public static ForgeConfigSpec CLIENT_CONFIG;
+	public static final ForgeConfigSpec SERVER_CONFIG;
+	public static final ForgeConfigSpec COMMON_CONFIG;
+	public static final ForgeConfigSpec CLIENT_CONFIG;
 	
-	public static ForgeConfigSpec.DoubleValue seedDropRate;
-	public static ForgeConfigSpec.DoubleValue seedPlantRate;
-	public static ForgeConfigSpec.IntValue seedTimeToLive;
-	public static ForgeConfigSpec.BooleanValue seedOnlyForest;
-	public static ForgeConfigSpec.DoubleValue seedMinForestness;
+	public static final ForgeConfigSpec.DoubleValue seedDropRate;
+	public static final ForgeConfigSpec.DoubleValue seedPlantRate;
+	public static final ForgeConfigSpec.IntValue seedTimeToLive;
+	public static final ForgeConfigSpec.BooleanValue seedOnlyForest;
+	public static final ForgeConfigSpec.DoubleValue seedMinForestness;
 	
-	public static ForgeConfigSpec.DoubleValue treeGrowthMultiplier;
-	public static ForgeConfigSpec.DoubleValue treeHarvestMultiplier;
-	public static ForgeConfigSpec.DoubleValue maxTreeHardness;
-	public static ForgeConfigSpec.IntValue treeGrowthFolding;
-	public static ForgeConfigSpec.BooleanValue dropSticks;
-	public static ForgeConfigSpec.DoubleValue scaleBiomeGrowthRate;
-	public static ForgeConfigSpec.DoubleValue diseaseChance;
-	public static ForgeConfigSpec.IntValue maxBranchRotRadius;
-	public static ForgeConfigSpec.BooleanValue enableAppleTrees;
-	public static ForgeConfigSpec.BooleanValue enableThickTrees;
-	public static ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
-	public static ForgeConfigSpec.BooleanValue enableSwampOaksInWater;
+	public static final ForgeConfigSpec.DoubleValue treeGrowthMultiplier;
+	public static final ForgeConfigSpec.DoubleValue treeHarvestMultiplier;
+	public static final ForgeConfigSpec.DoubleValue maxTreeHardness;
+	public static final ForgeConfigSpec.IntValue treeGrowthFolding;
+	public static final ForgeConfigSpec.BooleanValue dropSticks;
+	public static final ForgeConfigSpec.DoubleValue scaleBiomeGrowthRate;
+	public static final ForgeConfigSpec.DoubleValue diseaseChance;
+	public static final ForgeConfigSpec.IntValue maxBranchRotRadius;
+	public static final ForgeConfigSpec.BooleanValue enableAppleTrees;
+	public static final ForgeConfigSpec.BooleanValue enableThickTrees;
+	public static final ForgeConfigSpec.DoubleValue rootyBlockHardnessMultiplier;
+	public static final ForgeConfigSpec.BooleanValue enableSwampOaksInWater;
 	
-	public static ForgeConfigSpec.BooleanValue isLeavesPassable;
-	public static ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
-	public static ForgeConfigSpec.BooleanValue enableBranchClimbing;
-	public static ForgeConfigSpec.BooleanValue canopyCrash;
-	public static ForgeConfigSpec.EnumValue<DynamicTrees.EnumAxeDamage> axeDamageMode;
-	public static ForgeConfigSpec.BooleanValue enableFallingTrees;
-	public static ForgeConfigSpec.BooleanValue enableFallingTreeDamage;
-	public static ForgeConfigSpec.DoubleValue fallingTreeDamageMultiplier;
-	public static ForgeConfigSpec.BooleanValue dirtBucketPlacesDirt;
-	public static ForgeConfigSpec.BooleanValue sloppyBreakDrops;
-	public static ForgeConfigSpec.IntValue minRadiusForStrip;
-	public static ForgeConfigSpec.BooleanValue enableStripRadiusReduction;
+	public static final ForgeConfigSpec.BooleanValue isLeavesPassable;
+	public static final ForgeConfigSpec.BooleanValue vanillaLeavesCollision;
+	public static final ForgeConfigSpec.BooleanValue enableBranchClimbing;
+	public static final ForgeConfigSpec.BooleanValue canopyCrash;
+	public static final ForgeConfigSpec.EnumValue<DynamicTrees.EnumAxeDamage> axeDamageMode;
+	public static final ForgeConfigSpec.BooleanValue enableFallingTrees;
+	public static final ForgeConfigSpec.BooleanValue enableFallingTreeDamage;
+	public static final ForgeConfigSpec.DoubleValue fallingTreeDamageMultiplier;
+	public static final ForgeConfigSpec.BooleanValue dirtBucketPlacesDirt;
+	public static final ForgeConfigSpec.BooleanValue sloppyBreakDrops;
+	public static final ForgeConfigSpec.IntValue minRadiusForStrip;
+	public static final ForgeConfigSpec.BooleanValue enableStripRadiusReduction;
 	
-	public static ForgeConfigSpec.BooleanValue replaceVanillaSapling;
-	public static ForgeConfigSpec.BooleanValue replaceNyliumFungi;
+	public static final ForgeConfigSpec.BooleanValue replaceVanillaSapling;
+	public static final ForgeConfigSpec.BooleanValue replaceNyliumFungi;
 	
-	public static ForgeConfigSpec.BooleanValue podzolGen;
-	public static ForgeConfigSpec.BooleanValue worldGen;
-	public static ForgeConfigSpec.ConfigValue<List<String>> dimensionBlacklist;
+	public static final ForgeConfigSpec.BooleanValue podzolGen;
+	public static final ForgeConfigSpec.BooleanValue worldGen;
+	public static final ForgeConfigSpec.ConfigValue<List<String>> dimensionBlacklist;
 	
-	//public static ForgeConfigSpec.BooleanValue fancyThickRings;
+	//public static final ForgeConfigSpec.BooleanValue fancyThickRings;
 
-	public static ForgeConfigSpec.BooleanValue worldGenDebug;
+	public static final ForgeConfigSpec.BooleanValue worldGenDebug;
 
-	public static ForgeConfigSpec.BooleanValue enableSeasonalSeedDropFactor;
-	public static ForgeConfigSpec.BooleanValue enableSeasonalGrowthFactor;
-	public static ForgeConfigSpec.BooleanValue enableSeasonalFruitProductionFactor;
+	public static final ForgeConfigSpec.BooleanValue enableSeasonalSeedDropFactor;
+	public static final ForgeConfigSpec.BooleanValue enableSeasonalGrowthFactor;
+	public static final ForgeConfigSpec.BooleanValue enableSeasonalFruitProductionFactor;
 
 	static {
-		configDirectory = new File(FMLPaths.CONFIGDIR.get().toUri());
+		CONFIG_DIRECTORY = new File(FMLPaths.CONFIGDIR.get().toUri());
 
 		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
@@ -142,12 +144,12 @@ public class DTConfigs {
 				define("enableStripRadiusReduction", true);
 		SERVER_BUILDER.pop();
 		
-		SERVER_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
-		replaceVanillaSapling = SERVER_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
+		COMMON_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
+		replaceVanillaSapling = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
-		replaceNyliumFungi = SERVER_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
+		replaceNyliumFungi = COMMON_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
 				define("replaceNyliumFungi", false);
-		SERVER_BUILDER.pop();
+		COMMON_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("World settings").push("world");
 		podzolGen = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
@@ -189,6 +191,13 @@ public class DTConfigs {
 	}
 	
 	@SubscribeEvent
-	public static void onLoad (final ModConfig.Loading event) { }
+	public static void onLoad (final ModConfig.Loading event) {
+		EventHandlers.configReload();
+	}
+
+	@SubscribeEvent
+	public static void onReload (final ModConfig.Reloading event) {
+		EventHandlers.configReload();
+	}
 
 }

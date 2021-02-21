@@ -4,20 +4,15 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.util.CommandUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Harley O'Connor
@@ -30,7 +25,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
         this.defaultToExecute = false;
 
         this.extraArguments = Commands.argument(CommandConstants.TREE_FAMILY_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocs(), builder)).executes(this::execute);
+                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
     }
 
     @Override
@@ -55,7 +50,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
-        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack, true); // Spawn potion in the world.
+        ItemUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack, true); // Spawn potion in the world.
 
         return 1;
     }

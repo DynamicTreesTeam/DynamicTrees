@@ -13,7 +13,7 @@ public class GrowSignal {
 	public Direction dir;
 	public int numTurns;
 	public int numSteps;
-	private Species species;
+	private final Species species;
 	
 	public BlockPos rootPos;
 	public BlockPos delta;

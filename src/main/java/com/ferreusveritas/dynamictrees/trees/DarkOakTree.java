@@ -54,6 +54,8 @@ public class DarkOakTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
+
+			this.setPrimitiveSapling(Blocks.DARK_OAK_SAPLING);
 			
 			//Add species features
 			this.addGenFeature(GenFeatures.CLEAR_VOLUME.with(ClearVolumeGenFeature.HEIGHT, 6)); // Clear a spot for the thick tree trunk.
@@ -89,8 +91,8 @@ public class DarkOakTree extends VanillaTreeFamily {
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
 				if(radius > 2 && TreeHelper.isRooty(world.getBlockState(pos.down())) && world.getLightFor(LightType.SKY, pos) < 6) {
-					world.setBlockState(pos, DTRegistries.blockStates.redMushroom, 3);//Change branch to a red mushroom
-					world.setBlockState(pos.down(), DTRegistries.blockStates.podzol, 3);//Change rooty dirt to Podzol
+					world.setBlockState(pos, DTRegistries.blockStates.RED_MUSHROOM, 3);//Change branch to a red mushroom
+					world.setBlockState(pos.down(), DTRegistries.blockStates.PODZOL, 3);//Change rooty dirt to Podzol
 				}
 				return true;
 			}

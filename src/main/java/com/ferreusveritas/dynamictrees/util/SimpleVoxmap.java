@@ -13,8 +13,8 @@ import java.util.Iterator;
 */
 public class SimpleVoxmap {
 
-	private final byte data[];
-	private final boolean touched[];
+	private final byte[] data;
+	private final boolean[] touched;
 	
 	private final int lenX;
 	private final int lenY;
@@ -252,9 +252,9 @@ public class SimpleVoxmap {
 	}
 	
 	
-	public class Cell {
+	public static class Cell {
 		private byte value;
-		private BlockPos.Mutable pos;
+		private final BlockPos.Mutable pos;
 
 		public Cell() {
 			pos = new BlockPos.Mutable();
@@ -416,7 +416,7 @@ public class SimpleVoxmap {
 					private int x = -1;
 					private int y = 0;
 					private int z = 0;
-					private int yStart = getStartY();
+					private final int yStart = getStartY();
 					private final BlockPos.Mutable dPos = new BlockPos.Mutable();
 					
 					protected int getStartY() {
@@ -438,7 +438,7 @@ public class SimpleVoxmap {
 							} else {
 								return this.endOfData();
 							}
-							
+
 							y = yStart;
 							int dataPos = calcPos(x, y, z);
 							
@@ -460,26 +460,26 @@ public class SimpleVoxmap {
 	
 	public void print() {
 				
-		String buffer;
+		StringBuilder buffer;
 		for(int y = 0; y < lenY; y++) {
 			for(int z = 0; z < lenZ; z++) {
-				buffer = "";
+				buffer = new StringBuilder();
 				for(int x = 0; x < lenX; x++) {
 					byte b = getVoxel(x - center.getX(), y - center.getY(), z - center.getZ());
 					if((b & 32) != 0) {
-						buffer += "B";
+						buffer.append("B");
 					}
 					else if((b & 16) != 0) {
-						buffer += "T";
+						buffer.append("T");
 					} else {
-						buffer += Integer.toHexString(b & 0xF);
+						buffer.append(Integer.toHexString(b & 0xF));
 					}
 				}
 				System.out.println(buffer);
 			}
-			buffer = "";
+			buffer = new StringBuilder();
 			for(int k = 0; k < lenX; k++) {
-				buffer += "-";
+				buffer.append("-");
 			}
 			System.out.println(buffer);
 		}

@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,20 +24,21 @@ import java.util.Map;
 */
 public class TreeRegistry {
 
-	public static final IDropCreatorStorage globalDropCreatorStorage = new StorageDropCreator();
-	private static HashMap<ResourceLocation, ICellKit> cellKitRegistry = new HashMap<>();
-	private static HashMap<ResourceLocation, IGrowthLogicKit> growthLogicKitRegistry = new HashMap<>();
+	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
+	private static HashMap<ResourceLocation, ICellKit> CELL_KIT_REGISTRY = new HashMap<>();
+	private static HashMap<ResourceLocation, IGrowthLogicKit> GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
 
 	//////////////////////////////
 	// SPECIES REGISTRY
 	//////////////////////////////
 
-	public static Species findSpecies(String name) {
+	public static Species findSpecies(final String name) {
 		return findSpecies(new ResourceLocation(name));
 	}
 
-	public static Species findSpecies(ResourceLocation name) {
-		return Species.REGISTRY.getValue(name);
+	public static Species findSpecies(final ResourceLocation name) {
+		final Species species = Species.REGISTRY.getValue(name);
+		return species == null ? Species.NULL_SPECIES : species;
 	}
 
 	/**
@@ -46,21 +48,21 @@ public class TreeRegistry {
 	 * @param name The name of the tree.  Either the simple name or the full name
 	 * @return The tree that was found or null if not found
 	 */
-	public static Species findSpeciesSloppy(String name) {
+	public static Species findSpeciesSloppy(final String name) {
 
-		ResourceLocation resloc = new ResourceLocation(name);
-		if("minecraft".equals(resloc.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
-			resloc = new ResourceLocation(DynamicTrees.MOD_ID, resloc.getPath());//Search DynamicTrees Domain instead
+		ResourceLocation resourceLocation = new ResourceLocation(name);
+		if(DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
+			resourceLocation = new ResourceLocation(DynamicTrees.MOD_ID, resourceLocation.getPath());//Search DynamicTrees Domain instead
 		}
 
 		//Search specific domain first
-		if(Species.REGISTRY.containsKey(resloc)) {
-			return Species.REGISTRY.getValue(resloc);
+		if (Species.REGISTRY.containsKey(resourceLocation)) {
+			return findSpecies(resourceLocation);
 		}
 
 		//Search all domains
-		for(Species species : Species.REGISTRY) {
-			if(species.getRegistryName().getPath().equals(resloc.getPath())) {
+		for (Species species : Species.REGISTRY) {
+			if (species.getRegistryName().getPath().equals(resourceLocation.getPath())) {
 				return species;
 			}
 		}
@@ -75,7 +77,7 @@ public class TreeRegistry {
 	/**
 	 * @return A list of resource locations for species which can be transformed to other species.
 	 */
-	public static List<ResourceLocation> getTransformableSpeciesLocs() {
+	public static List<ResourceLocation> getTransformableSpeciesLocations() {
 		final List<ResourceLocation> species = getSpeciesDirectory();
 		species.removeIf(resLoc -> !findSpecies(resLoc).isTransformable());
 		return species;
@@ -86,7 +88,7 @@ public class TreeRegistry {
 	 */
 	public static List<Species> getTransformableSpecies() {
 		final List<Species> species = new ArrayList<>();
-		getTransformableSpeciesLocs().forEach(speciesLoc -> species.add(findSpecies(speciesLoc)));
+		getTransformableSpeciesLocations().forEach(speciesLoc -> species.add(findSpecies(speciesLoc)));
 		return species;
 	}
 
@@ -108,10 +110,10 @@ public class TreeRegistry {
 	// SAPLING HANDLING
 	//////////////////////////////
 
-	public static Map<BlockState, Species> saplingReplacers = new HashMap<>();
+	public final static Map<BlockState, Species> SAPLING_REPLACERS = new HashMap<>();
 
 	public static void registerSaplingReplacer(BlockState state, Species species) {
-		saplingReplacers.put(state, species);
+		SAPLING_REPLACERS.put(state, species);
 	}
 
 
@@ -125,22 +127,23 @@ public class TreeRegistry {
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
 	 * all trees.
 	 *
-	 * @param dropCreator
+	 * @param dropCreator The {@link IDropCreator} to register.
 	 */
-	public static boolean registerDropCreator(ResourceLocation speciesName, IDropCreator dropCreator) {
+	public static boolean registerDropCreator(@Nullable final ResourceLocation speciesName, final IDropCreator dropCreator) {
 		if(speciesName == null || speciesName.equals(globalName)) {
-			return globalDropCreatorStorage.addDropCreator(dropCreator);
+			return GLOBAL_DROP_CREATOR_STORAGE.addDropCreator(dropCreator);
 		} else {
 			return findSpecies(speciesName).addDropCreator(dropCreator);
 		}
 	}
-	public static boolean registerGlobalDropCreator(IDropCreator dropCreator){
+
+	public static boolean registerGlobalDropCreator(final IDropCreator dropCreator){
 		return registerDropCreator(globalName, dropCreator);
 	}
 
-	public static boolean removeDropCreator(ResourceLocation speciesName, ResourceLocation dropCreatorName) {
+	public static boolean removeDropCreator(@Nullable final ResourceLocation speciesName, ResourceLocation dropCreatorName) {
 		if(speciesName == null || speciesName.equals(globalName)) {
-			return globalDropCreatorStorage.remDropCreator(dropCreatorName);
+			return GLOBAL_DROP_CREATOR_STORAGE.remDropCreator(dropCreatorName);
 		} else {
 			return findSpecies(speciesName).remDropCreator(dropCreatorName);
 		}
@@ -148,7 +151,7 @@ public class TreeRegistry {
 
 	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
 		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<>();
-		dir.put(globalName, globalDropCreatorStorage.getDropCreators());
+		dir.put(globalName, GLOBAL_DROP_CREATOR_STORAGE.getDropCreators());
 		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
 		return dir;
 	}
@@ -158,23 +161,23 @@ public class TreeRegistry {
 	//////////////////////////////
 
 	public static ICellKit registerCellKit(ResourceLocation name, ICellKit kit) {
-		return cellKitRegistry.computeIfAbsent(name, k -> kit);
+		return CELL_KIT_REGISTRY.computeIfAbsent(name, k -> kit);
 	}
 
 	public static ICellKit findCellKit(ResourceLocation name) {
-		return cellKitRegistry.get(name);
+		return CELL_KIT_REGISTRY.get(name);
 	}
 
 	public static ICellKit findCellKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
-		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
+		if(DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
 			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findCellKit(kitLocation);
 	}
 
 	public static void cleanupCellKit() {
-		cellKitRegistry = new HashMap<>();
+		CELL_KIT_REGISTRY = new HashMap<>();
 	}
 
 	//////////////////////////////
@@ -182,11 +185,11 @@ public class TreeRegistry {
 	//////////////////////////////
 
 	public static IGrowthLogicKit registerGrowthLogicKit(ResourceLocation name, IGrowthLogicKit kit) {
-		return growthLogicKitRegistry.computeIfAbsent(name, k -> kit);
+		return GROWTH_LOGIC_KIT_REGISTRY.computeIfAbsent(name, k -> kit);
 	}
 
 	public static IGrowthLogicKit findGrowthLogicKit(ResourceLocation name) {
-		return growthLogicKitRegistry.get(name);
+		return GROWTH_LOGIC_KIT_REGISTRY.get(name);
 	}
 
 	public static IGrowthLogicKit findGrowthLogicKit(String name) {
@@ -198,7 +201,7 @@ public class TreeRegistry {
 	}
 
 	public static void cleanupGrowthLogicKit() {
-		growthLogicKitRegistry = new HashMap<>();
+		GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
 	}
 
 }

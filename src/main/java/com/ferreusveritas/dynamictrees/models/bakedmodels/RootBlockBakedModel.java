@@ -226,7 +226,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 	@Override
 	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Block block = state.getBlock();
-		return block instanceof SurfaceRootBlock ? new RootModelConnections(((SurfaceRootBlock) block).getConnectionData(world, pos, state)) : new RootModelConnections();
+		return block instanceof SurfaceRootBlock ? new RootModelConnections(((SurfaceRootBlock) block).getConnectionData(world, pos)) : new RootModelConnections();
 	}
 
 	/**

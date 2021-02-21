@@ -9,7 +9,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class AcaciaTree extends VanillaTreeFamily {
 	
-	public class AcaciaSpecies extends Species {
+	public static class AcaciaSpecies extends Species {
 		
 		AcaciaSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -23,6 +23,8 @@ public class AcaciaTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
+
+			this.setPrimitiveSapling(Blocks.ACACIA_SAPLING);
 		}
 		
 		@Override

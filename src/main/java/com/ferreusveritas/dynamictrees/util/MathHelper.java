@@ -11,12 +11,12 @@ import java.util.Random;
 public class MathHelper {
     
 	/** Select a random direction weighted from the probability map **/ 
-	public static int selectRandomFromDistribution(Random random, int distMap[]) {
+	public static int selectRandomFromDistribution(Random random, int[] distMap) {
 		
 		int distSize = 0;
-		
-		for(int i = 0; i < distMap.length; i++) {
-			distSize += distMap[i];
+
+		for (int j : distMap) {
+			distSize += j;
 		}
 		
 		if(distSize <= 0) {

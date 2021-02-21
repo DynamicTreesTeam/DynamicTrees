@@ -1,10 +1,8 @@
 package com.ferreusveritas.dynamictrees.command;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommandUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -13,13 +11,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.ResourceLocationArgument;
-import net.minecraft.command.arguments.Vec3Argument;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 
 import java.util.Arrays;
 
@@ -67,7 +61,7 @@ public final class CreateStaffCommand extends SubCommand {
                 .setMaxUses(wandStack, maxUses)
                 .setUses(wandStack, maxUses);
 
-        CommandUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack, true);
+        ItemUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack, true);
 
         return 1;
     }

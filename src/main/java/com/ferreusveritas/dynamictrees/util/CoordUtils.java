@@ -6,21 +6,21 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.*;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
-import net.minecraft.world.gen.WorldGenRegion;
-import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Random;
@@ -47,7 +47,7 @@ public class CoordUtils {
 		final private String name;
 		final private Vector3i offset;
 		
-		private Surround(String name, Direction ... dirs) {
+		Surround(String name, Direction ... dirs) {
 			this.name = name;
 			BlockPos pos = BlockPos.ZERO;
 			for(Direction d : dirs) {
@@ -55,7 +55,7 @@ public class CoordUtils {
 			}
 			this.offset = pos;
 		}
-		
+
 		public String getString() {
 			return name;
 		}
@@ -88,7 +88,7 @@ public class CoordUtils {
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
 			return ((IWorldReader) blockReader).isBlockLoaded(pos);
-		} else return blockReader instanceof EmptyBlockReader;
+		} else return blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class CoordUtils {
 		return BlockPos.ZERO;
 	}
 	
-	
+	@Nullable
 	public static RayTraceResult branchRayTrace(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
 		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
 
@@ -162,8 +162,8 @@ public class CoordUtils {
 			RayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
 			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
 			if (result != null){
-				BlockPos hitPos = new BlockPos(result.getHitVec());
-				if(result.getType() == RayTraceResult.Type.BLOCK && hitPos != BlockPos.ZERO) {//We found a block
+				final BlockPos hitPos = new BlockPos(result.getHitVec());
+				if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
 					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 						return result;
 					}
@@ -317,7 +317,7 @@ public class CoordUtils {
 	}
 
 	//Some ready made not terrible prime hash factors
-	private static final int coordHashMap[][] = {
+	private static final int[][] coordHashMap = {
 			{4111, 271, 3067},
 			{7933711, 6144389, 9538033},
 			{9973, 8287, 9721},
@@ -330,7 +330,7 @@ public class CoordUtils {
 	}
 	
 	public static int coordHashCode(BlockPos pos, int readyMade) {
-		int factors[] = coordHashMap[readyMade & 3];
+		int[] factors = coordHashMap[readyMade & 3];
 		return coordHashCode(pos, factors[0], factors[1], factors[2]);
 	}
 	
@@ -340,7 +340,7 @@ public class CoordUtils {
 
 	public static Iterable<BlockPos> goHorSides(BlockPos pos, Direction ignore) {
 		return new Iterable<BlockPos>() {
-			@Override
+			@Nonnull @Override
 			public Iterator<BlockPos> iterator() {
 				 return new AbstractIterator<BlockPos>() {
 					private int currentDir = 0;

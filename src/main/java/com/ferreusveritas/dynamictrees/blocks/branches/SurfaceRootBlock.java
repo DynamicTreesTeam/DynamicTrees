@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -13,7 +12,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
@@ -32,10 +30,10 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("deprecation")
 public class SurfaceRootBlock extends Block {
 	
 	public static final int RADMAX_NORMAL = 8;
@@ -61,13 +59,18 @@ public class SurfaceRootBlock extends Block {
 		this.family = family;
 	}
 
-	public class RootConnection {
+	public static class RootConnection {
 		public RootConnections.ConnectionLevel level;
 		public int radius;
 
 		public RootConnection(RootConnections.ConnectionLevel level, int radius) {
 			this.level = level;
 			this.radius = radius;
+		}
+
+		@Override
+		public String toString() {
+			return super.toString() + " Level: " + this.level.toString() + " Radius: " + this.radius;
 		}
 	}
 
@@ -89,7 +92,7 @@ public class SurfaceRootBlock extends Block {
 		return blockState.getBlock() == this ? blockState.get(RADIUS) : 0;
 	}
 
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, int flags) {
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		return radius;
 	}
@@ -111,15 +114,14 @@ public class SurfaceRootBlock extends Block {
 	// RENDERING
 	///////////////////////////////////////////
 
-	public RootConnections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public RootConnections getConnectionData(final IBlockDisplayReader world, final BlockPos pos) {
 		final RootConnections connections = new RootConnections();
 
-		int radius = this.getRadius(world.getBlockState(pos));
-
 		for (Direction dir : CoordUtils.HORIZONTALS) {
-			final RootConnection connection = this.getSideConnectionRadius(world, pos, radius, dir);
+			final RootConnection connection = this.getSideConnectionRadius(world, pos, dir);
 
-			if (connection == null) continue;
+			if (connection == null)
+				continue;
 
 			connections.setRadius(dir, connection.radius);
 			connections.setConnectionLevel(dir, connection.level);
@@ -133,6 +135,7 @@ public class SurfaceRootBlock extends Block {
 	// PHYSICAL BOUNDS
 	///////////////////////////////////////////
 
+	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
 		boolean connectionMade = false;
@@ -141,7 +144,7 @@ public class SurfaceRootBlock extends Block {
 		VoxelShape shape = VoxelShapes.empty();
 
 		for (Direction dir : CoordUtils.HORIZONTALS) {
-			RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+			RootConnection conn = getSideConnectionRadius(world, pos, dir);
 			if (conn != null) {
 				connectionMade = true;
 				int r = MathHelper.clamp(conn.radius, 1, thisRadius);
@@ -164,14 +167,14 @@ public class SurfaceRootBlock extends Block {
 		return shape;
 	}
 
-	protected RootConnection getSideConnectionRadius(IBlockReader blockReader, BlockPos pos, int radius, Direction side) {
+	protected RootConnection getSideConnectionRadius(IBlockReader blockReader, BlockPos pos, Direction side) {
 		if (!side.getAxis().isHorizontal())
 			return null;
 
 		BlockPos dPos = pos.offset(side);
-
 		BlockState state = CoordUtils.getStateSafe(blockReader, dPos);
 		final BlockState upState = CoordUtils.getStateSafe(blockReader, pos.up());
+
 		final RootConnections.ConnectionLevel level = (upState != null && upState.getBlock() == Blocks.AIR && state != null && state.isNormalCube(blockReader, dPos)) ?
 				RootConnections.ConnectionLevel.HIGH : (state != null && state.getBlock() == Blocks.AIR ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
 
@@ -219,17 +222,17 @@ public class SurfaceRootBlock extends Block {
 
 		int thisRadius = getRadius(state);
 
-		if(belowState.isNormalCube(world,below)) {//If a branch is sitting on a solid block
+		if(belowState.isNormalCube(world,below)) { // If a branch is sitting on a solid block
 			for(Direction dir : CoordUtils.HORIZONTALS) {
-				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+				RootConnection conn = getSideConnectionRadius(world, pos, dir);
 				if(conn != null && conn.radius > thisRadius) {
 					return true;
 				}
 			}
-		} else {//If the branch has no solid block under it
+		} else { // If the branch has no solid block under it
 			boolean connections = false;
 			for(Direction dir : CoordUtils.HORIZONTALS) {
-				RootConnection conn = getSideConnectionRadius(world, pos, thisRadius, dir);
+				RootConnection conn = getSideConnectionRadius(world, pos, dir);
 				if(conn != null) {
 					if(conn.level == RootConnections.ConnectionLevel.MID) {
 						return false;

@@ -29,15 +29,17 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.*;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class BasicBranchBlock extends BranchBlock {
 	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
@@ -207,7 +209,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
-		destroyMode = DynamicTrees.EnumDestroyMode.SETRADIUS;
+		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 		return radius;

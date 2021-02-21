@@ -16,19 +16,19 @@ import java.util.Map;
  */
 public class BranchConnectables {
 
-    private static Map<Block, RadiusForConnectionFunction> connectablesMap = new HashMap<>();
+    private static final Map<Block, RadiusForConnectionFunction> connectablesMap = new HashMap<>();
 
     public static void makeBlockConnectable (Block block, RadiusForConnectionFunction radiusFunction){
         connectablesMap.putIfAbsent(block, radiusFunction);
     }
+
     public static boolean isBlockConnectable (Block block){
         return connectablesMap.containsKey(block);
     }
-    public static int getConnectionRadiusForBlock (BlockState blockState, IBlockReader world, BlockPos pos, Direction side){
-        Block block = blockState.getBlock();
-        if (connectablesMap.containsKey(block))
-            return connectablesMap.get(block).apply(blockState, world, pos, side);
-        return 0;
+
+    public static int getConnectionRadiusForBlock (BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+        final Block block = state.getBlock();
+        return isBlockConnectable(block) ? connectablesMap.get(block).apply(state, world, pos, side) : 0;
     }
 
     public interface RadiusForConnectionFunction {

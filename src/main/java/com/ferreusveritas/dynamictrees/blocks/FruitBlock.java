@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements IGrowable {
 
 	enum MatureFruitAction {
@@ -50,10 +51,10 @@ public class FruitBlock extends Block implements IGrowable {
 	
 	public static final String name = "apple_fruit";
 
-	private static Map<Species, FruitBlock> speciesFruitMap = new HashMap<>();
+	private static final Map<Species, FruitBlock> SPECIES_FRUIT_MAP = new HashMap<>();
 
 	public static FruitBlock getFruitBlockForSpecies(Species species) {
-		return speciesFruitMap.getOrDefault(species, null);
+		return SPECIES_FRUIT_MAP.getOrDefault(species, null);
 	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
@@ -82,7 +83,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public void setSpecies(Species species) {
-		speciesFruitMap.put(species, this);
+		SPECIES_FRUIT_MAP.put(species, this);
 		this.species = species;
 	}
 
@@ -92,15 +93,15 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-		if (!this.canBlockStay(world, pos, state)) {
-			this.dropBlock(world, pos);
+		if (this.shouldBlockDrop(world, pos, state)) {
+			this.dropBlock(world, state, pos);
 			return;
 		}
 
 		int age = state.get(AGE);
 		Float season = SeasonHelper.getSeasonValue(world, pos);
 
-		if(season != null && getSpecies() != null) { //Non-Null means we are season capable
+		if(season != null && getSpecies().isValid()) { //Non-Null means we are season capable
 			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
 				outOfSeasonAction(world, pos);//Destroy the block or similar action
 				return;
@@ -120,10 +121,11 @@ public class FruitBlock extends Block implements IGrowable {
 		} else {
 			if (age == 3) {
 				switch(matureAction(world, pos, state, rand)) {
-					case NOTHING: break;
-					case DROP: this.dropBlock(world, pos); break;
-					case ROT: world.setBlockState(pos, DTRegistries.blockStates.air); break;
-					case CUSTOM: break;
+					case NOTHING:
+					case CUSTOM:
+						break;
+					case DROP: this.dropBlock(world, state, pos); break;
+					case ROT: world.setBlockState(pos, DTRegistries.blockStates.AIR); break;
 				}
 			}
 		}
@@ -147,46 +149,53 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockState(pos, DTRegistries.blockStates.air);
+		world.setBlockState(pos, DTRegistries.blockStates.AIR);
+	}
+
+	@Override
+	public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos neighbor, boolean isMoving) {
+		this.onNeighborChange(state, world, pos, neighbor);
 	}
 
 	@Override
 	public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-		if (!this.canBlockStay(world, pos, state)) {
-			this.dropBlock((World)world, pos);
+		if (this.shouldBlockDrop(world, pos, state)) {
+			this.dropBlock((World)world, state, pos);
 		}
 	}
 
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (state.get(AGE) >= 3 ) {
-			this.dropBlock(worldIn, pos);
+			this.dropBlock(worldIn, state, pos);
 			return ActionResultType.SUCCESS;
 		}
 
 		return ActionResultType.FAIL;
 	}
 
-	private void dropBlock(World worldIn, BlockPos pos) {
+	private void dropBlock(World worldIn, BlockState state, BlockPos pos) {
 		worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-		worldIn.addEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, droppedFruit));
+		if (state.get(AGE) >= 3) {
+			worldIn.addEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop()));
+		}
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return getFruitDrop();
+		return this.getFruitDrop();
 	}
 
 	/**
-	 * Checks if Leaves of any kind are above this block.  Not picky.
+	 * Checks if Leaves of any kind are above this block. Not picky.
 	 *
 	 * @param world
 	 * @param pos
 	 * @param state
-	 * @return true if there are leaves above the block
+	 * @return True if it should drop (leaves are not above).
 	 */
-	public boolean canBlockStay(IBlockReader world, BlockPos pos, BlockState state) {
-		return world.getBlockState(pos.up()).getBlock() instanceof LeavesBlock;
+	public boolean shouldBlockDrop(IBlockReader world, BlockPos pos, BlockState state) {
+		return !(world.getBlockState(pos.up()).getBlock() instanceof LeavesBlock);
 	}
 
 

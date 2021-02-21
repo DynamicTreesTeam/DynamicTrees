@@ -27,6 +27,8 @@ public class CrimsonFungus extends NetherTreeFamily {
 		CrimsonSpecies(TreeFamily family){
 			super(family.getName(), family);
 
+			this.setPrimitiveSapling(Blocks.CRIMSON_FUNGUS);
+
 			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}
 

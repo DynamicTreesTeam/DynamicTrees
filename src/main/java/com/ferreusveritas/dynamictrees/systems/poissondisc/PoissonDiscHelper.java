@@ -16,7 +16,7 @@ public class PoissonDiscHelper {
 		return findSecondDisc(cA, cBrad, CCW ? cA.getFreeAngleCCW() : cA.getFreeAngleCW(), onlyTight);
 	}
 
-	private static final int singleSearchOrder[] = new int[] {0, 1, -1};
+	private static final int[] singleSearchOrder = new int[] {0, 1, -1};
 	
 	/**
 	* Creates a tangential circle to cA at a specific angle with radius cBrad
@@ -44,7 +44,7 @@ public class PoissonDiscHelper {
 		return (PoissonDisc) new PoissonDisc(pd.getCoords(sector), cBrad).add(cA.x, cA.z);
 	}
 
-	private static final int pairSearchOrder[] = new int[] {34, 33, 35, 18, 50, 17, 17, 19, 49, 51, 32, 36, 2, 66, 1, 3, 65, 67, 16, 20, 48, 52};
+	private static final int[] pairSearchOrder = new int[] {34, 33, 35, 18, 50, 17, 17, 19, 49, 51, 32, 36, 2, 66, 1, 3, 65, 67, 16, 20, 48, 52};
 	
 	/**
 	* Finds a circle that is tangential to both circle cA and circle cB of radius cCrad.
@@ -86,8 +86,8 @@ public class PoissonDiscHelper {
 		int sectorBC = pdBC.getSector(angABC);
 
 		//Cache of possible circle candidate coordinates
-		Vec2i aCoords[] = new Vec2i[5];
-		Vec2i bCoords[] = new Vec2i[5];
+		Vec2i[] aCoords = new Vec2i[5];
+		Vec2i[] bCoords = new Vec2i[5];
 		
 		//Possible result holders
 		Vec2i halftight = null;
@@ -226,9 +226,8 @@ public class PoissonDiscHelper {
 
 		unsolved.clear();//Prep the list for recreation
 
-		for(int ci = 0; ci < allDiscs.size(); ci++) {
-			PoissonDisc c = allDiscs.get(ci);
-			if(!c.isSolved()) {
+		for (PoissonDisc c : allDiscs) {
+			if (!c.isSolved()) {
 				unsolved.add(c);
 			}
 		}

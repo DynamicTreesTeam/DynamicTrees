@@ -37,6 +37,8 @@ public class SpruceTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
+
+			this.setPrimitiveSapling(Blocks.SPRUCE_SAPLING);
 			
 			//Add species features
 			this.addGenFeature(GenFeatures.CONIFER_TOPPER.with(ConiferTopperGenFeature.LEAVES_PROPERTIES, this.getLeavesProperties()));

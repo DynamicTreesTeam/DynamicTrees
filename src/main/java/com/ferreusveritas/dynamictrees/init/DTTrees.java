@@ -26,9 +26,7 @@ public class DTTrees {
 	public static final String CONIFER = "conifer";
 	
 	public static ArrayList<VanillaTreeFamily> baseFamilies = new ArrayList<>();
-	// keeping the cactus 'tree' out of baseTrees prevents automatic registration of seed/sapling conversion recipes, transformation potion recipes, and models
-//	public static Cactus dynamicCactus;
-	
+
 	/**
 	 * Pay Attn! This should be run after the Dynamic Trees Mod
 	 * has created it's Blocks and Items.  These trees depend
@@ -38,13 +36,10 @@ public class DTTrees {
 		Species.REGISTRY.register(Species.NULL_SPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null")));
 		Collections.addAll(baseFamilies, new OakTree(), new SpruceTree(), new BirchTree(), new JungleTree(), new AcaciaTree(), new DarkOakTree(), new CrimsonFungus(), new WarpedFungus());
 		baseFamilies.forEach(tree -> tree.registerSpecies(Species.REGISTRY));
-//		dynamicCactus = new Cactus();
-//		dynamicCactus.registerSpecies(Species.REGISTRY);
-		
-		//Registers a fake species for generating mushrooms
+
+		// Registers a fake species for generating mushrooms
 		Species.REGISTRY.register(new Mushroom(true));
 		Species.REGISTRY.register(new Mushroom(false));
-
 	}
 	
 	@SubscribeEvent

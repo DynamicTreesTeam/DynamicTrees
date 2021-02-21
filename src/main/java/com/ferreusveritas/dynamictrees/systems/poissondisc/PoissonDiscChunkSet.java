@@ -53,7 +53,7 @@ public class PoissonDiscChunkSet {
 		discData = new byte[16];
 	}
 
-	public PoissonDiscChunkSet(byte data[]) {
+	public PoissonDiscChunkSet(byte[] data) {
 		generated = true;
 		discData = data != null && data.length == 16 ? Arrays.copyOf(data, 16) : new byte[16];
 	}
@@ -86,22 +86,22 @@ public class PoissonDiscChunkSet {
 		return discs;
 	}
 
-	private static final PoissonDisc unpackDiscData(int tile, int diskData, int chunkX, int chunkZ) {
+	private static PoissonDisc unpackDiscData(int tile, int diskData, int chunkX, int chunkZ) {
 		int radius = getRadiusFromDiscData(diskData);
 		int x = ((tile << 2) & 12);
 		int z = (tile & 12);
 		return new PoissonDisc((chunkX << 4) | x | ((diskData >> 2) & 3), (chunkZ << 4) | z | (diskData & 3), radius, true);
 	}
 	
-	private static final int getRadiusFromDiscData(int discData) {
+	private static int getRadiusFromDiscData(int discData) {
 		return ((discData >> 4) & 7) + 1;
 	}
 	
-	private static final byte buildDiscData(PoissonDisc c) {
+	private static byte buildDiscData(PoissonDisc c) {
 		return (byte) ((((c.radius - 1) & 7) << 4) | (c.x & 3) << 2 | c.z & 3);
 	}
 	
-	private static final int calcTileNum(PoissonDisc c) {
+	private static int calcTileNum(PoissonDisc c) {
 		return c.z & 12 | ((c.x & 12) >> 2);//Calculate which of the 16 tiles we are working in
 	}
 	

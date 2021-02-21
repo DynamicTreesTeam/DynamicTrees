@@ -1,6 +1,7 @@
 {
     "name": "oak",
-    "primitiveLog": "minecraft:oak_log",
+    "common_leaves": "dynamictrees:oak",
+    "primitive_log": "minecraft:oak_log",
     "sticks": "minecraft:sticks",
-    "commonSpecies": "dynamictrees:oak"
+    "common_species": "dynamictrees:oak"
 }

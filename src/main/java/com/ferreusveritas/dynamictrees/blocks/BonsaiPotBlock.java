@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommandUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -162,9 +162,9 @@ public class BonsaiPotBlock extends ContainerBlock {
 	}
 
 	public void spawnDrops(World world, BlockPos pos) {
-		CommandUtils.spawnItemStack(world, pos, new ItemStack(Blocks.FLOWER_POT), false);
+		ItemUtils.spawnItemStack(world, pos, new ItemStack(Blocks.FLOWER_POT), false);
 		if (this.getSpecies(world, pos) != Species.NULL_SPECIES) { // Safety check in case for whatever reason the species was not set.
-			CommandUtils.spawnItemStack(world, pos, this.getSpecies(world, pos).getSeedStack(1), false);
+			ItemUtils.spawnItemStack(world, pos, this.getSpecies(world, pos).getSeedStack(1), false);
 		}
 	}
 

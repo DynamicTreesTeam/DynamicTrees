@@ -9,11 +9,11 @@ public class PoissonDisc extends Vec2i {
 	public int arc;
 	public boolean real;
 	
-	private static SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles
-	private static SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
+	private static final SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles
+	private static final SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
 	
 	static {
-		int circledata[] = {0x48,0x488,0x36D1,0x248D1,0x16D919,0xDB5B19,0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
+		int[] circledata = {0x48,0x488,0x36D1,0x248D1,0x16D919,0xDB5B19,0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
 		for(int r = 2; r <= 8; r++) {//Circles with radius 2 - 8
 			SimpleBitmap whole = circleBitmapGen(r, circledata[r - 2]);//Unpack circle bitmaps
 			SimpleBitmap inside = new SimpleBitmap(whole.getW(), whole.getH());//Make a bitmap the same size that will serve as the inner circle pixels(non-edge)
@@ -40,7 +40,7 @@ public class PoissonDisc extends Vec2i {
 		int dim = radius * 2 + 1;
 		int top = 0;
 		int bot = dim - 1;
-		int lines[] = new int[dim];
+		int[] lines = new int[dim];
 		
 		while(top <= bot) {
 			int slice = ((points >> (top * 3)) & 0x7) + 1;
@@ -240,11 +240,11 @@ public class PoissonDisc extends Vec2i {
 			return;
 		}
 		
-		byte pointMap[] = {6,4,12,2,0,13,3,11,9,0,0,0,0,0,0,0};//Bitfields: [--,--,--,--,Bz,Bx,Az,Ax]
+		byte[] pointMap = {6,4,12,2,0,13,3,11,9,0,0,0,0,0,0,0};//Bitfields: [--,--,--,--,Bz,Bx,Az,Ax]
 		byte points = pointMap[( (x >> 4) + (z >> 4) * 3) & 15];
 		if(points == 0) {//Check for center chunk
 			
-			double adjs[] = {//⟳
+			double[] adjs = {//⟳
 				31.5 - x,	//East +X
 				31.5 - z,	//Down +Z
 				x - 15.5,	//West -X
@@ -263,7 +263,7 @@ public class PoissonDisc extends Vec2i {
 				offset += Math.PI * 0.5;//⟳
 			}
 		} else {
-			double angle1 = Math.atan2( 15.5 + (((points >> 1) & 1) << 4) - z, 15.5 + (((points >> 0) & 1) << 4) - x );
+			double angle1 = Math.atan2( 15.5 + (((points >> 1) & 1) << 4) - z, 15.5 + (((points) & 1) << 4) - x );
 			double angle2 = Math.atan2( 15.5 + (((points >> 3) & 1) << 4) - z, 15.5 + (((points >> 2) & 1) << 4) - x );
 			maskArc(angle1, angle2);
 		}

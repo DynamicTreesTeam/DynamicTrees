@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class BirchTree extends VanillaTreeFamily {
 	
-	public class BirchSpecies extends Species {
+	public static class BirchSpecies extends Species {
 		
 		BirchSpecies(TreeFamily treeFamily) {
 			super(treeFamily.getName(), treeFamily);
@@ -32,6 +32,8 @@ public class BirchTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 			setupStandardStickDropping();
+
+			this.setPrimitiveSapling(Blocks.BIRCH_SAPLING);
 
 			this.addGenFeature(GenFeatures.BEE_NEST);
 		}

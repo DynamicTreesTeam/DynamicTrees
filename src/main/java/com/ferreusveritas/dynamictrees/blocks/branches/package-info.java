@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package com.ferreusveritas.dynamictrees.blocks.branches;
+
+import javax.annotation.ParametersAreNonnullByDefault;
