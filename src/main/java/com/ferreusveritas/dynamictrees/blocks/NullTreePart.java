@@ -74,7 +74,7 @@ public class NullTreePart implements ITreePart {
 	
 	@Override
 	public TreeFamily getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return TreeFamily.NULLFAMILY;
+		return TreeFamily.NULL_FAMILY;
 	}
 	
 	public final TreePartType getTreePartType() {

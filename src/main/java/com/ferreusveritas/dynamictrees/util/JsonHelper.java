@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.*;
 
 public class JsonHelper {
@@ -24,10 +25,12 @@ public class JsonHelper {
 		}
 	}
 
+	@Nullable
 	public static JsonElement load(ResourceLocation jsonLocation) {
 		return load(jsonLocation, ResourceFolder.DATA);
 	}
 
+	@Nullable
 	public static JsonElement load(ResourceLocation jsonLocation, ResourceFolder resourceFolder) {
 		String filename = resourceFolder.folderName + jsonLocation.getNamespace() + "/" + (resourceFolder == ResourceFolder.DATA ? "trees/" : "") + jsonLocation.getPath();
 		InputStream in = LeavesPaging.class.getClassLoader().getResourceAsStream(filename);
@@ -38,8 +41,9 @@ public class JsonHelper {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		return new Gson().fromJson(reader, JsonElement.class);
 	}
-	
-	public static JsonElement load(File file) {
+
+	@Nullable
+	public static JsonElement load(@Nullable final File file) {
 		
 		if (file != null && file.exists() && file.isFile() && file.canRead()) {
 			String fileName = file.getAbsolutePath();
@@ -74,6 +78,7 @@ public class JsonHelper {
 		return element.getAsBoolean();
 	}
 
+	@Nullable
 	@SuppressWarnings("unchecked")
 	public static <T> T getFromPrimitive (JsonPrimitive jsonPrimitive, Class<T> type) {
 		for (JsonPrimitives primitive : JsonPrimitives.values()) {
@@ -112,6 +117,7 @@ public class JsonHelper {
 			return isOfType;
 		}
 
+		@Nullable
 		public Object get (JsonPrimitive jsonPrimitive) {
 			if (!this.isOfType(jsonPrimitive))
 				return null;

@@ -37,7 +37,7 @@ public class LeavesProperties implements ILeavesProperties {
 	
 	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
 		@Override public ILeavesProperties setTree(TreeFamily tree) { return this; }
-		@Override public TreeFamily getTree() { return TreeFamily.NULLFAMILY; }
+		@Override public TreeFamily getTree() { return TreeFamily.NULL_FAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
 		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemStack.EMPTY; }
 		@Override public ILeavesProperties setDynamicLeavesState(BlockState state) { return this; }
@@ -55,7 +55,7 @@ public class LeavesProperties implements ILeavesProperties {
 
 	protected BlockState primitiveLeaves;
 	protected ICellKit cellKit;
-	protected TreeFamily tree = TreeFamily.NULLFAMILY;
+	protected TreeFamily tree = TreeFamily.NULL_FAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves

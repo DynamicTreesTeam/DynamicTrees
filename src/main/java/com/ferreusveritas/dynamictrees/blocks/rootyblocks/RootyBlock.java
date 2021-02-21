@@ -343,7 +343,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public TreeFamily getFamily(BlockState rootyState, IBlockReader blockAccess, BlockPos rootPos) {
 		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
 		BlockState treeState = blockAccess.getBlockState(treePos);
-		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULLFAMILY;
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULL_FAMILY;
 	}
 	
 	private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {

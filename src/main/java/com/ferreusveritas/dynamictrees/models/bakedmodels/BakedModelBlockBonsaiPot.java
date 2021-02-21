@@ -43,7 +43,7 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         final Species species = extraData.getData(BonsaiTileEntity.SPECIES);
         final BlockState potState = extraData.getData(BonsaiTileEntity.POT_MIMIC);
 
-        if (!species.isValid() || !species.getSapling().isPresent()) {
+        if (species == null || potState == null || !species.isValid() || !species.getSapling().isPresent()) {
             return quads;
         }
 

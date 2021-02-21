@@ -74,7 +74,7 @@ public class DTClient {
 		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
-			if(family != TreeFamily.NULLFAMILY) {
+			if(family != TreeFamily.NULL_FAMILY) {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);

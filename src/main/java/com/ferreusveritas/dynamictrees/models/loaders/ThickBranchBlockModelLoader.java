@@ -17,4 +17,9 @@ public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
         return new ThickBranchBlockModelGeometry(barkResLoc, ringsResLoc);
     }
 
+    @Override
+    protected String getModelTypeName() {
+        return "thick branch";
+    }
+
 }

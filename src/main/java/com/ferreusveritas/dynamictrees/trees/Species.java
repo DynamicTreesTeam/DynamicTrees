@@ -81,7 +81,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
-		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
+		@Override public TreeFamily getFamily() { return TreeFamily.NULL_FAMILY; }
 		@Override public boolean isTransformable() { return false; }
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -102,7 +102,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public static IForgeRegistry<Species> REGISTRY;
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected final TreeFamily treeFamily;
+	protected TreeFamily treeFamily;
 	
 	/** Logic kit for standardized extended growth behavior */
 	protected IGrowthLogicKit logicKit = GrowthLogicKits.nullLogic;
@@ -152,7 +152,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * Constructor only used by NULLSPECIES
 	 */
 	public Species() {
-		this.treeFamily = TreeFamily.NULLFAMILY;
+		this.treeFamily = TreeFamily.NULL_FAMILY;
 		this.leavesProperties = LeavesProperties.NULL_PROPERTIES;
 	}
 	
@@ -332,15 +332,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
 		int index = validLeaves.indexOf(block.properties);
-		if (index < 0){
-			LogManager.getLogger().warn("Block " + block + " not valid leaves for " + this);
+		if (index < 0) {
+			LogManager.getLogger().warn("Block {} not valid leaves for {}.", block, this);
 			return 0;
 		}
 		return index;
 	}
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
-		return (DynamicLeavesBlock)validLeaves.get(index).getDynamicLeavesState().getBlock();
+		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
 	}
 
 	///////////////////////////////////////////

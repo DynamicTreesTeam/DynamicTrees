@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.models.geometry;
 
 import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.ThickBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.loaders.ThickBranchBlockModelLoader;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -12,6 +13,9 @@ import net.minecraftforge.client.model.IModelConfiguration;
 import java.util.function.Function;
 
 /**
+ * Bakes {@link ThickBranchBlockBakedModel} from bark and rings texture locations given by
+ * {@link ThickBranchBlockModelLoader}.
+ *
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)

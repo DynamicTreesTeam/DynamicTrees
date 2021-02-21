@@ -58,7 +58,7 @@ import java.util.List;
 */
 public class TreeFamily {
 	
-	public final static TreeFamily NULLFAMILY = new TreeFamily() {
+	public final static TreeFamily NULL_FAMILY = new TreeFamily() {
 		@Override public void setCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
@@ -89,7 +89,7 @@ public class TreeFamily {
 	private Block primitiveStrippedLog = Blocks.AIR;
 
 	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
-	private List<BranchBlock> validBranches = new LinkedList<>();
+	private final List<BranchBlock> validBranches = new LinkedList<>();
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -382,6 +382,7 @@ public class TreeFamily {
 	public Block getPrimitiveLog() {
 		return primitiveLog;
 	}
+
 	public Block getPrimitiveStrippedLog() {
 		return primitiveStrippedLog;
 	}
@@ -444,20 +445,21 @@ public class TreeFamily {
 	}
 
 	public void addValidBranches (BranchBlock... branches){
-		validBranches.addAll(Arrays.asList(branches));
+		this.validBranches.addAll(Arrays.asList(branches));
 	}
 
 	public int getBranchBlockIndex (BranchBlock block){
-		int index = validBranches.indexOf(block);
+		int index = this.validBranches.indexOf(block);
 		if (index < 0){
-			LogManager.getLogger().warn("Block " + block + " not valid branch for " + this);
+			LogManager.getLogger().warn("Block {} not valid branch for {}.", block, this);
 			return 0;
 		}
 		return index;
 	}
 
+	@Nullable
 	public BranchBlock getValidBranchBlock (int index) {
-		return validBranches.get(index);
+		return this.validBranches.get(index);
 	}
 
 	///////////////////////////////////////////

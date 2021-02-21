@@ -53,7 +53,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
-	private TreeFamily tree = TreeFamily.NULLFAMILY; //The tree this branch type creates
+	private TreeFamily tree = TreeFamily.NULL_FAMILY; // The tree this branch type creates
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
 	
