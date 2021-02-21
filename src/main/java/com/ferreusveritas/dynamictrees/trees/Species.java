@@ -1,11 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 
 import com.ferreusveritas.dynamictrees.ModBlocks;
@@ -89,6 +84,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import org.apache.logging.log4j.LogManager;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
@@ -151,7 +147,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	//Leaves
 	protected ILeavesProperties leavesProperties;
-	
+
+	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
+	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
+
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	/** Hold damage value for seed items with multiple variants */
@@ -316,13 +315,49 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	
 	public Species setLeavesProperties(ILeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
+		this.addValidLeavesBlocks(leavesProperties);
 		return this;
 	}
 	
 	public ILeavesProperties getLeavesProperties() {
 		return leavesProperties;
 	}
+
+	public void addValidLeavesBlocks(ILeavesProperties... leaves){
+		this.validLeaves.addAll(Arrays.asList(leaves));
+	}
+
+	public int getLeavesBlockIndex(IBlockState state) {
+		if (!(state.getBlock() instanceof BlockDynamicLeaves))
+			return 0;
+		
+		final BlockDynamicLeaves dynamicLeaves = ((BlockDynamicLeaves) state.getBlock());
+		return this.getLeavesBlockIndex(dynamicLeaves.getProperties(state));
+	}
+
+	public int getLeavesBlockIndex(ILeavesProperties leavesProperties) {
+		int index = this.validLeaves.indexOf(leavesProperties);
+
+		if (index < 0) {
+			LogManager.getLogger().warn("{} not valid leaves for {}.", leavesProperties, this);
+			return 0;
+		}
+
+		return index;
+	}
 	
+	public List<ILeavesProperties> getValidLeaves () {
+		return this.validLeaves;
+	}
+
+	public ILeavesProperties getValidLeavesProperties(int index) {
+		return this.validLeaves.get(index);
+	}
+
+	public IBlockState getValidLeavesBlock(int index) {
+		return this.getValidLeavesProperties(index).getDynamicLeavesState();
+	}
+
 	///////////////////////////////////////////
 	//SEEDS
 	///////////////////////////////////////////

@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommandUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -66,7 +66,7 @@ public class CommandCreateTransformPotion extends SubCommand {
 		final ItemStack dendroPotionStack = new ItemStack(dendroPotion, 1, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Create the transform potion.
 		dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target species to the given species.
 
-		CommandUtils.spawnItemStack(world, pos, dendroPotionStack); // Spawn potion in the world.
+		ItemUtils.spawnItemStack(world, pos, dendroPotionStack, true); // Spawn potion in the world.
 	}
 	
 }

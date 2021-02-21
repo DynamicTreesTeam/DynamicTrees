@@ -7,14 +7,13 @@ import com.ferreusveritas.dynamictrees.ModItems;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommandUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -102,7 +101,7 @@ public class CommandCreateStaff extends SubCommand {
 			}
 		}
 
-		CommandUtils.spawnItemStack(world, pos, stack);
+		ItemUtils.spawnItemStack(world, pos, stack, true);
 	}
 
 }

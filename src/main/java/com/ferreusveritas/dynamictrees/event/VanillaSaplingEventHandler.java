@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.math.BlockPos;
@@ -19,39 +20,39 @@ public class VanillaSaplingEventHandler {
 	public void onPlayerPlaceBlock(PlaceEvent event) {
 		IBlockState blockState = event.getPlacedBlock();
 		
-		if(TreeRegistry.saplingReplacers.containsKey(blockState)) {
-			Species species = TreeRegistry.saplingReplacers.get(blockState);
-			event.getWorld().setBlockToAir(event.getPos());//Set the block to air so the plantTree function won't automatically fail.
-			
-			if(!species.plantSapling(event.getWorld(), event.getPos())) { //If it fails then give a seed back to the player
-				double x = event.getPos().getX() + 0.5;
-				double y = event.getPos().getY() + 0.5;
-				double z = event.getPos().getZ() + 0.5;
-				EntityItem itemEntity = new EntityItem(event.getWorld(), x, y, z, species.getSeedStack(1));
-				event.getWorld().spawnEntity(itemEntity);
-			}
+		if (!TreeRegistry.saplingReplacers.containsKey(blockState))
+			return;
+
+		final Species species = TreeRegistry.saplingReplacers.get(blockState);
+		final World world = event.getWorld();
+		final BlockPos pos = event.getPos();
+
+		world.setBlockToAir(pos); // Set the block to air so the plantTree function won't automatically fail.
+
+		if(!species.plantSapling(world, pos)) { // If it fails then give a seed back to the player.
+			ItemUtils.spawnItemStack(world, pos, species.getSeedStack(1));
 		}
 	}
 
 	@SubscribeEvent	//TERRAIN_GEN_BUS
 	public void onSaplingGrowTree(SaplingGrowTreeEvent event) {
+		final World world = event.getWorld();
+		final BlockPos pos = event.getPos();
+		final IBlockState blockState = world.getBlockState(pos);
 		
-		World world = event.getWorld();
-		BlockPos pos = event.getPos();
-		IBlockState blockState = world.getBlockState(pos);
-		
-		if(TreeRegistry.saplingReplacers.containsKey(blockState)) {
-			Species species = TreeRegistry.saplingReplacers.get(blockState);
-			event.getWorld().setBlockToAir(event.getPos());//Set the block to air so the plantTree function won't automatically fail.
-			event.setResult(Result.DENY);
+		if(!TreeRegistry.saplingReplacers.containsKey(blockState)) 
+			return;
 
-			if(species.isValid()) {
-				if(BlockDynamicSapling.canSaplingStay(world, species, pos)) {
-					species.transitionToTree(world, pos);
-				}
+		final Species species = TreeRegistry.saplingReplacers.get(blockState);
+		
+		world.setBlockToAir(pos); // Set the block to air so the plantTree function won't automatically fail.
+		event.setResult(Result.DENY);
+
+		if (species.isValid()) {
+			if (BlockDynamicSapling.canSaplingStay(world, species, pos)) {
+				species.transitionToTree(world, pos);
 			}
 		}
-
 	}
 	
 }

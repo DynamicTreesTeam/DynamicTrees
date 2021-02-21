@@ -86,6 +86,11 @@ processResources {
 	}
 }
 
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allJava
+}
+
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     classifier = 'deobf'

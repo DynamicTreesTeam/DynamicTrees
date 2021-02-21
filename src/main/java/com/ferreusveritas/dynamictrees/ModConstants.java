@@ -59,4 +59,9 @@ public class ModConstants {
 		+ OPTAFTER + RECURRENT_COMPLEX
 		;
 	
+	public static final String CLIENT_PROXY = "com.ferreusveritas.dynamictrees.proxy.ClientProxy";
+	public static final String COMMON_PROXY = "com.ferreusveritas.dynamictrees.proxy.CommonProxy";
+	
+	public static final String UPDATE_CHECKER = "https://github.com/ferreusveritas/DynamicTrees/blob/1.12.2/version_info.json?raw=true";
+	
 }

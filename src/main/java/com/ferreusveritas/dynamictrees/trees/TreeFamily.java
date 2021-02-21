@@ -28,8 +28,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +75,10 @@ public class TreeFamily {
 	private IBlockState primitiveLog = Blocks.AIR.getDefaultState();
 	/** cached ItemStack of primitive logs(what is returned when wood is harvested) */
 	private ItemStack primitiveLogItemStack = ItemStack.EMPTY;
-	
+
+	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
+	private final List<BlockBranch> validBranches = new LinkedList<>();
+
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
 	protected boolean hasConiferVariants = false;
@@ -126,7 +132,6 @@ public class TreeFamily {
 	 * For instance Oak may use this to select a Swamp Oak species if the coordinates 
 	 * are in a swamp.
 	 * 
-	 * @param access
 	 * @param trunkPos
 	 * @return
 	 */
@@ -232,8 +237,9 @@ public class TreeFamily {
 	}
 	
 	protected TreeFamily setDynamicBranch(BlockBranch gBranch) {
-		dynamicBranch = gBranch;//Link the tree to the branch
-		dynamicBranch.setFamily(this);//Link the branch back to the tree
+		this.dynamicBranch = gBranch;//Link the tree to the branch
+		this.dynamicBranch.setFamily(this);//Link the branch back to the tree
+		this.addValidBranches(this.dynamicBranch);
 		
 		return this;
 	}
@@ -354,7 +360,25 @@ public class TreeFamily {
 	public float getSecondaryThickness() {
 		return 2.0f;
 	}
-	
+
+	public void addValidBranches (BlockBranch... branches){
+		this.validBranches.addAll(Arrays.asList(branches));
+	}
+
+	public int getBranchBlockIndex (BlockBranch block){
+		int index = this.validBranches.indexOf(block);
+		if (index < 0){
+			LogManager.getLogger().warn("Block {} not valid branch for {}.", block, this);
+			return 0;
+		}
+		return index;
+	}
+
+	@Nullable
+	public BlockBranch getValidBranchBlock (int index) {
+		return this.validBranches.get(index);
+	}
+
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////

@@ -63,7 +63,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		
 		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
 		
-		drawBakedQuads(treeModel.getQuads(), brightnessIn, treeModel.getLeavesColor());
+		this.drawBakedQuads(treeModel.getQuadData(), brightnessIn);
 		
 		GlStateManager.popMatrix();
 		GlStateManager.enableLighting();
@@ -75,47 +75,49 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		IBlockState fire = Blocks.FIRE.getDefaultState();
 		IBakedModel model = dispatcher.getModelForState(fire);
-		drawBakedQuads(QuadManipulator.getQuads(model, fire), 255, 0xFFFFFFFF);
+		drawBakedQuads(ModelEntityFallingTree.toTreeQuadData(QuadManipulator.getQuads(model, fire), 0xFFFFFFFF), 255);
 		GlStateManager.popMatrix();
 	}
 	
 	//TODO: Convert to IBakedModel and eliminate this mess
-	public void drawBakedQuads(List<BakedQuad> inQuads, int brightnessIn, int color) {
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+	public void drawBakedQuads(List<ModelEntityFallingTree.TreeQuadData> inQuads, int brightness) {
+		final Tessellator tessellator = Tessellator.getInstance();
+		final BufferBuilder buffer = tessellator.getBuffer();
 		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		
-		for(BakedQuad bakedquad: inQuads) {
-			buffer.addVertexData(bakedquad.getVertexData());
-			buffer.putBrightness4(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
-			
-			if (bakedquad.hasTintIndex()) {
-				float r = (float)(color >> 16 & 255) / 255.0F;
-				float g = (float)(color >> 8 & 255) / 255.0F;
-				float b = (float)(color & 255) / 255.0F;
-				if(bakedquad.shouldApplyDiffuseLighting()) {
-					float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedquad.getFace());
-					r *= diffuse;
-					g *= diffuse;
-					b *= diffuse;
-				}
-				buffer.putColorMultiplier(r, g, b, 4);
-				buffer.putColorMultiplier(r, g, b, 3);
-				buffer.putColorMultiplier(r, g, b, 2);
-				buffer.putColorMultiplier(r, g, b, 1);
-			}
-			else if(bakedquad.shouldApplyDiffuseLighting()) {
-				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedquad.getFace());
-				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
-				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);
-				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 2);
-				buffer.putColorMultiplier(diffuse, diffuse, diffuse, 1);
-			}
-			
+		for (ModelEntityFallingTree.TreeQuadData treeQuad: inQuads) {
+			this.drawBakedQuad(buffer, treeQuad.bakedQuad, brightness, treeQuad.color);
 		}
 		
 		tessellator.draw();
+	}
+	
+	public void drawBakedQuad (BufferBuilder buffer, BakedQuad bakedQuad, int brightness, int color) {
+		buffer.addVertexData(bakedQuad.getVertexData());
+		buffer.putBrightness4(brightness, brightness, brightness, brightness);
+
+		if (bakedQuad.hasTintIndex()) {
+			float r = (float)(color >> 16 & 255) / 255.0F;
+			float g = (float)(color >> 8 & 255) / 255.0F;
+			float b = (float)(color & 255) / 255.0F;
+			if(bakedQuad.shouldApplyDiffuseLighting()) {
+				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
+				r *= diffuse;
+				g *= diffuse;
+				b *= diffuse;
+			}
+			buffer.putColorMultiplier(r, g, b, 4);
+			buffer.putColorMultiplier(r, g, b, 3);
+			buffer.putColorMultiplier(r, g, b, 2);
+			buffer.putColorMultiplier(r, g, b, 1);
+		} else if(bakedQuad.shouldApplyDiffuseLighting()) {
+			float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
+			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
+			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);
+			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 2);
+			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 1);
+		}
 	}
 	
 	public static class Factory implements IRenderFactory<EntityFallingTree> {

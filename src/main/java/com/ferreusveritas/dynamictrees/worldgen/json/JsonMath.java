@@ -16,7 +16,7 @@ import net.minecraft.world.biome.Biome;
 public class JsonMath {
 	
 	public MathOperator rootOp;
-	private Biome biome;
+	private final Biome biome;
 	
 	public JsonMath(JsonElement mathElement, Biome biome) {
 		
