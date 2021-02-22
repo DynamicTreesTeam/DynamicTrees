@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen.canceller;
 
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeSelectorJson;
 import com.google.common.collect.Lists;

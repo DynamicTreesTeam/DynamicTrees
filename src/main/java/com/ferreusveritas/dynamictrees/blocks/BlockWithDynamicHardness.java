@@ -22,24 +22,17 @@ import java.lang.reflect.Field;
  */
 public abstract class BlockWithDynamicHardness extends Block {
 
-    // Obfuscated field name of stateContainer in Block.class
-    private static final String STATE_CONTAINER_FIELD_NAME = "field_176227_L";
-
     public BlockWithDynamicHardness(Properties properties) {
         super(properties);
 
-        StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
+        // Create and fill a new state container.
+        final StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
         this.fillStateContainer(builder);
 
-        try {
-            // Grab the stateContainer field.
-            final Field stateContainer = ObfuscationReflectionHelper.findField(Block.class, STATE_CONTAINER_FIELD_NAME);
-            // Give us access to the stateContainer.
-            stateContainer.setAccessible(true);
-            // Set the state container to use our custom BlockState.
-            stateContainer.set(this, builder.func_235882_a_(Block::getDefaultState, DynamicHardnessBlockState::new));
-        } catch (IllegalAccessException ignored) {}
+        // Set the state container to use our custom BlockState class.
+        this.stateContainer = builder.func_235882_a_(Block::getDefaultState, DynamicHardnessBlockState::new);
 
+        // Sets the default state to the current default state, but with our new BlockState class.
         this.setDefaultState(this.stateContainer.getBaseState());
     }
 
@@ -47,11 +40,11 @@ public abstract class BlockWithDynamicHardness extends Block {
      * Sub-classes can override this method to return a hardness value that could, for example,
      * depend on the {@link BlockState}.
      *
-     * @param world An {@link IBlockReader} world instance.
+     * @param world An {@link IBlockReader} instance.
      * @param pos The {@link BlockPos}.
      * @return The hardness value.
      */
-    public float getHardness (IBlockReader world, BlockPos pos) {
+    public float getHardness (final IBlockReader world, final BlockPos pos) {
         return 2.0f;
     }
 
@@ -68,6 +61,7 @@ public abstract class BlockWithDynamicHardness extends Block {
         public float getBlockHardness (IBlockReader worldIn, BlockPos pos) {
             return getHardness(worldIn, pos);
         }
+
     }
 
 }

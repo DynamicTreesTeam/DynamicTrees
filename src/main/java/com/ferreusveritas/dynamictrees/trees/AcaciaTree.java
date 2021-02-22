@@ -12,7 +12,7 @@ public class AcaciaTree extends VanillaTreeFamily {
 	public static class AcaciaSpecies extends Species {
 		
 		AcaciaSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);

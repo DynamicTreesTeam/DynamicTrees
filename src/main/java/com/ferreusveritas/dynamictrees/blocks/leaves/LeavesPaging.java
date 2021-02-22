@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class LeavesPaging {
 	
-	private static HashMap<String, List<DynamicLeavesBlock>> modLeavesArray = new HashMap<>();
+	private static final HashMap<String, List<DynamicLeavesBlock>> modLeavesArray = new HashMap<>();
 	
 	///////////////////////////////////////////
 	//BLOCK PAGING

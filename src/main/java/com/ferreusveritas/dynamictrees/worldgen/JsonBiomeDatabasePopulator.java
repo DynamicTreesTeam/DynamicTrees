@@ -4,11 +4,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.BiomeDatabaseJsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.json.*;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;

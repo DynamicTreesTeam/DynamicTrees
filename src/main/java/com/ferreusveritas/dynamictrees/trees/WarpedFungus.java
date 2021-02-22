@@ -18,7 +18,7 @@ public class WarpedFungus extends NetherTreeFamily {
 	public class WarpedSpecies extends BaseNetherFungiSpecies {
 
 		WarpedSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 
 			this.setPrimitiveSapling(Blocks.WARPED_FUNGUS);
 		}
@@ -41,7 +41,7 @@ public class WarpedFungus extends NetherTreeFamily {
 	public class MegaWarpedSpecies extends MegaNetherFungiSpecies {
 
 		MegaWarpedSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), "mega_"+treeFamily.getName().getPath()), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), "mega_"+treeFamily.getRegistryName().getPath()), treeFamily);
 		}
 
 		@Override

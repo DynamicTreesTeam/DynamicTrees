@@ -34,7 +34,7 @@ public class VanillaTreeFamily extends TreeFamily {
 	
 	@Override
 	public ILeavesProperties getCommonLeaves() {
-		return DTRegistries.leaves.get(getName().getPath());
+		return DTRegistries.leaves.get(getRegistryName().getPath());
 	}
 
 }

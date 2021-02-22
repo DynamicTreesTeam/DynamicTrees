@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.util.json;
 
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.google.gson.*;
@@ -61,6 +61,28 @@ public class JsonHelper {
 	}
 
 	/**
+	 * Determines if a {@link JsonElement} is a comment (comments start with an underscore).
+	 *
+	 * @param jsonElement The {@link JsonElement} object.
+	 * @return True if {@link JsonElement} is a comment.
+	 */
+	public static boolean isComment(final JsonElement jsonElement) {
+		final ObjectFetchResult<String> fetchResult = JsonObjectGetters.STRING_GETTER.get(jsonElement);
+		return fetchResult.wasSuccessful() && isComment(fetchResult.getValue());
+	}
+
+	/**
+	 * Determines if the key of a {@link JsonElement} is a comment (comments start with
+	 * an underscore).
+	 *
+	 * @param key The key of the {@link JsonElement}.
+	 * @return True if key is a comment.
+	 */
+	public static boolean isComment(final String key) {
+		return key.startsWith("_");
+	}
+
+	/**
 	 * Gets the boolean value from the element name of the {@link JsonObject} given, or
 	 * returns the default value given if the element was not found or wasn't a boolean.
 	 *
@@ -69,13 +91,15 @@ public class JsonHelper {
 	 * @param defaultValue The default value if it couldn't be obtained.
 	 * @return The boolean value.
 	 */
-	public static boolean getOrDefault (JsonObject jsonObject, String elementName, boolean defaultValue) {
-		JsonElement element = jsonObject.get(elementName);
+	@SuppressWarnings("boxing")
+	public static boolean getOrDefault (final JsonObject jsonObject, final String elementName, final boolean defaultValue) {
+		final JsonElement element = jsonObject.get(elementName);
 
-		if (element == null || !element.isJsonPrimitive() || !((JsonPrimitive) element).isBoolean())
+		if (element == null)
 			return defaultValue;
 
-		return element.getAsBoolean();
+		final ObjectFetchResult<Boolean> fetchResult = JsonObjectGetters.BOOLEAN_GETTER.get(element);
+		return fetchResult.wasSuccessful() && fetchResult.getValue();
 	}
 
 	@Nullable

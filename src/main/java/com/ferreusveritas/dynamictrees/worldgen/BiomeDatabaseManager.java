@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.api.events.PopulateDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;

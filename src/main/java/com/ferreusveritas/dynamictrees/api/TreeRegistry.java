@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
-import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
@@ -26,7 +26,7 @@ public class TreeRegistry {
 
 	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
 	private static HashMap<ResourceLocation, ICellKit> CELL_KIT_REGISTRY = new HashMap<>();
-	private static HashMap<ResourceLocation, IGrowthLogicKit> GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
+	private static HashMap<ResourceLocation, GrowthLogicKit> GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
 
 	//////////////////////////////
 	// SPECIES REGISTRY
@@ -184,24 +184,18 @@ public class TreeRegistry {
 	// GROWTHLOGICKIT HANDLING
 	//////////////////////////////
 
-	public static IGrowthLogicKit registerGrowthLogicKit(ResourceLocation name, IGrowthLogicKit kit) {
-		return GROWTH_LOGIC_KIT_REGISTRY.computeIfAbsent(name, k -> kit);
+	@Nullable
+	public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
+		return GrowthLogicKit.REGISTRY.getValue(name);
 	}
 
-	public static IGrowthLogicKit findGrowthLogicKit(ResourceLocation name) {
-		return GROWTH_LOGIC_KIT_REGISTRY.get(name);
-	}
-
-	public static IGrowthLogicKit findGrowthLogicKit(String name) {
+	@Nullable
+	public static GrowthLogicKit findGrowthLogicKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
 		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
 			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findGrowthLogicKit(kitLocation);
-	}
-
-	public static void cleanupGrowthLogicKit() {
-		GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
 	}
 
 }

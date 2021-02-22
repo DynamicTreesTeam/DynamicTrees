@@ -4,22 +4,17 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.*;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
+import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import com.ferreusveritas.dynamictrees.worldgen.WorldGenEventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -102,7 +97,6 @@ public class DynamicTrees {
 //		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
 
 		CellKits.setup();
-		GrowthLogicKits.setup();
 		TreeGenerator.setup();
 		
 		DTRegistries.setupBlocks();
@@ -151,7 +145,6 @@ public class DynamicTrees {
 	public void cleanUp() {
 		LeavesPropertiesJson.cleanUp();
 		TreeRegistry.cleanupCellKit();
-		TreeRegistry.cleanupGrowthLogicKit();
 	}
 
 }

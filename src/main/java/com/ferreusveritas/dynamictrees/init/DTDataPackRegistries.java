@@ -23,6 +23,7 @@ public final class DTDataPackRegistries {
 
     @SubscribeEvent
     public static void onAddReloadListeners (final AddReloadListenerEvent event) {
+        event.addListener(SPECIES_MANAGER);
         event.addListener(JO_CODE_MANAGER);
         event.addListener(BIOME_DATABASE_MANAGER);
     }

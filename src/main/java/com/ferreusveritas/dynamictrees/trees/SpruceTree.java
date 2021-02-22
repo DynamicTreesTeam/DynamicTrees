@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.growthlogic.ConiferLogic;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
@@ -29,7 +29,7 @@ public class SpruceTree extends VanillaTreeFamily {
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
-			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.CONIFER));
+			setGrowthLogicKit(GrowthLogicKits.CONIFER);
 			
 			envFactor(Type.HOT, 0.50f);
 			envFactor(Type.DRY, 0.25f);
@@ -55,7 +55,7 @@ public class SpruceTree extends VanillaTreeFamily {
 	public class SpruceSpecies extends BaseSpruceSpecies {
 		
 		SpruceSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 		}
 
 		@Override
@@ -74,9 +74,9 @@ public class SpruceTree extends VanillaTreeFamily {
 		private static final String speciesName = "mega_spruce";
 		
 		MegaSpruceSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
 			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
-			setGrowthLogicKit(new ConiferLogic(5.0f));
+			setGrowthLogicKit(GrowthLogicKits.MEGA_CONIFER);
 			
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
 			

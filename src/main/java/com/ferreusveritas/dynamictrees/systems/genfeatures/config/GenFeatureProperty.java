@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
