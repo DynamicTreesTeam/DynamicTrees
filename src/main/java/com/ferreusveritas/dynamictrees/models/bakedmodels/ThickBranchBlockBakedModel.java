@@ -61,7 +61,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 				thickRingsTexture = ringsTexture;
 			}
 		//}
-
+		
 		for (int i = 0; i < ThickBranchBlock.RADMAX_THICK-ThickBranchBlock.RADMAX_NORMAL; i++) {
 			int radius = i + ThickBranchBlock.RADMAX_NORMAL + 1;
 			trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);
