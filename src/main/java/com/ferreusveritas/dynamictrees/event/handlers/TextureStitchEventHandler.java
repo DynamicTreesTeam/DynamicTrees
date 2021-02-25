@@ -1,15 +1,9 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
 import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.profiler.EmptyProfiler;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -49,9 +43,6 @@ public class TextureStitchEventHandler {
 //            ThickRingTextureManager.textureAtlas = new ThickRingAtlasTexture();
 //            ThickRingTextureManager.thickRingData = ThickRingTextureManager.textureAtlas.stitch(manager, ringLocationsToGenerate.stream(), EmptyProfiler.INSTANCE, 0);
 
-        }
-        else if (eventAtlasLocation.equals(ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE)){
-            System.out.println(event.getMap().getClass());
         }
     }
 

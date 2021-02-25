@@ -55,7 +55,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
 		//if (isTextureNull(thickRingsTexture)){
 			//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
-			//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE);
+			//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
 
 			if (isTextureNull(thickRingsTexture)){
 				thickRingsTexture = ringsTexture;

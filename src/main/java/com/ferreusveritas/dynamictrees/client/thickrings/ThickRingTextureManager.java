@@ -3,8 +3,11 @@ package com.ferreusveritas.dynamictrees.client.thickrings;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import net.minecraft.client.renderer.RenderState;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -22,8 +25,10 @@ public class ThickRingTextureManager {
 	public static final ResourceLocation LOCATION_THICKRINGS_TEXTURE = new ResourceLocation(DynamicTrees.MOD_ID, "textures/atlas/thick_rings.png");
 
 	public static ThickRingAtlasTexture textureAtlas;
-	//public static ThickRingSpriteUploader uploader;
 	public static AtlasTexture.SheetData thickRingData;
+
+//	protected static final RenderState.TextureState BRANCHES_SHEET_MIPPED = new RenderState.TextureState(LOCATION_THICKRINGS_TEXTURE, false, true);
+//	public static final RenderType BRANCH_SOLID = RenderType.makeType("dynamic_trees_branch_solid", DefaultVertexFormats.BLOCK, 7, 2097152, true, false, RenderType.State.getBuilder().shadeModel(new RenderState.ShadeModelState(true)).lightmap(new RenderState.LightmapState(true)).texture(BRANCHES_SHEET_MIPPED).build(true));
 
     private static final BiMap<ResourceLocation, ResourceLocation> thickRingTextures = HashBiMap.create();
 
