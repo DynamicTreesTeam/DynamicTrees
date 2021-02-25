@@ -41,7 +41,7 @@ public class TextureUtils {
 		}
 
 		public NativeImage toNativeImage (){
-			NativeImage image = new NativeImage(w, h, false);
+			NativeImage image = new NativeImage(w, h, true);
 			for (int x=0; x<w; x++) {
 				for (int y=0; y<h; y++) {
 					image.setPixelRGBA(x, y, getPixel(x, y));

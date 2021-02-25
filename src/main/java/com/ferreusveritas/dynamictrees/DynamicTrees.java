@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingSpriteUploader;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.*;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
@@ -16,9 +18,17 @@ import com.ferreusveritas.dynamictrees.worldgen.WorldGenEventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.resources.IResourceManager;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -152,7 +162,7 @@ public class DynamicTrees {
 		loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 		loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-//		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
+		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
 
 		CellKits.setup();
 		GrowthLogicKits.setup();
@@ -171,15 +181,15 @@ public class DynamicTrees {
 	}
 
 	//TODO: thick ring stitching
-//	private static void clientStart(IEventBus modEventBus) {
-//		modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
-//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
-//			if (manager instanceof IReloadableResourceManager){
-//				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
-//				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
-//			}
-//		});
-//	}
+	private static void clientStart(IEventBus modEventBus) {
+		//modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
+			//IResourceManager manager = Minecraft.getInstance().getResourceManager();
+			//if (manager instanceof IReloadableResourceManager){
+			//	ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+			//	((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
+			//}
+		//});
+	}
 
 	@SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event) {

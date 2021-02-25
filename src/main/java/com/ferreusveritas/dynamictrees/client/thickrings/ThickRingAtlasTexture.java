@@ -8,15 +8,13 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.StitcherException;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.client.renderer.texture.Stitcher;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.profiler.IProfiler;
+import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -24,6 +22,8 @@ import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -44,67 +44,62 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         maximumTextureSize = RenderSystem.maxSupportedTextureSize();
     }
 
-    @Override
-    public TextureAtlasSprite getSprite(ResourceLocation resloc) {
-        TextureAtlasSprite sprite = super.getSprite(resloc);
-        if (sprite instanceof ThickRingTextureAtlasSprite){
-            ((ThickRingTextureAtlasSprite) sprite).loadAtlasTexture();
-        }
-        return sprite;
-    }
-
-//    private List<TreeFamily> getThickTreeFamilies(){
-//        List<TreeFamily> thickFamilies = new LinkedList<>();
-//        for (Species species : Species.REGISTRY.getValues()){
-//            TreeFamily tree = species.getFamily();
-//            if (!thickFamilies.contains(tree) && tree.isThick()){
-//                thickFamilies.add(tree);
-//            }
+//    @Override
+//    public TextureAtlasSprite getSprite(ResourceLocation resloc) {
+//        TextureAtlasSprite sprite = super.getSprite(resloc);
+//        if (sprite instanceof ThickRingTextureAtlasSprite){
+//            ((ThickRingTextureAtlasSprite) sprite).loadAtlasTexture();
 //        }
-//        return thickFamilies;
+//        return sprite;
 //    }
 
-    /**
-     * THIS IS TEMPORAL TO TEST
-     * TODO: NOT THIS
-     */
-    private Set<ResourceLocation> fetchThickRings (){
-//        for (TreeFamily tree : getThickTreeFamilies()){
-//            String log = "log";
-//            if (tree.isFireProof())
-//                log = "stem";
-//            ResourceLocation ringResloc = new ResourceLocation("minecraft", "block/"+tree.getName().getPath()+"_"+log+"_top");
-//            ThickRingTextureManager.addRingTextureLocation(ringResloc);
-//            ResourceLocation strippedRingResloc = new ResourceLocation("minecraft", "block/stripped_"+tree.getName().getPath()+"_"+log+"_top");
-//            ThickRingTextureManager.addRingTextureLocation(strippedRingResloc);
-//        }
-//        return ThickRingTextureManager.getThickRingResourceLocations();
-        return new HashSet<>();
-    }
 
-    public SheetData stitch(IResourceManager resourceManagerIn, IProfiler profilerIn, int maxMipmapLevelIn) {
-        return stitch(resourceManagerIn, null, profilerIn, maxMipmapLevelIn);
-    }
-
+    private static boolean uploaded = false;
     @Override
-    public SheetData stitch(IResourceManager resourceManagerIn, Stream<ResourceLocation> resourceLocationsIn, IProfiler profilerIn, int maxMipmapLevelIn) {
+    public void upload(SheetData sheetData) {
+        if (!uploaded){
+            super.upload(sheetData);
+            uploaded = true;
+        }
+    }
+
+    public AtlasTexture.SheetData stitch(IResourceManager resourceManagerIn, Stream<ResourceLocation> resourceLocationsIn, IProfiler profilerIn, int maxMipmapLevelIn) {
         profilerIn.startSection("preparing");
+        Set<ResourceLocation> set = resourceLocationsIn.peek((resloc) -> {
+            if (resloc == null) {
+                throw new IllegalArgumentException("Location cannot be null!");
+            }
+        }).collect(Collectors.toSet());
         int i = this.maximumTextureSize;
         Stitcher stitcher = new Stitcher(i, i, maxMipmapLevelIn);
+        int j = Integer.MAX_VALUE;
         int k = 1 << maxMipmapLevelIn;
         profilerIn.endStartSection("extracting_frames");
-
-        Set<ResourceLocation> set = fetchThickRings();
         net.minecraftforge.client.ForgeHooksClient.onTextureStitchedPre(this, set);
 
-        for(TextureAtlasSprite.Info textureatlassprite$info : this.makeSprites(resourceManagerIn, set)) {
-            int l = Math.min(Integer.lowestOneBit(textureatlassprite$info.getSpriteWidth()), Integer.lowestOneBit(textureatlassprite$info.getSpriteHeight()));
+        for(TextureAtlasSprite.Info spriteInfo : this.makeSprites(resourceManagerIn, set)) {
+            int spriteWidth = spriteInfo.getSpriteWidth()*spriteSizeMultiplier;
+            int spriteHeight = spriteInfo.getSpriteHeight()*spriteSizeMultiplier;
+            j = Math.min(j, Math.min(spriteWidth, spriteHeight));
+            int l = Math.min(Integer.lowestOneBit(spriteWidth), Integer.lowestOneBit(spriteHeight));
             if (l < k) {
-                LOGGER.warn("Texture {} with size {}x{} limits mip level from {} to {}", textureatlassprite$info.getSpriteLocation(), textureatlassprite$info.getSpriteWidth(), textureatlassprite$info.getSpriteHeight(), MathHelper.log2(k), MathHelper.log2(l));
+                LOGGER.warn("Texture {} with size {}x{} limits mip level from {} to {}", spriteInfo.getSpriteLocation(), spriteWidth, spriteHeight, MathHelper.log2(k), MathHelper.log2(l));
                 k = l;
             }
-            stitcher.addSprite(textureatlassprite$info);
+
+            stitcher.addSprite(spriteInfo);
         }
+
+        int i1 = Math.min(j, k);
+        int j1 = MathHelper.log2(i1);
+        int k1 = maxMipmapLevelIn;
+        if (false) // FORGE: do not lower the mipmap level
+            if (j1 < maxMipmapLevelIn) {
+                LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", LOCATION_THICKRINGS_TEXTURE, maxMipmapLevelIn, j1, i1);
+                k1 = j1;
+            } else {
+                k1 = maxMipmapLevelIn;
+            }
 
         profilerIn.endStartSection("register");
         stitcher.addSprite(MissingTextureSprite.getSpriteInfo());
@@ -115,61 +110,69 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         } catch (StitcherException stitcherexception) {
             CrashReport crashreport = CrashReport.makeCrashReport(stitcherexception, "Stitching");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Stitcher");
-            crashreportcategory.addDetail("Sprites", stitcherexception.getSpriteInfos().stream().map((atlsInfo) ->
-                    String.format("%s[%dx%d]", atlsInfo.getSpriteLocation(), atlsInfo.getSpriteWidth(), atlsInfo.getSpriteHeight())).collect(Collectors.joining(",")));
+            crashreportcategory.addDetail("Sprites", stitcherexception.getSpriteInfos().stream().map((p_229216_0_) -> {
+                return String.format("%s[%dx%d]", p_229216_0_.getSpriteLocation(), p_229216_0_.getSpriteWidth(), p_229216_0_.getSpriteHeight());
+            }).collect(Collectors.joining(",")));
             crashreportcategory.addDetail("Max Texture Size", i);
             throw new ReportedException(crashreport);
         }
 
         profilerIn.endStartSection("loading");
-        List<TextureAtlasSprite> list = this.getStitchedSprites(stitcher, maxMipmapLevelIn);
+        List<TextureAtlasSprite> list = this.getStitchedSprites(resourceManagerIn, stitcher, k1);
         profilerIn.endSection();
-        return new AtlasTexture.SheetData(set, stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), maxMipmapLevelIn, list);
+        return new AtlasTexture.SheetData(set, stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), k1, list);
     }
 
     private Collection<TextureAtlasSprite.Info> makeSprites(IResourceManager resourceManagerIn, Set<ResourceLocation> spriteLocationsIn) {
+        List<CompletableFuture<?>> list = Lists.newArrayList();
         ConcurrentLinkedQueue<TextureAtlasSprite.Info> concurrentlinkedqueue = new ConcurrentLinkedQueue<>();
 
-        for(ResourceLocation resourcelocation : spriteLocationsIn) {
-            if (!MissingTextureSprite.getLocation().equals(resourcelocation)) {
-//                ResourceLocation resourcelocation1 = ThickRingTextureManager.thickRingTextures.get(resourcelocation);
+        for(ResourceLocation thickSpriteLocation : spriteLocationsIn) {
+            if (!MissingTextureSprite.getLocation().equals(thickSpriteLocation)) {
+                list.add(CompletableFuture.runAsync(() -> {
+                    ResourceLocation baseSpriteLocation = ThickRingTextureManager.getBaseRingFromThickRing(thickSpriteLocation);
+                    ResourceLocation baseSpritePath = this.getSpritePath(baseSpriteLocation);
 
-                TextureAtlasSprite.Info textureatlassprite$info;
+                    TextureAtlasSprite.Info textureatlassprite$info;
+                    try (IResource baseRingResource = resourceManagerIn.getResource(baseSpritePath)) {
+                        PngSizeInfo pngsizeinfo = new PngSizeInfo(baseRingResource.toString(), baseRingResource.getInputStream());
+                        AnimationMetadataSection animationmetadatasection = baseRingResource.getMetadata(AnimationMetadataSection.SERIALIZER);
+                        if (animationmetadatasection == null) {
+                            animationmetadatasection = AnimationMetadataSection.EMPTY;
+                        }
 
-                Pair<Integer, Integer> pair = AnimationMetadataSection.EMPTY.getSpriteSize(16*spriteSizeMultiplier, 16*spriteSizeMultiplier);
-                textureatlassprite$info = new TextureAtlasSprite.Info(resourcelocation, pair.getFirst(), pair.getSecond(), AnimationMetadataSection.EMPTY);
+                        Pair<Integer, Integer> pair = animationmetadatasection.getSpriteSize(pngsizeinfo.width, pngsizeinfo.height);
+                        textureatlassprite$info = new TextureAtlasSprite.Info(baseSpriteLocation, pair.getFirst(), pair.getSecond(), animationmetadatasection);
+                    } catch (RuntimeException runtimeexception) {
+                        LOGGER.error("Unable to parse metadata from {} : {}", baseSpritePath, runtimeexception);
+                        return;
+                    } catch (IOException ioexception) {
+                        LOGGER.error("Using missing texture, unable to load {} : {}", baseSpritePath, ioexception);
+                        return;
+                    }
 
-                concurrentlinkedqueue.add(textureatlassprite$info);
-
-//                try (IResource iresource = resourceManagerIn.getResource(resourcelocation1)) {
-//                    PngSizeInfo pngsizeinfo = new PngSizeInfo(iresource.toString(), iresource.getInputStream());
-//
-//                    Pair<Integer, Integer> pair = AnimationMetadataSection.EMPTY.getSpriteSize(pngsizeinfo.width*spriteSizeMultiplier, pngsizeinfo.height*spriteSizeMultiplier);
-//                    textureatlassprite$info = new TextureAtlasSprite.Info(resourcelocation, pair.getFirst(), pair.getSecond(), AnimationMetadataSection.EMPTY);
-//
-//                    concurrentlinkedqueue.add(textureatlassprite$info);
-//                } catch (RuntimeException runtimeexception) {
-//                    LOGGER.error("Unable to parse metadata from {} : {}", resourcelocation1, runtimeexception);
-//                } catch (IOException ioexception) {
-//                    LOGGER.error("Using missing texture, unable to load {} : {}", resourcelocation1, ioexception);
-//                }
+                    concurrentlinkedqueue.add(textureatlassprite$info);
+                }, Util.getServerExecutor()));
             }
         }
 
+        CompletableFuture.allOf(list.toArray(new CompletableFuture[0])).join();
         return concurrentlinkedqueue;
     }
 
-    private List<TextureAtlasSprite> getStitchedSprites(Stitcher stitcherIn, int mipmapLevelIn) {
+    private List<TextureAtlasSprite> getStitchedSprites(IResourceManager resourceManagerIn, Stitcher stitcherIn, int mipmapLevelIn) {
         ConcurrentLinkedQueue<TextureAtlasSprite> concurrentlinkedqueue = new ConcurrentLinkedQueue<>();
         List<CompletableFuture<?>> list = Lists.newArrayList();
-        stitcherIn.getStitchSlots((atlasInfo, atlasWidth, atlasHeight, x, y) -> {
-            if (atlasInfo == MissingTextureSprite.getSpriteInfo()) {
-                MissingTextureSprite missingtexturesprite = MissingTextureSprite.create(this, mipmapLevelIn, atlasWidth, atlasHeight, x, y);
+        stitcherIn.getStitchSlots((spriteInfo, width, height, x, y) -> {
+            if (spriteInfo == MissingTextureSprite.getSpriteInfo()) {
+                MissingTextureSprite missingtexturesprite = MissingTextureSprite.create(this, mipmapLevelIn, width, height, x, y);
                 concurrentlinkedqueue.add(missingtexturesprite);
             } else {
                 list.add(CompletableFuture.runAsync(() -> {
-                    TextureAtlasSprite textureatlassprite = new ThickRingTextureAtlasSprite(this, atlasInfo, mipmapLevelIn, atlasWidth, atlasHeight, x, y);
-                    concurrentlinkedqueue.add(textureatlassprite);
+                    TextureAtlasSprite textureatlassprite = this.loadSprite(resourceManagerIn, spriteInfo, width, height, mipmapLevelIn, x, y);
+                    if (textureatlassprite != null) {
+                        concurrentlinkedqueue.add(textureatlassprite);
+                    }
 
                 }, Util.getServerExecutor()));
             }
@@ -177,6 +180,33 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         });
         CompletableFuture.allOf(list.toArray(new CompletableFuture[0])).join();
         return Lists.newArrayList(concurrentlinkedqueue);
+    }
+
+    @Nullable
+    private TextureAtlasSprite loadSprite(IResourceManager resourceManagerIn, TextureAtlasSprite.Info spriteInfoIn, int widthIn, int heightIn, int mipmapLevelIn, int originX, int originY) {
+        ResourceLocation baseSpritePath = this.getSpritePath(spriteInfoIn.getSpriteLocation());
+
+        TextureAtlasSprite.Info thickSpriteInfo = new TextureAtlasSprite.Info(
+                ThickRingTextureManager.getThickRingFromBaseRing(spriteInfoIn.getSpriteLocation()),
+                spriteInfoIn.getSpriteWidth()*spriteSizeMultiplier,
+                spriteInfoIn.getSpriteHeight()*spriteSizeMultiplier,
+                AnimationMetadataSection.EMPTY);
+
+        try (IResource iresource = resourceManagerIn.getResource(baseSpritePath)) {
+            NativeImage nativeimage = NativeImage.read(iresource.getInputStream());
+            TextureAtlasSprite thinRings = new TextureAtlasSprite(this, spriteInfoIn, mipmapLevelIn, widthIn, heightIn, originX, originY, nativeimage){};
+            return new ThickRingTextureAtlasSprite(this, thickSpriteInfo, mipmapLevelIn, widthIn, heightIn, originX, originY, thinRings, baseSpritePath);
+        } catch (RuntimeException runtimeexception) {
+            LOGGER.error("Unable to parse metadata from {}", baseSpritePath, runtimeexception);
+            return null;
+        } catch (IOException ioexception) {
+            LOGGER.error("Using missing texture, unable to load {}", baseSpritePath, ioexception);
+            return null;
+        }
+    }
+
+    private ResourceLocation getSpritePath(ResourceLocation location) {
+        return new ResourceLocation(location.getNamespace(), String.format("textures/%s%s", location.getPath(), ".png"));
     }
 
 }

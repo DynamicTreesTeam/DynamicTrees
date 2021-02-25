@@ -46,17 +46,25 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 		this.thickRingsResLoc = thickRingsResLoc;
 	}
 
+	private boolean isTextureNull (TextureAtlasSprite sprite){
+		return sprite == null || sprite.equals(ModelUtils.getTexture(new ResourceLocation("")));
+	}
+
 	@Override
 	public void setupModels() {
 		super.setupModels();
 
 		TextureAtlasSprite ringsTexture = ModelUtils.getTexture(ringsResLoc);
 		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc);
-		//TextureAtlasSprite thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
 
-		if (thickRingsTexture == null || thickRingsTexture.equals(ModelUtils.getTexture(new ResourceLocation("")))){
-			thickRingsTexture = ringsTexture;
-		}
+		//if (isTextureNull(thickRingsTexture)){
+			//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
+			//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE);
+
+			if (isTextureNull(thickRingsTexture)){
+				thickRingsTexture = ringsTexture;
+			}
+		//}
 
 		for (int i = 0; i < ThickBranchBlock.RADMAX_THICK-ThickBranchBlock.RADMAX_NORMAL; i++) {
 			int radius = i + ThickBranchBlock.RADMAX_NORMAL + 1;
