@@ -9,6 +9,10 @@ import com.google.gson.JsonElement;
  */
 public interface IJsonObjectGetter<T> {
 
+    default boolean isValidGetter () {
+        return true;
+    }
+
     /**
      * Attempts to fetch the object from the given {@link JsonElement}.
      *

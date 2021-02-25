@@ -5,10 +5,8 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BeehiveBlock;
@@ -47,7 +45,7 @@ import java.util.function.BiFunction;
  */
 public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Block> NEST_BLOCK = new GenFeatureBlockProperty("nest");
+    public static final GenFeatureProperty<Block> NEST_BLOCK = GenFeatureProperty.createBlockProperty("nest");
     public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
 
     private static final double vanillaGenChancePlains = 0.05f;

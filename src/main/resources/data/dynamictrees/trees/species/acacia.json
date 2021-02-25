@@ -1,0 +1,18 @@
+{
+    "family": "dynamictrees:acacia",
+    "tapering": 0.15,
+    "signal_energy": 12.0,
+    "up_probability": 0,
+    "lowest_branch_height": 3,
+    "growth_rate": 0.7,
+    "leaves_properties": "dynamictrees:acacia",
+    "environment_factors" : {
+        "cold": 0.25,
+        "nether": 0.75,
+        "wet": 0.75
+    },
+    "seed_drop_rarity": 1.0,
+    "stick_drop_rarity": 1.0,
+    "perfect_biomes": { "type": "savanna" },
+    "primitive_sapling": "minecraft:acacia_sapling"
+}

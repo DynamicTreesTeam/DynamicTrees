@@ -5,10 +5,10 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -275,7 +275,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesTree) {
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
 		return CellNull.NULLCELL;
 	}
 	
@@ -345,7 +345,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		BlockState treeState = blockAccess.getBlockState(treePos);
 		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULL_FAMILY;
 	}
-	
+
+	@Nullable
 	private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
 		return (SpeciesTileEntity) world.getTileEntity(pos);
 	}

@@ -14,10 +14,10 @@ import javax.annotation.Nullable;
  */
 public class JsonPropertyApplier<T, V> {
 
-    private final String key;
-    private final Class<T> objectClass;
-    private final Class<V> valueClass;
-    private final IPropertyApplier<T, V> propertyApplier;
+    protected final String key;
+    protected final Class<T> objectClass;
+    protected final Class<V> valueClass;
+    protected final IPropertyApplier<T, V> propertyApplier;
 
     public JsonPropertyApplier (final String key, final Class<T> objectClass, final Class<V> valueClass, final IVoidPropertyApplier<T, V> propertyApplier) {
         this(key, objectClass, valueClass, (IPropertyApplier<T, V>) propertyApplier);
@@ -36,22 +36,30 @@ public class JsonPropertyApplier<T, V> {
      * {@link #objectClass} value, and the {@link JsonElement} given contained a value that can
      * be converted to the {@link #valueClass}.
      *
-     * @param key The key for the current {@link JsonElement}.
+     * @param keyIn The keyIn for the current {@link JsonElement}.
      * @param object The {@link Object} being applied to.
      * @param jsonElement The {@link JsonElement} for the key given.
      * @return The {@link PropertyApplierResult}, or null if application was not necessary.
      */
-    @SuppressWarnings("unchecked")
     @Nullable
-    public PropertyApplierResult applyIfShould(final String key, final Object object, final JsonElement jsonElement) {
-        final IJsonObjectGetter<V> valueGetter = JsonObjectGetters.getObjectGetter(this.valueClass);
-
-        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object) || valueGetter == null)
+    public PropertyApplierResult applyIfShould(final String keyIn, final Object object, final JsonElement jsonElement) {
+        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object))
             return null;
 
-        final ObjectFetchResult<V> fetchResult = valueGetter.get(jsonElement);
+        return this.applyIfShould(object, jsonElement, this.valueClass, this.propertyApplier);
+    }
 
-        return fetchResult.wasSuccessful() ? this.propertyApplier.apply((T) object, fetchResult.getValue()) :
+    @SuppressWarnings("unchecked")
+    @Nullable
+    protected <S, R> PropertyApplierResult applyIfShould(final Object object, final JsonElement jsonElement, final Class<R> valueClass, final IPropertyApplier<S, R> applier) {
+        final IJsonObjectGetter<R> valueGetter = JsonObjectGetters.getObjectGetter(valueClass);
+
+        if (!valueGetter.isValidGetter())
+            return null;
+
+        final ObjectFetchResult<R> fetchResult = valueGetter.get(jsonElement);
+
+        return fetchResult.wasSuccessful() ? applier.apply((S) object, fetchResult.getValue()) :
                 new PropertyApplierResult(fetchResult.getErrorMessage());
     }
 

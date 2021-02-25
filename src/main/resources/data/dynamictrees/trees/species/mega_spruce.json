@@ -1,11 +1,12 @@
 {
     "family": "dynamictrees:spruce",
     "tapering": 0.25,
-    "signal_energy": 16.0,
-    "up_probability": 3,
-    "lowest_branch_height": 3,
+    "signal_energy": 24.0,
+    "up_probability": 7,
+    "lowest_branch_height": 5,
     "growth_rate": 0.9,
-    "growth_logic_kit": "dynamictrees:conifer",
+    "max_branch_radius": 24,
+    "growth_logic_kit": "dynamictrees:mega_conifer",
     "leaves_properties": "dynamictrees:spruce",
     "environment_factors" : {
         "hot": 0.50,
@@ -14,15 +15,14 @@
     },
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
-    "perfect_biomes": { "type": "coniferous" },
-    "primitive_sapling": "minecraft:spruce_sapling",
+    "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
     "features" : [
         {
-            "name": "dynamictrees:conifer_topper",
+            "name": "dynamictrees:mound",
             "properties": {
-                "leaves_properties": "dynamictrees:spruce"
+                "mound_cutoff_radius": 999
             }
         },
-        "dynamictrees:podzol"
+        "dynamictrees:clear_volume"
     ]
 }

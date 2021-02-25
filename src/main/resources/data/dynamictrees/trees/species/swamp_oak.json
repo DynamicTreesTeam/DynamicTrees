@@ -1,0 +1,27 @@
+{
+    "family": "dynamictrees:oak",
+    "tapering": 0.3,
+    "signal_energy": 12.0,
+    "up_probability": 2,
+    "lowest_branch_height": 3,
+    "growth_rate": 0.8,
+    "leaves_properties": "dynamictrees:oak",
+    "environment_factors" : {
+        "cold": 0.5,
+        "dry": 0.5
+    },
+    "seed_drop_rarity": 1.0,
+    "perfect_biomes": { "type": "swamp" },
+    "location_override": { "type": "swamp" },
+    "features" : [
+        {
+            "name": "dynamictrees:vines",
+            "properties": {
+                "max_length": 7,
+                "vertical_spread": 30,
+                "ray_distance": 6,
+                "quantity": 24
+            }
+        }
+    ]
+}

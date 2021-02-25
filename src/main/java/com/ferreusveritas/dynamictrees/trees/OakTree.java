@@ -59,7 +59,9 @@ public class OakTree extends VanillaTreeFamily {
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.FOREST) && BiomeDictionary.hasType(biome, Type.OVERWORLD);
 		}
-		
+
+		// TODO: Rot types.
+
 		@Override
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 			if(super.rot(world, pos, neighborCount, radius, random, rapid)) {
@@ -90,6 +92,8 @@ public class OakTree extends VanillaTreeFamily {
 			envFactor(Type.DRY, 0.50f);
 			
 			setupStandardSeedDropping();
+
+			this.shouldSpawnPredicate = (world, trunkPos) -> BiomeDictionary.hasType(getBiomeKey(world.getBiome(trunkPos)), Type.SWAMP);
 			
 			//Add species features
 			this.addGenFeature(GenFeatures.VINES.with(VinesGenFeature.MAX_LENGTH, 7)
@@ -212,21 +216,7 @@ public class OakTree extends VanillaTreeFamily {
 		appleSpecies.getSeed().ifPresent(itemList::add);//Since we generated the apple species internally we need to let the seed out to be registered.
 		return super.getRegisterableItems(itemList);
 	}
-	
-	/**
-	 * This will cause the swamp variation of the oak to grow when the player plants
-	 * a common oak acorn.
-	 */
-	@Override
-	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
-		//TODO: Move to location override mechanism
-		if(BiomeDictionary.hasType(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(trunkPos).getRegistryName()), Type.SWAMP)) {
-			return swampSpecies;
-		}
-		
-		return super.getSpeciesForLocation(world, trunkPos);
-	}
-	
+
 	@Override
 	public boolean isThick() {
 		return false;

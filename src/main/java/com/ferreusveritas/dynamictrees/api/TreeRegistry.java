@@ -26,7 +26,6 @@ public class TreeRegistry {
 
 	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
 	private static HashMap<ResourceLocation, ICellKit> CELL_KIT_REGISTRY = new HashMap<>();
-	private static HashMap<ResourceLocation, GrowthLogicKit> GROWTH_LOGIC_KIT_REGISTRY = new HashMap<>();
 
 	//////////////////////////////
 	// SPECIES REGISTRY

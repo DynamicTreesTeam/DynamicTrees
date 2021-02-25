@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -41,12 +40,12 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	private JsonObject jsonObj;
 	private boolean connectAnyRadius = false;
 
-	public LeavesPropertiesJson(String jsonData) {
-		this(getJsonObject(jsonData));
+	public LeavesPropertiesJson(String jsonData, ResourceLocation registryName) {
+		this(getJsonObject(jsonData), registryName);
 	}
 
-	public LeavesPropertiesJson(JsonObject jsonObj) {
-		super(DTRegistries.blockStates.AIR);//Assigns deciduous cell kit by default
+	public LeavesPropertiesJson(JsonObject jsonObj, ResourceLocation registryName) {
+		super(DTRegistries.blockStates.AIR, registryName);//Assigns deciduous cell kit by default
 		this.jsonObj = jsonObj;
 		resolutionList.add(this);
 		resolve();
@@ -180,8 +179,8 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	
 	protected ILeavesUpdate leavesUpdate = (w,p,s,r,l) -> true;
 	
-	public static interface ILeavesUpdate {
-		boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand, ILeavesProperties leavesProperties);
+	public interface ILeavesUpdate {
+		boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand, LeavesProperties leavesProperties);
 	}
 	
 	public void setLeavesUpdate(ILeavesUpdate leavesUpdate) {

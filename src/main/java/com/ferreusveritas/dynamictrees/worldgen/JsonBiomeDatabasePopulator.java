@@ -123,11 +123,7 @@ public class JsonBiomeDatabasePopulator extends BiomeSelectorJson implements IBi
 		});
 
 	}
-	
-	public JsonBiomeDatabasePopulator(ResourceLocation jsonLocation) {
-		this(JsonHelper.load(jsonLocation), "default_old.json");
-	}
-	
+
 	public JsonBiomeDatabasePopulator(JsonElement jsonElement, String fileName) {
 		this.jsonElement = jsonElement;
 		this.fileName = fileName;

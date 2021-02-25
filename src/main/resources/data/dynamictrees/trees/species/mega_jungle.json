@@ -1,0 +1,45 @@
+{
+    "family": "dynamictrees:jungle",
+    "tapering": 0.32,
+    "signal_energy": 32.0,
+    "up_probability": 7,
+    "lowest_branch_height": 8,
+    "growth_rate": 0.9,
+    "soil_longevity": 16,
+    "growth_logic_kit": "dynamictrees:jungle",
+    "leaves_properties": "dynamictrees:jungle",
+    "environment_factors" : {
+        "cold": 0.15,
+        "dry": 0.2,
+        "hot": 1.1,
+        "wet": 1.1
+    },
+    "seed_drop_rarity": 1.0,
+    "stick_drop_rarity": 1.0,
+    "perfect_biomes": { "type": "forest" },
+    "features" : [
+        {
+            "name": "dynamictrees:vines",
+            "properties": {
+                "quantity": 16,
+                "max_length": 16
+            }
+        },
+        {
+            "name": "dynamictrees:mound",
+            "properties": {
+                "mound_cutoff_radius": 999
+            }
+        },
+        {
+            "name": "dynamictrees:roots",
+            "properties": {
+                "min_trunk_radius": 9
+            }
+        },
+        "dynamictrees:clear_volume",
+        "dynamictrees:bottom_flare",
+        "dynamictrees:mound",
+        "dynamictrees:roots"
+    ]
+}

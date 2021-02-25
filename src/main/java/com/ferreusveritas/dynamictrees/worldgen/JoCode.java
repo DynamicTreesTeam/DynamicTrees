@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -170,7 +170,7 @@ public class JoCode {
 			BlockState treeState = world.getBlockState(treePos);
 			BranchBlock branch = TreeHelper.getBranch(treeState);
 			if(branch != null) {//If a branch exists then the growth was successful
-				ILeavesProperties leavesProperties = species.getLeavesProperties();
+				LeavesProperties leavesProperties = species.getLeavesProperties();
 				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
 				INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
 				FindEndsNode endFinder = new FindEndsNode();//This is responsible for gathering a list of branch end points
@@ -267,7 +267,7 @@ public class JoCode {
 	 * @param leafMap
 	 * @param leavesProperties
 	 */
-	protected void smother(SimpleVoxmap leafMap, ILeavesProperties leavesProperties) {
+	protected void smother(SimpleVoxmap leafMap, LeavesProperties leavesProperties) {
 		
 		int smotherMax = leavesProperties.getSmotherLeavesMax();
 		

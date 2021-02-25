@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -40,8 +39,8 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 	protected final BooleanProperty[] sideVineStates = new BooleanProperty[] {null, null, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
 
 	public static final GenFeatureProperty<Integer> MAX_LENGTH = GenFeatureProperty.createIntegerProperty("max_length");
-	public static final GenFeatureProperty<Block> VINE_BLOCK = new GenFeatureBlockProperty("vine");
-	public static final GenFeatureProperty<Block> TIP_BLOCK = new GenFeatureBlockProperty("vine_tip");
+	public static final GenFeatureProperty<Block> VINE_BLOCK = GenFeatureProperty.createBlockProperty("vine");
+	public static final GenFeatureProperty<Block> TIP_BLOCK = GenFeatureProperty.createBlockProperty("vine_tip");
 	public static final GenFeatureProperty<VineType> VINE_TYPE = GenFeatureProperty.createProperty("vine_type", VineType.class);
 
 	public VinesGenFeature(ResourceLocation registryName) {

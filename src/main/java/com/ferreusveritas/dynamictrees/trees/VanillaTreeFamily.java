@@ -1,16 +1,15 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import net.minecraft.util.ResourceLocation;
 
 /**
  * Get your Cheeto fingers off! Only the DynamicTrees mod should use this and only for vanilla trees
  * 
  * @author ferreusveritas
- *
  */
 public class VanillaTreeFamily extends TreeFamily {
 	
@@ -31,10 +30,11 @@ public class VanillaTreeFamily extends TreeFamily {
 		getCommonSpecies().generateSapling();
 		
 	}
-	
+
+	@SuppressWarnings("all")
 	@Override
-	public ILeavesProperties getCommonLeaves() {
-		return DTRegistries.leaves.get(getRegistryName().getPath());
+	public LeavesProperties getCommonLeaves() {
+		return LeavesProperties.REGISTRY.getValue(this.getRegistryName());
 	}
 
 }

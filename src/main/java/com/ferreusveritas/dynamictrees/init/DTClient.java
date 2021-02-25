@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
@@ -168,7 +168,7 @@ public class DTClient {
 		//Register Leaves Colorizers
 		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID)) {
 			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->{
-						ILeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
+						LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
 						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
 					}
 			);
@@ -192,7 +192,7 @@ public class DTClient {
 		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.lingeringEffector, new LingeringEffectorRenderer.Factory());
 	}
 	
-	private static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
+	private static int getFoliageColor(LeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
 		return leavesProperties.foliageColorMultiplier(blockState, world, pos);
 	}
 	
@@ -232,7 +232,7 @@ public class DTClient {
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
 			if(treePart instanceof DynamicLeavesBlock) {
 				DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
-				ILeavesProperties leavesProperties = leaves.getProperties(blockState);
+				LeavesProperties leavesProperties = leaves.getProperties(blockState);
 				int color = getFoliageColor(leavesProperties, world, blockState, pos);
 				float r = (color >> 16 & 255) / 255.0F;
 				float g = (color >> 8 & 255) / 255.0F;

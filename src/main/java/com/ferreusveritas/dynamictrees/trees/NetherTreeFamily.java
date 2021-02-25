@@ -1,21 +1,14 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicWartBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.ClearVolumeGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.MoundGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.ShroomlightGenFeature;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -67,7 +60,7 @@ public class NetherTreeFamily extends VanillaTreeFamily {
             return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.5f, 0.75f));
         }
 
-        public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
+        public DynamicLeavesBlock createLeavesBlock(LeavesProperties leavesProperties) {
             return (DynamicLeavesBlock) new DynamicWartBlock(leavesProperties).setRegistryName(getRegistryName() + "_wart");
         }
     }
@@ -110,7 +103,7 @@ public class NetherTreeFamily extends VanillaTreeFamily {
         }
 
         @Override
-        public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
+        public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
             return true;
         }
 

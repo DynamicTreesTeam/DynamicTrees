@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
@@ -35,11 +34,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,6 +67,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
+		@Override public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) { return Species.NULL_SPECIES; }
 	};
 
 	/**
@@ -112,6 +112,9 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	@OnlyIn(Dist.CLIENT)
 	public int woodBarkColor; // For rooty water
 
+	/** A list of child species, added to when tree family is set for species. */
+	private final List<Species> species = new ArrayList<>();
+
 	public TreeFamily() {
 		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null"));
 	}
@@ -147,11 +150,21 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	}
 
 	public void setCommonSpecies(@Nonnull Species species) {
+		LogManager.getLogger().debug("Set common species " + species.getRegistryName());
 		commonSpecies = species;
 	}
 
 	public Species getCommonSpecies() {
 		return commonSpecies;
+	}
+
+	public TreeFamily addSpecies (final Species species) {
+		this.species.add(species);
+		return this;
+	}
+
+	public List<Species> getSpecies () {
+		return this.species;
 	}
 
 	///////////////////////////////////////////
@@ -163,28 +176,17 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
 	 * are in a swamp.
 	 *
-	 * @param access
-	 * @param trunkPos
-	 * @return
+	 * @param world The {@link IWorld} object.
+	 * @param trunkPos The {@link BlockPos} of the trunk.
+	 * @return The {@link Species} to place.
 	 */
-	public Species getSpeciesForLocation(IWorld access, BlockPos trunkPos) {
-		for(ISpeciesLocationOverride override : speciesLocationOverrides) {
-			Species species = override.getSpeciesForLocation(access, trunkPos);
-			if(species.isValid()) {
+	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+		for (final Species species : this.species) {
+			if (species.shouldSpawnAt(world, trunkPos))
 				return species;
-			}
 		}
-		return getCommonSpecies();
-	}
 
-	public void addSpeciesLocationOverride(ISpeciesLocationOverride override) {
-		speciesLocationOverrides.add(override);
-	}
-
-	private final LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
-
-	public interface ISpeciesLocationOverride {
-		Species getSpeciesForLocation(IWorld access, BlockPos trunkPos);
+		return this.commonSpecies;
 	}
 
 	///////////////////////////////////////////
@@ -533,7 +535,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
 	}
 
-	public ILeavesProperties getCommonLeaves() {
+	public LeavesProperties getCommonLeaves() {
 		return LeavesProperties.NULL_PROPERTIES;
 	}
 

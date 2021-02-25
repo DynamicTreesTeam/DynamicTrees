@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -73,6 +72,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> {
@@ -124,10 +124,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	private boolean requiresTileEntity = false;
 
 	//Leaves
-	protected ILeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
+	protected LeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
 
 	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
-	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
+	private final List<LeavesProperties> validLeaves = new LinkedList<>();
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
@@ -144,6 +144,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
+
+	protected IShouldSpawnPredicate shouldSpawnPredicate;
 
 	private String unlocalizedName = "";
 
@@ -170,7 +172,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param leavesProperties The properties of the leaves to be used for this species
 	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
+	public Species(ResourceLocation name, TreeFamily treeFamily, LeavesProperties leavesProperties) {
 		setRegistryName(name);
 		setUnlocalizedName(name.toString());
 		this.treeFamily = treeFamily;
@@ -196,6 +198,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public void setFamily(TreeFamily treeFamily) {
+		treeFamily.addSpecies(this);
 		this.treeFamily = treeFamily;
 	}
 
@@ -275,9 +278,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public float getTapering() {
 		return tapering;
 	}
-	
+
 	//Rare species require TileEntity Storage
-	public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
+	public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
+		if (!this.shouldSpawnAt(world, pos))
+			return true;
+
 		return requiresTileEntity;
 	}
 	
@@ -313,17 +319,23 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this;
 	}
 
+	public boolean shouldSpawnAt (final IWorld world, final BlockPos trunkPos) {
+		return this.shouldSpawnPredicate != null && this.shouldSpawnPredicate.test(world, trunkPos);
+	}
+
+	public interface IShouldSpawnPredicate extends BiPredicate<IWorld, BlockPos> {}
+
 	///////////////////////////////////////////
 	//LEAVES
 	///////////////////////////////////////////
 	
-	public Species setLeavesProperties(ILeavesProperties leavesProperties) {
+	public Species setLeavesProperties(LeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
 		addValidLeafBlocks(leavesProperties);
 		return this;
 	}
 	
-	public ILeavesProperties getLeavesProperties() {
+	public LeavesProperties getLeavesProperties() {
 		return leavesProperties;
 	}
 
@@ -339,14 +351,14 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return Optional.ofNullable(block);
 	}
 
-	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
+	public DynamicLeavesBlock createLeavesBlock(LeavesProperties leavesProperties) {
 		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
 		block.setRegistryName(getRegistryName() + "_leaves");
 		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
 		return block;
 	}
 
-	public void addValidLeafBlocks (ILeavesProperties... leaves){
+	public void addValidLeafBlocks (LeavesProperties... leaves){
 		validLeaves.addAll(Arrays.asList(leaves));
 	}
 
@@ -647,7 +659,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			
-			if(getRequiresTileEntity(world, pos)) {
+			if(doesRequireTileEntity(world, pos)) {
 				SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
 				world.setTileEntity(pos.down(), speciesTE);
 				speciesTE.setSpecies(this);
@@ -712,7 +724,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
-		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.IS_VARIANT, this.getRequiresTileEntity(world, rootPos)), 3);
+		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
 	}
 	
 	public Species setSoilLongevity(int longevity) {
@@ -1249,7 +1261,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this;
 	}
 
-	public boolean testFlowerSeasonHold(float seasonValue) {
+	public boolean testFlowerSeasonHold(Float seasonValue) {
 		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin, flowerSeasonHoldMax);
 	}
 
@@ -1363,16 +1375,21 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	///////////////////////////////////////////
 	// MEGANESS
 	///////////////////////////////////////////
+
+	private Species megaSpecies = Species.NULL_SPECIES;
 	
 	public boolean isMega() {
 		return false;
 	}
-	
+
 	public Species getMegaSpecies() {
-		return Species.NULL_SPECIES;
+		return megaSpecies;
 	}
-	
-	
+
+	public void setMegaSpecies(final Species megaSpecies) {
+		this.megaSpecies = megaSpecies;
+	}
+
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
@@ -1466,6 +1483,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public Species addGenFeature(ConfiguredGenFeature<?> configuredGenFeature) {
 		this.genFeatures.add(configuredGenFeature);
+		return this;
+	}
+
+	/**
+	 * Clears gen features. Used by {@link SpeciesManager} so duplicate gen features
+	 * aren't added on datapack reload.
+	 *
+	 * @return This {@link Species} object.
+	 */
+	public Species clearGenFeatures () {
+		this.genFeatures.clear();
 		return this;
 	}
 

@@ -1,9 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
+import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.block.Block;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 
@@ -33,26 +38,27 @@ public class GenFeatureProperty<T> {
     }
 
     /**
-     * Gets the property from the given {@link JsonObject}, or null if it was not found.
-     * Note that the base implementation of this method only handles {@link JsonPrimitive} objects,
-     * for handling other types of value a sub-class will be needed with an implementation of this.
+     * Gets an {@link ObjectFetchResult} for the property's value from the given {@link JsonObject},
+     * or null if it was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
-     * @return The {@link GenFeaturePropertyValue}.
+     * @return The an {@link ObjectFetchResult} for the property value, or null if it wasn't found.
      */
     @Nullable
-    public GenFeaturePropertyValue<T> getFromJsonObject (JsonObject jsonObject) {
-        JsonElement jsonElement = jsonObject.get(this.identifier);
+    public ObjectFetchResult<T> getValueFromJsonObject(JsonObject jsonObject) {
+        final JsonElement jsonElement = jsonObject.get(this.identifier);
 
-        if (jsonElement == null || !jsonElement.isJsonPrimitive())
+        final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
+
+        if (jsonElement == null)
             return null;
 
-        final T value = JsonHelper.getFromPrimitive(jsonElement.getAsJsonPrimitive(), this.type);
-
-        if (value == null)
+        if (!getter.isValidGetter()) {
+            LogManager.getLogger().warn("Tried to get class {} for gen feature property {}, but object getter was not registered.", this.type.getSimpleName(), this.identifier);
             return null;
+        }
 
-        return new GenFeaturePropertyValue<>(value);
+        return getter.get(jsonElement);
     }
 
     /**
@@ -66,7 +72,6 @@ public class GenFeatureProperty<T> {
      * @param <T> The value the property will store.
      * @return The new {@link GenFeatureProperty} object.
      */
-    @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<?> type) {
         return new GenFeatureProperty<>(identifier, (Class<T>) type);
@@ -94,6 +99,18 @@ public class GenFeatureProperty<T> {
 
     public static GenFeatureProperty<Float> createFloatProperty(String identifier) {
         return createProperty(identifier, Float.class);
+    }
+
+    public static GenFeatureProperty<Block> createBlockProperty(String identifier) {
+        return createProperty(identifier, Block.class);
+    }
+
+    @Override
+    public String toString() {
+        return "GenFeatureProperty{" +
+                "identifier='" + identifier + '\'' +
+                ", type=" + type +
+                '}';
     }
 
 }

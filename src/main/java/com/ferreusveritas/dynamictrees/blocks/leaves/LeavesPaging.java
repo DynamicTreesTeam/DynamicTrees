@@ -1,19 +1,17 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -41,51 +39,49 @@ public class LeavesPaging {
 		getLeavesListForModId(modid).add(block);
 	}
 
-	public static Map<String, ILeavesProperties> buildAll (Object ... leavesProperties) {
-		Map<String, ILeavesProperties> leafMap = new HashMap<>();
+	public static void registerAll (final String namespace, final Object ... leavesProperties) {
+		final List<LeavesProperties> leaves = new ArrayList<>();
 
-		for(int i = 0; i < (leavesProperties.length & ~1); i+=2) {
+		for(int i = 0; i < (leavesProperties.length & ~1); i += 2) {
 			String label = leavesProperties[i].toString();
 			Object obj = leavesProperties[i+1];
 
-			ILeavesProperties newLp = LeavesProperties.NULL_PROPERTIES;
+			LeavesProperties newProperties = LeavesProperties.NULL_PROPERTIES;
 
-			if(obj instanceof ILeavesProperties) {
-				newLp = (ILeavesProperties) obj;
+			if(obj instanceof LeavesProperties) {
+				newProperties = (LeavesProperties) obj;
 			} else
 			if(obj instanceof String && !"".equals(obj)) {
-				newLp = new LeavesPropertiesJson((String) obj);
+				newProperties = new LeavesPropertiesJson((String) obj, new ResourceLocation(namespace, label));
 			}
 
-			leafMap.put(label, newLp);
+			leaves.add(newProperties);
 		}
 
-		return leafMap;
+		leaves.forEach(LeavesProperties.REGISTRY::register);
 	}
 
-	public static Map<String, ILeavesProperties> build(JsonObject root) {
-		Map<String, ILeavesProperties> leafMap = new HashMap<>();
+	public static void register(final JsonObject root, final String namespace) {
+		if (root == null)
+			return;
 
-		if(root != null) {
-			for(Entry<String, JsonElement> entry : root.entrySet()) {
-				String label = entry.getKey();
-				JsonObject jsonObj = entry.getValue().getAsJsonObject();
-				ILeavesProperties newLp = new LeavesPropertiesJson(jsonObj);
-				leafMap.put(label, newLp);
-			}
+		final List<LeavesProperties> leaves = new ArrayList<>();
+
+		for (Entry<String, JsonElement> entry : root.entrySet()) {
+			leaves.add(new LeavesPropertiesJson(entry.getValue().getAsJsonObject(), new ResourceLocation(namespace, entry.getKey())));
 		}
 
-		return leafMap;
+		leaves.forEach(LeavesProperties.REGISTRY::register);
 	}
 
-	public static Map<String, ILeavesProperties> build(ResourceLocation jsonLocation) {
-		JsonElement element = JsonHelper.load(jsonLocation, JsonHelper.ResourceFolder.TREES);
-		if(element != null && element.isJsonObject()) {
-			return build(element.getAsJsonObject());
-		}
-		Logger.getLogger(DynamicTrees.MOD_ID).log(Level.SEVERE, "Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
+	public static void register(final ResourceLocation jsonLocation) {
+		final JsonElement element = JsonHelper.load(jsonLocation, JsonHelper.ResourceFolder.TREES);
 
-		return null;
+		if (element != null && element.isJsonObject()) {
+			register(element.getAsJsonObject(), jsonLocation.getNamespace());
+		}
+
+		Logger.getLogger(DynamicTrees.MOD_ID).severe("Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.api.treedata;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -24,7 +25,7 @@ public interface ITreePart {
 	* @param leavesProperties The tree data of the leaves the request came from
 	* @return Cell for getting hydration level
 	*/
-	ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties);
+	ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties);
 
 	/**
 	* The signal that is passed from the root of the tree to the tip of a branch to create growth.

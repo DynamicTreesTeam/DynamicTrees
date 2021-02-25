@@ -79,6 +79,9 @@ public class SpruceTree extends VanillaTreeFamily {
 			setGrowthLogicKit(GrowthLogicKits.MEGA_CONIFER);
 			
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
+
+			//This will cause the mega spruce to be planted if the player is in a mega taiga biome.
+			this.shouldSpawnPredicate = SpruceTree.this::isLocationForMega;
 			
 			this.addGenFeature(GenFeatures.CLEAR_VOLUME);//Clear a spot for the thick tree trunk
 			this.addGenFeature(GenFeatures.MOUND.with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999));//Place a 3x3 of dirt under thick trees
@@ -112,7 +115,7 @@ public class SpruceTree extends VanillaTreeFamily {
 		}
 
 		@Override
-		public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
+		public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
 			return !isLocationForMega(world, pos);
 		}
 
@@ -124,16 +127,14 @@ public class SpruceTree extends VanillaTreeFamily {
 		super(DynamicTrees.VanillaWoodTypes.spruce);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.SPRUCE_LEAVES);
-		
-		//This will cause the mega spruce to be planted if the player is in a mega taiga biome
-		addSpeciesLocationOverride((world, trunkPos) -> isLocationForMega(world, trunkPos) ? megaSpecies : Species.NULL_SPECIES);
-		
 	}
 	
 	@Override
 	public void createSpecies() {
+		final Species common = new Species().setRegistryName(this.getRegistryName()).setLeavesProperties(getCommonLeaves());
+
 		megaSpecies = new MegaSpruceSpecies(this);
-		setCommonSpecies(new SpruceSpecies(this));
+		this.setCommonSpecies(common);
 	}
 	
 	@Override

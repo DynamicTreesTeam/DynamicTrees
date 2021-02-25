@@ -81,6 +81,16 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
     }
 
     /**
+     * Gets the {@link Set} of {@link GenFeatureProperty} objects registered to this
+     * {@link GenFeature}.
+     *
+     * @return The {@link Set} of {@link GenFeatureProperty} for this {@link GenFeature}.
+     */
+    public Set<GenFeatureProperty<?>> getRegisteredProperties() {
+        return registeredProperties;
+    }
+
+    /**
      * Gets the default configuration. For sub-classes, do not use this to add default
      * properties, use <tt>createDefaultConfiguration</tt>. This returns a copy of the
      * default configuration, so any default properties will not be set.
@@ -102,6 +112,13 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
      */
     public <V> ConfiguredGenFeature<?> with (GenFeatureProperty<V> featureProperty, V value) {
         return this.getDefaultConfiguration().with(featureProperty, value);
+    }
+
+    @Override
+    public String toString() {
+        return "GenFeature{" +
+                "registryName=" + this.getRegistryName() +
+                '}';
     }
 
 }

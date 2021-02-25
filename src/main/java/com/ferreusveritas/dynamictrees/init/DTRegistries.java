@@ -3,13 +3,13 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
@@ -23,9 +23,12 @@ import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -63,9 +66,7 @@ public class DTRegistries {
 	public static CocoaFruitBlock cocoaFruitBlock;
 	public static BonsaiPotBlock bonsaiPotBlock;
 	public static TrunkShellBlock trunkShellBlock;
-	
-	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
-	
+
 	public static final CommonBlockStates blockStates = new CommonBlockStates();
 	
 	public static void setupBlocks() {
@@ -76,7 +77,6 @@ public class DTRegistries {
 
 		setUpSoils();
 		setupConnectables();
-		setupLeavesProperties();
 	}
 
 	private static void setUpSoils(){
@@ -123,16 +123,12 @@ public class DTRegistries {
 		});
 	}
 
-	private static void setupLeavesProperties() {
-		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MOD_ID, "leaves/common.json"));
-	}
-	
 	@SubscribeEvent
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -162,7 +158,7 @@ public class DTRegistries {
 		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 		
 		ArrayList<Item> treeItems = new ArrayList<>();
-		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
+		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableItems(treeItems));
 
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
@@ -257,6 +253,11 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onGrowthLogicKitRegistry (final RegistryEvent.Register<GrowthLogicKit> event) {
 		GrowthLogicKits.register(event.getRegistry());
+	}
+
+	@SubscribeEvent
+	public static void onGenFeatureRegistry (final RegistryEvent.Register<GenFeature> event) {
+		GenFeatures.register(event.getRegistry());
 	}
 
 }

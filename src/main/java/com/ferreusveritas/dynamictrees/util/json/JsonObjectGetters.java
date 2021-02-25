@@ -1,38 +1,63 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
+ * Holds {@link IJsonObjectGetter} objects, which can be used to obtain objects from
+ * {@link JsonElement} objects.
+ *
  * @author Harley O'Connor
  */
 public final class JsonObjectGetters {
 
     private static final Set<JsonObjectGetterHolder<?>> OBJECT_GETTERS = Sets.newHashSet();
 
+    /** Returned by {@link #getObjectGetter(Class)} if an object getter wasn't found. */
+    public static final class NullObjectGetter<T> implements IJsonObjectGetter<T> {
+        @Override
+        public boolean isValidGetter() {
+            return false;
+        }
+
+        @Override
+        public ObjectFetchResult<T> get(final JsonElement jsonElement) {
+            return ObjectFetchResult.failure("Could not get Json object getter for json element: " + jsonElement.toString() + ".");
+        }
+    }
+
     /**
      * Gets the {@link IJsonObjectGetter} for the given class type.
      *
      * @param objectClass The {@link Class} of the object to get.
      * @param <T> The type of the object.
-     * @return The {@link IJsonObjectGetter} for the class.
+     * @return The {@link IJsonObjectGetter} for the class, or {@link NullObjectGetter} if it wasn't found.
      */
     @SuppressWarnings("unchecked")
-    @Nullable
     public static <T> IJsonObjectGetter<T> getObjectGetter (final Class<T> objectClass) {
         return OBJECT_GETTERS.stream().filter(jsonObjectGetterHolder -> jsonObjectGetterHolder.objectClass.equals(objectClass))
-                .findFirst().map(jsonObjectGetterHolder -> (IJsonObjectGetter<T>) jsonObjectGetterHolder.objectGetter).orElse(null);
+                .findFirst().map(jsonObjectGetterHolder -> (IJsonObjectGetter<T>) jsonObjectGetterHolder.objectGetter).orElse(new NullObjectGetter<>());
     }
 
     /**
@@ -118,6 +143,13 @@ public final class JsonObjectGetters {
         return ObjectFetchResult.success(jsonElement.getAsJsonObject());
     });
 
+    public static final IJsonObjectGetter<JsonArray> JSON_ARRAY_GETTER = register(JsonArray.class, jsonElement -> {
+        if (!jsonElement.isJsonArray())
+            return ObjectFetchResult.failure("Json element was not a json array.");
+
+        return ObjectFetchResult.success(jsonElement.getAsJsonArray());
+    });
+
     public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION_GETTER = register(ResourceLocation.class, jsonElement -> {
         final ObjectFetchResult<String> stringFetchResult = STRING_GETTER.get(jsonElement);
 
@@ -131,21 +163,14 @@ public final class JsonObjectGetters {
         }
     });
 
+    public static final IJsonObjectGetter<Block> BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
+    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
     public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
     public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
     public static final IJsonObjectGetter<TreeFamily> TREE_FAMILY_GETTER = register(TreeFamily.class, new ForgeRegistryEntryGetter<>(TreeFamily.REGISTRY, "tree family"));
     public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new ForgeRegistryEntryGetter<>(Species.REGISTRY, "species"));
 
-    // TODO: Make leaves properties a forge registry.
-    public static final IJsonObjectGetter<ILeavesProperties> LEAVES_PROPERTIES_GETTER = register(ILeavesProperties.class, jsonElement -> {
-        final ObjectFetchResult<String> stringFetchResult = STRING_GETTER.get(jsonElement);
-
-        if (!stringFetchResult.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(stringFetchResult);
-
-        final ILeavesProperties leavesProperties = DTRegistries.leaves.get(stringFetchResult.getValue());
-        return ObjectFetchResult.successOrFailure(leavesProperties,
-                "Json element referenced unregistered leaves properties '" + stringFetchResult.getValue() + "'.");
-    });
+    @SuppressWarnings("unchecked")
+    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register((Class<ConfiguredGenFeature<GenFeature>>) ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), new ConfiguredGenFeatureGetter());
 
 }

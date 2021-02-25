@@ -1,0 +1,31 @@
+{
+    "family": "dynamictrees:jungle",
+    "tapering": 0.2,
+    "signal_energy": 28.0,
+    "up_probability": 3,
+    "lowest_branch_height": 2,
+    "growth_rate": 1.0,
+    "growth_logic_kit": "dynamictrees:jungle",
+    "leaves_properties": "dynamictrees:jungle",
+    "environment_factors" : {
+        "cold": 0.15,
+        "dry": 0.2,
+        "hot": 1.1,
+        "wet": 1.1
+    },
+    "seed_drop_rarity": 1.0,
+    "stick_drop_rarity": 1.0,
+    "perfect_biomes": { "type": "jungle" },
+    "primitive_sapling": "minecraft:jungle_sapling",
+    "features" : [
+        {
+            "name": "dynamictrees:vines",
+            "properties": {
+                "quantity": 16,
+                "max_length": 16
+            }
+        },
+        "dynamictrees:cocoa",
+        "dynamictrees:undergrowth"
+    ]
+}

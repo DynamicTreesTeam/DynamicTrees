@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.google.common.collect.Maps;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
@@ -15,6 +17,10 @@ import java.util.Map;
  * @author Harley O'Connor
  */
 public class ConfiguredGenFeature<T extends GenFeature> {
+
+    /** A null configured gen feature. Mainly used for getting the class with the
+     * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE_GETTER}. */
+    public static final ConfiguredGenFeature<GenFeature> NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature<>(GenFeatures.NULL);
 
     private final T genFeature;
     private final Map<GenFeatureProperty<?>, GenFeaturePropertyValue<?>> properties = Maps.newHashMap();
@@ -90,6 +96,14 @@ public class ConfiguredGenFeature<T extends GenFeature> {
         ConfiguredGenFeature<V> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.genFeature);
         duplicateGenFeature.properties.putAll(configuredGenFeature.properties);
         return duplicateGenFeature;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfiguredGenFeature{" +
+                "genFeature=" + genFeature +
+                ", properties=" + properties +
+                '}';
     }
 
 }
