@@ -36,7 +36,7 @@ public class ModelHelper {
 	}
 
 	private static ModelResourceLocation getBranchModelResourceLocation(BranchBlock branchBlock) {
-		ResourceLocation family = branchBlock.getFamily().getName();
+		ResourceLocation family = branchBlock.getFamily().getRegistryName();
 		ResourceLocation resloc = new ResourceLocation(family.getNamespace(), family.getPath() + "branch");
 		return new ModelResourceLocation(resloc, null);
 	}

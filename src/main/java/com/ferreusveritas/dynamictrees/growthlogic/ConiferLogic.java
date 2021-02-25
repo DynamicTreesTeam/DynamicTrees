@@ -4,23 +4,25 @@ import com.ferreusveritas.dynamictrees.systems.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ConiferLogic implements IGrowthLogicKit {
+public class ConiferLogic extends GrowthLogicKit {
 	
 	private final float energyDivisor;
 	private float horizontalLimiter = 16.0f;
 	private int heightVariation = 5;
 	
-	public ConiferLogic() {
-		this(3.0f);//Default for normal spruce
+	public ConiferLogic(final ResourceLocation registryName) {
+		this(registryName, 3.0f); // Default for normal spruce
 	}
 	
 	/**
 	 * @param energyDivisor The remaining energy a branch has will be determined by this divisor.  Affects the conical slope of the tree shape.
 	 */
-	public ConiferLogic(float energyDivisor) {
+	public ConiferLogic(final ResourceLocation registryName, final float energyDivisor) {
+		super(registryName);
 		this.energyDivisor = energyDivisor;
 	}
 	

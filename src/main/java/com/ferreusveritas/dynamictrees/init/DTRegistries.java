@@ -15,6 +15,8 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
@@ -250,6 +252,11 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
 		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
+	}
+
+	@SubscribeEvent
+	public static void onGrowthLogicKitRegistry (final RegistryEvent.Register<GrowthLogicKit> event) {
+		GrowthLogicKits.register(event.getRegistry());
 	}
 
 }

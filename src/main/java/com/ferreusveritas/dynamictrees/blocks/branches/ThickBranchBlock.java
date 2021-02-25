@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,8 +24,6 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
-
-//TODO: 1.14.4 This gets flattened into the normal block branch with radius 1 - 32 and eliminated 
 
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
@@ -138,12 +136,13 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
-		BlockPos deltaPos = pos.offset(side);
+		final BlockPos deltaPos = pos.offset(side);
+		final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
-		try {
+		if (blockState == null)
+			return 0;
 
-			BlockState blockState = blockAccess.getBlockState(deltaPos);
-			int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
+		final int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, blockAccess, deltaPos, this, side, radius);
 
 //			if (radius > 8) {
 //				if (side == Direction.DOWN) {
@@ -153,11 +152,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 //				}
 //			}
 
-			return Math.min(RADMAX_NORMAL, connectionRadius);
-		} catch (Exception e) { // Temporary measure until we find a way to solve calling an out-of-bounds block here.
-			LogManager.getLogger().warn("Tried to get unloaded block X: " + deltaPos.getX() + " Y: " + deltaPos.getY() + " Z: " + deltaPos.getZ());
-			return 0;
-		}
+		return Math.min(RADMAX_NORMAL, connectionRadius);
 	}
 
 	public ReplaceableState getReplaceability(IWorld world, BlockPos pos, BlockPos corePos) {

@@ -37,10 +37,8 @@ public class ThickRingAtlasTexture extends AtlasTexture {
 
     private static final int spriteSizeMultiplier = 3;
 
-    public static final ResourceLocation LOCATION_THICKRINGS_TEXTURE = new ResourceLocation(DynamicTrees.MOD_ID, "textures/atlas/thick_rings.png");
-
     public ThickRingAtlasTexture() {
-        super(LOCATION_THICKRINGS_TEXTURE);
+        super(ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
         maximumTextureSize = RenderSystem.maxSupportedTextureSize();
     }
 
@@ -95,7 +93,7 @@ public class ThickRingAtlasTexture extends AtlasTexture {
         int k1 = maxMipmapLevelIn;
         if (false) // FORGE: do not lower the mipmap level
             if (j1 < maxMipmapLevelIn) {
-                LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", LOCATION_THICKRINGS_TEXTURE, maxMipmapLevelIn, j1, i1);
+                LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE, maxMipmapLevelIn, j1, i1);
                 k1 = j1;
             } else {
                 k1 = maxMipmapLevelIn;

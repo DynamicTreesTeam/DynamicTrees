@@ -19,6 +19,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,7 +89,8 @@ public class CoordUtils {
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
 			return ((IWorldReader) blockReader).isBlockLoaded(pos);
-		} else return blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache;
+		} else return (blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache ||
+				blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
 	}
 
 	/**
@@ -203,7 +205,8 @@ public class CoordUtils {
 			return BlockRayTraceResult.createMiss(context1.getEndVector(), Direction.getFacingFromVector(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context1.getEndVector()));
 		});
 	}
-	static <T> T getRayTraceVector(CustomRayTraceContext context, BiFunction<CustomRayTraceContext, BlockPos, T> biFunction, Function<CustomRayTraceContext, T> function) {
+
+	private static <T> T getRayTraceVector(CustomRayTraceContext context, BiFunction<CustomRayTraceContext, BlockPos, T> biFunction, Function<CustomRayTraceContext, T> function) {
 		Vector3d startVec = context.getStartVector();
 		Vector3d endVec = context.getEndVector();
 		if (startVec.equals(endVec)) {
@@ -338,7 +341,7 @@ public class CoordUtils {
 		return goHorSides(pos, null);
 	}
 
-	public static Iterable<BlockPos> goHorSides(BlockPos pos, Direction ignore) {
+	public static Iterable<BlockPos> goHorSides(final BlockPos pos, @Nullable final Direction ignore) {
 		return new Iterable<BlockPos>() {
 			@Nonnull @Override
 			public Iterator<BlockPos> iterator() {

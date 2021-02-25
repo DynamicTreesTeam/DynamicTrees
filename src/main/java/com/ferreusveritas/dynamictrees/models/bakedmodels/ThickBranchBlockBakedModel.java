@@ -4,16 +4,13 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureAtlasSprite;
 import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
-import com.ferreusveritas.dynamictrees.models.ICustomDamageModel;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.*;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -27,12 +24,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
-public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel implements ICustomDamageModel {
+public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
 	protected final ResourceLocation thickRingsResLoc;
 
@@ -54,8 +50,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 	public void setupModels() {
 		super.setupModels();
 
-		TextureAtlasSprite ringsTexture = ModelUtils.getTexture(ringsResLoc);
-		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc);
+		final TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
+		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(this.thickRingsResLoc);
 
 		//if (isTextureNull(thickRingsTexture)){
 			//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
@@ -84,7 +80,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 		ArrayList<Vector3i> offsets = new ArrayList<>();
 
 		for (Surround dir: Surround.values()) {
-			offsets.add(dir.getOffset());//8 surrounding component pieces
+			offsets.add(dir.getOffset()); // 8 surrounding component pieces
 		}
 		offsets.add(new Vector3i(0, 0, 0));//Center
 
@@ -158,9 +154,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 		return builder.build();
 	}
 
-	@Nonnull
 	@Override
-	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+	public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final Random rand, final IModelData extraData) {
 		if (state == null || side != null) return Collections.emptyList();
 
 		int coreRadius = this.getRadius(state);
@@ -209,24 +204,5 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel imple
 
 		return quads;
 	}
-
-    @Override
-    public List<BakedQuad> getCustomDamageQuads(BlockState blockState, Direction side, long randSeed, IModelData modelData) {
-        int coreRadius = getRadius(blockState);
-        Random rand = new Random();
-        rand.setSeed(randSeed);
-        if (coreRadius <= BranchBlock.RADMAX_NORMAL) {
-            return super.getQuads(blockState, side, rand);
-        }
-
-        coreRadius = MathHelper.clamp(coreRadius, 9, 24);
-
-        List<BakedQuad> quadsList = new LinkedList<>();
-
-        quadsList.addAll(trunksBark[coreRadius - 9].getQuads(blockState, side, rand, modelData));
-        quadsList.addAll(trunksTopBark[coreRadius - 9].getQuads(blockState, side, rand, modelData));
-
-        return quadsList;
-    }
 
 }

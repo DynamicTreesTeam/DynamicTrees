@@ -43,34 +43,32 @@ public class TextureStitchEventHandler {
 
                 if (textureNotFound){
                     ringLocationsToGenerate.add(thickLogResLoc);
-                } else {
-                    event.addSprite(thickLogResLoc);
                 }
             }
 
-            ThickRingTextureManager.textureAtlas = new ThickRingAtlasTexture();
-            ThickRingTextureManager.thickRingData = ThickRingTextureManager.textureAtlas.stitch(manager, ringLocationsToGenerate.stream(), EmptyProfiler.INSTANCE, 0);
-            //ThickRingTextureManager.thickRingData = ThickRingTextureManager.uploader.prepare(manager, ringLocationsToGenerate.stream());
+//            ThickRingTextureManager.textureAtlas = new ThickRingAtlasTexture();
+//            ThickRingTextureManager.thickRingData = ThickRingTextureManager.textureAtlas.stitch(manager, ringLocationsToGenerate.stream(), EmptyProfiler.INSTANCE, 0);
+
         }
-        else if (eventAtlasLocation.equals(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE)){
+        else if (eventAtlasLocation.equals(ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE)){
             System.out.println(event.getMap().getClass());
         }
     }
 
     @SubscribeEvent
     public static void onTextureStitchEventPost(final TextureStitchEvent.Post event) {
-        if (event.getMap().getTextureLocation().equals(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE)) {
-            TextureManager textureManager = Minecraft.getInstance().textureManager;
-            ThickRingAtlasTexture atlastexture = ThickRingTextureManager.textureAtlas;
-            AtlasTexture.SheetData atlastexture$sheetdata = ThickRingTextureManager.thickRingData;
-
-            textureManager.mapTextureObjects.remove(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE);
-
-            atlastexture.upload(atlastexture$sheetdata);
-            textureManager.loadTexture(atlastexture.getTextureLocation(), atlastexture);
-            textureManager.bindTexture(atlastexture.getTextureLocation());
-            atlastexture.setBlurMipmap(atlastexture$sheetdata);
-        }
+//        if (event.getMap().getTextureLocation().equals(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE)) {
+//            TextureManager textureManager = Minecraft.getInstance().textureManager;
+//            ThickRingAtlasTexture atlastexture = ThickRingTextureManager.textureAtlas;
+//            AtlasTexture.SheetData atlastexture$sheetdata = ThickRingTextureManager.thickRingData;
+//
+//            textureManager.mapTextureObjects.remove(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE);
+//
+//            atlastexture.upload(atlastexture$sheetdata);
+//            textureManager.loadTexture(atlastexture.getTextureLocation(), atlastexture);
+//            textureManager.bindTexture(atlastexture.getTextureLocation());
+//            atlastexture.setBlurMipmap(atlastexture$sheetdata);
+//        }
 
     }
 

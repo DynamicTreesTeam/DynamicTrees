@@ -70,7 +70,7 @@ public class FruitBlock extends Block implements IGrowable {
 		super(Properties.create(Material.PLANTS)
 				.tickRandomly()
 				.hardnessAndResistance(0.3f));
-		setRegistryName(name);
+		this.setRegistryName(name);
 	}
 
 	public FruitBlock setBonemealable(boolean bonemealable) {

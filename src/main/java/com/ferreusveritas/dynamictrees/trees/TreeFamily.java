@@ -33,7 +33,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
@@ -56,9 +58,9 @@ import java.util.List;
 *
 * @author ferreusveritas
 */
-public class TreeFamily {
+public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	
-	public final static TreeFamily NULLFAMILY = new TreeFamily() {
+	public final static TreeFamily NULL_FAMILY = new TreeFamily() {
 		@Override public void setCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
 		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
@@ -67,9 +69,13 @@ public class TreeFamily {
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
 	};
-	
-	/** Simple name of the tree e.g. "oak" */
-	private final ResourceLocation name;
+
+	/**
+	 * Mods should use this to register their {@link TreeFamily} objects.
+	 *
+	 * Places the species in a central registry.
+	 */
+	public static IForgeRegistry<TreeFamily> REGISTRY;
 
 	@Nonnull
 	protected Species commonSpecies = Species.NULL_SPECIES;
@@ -89,7 +95,7 @@ public class TreeFamily {
 	private Block primitiveStrippedLog = Blocks.AIR;
 
 	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
-	private List<BranchBlock> validBranches = new LinkedList<>();
+	private final List<BranchBlock> validBranches = new LinkedList<>();
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -102,12 +108,12 @@ public class TreeFamily {
 	public boolean canSupportCocoa = false;
 
 	@OnlyIn(Dist.CLIENT)
-	public int woodRingColor;//For rooty blocks
+	public int woodRingColor; // For rooty blocks
 	@OnlyIn(Dist.CLIENT)
-	public int woodBarkColor;//For rooty water
+	public int woodBarkColor; // For rooty water
 
 	public TreeFamily() {
-		this.name = new ResourceLocation(DynamicTrees.MOD_ID, "null");
+		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null"));
 	}
 
 	/**
@@ -116,7 +122,7 @@ public class TreeFamily {
 	 * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
 	 */
 	public TreeFamily(ResourceLocation name) {
-		this.name = name;
+		this.setRegistryName(name);
 
 		//this must be the first branch registered, to have its validBranches index be 0;
 		setDynamicBranch(createBranch());
@@ -262,10 +268,6 @@ public class TreeFamily {
 	// TREE PROPERTIES
 	///////////////////////////////////////////
 
-	public ResourceLocation getName() {
-		return name;
-	}
-
 	public boolean isWood() {
 		return true;
 	}
@@ -278,8 +280,9 @@ public class TreeFamily {
 	public BranchBlock createBranch() {
 		return createBranch("_branch");
 	}
+
 	public BranchBlock createBranch(String postfix) {
-		String branchName = this.getName() + postfix;
+		String branchName = this.getRegistryName().getPath() + postfix;
 		BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
 		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
 		return branch;
@@ -382,6 +385,7 @@ public class TreeFamily {
 	public Block getPrimitiveLog() {
 		return primitiveLog;
 	}
+
 	public Block getPrimitiveStrippedLog() {
 		return primitiveStrippedLog;
 	}
@@ -444,20 +448,21 @@ public class TreeFamily {
 	}
 
 	public void addValidBranches (BranchBlock... branches){
-		validBranches.addAll(Arrays.asList(branches));
+		this.validBranches.addAll(Arrays.asList(branches));
 	}
 
 	public int getBranchBlockIndex (BranchBlock block){
-		int index = validBranches.indexOf(block);
+		int index = this.validBranches.indexOf(block);
 		if (index < 0){
-			LogManager.getLogger().warn("Block " + block + " not valid branch for " + this);
+			LogManager.getLogger().warn("Block {} not valid branch for {}.", block, this);
 			return 0;
 		}
 		return index;
 	}
 
+	@Nullable
 	public BranchBlock getValidBranchBlock (int index) {
-		return validBranches.get(index);
+		return this.validBranches.get(index);
 	}
 
 	///////////////////////////////////////////
@@ -469,7 +474,7 @@ public class TreeFamily {
 	}
 
 	public SurfaceRootBlock createSurfaceRoot () {
-		String surfaceRootName = this.getName() + "_root";
+		String surfaceRootName = this.getRegistryName().getPath() + "_root";
 		return new SurfaceRootBlock(surfaceRootName, this);
 	}
 
@@ -538,7 +543,7 @@ public class TreeFamily {
 
 	@Override
 	public String toString() {
-		return getName().toString();
+		return getRegistryName().toString();
 	}
 	
 }

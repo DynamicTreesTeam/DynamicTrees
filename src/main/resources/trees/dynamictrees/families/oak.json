@@ -3,5 +3,6 @@
     "common_leaves": "dynamictrees:oak",
     "primitive_log": "minecraft:oak_log",
     "sticks": "minecraft:sticks",
+    "max_branch_radius": 8,
     "common_species": "dynamictrees:oak"
 }

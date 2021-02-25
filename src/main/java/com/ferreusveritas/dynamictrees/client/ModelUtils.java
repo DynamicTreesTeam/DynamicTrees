@@ -67,9 +67,11 @@ public class ModelUtils {
 		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, modelRotation, blockPart.partRotation, true, modelResLoc);
 	}
 
+	@SuppressWarnings("deprecation")
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
 		return getTexture(resLoc, AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 	}
+
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc, ResourceLocation atlasResLoc) {
 		return Minecraft.getInstance().getAtlasSpriteGetter(atlasResLoc).apply(resLoc);
 	}

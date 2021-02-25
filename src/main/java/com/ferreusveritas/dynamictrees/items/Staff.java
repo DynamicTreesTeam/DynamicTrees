@@ -171,8 +171,8 @@ public class Staff extends Item {
 	public Species getSpecies(ItemStack itemStack) {
 		CompoundNBT nbt = itemStack.getOrCreateTag();
 		
-		if(nbt.contains(TREE)) {
-			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
+		if (nbt.contains(TREE)) {
+			return TreeRegistry.findSpecies(nbt.getString(TREE));
 		} else {
 			Species species = TreeRegistry.findSpeciesSloppy("oak");
 			setSpecies(itemStack, species);

@@ -24,6 +24,7 @@ public class LeavesStickDropCreator extends DropCreator {
 	public LeavesStickDropCreator(Species species) {
 		this(species, 1, 2);
 	}
+
 	public LeavesStickDropCreator(Species species, float rarity, int maxCount) {
 		super(new ResourceLocation(DynamicTrees.MOD_ID, "sticks"));
 		this.droppedItem = species.getFamily().getStick(1);

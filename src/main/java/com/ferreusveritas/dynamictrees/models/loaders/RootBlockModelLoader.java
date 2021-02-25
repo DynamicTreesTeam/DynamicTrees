@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.ferreusveritas.dynamictrees.models.geometry.RootBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,6 +18,11 @@ public class RootBlockModelLoader extends BranchBlockModelLoader {
         final JsonObject textures = this.getTexturesObject(modelContents);
 
         return new RootBlockModelGeometry(this.getBarkResLoc(textures));
+    }
+
+    @Override
+    protected String getModelTypeName() {
+        return "surface root";
     }
 
 }

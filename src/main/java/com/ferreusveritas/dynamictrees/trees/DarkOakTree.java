@@ -2,10 +2,9 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.Blocks;
@@ -28,18 +27,13 @@ import static com.ferreusveritas.dynamictrees.systems.genfeatures.HugeMushroomsG
 public class DarkOakTree extends VanillaTreeFamily {
 	
 	public class DarkOakSpecies extends Species {
-		
-		protected HugeMushroomsGenFeature underGen;
-		protected BottomFlareGenFeature flareBottomGen;
-		protected RootsGenFeature rootGen;
-		protected MoundGenFeature moundGen;
-		
+
 		DarkOakSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);
-			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.DARK_OAK));
+			setGrowthLogicKit(GrowthLogicKits.DARK_OAK);
 			
 			setSoilLongevity(14);//Grows for a long long time
 			

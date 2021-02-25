@@ -4,8 +4,8 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import net.minecraft.block.BlockState;
@@ -22,7 +22,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -30,18 +29,17 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 public class JungleTree extends VanillaTreeFamily {
 	
 	public class JungleSpecies extends Species {
 		
 		JungleSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 			
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
-			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.JUNGLE));
+			setGrowthLogicKit(GrowthLogicKits.JUNGLE);
 			
 			envFactor(Type.COLD, 0.15f);
 			envFactor(Type.DRY,  0.20f);
@@ -76,12 +74,12 @@ public class JungleTree extends VanillaTreeFamily {
 		private static final String speciesName = "mega_jungle";
 		
 		MegaJungleSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
 			
 			setRequiresTileEntity(true);
 			
 			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
-			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(DTTrees.JUNGLE));
+			setGrowthLogicKit(GrowthLogicKits.JUNGLE);
 			
 			envFactor(Type.COLD, 0.15f);
 			envFactor(Type.DRY,  0.20f);

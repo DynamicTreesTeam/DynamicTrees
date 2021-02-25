@@ -1,23 +1,19 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class GrowthLogicKits {
 	
-	public final static NullLogic nullLogic = new NullLogic();
-	
-	public static void setup() {
-		new GrowthLogicKits();
+	public static final GrowthLogicKit NULL = new NullLogic();
+	public static final GrowthLogicKit DARK_OAK = new DarkOakLogic(new ResourceLocation(DynamicTrees.MOD_ID, "dark_oak"));
+	public static final GrowthLogicKit CONIFER = new ConiferLogic(new ResourceLocation(DynamicTrees.MOD_ID, "conifer"));
+	public static final GrowthLogicKit MEGA_CONIFER = new ConiferLogic(new ResourceLocation(DynamicTrees.MOD_ID, "mega_conifer"), 5);
+	public static final GrowthLogicKit JUNGLE = new JungleLogic(new ResourceLocation(DynamicTrees.MOD_ID, "jungle"));
+
+	public static void register(final IForgeRegistry<GrowthLogicKit> registry) {
+		registry.registerAll(NULL, DARK_OAK, CONIFER, MEGA_CONIFER, JUNGLE);
 	}
-	
-	public GrowthLogicKits() {
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MOD_ID, DTTrees.NULL), new NullLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MOD_ID, DTTrees.DARK_OAK), new DarkOakLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MOD_ID, DTTrees.CONIFER), new ConiferLogic());
-		TreeRegistry.registerGrowthLogicKit(new ResourceLocation(DynamicTrees.MOD_ID, DTTrees.JUNGLE), new JungleLogic());
-	}
-	
+
 }

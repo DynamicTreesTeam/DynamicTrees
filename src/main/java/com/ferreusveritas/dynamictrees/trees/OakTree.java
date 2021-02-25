@@ -33,7 +33,7 @@ public class OakTree extends VanillaTreeFamily {
 	public static class OakSpecies extends Species {
 		
 		OakSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 			
 			//Oak trees are about as average as you can get
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
@@ -82,7 +82,7 @@ public class OakTree extends VanillaTreeFamily {
 	public class SwampOakSpecies extends Species {
 				
 		SwampOakSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), "swamp_" + treeFamily.getName().getPath()), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), "swamp_" + treeFamily.getRegistryName().getPath()), treeFamily);
 			
 			setBasicGrowingParameters(0.3f, 12.0f, upProbability, lowestBranchHeight, 0.8f);
 			
@@ -153,7 +153,7 @@ public class OakTree extends VanillaTreeFamily {
 		private static final String speciesName = "apple";
 		
 		public AppleOakSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getName().getNamespace(), speciesName), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
 			
 			setRequiresTileEntity(true);
 			

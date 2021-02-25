@@ -58,24 +58,23 @@ public final class BakedModelEventHandler {
                 new BakedModelBlockBonsaiPot(flowerPotModel));
 
         ////Highly experimental code
-
-        SpriteMap spriteAtlases = event.getModelManager().atlases;
-        assert spriteAtlases != null;
-        Map<ResourceLocation, AtlasTexture> atlasTextures = spriteAtlases.atlasTextures;
-        atlasTextures.put(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE, ThickRingTextureManager.textureAtlas);
-
-        Map<ResourceLocation, IUnbakedModel> topUnbakedModels = event.getModelLoader().topUnbakedModels;
-        List<ResourceLocation> modelsToRebake = new LinkedList<>();
-        for (Map.Entry<ResourceLocation, IUnbakedModel> entry : topUnbakedModels.entrySet()){
-            for (RenderMaterial material : entry.getValue().getTextures(event.getModelLoader()::getUnbakedModel, Sets.newLinkedHashSet())){
-                if (material.getAtlasLocation().equals(ThickRingAtlasTexture.LOCATION_THICKRINGS_TEXTURE)){
-                    modelsToRebake.add(entry.getKey());
-                }
-            }
-        }
-        for (ResourceLocation resourceLocation : modelsToRebake){
-            event.getModelRegistry().put(resourceLocation, event.getModelLoader().bake(resourceLocation, ModelRotation.X0_Y0));
-        }
+//        SpriteMap spriteAtlases = event.getModelManager().atlases;
+//        assert spriteAtlases != null;
+//        Map<ResourceLocation, AtlasTexture> atlasTextures = spriteAtlases.atlasTextures;
+//        atlasTextures.put(ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE, ThickRingTextureManager.textureAtlas);
+//
+//        Map<ResourceLocation, IUnbakedModel> topUnbakedModels = event.getModelLoader().topUnbakedModels;
+//        List<ResourceLocation> modelsToRebake = new LinkedList<>();
+//        for (Map.Entry<ResourceLocation, IUnbakedModel> entry : topUnbakedModels.entrySet()){
+//            for (RenderMaterial material : entry.getValue().getTextures(event.getModelLoader()::getUnbakedModel, Sets.newLinkedHashSet())){
+//                if (material.getAtlasLocation().equals(ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE)){
+//                    modelsToRebake.add(entry.getKey());
+//                }
+//            }
+//        }
+//        for (ResourceLocation resourceLocation : modelsToRebake){
+//            event.getModelRegistry().put(resourceLocation, event.getModelLoader().bake(resourceLocation, ModelRotation.X0_Y0));
+//        }
     }
 
 }

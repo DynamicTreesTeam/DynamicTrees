@@ -19,7 +19,9 @@ public class ThickRingTextureManager {
      * THIS IS STILL WIP. THICK RINGS ARE NOT YET STITCHED AUTOMATICALLY
      */
 
-    public static ThickRingAtlasTexture textureAtlas;
+	public static final ResourceLocation LOCATION_THICKRINGS_TEXTURE = new ResourceLocation(DynamicTrees.MOD_ID, "textures/atlas/thick_rings.png");
+
+	public static ThickRingAtlasTexture textureAtlas;
 	//public static ThickRingSpriteUploader uploader;
 	public static AtlasTexture.SheetData thickRingData;
 
@@ -28,8 +30,7 @@ public class ThickRingTextureManager {
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
 		ResourceLocation thickRingSet = new ResourceLocation(ringsRes.getNamespace(), ringsRes.getPath() + "_thick");
 		thickRingTextures.put(ringsRes, thickRingSet);
-		//return thickRingSet;
-		return ringsRes;
+		return thickRingSet;
 	}
 
 	public static Set<ResourceLocation> getThickRingResourceLocations (){

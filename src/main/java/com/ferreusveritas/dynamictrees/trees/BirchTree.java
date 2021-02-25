@@ -20,7 +20,7 @@ public class BirchTree extends VanillaTreeFamily {
 	public static class BirchSpecies extends Species {
 		
 		BirchSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getName(), treeFamily);
+			super(treeFamily.getRegistryName(), treeFamily);
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);

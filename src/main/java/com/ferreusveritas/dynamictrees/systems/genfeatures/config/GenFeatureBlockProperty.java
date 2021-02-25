@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
-import com.ferreusveritas.dynamictrees.util.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
@@ -20,7 +20,7 @@ public class GenFeatureBlockProperty extends GenFeatureProperty<Block> {
     public GenFeatureBlockProperty(String identifier) {
         super(identifier, Block.class);
     }
-
+    
     @Nullable
     @Override
     public GenFeaturePropertyValue<Block> getFromJsonObject(JsonObject jsonObject) {

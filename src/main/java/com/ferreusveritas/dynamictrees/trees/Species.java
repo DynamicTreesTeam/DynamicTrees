@@ -23,7 +23,7 @@ import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -81,7 +81,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
-		@Override public TreeFamily getFamily() { return TreeFamily.NULLFAMILY; }
+		@Override public TreeFamily getFamily() { return TreeFamily.NULL_FAMILY; }
 		@Override public boolean isTransformable() { return false; }
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -97,15 +97,14 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * Mods should use this to register their {@link Species}
 	 *
 	 * Places the species in a central registry.
-	 * The proper place to use this is during the preInit phase of your mod.
 	 */
 	public static IForgeRegistry<Species> REGISTRY;
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected final TreeFamily treeFamily;
+	protected TreeFamily treeFamily = TreeFamily.NULL_FAMILY;
 	
 	/** Logic kit for standardized extended growth behavior */
-	protected IGrowthLogicKit logicKit = GrowthLogicKits.nullLogic;
+	protected GrowthLogicKit logicKit = GrowthLogicKits.NULL;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
@@ -125,7 +124,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	private boolean requiresTileEntity = false;
 
 	//Leaves
-	protected ILeavesProperties leavesProperties;
+	protected ILeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
 
 	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
 	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
@@ -147,15 +146,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
 
 	private String unlocalizedName = "";
-	
+
 	/**
-	 * Constructor only used by NULLSPECIES
+	 * Constructor should only used by {@link #NULL_SPECIES}.
 	 */
-	public Species() {
-		this.treeFamily = TreeFamily.NULLFAMILY;
-		this.leavesProperties = LeavesProperties.NULL_PROPERTIES;
-	}
-	
+	public Species() {}
+
 	/**
 	 * Constructor suitable for derivative mods that defaults
 	 * the leavesProperties to the common type for the family
@@ -199,6 +195,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return treeFamily;
 	}
 
+	public void setFamily(TreeFamily treeFamily) {
+		this.treeFamily = treeFamily;
+	}
+
 	public Species setUnlocalizedName(String name) {
 		unlocalizedName = name;
 		return this;
@@ -220,7 +220,27 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		this.growthRate = growthRate;
 		return this;
 	}
-	
+
+	public void setTapering(float tapering) {
+		this.tapering = tapering;
+	}
+
+	public void setUpProbability(int upProbability) {
+		this.upProbability = upProbability;
+	}
+
+	public void setLowestBranchHeight(int lowestBranchHeight) {
+		this.lowestBranchHeight = lowestBranchHeight;
+	}
+
+	public void setSignalEnergy(float signalEnergy) {
+		this.signalEnergy = signalEnergy;
+	}
+
+	public void setGrowthRate(float growthRate) {
+		this.growthRate = growthRate;
+	}
+
 	public float getEnergy(World world, BlockPos rootPos) {
 		return getGrowthLogicKit().getEnergy(world, rootPos, this, signalEnergy);
 	}
@@ -332,15 +352,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
 		int index = validLeaves.indexOf(block.properties);
-		if (index < 0){
-			LogManager.getLogger().warn("Block " + block + " not valid leaves for " + this);
+		if (index < 0) {
+			LogManager.getLogger().warn("Block {} not valid leaves for {}.", block, this);
 			return 0;
 		}
 		return index;
 	}
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
-		return (DynamicLeavesBlock)validLeaves.get(index).getDynamicLeavesState().getBlock();
+		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
 	}
 
 	///////////////////////////////////////////
@@ -393,6 +413,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		addDropCreator(new SeedDropCreator());
 		return this;
 	}
+
 	public Species setupStandardSeedDropping(float rarity) {
 		addDropCreator(new SeedDropCreator(rarity));
 		return this;
@@ -413,6 +434,11 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	public Species setupStandardStickDropping() {
 		addDropCreator(new LeavesStickDropCreator(this));
+		return this;
+	}
+
+	public Species setupStandardStickDropping (float rarity) {
+		addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
 		return this;
 	}
 
@@ -958,12 +984,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param logicKit A growth logic kit
 	 * @return this species for chaining
 	 */
-	public Species setGrowthLogicKit(IGrowthLogicKit logicKit) {
+	public Species setGrowthLogicKit(GrowthLogicKit logicKit) {
 		this.logicKit = logicKit;
 		return this;
 	}
 	
-	public IGrowthLogicKit getGrowthLogicKit() {
+	public GrowthLogicKit getGrowthLogicKit() {
 		return logicKit;
 	}
 
@@ -1531,5 +1557,32 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		}
 		return getRegistryName().toString();
 	}
-	
+
+
+	public String getDisplayInfo() {
+		return "Species{" +
+				"treeFamily=" + treeFamily +
+				", logicKit=" + logicKit +
+				", tapering=" + tapering +
+				", upProbability=" + upProbability +
+				", lowestBranchHeight=" + lowestBranchHeight +
+				", signalEnergy=" + signalEnergy +
+				", growthRate=" + growthRate +
+				", soilLongevity=" + soilLongevity +
+				", soilTypeFlags=" + soilTypeFlags +
+				", requiresTileEntity=" + requiresTileEntity +
+				", leavesProperties=" + leavesProperties +
+				", validLeaves=" + validLeaves +
+				", seed=" + seed +
+				", saplingBlock=" + saplingBlock +
+				", primitiveSapling=" + primitiveSapling +
+				", dropCreatorStorage=" + dropCreatorStorage +
+				", envFactors=" + envFactors +
+				", genFeatures=" + genFeatures +
+				", unlocalizedName='" + unlocalizedName + '\'' +
+				", flowerSeasonHoldMin=" + flowerSeasonHoldMin +
+				", flowerSeasonHoldMax=" + flowerSeasonHoldMax +
+				'}';
+	}
+
 }

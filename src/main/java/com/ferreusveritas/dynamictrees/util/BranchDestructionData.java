@@ -15,23 +15,24 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
 public class BranchDestructionData {
-	public final Species species;//The species of the tree that was harvested
-	public final int[] destroyedBranchesRadiusPosition;//Encoded branch radius and relative positions
-	public final int[] destroyedBranchesConnections;//Encoded branch shapes
-	public final int[] destroyedBranchesBlockIndex;//Encoded valid branch block index for family
-	public final int[] destroyedLeaves;//Encoded leaves relative positions
-	public final int[] destroyedLeavesBlockIndex;//Encoded leaves relative positions
-	public final List<BranchBlock.ItemStackPos> leavesDrops;//A list of itemstacks and their spawn positions.  Not used on the client.
-	public final int[] endPoints;//Encoded endpoint relative positions
-	public final NetVolumeNode.Volume woodVolume;//A summation of all of the wood voxels that was harvested
-	public final Direction cutDir;//The face that was connected to the remaining body of the tree or the rooty block
-	public final Direction toolDir;//The face that was pounded on when breaking the block at cutPos
-	public final BlockPos cutPos;//The absolute(world) position of the block that was cut
+	public final Species species; // The species of the tree that was harvested
+	public final int[] destroyedBranchesRadiusPosition; // Encoded branch radius and relative positions
+	public final int[] destroyedBranchesConnections; // Encoded branch shapes
+	public final int[] destroyedBranchesBlockIndex; // Encoded valid branch block index for family
+	public final int[] destroyedLeaves; // Encoded leaves relative positions
+	public final int[] destroyedLeavesBlockIndex; // Encoded valid leaves block index for species
+	public final List<BranchBlock.ItemStackPos> leavesDrops; // A list of itemstacks and their spawn positions.  Not used on the client.
+	public final int[] endPoints; // Encoded endpoint relative positions
+	public final NetVolumeNode.Volume woodVolume; // A summation of all of the wood voxels that was harvested
+	public final Direction cutDir; // The face that was connected to the remaining body of the tree or the rooty block
+	public final Direction toolDir; // The face that was pounded on when breaking the block at cutPos
+	public final BlockPos cutPos; // The absolute(world) position of the block that was cut
 	public final int trunkHeight;
 	
 	public static final BlockBounds bounds = new BlockBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
@@ -183,7 +184,8 @@ public class BranchDestructionData {
 	private int decodeBranchRadius(int encoded) {
 		return (encoded >> 24) & 0x1F;
 	}
-	
+
+	@Nullable
 	public BlockState getBranchBlockState(int index) {
 		BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
 		if(branch != null) {
@@ -251,6 +253,7 @@ public class BranchDestructionData {
 	private int encodeLeavesPos(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
 		return	(state.get(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
 	}
+
 	private int encodeLeavesBlocks (DynamicLeavesBlock block, Species species){
 		return species.getLeafBlockIndex(block);
 	}

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.util.json;
 
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.google.gson.*;
@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.*;
 
 public class JsonHelper {
@@ -24,10 +25,12 @@ public class JsonHelper {
 		}
 	}
 
+	@Nullable
 	public static JsonElement load(ResourceLocation jsonLocation) {
 		return load(jsonLocation, ResourceFolder.DATA);
 	}
 
+	@Nullable
 	public static JsonElement load(ResourceLocation jsonLocation, ResourceFolder resourceFolder) {
 		String filename = resourceFolder.folderName + jsonLocation.getNamespace() + "/" + (resourceFolder == ResourceFolder.DATA ? "trees/" : "") + jsonLocation.getPath();
 		InputStream in = LeavesPaging.class.getClassLoader().getResourceAsStream(filename);
@@ -38,8 +41,9 @@ public class JsonHelper {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		return new Gson().fromJson(reader, JsonElement.class);
 	}
-	
-	public static JsonElement load(File file) {
+
+	@Nullable
+	public static JsonElement load(@Nullable final File file) {
 		
 		if (file != null && file.exists() && file.isFile() && file.canRead()) {
 			String fileName = file.getAbsolutePath();
@@ -57,6 +61,28 @@ public class JsonHelper {
 	}
 
 	/**
+	 * Determines if a {@link JsonElement} is a comment (comments start with an underscore).
+	 *
+	 * @param jsonElement The {@link JsonElement} object.
+	 * @return True if {@link JsonElement} is a comment.
+	 */
+	public static boolean isComment(final JsonElement jsonElement) {
+		final ObjectFetchResult<String> fetchResult = JsonObjectGetters.STRING_GETTER.get(jsonElement);
+		return fetchResult.wasSuccessful() && isComment(fetchResult.getValue());
+	}
+
+	/**
+	 * Determines if the key of a {@link JsonElement} is a comment (comments start with
+	 * an underscore).
+	 *
+	 * @param key The key of the {@link JsonElement}.
+	 * @return True if key is a comment.
+	 */
+	public static boolean isComment(final String key) {
+		return key.startsWith("_");
+	}
+
+	/**
 	 * Gets the boolean value from the element name of the {@link JsonObject} given, or
 	 * returns the default value given if the element was not found or wasn't a boolean.
 	 *
@@ -65,15 +91,18 @@ public class JsonHelper {
 	 * @param defaultValue The default value if it couldn't be obtained.
 	 * @return The boolean value.
 	 */
-	public static boolean getOrDefault (JsonObject jsonObject, String elementName, boolean defaultValue) {
-		JsonElement element = jsonObject.get(elementName);
+	@SuppressWarnings("boxing")
+	public static boolean getOrDefault (final JsonObject jsonObject, final String elementName, final boolean defaultValue) {
+		final JsonElement element = jsonObject.get(elementName);
 
-		if (element == null || !element.isJsonPrimitive() || !((JsonPrimitive) element).isBoolean())
+		if (element == null)
 			return defaultValue;
 
-		return element.getAsBoolean();
+		final ObjectFetchResult<Boolean> fetchResult = JsonObjectGetters.BOOLEAN_GETTER.get(element);
+		return fetchResult.wasSuccessful() && fetchResult.getValue();
 	}
 
+	@Nullable
 	@SuppressWarnings("unchecked")
 	public static <T> T getFromPrimitive (JsonPrimitive jsonPrimitive, Class<T> type) {
 		for (JsonPrimitives primitive : JsonPrimitives.values()) {
@@ -112,6 +141,7 @@ public class JsonHelper {
 			return isOfType;
 		}
 
+		@Nullable
 		public Object get (JsonPrimitive jsonPrimitive) {
 			if (!this.isOfType(jsonPrimitive))
 				return null;
