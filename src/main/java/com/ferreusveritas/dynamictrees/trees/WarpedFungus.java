@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import java.util.Set;
 
 public class WarpedFungus extends NetherTreeFamily {
 
@@ -32,10 +34,10 @@ public class WarpedFungus extends NetherTreeFamily {
 		@Override
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) { return isOneOfBiomes(biome, Biomes.WARPED_FOREST); }
 
-		@Override
-		public Species getMegaSpecies() {
-			return megaWarpedSpecies;
-		}
+//		@Override
+//		public Species getMegaSpecies() {
+//			return megaWarpedSpecies;
+//		}
 	}
 
 	public class MegaWarpedSpecies extends MegaNetherFungiSpecies {
@@ -49,22 +51,15 @@ public class WarpedFungus extends NetherTreeFamily {
 
 	}
 
-	private Species megaWarpedSpecies;
 	public WarpedFungus() {
 		super(DynamicTrees.VanillaWoodTypes.warped);
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.WARPED_WART_BLOCK);
 	}
-	
-	@Override
-	public void createSpecies() {
-		megaWarpedSpecies = new MegaWarpedSpecies(this);
-		setCommonSpecies(new WarpedSpecies(this));
-	}
 
 	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(megaWarpedSpecies);
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet(new ResourceLocation(DynamicTrees.MOD_ID, "mega_" + this.getRegistryName().getPath()));
 	}
+
 }

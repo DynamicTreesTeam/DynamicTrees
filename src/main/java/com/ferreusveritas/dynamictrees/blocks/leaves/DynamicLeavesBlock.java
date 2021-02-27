@@ -63,11 +63,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public DynamicLeavesBlock() {
 		this(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
 	}
+
 	public DynamicLeavesBlock(LeavesProperties leavesProperties) {
 		this(Properties.from(leavesProperties.getPrimitiveLeaves().getBlock()).tickRandomly());
 		setProperties(leavesProperties);
 		leavesProperties.setDynamicLeavesState(getDefaultState());
 	}
+
 	public DynamicLeavesBlock(Properties properties) {
 		super(properties);
 		this.setDefaultState(this.stateContainer.getBaseState().with(DISTANCE, LeavesProperties.maxHydro).with(PERSISTENT, false));

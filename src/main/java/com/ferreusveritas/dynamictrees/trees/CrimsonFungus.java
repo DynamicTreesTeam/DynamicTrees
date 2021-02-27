@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
@@ -13,7 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.registries.IForgeRegistry;
+
+import java.util.Set;
 
 import static com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature.*;
 
@@ -41,10 +43,10 @@ public class CrimsonFungus extends NetherTreeFamily {
 			return soilState.getBlock() == Blocks.CRIMSON_NYLIUM || soilState.getBlock() == RootyBlockHelper.getRootyBlock(Blocks.CRIMSON_NYLIUM);
 		}
 
-		@Override
-		public Species getMegaSpecies() {
-			return megaCrimsonSpecies;
-		}
+//		@Override
+//		public Species getMegaSpecies() {
+//			return megaCrimsonSpecies;
+//		}
 	}
 
 	public class MegaCrimsonSpecies extends MegaNetherFungiSpecies {
@@ -64,23 +66,15 @@ public class CrimsonFungus extends NetherTreeFamily {
 		super(type);
 	}
 
-	private Species megaCrimsonSpecies;
 	public CrimsonFungus() {
 		this(DynamicTrees.VanillaWoodTypes.crimson);
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.NETHER_WART_BLOCK);
 	}
-	
-	@Override
-	public void createSpecies() {
-		megaCrimsonSpecies = new MegaCrimsonSpecies(this);
-		setCommonSpecies(new CrimsonSpecies(this));
-	}
 
 	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(megaCrimsonSpecies);
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet(new ResourceLocation(DynamicTrees.MOD_ID, "mega_" + this.getRegistryName().getPath()));
 	}
 
 }

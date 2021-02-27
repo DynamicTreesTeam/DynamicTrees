@@ -38,6 +38,19 @@
                 "biome_predicate": { "type": "spooky", "name": "minecraft:.*" }
             }
         },
+        {
+            "name": "dynamictrees:rot_soil",
+            "properties": {
+                "rotted_soil": "minecraft:podzol"
+            }
+        },
+        {
+            "name": "dynamictrees:mushroom_rot",
+            "properties": {
+                "__comment": "An alternate mushroom chance of -1 means that a red mushroom will always be generated.",
+                "alternate_mushroom_chance": -1
+            }
+        },
         "dynamictrees:bottom_flare",
         "dynamictrees:mound",
         "dynamictrees:roots"

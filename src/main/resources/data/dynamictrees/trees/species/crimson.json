@@ -1,0 +1,30 @@
+{
+    "family": "dynamictrees:crimson",
+    "tapering": 0,
+    "signal_energy": 14.0,
+    "up_probability": 0,
+    "lowest_branch_height": 4,
+    "growth_rate": 1,
+    "leaves_properties": "dynamictrees:crimson",
+    "environment_factors" : {
+        "cold": 0.25,
+        "wet": 0.75
+    },
+    "perfect_biomes": { "name": "minecraft:crimson_forest" },
+    "primitive_sapling": "minecraft:crimson_fungus",
+    "acceptable_soils": ["dirt_like" ,"nether_soil_like", "fungus_like"],
+    "features": [
+        {
+            "name": "dynamictrees:vines",
+            "properties": {
+                "vine_type": "ceiling",
+                "vine_block": "minecraft:weeping_vines_plant",
+                "tip_block": "minecraft:weeping_vines",
+                "max_length": 5,
+                "quantity": 7
+            }
+        },
+        "dynamictrees:clear_volume",
+        "dynamictrees:shroomlight"
+    ]
+}

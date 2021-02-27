@@ -54,7 +54,7 @@ public class GenFeatureProperty<T> {
             return null;
 
         if (!getter.isValidGetter()) {
-            LogManager.getLogger().warn("Tried to get class {} for gen feature property {}, but object getter was not registered.", this.type.getSimpleName(), this.identifier);
+            LogManager.getLogger().warn("Tried to get class {} for gen feature property {}, but object getter was not registered.", this.type == null ? "null" : this.type.getSimpleName(), this.identifier);
             return null;
         }
 
@@ -64,17 +64,13 @@ public class GenFeatureProperty<T> {
     /**
      * Creates a new {@link GenFeatureProperty} from the identifier and class given.
      *
-     * @deprecated For custom class types, sub-classes should be used with an implementation of
-     * <tt>getFromJsonObject</tt> so that the value can be obtained from Json. This method will
-     * be made private soon.
      * @param identifier The identifier for the property.
      * @param type The {@link Class} of the value the property will store.
      * @param <T> The value the property will store.
      * @return The new {@link GenFeatureProperty} object.
      */
-    @SuppressWarnings("unchecked")
-    public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<?> type) {
-        return new GenFeatureProperty<>(identifier, (Class<T>) type);
+    public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<T> type) {
+        return new GenFeatureProperty<>(identifier, type);
     }
 
     public static GenFeatureProperty<String> createStringProperty(String identifier) {
@@ -94,7 +90,7 @@ public class GenFeatureProperty<T> {
     }
 
     public static GenFeatureProperty<Float> createDoubleProperty(String identifier) {
-        return createProperty(identifier, Double.class);
+        return createProperty(identifier, Float.class);
     }
 
     public static GenFeatureProperty<Float> createFloatProperty(String identifier) {

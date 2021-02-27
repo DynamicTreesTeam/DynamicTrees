@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.BeeNestGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
@@ -13,6 +12,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
+import java.util.List;
 import java.util.Random;
 
 public class BirchTree extends VanillaTreeFamily {
@@ -62,11 +62,6 @@ public class BirchTree extends VanillaTreeFamily {
 		super(DynamicTrees.VanillaWoodTypes.birch);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.BIRCH_LEAVES);
-	}
-	
-	@Override
-	public void createSpecies() {
-		setCommonSpecies(new BirchSpecies(this));
 	}
 
 }

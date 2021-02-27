@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -41,6 +40,9 @@ public final class GenFeatures {
     public static final GenFeature HUGE_MUSHROOM = new HugeMushroomGenFeature(regName("huge_mushroom"));
     public static final GenFeature HUGE_MUSHROOMS = new HugeMushroomsGenFeature(regName("huge_mushrooms"));
 
+    public static final GenFeature MUSHROOM_ROT = new MushroomRotGenFeature(regName("mushroom_rot"));
+    public static final GenFeature ROT_SOIL = new RotSoilGenFeature(regName("rot_soil"));
+
     public static final GenFeature BIOME_PREDICATE = new BiomePredicateGenFeature(regName("biome_predicate"));
 
     private static ResourceLocation regName (String name) {
@@ -50,7 +52,7 @@ public final class GenFeatures {
     public static void register(final IForgeRegistry<GenFeature> registry) {
         registry.registerAll(NULL, FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND, 
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, CONSISTENT_TRUNK, PODZOL, BUSH, 
-                HUGE_MUSHROOM, HUGE_MUSHROOMS, BIOME_PREDICATE);
+                HUGE_MUSHROOM, HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE);
     }
     
 }

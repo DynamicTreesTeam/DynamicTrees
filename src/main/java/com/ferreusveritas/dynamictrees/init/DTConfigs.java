@@ -105,7 +105,7 @@ public class DTConfigs {
 				defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
 		diseaseChance = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
-		maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to rot away. 8 = Full block size. Set to 0 to prevent rotting").
+		maxBranchRotRadius = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. Set to 0 to prevent rotting").
 				defineInRange("maxBranchRotRadius", 8, 0, 24);
 		enableAppleTrees = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableAppleTrees", true);

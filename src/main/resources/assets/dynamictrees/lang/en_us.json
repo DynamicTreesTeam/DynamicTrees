@@ -19,7 +19,7 @@
   "species.dynamictrees.mega_jungle": "Mega Jungle",
   "species.dynamictrees.dark_oak": "Dark Oak",
   "species.dynamictrees.acacia": "Acacia",
-  "species.dynamictrees.apple": "Apple",
+  "species.dynamictrees.apple_oak": "Apple Oak",
   "species.dynamictrees.crimson": "Crimson",
   "species.dynamictrees.mega_crimson": "Mega Crimson",
   "species.dynamictrees.warped": "Warped",
@@ -31,7 +31,7 @@
   "item.dynamictrees.jungle_seed":"Jungle Pod",
   "item.dynamictrees.dark_oak_seed":"Dark Oak Acorn",
   "item.dynamictrees.acacia_seed":"Acacia Seed",
-  "item.dynamictrees.apple_seed":"Apple Pip",
+  "item.dynamictrees.apple_oak_seed":"Apple Pip",
   "item.dynamictrees.crimson_seed":"Crimson Cap",
   "item.dynamictrees.warped_seed":"Warped Cap",
 

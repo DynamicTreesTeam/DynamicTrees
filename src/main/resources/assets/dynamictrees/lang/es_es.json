@@ -17,7 +17,7 @@
   "species.dynamictrees.mega_jungle": "Jungla gigante",
   "species.dynamictrees.dark_oak": "Roble oscuro",
   "species.dynamictrees.acacia": "Acacia",
-  "species.dynamictrees.apple": "Manzana",
+  "species.dynamictrees.apple_oak": "Manzana",
   "species.dynamictrees.crimson": "Carmesí",
   "species.dynamictrees.warped": "Distorsionado",
 
@@ -27,7 +27,7 @@
   "item.dynamictrees.jungle_seed":"Vaina de jungla",
   "item.dynamictrees.dark_oak_seed":"Bellota de roble oscuro",
   "item.dynamictrees.acacia_seed":"Semilla de acacia",
-  "item.dynamictrees.apple_seed":"Semilla de manzana",
+  "item.dynamictrees.apple_oak_seed":"Semilla de manzana",
   "item.dynamictrees.crimson_seed":"Tapa carmesí",
   "item.dynamictrees.warped_seed":"Tapa distorsionada",
 

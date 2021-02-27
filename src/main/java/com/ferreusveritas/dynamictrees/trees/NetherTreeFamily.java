@@ -37,7 +37,7 @@ public class NetherTreeFamily extends VanillaTreeFamily {
             envFactor(BiomeDictionary.Type.WET, 0.75f);
 
             this.addGenFeature(GenFeatures.CLEAR_VOLUME);//Clear a spot for the thick tree trunk
-            this.addGenFeature(GenFeatures.SHROOMLIGHT.getDefaultConfiguration());
+            this.addGenFeature(GenFeatures.SHROOMLIGHT);
         }
 
         @Override
@@ -73,7 +73,7 @@ public class NetherTreeFamily extends VanillaTreeFamily {
 
             setSoilLongevity(16);//Grows for a while so it can actually get tall
 
-            this.addGenFeature(GenFeatures.CONSISTENT_TRUNK.getDefaultConfiguration());
+            this.addGenFeature(GenFeatures.CONSISTENT_TRUNK);
             this.addGenFeature(GenFeatures.MOUND.with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999)); // Place a 3x3 of dirt under thick trees
         }
 
@@ -88,7 +88,7 @@ public class NetherTreeFamily extends VanillaTreeFamily {
         }
 
         @Override
-        public int maxBranchRadius() {
+        public int getMaxBranchRadius() {
             return 20;
         }
 

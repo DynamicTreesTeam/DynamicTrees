@@ -24,6 +24,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**

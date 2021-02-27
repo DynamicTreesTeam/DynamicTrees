@@ -17,6 +17,13 @@
     "perfect_biomes": { "type": "forest" },
     "primitive_sapling": "minecraft:oak_sapling",
     "features" : [
+        {
+            "name": "dynamictrees:rot_soil",
+            "properties": {
+                "rotted_soil": "minecraft:podzol"
+            }
+        },
+        "dynamictrees:mushroom_rot",
         "dynamictrees:bee_nest"
     ]
 }

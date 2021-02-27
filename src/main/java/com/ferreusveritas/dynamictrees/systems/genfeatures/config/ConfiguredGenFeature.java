@@ -21,6 +21,7 @@ public class ConfiguredGenFeature<T extends GenFeature> {
     /** A null configured gen feature. Mainly used for getting the class with the
      * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE_GETTER}. */
     public static final ConfiguredGenFeature<GenFeature> NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature<>(GenFeatures.NULL);
+    public static final Class<ConfiguredGenFeature<GenFeature>> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature<GenFeature>>) NULL_CONFIGURED_FEATURE.getClass();
 
     private final T genFeature;
     private final Map<GenFeatureProperty<?>, GenFeaturePropertyValue<?>> properties = Maps.newHashMap();

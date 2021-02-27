@@ -2,12 +2,15 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.MoundGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.RootsGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
@@ -29,6 +32,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class JungleTree extends VanillaTreeFamily {
 	
@@ -62,10 +66,10 @@ public class JungleTree extends VanillaTreeFamily {
 			return BiomeDictionary.hasType(biome, Type.JUNGLE);
 		};
 
-		@Override
-		public Species getMegaSpecies() {
-			return megaSpecies;
-		}
+//		@Override
+//		public Species getMegaSpecies() {
+//			return megaSpecies;
+//		}
 
 	}
 
@@ -76,7 +80,7 @@ public class JungleTree extends VanillaTreeFamily {
 		MegaJungleSpecies(TreeFamily treeFamily) {
 			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
 			
-			setRequiresTileEntity(true);
+//			setRequiresTileEntity(true);
 			
 			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
 			setGrowthLogicKit(GrowthLogicKits.JUNGLE);
@@ -115,7 +119,7 @@ public class JungleTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public int maxBranchRadius() {
+		public int getMaxBranchRadius() {
 			return 24;
 		}
 		
@@ -130,8 +134,6 @@ public class JungleTree extends VanillaTreeFamily {
 		}
 
 	}
-	
-	Species megaSpecies;
 
 	public JungleTree() {
 		super(DynamicTrees.VanillaWoodTypes.jungle);
@@ -139,19 +141,12 @@ public class JungleTree extends VanillaTreeFamily {
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.JUNGLE_LEAVES);
 	}
-	
+
 	@Override
-	public void createSpecies() {
-		megaSpecies = new MegaJungleSpecies(this);
-		setCommonSpecies(new JungleSpecies(this));
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet(new ResourceLocation(DynamicTrees.MOD_ID, "mega_" + this.getRegistryName().getPath()));
 	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(megaSpecies);
-	}
-	
+
 	@Override
 	public boolean isThick() {
 		return true;

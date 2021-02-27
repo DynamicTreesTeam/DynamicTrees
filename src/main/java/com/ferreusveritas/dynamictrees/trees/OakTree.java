@@ -6,27 +6,26 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
-import net.minecraft.block.Block;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.FruitGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 public class OakTree extends VanillaTreeFamily {
 	
@@ -59,8 +58,6 @@ public class OakTree extends VanillaTreeFamily {
 		public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 			return BiomeDictionary.hasType(biome, Type.FOREST) && BiomeDictionary.hasType(biome, Type.OVERWORLD);
 		}
-
-		// TODO: Rot types.
 
 		@Override
 		public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
@@ -154,12 +151,12 @@ public class OakTree extends VanillaTreeFamily {
 	 */
 	public static class AppleOakSpecies extends Species {
 		
-		private static final String speciesName = "apple";
+		private static final String SPECIES_NAME = "apple_oak";
 		
 		public AppleOakSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
+			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), SPECIES_NAME), treeFamily);
 			
-			setRequiresTileEntity(true);
+//			setRequiresTileEntity(true);
 			
 			//A bit stockier, smaller and slower than your basic oak
 			setBasicGrowingParameters(0.4f, 10.0f, 1, 4, 0.7f);
@@ -182,44 +179,29 @@ public class OakTree extends VanillaTreeFamily {
 		
 	}
 
-	Species swampSpecies;
-	Species appleSpecies;
-	
 	public OakTree() {
 		super(DynamicTrees.VanillaWoodTypes.oak);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.OAK_LEAVES);
 	}
-	
+
+	// TODO: Eww... This needs changing.
 	@Override
-	public void createSpecies() {
-		setCommonSpecies(new OakSpecies(this));
-		swampSpecies = new SwampOakSpecies(this);
-		appleSpecies = new AppleOakSpecies(this);
-	}
-	
-	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(swampSpecies);
-		speciesRegistry.register(appleSpecies);
+	public Set<Species> createSpecies() {
+		final Set<Species> species = super.createSpecies();
+		final Species appleOak = new Species(new ResourceLocation(DynamicTrees.MOD_ID, "apple_oak"), this);
+
+		appleOak.generateSeed();
+		appleOak.generateSapling();
+
+		DTRegistries.appleBlock.setSpecies(appleOak);
+		species.add(appleOak);
+		return species;
 	}
 
 	@Override
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
-		appleSpecies.getSapling().ifPresent(blockList::add);
-		return super.getRegisterableBlocks(blockList);
-	}
-
-	@Override
-	public List<Item> getRegisterableItems(List<Item> itemList) {
-		appleSpecies.getSeed().ifPresent(itemList::add);//Since we generated the apple species internally we need to let the seed out to be registered.
-		return super.getRegisterableItems(itemList);
-	}
-
-	@Override
-	public boolean isThick() {
-		return false;
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet(new ResourceLocation(DynamicTrees.MOD_ID, "swamp_oak"));
 	}
 
 }

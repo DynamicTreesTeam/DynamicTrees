@@ -1,0 +1,38 @@
+{
+    "family": "dynamictrees:warped",
+    "tapering": 0,
+    "signal_energy": 25.0,
+    "up_probability": 7,
+    "lowest_branch_height": 20,
+    "growth_rate": 0.9,
+    "soil_longevity": 16,
+    "max_branch_radius": 24,
+    "leaves_properties": "dynamictrees:warped",
+    "environment_factors" : {
+        "cold": 0.25,
+        "wet": 0.75
+    },
+    "perfect_biomes": { "name": "minecraft:warped_forest" },
+    "acceptable_soils": ["dirt_like" ,"nether_soil_like", "fungus_like"],
+    "features": [
+        {
+            "name": "dynamictrees:weeping_vines",
+            "properties": {
+                "vine_type": "ceiling",
+                "vine_block": "minecraft:weeping_vines_plant",
+                "tip_block": "minecraft:weeping_vines",
+                "max_length": 5,
+                "quantity": 7
+            }
+        },
+        {
+            "name": "dynamictrees:mound",
+            "properties": {
+                "mound_cutoff_radius": 999
+            }
+        },
+        "dynamictrees:consistent_trunk",
+        "dynamictrees:clear_volume",
+        "dynamictrees:shroomlight"
+    ]
+}

@@ -38,7 +38,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class Seed extends Item implements IPlantable {
 	
-	private Species species;//The tree this seed creates
+	private final Species species;//The tree this seed creates
 	
 	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULL_SPECIES;}
 	

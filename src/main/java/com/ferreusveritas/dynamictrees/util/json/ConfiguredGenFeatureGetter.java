@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
@@ -22,7 +23,7 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
 
     private static final JsonPropertyApplierList<ConfiguredGenFeatureHolder> APPLIERS = new JsonPropertyApplierList<>(ConfiguredGenFeatureHolder.class)
             .register("name", GenFeature.class,
-                    (configuredGenFeatureHolder, genFeature) -> configuredGenFeatureHolder.configuredGenFeature = new ConfiguredGenFeature<>(genFeature))
+                    (configuredGenFeatureHolder, genFeature) -> configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) genFeature.getDefaultConfiguration())
             .register("properties", JsonObject.class,
                     (configuredGenFeatureHolder, jsonObject) -> {
                         final ConfiguredGenFeature<GenFeature> configuredGenFeature = configuredGenFeatureHolder.configuredGenFeature;
@@ -45,7 +46,7 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
             APPLIERS.applyAll(jsonObjectFetchResult.getValue(), configuredGenFeatureHolder);
         }
 
-        if (configuredGenFeatureHolder.configuredGenFeature.equals(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE))
+        if (configuredGenFeatureHolder.configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL))
             return ObjectFetchResult.failure("Configured feature couldn't be found from name or wasn't given a name.");
 
         return ObjectFetchResult.success(configuredGenFeatureHolder.configuredGenFeature);

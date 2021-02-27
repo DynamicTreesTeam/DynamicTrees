@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -79,9 +80,10 @@ public class LeavesPaging {
 
 		if (element != null && element.isJsonObject()) {
 			register(element.getAsJsonObject(), jsonLocation.getNamespace());
+			return;
 		}
 
-		Logger.getLogger(DynamicTrees.MOD_ID).severe("Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
+		LogManager.getLogger().warn("Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
 	}
 	
 }

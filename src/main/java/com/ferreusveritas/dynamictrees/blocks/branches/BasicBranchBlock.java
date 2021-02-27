@@ -119,7 +119,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
-			return false;//Bail out if not in rapid mode and the rot chance fails
+			return false;//Bail out if not in rapid mode and the postRot chance fails
 		}
 		
 		// Rooty dirt below the block counts as a branch in this instance
@@ -137,7 +137,7 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid);// Unreinforced branches are destroyed
 		
-		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
+		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
 				BlockState neighState = world.getBlockState(neighPos);
@@ -157,10 +157,9 @@ public class BasicBranchBlock extends BranchBlock {
 
 	@Override
 	public float getHardness (IBlockReader worldIn, BlockPos pos) {
-		int radius = getRadius(worldIn.getBlockState(pos));
-		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-		return hardness;
+		final int radius = this.getRadius(worldIn.getBlockState(pos));
+		final float hardness = this.getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+		return (float) Math.min(hardness, DTConfigs.maxTreeHardness.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 
 	@Override
@@ -289,7 +288,7 @@ public class BasicBranchBlock extends BranchBlock {
 			//Only continue to set radii if the tree growth isn't choked out
 			if(!signal.choked) {
 				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-				int maxRadius = inTrunk ? species.maxBranchRadius() : Math.min(species.maxBranchRadius(), RADMAX_NORMAL);
+				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), RADMAX_NORMAL);
 				
 				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)

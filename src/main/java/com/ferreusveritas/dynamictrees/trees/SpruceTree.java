@@ -1,11 +1,12 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.ConiferTopperGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.MoundGenFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class SpruceTree extends VanillaTreeFamily {
 	
@@ -58,10 +60,10 @@ public class SpruceTree extends VanillaTreeFamily {
 			super(treeFamily.getRegistryName(), treeFamily);
 		}
 
-		@Override
-		public Species getMegaSpecies() {
-			return megaSpecies;
-		}
+//		@Override
+//		public Species getMegaSpecies() {
+//			return megaSpecies;
+//		}
 
 	}
 
@@ -100,7 +102,7 @@ public class SpruceTree extends VanillaTreeFamily {
 		}
 		
 		@Override
-		public int maxBranchRadius() {
+		public int getMaxBranchRadius() {
 			return 24;
 		}
 		
@@ -120,29 +122,18 @@ public class SpruceTree extends VanillaTreeFamily {
 		}
 
 	}
-	
-	Species megaSpecies;
-	
+
 	public SpruceTree() {
 		super(DynamicTrees.VanillaWoodTypes.spruce);
 		hasConiferVariants = true;
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.SPRUCE_LEAVES);
 	}
-	
-	@Override
-	public void createSpecies() {
-		final Species common = new Species().setRegistryName(this.getRegistryName()).setLeavesProperties(getCommonLeaves());
 
-		megaSpecies = new MegaSpruceSpecies(this);
-		this.setCommonSpecies(common);
-	}
-	
 	@Override
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		super.registerSpecies(speciesRegistry);
-		speciesRegistry.register(megaSpecies);
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet(new ResourceLocation(DynamicTrees.MOD_ID, "mega_" + this.getRegistryName().getPath()));
 	}
-	
+
 	@Override
 	public boolean isThick() {
 		return true;

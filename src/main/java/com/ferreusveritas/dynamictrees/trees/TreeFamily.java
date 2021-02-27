@@ -12,7 +12,9 @@ import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,7 +22,10 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -38,10 +43,8 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This structure describes a Tree Family whose member Species all have a common wood type.
@@ -62,8 +65,8 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	public final static TreeFamily NULL_FAMILY = new TreeFamily() {
 		@Override public void setCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
-		@Override public List<Block> getRegisterableBlocks(List<Block> blockList) { return blockList; }
-		@Override public List<Item> getRegisterableItems(List<Item> itemList) { return itemList; }
+		@Override public Set<Block> getRegisterableBlocks(Set<Block> blockList) { return blockList; }
+		@Override public Set<Item> getRegisterableItems(Set<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
@@ -113,7 +116,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	public int woodBarkColor; // For rooty water
 
 	/** A list of child species, added to when tree family is set for species. */
-	private final List<Species> species = new ArrayList<>();
+	private final Set<Species> species = new HashSet<>();
 
 	public TreeFamily() {
 		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null"));
@@ -140,18 +143,30 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		}
 
 		stick = Items.STICK;
-		createSpecies();
+		this.species.addAll(this.createSpecies());
 	}
 
-	public void createSpecies() {}
+	public Set<Species> createSpecies() {
+		this.setCommonSpecies(new Species(this.getCommonSpeciesName(), this, this.getCommonLeaves()));
+		return this.getExtraSpeciesNames().stream().map(registryName -> new Species(registryName, this, this.getCommonLeaves())).collect(Collectors.toSet());
+	}
+
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet();
+	}
 
 	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.register(getCommonSpecies());
+		speciesRegistry.registerAll(this.species.toArray(new Species[0]));
 	}
 
-	public void setCommonSpecies(@Nonnull Species species) {
-		LogManager.getLogger().debug("Set common species " + species.getRegistryName());
-		commonSpecies = species;
+	public ResourceLocation getCommonSpeciesName() {
+		final ResourceLocation registryName = this.getRegistryName();
+		return registryName == null ? DTTrees.NULL : registryName;
+	}
+
+	public void setCommonSpecies(final Species species) {
+		this.species.add(species);
+		this.commonSpecies = species;
 	}
 
 	public Species getCommonSpecies() {
@@ -163,7 +178,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return this;
 	}
 
-	public List<Species> getSpecies () {
+	public Set<Species> getSpecies () {
 		return this.species;
 	}
 
@@ -234,17 +249,30 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	/**
 	 * Used to register the blocks this tree uses.  Mainly just the {@link BranchBlock}
 	 * We intentionally leave out leaves since they are shared between trees
-	 * */
-	public List<Block> getRegisterableBlocks(List<Block> blockList) {
+	 *
+	 *
+	 * @param blockList
+	 * @return */
+	public Set<Block> getRegisterableBlocks(Set<Block> blockList) {
 		blockList.add(getDynamicBranch());
+
 		if (this.hasStrippedBranch())
 			blockList.add(getDynamicStrippedBranch());
-		if (this.hasSurfaceRoot()) {
+
+		if (this.hasSurfaceRoot())
 			blockList.add(getSurfaceRoot());
-		}
-		
-		getCommonSpecies().getSapling().ifPresent(blockList::add);
-		getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
+
+		// Prioritise the common species' blocks.
+		this.getCommonSpecies().getSapling().ifPresent(blockList::add);
+		this.getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
+
+		this.getSpecies().forEach(species -> {
+			if (species.isCommonSpecies())
+				return;
+
+			species.getSapling().ifPresent(blockList::add);
+			species.getLeavesBlock().ifPresent(blockList::add);
+		});
 
 		return blockList;
 	}
@@ -255,12 +283,14 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 * generated internally then the seed should be allowed to register here.
 	 * If this can't be the case then override this member function with a
 	 * dummy one.
+	 * @return
+	 * @param itemList
 	 */
-	public List<Item> getRegisterableItems(List<Item> itemList) {
+	public Set<Item> getRegisterableItems(Set<Item> itemList) {
 		//Register an itemBlock for the branch block
 		itemList.add(this.dynamicBranchItem);
 
-		getCommonSpecies().getSeed().ifPresent(itemList::add);
+		this.species.forEach(species -> species.getSeed().ifPresent(itemList::add));
 
 		return itemList;
 	}

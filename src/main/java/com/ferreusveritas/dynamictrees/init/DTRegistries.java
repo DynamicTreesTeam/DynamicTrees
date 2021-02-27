@@ -8,8 +8,6 @@ import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
@@ -28,8 +26,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
+import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -50,10 +48,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Set;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -127,7 +123,7 @@ public class DTRegistries {
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
+		Set<Block> treeBlocks = Sets.newHashSet();
 		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
@@ -157,7 +153,7 @@ public class DTRegistries {
 	public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
 		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 		
-		ArrayList<Item> treeItems = new ArrayList<>();
+		Set<Item> treeItems = Sets.newHashSet();
 		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableItems(treeItems));
 
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);

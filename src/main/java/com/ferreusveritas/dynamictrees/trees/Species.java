@@ -120,8 +120,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	protected int soilLongevity = 8;
 	/** The tags for the types of soil the tree can be planted on**/
 	protected int soilTypeFlags = 0;
-	
-	private boolean requiresTileEntity = false;
+
+	// TODO: Make sure this is implemented properly.
+	protected int maxBranchRadius = 8;
+
+	/** Stores whether or not this species can be transformed to another, if true and this species has it's own seed a
+	 * transformation potion will also be automatically created. */
+	private boolean transformable = true;
 
 	//Leaves
 	protected LeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
@@ -202,8 +207,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		this.treeFamily = treeFamily;
 	}
 
+	/**
+	 * @return True if this species is the common of its tree.
+	 */
+	public boolean isCommonSpecies () {
+		return this.treeFamily.getCommonSpecies().equals(this);
+	}
+
 	public Species setUnlocalizedName(String name) {
-		unlocalizedName = name;
+		this.unlocalizedName = "species." + name.replace(":", ".");
 		return this;
 	}
 
@@ -212,7 +224,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public String getUnlocalizedName() {
-		return "species." + this.unlocalizedName.replace(':','.');
+		return this.unlocalizedName;
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -279,27 +291,37 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return tapering;
 	}
 
-	//Rare species require TileEntity Storage
+	/**
+	 * Works out if this {@link Species} will require a {@link SpeciesTileEntity} at the given position.
+	 * It should require one if it's not the common species and it's not in its location override for
+	 * the given position.
+	 *
+	 * @param world The {@link IWorld} the tree is being planted in.
+	 * @param pos The {@link BlockPos} at which the tree is being planted at.
+	 * @return True if it will require a {@link SpeciesTileEntity}.
+	 */
 	public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
-		if (!this.shouldSpawnAt(world, pos))
-			return true;
-
-		return requiresTileEntity;
-	}
-	
-	public void setRequiresTileEntity(boolean truth) {
-		requiresTileEntity = truth;
+		return this.isCommonSpecies() || !this.shouldSpawnAt(world, pos);
 	}
 
 	/**
-	 * Override and return false on things like cactus species which should not be
-	 * transformed to/from. If true and this species has it's own seed a transformation
-	 * potion will also be automatically created.
+	 * Returns whether or not this species can be transformed to another. See {@link #transformable} for
+	 * more details.
 	 *
 	 * @return True if it can be transformed to, false if not.
 	 */
 	public boolean isTransformable () {
-		return true;
+		return this.transformable;
+	}
+
+	/**
+	 * Sets whether or not this species can be transformed to another. See {@link #transformable} for
+	 * more details.
+	 *
+	 * @param transformable True if it should be transformable.
+	 */
+	public void setTransformable(boolean transformable) {
+		this.transformable = transformable;
 	}
 
 	/**
@@ -319,8 +341,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this;
 	}
 
+	public boolean hasShouldSpawnPredicate () {
+		return this.shouldSpawnPredicate != null;
+	}
+
 	public boolean shouldSpawnAt (final IWorld world, final BlockPos trunkPos) {
-		return this.shouldSpawnPredicate != null && this.shouldSpawnPredicate.test(world, trunkPos);
+		return this.hasShouldSpawnPredicate() && this.shouldSpawnPredicate.test(world, trunkPos);
 	}
 
 	public interface IShouldSpawnPredicate extends BiPredicate<IWorld, BlockPos> {}
@@ -386,15 +412,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return An {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return hasSeed() ? new ItemStack(seed, qty) : ItemStack.EMPTY;
+		return this.hasSeed() ? this.isCommonSpecies() ? new ItemStack(this.seed, qty) : this.treeFamily.getCommonSpecies().getSeedStack(qty) : ItemStack.EMPTY;
 	}
 	
 	public boolean hasSeed() {
-		return seed != null;
+		return this.seed != null;
 	}
 	
 	public Optional<Seed> getSeed() {
-		return Optional.ofNullable(seed);
+		return !this.hasSeed() && !this.isCommonSpecies() ? this.treeFamily.getCommonSpecies().getSeed() : Optional.of(this.seed);
 	}
 	
 	/**
@@ -737,11 +763,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public boolean isThick() {
-		return false;
+		return this.maxBranchRadius > 8;
 	}
-	
-	public int maxBranchRadius() {
-		return isThick() ? ThickBranchBlock.RADMAX_THICK : BranchBlock.RADMAX_NORMAL;
+
+	public int getMaxBranchRadius() {
+		return this.maxBranchRadius;
+	}
+
+	public void setMaxBranchRadius(int maxBranchRadius) {
+		this.maxBranchRadius = MathHelper.clamp(maxBranchRadius, 1, this.getFamily().isThick() ? ThickBranchBlock.RADMAX_THICK : ThickBranchBlock.RADMAX_NORMAL);
 	}
 
 	public Species addAcceptableSoils(String ... soilTypes) {
@@ -767,6 +797,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	protected void setStandardSoils() {
 		addAcceptableSoils(DirtHelper.DIRT_LIKE);
+	}
+
+	public boolean hasAcceptableSoil () {
+		return this.soilTypeFlags != 0;
 	}
 
 	/**
@@ -866,7 +900,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	/**
-	 * A rot handler.
+	 * A postRot handler.
 	 *
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
@@ -904,8 +938,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	
 	/**
 	 * Handle rotting branches
+	 *
 	 * @param world The world
-	 * @param pos
+	 * @param pos The {@link BlockPos}.
 	 * @param neighborCount Count of neighbors reinforcing this block
 	 * @param radius The radius of the branch
 	 * @param random Access to a random number generator
@@ -913,38 +948,43 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if the branch should rot
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
-		
-		if(radius <= 1) {
+		if (radius <= 1) {
 			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-			for(Direction dir: upFirst) {
-				if(leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
+			for (Direction dir: upFirst) {
+				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
 					return false;
 				}
 			}
 		}
 		
-		if(rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
+		if (rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
-			if(branch != null) {
+			if (branch != null) {
 				branch.rot(world, pos);
 			}
+			this.postRot(world, pos, neighborCount, radius, random, rapid);
 			return true;
 		}
 		
 		return false;
 	}
+
+	private void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final Random random, final boolean rapid) {
+		this.genFeatures.stream().filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature).forEach(configuredGenFeature ->
+				((IPostRotGenFeature) configuredGenFeature.getGenFeature()).postRot(configuredGenFeature, world, pos, neighborCount, radius, random, rapid));
+	}
 	
 	/**
-	 * Provides the chance that a log will rot.
+	 * Provides the chance that a log will postRot.
 	 *
 	 * @param world The world
 	 * @param pos The {@link BlockPos} of the {@link BranchBlock}
 	 * @param rand A random number generator
 	 * @param radius The radius of the {@link BranchBlock}
-	 * @return The chance this will rot. 0.0(never) -> 1.0(always)
+	 * @return The chance this will postRot. 0.0(never) -> 1.0(always)
 	 */
 	public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
-		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
+		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to postRot
 	}
 	
 	/**
@@ -1590,6 +1630,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public String getDisplayInfo() {
 		return "Species{" +
 				"treeFamily=" + treeFamily +
+				", registryName=" + this.getRegistryName() +
 				", logicKit=" + logicKit +
 				", tapering=" + tapering +
 				", upProbability=" + upProbability +
@@ -1598,7 +1639,6 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 				", growthRate=" + growthRate +
 				", soilLongevity=" + soilLongevity +
 				", soilTypeFlags=" + soilTypeFlags +
-				", requiresTileEntity=" + requiresTileEntity +
 				", leavesProperties=" + leavesProperties +
 				", validLeaves=" + validLeaves +
 				", seed=" + seed +
@@ -1607,7 +1647,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 				", dropCreatorStorage=" + dropCreatorStorage +
 				", envFactors=" + envFactors +
 				", genFeatures=" + genFeatures +
-				", unlocalizedName='" + unlocalizedName + '\'' +
+				", unlocalizedName='" + this.unlocalizedName + '\'' +
 				", flowerSeasonHoldMin=" + flowerSeasonHoldMin +
 				", flowerSeasonHoldMax=" + flowerSeasonHoldMax +
 				'}';

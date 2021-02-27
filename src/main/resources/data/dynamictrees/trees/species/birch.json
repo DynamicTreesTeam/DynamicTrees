@@ -17,6 +17,14 @@
     "perfect_biomes": { "name": "minecraft:.*birch.*" },
     "primitive_sapling": "minecraft:birch_sapling",
     "features" : [
+        {
+            "name": "dynamictrees:mushroom_rot",
+            "properties": {
+                "__comment": "An alternate mushroom chance of 2 means that a brown mushroom will always be generated.",
+                "alternate_mushroom_chance": 2
+            }
+        },
+        "dynamictrees:rot_soil",
         "dynamictrees:bee_nest"
     ]
 }

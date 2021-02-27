@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
@@ -17,6 +18,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
+import java.util.List;
 import java.util.Random;
 
 import static com.ferreusveritas.dynamictrees.systems.genfeatures.BiomePredicateGenFeature.BIOME_PREDICATE;
@@ -56,7 +58,7 @@ public class DarkOakTree extends VanillaTreeFamily {
 			this.addGenFeature(GenFeatures.BOTTOM_FLARE); // Flare the bottom.
 			this.addGenFeature(GenFeatures.MOUND); // Establish mounds.
 			this.addGenFeature(GenFeatures.BIOME_PREDICATE
-					.with(GEN_FEATURE, GenFeatures.HUGE_MUSHROOMS.with(MAX_MUSHROOMS, 1).with(MAX_ATTEMPTS, 3))
+					.with(GEN_FEATURE, (ConfiguredGenFeature<GenFeature>) GenFeatures.HUGE_MUSHROOMS.with(MAX_MUSHROOMS, 1).with(MAX_ATTEMPTS, 3))
 					.with(BIOME_PREDICATE, biome -> isBiomePerfect(getBiomeKey(biome)))); // Generate huge mushrooms.
 			this.addGenFeature(GenFeatures.ROOTS); // Finally generate roots.
 		}
@@ -107,12 +109,7 @@ public class DarkOakTree extends VanillaTreeFamily {
 
 		addConnectableVanillaLeaves((state) -> state.getBlock() == Blocks.DARK_OAK_LEAVES);
 	}
-	
-	@Override
-	public void createSpecies() {
-		setCommonSpecies(new DarkOakSpecies(this));
-	}
-	
+
 	@Override
 	public boolean isThick() {
 		return true;
