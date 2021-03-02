@@ -7,7 +7,8 @@ import com.ferreusveritas.dynamictrees.api.events.BiomeDatabasePopulatorRegistry
 import com.ferreusveritas.dynamictrees.api.events.PopulateDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -32,55 +33,22 @@ import java.util.*;
  *
  * @author Harley O'Connor
  */
-public final class BiomeDatabaseManager extends ReloadListener<Map<ResourceLocation, Map<String, JsonElement>>> {
+public final class BiomeDatabaseManager extends MultiJsonReloadListener {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final String JSON_EXTENSION = ".json";
-    private static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
 
     private static final String DEFAULT_POPULATOR_NAME = "default";
 
     private static final String REPLACE = "replace";
     private static final String ENTRIES = "entries";
 
-    private final Gson gson = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
-    private final String folderName = "trees/world_gen";
-
     private BiomeDatabase defaultDatabase = new BiomeDatabase();
     private final Map<ResourceLocation, BiomeDatabase> dimensionDatabases = Maps.newHashMap();
 
     protected final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
 
-    @Override
-    protected Map<ResourceLocation, Map<String, JsonElement>> prepare(IResourceManager resourceManager, IProfiler profiler) {
-        Map<ResourceLocation, Map<String, JsonElement>> databases = Maps.newHashMap();
-        int i = folderName.length() + 1;
-
-        for(ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
-            String resourcePath = resourceLocationIn.getPath();
-            ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(),
-                    resourcePath.substring(i, resourcePath.length() - JSON_EXTENSION_LENGTH));
-
-            try {
-                resourceManager.getAllResources(resourceLocationIn).forEach(resource -> {
-                    InputStream inputstream = resource.getInputStream();
-                    Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8));
-
-                    JsonElement jsonElement = JSONUtils.fromJson(this.gson, reader, JsonElement.class);
-
-                    if (jsonElement != null) {
-                        databases.computeIfAbsent(resourceLocation, l -> Maps.newHashMap()).put(resourceLocationIn.getPath(), jsonElement);
-                    } else {
-                        LOGGER.error("Couldn't load data file {} from {} as it's null or empty", resourceLocation, resourceLocationIn);
-                    }
-                });
-            } catch (IllegalArgumentException | IOException | JsonParseException e) {
-                LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, e);
-            }
-        }
-
-        return databases;
+    public BiomeDatabaseManager() {
+        super("trees/world_gen");
     }
 
     @Override

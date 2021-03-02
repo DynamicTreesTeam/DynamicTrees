@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;

@@ -24,7 +24,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
@@ -42,6 +42,7 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
+import com.google.common.collect.Lists;
 import net.minecraft.block.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
@@ -127,6 +128,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	/** Stores whether or not this species can be transformed to another, if true and this species has it's own seed a
 	 * transformation potion will also be automatically created. */
 	private boolean transformable = true;
+
+	/** If this is not empty, saplings will only grow when planted on these blocks. */
+	protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
 
 	//Leaves
 	protected LeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
@@ -654,8 +658,20 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return false;
 	}
 
-	//If false is returned the sapling will not grow and bonemeal will not work
-	public boolean canSaplingGrow(World world, BlockPos pos) {return true;}
+	public void addAcceptableBlockForGrowth (final Block block) {
+		this.acceptableBlocksForGrowth.add(block);
+	}
+
+	/**
+	 * Checks if the sapling can grow at the given position.
+	 *
+	 * @param world The {@link World} object.
+	 * @param pos The {@link BlockPos} the sapling is on.
+	 * @return True if it can grow.
+	 */
+	public boolean canSaplingGrow(World world, BlockPos pos) {
+		return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.contains(world.getBlockState(pos).getBlock());
+	}
 
 	//Returns whether the sapling should be able to grow without player intervention
 	public boolean canSaplingGrowNaturally(World world, BlockPos pos) {
@@ -763,7 +779,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public boolean isThick() {
-		return this.maxBranchRadius > 8;
+		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
 	}
 
 	public int getMaxBranchRadius() {
@@ -771,7 +787,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public void setMaxBranchRadius(int maxBranchRadius) {
-		this.maxBranchRadius = MathHelper.clamp(maxBranchRadius, 1, this.getFamily().isThick() ? ThickBranchBlock.RADMAX_THICK : ThickBranchBlock.RADMAX_NORMAL);
+		this.maxBranchRadius = MathHelper.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
 	}
 
 	public Species addAcceptableSoils(String ... soilTypes) {

@@ -72,6 +72,7 @@ public final class SpeciesManager extends JsonReloadListener implements IJsonApp
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.SUCCESS;
                 })
+                .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), Species::addGenFeature);
 
         this.fireEvent(this.applierRegistryEvent);

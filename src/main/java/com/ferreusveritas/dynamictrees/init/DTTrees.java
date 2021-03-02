@@ -87,7 +87,7 @@ public class DTTrees {
 	}
 
 	private static ResourceLocation resLoc (final String path) {
-		return new ResourceLocation(DynamicTrees.MOD_ID, path);
+		return DynamicTrees.resLoc(path);
 	}
 
 }

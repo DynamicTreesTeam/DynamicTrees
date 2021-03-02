@@ -12,7 +12,8 @@
     },
     "perfect_biomes": { "name": "minecraft:warped_forest" },
     "primitive_sapling": "minecraft:warped_fungus",
-    "acceptable_soils": ["dirt_like" ,"nether_soil_like", "fungus_like"],
+    "acceptable_soils": ["nether_soil_like", "fungus_like"],
+    "acceptable_growth_blocks": ["minecraft:warped_nylium"],
     "features": [
         "dynamictrees:clear_volume",
         "dynamictrees:shroomlight"

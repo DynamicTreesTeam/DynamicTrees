@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;

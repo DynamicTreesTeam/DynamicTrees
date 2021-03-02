@@ -8,11 +8,16 @@ import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.resources.TreeResourcePack;
+import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -85,6 +90,8 @@ public class DynamicTrees {
 		ROT,
 		OVERFLOW
 	}
+
+	public static final TreesResourceManager treesResourceManager = new TreesResourceManager();
 	
 	public DynamicTrees() {
 		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -109,6 +116,8 @@ public class DynamicTrees {
 
 		EventHandlers.registerCommon();
 		CompatHandler.init();
+
+		treesResourceManager.addResourcePack(new TreeResourcePack(JsonHelper.getDirectory(MOD_ID, JsonHelper.ResourceFolder.TREES)));
 	}
 
 	//TODO: thick ring stitching
@@ -145,6 +154,10 @@ public class DynamicTrees {
 	public void cleanUp() {
 		LeavesPropertiesJson.cleanUp();
 		TreeRegistry.cleanupCellKit();
+	}
+
+	public static ResourceLocation resLoc (final String path) {
+		return new ResourceLocation(MOD_ID, path);
 	}
 
 }

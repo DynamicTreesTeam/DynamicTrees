@@ -12,7 +12,8 @@
     },
     "perfect_biomes": { "name": "minecraft:crimson_forest" },
     "primitive_sapling": "minecraft:crimson_fungus",
-    "acceptable_soils": ["dirt_like" ,"nether_soil_like", "fungus_like"],
+    "acceptable_soils": ["nether_soil_like", "fungus_like"],
+    "acceptable_growth_blocks": ["minecraft:crimson_nylium"],
     "features": [
         {
             "name": "dynamictrees:vines",

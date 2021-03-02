@@ -30,7 +30,7 @@ public class CellKits {
 	public CellKits() {
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous"), deciduous);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "conifer"), conifer);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "acacia"), acacia);
+		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "acacia.json"), acacia);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "dark_oak"), dark_oak);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "bare"), bare);
 		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "palm"), palm);

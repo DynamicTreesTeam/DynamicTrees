@@ -13,7 +13,8 @@
         "wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:warped_forest" },
-    "acceptable_soils": ["dirt_like" ,"nether_soil_like", "fungus_like"],
+    "acceptable_soils": ["nether_soil_like", "fungus_like"],
+    "acceptable_growth_blocks": ["minecraft:warped_nylium"],
     "features": [
         {
             "name": "dynamictrees:weeping_vines",

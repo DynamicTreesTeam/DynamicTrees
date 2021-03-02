@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.net.URISyntaxException;
 
 public class JsonHelper {
 
@@ -22,6 +23,15 @@ public class JsonHelper {
 
 		ResourceFolder(String folderName) {
 			this.folderName = folderName;
+		}
+	}
+
+	public static File getDirectory(String namespace, ResourceFolder resourceFolder) {
+		try {
+			return new File(LeavesPaging.class.getResource(resourceFolder.folderName + namespace).toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

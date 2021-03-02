@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.init;
+package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;

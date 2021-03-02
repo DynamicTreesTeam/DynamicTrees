@@ -11,7 +11,9 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenF
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.SpeciesType;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.TreeSpecies;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -22,10 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds {@link IJsonObjectGetter} objects, which can be used to obtain objects from
@@ -174,6 +173,8 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
     public static final IJsonObjectGetter<TreeFamily> TREE_FAMILY_GETTER = register(TreeFamily.class, new ForgeRegistryEntryGetter<>(TreeFamily.REGISTRY, "tree family"));
     public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new ForgeRegistryEntryGetter<>(Species.REGISTRY, "species"));
+
+    public static final IJsonObjectGetter<SpeciesType<Species>> SPECIES_TYPE_GETTER = register(SpeciesType.CLASS, new SpeciesTypeGetter());
 
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 

@@ -83,6 +83,8 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	@Nonnull
 	protected Species commonSpecies = Species.NULL_SPECIES;
 
+	protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
+
 	//Branches
 	/** The dynamic branch used by this tree family */
 	private BranchBlock dynamicBranch;
@@ -99,6 +101,9 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 
 	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
 	private final List<BranchBlock> validBranches = new LinkedList<>();
+
+	/** The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#maxBranchRadius} will be clamped to this value. */
+	private int maxBranchRadius = BranchBlock.RADMAX_NORMAL;
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -180,6 +185,15 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 
 	public Set<Species> getSpecies () {
 		return this.species;
+	}
+
+	/**
+	 * Resets common species and clears all registered species. This allows for users to override
+	 * all species using the trees folder.
+	 */
+	public void resetSpecies () {
+		this.commonSpecies = Species.NULL_SPECIES;
+		this.species.clear();
 	}
 
 	///////////////////////////////////////////
@@ -357,7 +371,15 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	}
 
 	public boolean isThick() {
-		return false;
+		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
+	}
+
+	public int getMaxBranchRadius() {
+		return this.maxBranchRadius;
+	}
+
+	public void setMaxBranchRadius(int maxBranchRadius) {
+		this.maxBranchRadius = maxBranchRadius;
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -567,6 +589,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 
 	public LeavesProperties getCommonLeaves() {
 		return LeavesProperties.NULL_PROPERTIES;
+	}
+
+	public void setCommonLeaves (LeavesProperties properties) {
+		this.commonLeaves = properties;
 	}
 
 	//////////////////////////////
