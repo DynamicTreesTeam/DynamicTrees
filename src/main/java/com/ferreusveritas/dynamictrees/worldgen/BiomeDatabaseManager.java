@@ -20,6 +20,7 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,7 +53,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, Map<String, JsonElement>> databases, IResourceManager resourceManager, IProfiler profiler) {
+    protected void apply(Map<ResourceLocation, List<Pair<String, JsonElement>>> databases, IResourceManager resourceManager, IProfiler profiler) {
         // Ensure databases are reset.
         this.defaultDatabase = new BiomeDatabase();
         this.dimensionDatabases.clear();
@@ -69,13 +70,13 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
         MinecraftForge.EVENT_BUS.post(event); // Allows add-ons to register custom populators.
 
         // Stores the dimension database files, as they must be populated after the default database.
-        final Map<ResourceLocation, Map<String, JsonElement>> dimensionDatabasesData = Maps.newHashMap();
+        final Map<ResourceLocation, List<Pair<String, JsonElement>>> dimensionDatabasesData = Maps.newHashMap();
 
         // Register the default populators and fetch the dimension populator files.
         databases.forEach((resourceLocation, jsonFiles) ->
-            jsonFiles.forEach((fileName, jsonElement) -> {
+            jsonFiles.forEach((elementPair) -> {
                 if (resourceLocation.getPath().equals(DEFAULT_POPULATOR_NAME)) {
-                    this.registerDefaultPopulator(event, resourceLocation, fileName, jsonElement);
+                    this.registerDefaultPopulator(event, resourceLocation, elementPair.getKey(), elementPair.getValue());
                 } else {
                     dimensionDatabasesData.put(resourceLocation, jsonFiles);
                 }
@@ -144,13 +145,16 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
         }
     }
 
-    private void registerDimensionPopulators(IBiomeDatabasePopulator defaultPopulator, ResourceLocation resourceLocation, Map<String, JsonElement> jsonFiles) {
+    private void registerDimensionPopulators(IBiomeDatabasePopulator defaultPopulator, ResourceLocation resourceLocation, List<Pair<String, JsonElement>> jsonFiles) {
         BiomeDatabase dimensionDatabase = new BiomeDatabase();
 
         // Populate with default entries.
         defaultPopulator.populate(dimensionDatabase);
 
-        jsonFiles.forEach((fileName, jsonElement) -> {
+        jsonFiles.forEach((elementPair) -> {
+            final String fileName = elementPair.getKey();
+            final JsonElement jsonElement = elementPair.getValue();
+
             if (!jsonElement.isJsonObject()) {
                 LOGGER.warn("Skipping loading dimension populator for {} from {} as its root element is not a Json object.", resourceLocation, fileName);
                 return;

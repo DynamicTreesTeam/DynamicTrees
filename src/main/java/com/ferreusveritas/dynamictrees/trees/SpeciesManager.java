@@ -64,6 +64,7 @@ public final class SpeciesManager extends JsonReloadListener implements IJsonApp
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("primitive_sapling", Block.class, Species::setPrimitiveSapling)
+                .register("mega_species", Species.class, Species::setMegaSpecies)
                 .register("seed", Seed.class, Species::setSeed)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
                     if (DirtHelper.getSoilFlags(acceptableSoil) == 0)

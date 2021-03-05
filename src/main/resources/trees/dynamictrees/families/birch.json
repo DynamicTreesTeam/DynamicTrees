@@ -1,0 +1,14 @@
+{
+    "common_leaves": "dynamictrees:birch",
+    "primitive_log": "minecraft:birch_log",
+    "primitive_stripped_log": "minecraft:stripped_birch_log",
+    "sticks": "minecraft:stick",
+    "max_branch_radius": 8,
+    "conifer_variants": true,
+    "species": [
+        {
+            "name": "dynamictrees:birch",
+            "common": true
+        }
+    ]
+}

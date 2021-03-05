@@ -90,7 +90,7 @@ public class OakTree extends VanillaTreeFamily {
 			
 			setupStandardSeedDropping();
 
-			this.shouldSpawnPredicate = (world, trunkPos) -> BiomeDictionary.hasType(getBiomeKey(world.getBiome(trunkPos)), Type.SWAMP);
+			this.commonOverride = (world, trunkPos) -> BiomeDictionary.hasType(getBiomeKey(world.getBiome(trunkPos)), Type.SWAMP);
 			
 			//Add species features
 			this.addGenFeature(GenFeatures.VINES.with(VinesGenFeature.MAX_LENGTH, 7)

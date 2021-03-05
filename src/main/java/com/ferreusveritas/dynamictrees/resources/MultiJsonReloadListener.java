@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,11 +11,13 @@ import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +27,7 @@ import java.util.Map;
  *
  * @author Harley O'Connor
  */
-public abstract class MultiJsonReloadListener extends ReloadListener<Map<ResourceLocation, Map<String, JsonElement>>> {
+public abstract class MultiJsonReloadListener extends ReloadListener<Map<ResourceLocation, List<Pair<String, JsonElement>>>> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -39,8 +42,8 @@ public abstract class MultiJsonReloadListener extends ReloadListener<Map<Resourc
     }
 
     @Override
-    protected Map<ResourceLocation, Map<String, JsonElement>> prepare(IResourceManager resourceManager, IProfiler profiler) {
-        final Map<ResourceLocation, Map<String, JsonElement>> maps = Maps.newHashMap();
+    protected Map<ResourceLocation, List<Pair<String, JsonElement>>> prepare(IResourceManager resourceManager, IProfiler profiler) {
+        final Map<ResourceLocation, List<Pair<String, JsonElement>>> map = Maps.newHashMap();
         int i = folderName.length() + 1;
 
         for(ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
@@ -58,14 +61,14 @@ public abstract class MultiJsonReloadListener extends ReloadListener<Map<Resourc
                         return;
                     }
 
-                    maps.computeIfAbsent(resourceLocation, l -> Maps.newHashMap()).put(resourceLocationIn.getPath(), jsonElement);
+                    map.computeIfAbsent(resourceLocation, l -> Lists.newArrayList()).add(Pair.of(resourceLocationIn.getPath(), jsonElement));
                 });
             } catch (IllegalArgumentException | IOException | JsonParseException e) {
                 LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, e);
             }
         }
 
-        return maps;
+        return map;
     }
 
 }

@@ -16,6 +16,7 @@
     "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "coniferous" },
     "primitive_sapling": "minecraft:spruce_sapling",
+    "mega_species": "dynamictrees:mega_spruce",
     "features" : [
         {
             "name": "dynamictrees:conifer_topper",

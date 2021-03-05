@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.api.datapacks.IJsonApplierManager;
 import com.ferreusveritas.dynamictrees.api.datapacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.resources.ILoadListener;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
@@ -11,10 +12,15 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.profiler.EmptyProfiler;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,10 +30,13 @@ import java.util.stream.Collectors;
  *
  * @author Harley O'Connor
  */
-public final class TreeFamilyManager extends MultiJsonReloadListener implements IJsonApplierManager {
+public final class TreeFamilyManager extends MultiJsonReloadListener implements ILoadListener, IJsonApplierManager {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final class SpeciesRegistryData {
         private SpeciesType<Species> type = TreeSpecies.TREE_SPECIES;
+        private LeavesProperties leavesProperties;
         private ResourceLocation registryName;
         private boolean common = false;
         private boolean generateSeed = false;
@@ -40,6 +49,10 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
 
         public void setType(SpeciesType<Species> type) {
             this.type = type;
+        }
+
+        public void setLeavesProperties(LeavesProperties leavesProperties) {
+            this.leavesProperties = leavesProperties;
         }
 
         public void setCommon(boolean common) {
@@ -72,7 +85,8 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
     @Override
     public void registerAppliers() {
         this.speciesRegistryDataAppliers.register("name", ResourceLocation.class, SpeciesRegistryData::setRegistryName)
-                .register("type", SpeciesType.class, SpeciesRegistryData::setType)
+                .register("type", TreeSpecies.CLASS, SpeciesRegistryData::setType)
+                .register("leaves_properties", LeavesProperties.class, SpeciesRegistryData::setLeavesProperties)
                 .register("common", Boolean.class, SpeciesRegistryData::setCommon)
                 .register("generate_seed", Boolean.class, SpeciesRegistryData::setGenerateSeed)
                 .register("generate_sapling", Boolean.class, SpeciesRegistryData::setGenerateSeed);
@@ -98,6 +112,8 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
                 .register("primitive_stripped_log", Block.class, TreeFamily::setPrimitiveStrippedLog)
                 .register("sticks", Item.class, TreeFamily::setStick)
                 .register("max_branch_radius", Integer.class, TreeFamily::setMaxBranchRadius)
+                .register("conifer_variants", Boolean.class, TreeFamily::setHasConiferVariants)
+                .register("generate_surface_root", Boolean.class, (treeFamily, generateRoot) -> { if (generateRoot) treeFamily.generateSurfaceRoot(); })
                 .register("replace_species", Boolean.class, (treeFamily, replaceSpecies) -> {
                     this.speciesToRegister.removeAll(treeFamily.getSpecies().stream().map(Species::getRegistryName).collect(Collectors.toList()));
 
@@ -119,18 +135,22 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
                     final Species species;
 
                     // Get the species or construct it using the correct species class for the SpeciesType given.
-                    if (!isRegisteredToTree(treeFamily, registryName))
+                    if (isRegisteredToTree(treeFamily, registryName))
                         species = treeFamily.getSpecies().stream().filter(currentSpecies -> registryName.equals(currentSpecies.getRegistryName())).findAny().orElse(Species.NULL_SPECIES);
                     else species = registryData.type.construct(registryData.registryName, treeFamily);
 
                     if (registryData.common)
-                        treeFamily.setCommonSpecies(species);
+                        treeFamily.setupCommonSpecies(species);
                     else treeFamily.addSpecies(species);
 
                     if (registryData.generateSeed)
                         species.generateSeed();
                     if (registryData.generateSapling)
                         species.generateSapling();
+
+                    // TODO: Move leaves block creation to leaves properties Json.
+                    if (registryData.leavesProperties != null)
+                        species.setLeavesProperties(registryData.leavesProperties);
 
                     return PropertyApplierResult.SUCCESS;
                 });
@@ -141,10 +161,30 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, Map<String, JsonElement>> map, IResourceManager resourceManager, IProfiler profiler) {
-        for (final Map.Entry<ResourceLocation, Map<String, JsonElement>> entry : map.entrySet()) {
+    protected void apply(Map<ResourceLocation, List<Pair<String, JsonElement>>> map, IResourceManager resourceManager, IProfiler profiler) {
+        for (final Map.Entry<ResourceLocation, List<Pair<String, JsonElement>>> entry : map.entrySet()) {
+            final ResourceLocation registryName = entry.getKey();
+            final TreeFamily family = new TreeFamily(registryName);
 
+            for (Pair<String, JsonElement> elementPair : entry.getValue()) {
+                final String fileName = elementPair.getKey();
+                final JsonElement jsonElement = elementPair.getValue();
+
+                if (!jsonElement.isJsonObject()) {
+                    LOGGER.warn("Skipping loading tree family data for {} from {} as its root element is not a Json object.", registryName, fileName);
+                    return;
+                }
+
+                this.appliers.applyAll(jsonElement.getAsJsonObject(), family).forEach(failureResult -> LOGGER.warn("Error whilst loading tree family data for {} from {}: {}", registryName, fileName, failureResult.getErrorMessage()));
+            }
+
+            TreeFamily.REGISTRY.register(family);
+            LOGGER.debug("Loaded and registered tree family data: {}.", family.getDisplayString());
         }
     }
 
+    @Override
+    public void load(IResourceManager resourceManager) {
+        this.apply(this.prepare(resourceManager, EmptyProfiler.INSTANCE), resourceManager, EmptyProfiler.INSTANCE);
+    }
 }

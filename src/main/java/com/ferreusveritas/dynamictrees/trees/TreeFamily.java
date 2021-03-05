@@ -12,20 +12,15 @@ import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.google.common.collect.Sets;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -63,7 +58,7 @@ import java.util.stream.Collectors;
 public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	
 	public final static TreeFamily NULL_FAMILY = new TreeFamily() {
-		@Override public void setCommonSpecies(Species species) {}
+		@Override public void setupCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
 		@Override public Set<Block> getRegisterableBlocks(Set<Block> blockList) { return blockList; }
 		@Override public Set<Item> getRegisterableItems(Set<Item> itemList) { return itemList; }
@@ -148,11 +143,11 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		}
 
 		stick = Items.STICK;
-		this.species.addAll(this.createSpecies());
+//		this.species.addAll(this.createSpecies());
 	}
 
 	public Set<Species> createSpecies() {
-		this.setCommonSpecies(new Species(this.getCommonSpeciesName(), this, this.getCommonLeaves()));
+		this.setupCommonSpecies(new Species(this.getCommonSpeciesName(), this, this.getCommonLeaves()));
 		return this.getExtraSpeciesNames().stream().map(registryName -> new Species(registryName, this, this.getCommonLeaves())).collect(Collectors.toSet());
 	}
 
@@ -169,9 +164,13 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return registryName == null ? DTTrees.NULL : registryName;
 	}
 
-	public void setCommonSpecies(final Species species) {
+	public void setupCommonSpecies(final Species species) {
 		this.species.add(species);
 		this.commonSpecies = species;
+
+		// Auto generate seeds and saplings for common species.
+		species.generateSeed();
+		species.generateSapling();
 	}
 
 	public Species getCommonSpecies() {
@@ -223,6 +222,30 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	///////////////////////////////////////////
 
 	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+
+		if (this.canSupportCocoa) {
+			BlockPos pos = hit.getPos();
+			if(heldItem != null) {
+				if(heldItem.getItem() == Items.COCOA_BEANS) {
+					BranchBlock branch = TreeHelper.getBranch(state);
+					if(branch != null && branch.getRadius(state) == 8) {
+						if(hit.getFace() != Direction.UP && hit.getFace() != Direction.DOWN) {
+							pos = pos.offset(hit.getFace());
+						}
+						if (world.isAirBlock(pos)) {
+							BlockState cocoaState = DTRegistries.cocoaFruitBlock.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+							assert cocoaState != null;
+							Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
+							world.setBlockState(pos, DTRegistries.cocoaFruitBlock.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
+							if (!player.isCreative()) {
+								heldItem.shrink(1);
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
 
 		BlockPos rootPos = TreeHelper.findRootNode(world, hitPos);
 
@@ -387,6 +410,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return getBark? woodBarkColor : woodRingColor;
 	}
 
+	public void setHasConiferVariants(boolean hasConiferVariants) {
+		this.hasConiferVariants = hasConiferVariants;
+	}
+
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 *
@@ -527,6 +554,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return false;
 	}
 
+	public void generateSurfaceRoot () {
+		this.setSurfaceRoot(this.createSurfaceRoot());
+	}
+
 	public SurfaceRootBlock createSurfaceRoot () {
 		String surfaceRootName = this.getRegistryName().getPath() + "_root";
 		return new SurfaceRootBlock(surfaceRootName, this);
@@ -588,20 +619,44 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	}
 
 	public LeavesProperties getCommonLeaves() {
-		return LeavesProperties.NULL_PROPERTIES;
+		return this.commonLeaves;
 	}
 
 	public void setCommonLeaves (LeavesProperties properties) {
 		this.commonLeaves = properties;
+		properties.setTree(this);
 	}
 
 	//////////////////////////////
 	// JAVA OBJECT STUFF
 	//////////////////////////////
 
+
 	@Override
 	public String toString() {
-		return getRegistryName().toString();
+		return "TreeFamily{registryName=" + this.getRegistryName() + "}";
 	}
-	
+
+	public String getDisplayString() {
+		return "TreeFamily{" +
+				"commonSpecies=" + commonSpecies +
+				", commonLeaves=" + commonLeaves +
+				", dynamicBranch=" + dynamicBranch +
+				", dynamicStrippedBranch=" + dynamicStrippedBranch +
+				", dynamicBranchItem=" + dynamicBranchItem +
+				", surfaceRoot=" + surfaceRoot +
+				", primitiveLog=" + primitiveLog +
+				", primitiveStrippedLog=" + primitiveStrippedLog +
+				", validBranches=" + validBranches +
+				", maxBranchRadius=" + maxBranchRadius +
+				", hasConiferVariants=" + hasConiferVariants +
+				", stick=" + stick +
+				", canSupportCocoa=" + canSupportCocoa +
+				", woodRingColor=" + woodRingColor +
+				", woodBarkColor=" + woodBarkColor +
+				", species=" + species +
+				", vanillaConnectables=" + vanillaConnectables +
+				'}';
+	}
+
 }

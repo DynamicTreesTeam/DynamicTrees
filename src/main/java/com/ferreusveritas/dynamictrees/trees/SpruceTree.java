@@ -17,7 +17,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
 import java.util.Set;
@@ -83,7 +82,7 @@ public class SpruceTree extends VanillaTreeFamily {
 			setSoilLongevity(16);//Grows for a while so it can actually get tall
 
 			//This will cause the mega spruce to be planted if the player is in a mega taiga biome.
-			this.shouldSpawnPredicate = SpruceTree.this::isLocationForMega;
+			this.commonOverride = SpruceTree.this::isLocationForMega;
 			
 			this.addGenFeature(GenFeatures.CLEAR_VOLUME);//Clear a spot for the thick tree trunk
 			this.addGenFeature(GenFeatures.MOUND.with(MoundGenFeature.MOUND_CUTOFF_RADIUS, 999));//Place a 3x3 of dirt under thick trees

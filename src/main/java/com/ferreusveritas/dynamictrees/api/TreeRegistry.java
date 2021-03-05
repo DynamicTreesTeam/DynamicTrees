@@ -50,8 +50,8 @@ public class TreeRegistry {
 	public static Species findSpeciesSloppy(final String name) {
 
 		ResourceLocation resourceLocation = new ResourceLocation(name);
-		if(DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
-			resourceLocation = new ResourceLocation(DynamicTrees.MOD_ID, resourceLocation.getPath());//Search DynamicTrees Domain instead
+		if (DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
+			resourceLocation = DynamicTrees.resLoc(resourceLocation.getPath());//Search DynamicTrees Domain instead
 		}
 
 		//Search specific domain first
@@ -120,7 +120,7 @@ public class TreeRegistry {
 	// DROP HANDLING
 	//////////////////////////////
 
-	public static final ResourceLocation globalName = new ResourceLocation(DynamicTrees.MOD_ID, "global");
+	public static final ResourceLocation globalName = DynamicTrees.resLoc("global");
 
 	/**
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
@@ -170,7 +170,7 @@ public class TreeRegistry {
 	public static ICellKit findCellKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
 		if(DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
+			kitLocation = DynamicTrees.resLoc(kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findCellKit(kitLocation);
 	}
@@ -192,7 +192,7 @@ public class TreeRegistry {
 	public static GrowthLogicKit findGrowthLogicKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
 		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = new ResourceLocation(DynamicTrees.MOD_ID, kitLocation.getPath());//Default to "dynamictrees" instead
+			kitLocation = DynamicTrees.resLoc(kitLocation.getPath());//Default to "dynamictrees" instead
 		}
 		return findGrowthLogicKit(kitLocation);
 	}

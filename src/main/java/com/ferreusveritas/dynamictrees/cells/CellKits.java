@@ -28,12 +28,12 @@ public class CellKits {
 	}
 	
 	public CellKits() {
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous"), deciduous);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "conifer"), conifer);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "acacia.json"), acacia);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "dark_oak"), dark_oak);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "bare"), bare);
-		TreeRegistry.registerCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "palm"), palm);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("deciduous"), deciduous);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("conifer"), conifer);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("acacia.json"), acacia);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("dark_oak"), dark_oak);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("bare"), bare);
+		TreeRegistry.registerCellKit(DynamicTrees.resLoc("palm"), palm);
 	}
 	
 	private final ICellKit deciduous = new ICellKit() {

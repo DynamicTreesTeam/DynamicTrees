@@ -2,7 +2,7 @@
     "common_leaves": "dynamictrees:oak",
     "primitive_log": "minecraft:oak_log",
     "primitive_stripped_log": "minecraft:stripped_oak_log",
-    "sticks": "minecraft:sticks",
+    "sticks": "minecraft:stick",
     "max_branch_radius": 8,
     "species": [
         {

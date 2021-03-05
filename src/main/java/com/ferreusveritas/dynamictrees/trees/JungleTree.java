@@ -157,33 +157,35 @@ public class JungleTree extends VanillaTreeFamily {
 		return true;
 	}
 
-	@Override
-	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
-		//Place Cocoa Pod if we are holding Cocoa Beans
-		BlockPos pos = hit.getPos();
-		if(heldItem != null) {
-			if(heldItem.getItem() == Items.COCOA_BEANS) {
-				BranchBlock branch = TreeHelper.getBranch(state);
-				if(branch != null && branch.getRadius(state) == 8) {
-					if(hit.getFace() != Direction.UP && hit.getFace() != Direction.DOWN) {
-						pos = pos.offset(hit.getFace());
-					}
-					if (world.isAirBlock(pos)) {
-						BlockState cocoaState = DTRegistries.cocoaFruitBlock.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
-						assert cocoaState != null;
-						Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
-						world.setBlockState(pos, DTRegistries.cocoaFruitBlock.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
-						if (!player.isCreative()) {
-							heldItem.shrink(1);
-						}
-						return true;
-					}
-				}
-			}
-		}
+	// This moved to TreeFamily for tree packs.
 
-		//Need this here to apply potions or bone meal.
-		return super.onTreeActivated(world, hitPos, state, player, hand, heldItem, hit);
-	}
-	
+//	@Override
+//	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+//		//Place Cocoa Pod if we are holding Cocoa Beans
+//		BlockPos pos = hit.getPos();
+//		if(heldItem != null) {
+//			if(heldItem.getItem() == Items.COCOA_BEANS) {
+//				BranchBlock branch = TreeHelper.getBranch(state);
+//				if(branch != null && branch.getRadius(state) == 8) {
+//					if(hit.getFace() != Direction.UP && hit.getFace() != Direction.DOWN) {
+//						pos = pos.offset(hit.getFace());
+//					}
+//					if (world.isAirBlock(pos)) {
+//						BlockState cocoaState = DTRegistries.cocoaFruitBlock.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+//						assert cocoaState != null;
+//						Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
+//						world.setBlockState(pos, DTRegistries.cocoaFruitBlock.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
+//						if (!player.isCreative()) {
+//							heldItem.shrink(1);
+//						}
+//						return true;
+//					}
+//				}
+//			}
+//		}
+//
+//		//Need this here to apply potions or bone meal.
+//		return super.onTreeActivated(world, hitPos, state, player, hand, heldItem, hit);
+//	}
+
 }

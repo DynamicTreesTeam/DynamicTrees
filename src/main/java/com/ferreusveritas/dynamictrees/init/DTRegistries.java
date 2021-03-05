@@ -26,6 +26,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
@@ -124,7 +125,7 @@ public class DTRegistries {
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
 		Set<Block> treeBlocks = Sets.newHashSet();
-		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		TreeFamily.REGISTRY.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -154,7 +155,7 @@ public class DTRegistries {
 		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 		
 		Set<Item> treeItems = Sets.newHashSet();
-		DTTrees.FAMILIES.forEach(tree -> tree.getRegisterableItems(treeItems));
+		TreeFamily.REGISTRY.forEach(tree -> tree.getRegisterableItems(treeItems));
 
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
@@ -191,8 +192,8 @@ public class DTRegistries {
 		
 		IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
 		
-		registry.registerAll(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, FALLING_TREE)),
-				lingeringEffector.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, LINGERING_EFFECTOR)));
+		registry.registerAll(fallingTree.setRegistryName(DynamicTrees.resLoc(FALLING_TREE)),
+				lingeringEffector.setRegistryName(DynamicTrees.resLoc(LINGERING_EFFECTOR)));
 	}
 	
 	///////////////////////////////////////////
@@ -213,7 +214,7 @@ public class DTRegistries {
 		setupTileEntities();
 		
 		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(bonsaiPotBlock.getRegistryName()));
-		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tile_entity_species")));
+		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
 	}
 	
 	///////////////////////////////////////////

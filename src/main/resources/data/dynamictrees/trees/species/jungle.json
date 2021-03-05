@@ -17,6 +17,7 @@
     "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "jungle" },
     "primitive_sapling": "minecraft:jungle_sapling",
+    "mega_species": "dynamictrees:mega_jungle",
     "features" : [
         {
             "name": "dynamictrees:vines",

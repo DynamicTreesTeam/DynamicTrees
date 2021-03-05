@@ -6,11 +6,10 @@ import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.io.InputStream;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -21,6 +20,7 @@ public final class TreesResourceManager implements IResourceManager {
 
     private final List<TreeResourcePack> resourcePacks = Lists.newArrayList();
     private final Set<String> namespaces = Sets.newHashSet();
+    private final List<ILoadListener> loadListeners = Lists.newArrayList();
 
     public TreesResourceManager() {
         // Create the priority trees file. Added first (so stored at the front) so that the user's modifications take priority.
@@ -30,6 +30,14 @@ public final class TreesResourceManager implements IResourceManager {
             mainTreeFolder.mkdir();
 
         this.resourcePacks.add(new TreeResourcePack(mainTreeFolder));
+    }
+
+    public void addLoadListener (final ILoadListener loadListener) {
+        this.loadListeners.add(loadListener);
+    }
+
+    public void load () {
+        this.loadListeners.forEach(loadListener -> loadListener.load(this));
     }
 
     public void addResourcePack (final TreeResourcePack treeResourcePack) {
@@ -43,7 +51,17 @@ public final class TreesResourceManager implements IResourceManager {
 
     @Override
     public IResource getResource(final ResourceLocation resourceLocationIn) throws IOException {
-        return new SimpleResource("", resourceLocationIn, this.resourcePacks.get(0).getResourceStream(null, resourceLocationIn), null);
+        final Iterator<TreeResourcePack> iterator = this.resourcePacks.iterator();
+        InputStream stream;
+
+        do {
+            stream = iterator.next().getResourceStream(null, resourceLocationIn);
+        } while (stream != null || !iterator.hasNext());
+
+        if (stream == null)
+            throw new FileNotFoundException();
+
+        return new SimpleResource("", resourceLocationIn, stream, null);
     }
 
     @Override
@@ -56,7 +74,12 @@ public final class TreesResourceManager implements IResourceManager {
         final List<IResource> resources = new ArrayList<>();
 
         for (final TreeResourcePack resourcePack : this.resourcePacks) {
-            resources.add(new SimpleResource("", resourceLocationIn, resourcePack.getResourceStream(null, resourceLocationIn), null));
+            InputStream stream = resourcePack.getResourceStream(null, resourceLocationIn);
+
+            if (stream == null)
+                continue;
+
+            resources.add(new SimpleResource("", resourceLocationIn, stream, null));
         }
 
         return resources;
@@ -68,7 +91,7 @@ public final class TreesResourceManager implements IResourceManager {
 
         for (final TreeResourcePack resourcePack : this.resourcePacks) {
             for (final String namespace : resourcePack.getResourceNamespaces(null)) {
-                resourceLocations.addAll(resourcePack.getAllResourceLocations(null, namespace, pathIn, 0, filter));
+                resourceLocations.addAll(resourcePack.getAllResourceLocations(null, namespace, pathIn, Integer.MAX_VALUE, filter));
             }
         }
 

@@ -4,8 +4,11 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.resources.DTTreePackRegistries;
+import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,43 +23,48 @@ import java.util.Collections;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
 
-	public static TreeFamily OAK;
-	public static TreeFamily BIRCH;
-	public static TreeFamily SPRUCE;
-	public static TreeFamily JUNGLE;
-	public static TreeFamily DARK_OAK;
-	public static TreeFamily ACACIA;
-	public static TreeFamily CRIMSON;
-	public static TreeFamily WARPED;
+	public static ResourceLocation OAK = DynamicTrees.resLoc("oak");
+	public static ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
+	public static ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
+	public static ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
+	public static ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
+	public static ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
+	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
+	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
 	public static final ArrayList<TreeFamily> FAMILIES = new ArrayList<>();
 
 	public static void setupLeavesProperties() {
-		LeavesPaging.register(new ResourceLocation(DynamicTrees.MOD_ID, "leaves/common.json"));
+		LeavesPaging.register(resLoc("leaves/common.json"));
 	}
 
 	public static void setupTrees() {
-		OAK = new OakTree();
-		BIRCH = new BirchTree();
-		SPRUCE = new SpruceTree();
-		JUNGLE = new JungleTree();
-		DARK_OAK = new DarkOakTree();
-		ACACIA = new AcaciaTree();
-		CRIMSON = new CrimsonFungus();
-		WARPED = new WarpedFungus();
+		DTTreePackRegistries.INSTANCE.setupTreesResources();
+		DTTreePackRegistries.INSTANCE.getTreesResourceManager().load();
 
-		Collections.addAll(FAMILIES, OAK, BIRCH, SPRUCE, JUNGLE, DARK_OAK, ACACIA, CRIMSON, WARPED);
+		TreeFamily.REGISTRY.register(TreeFamily.NULL_FAMILY);
 
-		FAMILIES.forEach(TreeFamily.REGISTRY::register);
+//		OAK = new OakTree();
+//		BIRCH = new BirchTree();
+//		SPRUCE = new SpruceTree();
+//		JUNGLE = new JungleTree();
+//		DARK_OAK = new DarkOakTree();
+//		ACACIA = new AcaciaTree();
+//		CRIMSON = new CrimsonFungus();
+//		WARPED = new WarpedFungus();
+//
+//		Collections.addAll(FAMILIES, OAK, BIRCH, SPRUCE, JUNGLE, DARK_OAK, ACACIA, CRIMSON, WARPED);
+//
+//		FAMILIES.forEach(TreeFamily.REGISTRY::register);
 	}
 
 	@SubscribeEvent
 	public static void registerSpecies (final RegistryEvent.Register<Species> event) {
 		final IForgeRegistry<Species> registry = event.getRegistry();
 
-		registry.register(Species.NULL_SPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null")));
+		registry.register(Species.NULL_SPECIES.setRegistryName(NULL));
 
-		FAMILIES.forEach(family -> family.registerSpecies(registry));
+		TreeFamily.REGISTRY.forEach(family -> family.registerSpecies(registry));
 
 		// Registers a fake species for generating mushrooms
 		registry.registerAll(new Mushroom(true), new Mushroom(false));

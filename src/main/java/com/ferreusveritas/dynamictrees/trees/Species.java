@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -154,7 +153,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
 
-	protected IShouldSpawnPredicate shouldSpawnPredicate;
+	/** A {@link BiPredicate} that returns true if this species should override the common in the given position. */
+	protected ICommonOverride commonOverride;
 
 	private String unlocalizedName = "";
 
@@ -346,14 +346,14 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public boolean hasShouldSpawnPredicate () {
-		return this.shouldSpawnPredicate != null;
+		return this.commonOverride != null;
 	}
 
 	public boolean shouldSpawnAt (final IWorld world, final BlockPos trunkPos) {
-		return this.hasShouldSpawnPredicate() && this.shouldSpawnPredicate.test(world, trunkPos);
+		return this.hasShouldSpawnPredicate() && this.commonOverride.test(world, trunkPos);
 	}
 
-	public interface IShouldSpawnPredicate extends BiPredicate<IWorld, BlockPos> {}
+	public interface ICommonOverride extends BiPredicate<IWorld, BlockPos> {}
 
 	///////////////////////////////////////////
 	//LEAVES
@@ -389,7 +389,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public void addValidLeafBlocks (LeavesProperties... leaves){
-		validLeaves.addAll(Arrays.asList(leaves));
+		for (LeavesProperties leaf : leaves) {
+			if (!this.validLeaves.contains(leaf))
+				this.validLeaves.add(leaf);
+		}
 	}
 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
@@ -424,7 +427,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public Optional<Seed> getSeed() {
-		return !this.hasSeed() && !this.isCommonSpecies() ? this.treeFamily.getCommonSpecies().getSeed() : Optional.of(this.seed);
+		return !this.hasSeed() ? !this.isCommonSpecies() ? this.treeFamily.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
 	}
 	
 	/**
@@ -475,12 +478,11 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public Species setupStandardStickDropping() {
-		addDropCreator(new LeavesStickDropCreator(this));
-		return this;
+		return this.setupStandardStickDropping(1);
 	}
 
 	public Species setupStandardStickDropping (float rarity) {
-		addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
+		this.addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
 		return this;
 	}
 
@@ -1433,7 +1435,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	///////////////////////////////////////////
 
 	private Species megaSpecies = Species.NULL_SPECIES;
-	
+
 	public boolean isMega() {
 		return false;
 	}

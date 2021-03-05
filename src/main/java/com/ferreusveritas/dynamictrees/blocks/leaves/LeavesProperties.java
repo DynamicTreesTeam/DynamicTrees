@@ -73,7 +73,7 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	private LeavesProperties() {}
 	
 	public LeavesProperties(final BlockState primitiveLeaves, final ResourceLocation registryName) {
-		this(primitiveLeaves, TreeRegistry.findCellKit(new ResourceLocation(DynamicTrees.MOD_ID, "deciduous")), registryName);
+		this(primitiveLeaves, TreeRegistry.findCellKit(DynamicTrees.resLoc("deciduous")), registryName);
 	}
 	
 	public LeavesProperties(final BlockState primitiveLeaves, final ICellKit cellKit, final ResourceLocation registryName) {

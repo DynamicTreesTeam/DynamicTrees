@@ -26,9 +26,9 @@ public class JsonHelper {
 		}
 	}
 
-	public static File getDirectory(String namespace, ResourceFolder resourceFolder) {
+	public static File getDirectory(ResourceFolder resourceFolder) {
 		try {
-			return new File(LeavesPaging.class.getResource(resourceFolder.folderName + namespace).toURI());
+			return new File(LeavesPaging.class.getClassLoader().getResource(resourceFolder.folderName).toURI());
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;

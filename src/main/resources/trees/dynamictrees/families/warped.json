@@ -1,0 +1,13 @@
+{
+    "common_leaves": "dynamictrees:warped",
+    "primitive_log": "minecraft:warped_stem",
+    "primitive_stripped_log": "minecraft:stripped_warped_stem",
+    "max_branch_radius": 24,
+    "species": [
+        {
+            "name": "dynamictrees:warped",
+            "common": true
+        },
+        "dynamictrees:mega_warped"
+    ]
+}

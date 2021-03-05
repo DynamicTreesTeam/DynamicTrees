@@ -1,0 +1,13 @@
+{
+    "common_leaves": "dynamictrees:dark_oak",
+    "primitive_log": "minecraft:dark_oak_log",
+    "primitive_stripped_log": "minecraft:stripped_dark_oak_log",
+    "sticks": "minecraft:stick",
+    "max_branch_radius": 24,
+    "species": [
+        {
+            "name": "dynamictrees:dark_oak",
+            "common": true
+        }
+    ]
+}
