@@ -6,15 +6,12 @@ import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
@@ -65,7 +62,7 @@ public class DTClient {
 		registerColorHandlers();
 //		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 		
-		LeavesPropertiesJson.postInitClient();
+		LeavesProperties.postInitClient();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -170,8 +167,8 @@ public class DTClient {
 		}
 		
 		//Register Leaves Colorizers
-		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID)) {
-			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->{
+		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesList()) {
+			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> {
 						LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
 						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
 					}

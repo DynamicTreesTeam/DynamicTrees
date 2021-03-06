@@ -26,6 +26,12 @@ public class LeavesPaging {
 	//BLOCK PAGING
 	///////////////////////////////////////////
 
+	public static List<DynamicLeavesBlock> getLeavesList () {
+		final List<DynamicLeavesBlock> leavesBlocks = new ArrayList<>();
+		modLeavesArray.values().forEach(leavesBlocks::addAll);
+		return leavesBlocks;
+	}
+
 	/**
 	 * 	Get the map of leaves from for the appropriate modid.
 	 *  If the map does not exist then one is created.
@@ -36,54 +42,58 @@ public class LeavesPaging {
 	public static List<DynamicLeavesBlock> getLeavesListForModId(@Nullable String modid) {
 		return modLeavesArray.computeIfAbsent(modid, k -> new ArrayList<>());
 	}
+
 	public static void addLeavesBlockForModId(DynamicLeavesBlock block, String modid){
 		getLeavesListForModId(modid).add(block);
 	}
 
-	public static void registerAll (final String namespace, final Object ... leavesProperties) {
-		final List<LeavesProperties> leaves = new ArrayList<>();
-
-		for(int i = 0; i < (leavesProperties.length & ~1); i += 2) {
-			String label = leavesProperties[i].toString();
-			Object obj = leavesProperties[i+1];
-
-			LeavesProperties newProperties = LeavesProperties.NULL_PROPERTIES;
-
-			if(obj instanceof LeavesProperties) {
-				newProperties = (LeavesProperties) obj;
-			} else
-			if(obj instanceof String && !"".equals(obj)) {
-				newProperties = new LeavesPropertiesJson((String) obj, new ResourceLocation(namespace, label));
-			}
-
-			leaves.add(newProperties);
-		}
-
-		leaves.forEach(LeavesProperties.REGISTRY::register);
-	}
-
-	public static void register(final JsonObject root, final String namespace) {
-		if (root == null)
-			return;
-
-		final List<LeavesProperties> leaves = new ArrayList<>();
-
-		for (Entry<String, JsonElement> entry : root.entrySet()) {
-			leaves.add(new LeavesPropertiesJson(entry.getValue().getAsJsonObject(), new ResourceLocation(namespace, entry.getKey())));
-		}
-
-		leaves.forEach(LeavesProperties.REGISTRY::register);
-	}
-
-	public static void register(final ResourceLocation jsonLocation) {
-		final JsonElement element = JsonHelper.load(jsonLocation, JsonHelper.ResourceFolder.TREES);
-
-		if (element != null && element.isJsonObject()) {
-			register(element.getAsJsonObject(), jsonLocation.getNamespace());
-			return;
-		}
-
-		LogManager.getLogger().warn("Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
-	}
+//	@Deprecated
+//	public static void registerAll (final String namespace, final Object ... leavesProperties) {
+//		final List<LeavesProperties> leaves = new ArrayList<>();
+//
+//		for(int i = 0; i < (leavesProperties.length & ~1); i += 2) {
+//			String label = leavesProperties[i].toString();
+//			Object obj = leavesProperties[i+1];
+//
+//			LeavesProperties newProperties = LeavesProperties.NULL_PROPERTIES;
+//
+//			if(obj instanceof LeavesProperties) {
+//				newProperties = (LeavesProperties) obj;
+//			} else
+//			if(obj instanceof String && !"".equals(obj)) {
+//				newProperties = new LeavesPropertiesJson((String) obj, new ResourceLocation(namespace, label));
+//			}
+//
+//			leaves.add(newProperties);
+//		}
+//
+//		leaves.forEach(LeavesProperties.REGISTRY::register);
+//	}
+//
+//	@Deprecated
+//	public static void register(final JsonObject root, final String namespace) {
+//		if (root == null)
+//			return;
+//
+//		final List<LeavesProperties> leaves = new ArrayList<>();
+//
+//		for (Entry<String, JsonElement> entry : root.entrySet()) {
+//			leaves.add(new LeavesPropertiesJson(entry.getValue().getAsJsonObject(), new ResourceLocation(namespace, entry.getKey())));
+//		}
+//
+//		leaves.forEach(LeavesProperties.REGISTRY::register);
+//	}
+//
+//	@Deprecated
+//	public static void register(final ResourceLocation jsonLocation) {
+//		final JsonElement element = JsonHelper.load(jsonLocation, JsonHelper.ResourceFolder.TREES);
+//
+//		if (element != null && element.isJsonObject()) {
+//			register(element.getAsJsonObject(), jsonLocation.getNamespace());
+//			return;
+//		}
+//
+//		LogManager.getLogger().warn("Error building leaves paging for mod: " + jsonLocation.getNamespace() + " at " + jsonLocation.getPath());
+//	}
 	
 }

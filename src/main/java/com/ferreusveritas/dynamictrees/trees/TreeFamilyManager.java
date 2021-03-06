@@ -108,9 +108,9 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
         });
 
         this.appliers.register("common_leaves", LeavesProperties.class, TreeFamily::setCommonLeaves)
-                .register("primitive_log", Block.class, TreeFamily::setPrimitiveLog)
-                .register("primitive_stripped_log", Block.class, TreeFamily::setPrimitiveStrippedLog)
-                .register("sticks", Item.class, TreeFamily::setStick)
+                .register("primitive_log", ResourceLocation.class, TreeFamily::setPrimitiveLogRegName)
+                .register("primitive_stripped_log", ResourceLocation.class, TreeFamily::setPrimitiveStrippedLogRegName)
+                .register("stick", ResourceLocation.class, TreeFamily::setStickRegName)
                 .register("max_branch_radius", Integer.class, TreeFamily::setMaxBranchRadius)
                 .register("conifer_variants", Boolean.class, TreeFamily::setHasConiferVariants)
                 .register("generate_surface_root", Boolean.class, TreeFamily::setHasSurfaceRoot)

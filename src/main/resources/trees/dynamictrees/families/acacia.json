@@ -2,7 +2,7 @@
     "common_leaves": "dynamictrees:acacia",
     "primitive_log": "minecraft:acacia_log",
     "primitive_stripped_log": "minecraft:stripped_acacia_log",
-    "sticks": "minecraft:stick",
+    "stick": "minecraft:stick",
     "max_branch_radius": 8,
     "species": [
         {

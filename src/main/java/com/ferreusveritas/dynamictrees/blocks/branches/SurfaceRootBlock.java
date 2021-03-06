@@ -17,6 +17,7 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -44,18 +45,18 @@ public class SurfaceRootBlock extends Block {
 
 	private final TreeFamily family;
 
-	public SurfaceRootBlock(String name, TreeFamily family) {
-		this(Material.WOOD, name, family);
+	public SurfaceRootBlock(ResourceLocation registryName, TreeFamily family) {
+		this(Material.WOOD, registryName, family);
 	}
 
-	public SurfaceRootBlock(Material material, String name, TreeFamily family) {
+	public SurfaceRootBlock(Material material, ResourceLocation registryName, TreeFamily family) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
 				.hardnessAndResistance(2.5f, 1.0F)
 				.sound(SoundType.WOOD));
 
-		this.setRegistryName(name);
+		this.setRegistryName(registryName);
 		this.family = family;
 	}
 

@@ -2,10 +2,9 @@
     "common_leaves": "dynamictrees:spruce",
     "primitive_log": "minecraft:spruce_log",
     "primitive_stripped_log": "minecraft:stripped_spruce_log",
-    "sticks": "minecraft:stick",
+    "stick": "minecraft:stick",
     "max_branch_radius": 24,
     "conifer_variants": true,
-    "generate_surface_root": true,
     "species": [
         {
             "name": "dynamictrees:spruce",

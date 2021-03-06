@@ -32,8 +32,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
@@ -69,9 +71,9 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	};
 
 	/**
-	 * Mods should use this to register their {@link TreeFamily} objects.
+	 * The registry. This is used for registering and querying {@link TreeFamily} objects.
 	 *
-	 * Places the species in a central registry.
+	 * <p>Add-ons should use {@link DTTrees.TreeFamilyRegistryEvent}, <b>not</b> Forge's registry event.</p>
 	 */
 	public static IForgeRegistry<TreeFamily> REGISTRY;
 
@@ -94,6 +96,9 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	/** The primitive stripped log to base the texture, drops, and other behavior from */
 	private Block primitiveStrippedLog = Blocks.AIR;
 
+	private ResourceLocation primitiveLogRegName;
+	private ResourceLocation primitiveStrippedLogRegName;
+
 	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
 	private final List<BranchBlock> validBranches = new LinkedList<>();
 
@@ -113,6 +118,8 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	private Item stick = null;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
+
+	private ResourceLocation stickRegName;
 
 	@OnlyIn(Dist.CLIENT)
 	public int woodRingColor; // For rooty blocks
@@ -141,20 +148,8 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		this.setDynamicBranch(this.createBranch());
 		this.setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
 
-		if (this.primitiveLog != Blocks.AIR) {
-			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveLog));
-		} else {
-			LogManager.getLogger().warn("Tree family '{}' did not have a primitive log set for branch.", this.getRegistryName());
-		}
-
 		if (this.hasStrippedBranch()) {
 			this.setDynamicStrippedBranch(this.createBranch("stripped_", "_branch"));
-
-			if (this.primitiveStrippedLog != Blocks.AIR) {
-				this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveStrippedLog));
-			} else {
-				LogManager.getLogger().warn("Tree family '{}' did not have a primitive stripped log set for stripped branch.", this.getRegistryName());
-			}
 		}
 
 		if (this.hasSurfaceRoot()) {
@@ -367,7 +362,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	}
 
 	public BranchBlock createBranch(final String prefix, final String suffix) {
-		final String branchName = prefix + this.getRegistryName().getPath() + suffix;
+		final ResourceLocation branchName = new ResourceLocation(this.getRegistryName().getNamespace(), prefix + this.getRegistryName().getPath() + suffix);
 		final BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
 		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
 		return branch;
@@ -430,6 +425,31 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		this.hasConiferVariants = hasConiferVariants;
 	}
 
+	public void onCommonSetup () {
+		this.setOrWarn(this.stick, this.stickRegName, ForgeRegistries.ITEMS, "stick");
+		this.setOrWarn(this.primitiveLog, this.primitiveLogRegName, ForgeRegistries.BLOCKS, "primitive log");
+		this.setOrWarn(this.primitiveStrippedLog, this.primitiveStrippedLogRegName, ForgeRegistries.BLOCKS, "primitive stripped log");
+
+		if (this.dynamicBranch != null && this.primitiveLog != null) {
+			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveLog));
+		}
+
+		if (this.dynamicStrippedBranch != null && this.primitiveStrippedLog != null) {
+			this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveStrippedLog));
+		}
+	}
+
+	private <V extends IForgeRegistryEntry<V>> void setOrWarn (V objectToSet, @Nullable final ResourceLocation registryName, final IForgeRegistry<V> registry, final String fieldName) {
+		if (registryName == null)
+			return;
+
+		objectToSet = registry.getValue(registryName);
+
+		if (objectToSet == null || objectToSet == Items.AIR || objectToSet == Blocks.AIR) {
+			LogManager.getLogger().warn("Could not set {} for tree family '{}' from '{}'.", fieldName, this.getRegistryName(), registryName);
+		}
+	}
+
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 *
@@ -449,6 +469,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 */
 	public ItemStack getStick(int qty) {
 		return new ItemStack(stick, MathHelper.clamp(qty, 0, 64));
+	}
+
+	public void setStickRegName(ResourceLocation stickRegName) {
+		this.stickRegName = stickRegName;
 	}
 
 	/**
@@ -482,6 +506,14 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 
 	public Block getPrimitiveStrippedLog() {
 		return primitiveStrippedLog;
+	}
+
+	public void setPrimitiveLogRegName(ResourceLocation primitiveLogRegName) {
+		this.primitiveLogRegName = primitiveLogRegName;
+	}
+
+	public void setPrimitiveStrippedLogRegName(ResourceLocation primitiveStrippedLogRegName) {
+		this.primitiveStrippedLogRegName = primitiveStrippedLogRegName;
 	}
 
 	private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
@@ -575,12 +607,8 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		this.hasSurfaceRoot = hasSurfaceRoot;
 	}
 
-	public void generateSurfaceRoot () {
-		this.setSurfaceRoot(this.createSurfaceRoot());
-	}
-
 	public SurfaceRootBlock createSurfaceRoot () {
-		String surfaceRootName = this.getRegistryName().getPath() + "_root";
+		final ResourceLocation surfaceRootName = new ResourceLocation(this.getRegistryName().getNamespace(), this.getRegistryName().getPath() + "_root");
 		return new SurfaceRootBlock(surfaceRootName, this);
 	}
 

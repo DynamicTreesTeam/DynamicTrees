@@ -4,42 +4,31 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class CellKits {
 	
-	private static final ICellSolver NULLCELLSOLVER = cells -> 0;
+	private static final ICellSolver NULL_CELL_SOLVER = cells -> 0;
 	
-	public static final ICellKit NULLCELLKIT = new ICellKit() {
-		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULLCELL; }
-		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULLCELL; }
-		@Override public ICellSolver getCellSolver() { return NULLCELLSOLVER; }
-		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULLMAP; }
+	public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
+		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULL_CELL; }
+		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULL_CELL; }
+		@Override public ICellSolver getCellSolver() { return NULL_CELL_SOLVER; }
+		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULL_MAP; }
 		@Override public int getDefaultHydration() { return 0; }
 	};
 	
-	public static void setup() {
-		new CellKits();
-	}
-	
-	public CellKits() {
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("deciduous"), deciduous);
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("conifer"), conifer);
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("acacia.json"), acacia);
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("dark_oak"), dark_oak);
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("bare"), bare);
-		TreeRegistry.registerCellKit(DynamicTrees.resLoc("palm"), palm);
-	}
-	
-	private final ICellKit deciduous = new ICellKit() {
+	public static final CellKit DECIDUOUS = new CellKit(DynamicTrees.resLoc("deciduous")) {
 
 		private final ICell[] normalCells = {
-				CellNull.NULLCELL,
+				CellNull.NULL_CELL,
 				new NormalCell(1),
 				new NormalCell(2),
 				new NormalCell(3),
@@ -61,12 +50,12 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			return radius == 1 ? branchCell : CellNull.NULLCELL;
+			return radius == 1 ? branchCell : CellNull.NULL_CELL;
 		}
 		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.deciduous;
+			return LeafClusters.DECIDUOUS;
 		}
 		
 		@Override
@@ -83,13 +72,13 @@ public class CellKits {
 	
 	
 	
-	private final ICellKit conifer = new ICellKit() {
+	public static final CellKit CONIFER = new CellKit(DynamicTrees.resLoc("conifer")) {
 		
 		private final ICell coniferBranch = new ConiferBranchCell();
 		private final ICell coniferTopBranch = new ConiferTopBranchCell();
 
 		private final ICell[] coniferLeafCells = {
-				CellNull.NULLCELL,
+				CellNull.NULL_CELL,
 				new ConiferLeafCell(1),
 				new ConiferLeafCell(2),
 				new ConiferLeafCell(3),
@@ -114,13 +103,13 @@ public class CellKits {
 			else if(radius == 1) {
 				return coniferBranch;
 			} else {
-				return CellNull.NULLCELL;
+				return CellNull.NULL_CELL;
 			}
 		}
 		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.conifer;
+			return LeafClusters.CONIFER;
 		}
 		
 		@Override
@@ -135,7 +124,7 @@ public class CellKits {
 		
 	};
 
-	private final ICellKit acacia = new ICellKit() {
+	public static final CellKit ACACIA = new CellKit(DynamicTrees.resLoc("acacia")) {
 		
 		private final ICell acaciaBranch = new ICell() {
 			@Override
@@ -153,7 +142,7 @@ public class CellKits {
 		};
 
 		private final ICell[] acaciaLeafCells = {
-				CellNull.NULLCELL,
+				CellNull.NULL_CELL,
 				new AcaciaLeafCell(1),
 				new AcaciaLeafCell(2),
 				new AcaciaLeafCell(3),
@@ -172,12 +161,12 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			return radius == 1 ? acaciaBranch : CellNull.NULLCELL;
+			return radius == 1 ? acaciaBranch : CellNull.NULL_CELL;
 		}
 		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.acacia;
+			return LeafClusters.ACACIA;
 		}
 		
 		@Override
@@ -193,13 +182,13 @@ public class CellKits {
 	};
 	
 	
-	private final ICellKit dark_oak = new ICellKit() {
+	public static final CellKit DARK_OAK = new CellKit(DynamicTrees.resLoc("dark_oak")) {
 		
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new NormalCell(5);
 		
 		private final ICell[] darkOakLeafCells = {
-				CellNull.NULLCELL,
+				CellNull.NULL_CELL,
 				new DarkOakLeafCell(1),
 				new DarkOakLeafCell(2),
 				new DarkOakLeafCell(3),
@@ -218,12 +207,12 @@ public class CellKits {
 		
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			return radius == 1 ? branchCell : CellNull.NULLCELL;
+			return radius == 1 ? branchCell : CellNull.NULL_CELL;
 		}
 
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.darkoak;
+			return LeafClusters.DARK_OAK;
 		}
 		
 		@Override
@@ -239,23 +228,23 @@ public class CellKits {
 	};
 	
 	
-	private final ICellKit bare = new ICellKit() {
+	public static final CellKit BARE = new CellKit(DynamicTrees.resLoc("bare")) {
 		
 		private final ICellSolver solver = new BasicSolver(new short[]{});
 		
 		@Override
 		public ICell getCellForLeaves(int hydro) {
-			return CellNull.NULLCELL;
+			return CellNull.NULL_CELL;
 		}
 		
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			return CellNull.NULLCELL;
+			return CellNull.NULL_CELL;
 		}
 		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.bare;
+			return LeafClusters.BARE;
 		}
 		
 		@Override
@@ -270,7 +259,7 @@ public class CellKits {
 		
 	};
 	
-	private final ICellKit palm = new ICellKit() {
+	public static final CellKit PALM = new CellKit(DynamicTrees.resLoc("palm")) {
 		
 		private final ICell palmBranch = new ICell() {
 			@Override
@@ -286,7 +275,7 @@ public class CellKits {
 		};
 		
 		private final ICell[] palmFrondCells = {
-				CellNull.NULLCELL,
+				CellNull.NULL_CELL,
 				new PalmFrondCell(1),
 				new PalmFrondCell(2),
 				new PalmFrondCell(3),
@@ -310,7 +299,7 @@ public class CellKits {
 		
 		@Override
 		public SimpleVoxmap getLeafCluster() {
-			return LeafClusters.palm;
+			return LeafClusters.PALM;
 		}
 		
 		@Override
@@ -324,7 +313,11 @@ public class CellKits {
 		}
 		
 	};
-	
+
+	public static void register(final IForgeRegistry<CellKit> registry) {
+		registry.registerAll(NULL_CELL_KIT, DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM);
+	}
+
 	/**
 	* Cellular automata function that determines the behavior of the center cell from it's neighbors.
 	* Values here are the number of neighbors for each hydration level.  Must be 16 elements.

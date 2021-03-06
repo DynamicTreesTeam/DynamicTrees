@@ -80,7 +80,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
 				world.setBlockState(pos, configuredGenFeature.get(LOG_BLOCK).getDefaultState(), 3);
 
-				SimpleVoxmap leafMap = LeafClusters.bush;
+				SimpleVoxmap leafMap = LeafClusters.BUSH;
 				BlockPos.Mutable leafPos = new BlockPos.Mutable();
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );

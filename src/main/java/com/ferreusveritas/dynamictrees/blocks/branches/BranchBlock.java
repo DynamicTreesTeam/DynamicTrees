@@ -57,13 +57,13 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
 	
-	public BranchBlock(Properties properties, String name){
+	public BranchBlock(Properties properties, ResourceLocation registryName){
 		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
-		this.setRegistryName(name);
+		this.setRegistryName(registryName);
 	}
 	
-	public BranchBlock(Material material, String name) {
-		this(Properties.create(material), name);
+	public BranchBlock(Material material, ResourceLocation registryName) {
+		this(Properties.create(material), registryName);
 	}
 
 	public BranchBlock setCanBeStripped(boolean truth){

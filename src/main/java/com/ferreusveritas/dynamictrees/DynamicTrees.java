@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
-import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -99,7 +99,6 @@ public class DynamicTrees {
 
 		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
 
-		CellKits.setup();
 		TreeGenerator.setup();
 		
 		DTRegistries.setupBlocks();
@@ -135,6 +134,9 @@ public class DynamicTrees {
 			if (primitiveSaplingState != null)
 				TreeRegistry.registerSaplingReplacer(primitiveSaplingState, species);
 		}
+
+		LeavesProperties.REGISTRY.forEach(LeavesProperties::onCommonSetup);
+		TreeFamily.REGISTRY.forEach(TreeFamily::onCommonSetup);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {
@@ -143,11 +145,6 @@ public class DynamicTrees {
 	
 	private void registerDendroRecipes () {
 		DTRegistries.dendroPotion.registerRecipes();
-	}
-	
-	public void cleanUp() {
-		LeavesPropertiesJson.cleanUp();
-		TreeRegistry.cleanupCellKit();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

@@ -21,6 +21,7 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.BeeEntity;
@@ -59,13 +60,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	protected static Random backupRng = new Random();
 	
 	public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
-	
+
+	private static final Properties DEFAULT_PROPERTIES = AbstractBlock.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F)
+			.tickRandomly().sound(SoundType.PLANT).notSolid().setAllowsSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+			.setSuffocates((s, r, p) -> false).setBlocksVision((s, r, p) -> false);
+
 	public DynamicLeavesBlock() {
-		this(Block.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
+		this(DEFAULT_PROPERTIES);
 	}
 
 	public DynamicLeavesBlock(LeavesProperties leavesProperties) {
-		this(Properties.from(leavesProperties.getPrimitiveLeaves().getBlock()).tickRandomly());
+		this(DEFAULT_PROPERTIES);
 		setProperties(leavesProperties);
 		leavesProperties.setDynamicLeavesState(getDefaultState());
 	}
@@ -440,7 +445,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
-		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.get(LeavesBlock.DISTANCE)) : CellNull.NULLCELL;
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.get(LeavesBlock.DISTANCE)) : CellNull.NULL_CELL;
 	}
 	
 	@Override

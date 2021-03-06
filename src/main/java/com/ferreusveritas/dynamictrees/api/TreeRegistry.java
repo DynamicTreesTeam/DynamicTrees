@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -25,7 +25,6 @@ import java.util.Map;
 public class TreeRegistry {
 
 	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
-	private static HashMap<ResourceLocation, ICellKit> CELL_KIT_REGISTRY = new HashMap<>();
 
 	//////////////////////////////
 	// SPECIES REGISTRY
@@ -159,30 +158,25 @@ public class TreeRegistry {
 	// CELLKIT HANDLING
 	//////////////////////////////
 
-	public static ICellKit registerCellKit(ResourceLocation name, ICellKit kit) {
-		return CELL_KIT_REGISTRY.computeIfAbsent(name, k -> kit);
+	@Nullable
+	public static CellKit findCellKit(ResourceLocation name) {
+		return CellKit.REGISTRY.getValue(name);
 	}
 
-	public static ICellKit findCellKit(ResourceLocation name) {
-		return CELL_KIT_REGISTRY.get(name);
-	}
-
-	public static ICellKit findCellKit(String name) {
+	@Nullable
+	public static CellKit findCellKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
-		if(DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = DynamicTrees.resLoc(kitLocation.getPath());//Default to "dynamictrees" instead
+		if (DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) { // Minecraft doesn't register cell kits.
+			kitLocation = DynamicTrees.resLoc(kitLocation.getPath()); // Default to "dynamictrees" instead.
 		}
 		return findCellKit(kitLocation);
-	}
-
-	public static void cleanupCellKit() {
-		CELL_KIT_REGISTRY = new HashMap<>();
 	}
 
 	//////////////////////////////
 	// GROWTHLOGICKIT HANDLING
 	//////////////////////////////
 
+	@Deprecated
 	@Nullable
 	public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
 		return GrowthLogicKit.REGISTRY.getValue(name);
@@ -191,8 +185,8 @@ public class TreeRegistry {
 	@Nullable
 	public static GrowthLogicKit findGrowthLogicKit(String name) {
 		ResourceLocation kitLocation = new ResourceLocation(name);
-		if("minecraft".equals(kitLocation.getNamespace())) {//Minecraft doesn't register leaves properties
-			kitLocation = DynamicTrees.resLoc(kitLocation.getPath());//Default to "dynamictrees" instead
+		if (DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) { // Minecraft doesn't register growth logic kits.
+			kitLocation = DynamicTrees.resLoc(kitLocation.getPath()); // Default to "dynamictrees" instead.
 		}
 		return findGrowthLogicKit(kitLocation);
 	}

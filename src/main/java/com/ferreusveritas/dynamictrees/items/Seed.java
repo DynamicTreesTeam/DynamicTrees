@@ -25,6 +25,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -38,11 +39,16 @@ public class Seed extends Item implements IPlantable {
 	
 	private final Species species;//The tree this seed creates
 	
-	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULL_SPECIES;}
+	public Seed() {
+		super(new Item.Properties());
+		this.setRegistryName("null");
+		species = Species.NULL_SPECIES;
+	}
 	
 	public Seed(Species species) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
-		setRegistryName(species.getRegistryName().getPath() + "_seed");
+		final ResourceLocation speciesRegName = species.getRegistryName();
+		this.setRegistryName(new ResourceLocation(speciesRegName.getNamespace(), speciesRegName.getPath() + "_seed"));
 		this.species = species;
 	}
 	

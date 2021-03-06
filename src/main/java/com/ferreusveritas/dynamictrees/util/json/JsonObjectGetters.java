@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -168,6 +169,7 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<Block> BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
     public static final IJsonObjectGetter<Item> ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
 
+    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
     public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
     public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
     public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));

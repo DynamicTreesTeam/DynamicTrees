@@ -10,7 +10,7 @@ import net.minecraft.util.Direction;
  */
 public class CellNull implements ICell {
 
-	public static final CellNull NULLCELL = new CellNull();
+	public static final CellNull NULL_CELL = new CellNull();
 	
 	@Override
 	public int getValue() {

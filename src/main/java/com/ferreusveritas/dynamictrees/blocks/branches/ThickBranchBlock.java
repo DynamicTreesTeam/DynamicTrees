@@ -12,6 +12,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -31,12 +32,12 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
-	public ThickBranchBlock(Material material, String name) {
-		this(Properties.create(material),name);
+	public ThickBranchBlock(Material material, ResourceLocation registryName) {
+		this(Properties.create(material), registryName);
 	}
 
-	public ThickBranchBlock(Properties properties, String name) {
-		super(properties, name);
+	public ThickBranchBlock(Properties properties, ResourceLocation registryName) {
+		super(properties, registryName);
 
 		cacheBranchThickStates();
 	}

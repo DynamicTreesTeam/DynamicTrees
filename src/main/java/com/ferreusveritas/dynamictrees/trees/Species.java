@@ -375,7 +375,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 			BlockState leavesState = getLeavesProperties().getDynamicLeavesState();
 			if (leavesState!=null && leavesState.getBlock() instanceof DynamicLeavesBlock)
 				block = (DynamicLeavesBlock) leavesState.getBlock();
-		} else if (getLeavesProperties().getPrimitiveLeaves() != null && !getLeavesProperties().getPrimitiveLeaves().getBlock().equals(Blocks.AIR)) {
+		} else if (getLeavesProperties().getPrimitiveLeavesRegName() != null) {
 			block = createLeavesBlock(getLeavesProperties());
 		}
 		return Optional.ofNullable(block);

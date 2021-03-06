@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
 import com.ferreusveritas.dynamictrees.trees.TreeFamilyManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
@@ -16,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,20 +38,16 @@ public final class DTResourceRegistries {
     public static final TreesResourceManager TREES_RESOURCE_MANAGER = new TreesResourceManager();
 
     private static TreeFamilyManager treeFamilyManager;
+    private static LeavesPropertiesManager leavesPropertiesManager;
 
     public static void setupTreesResourceManager () {
+        leavesPropertiesManager = new LeavesPropertiesManager();
         treeFamilyManager = new TreeFamilyManager();
-        TREES_RESOURCE_MANAGER.addLoadListener(treeFamilyManager);
+        TREES_RESOURCE_MANAGER.addLoadListeners(leavesPropertiesManager, treeFamilyManager);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
-        final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent();
+        final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);
         MinecraftForge.EVENT_BUS.post(addLoadListenerEvent);
-        addLoadListenerEvent.loadListeners.forEach(TREES_RESOURCE_MANAGER::addLoadListener);
-
-        // Create and fire event so add-ons can register custom tree resource packs.
-        final AddTreesResourcePackEvent addTreesResourcePackEvent = new AddTreesResourcePackEvent();
-        MinecraftForge.EVENT_BUS.post(addTreesResourcePackEvent);
-        addTreesResourcePackEvent.treeResourcePacks.forEach(TREES_RESOURCE_MANAGER::addResourcePack);
 
         ModList.get().getMods().forEach(modInfo -> {
             final String modId = modInfo.getModId();
@@ -81,22 +77,20 @@ public final class DTResourceRegistries {
         return treeFamilyManager;
     }
 
-    public static final class AddTreesLoadListenerEvent extends Event {
-
-        private final List<ILoadListener> loadListeners = Lists.newArrayList();
-
-        public void addLoadListener (final ILoadListener loadListener) {
-            loadListeners.add(loadListener);
-        }
-
+    public static LeavesPropertiesManager getLeavesPropertiesManager() {
+        return leavesPropertiesManager;
     }
 
-    public static final class AddTreesResourcePackEvent extends Event {
+    public static final class AddTreesLoadListenerEvent extends Event {
 
-        private final List<TreeResourcePack> treeResourcePacks = Lists.newArrayList();
+        private final TreesResourceManager treesResourceManager;
 
-        public void addResourcePack (final TreeResourcePack treeResourcePack) {
-            this.treeResourcePacks.add(treeResourcePack);
+        public AddTreesLoadListenerEvent(final TreesResourceManager treesResourceManager) {
+            this.treesResourceManager = treesResourceManager;
+        }
+
+        public TreesResourceManager getTreesResourceManager() {
+            return treesResourceManager;
         }
 
     }

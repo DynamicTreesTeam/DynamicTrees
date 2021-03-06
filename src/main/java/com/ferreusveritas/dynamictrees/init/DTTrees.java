@@ -1,19 +1,23 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.*;
 
 import java.util.ArrayList;
 
@@ -29,15 +33,9 @@ public class DTTrees {
 	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
 	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
-	public static void setupLeavesProperties() {
-		LeavesPaging.register(resLoc("leaves/common.json"));
-	}
-
-	public static void setupTrees() {
-		DTResourceRegistries.setupTreesResourceManager();
-		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
-
-		TreeFamily.REGISTRY.register(TreeFamily.NULL_FAMILY);
+	@SubscribeEvent
+	public static void registerTrees(final TreeFamilyRegistryEvent event) {
+		event.getRegistry().register(TreeFamily.NULL_FAMILY);
 	}
 
 	@SubscribeEvent
@@ -48,12 +46,13 @@ public class DTTrees {
 
 		TreeFamily.REGISTRY.forEach(family -> family.registerSpecies(registry));
 
-		// Registers a fake species for generating mushrooms
+		// Registers fake species for generating mushrooms.
 		registry.registerAll(new Mushroom(true), new Mushroom(false));
 	}
 
 	public static final ResourceLocation NULL = resLoc("null");
 
+	public static final ResourceLocation CELL_KIT = resLoc("cell_kit");
 	public static final ResourceLocation LEAVES_PROPERTIES = resLoc("leaves_properties");
 	public static final ResourceLocation GROWTH_LOGIC_KIT = resLoc("growth_logic_kit");
 	public static final ResourceLocation TREE_FAMILY = resLoc("tree_family");
@@ -62,14 +61,56 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
+		CellKit.REGISTRY = createRegistry(CellKit.class, CELL_KIT);
 		LeavesProperties.REGISTRY = createRegistry(LeavesProperties.class, LEAVES_PROPERTIES);
 		GrowthLogicKit.REGISTRY = createRegistry(GrowthLogicKit.class, GROWTH_LOGIC_KIT);
 		TreeFamily.REGISTRY = createRegistry(TreeFamily.class, TREE_FAMILY);
 		Species.REGISTRY = createRegistry(Species.class, SPECIES);
 		GenFeature.REGISTRY = createRegistry(GenFeature.class, GEN_FEATURE);
 
-		setupLeavesProperties();
-		setupTrees();
+		// Fire custom registry events.
+		FMLJavaModLoadingContext.get().getModEventBus().post(new CellKitRegistryEvent());
+		FMLJavaModLoadingContext.get().getModEventBus().post(new LeavesPropertiesRegistryEvent());
+		FMLJavaModLoadingContext.get().getModEventBus().post(new TreeFamilyRegistryEvent());
+
+		DTResourceRegistries.setupTreesResourceManager();
+		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
+	}
+
+	/**
+	 * Custom registry event so that certain registries are created before blocks and items
+	 * are registered.
+	 *
+	 * @param <T> The registry entry {@link Class}.
+	 */
+	public static class CustomRegistryEvent<T extends IForgeRegistryEntry<T>> extends Event implements IModBusEvent {
+		private final IForgeRegistry<T> registry;
+
+		public CustomRegistryEvent(IForgeRegistry<T> registry) {
+			this.registry = registry;
+		}
+
+		public IForgeRegistry<T> getRegistry() {
+			return registry;
+		}
+	}
+
+	public static final class CellKitRegistryEvent extends CustomRegistryEvent<CellKit> {
+		public CellKitRegistryEvent() {
+			super(CellKit.REGISTRY);
+		}
+	}
+
+	public static final class LeavesPropertiesRegistryEvent extends CustomRegistryEvent<LeavesProperties> {
+		public LeavesPropertiesRegistryEvent() {
+			super(LeavesProperties.REGISTRY);
+		}
+	}
+
+	public static final class TreeFamilyRegistryEvent extends CustomRegistryEvent<TreeFamily> {
+		public TreeFamilyRegistryEvent() {
+			super(TreeFamily.REGISTRY);
+		}
 	}
 
 	private static <T extends ForgeRegistryEntry<T>> IForgeRegistry<T> createRegistry (final Class<T> type, final ResourceLocation name) {

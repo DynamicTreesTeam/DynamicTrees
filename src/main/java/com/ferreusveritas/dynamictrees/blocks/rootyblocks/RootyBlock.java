@@ -276,7 +276,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
-		return CellNull.NULLCELL;
+		return CellNull.NULL_CELL;
 	}
 	
 	@Override

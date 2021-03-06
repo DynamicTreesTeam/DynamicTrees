@@ -2,8 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import net.minecraft.util.ResourceLocation;
 
 /**

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
@@ -11,6 +12,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
+import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -40,7 +42,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.gen.feature.Feature;
@@ -48,6 +49,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.LinkedList;
 import java.util.Set;
@@ -245,6 +247,11 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
 		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
+	}
+
+	@SubscribeEvent
+	public static void onCellKitRegistry (final DTTrees.CellKitRegistryEvent event) {
+		CellKits.register(event.getRegistry());
 	}
 
 	@SubscribeEvent

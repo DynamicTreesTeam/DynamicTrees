@@ -1,15 +1,17 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cells.ICellKit;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
+import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -18,14 +20,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.awt.*;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -46,7 +52,7 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 		@Override public LeavesProperties setDynamicLeavesState(BlockState state) { return this; }
 		@Override public BlockState getDynamicLeavesState() { return Blocks.AIR.getDefaultState(); }
 		@Override public BlockState getDynamicLeavesState(int hydro) { return Blocks.AIR.getDefaultState(); }
-		@Override public ICellKit getCellKit() { return CellKits.NULLCELLKIT; }
+		@Override public CellKit getCellKit() { return CellKits.NULL_CELL_KIT; }
 		@Override public int getFlammability() { return 0; }
 		@Override public int getFireSpreadSpeed() { return 0; }
 		@Override public int getSmotherLeavesMax() { return 0; }
@@ -54,29 +60,43 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 		@Override public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return false; }
 	};
 
-	/** The registry. This is used for registering and querying {@link LeavesProperties} objects. */
+	/**
+	 * The registry. This is used for registering and querying {@link LeavesProperties} objects.
+	 *
+	 * <p>Add-ons should use {@link DTTrees.LeavesPropertiesRegistryEvent}, <b>not</b> Forge's registry event.</p>
+	 */
 	public static IForgeRegistry<LeavesProperties> REGISTRY;
 
 	protected static final int maxHydro = 4;
 
+	protected ResourceLocation primitiveLeavesRegName;
+
 	/** The primitive (vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	protected BlockState primitiveLeaves;
 
-	/** The {@link ICellKit}, which is for leaves automata. */
-	protected ICellKit cellKit;
+	/** The {@link CellKit}, which is for leaves automata. */
+	protected CellKit cellKit;
 
 	protected TreeFamily tree = TreeFamily.NULL_FAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
 
+	protected int smotherLeavesMax = 4;
+	protected int lightRequirement = 13;
+	protected boolean connectAnyRadius = false;
+
 	private LeavesProperties() {}
-	
-	public LeavesProperties(final BlockState primitiveLeaves, final ResourceLocation registryName) {
-		this(primitiveLeaves, TreeRegistry.findCellKit(DynamicTrees.resLoc("deciduous")), registryName);
+
+	public LeavesProperties(final ResourceLocation registryName) {
+		this(null, registryName);
 	}
 	
-	public LeavesProperties(final BlockState primitiveLeaves, final ICellKit cellKit, final ResourceLocation registryName) {
+	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final ResourceLocation registryName) {
+		this(primitiveLeaves, CellKits.DECIDUOUS, registryName);
+	}
+	
+	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
@@ -89,6 +109,32 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	 */
 	public BlockState getPrimitiveLeaves() {
 		return primitiveLeaves;
+	}
+
+	public void setPrimitiveLeaves(Block primitiveLeaves) {
+		this.primitiveLeaves = primitiveLeaves.getDefaultState();
+	}
+
+	public void onCommonSetup () {
+		if (this.primitiveLeavesRegName == null)
+			return;
+
+		final Block primitiveLeaves = ForgeRegistries.BLOCKS.getValue(this.primitiveLeavesRegName);
+
+		if (primitiveLeaves == null) {
+			LogManager.getLogger().error("Could not get primitive leaves '{}' for leaves properties '{}'", this.primitiveLeavesRegName, this.getRegistryName());
+			return;
+		}
+
+		this.primitiveLeaves = primitiveLeaves.getDefaultState();
+	}
+
+	public ResourceLocation getPrimitiveLeavesRegName() {
+		return primitiveLeavesRegName;
+	}
+
+	public void setPrimitiveLeavesRegName(ResourceLocation primitiveLeavesRegName) {
+		this.primitiveLeavesRegName = primitiveLeavesRegName;
 	}
 
 	/**
@@ -124,6 +170,15 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	}
 
 	/**
+	 * Used by the {@link DynamicLeavesBlock} to find out if it can pull hydro from a branch.
+	 *
+	 * @return The {@link TreeFamily} for these {@link LeavesProperties}.
+	 * */
+	public TreeFamily getTree() {
+		return tree;
+	}
+
+	/**
 	 * Sets the type of tree these leaves connect to.
 	 *
 	 * @param tree The {@link TreeFamily} object to set.
@@ -138,21 +193,20 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 		return this;
 	}
 
-	/**
-	 * Used by the {@link DynamicLeavesBlock} to find out if it can pull hydro from a branch.
-	 *
-	 * @return The {@link TreeFamily} for these {@link LeavesProperties}.
-	 * */
-	public TreeFamily getTree() {
-		return tree;
-	}
-	
 	public int getFlammability() {
 		return flammability;
 	}
-	
+
+	public void setFlammability(int flammability) {
+		this.flammability = flammability;
+	}
+
 	public int getFireSpreadSpeed() {
 		return fireSpreadSpeed;
+	}
+
+	public void setFireSpreadSpeed(int fireSpreadSpeed) {
+		this.fireSpreadSpeed = fireSpreadSpeed;
 	}
 
 	/**
@@ -162,7 +216,11 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	 * @return The smother leaves max.
 	 */
 	public int getSmotherLeavesMax() {
-		return 4;
+		return this.smotherLeavesMax;
+	}
+
+	public void setSmotherLeavesMax(int smotherLeavesMax) {
+		this.smotherLeavesMax = smotherLeavesMax;
 	}
 
 	/**
@@ -171,36 +229,95 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	 * @return The minimum light requirement.
 	 */
 	public int getLightRequirement() {
-		return 13;
+		return this.lightRequirement;
+	}
+
+	public void setLightRequirement(int lightRequirement) {
+		this.lightRequirement = lightRequirement;
 	}
 
 	/**
-	 * Gets the {@link ICellKit}, which is for leaves automata.
+	 * Gets the {@link CellKit}, which is for leaves automata.
 	 *
-	 * @return The {@link ICellKit} object.
+	 * @return The {@link CellKit} object.
 	 */
-	public ICellKit getCellKit() {
+	public CellKit getCellKit() {
 		return cellKit;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
-		return Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), world, pos, 0);
+	public void setCellKit(CellKit cellKit) {
+		this.cellKit = cellKit;
+	}
+
+	public boolean isConnectAnyRadius() {
+		return connectAnyRadius;
+	}
+
+	public void setConnectAnyRadius(boolean connectAnyRadius) {
+		this.connectAnyRadius = connectAnyRadius;
 	}
 
 	/**
-	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update
+	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update.
 	 *
-	 * @param worldIn
-	 * @param pos
-	 * @param state
-	 * @param rand
+	 * @param worldIn The {@link World} object.
+	 * @param pos The {@link BlockPos} of the leaves.
+	 * @param state The {@link BlockState} of the leaves.
+	 * @param rand A {@link Random} object.
 	 * @return return true to allow the normal DynamicLeavesBlock update to occur
 	 */
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		return fromRadius == 1 && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+		return (fromRadius == 1 || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+	}
+
+	///////////////////////////////////////////
+	// Leaves colours
+	///////////////////////////////////////////
+
+	protected Integer colorNumber;
+	protected String colorString;
+
+	@OnlyIn(Dist.CLIENT)
+	private IBlockColor colorMultiplier;
+
+	@OnlyIn(Dist.CLIENT)
+	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
+		return colorMultiplier.getColor(state, world, pos, -1);
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private void processColor() {
+		int color = -1;
+		if (this.colorNumber != null) {
+			color = this.colorNumber;
+		} else if (this.colorString != null) {
+			String code = this.colorString;
+			if(code.startsWith("@")) {
+				code = code.substring(1);
+				if ("biome".equals(code)) { // Built in code since we need access to super.
+					this.colorMultiplier = (state, world, pos, t) -> ((IWorld) world).getBiome(pos).getFoliageColor();
+					return;
+				}
+
+				IBlockColor blockColor = BlockColorMultipliers.find(code);
+				if(blockColor != null) {
+					return;
+				} else {
+					LogManager.getLogger().error("Error: ColorMultiplier resource '{}' could not be found.", code);
+				}
+			} else {
+				color = Color.decode(code).getRGB();
+			}
+		}
+		int c = color;
+		this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static void postInitClient() {
+		REGISTRY.getValues().forEach(LeavesProperties::processColor);
 	}
 
 	@Override
@@ -210,4 +327,16 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 				", tree=" + tree + '}';
 	}
 
+	public String getDisplayString() {
+		return "LeavesProperties{" +
+				"registryName=" + this.getRegistryName() +
+				", primitiveLeaves=" + primitiveLeaves +
+				", primitiveLeavesRegistryName=" + primitiveLeavesRegName +
+				", cellKit=" + cellKit +
+				", tree=" + tree +
+				", dynamicLeavesBlockHydroStates=" + Arrays.toString(dynamicLeavesBlockHydroStates) +
+				", flammability=" + flammability +
+				", fireSpreadSpeed=" + fireSpreadSpeed +
+				'}';
+	}
 }

@@ -40,6 +40,9 @@ public final class JsonPropertyApplierList<T> {
             return PropertyApplierResult.SUCCESS;
 
         for (final JsonPropertyApplier<T, ?> applier : this.appliers) {
+            if (!applier.getObjectClass().isInstance(object))
+                continue;
+
             final PropertyApplierResult result = applier.applyIfShould(key, object, jsonElement);
 
             // If the result is null, it's not the right applier, so move onto the next one.
@@ -56,25 +59,42 @@ public final class JsonPropertyApplierList<T> {
         return PropertyApplierResult.SUCCESS;
     }
 
-    public JsonPropertyApplierList<T> register (final JsonPropertyApplier<T, ?> applier) {
-        this.appliers.add(applier);
+    @SuppressWarnings("unchecked")
+    public <E extends T> JsonPropertyApplierList<T> register (final JsonPropertyApplier<E, ?> applier) {
+        this.appliers.add((JsonPropertyApplier<T, ?>) applier);
         return this;
     }
 
-    public <V> JsonPropertyApplierList<T> register(final String key, final Class<V> valueClass, final IVoidPropertyApplier<T, V> applier) {
-        return this.register(new JsonPropertyApplier<>(key, this.objectType, valueClass, applier));
+    public <V> JsonPropertyApplierList<T> register(final String key, final Class<V> valueClass, final IPropertyApplier<T, V> applier) {
+        return this.register(key, this.objectType, valueClass, applier);
     }
 
-    public <V> JsonPropertyApplierList<T> register(final String key, final Class<V> valueClass, final IPropertyApplier<T, V> applier) {
-        return this.register(new JsonPropertyApplier<>(key, this.objectType, valueClass, applier));
+    public <V> JsonPropertyApplierList<T> register(final String key, final Class<V> valueClass, final IVoidPropertyApplier<T, V> applier) {
+        return this.register(key, this.objectType, valueClass, applier);
     }
 
     public <V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<V> valueClass, final IPropertyApplier<T, V> applier) {
-        return this.register(new JsonArrayPropertyApplier<>(key, this.objectType, valueClass, new JsonPropertyApplier<>("", this.objectType, valueClass , applier)));
+        return this.registerArrayApplier(key, this.objectType, valueClass, applier);
     }
 
     public <V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<V> valueClass, final IVoidPropertyApplier<T, V> applier) {
-        return this.register(new JsonArrayPropertyApplier<>(key, this.objectType, valueClass, new JsonPropertyApplier<>("", this.objectType, valueClass , applier)));
+        return this.registerArrayApplier(key, this.objectType, valueClass, applier);
+    }
+
+    public <E extends T, V> JsonPropertyApplierList<T> register(final String key, final Class<E> subClass, final Class<V> valueClass, final IPropertyApplier<E, V> applier) {
+        return this.register(new JsonPropertyApplier<>(key, subClass, valueClass, applier));
+    }
+
+    public <E extends T, V> JsonPropertyApplierList<T> register(final String key, final Class<E> subClass, final Class<V> valueClass, final IVoidPropertyApplier<E, V> applier) {
+        return this.register(new JsonPropertyApplier<>(key, subClass, valueClass, applier));
+    }
+
+    public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IPropertyApplier<E, V> applier) {
+        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+    }
+
+    public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IVoidPropertyApplier<E, V> applier) {
+        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
     }
 
 }

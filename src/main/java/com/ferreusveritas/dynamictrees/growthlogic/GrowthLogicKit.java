@@ -14,7 +14,7 @@ public abstract class GrowthLogicKit extends ForgeRegistryEntry<GrowthLogicKit> 
 	/**
 	 * Mods should use this to register their {@link GrowthLogicKit} objects.
 	 *
-	 * Places the species in a central registry.
+	 * Places the growth logic kits in a central registry.
 	 */
 	public static IForgeRegistry<GrowthLogicKit> REGISTRY;
 

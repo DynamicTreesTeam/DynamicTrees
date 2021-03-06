@@ -23,6 +23,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -49,13 +50,13 @@ public class BasicBranchBlock extends BranchBlock {
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-	public BasicBranchBlock(Material material, String name) {
-		this(AbstractBlock.Properties.create(material), name);
+	public BasicBranchBlock(Material material, ResourceLocation registryName) {
+		this(AbstractBlock.Properties.create(material), registryName);
 	}
 	
 	// Useful for more unique subclasses
-	public BasicBranchBlock(AbstractBlock.Properties properties, String name) {
-		super(properties.harvestLevel(0), name);
+	public BasicBranchBlock(AbstractBlock.Properties properties, ResourceLocation registryName) {
+		super(properties.harvestLevel(0), registryName);
 
 		cacheBranchStates();
 	}
@@ -197,7 +198,7 @@ public class BasicBranchBlock extends BranchBlock {
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
 			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
 		} else {
-			return CellNull.NULLCELL;
+			return CellNull.NULL_CELL;
 		}
 	}
 	

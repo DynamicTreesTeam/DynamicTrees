@@ -38,8 +38,12 @@ public final class TreesResourceManager implements IResourceManager {
         this.resourcePacks.add(new TreeResourcePack(mainTreeFolder.toPath().toAbsolutePath()));
     }
 
-    public void addLoadListener (final ILoadListener loadListener) {
-        this.loadListeners.add(loadListener);
+    public void addLoadListeners(final ILoadListener... loadListeners) {
+        this.loadListeners.addAll(Arrays.asList(loadListeners));
+    }
+
+    public void addLoadListener(final int position, final ILoadListener loadListener) {
+        this.loadListeners.add(position, loadListener);
     }
 
     public void load () {
