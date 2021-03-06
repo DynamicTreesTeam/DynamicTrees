@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -103,7 +103,7 @@ public class Seed extends Item implements IPlantable {
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
 		
 		if(DTConfigs.seedOnlyForest.get()) {
-			plantChance *= DTDataPackRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.getDimensionKey().getLocation())
+			plantChance *= DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.getDimensionKey().getLocation())
 					.getForestness(world.getBiome(pos));
 		}
 		

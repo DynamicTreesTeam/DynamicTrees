@@ -104,6 +104,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	/** Used to modify the getRadiusForCellKit call to create a special case */
 	protected boolean hasConiferVariants = false;
 
+	protected boolean hasSurfaceRoot = false;
+
+	protected boolean hasStrippedBranch = true;
+
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
 	private Item stick = null;
@@ -130,20 +134,32 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	public TreeFamily(ResourceLocation name) {
 		this.setRegistryName(name);
 
-		//this must be the first branch registered, to have its validBranches index be 0;
-		setDynamicBranch(createBranch());
-		setDynamicBranchItem(createBranchItem(dynamicBranch));
+		stick = Items.STICK;
+	}
+
+	public void setupBlocks() {
+		this.setDynamicBranch(this.createBranch());
+		this.setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+
+		if (this.primitiveLog != Blocks.AIR) {
+			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveLog));
+		} else {
+			LogManager.getLogger().warn("Tree family '{}' did not have a primitive log set for branch.", this.getRegistryName());
+		}
 
 		if (this.hasStrippedBranch()) {
-			this.setDynamicStrippedBranch(createBranch("_branch_stripped"));
+			this.setDynamicStrippedBranch(this.createBranch("stripped_", "_branch"));
+
+			if (this.primitiveStrippedLog != Blocks.AIR) {
+				this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveStrippedLog));
+			} else {
+				LogManager.getLogger().warn("Tree family '{}' did not have a primitive stripped log set for stripped branch.", this.getRegistryName());
+			}
 		}
 
 		if (this.hasSurfaceRoot()) {
 			this.setSurfaceRoot(this.createSurfaceRoot());
 		}
-
-		stick = Items.STICK;
-//		this.species.addAll(this.createSpecies());
 	}
 
 	public Set<Species> createSpecies() {
@@ -347,12 +363,12 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 * @return the branch to be created
 	 */
 	public BranchBlock createBranch() {
-		return createBranch("_branch");
+		return createBranch("", "_branch");
 	}
 
-	public BranchBlock createBranch(String postfix) {
-		String branchName = this.getRegistryName().getPath() + postfix;
-		BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
+	public BranchBlock createBranch(final String prefix, final String suffix) {
+		final String branchName = prefix + this.getRegistryName().getPath() + suffix;
+		final BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
 		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
 		return branch;
 	}
@@ -446,13 +462,10 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 */
 	protected TreeFamily setPrimitiveLog(Block primLog) {
 		primitiveLog = primLog;
-		dynamicBranch.setPrimitiveLogDrops(new ItemStack(primLog));
 		return this;
 	}
 	protected TreeFamily setPrimitiveStrippedLog(Block primLog) {
 		primitiveStrippedLog = primLog;
-		if (hasStrippedBranch())
-			dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(primLog));
 		return this;
 	}
 
@@ -524,8 +537,12 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		return 2.0f;
 	}
 
-	public boolean hasStrippedBranch(){
-		return true;
+	public boolean hasStrippedBranch() {
+		return this.hasStrippedBranch;
+	}
+
+	public void setHasStrippedBranch(boolean hasStrippedBranch) {
+		this.hasStrippedBranch = hasStrippedBranch;
 	}
 
 	public void addValidBranches (BranchBlock... branches){
@@ -551,7 +568,11 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	///////////////////////////////////////////
 
 	public boolean hasSurfaceRoot () {
-		return false;
+		return this.hasSurfaceRoot;
+	}
+
+	public void setHasSurfaceRoot(boolean hasSurfaceRoot) {
+		this.hasSurfaceRoot = hasSurfaceRoot;
 	}
 
 	public void generateSurfaceRoot () {

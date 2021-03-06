@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.resources.DTTreePackRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
@@ -111,8 +110,6 @@ public class DynamicTrees {
 
 		EventHandlers.registerCommon();
 		CompatHandler.init();
-
-		new DTTreePackRegistries();
 	}
 
 	//TODO: thick ring stitching

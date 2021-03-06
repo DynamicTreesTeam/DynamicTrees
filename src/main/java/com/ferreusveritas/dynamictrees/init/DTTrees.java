@@ -4,11 +4,9 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.resources.DTTreePackRegistries;
-import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,7 +16,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
@@ -32,30 +29,15 @@ public class DTTrees {
 	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
 	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
-	public static final ArrayList<TreeFamily> FAMILIES = new ArrayList<>();
-
 	public static void setupLeavesProperties() {
 		LeavesPaging.register(resLoc("leaves/common.json"));
 	}
 
 	public static void setupTrees() {
-		DTTreePackRegistries.INSTANCE.setupTreesResources();
-		DTTreePackRegistries.INSTANCE.getTreesResourceManager().load();
+		DTResourceRegistries.setupTreesResourceManager();
+		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
 
 		TreeFamily.REGISTRY.register(TreeFamily.NULL_FAMILY);
-
-//		OAK = new OakTree();
-//		BIRCH = new BirchTree();
-//		SPRUCE = new SpruceTree();
-//		JUNGLE = new JungleTree();
-//		DARK_OAK = new DarkOakTree();
-//		ACACIA = new AcaciaTree();
-//		CRIMSON = new CrimsonFungus();
-//		WARPED = new WarpedFungus();
-//
-//		Collections.addAll(FAMILIES, OAK, BIRCH, SPRUCE, JUNGLE, DARK_OAK, ACACIA, CRIMSON, WARPED);
-//
-//		FAMILIES.forEach(TreeFamily.REGISTRY::register);
 	}
 
 	@SubscribeEvent

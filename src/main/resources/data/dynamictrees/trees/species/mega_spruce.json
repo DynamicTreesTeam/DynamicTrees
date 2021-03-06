@@ -18,11 +18,18 @@
     "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
     "features" : [
         {
+            "name": "dynamictrees:conifer_topper",
+            "properties": {
+                "leaves_properties": "dynamictrees:spruce"
+            }
+        },
+        {
             "name": "dynamictrees:mound",
             "properties": {
                 "mound_cutoff_radius": 999
             }
         },
-        "dynamictrees:clear_volume"
+        "dynamictrees:clear_volume",
+        "dynamictrees:podzol"
     ]
 }

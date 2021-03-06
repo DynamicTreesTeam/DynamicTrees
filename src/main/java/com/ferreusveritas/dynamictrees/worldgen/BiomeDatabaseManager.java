@@ -7,16 +7,14 @@ import com.ferreusveritas.dynamictrees.api.events.BiomeDatabasePopulatorRegistry
 import com.ferreusveritas.dynamictrees.api.events.PopulateDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;
-import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,13 +22,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
  * Manages {@link BiomeDatabase} objects, reading from datapacks. Main instance stored in
- * {@link DTDataPackRegistries}.
+ * {@link DTResourceRegistries}.
  *
  * @author Harley O'Connor
  */

@@ -23,7 +23,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
@@ -77,7 +77,7 @@ import java.util.function.Consumer;
 
 public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> {
 
-	private static final JoCodeManager JO_CODE_MANAGER = DTDataPackRegistries.JO_CODE_MANAGER;
+	private static final JoCodeManager JO_CODE_MANAGER = DTResourceRegistries.JO_CODE_MANAGER;
 	
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }

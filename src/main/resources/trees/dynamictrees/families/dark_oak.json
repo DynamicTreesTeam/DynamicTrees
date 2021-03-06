@@ -4,6 +4,7 @@
     "primitive_stripped_log": "minecraft:stripped_dark_oak_log",
     "sticks": "minecraft:stick",
     "max_branch_radius": 24,
+    "generate_surface_root": true,
     "species": [
         {
             "name": "dynamictrees:dark_oak",

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
@@ -23,7 +23,7 @@ import java.util.*;
 
 /**
  * Manages {@link JoCode} objects, reading from datapacks. Can be used to call random JoCodes during worldgen.
- * Main instance stored in {@link DTDataPackRegistries}.
+ * Main instance stored in {@link DTResourceRegistries}.
  *
  * @author Harley O'Connor
  */

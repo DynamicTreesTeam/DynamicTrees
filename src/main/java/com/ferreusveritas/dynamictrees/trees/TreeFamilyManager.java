@@ -113,7 +113,8 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
                 .register("sticks", Item.class, TreeFamily::setStick)
                 .register("max_branch_radius", Integer.class, TreeFamily::setMaxBranchRadius)
                 .register("conifer_variants", Boolean.class, TreeFamily::setHasConiferVariants)
-                .register("generate_surface_root", Boolean.class, (treeFamily, generateRoot) -> { if (generateRoot) treeFamily.generateSurfaceRoot(); })
+                .register("generate_surface_root", Boolean.class, TreeFamily::setHasSurfaceRoot)
+                .register("generate_stripped_branch", Boolean.class, TreeFamily::setHasStrippedBranch)
                 .register("replace_species", Boolean.class, (treeFamily, replaceSpecies) -> {
                     this.speciesToRegister.removeAll(treeFamily.getSpecies().stream().map(Species::getRegistryName).collect(Collectors.toList()));
 
@@ -178,6 +179,7 @@ public final class TreeFamilyManager extends MultiJsonReloadListener implements 
                 this.appliers.applyAll(jsonElement.getAsJsonObject(), family).forEach(failureResult -> LOGGER.warn("Error whilst loading tree family data for {} from {}: {}", registryName, fileName, failureResult.getErrorMessage()));
             }
 
+            family.setupBlocks();
             TreeFamily.REGISTRY.register(family);
             LOGGER.debug("Loaded and registered tree family data: {}.", family.getDisplayString());
         }

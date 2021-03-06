@@ -21,6 +21,7 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static final JsonPropertyApplierList<ConfiguredGenFeatureHolder> APPLIERS = new JsonPropertyApplierList<>(ConfiguredGenFeatureHolder.class)
             .register("name", GenFeature.class,
                     (configuredGenFeatureHolder, genFeature) -> configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) genFeature.getDefaultConfiguration())
@@ -31,6 +32,7 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
                                 addProperty(configuredGenFeature, jsonObject, genFeatureProperty));
                     });
 
+    @SuppressWarnings("unchecked")
     @Override
     public ObjectFetchResult<ConfiguredGenFeature<GenFeature>> get(final JsonElement jsonElement) {
         final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
@@ -42,6 +44,8 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
 
             if (!fetchResult.wasSuccessful())
                 return ObjectFetchResult.failureFromOther(fetchResult);
+
+            configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) fetchResult.getValue().getDefaultConfiguration();
         } else {
             APPLIERS.applyAll(jsonObjectFetchResult.getValue(), configuredGenFeatureHolder);
         }

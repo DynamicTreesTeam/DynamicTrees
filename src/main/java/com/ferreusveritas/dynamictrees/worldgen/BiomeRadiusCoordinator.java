@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.MathHelper;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
-	protected final BiomeDatabaseManager biomeDatabaseManager = DTDataPackRegistries.BIOME_DATABASE_MANAGER;
+	protected final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.BIOME_DATABASE_MANAGER;
 
 	public PerlinNoiseGenerator noiseGenerator;
 	protected final TreeGenerator treeGenerator;

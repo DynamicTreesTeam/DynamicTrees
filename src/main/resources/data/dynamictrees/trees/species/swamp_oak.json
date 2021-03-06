@@ -13,6 +13,7 @@
     "seed_drop_rarity": 1.0,
     "perfect_biomes": { "type": "swamp" },
     "location_override": { "type": "swamp" },
+    "acceptable_soils": ["dirt_like", "water_like"],
     "features" : [
         {
             "name": "dynamictrees:vines",

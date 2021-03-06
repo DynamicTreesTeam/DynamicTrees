@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.TreeCancelRegistryEvent;
-import com.ferreusveritas.dynamictrees.resources.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.canceller.ITreeCanceller;
 import com.ferreusveritas.dynamictrees.api.events.JsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -97,7 +97,7 @@ public class WorldGenRegistry {
 
 	public static boolean validateBiomeDataBases() {
 		if (WorldGenRegistry.isWorldGenEnabled()) {
-			return DTDataPackRegistries.BIOME_DATABASE_MANAGER.validateDatabases();
+			return DTResourceRegistries.BIOME_DATABASE_MANAGER.validateDatabases();
 		}
 		return true;
 	}
