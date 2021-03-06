@@ -4,12 +4,9 @@ import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -20,19 +17,16 @@ import java.util.function.Function;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 
-	private final ResourceLocation baseRingLocation;
-	private final ResourceLocation baseRingLocationAlternate;
+	private final TextureAtlasSprite baseTexture;
+	private final ResourceLocation baseRingResloc;
 
-	public ThickRingTextureAtlasSprite(AtlasTexture atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidthIn, int atlasHeightIn, int xIn, int yIn, NativeImage imageIn, ResourceLocation baseRingLocation){
-		super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidthIn, atlasHeightIn, xIn, yIn, imageIn);
+	public ThickRingTextureAtlasSprite(AtlasTexture atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidth, int atlasHeight, int xIn, int yIn, TextureAtlasSprite baseRing, ResourceLocation baseRingResLoc){
+		super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidth, atlasHeight, xIn, yIn, new NativeImage(atlasWidth, atlasHeight, false));
 
-		this.baseRingLocation = baseRingLocation;
-		this.baseRingLocationAlternate = null;
+		this.baseTexture = baseRing;
+		this.baseRingResloc = baseRingResLoc;
 
-	}
-
-	public ThickRingTextureAtlasSprite(AtlasTexture atlasTexture, TextureAtlasSprite.Info spriteInfo, int mipmapLevels, int atlasWidth, int atlasHeight, int x, int y){
-		this(atlasTexture, spriteInfo, mipmapLevels, atlasWidth, atlasHeight, x, y, new NativeImage(atlasWidth, atlasHeight, false), ThickRingTextureManager.thickRingTextures.inverse().get(spriteInfo.getSpriteLocation()));
+		loadAtlasTexture();
 	}
 
 	private boolean loaded = false;
@@ -46,28 +40,6 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	@Override
 	public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
 		return true;
-	}
-
-	public ResourceLocation solveRingTexture(Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-
-		//If there's no alternative then obviously we must use the primary
-		if(this.baseRingLocationAlternate == null) {
-			return this.baseRingLocation;
-		}
-
-		//A basic check that fits 80% of the time.  Usually the ringed texture's resource ends in "top" e.g. "oak_log_top"
-		if(baseRingLocation.getPath().endsWith("top")) {
-			return baseRingLocation;
-		}
-		if(baseRingLocationAlternate.getPath().endsWith("top")) {
-			return baseRingLocationAlternate;
-		}
-
-		//Sample the pixels themselves to determine which is the ringed texture
-		int deltaA = getDeltaBorderVsCenterColor(textureGetter.apply(baseRingLocation));
-		int deltaB = getDeltaBorderVsCenterColor(textureGetter.apply(baseRingLocationAlternate));
-
-		return deltaA > deltaB ? baseRingLocation : baseRingLocationAlternate;
 	}
 
 	/**
@@ -121,8 +93,6 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 	}
 
 	private void load(){
-		Function<ResourceLocation, TextureAtlasSprite> getter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-		TextureAtlasSprite baseTexture = getter.apply(solveRingTexture(getter));
 
 		PixelBuffer basePixbuf = new PixelBuffer(baseTexture);
 		PixelBuffer majPixbuf = createMajorTexture(basePixbuf);
@@ -132,11 +102,6 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 		this.frames[0] = frame;
 		this.uploadMipmaps();
 	}
-
-//	@Override
-//	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-//		return true;
-//	}
 
 	private PixelBuffer createMajorTexture(PixelBuffer baseBuffer) {
 
@@ -275,9 +240,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
-		return baseRingLocationAlternate == null ?
-			ImmutableList.of(baseRingLocation) :
-			ImmutableList.of(baseRingLocation, baseRingLocationAlternate);
+		return ImmutableList.of(baseRingResloc);
 	}
 
 }

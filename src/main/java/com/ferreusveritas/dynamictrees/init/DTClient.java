@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -13,6 +14,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
@@ -119,6 +121,8 @@ public class DTClient {
 			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof BonsaiPotBlock) {
 				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
 			}
+//			if (block instanceof ThickBranchBlock)
+//				RenderTypeLookup.setRenderLayer(block, ThickRingTextureManager.BRANCH_SOLID);
 		});
 	}
 	

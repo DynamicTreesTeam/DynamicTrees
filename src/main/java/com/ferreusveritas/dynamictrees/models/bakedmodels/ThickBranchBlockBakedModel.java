@@ -3,6 +3,8 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -40,18 +42,26 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		this.thickRingsResLoc = thickRingsResLoc;
 	}
 
+	private boolean isTextureNull (TextureAtlasSprite sprite){
+		return sprite == null || sprite.equals(ModelUtils.getTexture(new ResourceLocation("")));
+	}
+
 	@Override
 	public void setupModels() {
 		super.setupModels();
 
 		final TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
 		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(this.thickRingsResLoc);
-		//TextureAtlasSprite thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
 
-		if (thickRingsTexture == null || thickRingsTexture.equals(ModelUtils.getTexture(new ResourceLocation("")))) {
-			thickRingsTexture = ringsTexture;
-		}
+		//if (isTextureNull(thickRingsTexture)){
+			//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
+			//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
 
+			if (isTextureNull(thickRingsTexture)){
+				thickRingsTexture = ringsTexture;
+			}
+		//}
+		
 		for (int i = 0; i < ThickBranchBlock.RADMAX_THICK-ThickBranchBlock.RADMAX_NORMAL; i++) {
 			int radius = i + ThickBranchBlock.RADMAX_NORMAL + 1;
 			trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);

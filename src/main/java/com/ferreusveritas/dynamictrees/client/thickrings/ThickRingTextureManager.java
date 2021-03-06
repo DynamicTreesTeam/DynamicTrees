@@ -3,7 +3,11 @@ package com.ferreusveritas.dynamictrees.client.thickrings;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import net.minecraft.client.renderer.RenderState;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,9 +22,15 @@ public class ThickRingTextureManager {
      * THIS IS STILL WIP. THICK RINGS ARE NOT YET STITCHED AUTOMATICALLY
      */
 
-	public static ThickRingSpriteUploader uploader;
+	public static final ResourceLocation LOCATION_THICKRINGS_TEXTURE = new ResourceLocation(DynamicTrees.MOD_ID, "textures/atlas/thick_rings.png");
 
-    public static final BiMap<ResourceLocation, ResourceLocation> thickRingTextures = HashBiMap.create();
+	public static ThickRingAtlasTexture textureAtlas;
+	public static AtlasTexture.SheetData thickRingData;
+
+//	protected static final RenderState.TextureState BRANCHES_SHEET_MIPPED = new RenderState.TextureState(LOCATION_THICKRINGS_TEXTURE, false, true);
+//	public static final RenderType BRANCH_SOLID = RenderType.makeType("dynamic_trees_branch_solid", DefaultVertexFormats.BLOCK, 7, 2097152, true, false, RenderType.State.getBuilder().shadeModel(new RenderState.ShadeModelState(true)).lightmap(new RenderState.LightmapState(true)).texture(BRANCHES_SHEET_MIPPED).build(true));
+
+    private static final BiMap<ResourceLocation, ResourceLocation> thickRingTextures = HashBiMap.create();
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {
 		ResourceLocation thickRingSet = new ResourceLocation(ringsRes.getNamespace(), ringsRes.getPath() + "_thick");
@@ -35,34 +45,11 @@ public class ThickRingTextureManager {
 		return thickRingTextures.entrySet();
 	}
 
-//    public static void generateThickRingTexture (ResourceLocation originalResLoc, ResourceLocation thickResLoc){
-//		if (spriteUploader == null){
-//			DynamicTrees.getLogger().error("ThickRingSpriteUploader not added yet!");
-//			return;
-//		}
-//		spriteUploader.getTextureAtlas().addThickRingSprite(originalResLoc, thickResLoc);
-//	}
+	public static ResourceLocation getThickRingFromBaseRing (ResourceLocation baseRing){
+		return thickRingTextures.get(baseRing);
+	}
+	public static ResourceLocation getBaseRingFromThickRing (ResourceLocation thickRing){
+		return thickRingTextures.inverse().get(thickRing);
+	}
 
-//	public static void uploadToAtlas (){
-//        List<TextureAtlasSprite> sprites = new LinkedList<>();
-//        for (Map.Entry<ResourceLocation, ResourceLocation> entry : thickRingTextures.entrySet()){
-//            sprites.add(new ThickRingTextureAtlasSprite(thickRingsAtlasTexture, entry.getValue(), entry.getKey()));
-//        }
-//        thickRingsAtlasTexture.upload(new AtlasTexture.SheetData(new HashSet<>(thickRingTextures.values()), 48*sprites.size(), 48*sprites.size(), 0, sprites));
-//    }
-//
-//    public static TextureAtlasSprite getTexture (ResourceLocation resourceLocation){
-//        return thickRingsAtlasTexture.getSprite(resourceLocation);
-//    }
-
-//    @Override
-//    protected IResourceManager prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
-//
-//        return null;
-//    }
-//
-//    @Override
-//    protected void apply(IResourceManager objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-//        thickRingsAtlasTexture.stitch(objectIn, thickRingTextures.values().stream(), )
-//    }
 }
