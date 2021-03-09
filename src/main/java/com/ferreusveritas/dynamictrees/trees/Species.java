@@ -77,8 +77,6 @@ import java.util.function.Consumer;
 
 public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> {
 
-	private static final JoCodeManager JO_CODE_MANAGER = DTResourceRegistries.JO_CODE_MANAGER;
-	
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
 		@Override public TreeFamily getFamily() { return TreeFamily.NULL_FAMILY; }
@@ -151,6 +149,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
 
+	protected List<Biome> perfectBiomes = new ArrayList<>();
+
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
 
 	/** A {@link BiPredicate} that returns true if this species should override the common in the given position. */
@@ -185,6 +185,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		setRegistryName(name);
 		setUnlocalizedName(name.toString());
 		this.treeFamily = treeFamily;
+		this.treeFamily.addSpecies(this);
 		setLeavesProperties(leavesProperties);
 		
 		setStandardSoils();
@@ -297,7 +298,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	/**
 	 * Works out if this {@link Species} will require a {@link SpeciesTileEntity} at the given position.
-	 * It should require one if it's not the common species and it's not in its location override for
+	 * It should require one if it's not the common species and it's not in its common species override for
 	 * the given position.
 	 *
 	 * @param world The {@link IWorld} the tree is being planted in.
@@ -305,7 +306,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return True if it will require a {@link SpeciesTileEntity}.
 	 */
 	public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
-		return this.isCommonSpecies() || !this.shouldSpawnAt(world, pos);
+		return !this.isCommonSpecies() && !this.shouldOverrideCommon(world, pos);
 	}
 
 	/**
@@ -345,12 +346,16 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this;
 	}
 
-	public boolean hasShouldSpawnPredicate () {
+	public boolean hasCommonOverride() {
 		return this.commonOverride != null;
 	}
 
-	public boolean shouldSpawnAt (final IWorld world, final BlockPos trunkPos) {
-		return this.hasShouldSpawnPredicate() && this.commonOverride.test(world, trunkPos);
+	public void setCommonOverride(final ICommonOverride commonOverride) {
+		this.commonOverride = commonOverride;
+	}
+
+	public boolean shouldOverrideCommon(final IWorld world, final BlockPos trunkPos) {
+		return this.hasCommonOverride() && this.commonOverride.test(world, trunkPos);
 	}
 
 	public interface ICommonOverride extends BiPredicate<IWorld, BlockPos> {}
@@ -472,6 +477,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		addDropCreator(new SeedDropCreator().setCustomSeedDrop(customSeed));
 		return this;
 	}
+
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
 		addDropCreator(new SeedDropCreator(rarity).setCustomSeedDrop(customSeed));
 		return this;
@@ -703,7 +709,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			
-			if(doesRequireTileEntity(world, pos)) {
+			if (doesRequireTileEntity(world, pos)) {
 				SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
 				world.setTileEntity(pos.down(), speciesTE);
 				speciesTE.setSpecies(this);
@@ -1187,28 +1193,40 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
 		BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
 		MinecraftForge.EVENT_BUS.post(suitabilityEvent);
-		if(suitabilityEvent.isHandled()) {
+		if (suitabilityEvent.isHandled()) {
 			return suitabilityEvent.getSuitability();
 		}
 		
 		float ugs = (float)(double) DTConfigs.scaleBiomeGrowthRate.get();//universal growth scalar
 		
-		if(ugs == 1.0f || isBiomePerfect(getBiomeKey(biome))) {
+		if (ugs == 1.0f || this.isBiomePerfect(biome)) {
 			return 1.0f;
 		}
 		
 		float suit = defaultSuitability();
 		
-		for(BiomeDictionary.Type t : BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName()))) {
+		for (BiomeDictionary.Type t : BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName()))) {
 			suit *= envFactors.getOrDefault(t, 1.0f);
 		}
 		
 		//Linear interpolation of suitability with universal growth scalar
 		suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 		
-		return (float)MathHelper.clamp(suit, 0.0f, 1.0f);
+		return MathHelper.clamp(suit, 0.0f, 1.0f);
 	}
-	
+
+	/**
+	 * Used to determine if the provided {@link Biome} argument will yield
+	 * unhindered growth to Maximum potential. This has the affect of the
+	 * suitability being 100%(or 1.0f)
+	 *
+	 * @param biome The biome being tested
+	 * @return True if biome is "perfect" false otherwise.
+	 */
+	public boolean isBiomePerfect(final Biome biome) {
+		return this.perfectBiomes.contains(biome);
+	}
+
 	/**
 	 * Used to determine if the provided {@link Biome} argument will yield
 	 * unhindered growth to Maximum potential. This has the affect of the
@@ -1219,6 +1237,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public boolean isBiomePerfect(RegistryKey<Biome> biome) {
 		return false;
+	}
+
+	public List<Biome> getPerfectBiomes() {
+		return perfectBiomes;
 	}
 
 	public static Biome getBiome (final RegistryKey<Biome> biomeKey) {
@@ -1498,17 +1520,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if tree was generated. false otherwise.
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		
 		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
 			GenFeature genFeature = configuredGenFeature.getGenFeature();
 			if (genFeature instanceof IFullGenFeature) {
 				return ((IFullGenFeature) genFeature).generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds);
 			}
 		}
-		
+
+		final JoCodeManager joCodeManager = DTResourceRegistries.getJoCodeManager();
 		Direction facing = CoordUtils.getRandomDir(random);
-		if(!JO_CODE_MANAGER.getCodes(this).isEmpty()) {
-			JoCode code = JO_CODE_MANAGER.getRandomCode(this, radius, random);
+		if(!joCodeManager.getCodes(this).isEmpty()) {
+			JoCode code = joCodeManager.getRandomCode(this, radius, random);
 			if(code != null) {
 				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;

@@ -28,6 +28,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.google.common.collect.Sets;
@@ -124,6 +125,11 @@ public class DTRegistries {
 
 	@SubscribeEvent
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
+		final Species appleOak = Species.REGISTRY.getValue(DynamicTrees.resLoc("apple_oak"));
+
+		if (appleOak != null)
+			appleBlock.setSpecies(appleOak);
+
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
 		Set<Block> treeBlocks = Sets.newHashSet();

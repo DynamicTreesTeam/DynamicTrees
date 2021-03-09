@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 
-	protected final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.BIOME_DATABASE_MANAGER;
+	protected final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.getBiomeDatabaseManager();
 
 	public PerlinNoiseGenerator noiseGenerator;
 	protected final TreeGenerator treeGenerator;

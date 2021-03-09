@@ -176,7 +176,6 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	}
 
 	public void setupCommonSpecies(final Species species) {
-		this.species.add(species);
 		this.commonSpecies = species;
 
 		// Auto generate seeds and saplings for common species.
@@ -221,7 +220,7 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 */
 	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
 		for (final Species species : this.species) {
-			if (species.shouldSpawnAt(world, trunkPos))
+			if (species.shouldOverrideCommon(world, trunkPos))
 				return species;
 		}
 
@@ -425,31 +424,6 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 		this.hasConiferVariants = hasConiferVariants;
 	}
 
-	public void onCommonSetup () {
-		this.setOrWarn(this.stick, this.stickRegName, ForgeRegistries.ITEMS, "stick");
-		this.setOrWarn(this.primitiveLog, this.primitiveLogRegName, ForgeRegistries.BLOCKS, "primitive log");
-		this.setOrWarn(this.primitiveStrippedLog, this.primitiveStrippedLogRegName, ForgeRegistries.BLOCKS, "primitive stripped log");
-
-		if (this.dynamicBranch != null && this.primitiveLog != null) {
-			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveLog));
-		}
-
-		if (this.dynamicStrippedBranch != null && this.primitiveStrippedLog != null) {
-			this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(this.primitiveStrippedLog));
-		}
-	}
-
-	private <V extends IForgeRegistryEntry<V>> void setOrWarn (V objectToSet, @Nullable final ResourceLocation registryName, final IForgeRegistry<V> registry, final String fieldName) {
-		if (registryName == null)
-			return;
-
-		objectToSet = registry.getValue(registryName);
-
-		if (objectToSet == null || objectToSet == Items.AIR || objectToSet == Blocks.AIR) {
-			LogManager.getLogger().warn("Could not set {} for tree family '{}' from '{}'.", fieldName, this.getRegistryName(), registryName);
-		}
-	}
-
 	/**
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 *
@@ -480,16 +454,25 @@ public class TreeFamily extends ForgeRegistryEntry<TreeFamily> {
 	 * Use this function to explicitly set the itemstack instead of having it
 	 * done automatically.
 	 *
-	 * @param primLog A block object that is the log
-	 * @param primLog An itemStack of the log item
+	 * @param primitiveLog A block object that is the log
+	 * @param primitiveLog An itemStack of the log item
 	 * @return TreeFamily for chaining calls
 	 */
-	protected TreeFamily setPrimitiveLog(Block primLog) {
-		primitiveLog = primLog;
+	protected TreeFamily setPrimitiveLog(Block primitiveLog) {
+		this.primitiveLog = primitiveLog;
+
+		if (this.dynamicBranch != null)
+			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
+
 		return this;
 	}
-	protected TreeFamily setPrimitiveStrippedLog(Block primLog) {
-		primitiveStrippedLog = primLog;
+
+	protected TreeFamily setPrimitiveStrippedLog(Block primitiveStrippedLog) {
+		this.primitiveStrippedLog = primitiveStrippedLog;
+
+		if (this.dynamicStrippedBranch != null)
+			this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+
 		return this;
 	}
 

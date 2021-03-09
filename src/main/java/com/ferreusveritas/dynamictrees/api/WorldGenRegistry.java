@@ -97,7 +97,7 @@ public class WorldGenRegistry {
 
 	public static boolean validateBiomeDataBases() {
 		if (WorldGenRegistry.isWorldGenEnabled()) {
-			return DTResourceRegistries.BIOME_DATABASE_MANAGER.validateDatabases();
+			return DTResourceRegistries.getBiomeDatabaseManager().validateDatabases();
 		}
 		return true;
 	}

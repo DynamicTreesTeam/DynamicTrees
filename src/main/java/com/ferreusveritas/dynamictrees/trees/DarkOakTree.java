@@ -59,7 +59,7 @@ public class DarkOakTree extends VanillaTreeFamily {
 			this.addGenFeature(GenFeatures.MOUND); // Establish mounds.
 			this.addGenFeature(GenFeatures.BIOME_PREDICATE
 					.with(GEN_FEATURE, (ConfiguredGenFeature<GenFeature>) GenFeatures.HUGE_MUSHROOMS.with(MAX_MUSHROOMS, 1).with(MAX_ATTEMPTS, 3))
-					.with(BIOME_PREDICATE, biome -> isBiomePerfect(getBiomeKey(biome)))); // Generate huge mushrooms.
+					.with(BIOME_PREDICATE, this::isBiomePerfect)); // Generate huge mushrooms.
 			this.addGenFeature(GenFeatures.ROOTS); // Finally generate roots.
 		}
 

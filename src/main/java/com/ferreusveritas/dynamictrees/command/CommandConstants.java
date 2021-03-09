@@ -7,7 +7,6 @@ public final class CommandConstants {
     public static final String COMMAND_ALIAS = "dynamictrees";
 
     // Sub-commands.
-    public static final String REPOPULATE = "repop";
     public static final String GET_TREE = "gettree";
     public static final String GROW_PULSE = "growpulse";
     public static final String KILL_TREE = "killtree";

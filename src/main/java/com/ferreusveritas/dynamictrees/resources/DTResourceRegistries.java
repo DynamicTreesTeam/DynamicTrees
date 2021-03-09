@@ -6,8 +6,9 @@ import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
 import com.ferreusveritas.dynamictrees.trees.TreeFamilyManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
-import com.google.common.collect.Lists;
+import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IFutureReloadListener;
+import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -19,7 +20,10 @@ import org.apache.logging.log4j.LogManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * Holds and registers data pack entries ({@link IFutureReloadListener} objects).
@@ -29,21 +33,24 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public final class DTResourceRegistries {
 
-    ///////////////////////////////////////////
-    // Tree packs
-    ///////////////////////////////////////////
-
     public static final String TREES = "trees";
 
     public static final TreesResourceManager TREES_RESOURCE_MANAGER = new TreesResourceManager();
 
     private static TreeFamilyManager treeFamilyManager;
     private static LeavesPropertiesManager leavesPropertiesManager;
+    private static SpeciesManager speciesManager;
+    private static JoCodeManager joCodeManager;
+    private static BiomeDatabaseManager biomeDatabaseManager;
 
     public static void setupTreesResourceManager () {
         leavesPropertiesManager = new LeavesPropertiesManager();
         treeFamilyManager = new TreeFamilyManager();
-        TREES_RESOURCE_MANAGER.addLoadListeners(leavesPropertiesManager, treeFamilyManager);
+        speciesManager = new SpeciesManager();
+        joCodeManager = new JoCodeManager();
+        biomeDatabaseManager = new BiomeDatabaseManager();
+
+        TREES_RESOURCE_MANAGER.addReloadListeners(leavesPropertiesManager, treeFamilyManager, speciesManager, joCodeManager, biomeDatabaseManager);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);
@@ -81,6 +88,18 @@ public final class DTResourceRegistries {
         return leavesPropertiesManager;
     }
 
+    public static SpeciesManager getSpeciesManager() {
+        return speciesManager;
+    }
+
+    public static JoCodeManager getJoCodeManager() {
+        return joCodeManager;
+    }
+
+    public static BiomeDatabaseManager getBiomeDatabaseManager() {
+        return biomeDatabaseManager;
+    }
+
     public static final class AddTreesLoadListenerEvent extends Event {
 
         private final TreesResourceManager treesResourceManager;
@@ -95,19 +114,17 @@ public final class DTResourceRegistries {
 
     }
 
-    ///////////////////////////////////////////
-    // Data packs
-    ///////////////////////////////////////////
-
-    public static final JoCodeManager JO_CODE_MANAGER = new JoCodeManager();
-    public static final BiomeDatabaseManager BIOME_DATABASE_MANAGER = new BiomeDatabaseManager();
-    public static final SpeciesManager SPECIES_MANAGER = new SpeciesManager();
-
     @SubscribeEvent
-    public static void onAddReloadListeners (final AddReloadListenerEvent event) {
-        event.addListener(SPECIES_MANAGER);
-        event.addListener(JO_CODE_MANAGER);
-        event.addListener(BIOME_DATABASE_MANAGER);
+    public static void addReloadListeners(final AddReloadListenerEvent event) {
+        event.addListener(new ReloadTreesResources());
+    }
+
+    public static final class ReloadTreesResources implements IFutureReloadListener {
+        @Override
+        public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager, IProfiler preparationsProfiler, IProfiler reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+            // Reload all reload listeners in the trees resource manager.
+            return CompletableFuture.allOf(TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor).toArray(new CompletableFuture<?>[0]));
+        }
     }
 
 }

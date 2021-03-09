@@ -15,6 +15,8 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.SpeciesType;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.trees.TreeSpecies;
+import com.ferreusveritas.dynamictrees.util.BiomeList;
+import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
@@ -168,6 +171,7 @@ public final class JsonObjectGetters {
 
     public static final IJsonObjectGetter<Block> BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
     public static final IJsonObjectGetter<Item> ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
+    public static final IJsonObjectGetter<Biome> BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
 
     public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
     public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
@@ -196,5 +200,15 @@ public final class JsonObjectGetters {
 
     // Random enum getters.
     public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE_GETTER = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
+
+    public static final IJsonObjectGetter<BiomeList> BIOME_LIST_GETTER = register(BiomeList.class, new BiomeListGetter());
+    public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE_GETTER = register(BiomePredicate.class, jsonElement -> {
+        final ObjectFetchResult<BiomeList> biomeListFetchResult = BIOME_LIST_GETTER.get(jsonElement);
+
+        if (!biomeListFetchResult.wasSuccessful())
+            return ObjectFetchResult.failureFromOther(biomeListFetchResult);
+
+        return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> currentBiome.getRegistryName().equals(biome.getRegistryName())));
+    });
 
 }

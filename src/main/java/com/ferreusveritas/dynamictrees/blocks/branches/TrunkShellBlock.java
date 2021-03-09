@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -149,7 +150,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos, @Nonnull BlockPos originalPos) {
 		Surround museDir = getMuseDir(state, pos);
 		BlockPos musePos = pos.add(museDir.getOffset());
-		BlockState museState = access.getBlockState(musePos);
+		BlockState museState = CoordUtils.getStateSafe(access, musePos);
+
+		if (museState == null)
+			return null;
+
 		Block block = museState.getBlock();
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));

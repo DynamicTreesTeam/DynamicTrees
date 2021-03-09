@@ -11,8 +11,6 @@ import java.util.List;
  * Sub-class of {@link TreeResourcePack} for {@link IModFile} so tree resources are automatically
  * loaded from other mods.
  *
- * Credits: A lot of the file reading code was based off {@link net.minecraftforge.fml.packs.ModFileResourcePack}.
- *
  * @author Harley O'Connor
  */
 public final class ModTreeResourcePack extends TreeResourcePack {

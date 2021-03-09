@@ -2,9 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.ReloadListener;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Direction;
@@ -34,20 +33,21 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     private static final String TEXT_EXTENSION = ".txt";
     private static final int TEXT_EXTENSION_LENGTH = TEXT_EXTENSION.length();
 
-    private static final String FOLDER = "trees/jo_codes";
-    private static final int FOLDER_LENGTH = FOLDER.length();
-
     private final Map<ResourceLocation, Map<Integer, List<JoCode>>> joCodes = new HashMap<>();
+
+    public JoCodeManager() {
+        super("jo_codes");
+    }
 
     @Nonnull
     @Override
-    protected Map<ResourceLocation, List<String>> prepare(IResourceManager resourceManager, IProfiler profiler) {
+    protected Map<ResourceLocation, List<String>> prepare(final IResourceManager resourceManager) {
         final Map<ResourceLocation, List<String>> joCodeFiles = new HashMap<>();
 
-        for (ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(FOLDER,
+        for (ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName,
                 (fileName) -> fileName.endsWith(TEXT_EXTENSION))) {
             String resLocStr = resourceLocationIn.getPath();
-            ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(), resLocStr.substring(FOLDER_LENGTH + 1, resLocStr.length() - TEXT_EXTENSION_LENGTH));
+            ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(), resLocStr.substring(this.folderName.length() + 1, resLocStr.length() - TEXT_EXTENSION_LENGTH));
 
             // Only add the JoCode file if its name matches a species name.
             if (TreeRegistry.findSpecies(resourceLocation) == Species.NULL_SPECIES)
@@ -83,10 +83,10 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, List<String>> joCodeFiles, IResourceManager resourceManager, IProfiler profiler) {
+    protected void apply(final Map<ResourceLocation, List<String>> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
         this.joCodes.clear();
 
-        joCodeFiles.forEach((resourceLocation, lines) -> {
+        preparedObject.forEach((resourceLocation, lines) -> {
             Species species = TreeRegistry.findSpecies(resourceLocation);
 
             lines.forEach(line -> {
@@ -166,5 +166,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
 
         return list.get(rand.nextInt(list.size()));
     }
+
+    @Override
+    public void load(IResourceManager resourceManager) { }
 
 }

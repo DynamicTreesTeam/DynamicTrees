@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.Direction;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -89,7 +87,8 @@ public class CoordUtils {
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
 			return ((IWorldReader) blockReader).isBlockLoaded(pos);
-		} else return (blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache ||
+		} else return (blockReader instanceof EmptyBlockReader ||
+				blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
 				blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
 	}
 

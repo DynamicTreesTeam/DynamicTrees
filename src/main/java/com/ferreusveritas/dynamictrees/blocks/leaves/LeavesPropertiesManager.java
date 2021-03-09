@@ -2,12 +2,9 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.datapacks.IJsonApplierManager;
-import com.ferreusveritas.dynamictrees.resources.ILoadListener;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.JsonElement;
-import net.minecraft.profiler.EmptyProfiler;
-import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,20 +17,16 @@ import java.util.Map;
 /**
  * @author Harley O'Connor
  */
-public final class LeavesPropertiesManager extends MultiJsonReloadListener implements ILoadListener, IJsonApplierManager {
+public final class LeavesPropertiesManager extends MultiJsonReloadListener<LeavesProperties> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** A {@link JsonPropertyApplierList} for applying properties to {@link LeavesProperties} objects. */
-    private final JsonPropertyApplierList<LeavesProperties> appliers = new JsonPropertyApplierList<>(LeavesProperties.class);
-
     public LeavesPropertiesManager() {
-        super("leaves_properties");
-        this.registerAppliers();
+        super("leaves_properties", LeavesProperties.class, "leaves_properties");
     }
 
     @Override
-    public void registerAppliers() {
+    public void registerAppliers(final String applierRegistryName) {
         this.appliers.register("primitive_leaves", ResourceLocation.class, LeavesProperties::setPrimitiveLeavesRegName)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
@@ -41,11 +34,16 @@ public final class LeavesPropertiesManager extends MultiJsonReloadListener imple
                 .register("fire_spread", Integer.class, LeavesProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius);
+
+        super.registerAppliers(applierRegistryName);
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, List<Pair<String, JsonElement>>> map, IResourceManager resourceManager, IProfiler profiler) {
-        for (final Map.Entry<ResourceLocation, List<Pair<String, JsonElement>>> entry : map.entrySet()) {
+    protected void apply(final Map<ResourceLocation, List<Pair<String, JsonElement>>> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
+        if (!firstLoad)
+            return;
+
+        for (final Map.Entry<ResourceLocation, List<Pair<String, JsonElement>>> entry : preparedObject.entrySet()) {
             final ResourceLocation registryName = entry.getKey();
             final LeavesProperties leavesProperties = new LeavesProperties(registryName);
 
@@ -64,11 +62,6 @@ public final class LeavesPropertiesManager extends MultiJsonReloadListener imple
             LeavesProperties.REGISTRY.register(leavesProperties);
             LOGGER.debug("Loaded and registered leaves properties: {}.", leavesProperties.getDisplayString());
         }
-    }
-
-    @Override
-    public void load(IResourceManager resourceManager) {
-        this.apply(this.prepare(resourceManager, EmptyProfiler.INSTANCE), resourceManager, EmptyProfiler.INSTANCE);
     }
 
 }

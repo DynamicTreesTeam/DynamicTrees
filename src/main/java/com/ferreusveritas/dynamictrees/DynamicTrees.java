@@ -136,7 +136,6 @@ public class DynamicTrees {
 		}
 
 		LeavesProperties.REGISTRY.forEach(LeavesProperties::onCommonSetup);
-		TreeFamily.REGISTRY.forEach(TreeFamily::onCommonSetup);
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {

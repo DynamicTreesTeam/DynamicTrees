@@ -1,5 +1,6 @@
 {
     "family": "dynamictrees:birch",
+    "common": true,
     "tapering": 0.1,
     "signal_energy": 14.0,
     "up_probability": 4,

@@ -1,5 +1,6 @@
 {
     "family": "dynamictrees:crimson",
+    "common": true,
     "tapering": 0,
     "signal_energy": 14.0,
     "up_probability": 0,

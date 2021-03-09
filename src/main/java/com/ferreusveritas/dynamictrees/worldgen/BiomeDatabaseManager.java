@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;
+import net.minecraft.profiler.EmptyProfiler;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +31,7 @@ import java.util.*;
  *
  * @author Harley O'Connor
  */
-public final class BiomeDatabaseManager extends MultiJsonReloadListener {
+public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -45,11 +46,11 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
     protected final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
 
     public BiomeDatabaseManager() {
-        super("trees/world_gen");
+        super("world_gen", Object.class, "null");
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, List<Pair<String, JsonElement>>> databases, IResourceManager resourceManager, IProfiler profiler) {
+    protected void apply(final Map<ResourceLocation, List<Pair<String, JsonElement>>> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
         // Ensure databases are reset.
         this.defaultDatabase = new BiomeDatabase();
         this.dimensionDatabases.clear();
@@ -69,7 +70,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
         final Map<ResourceLocation, List<Pair<String, JsonElement>>> dimensionDatabasesData = Maps.newHashMap();
 
         // Register the default populators and fetch the dimension populator files.
-        databases.forEach((resourceLocation, jsonFiles) ->
+        preparedObject.forEach((resourceLocation, jsonFiles) ->
             jsonFiles.forEach((elementPair) -> {
                 if (resourceLocation.getPath().equals(DEFAULT_POPULATOR_NAME)) {
                     this.registerDefaultPopulator(event, resourceLocation, elementPair.getKey(), elementPair.getValue());
@@ -204,5 +205,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener {
     public boolean isDimensionBlacklisted (ResourceLocation resourceLocation) {
         return this.blacklistedDimensions.contains(resourceLocation);
     }
+
+    @Override
+    public void load(IResourceManager resourceManager) { }
 
 }

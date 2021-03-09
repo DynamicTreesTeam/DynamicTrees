@@ -11,8 +11,8 @@
         "dry": 0.5
     },
     "seed_drop_rarity": 1.0,
+    "common_override": { "type": "swamp" },
     "perfect_biomes": { "type": "swamp" },
-    "location_override": { "type": "swamp" },
     "acceptable_soils": ["dirt_like", "water_like"],
     "features" : [
         {

@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +28,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -116,17 +118,24 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	}
 
 	public void onCommonSetup () {
-		if (this.primitiveLeavesRegName == null)
-			return;
+		final Block primitiveLeaves = this.getOrWarn(this.primitiveLeavesRegName, ForgeRegistries.BLOCKS, "primitive leaves");
 
-		final Block primitiveLeaves = ForgeRegistries.BLOCKS.getValue(this.primitiveLeavesRegName);
+		if (primitiveLeaves != null)
+			this.primitiveLeaves = primitiveLeaves.getDefaultState();
+	}
 
-		if (primitiveLeaves == null) {
-			LogManager.getLogger().error("Could not get primitive leaves '{}' for leaves properties '{}'", this.primitiveLeavesRegName, this.getRegistryName());
-			return;
+	@Nullable
+	private <V extends IForgeRegistryEntry<V>> V getOrWarn(@Nullable final ResourceLocation registryName, final IForgeRegistry<V> registry, final String fieldName) {
+		if (registryName == null)
+			return null;
+
+		final V objectToSet = registry.getValue(registryName);
+
+		if (objectToSet == null || objectToSet == Items.AIR || objectToSet == Blocks.AIR) {
+			LogManager.getLogger().warn("Could not set {} for leaves properties '{}' from '{}'.", fieldName, this.getRegistryName(), registryName);
 		}
 
-		this.primitiveLeaves = primitiveLeaves.getDefaultState();
+		return objectToSet;
 	}
 
 	public ResourceLocation getPrimitiveLeavesRegName() {

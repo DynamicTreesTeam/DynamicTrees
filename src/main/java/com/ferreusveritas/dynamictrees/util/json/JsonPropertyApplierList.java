@@ -15,7 +15,7 @@ import java.util.Map;
 public final class JsonPropertyApplierList<T> {
 
     private final Class<T> objectType;
-    private final List<JsonPropertyApplier<T, ?>> appliers = new ArrayList<>();
+    private final List<JsonPropertyApplier<? extends T, ?>> appliers = new ArrayList<>();
 
     public JsonPropertyApplierList(final Class<T> objectType) {
         this.objectType = objectType;
@@ -39,7 +39,7 @@ public final class JsonPropertyApplierList<T> {
         if (JsonHelper.isComment(jsonElement))
             return PropertyApplierResult.SUCCESS;
 
-        for (final JsonPropertyApplier<T, ?> applier : this.appliers) {
+        for (final JsonPropertyApplier<? extends T, ?> applier : this.appliers) {
             if (!applier.getObjectClass().isInstance(object))
                 continue;
 
@@ -59,9 +59,8 @@ public final class JsonPropertyApplierList<T> {
         return PropertyApplierResult.SUCCESS;
     }
 
-    @SuppressWarnings("unchecked")
     public <E extends T> JsonPropertyApplierList<T> register (final JsonPropertyApplier<E, ?> applier) {
-        this.appliers.add((JsonPropertyApplier<T, ?>) applier);
+        this.appliers.add(applier);
         return this;
     }
 
@@ -81,12 +80,20 @@ public final class JsonPropertyApplierList<T> {
         return this.registerArrayApplier(key, this.objectType, valueClass, applier);
     }
 
+    public JsonPropertyApplierList<T> registerIfTrueApplier(final String key, final IIfTrueApplier<T> applier) {
+        return this.registerIfTrueApplier(key, this.objectType, applier);
+    }
+
     public <E extends T, V> JsonPropertyApplierList<T> register(final String key, final Class<E> subClass, final Class<V> valueClass, final IPropertyApplier<E, V> applier) {
         return this.register(new JsonPropertyApplier<>(key, subClass, valueClass, applier));
     }
 
     public <E extends T, V> JsonPropertyApplierList<T> register(final String key, final Class<E> subClass, final Class<V> valueClass, final IVoidPropertyApplier<E, V> applier) {
         return this.register(new JsonPropertyApplier<>(key, subClass, valueClass, applier));
+    }
+
+    public <E extends T> JsonPropertyApplierList<T> registerIfTrueApplier(final String key, final Class<E> subClass, final IIfTrueApplier<E> applier) {
+        return this.register(key, subClass, Boolean.class, (object, value) -> { if (value) applier.apply(object); });
     }
 
     public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IPropertyApplier<E, V> applier) {

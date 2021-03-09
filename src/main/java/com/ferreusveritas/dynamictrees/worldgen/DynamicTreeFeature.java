@@ -26,7 +26,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-		final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.BIOME_DATABASE_MANAGER;
+		final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.getBiomeDatabaseManager();
         final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		final ServerWorld serverWorld = world.getWorld();
 		final ResourceLocation dimensionRegistryName = serverWorld.getDimensionKey().getLocation();

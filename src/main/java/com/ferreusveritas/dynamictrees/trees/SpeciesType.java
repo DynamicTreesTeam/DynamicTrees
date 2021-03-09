@@ -12,9 +12,6 @@ import java.util.Set;
  * code, such as cacti. It will handle creating a custom sub-class of {@link Species}, with
  * the type parameter being the custom species class.
  *
- * <p><i>Note that this is not yet in use. It will be implemented properly when family tree
- * packs are done.</i></p>
- *
  * @author Harley O'Connor
  */
 public abstract class SpeciesType<T extends Species> {

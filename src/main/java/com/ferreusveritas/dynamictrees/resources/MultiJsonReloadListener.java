@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
@@ -15,7 +13,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -27,22 +28,16 @@ import java.util.Map;
  *
  * @author Harley O'Connor
  */
-public abstract class MultiJsonReloadListener extends ReloadListener<Map<ResourceLocation, List<Pair<String, JsonElement>>>> {
+public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListener<Map<ResourceLocation, List<Pair<String, JsonElement>>>, V> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String JSON_EXTENSION = ".json";
-    private static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
-
-    private final Gson gson = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
-    private final String folderName;
-
-    public MultiJsonReloadListener(final String folderName) {
-        this.folderName = folderName;
+    public MultiJsonReloadListener(final String folderName, final Class<V> objectType, final String applierRegistryName) {
+        super(folderName, objectType, applierRegistryName);
     }
 
     @Override
-    protected Map<ResourceLocation, List<Pair<String, JsonElement>>> prepare(IResourceManager resourceManager, IProfiler profiler) {
+    protected Map<ResourceLocation, List<Pair<String, JsonElement>>> prepare(final IResourceManager resourceManager) {
         final Map<ResourceLocation, List<Pair<String, JsonElement>>> map = Maps.newHashMap();
         int i = folderName.length() + 1;
 
