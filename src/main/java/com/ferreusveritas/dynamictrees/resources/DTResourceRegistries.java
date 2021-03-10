@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
+import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
-import com.ferreusveritas.dynamictrees.trees.TreeFamilyManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import net.minecraft.profiler.IProfiler;
@@ -20,8 +20,6 @@ import org.apache.logging.log4j.LogManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -37,7 +35,7 @@ public final class DTResourceRegistries {
 
     public static final TreesResourceManager TREES_RESOURCE_MANAGER = new TreesResourceManager();
 
-    private static TreeFamilyManager treeFamilyManager;
+    private static FamilyManager familyManager;
     private static LeavesPropertiesManager leavesPropertiesManager;
     private static SpeciesManager speciesManager;
     private static JoCodeManager joCodeManager;
@@ -45,12 +43,12 @@ public final class DTResourceRegistries {
 
     public static void setupTreesResourceManager () {
         leavesPropertiesManager = new LeavesPropertiesManager();
-        treeFamilyManager = new TreeFamilyManager();
+        familyManager = new FamilyManager();
         speciesManager = new SpeciesManager();
         joCodeManager = new JoCodeManager();
         biomeDatabaseManager = new BiomeDatabaseManager();
 
-        TREES_RESOURCE_MANAGER.addReloadListeners(leavesPropertiesManager, treeFamilyManager, speciesManager, joCodeManager, biomeDatabaseManager);
+        TREES_RESOURCE_MANAGER.addReloadListeners(leavesPropertiesManager, familyManager, speciesManager, joCodeManager, biomeDatabaseManager);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);
@@ -80,8 +78,8 @@ public final class DTResourceRegistries {
             TREES_RESOURCE_MANAGER.addResourcePack(new ModTreeResourcePack(treesPath, modFile));
     }
 
-    public static TreeFamilyManager getTreeFamilyManager() {
-        return treeFamilyManager;
+    public static FamilyManager getTreeFamilyManager() {
+        return familyManager;
     }
 
     public static LeavesPropertiesManager getLeavesPropertiesManager() {

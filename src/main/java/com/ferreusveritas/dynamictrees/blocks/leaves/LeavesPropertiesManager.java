@@ -26,7 +26,7 @@ public final class LeavesPropertiesManager extends MultiJsonReloadListener<Leave
     }
 
     @Override
-    public void registerAppliers(final String applierRegistryName) {
+    public void registerAppliers(final String applierListIdentifier) {
         this.appliers.register("primitive_leaves", ResourceLocation.class, LeavesProperties::setPrimitiveLeavesRegName)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
@@ -35,7 +35,7 @@ public final class LeavesPropertiesManager extends MultiJsonReloadListener<Leave
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius);
 
-        super.registerAppliers(applierRegistryName);
+        super.registerAppliers(applierListIdentifier);
     }
 
     @Override

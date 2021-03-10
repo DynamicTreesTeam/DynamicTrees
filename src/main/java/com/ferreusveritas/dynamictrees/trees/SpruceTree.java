@@ -25,8 +25,8 @@ public class SpruceTree extends VanillaTreeFamily {
 	
 	public static class BaseSpruceSpecies extends Species {
 		
-		BaseSpruceSpecies(ResourceLocation name, TreeFamily treeFamily) {
-			super(name, treeFamily);
+		BaseSpruceSpecies(ResourceLocation name, Family family) {
+			super(name, family);
 			
 			//Spruce are conical thick slower growing trees
 			setBasicGrowingParameters(0.25f, 16.0f, 3, 3, 0.9f);
@@ -55,8 +55,8 @@ public class SpruceTree extends VanillaTreeFamily {
 	
 	public class SpruceSpecies extends BaseSpruceSpecies {
 		
-		SpruceSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		SpruceSpecies(Family family) {
+			super(family.getRegistryName(), family);
 		}
 
 //		@Override
@@ -74,8 +74,8 @@ public class SpruceTree extends VanillaTreeFamily {
 		
 		private static final String speciesName = "mega_spruce";
 		
-		MegaSpruceSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
+		MegaSpruceSpecies(Family family) {
+			super(new ResourceLocation(family.getRegistryName().getNamespace(), speciesName), family);
 			setBasicGrowingParameters(0.25f, 24.0f, 7, 5, 0.9f);
 			setGrowthLogicKit(GrowthLogicKits.MEGA_CONIFER);
 			

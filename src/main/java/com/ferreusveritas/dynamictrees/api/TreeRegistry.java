@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
@@ -96,7 +96,7 @@ public class TreeRegistry {
 	public static List<Species> getPotionTransformableSpecies () {
 		final List<Species> speciesList = getTransformableSpecies();
 		speciesList.removeIf(species -> {
-			TreeFamily family = species.getFamily();
+			Family family = species.getFamily();
 
 			// Remove the species if it doesn't have seeds, or if it's not the common species and its seed is the same as the common species'.
 			return !species.hasSeed() || (species != family.getCommonSpecies() && species.getSeed() == family.getCommonSpecies().getSeed());

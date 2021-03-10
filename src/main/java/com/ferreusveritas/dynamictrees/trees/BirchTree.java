@@ -12,15 +12,14 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-import java.util.List;
 import java.util.Random;
 
 public class BirchTree extends VanillaTreeFamily {
 	
 	public static class BirchSpecies extends Species {
 		
-		BirchSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		BirchSpecies(Family family) {
+			super(family.getRegistryName(), family);
 			
 			//Birch are tall, skinny, fast growing trees
 			setBasicGrowingParameters(0.1f, 14.0f, 4, 4, 1.25f);

@@ -1,35 +1,20 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.MoundGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.RootsGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.google.common.collect.Sets;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Optional;
 import java.util.Set;
@@ -38,8 +23,8 @@ public class JungleTree extends VanillaTreeFamily {
 	
 	public class JungleSpecies extends Species {
 		
-		JungleSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		JungleSpecies(Family family) {
+			super(family.getRegistryName(), family);
 			
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
 			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
@@ -77,8 +62,8 @@ public class JungleTree extends VanillaTreeFamily {
 		
 		private static final String speciesName = "mega_jungle";
 		
-		MegaJungleSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), speciesName), treeFamily);
+		MegaJungleSpecies(Family family) {
+			super(new ResourceLocation(family.getRegistryName().getNamespace(), speciesName), family);
 			
 //			setRequiresTileEntity(true);
 			

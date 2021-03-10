@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -47,8 +47,8 @@ import java.util.Random;
 public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	
 	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
-		@Override public LeavesProperties setTree(TreeFamily tree) { return this; }
-		@Override public TreeFamily getTree() { return TreeFamily.NULL_FAMILY; }
+		@Override public LeavesProperties setTree(Family tree) { return this; }
+		@Override public Family getTree() { return Family.NULL_FAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
 		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemStack.EMPTY; }
 		@Override public LeavesProperties setDynamicLeavesState(BlockState state) { return this; }
@@ -79,7 +79,7 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	/** The {@link CellKit}, which is for leaves automata. */
 	protected CellKit cellKit;
 
-	protected TreeFamily tree = TreeFamily.NULL_FAMILY;
+	protected Family tree = Family.NULL_FAMILY;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
@@ -181,19 +181,19 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	/**
 	 * Used by the {@link DynamicLeavesBlock} to find out if it can pull hydro from a branch.
 	 *
-	 * @return The {@link TreeFamily} for these {@link LeavesProperties}.
+	 * @return The {@link Family} for these {@link LeavesProperties}.
 	 * */
-	public TreeFamily getTree() {
+	public Family getTree() {
 		return tree;
 	}
 
 	/**
 	 * Sets the type of tree these leaves connect to.
 	 *
-	 * @param tree The {@link TreeFamily} object to set.
+	 * @param tree The {@link Family} object to set.
 	 * @return This {@link LeavesProperties} object.
 	 */
-	public LeavesProperties setTree(TreeFamily tree) {
+	public LeavesProperties setTree(Family tree) {
 		this.tree = tree;
 		if (tree.isFireProof()) {
 			flammability = 0;

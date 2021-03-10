@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
@@ -73,8 +73,8 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return TreeFamily.NULL_FAMILY;
+	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		return Family.NULL_FAMILY;
 	}
 	
 	public final TreePartType getTreePartType() {

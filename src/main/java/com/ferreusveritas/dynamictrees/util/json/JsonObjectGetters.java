@@ -3,18 +3,11 @@ package com.ferreusveritas.dynamictrees.util.json;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.SpeciesType;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
-import com.ferreusveritas.dynamictrees.trees.TreeSpecies;
+import com.ferreusveritas.dynamictrees.trees.*;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.google.common.collect.Sets;
@@ -36,6 +29,7 @@ import java.util.*;
  *
  * @author Harley O'Connor
  */
+// TODO: Find another way of initialising so that calling them early doesn't lead to feeding registry entry getters null.
 public final class JsonObjectGetters {
 
     private static final Set<JsonObjectGetterHolder<?>> OBJECT_GETTERS = Sets.newHashSet();
@@ -169,18 +163,19 @@ public final class JsonObjectGetters {
         }
     });
 
-    public static final IJsonObjectGetter<Block> BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
-    public static final IJsonObjectGetter<Item> ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
-    public static final IJsonObjectGetter<Biome> BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
+    public static IJsonObjectGetter<Block> BLOCK_GETTER;
+    public static IJsonObjectGetter<Item> ITEM_GETTER;
+    public static IJsonObjectGetter<Biome> BIOME_GETTER;
 
-    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
-    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
-    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
-    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
-    public static final IJsonObjectGetter<TreeFamily> TREE_FAMILY_GETTER = register(TreeFamily.class, new ForgeRegistryEntryGetter<>(TreeFamily.REGISTRY, "tree family"));
-    public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new ForgeRegistryEntryGetter<>(Species.REGISTRY, "species"));
+    public static IJsonObjectGetter<CellKit> CELL_KIT_GETTER;
+    public static IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER;
+    public static IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER;
+    public static IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER;
+    public static IJsonObjectGetter<Family> TREE_FAMILY_GETTER;
+    public static IJsonObjectGetter<Species> SPECIES_GETTER;
 
-    public static final IJsonObjectGetter<SpeciesType<Species>> SPECIES_TYPE_GETTER = register(SpeciesType.CLASS, new SpeciesTypeGetter());
+    public static final IJsonObjectGetter<SpeciesType<Species>> SPECIES_TYPE_GETTER = register(TreeSpecies.CLASS, new SpeciesTypeGetter());
+    public static final IJsonObjectGetter<FamilyType<Family>> FAMILY_TYPE_GETTER = register(TreeFamily.CLASS, new FamilyTypeGetter());
 
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 
@@ -210,5 +205,22 @@ public final class JsonObjectGetters {
 
         return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> currentBiome.getRegistryName().equals(biome.getRegistryName())));
     });
+
+    /**
+     * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid
+     * giving null to the getters.
+     */
+    public static void registerRegistryEntryGetters () {
+        BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
+        ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
+        BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
+
+        CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
+        LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
+        GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
+        GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
+        TREE_FAMILY_GETTER = register(Family.class, new ForgeRegistryEntryGetter<>(Family.REGISTRY, "tree family"));
+        SPECIES_GETTER = register(Species.class, new ForgeRegistryEntryGetter<>(Species.REGISTRY, "species"));
+    }
 
 }

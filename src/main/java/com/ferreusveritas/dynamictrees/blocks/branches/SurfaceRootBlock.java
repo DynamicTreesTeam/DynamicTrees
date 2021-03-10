@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import net.minecraft.block.Block;
@@ -43,13 +43,13 @@ public class SurfaceRootBlock extends Block {
 
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
 
-	private final TreeFamily family;
+	private final Family family;
 
-	public SurfaceRootBlock(ResourceLocation registryName, TreeFamily family) {
+	public SurfaceRootBlock(ResourceLocation registryName, Family family) {
 		this(Material.WOOD, registryName, family);
 	}
 
-	public SurfaceRootBlock(Material material, ResourceLocation registryName, TreeFamily family) {
+	public SurfaceRootBlock(Material material, ResourceLocation registryName, Family family) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)

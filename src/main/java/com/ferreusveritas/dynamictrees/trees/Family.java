@@ -1,0 +1,692 @@
+package com.ferreusveritas.dynamictrees.trees;
+
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cells.MetadataCell;
+import com.ferreusveritas.dynamictrees.compat.WailaOther;
+import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
+import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.items.Seed;
+import com.google.common.collect.Sets;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
+import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.logging.log4j.LogManager;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * This structure describes a Tree Family whose member Species all have a common wood type.
+ *
+* A {@link Family} is more or less just a definition of {@link BranchBlock} blocks.
+* It also defines the cellular automata function of the {@link BranchBlock}.  It defines the type of wood that
+* the tree is made of and consequently what kind of log you get when you cut it down.
+*
+* A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
+* It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
+* All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
+* species(the common species).
+*
+* @author ferreusveritas
+*/
+public class Family extends ForgeRegistryEntry<Family> {
+	
+	public final static Family NULL_FAMILY = new Family() {
+		@Override public void setupCommonSpecies(Species species) {}
+		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
+		@Override public Set<Block> getRegisterableBlocks(Set<Block> blockList) { return blockList; }
+		@Override public Set<Item> getRegisterableItems(Set<Item> itemList) { return itemList; }
+		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
+		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
+		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
+		@Override public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) { return Species.NULL_SPECIES; }
+	};
+
+	/**
+	 * The registry. This is used for registering and querying {@link Family} objects.
+	 *
+	 * <p>Add-ons should use {@link DTTrees.TreeFamilyRegistryEvent}, <b>not</b> Forge's registry event.</p>
+	 */
+	public static IForgeRegistry<Family> REGISTRY;
+
+	@Nonnull
+	protected Species commonSpecies = Species.NULL_SPECIES;
+
+	protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
+
+	//Branches
+	/** The dynamic branch used by this tree family */
+	private BranchBlock dynamicBranch;
+	/** The stripped variant of the branch used by this tree family */
+	private BranchBlock dynamicStrippedBranch;
+	/** The dynamic branch's block item */
+	private Item dynamicBranchItem;
+	/** The surface root used by this tree family */
+	private SurfaceRootBlock surfaceRoot;
+	/** The primitive (vanilla) log to base the texture, drops, and other behavior from */
+	private Block primitiveLog = Blocks.AIR;
+	/** The primitive stripped log to base the texture, drops, and other behavior from */
+	private Block primitiveStrippedLog = Blocks.AIR;
+
+	private ResourceLocation primitiveLogRegName;
+	private ResourceLocation primitiveStrippedLogRegName;
+
+	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
+	private final List<BranchBlock> validBranches = new LinkedList<>();
+
+	/** The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#maxBranchRadius} will be clamped to this value. */
+	private int maxBranchRadius = BranchBlock.RADMAX_NORMAL;
+
+	//Leaves
+	/** Used to modify the getRadiusForCellKit call to create a special case */
+	protected boolean hasConiferVariants = false;
+
+	protected boolean hasSurfaceRoot = false;
+
+	protected boolean hasStrippedBranch = true;
+
+	//Misc
+	/** The stick that is returned when a whole log can't be dropped */
+	private Item stick = null;
+	/** Weather the branch can support cocoa pods on it's surface [default = false] */
+	public boolean canSupportCocoa = false;
+
+	private ResourceLocation stickRegName;
+
+	@OnlyIn(Dist.CLIENT)
+	public int woodRingColor; // For rooty blocks
+	@OnlyIn(Dist.CLIENT)
+	public int woodBarkColor; // For rooty water
+
+	/** A list of child species, added to when tree family is set for species. */
+	private final Set<Species> species = new HashSet<>();
+
+	public Family() {
+		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null"));
+	}
+
+	/**
+	 * Constructor suitable for derivative mods
+	 *
+	 * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
+	 */
+	public Family(ResourceLocation name) {
+		this.setRegistryName(name);
+
+		stick = Items.STICK;
+	}
+
+	public void setupBlocks() {
+		this.setDynamicBranch(this.createBranch());
+		this.setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+
+		if (this.hasStrippedBranch()) {
+			this.setDynamicStrippedBranch(this.createBranch("stripped_", "_branch"));
+		}
+
+		if (this.hasSurfaceRoot()) {
+			this.setSurfaceRoot(this.createSurfaceRoot());
+		}
+	}
+
+	public Set<Species> createSpecies() {
+		this.setupCommonSpecies(new Species(this.getCommonSpeciesName(), this, this.getCommonLeaves()));
+		return this.getExtraSpeciesNames().stream().map(registryName -> new Species(registryName, this, this.getCommonLeaves())).collect(Collectors.toSet());
+	}
+
+	public Set<ResourceLocation> getExtraSpeciesNames() {
+		return Sets.newHashSet();
+	}
+
+	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
+		speciesRegistry.registerAll(this.species.toArray(new Species[0]));
+	}
+
+	public ResourceLocation getCommonSpeciesName() {
+		final ResourceLocation registryName = this.getRegistryName();
+		return registryName == null ? DTTrees.NULL : registryName;
+	}
+
+	public void setupCommonSpecies(final Species species) {
+		this.commonSpecies = species;
+
+		// Auto generate seeds and saplings for common species.
+		species.generateSeed();
+		species.generateSapling();
+	}
+
+	public Species getCommonSpecies() {
+		return commonSpecies;
+	}
+
+	public Family addSpecies (final Species species) {
+		this.species.add(species);
+		return this;
+	}
+
+	public Set<Species> getSpecies () {
+		return this.species;
+	}
+
+	/**
+	 * Resets common species and clears all registered species. This allows for users to override
+	 * all species using the trees folder.
+	 */
+	public void resetSpecies () {
+		this.commonSpecies = Species.NULL_SPECIES;
+		this.species.clear();
+	}
+
+	///////////////////////////////////////////
+	// SPECIES LOCATION OVERRIDES
+	///////////////////////////////////////////
+
+	/**
+	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
+	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
+	 * are in a swamp.
+	 *
+	 * @param world The {@link IWorld} object.
+	 * @param trunkPos The {@link BlockPos} of the trunk.
+	 * @return The {@link Species} to place.
+	 */
+	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+		for (final Species species : this.species) {
+			if (species.shouldOverrideCommon(world, trunkPos))
+				return species;
+		}
+
+		return this.commonSpecies;
+	}
+
+	///////////////////////////////////////////
+	// INTERACTION
+	///////////////////////////////////////////
+
+	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+
+		if (this.canSupportCocoa) {
+			BlockPos pos = hit.getPos();
+			if(heldItem != null) {
+				if(heldItem.getItem() == Items.COCOA_BEANS) {
+					BranchBlock branch = TreeHelper.getBranch(state);
+					if(branch != null && branch.getRadius(state) == 8) {
+						if(hit.getFace() != Direction.UP && hit.getFace() != Direction.DOWN) {
+							pos = pos.offset(hit.getFace());
+						}
+						if (world.isAirBlock(pos)) {
+							BlockState cocoaState = DTRegistries.cocoaFruitBlock.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+							assert cocoaState != null;
+							Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
+							world.setBlockState(pos, DTRegistries.cocoaFruitBlock.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
+							if (!player.isCreative()) {
+								heldItem.shrink(1);
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		BlockPos rootPos = TreeHelper.findRootNode(world, hitPos);
+
+		if (canStripBranch(state, world, hitPos, player, heldItem)){
+			return stripBranch(state, world, hitPos, player, heldItem);
+		}
+
+		if(rootPos != BlockPos.ZERO) {
+			return TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
+		}
+
+		return false;
+	}
+
+	public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
+		BranchBlock branchBlock = TreeHelper.getBranch(state);
+		if (branchBlock == null) return false;
+		return branchBlock.canBeStripped(state, world, pos, player, heldItem);
+	}
+
+	public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
+		if (getDynamicStrippedBranch() != null){
+			getDynamicBranch().stripBranch(state, world, pos, player, heldItem);
+
+			if (world.isRemote) {
+				world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+				WailaOther.invalidateWailaPosition();
+			}
+			return true;
+		}
+		else return false;
+	}
+
+	///////////////////////////////////////////
+	// REGISTRATION
+	///////////////////////////////////////////
+
+	/**
+	 * Used to register the blocks this tree uses.  Mainly just the {@link BranchBlock}
+	 * We intentionally leave out leaves since they are shared between trees
+	 *
+	 *
+	 * @param blockList
+	 * @return */
+	public Set<Block> getRegisterableBlocks(Set<Block> blockList) {
+		blockList.add(getDynamicBranch());
+
+		if (this.hasStrippedBranch())
+			blockList.add(getDynamicStrippedBranch());
+
+		if (this.hasSurfaceRoot())
+			blockList.add(getSurfaceRoot());
+
+		// Prioritise the common species' blocks.
+		this.getCommonSpecies().getSapling().ifPresent(blockList::add);
+		this.getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
+
+		this.getSpecies().forEach(species -> {
+			if (species.isCommonSpecies())
+				return;
+
+			species.getSapling().ifPresent(blockList::add);
+			species.getLeavesBlock().ifPresent(blockList::add);
+		});
+
+		return blockList;
+	}
+
+	/**
+	 * Used to register items the tree creates. Mostly for the {@link Seed}
+	 * If the developer provides the seed externally instead of having it
+	 * generated internally then the seed should be allowed to register here.
+	 * If this can't be the case then override this member function with a
+	 * dummy one.
+	 * @return
+	 * @param itemList
+	 */
+	public Set<Item> getRegisterableItems(Set<Item> itemList) {
+		//Register an itemBlock for the branch block
+		itemList.add(this.dynamicBranchItem);
+
+		this.species.forEach(species -> species.getSeed().ifPresent(itemList::add));
+
+		return itemList;
+	}
+
+
+	///////////////////////////////////////////
+	// TREE PROPERTIES
+	///////////////////////////////////////////
+
+	public boolean isWood() {
+		return true;
+	}
+
+	/**
+	 * Override this to use a custom branch for the tree family
+	 *
+	 * @return the branch to be created
+	 */
+	public BranchBlock createBranch() {
+		return createBranch("", "_branch");
+	}
+
+	public BranchBlock createBranch(final String prefix, final String suffix) {
+		final ResourceLocation branchName = new ResourceLocation(this.getRegistryName().getNamespace(), prefix + this.getRegistryName().getPath() + suffix);
+		final BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
+		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
+		return branch;
+	}
+
+	public Item createBranchItem (BranchBlock branch) {
+		return new BlockItem(branch, new Item.Properties()).setRegistryName(branch.getRegistryName());
+	}
+
+	protected Family setDynamicBranch(BranchBlock branch) {
+		dynamicBranch = branch;//Link the tree to the branch
+		dynamicBranch.setFamily(this);//Link the branch back to the tree
+		dynamicBranch.setCanBeStripped(hasStrippedBranch());//Allow the branch to be stripped if a stripped variant exists
+		addValidBranches(branch);
+		return this;
+	}
+	protected Family setDynamicStrippedBranch(BranchBlock branch) {
+		dynamicStrippedBranch = branch;//Link the tree to the branch
+		dynamicStrippedBranch.setFamily(this);//Link the branch back to the tree
+		dynamicStrippedBranch.setCanBeStripped(false);//Already stripped logs should not be able to be stripped again
+		addValidBranches(branch);
+		return this;
+	}
+
+	protected Family setDynamicBranchItem (Item branchItem) {
+		this.dynamicBranchItem = branchItem;
+		return this;
+	}
+
+	public BranchBlock getDynamicBranch() {
+		return dynamicBranch;
+	}
+
+	public BranchBlock getDynamicStrippedBranch() {
+		return dynamicStrippedBranch;
+	}
+
+	public Item getDynamicBranchItem() {
+		return dynamicBranchItem;
+	}
+
+	public boolean isThick() {
+		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
+	}
+
+	public int getMaxBranchRadius() {
+		return this.maxBranchRadius;
+	}
+
+	public void setMaxBranchRadius(int maxBranchRadius) {
+		this.maxBranchRadius = maxBranchRadius;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public int getRootColor(BlockState state, boolean getBark) {
+		return getBark? woodBarkColor : woodRingColor;
+	}
+
+	public void setHasConiferVariants(boolean hasConiferVariants) {
+		this.hasConiferVariants = hasConiferVariants;
+	}
+
+	/**
+	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
+	 *
+	 * @param item An itemstack of the stick
+	 * @return TreeFamily for chaining calls
+	 */
+	protected Family setStick(Item item) {
+		stick = item;
+		return this;
+	}
+
+	/**
+	 * Get a quantity of whatever is considered a stick for this tree's type of wood.
+	 *
+	 * @param qty Number of sticks
+	 * @return an {@link ItemStack} of sticky things
+	 */
+	public ItemStack getStick(int qty) {
+		return new ItemStack(stick, MathHelper.clamp(qty, 0, 64));
+	}
+
+	public void setStickRegName(ResourceLocation stickRegName) {
+		this.stickRegName = stickRegName;
+	}
+
+	/**
+	 * Used to set the type of log item that a tree drops when it's harvested.
+	 * Use this function to explicitly set the itemstack instead of having it
+	 * done automatically.
+	 *
+	 * @param primitiveLog A block object that is the log
+	 * @param primitiveLog An itemStack of the log item
+	 * @return TreeFamily for chaining calls
+	 */
+	protected Family setPrimitiveLog(Block primitiveLog) {
+		this.primitiveLog = primitiveLog;
+
+		if (this.dynamicBranch != null)
+			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
+
+		return this;
+	}
+
+	protected Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
+		this.primitiveStrippedLog = primitiveStrippedLog;
+
+		if (this.dynamicStrippedBranch != null)
+			this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+
+		return this;
+	}
+
+	/**
+	 * Gets the primitive full block (vanilla)log that represents this tree's
+	 * material. Chiefly used to determine the wood hardness for harvesting
+	 * behavior.
+	 *
+	 * @return Block of the primitive log.
+	 */
+	public Block getPrimitiveLog() {
+		return primitiveLog;
+	}
+
+	public Block getPrimitiveStrippedLog() {
+		return primitiveStrippedLog;
+	}
+
+	public void setPrimitiveLogRegName(ResourceLocation primitiveLogRegName) {
+		this.primitiveLogRegName = primitiveLogRegName;
+	}
+
+	public void setPrimitiveStrippedLogRegName(ResourceLocation primitiveStrippedLogRegName) {
+		this.primitiveStrippedLogRegName = primitiveStrippedLogRegName;
+	}
+
+	private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
+		BranchBlock branchBlock = getValidBranchBlock(branch);
+		List<ItemStack> logs = new LinkedList<>();
+		if (branchBlock != null){
+			branchBlock.getPrimitiveLogs(volume, logs);
+		}
+		return logs;
+	}
+
+	public boolean isFireProof () { return false; }
+
+	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity){
+		return SoundType.WOOD;
+	}
+
+	public ToolType getBranchHarvestTool(BlockState state){
+		return ToolType.AXE;
+	}
+
+	public int getBranchHarvestLevel(BlockState state){
+		return 0;
+	}
+
+	public Material getBranchMaterial(){
+		return Material.WOOD; //Trees are made of wood. Brilliant.
+	}
+
+	///////////////////////////////////////////
+	//BRANCHES
+	///////////////////////////////////////////
+
+	public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
+		int radius = branch.getRadius(blockState);
+		int meta = MetadataCell.NONE;
+		if(hasConiferVariants && radius == 1) {
+			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+				meta = MetadataCell.CONIFERTOP;
+			}
+		}
+
+		return MetadataCell.radiusAndMeta(radius, meta);
+	}
+
+	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
+	public float getPrimaryThickness() {
+		return 1.0f;
+	}
+
+	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
+	public float getSecondaryThickness() {
+		return 2.0f;
+	}
+
+	public boolean hasStrippedBranch() {
+		return this.hasStrippedBranch;
+	}
+
+	public void setHasStrippedBranch(boolean hasStrippedBranch) {
+		this.hasStrippedBranch = hasStrippedBranch;
+	}
+
+	public void addValidBranches (BranchBlock... branches){
+		this.validBranches.addAll(Arrays.asList(branches));
+	}
+
+	public int getBranchBlockIndex (BranchBlock block){
+		int index = this.validBranches.indexOf(block);
+		if (index < 0){
+			LogManager.getLogger().warn("Block {} not valid branch for {}.", block, this);
+			return 0;
+		}
+		return index;
+	}
+
+	@Nullable
+	public BranchBlock getValidBranchBlock (int index) {
+		return this.validBranches.get(index);
+	}
+
+	///////////////////////////////////////////
+	// SURFACE ROOTS
+	///////////////////////////////////////////
+
+	public boolean hasSurfaceRoot () {
+		return this.hasSurfaceRoot;
+	}
+
+	public void setHasSurfaceRoot(boolean hasSurfaceRoot) {
+		this.hasSurfaceRoot = hasSurfaceRoot;
+	}
+
+	public SurfaceRootBlock createSurfaceRoot () {
+		final ResourceLocation surfaceRootName = new ResourceLocation(this.getRegistryName().getNamespace(), this.getRegistryName().getPath() + "_root");
+		return new SurfaceRootBlock(surfaceRootName, this);
+	}
+
+	public SurfaceRootBlock getSurfaceRoot() {
+		return this.surfaceRoot;
+	}
+
+	protected Family setSurfaceRoot (SurfaceRootBlock surfaceRoot) {
+		this.surfaceRoot = surfaceRoot;
+		return this;
+	}
+
+	///////////////////////////////////////////
+	// FALL ANIMATION HANDLING
+	///////////////////////////////////////////
+
+	public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
+		return fallingEntity.defaultAnimationHandler();
+	}
+
+	///////////////////////////////////////////
+	// LEAVES HANDLING
+	///////////////////////////////////////////
+
+	public boolean isCompatibleDynamicLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
+		return (leaves != null) && this == leaves.getFamily(blockState, blockAccess, pos);
+	}
+
+	public interface IConnectable {
+		boolean isConnectable(BlockState blockState);
+	}
+
+	LinkedList<IConnectable> vanillaConnectables = new LinkedList<>();
+
+	public void addConnectableVanillaLeaves(IConnectable connectable) {
+		this.vanillaConnectables.add(connectable);
+	}
+
+	public boolean isCompatibleVanillaLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+
+		Block block = blockState.getBlock();
+
+		if(!(block instanceof DynamicLeavesBlock)) {
+			for(IConnectable connectable : vanillaConnectables) {
+				if(connectable.isConnectable(blockState)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public boolean isCompatibleGenericLeaves(BlockState blockState, IWorld blockAccess, BlockPos pos) {
+		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
+	}
+
+	public LeavesProperties getCommonLeaves() {
+		return this.commonLeaves;
+	}
+
+	public void setCommonLeaves (LeavesProperties properties) {
+		this.commonLeaves = properties;
+		properties.setTree(this);
+	}
+
+	//////////////////////////////
+	// JAVA OBJECT STUFF
+	//////////////////////////////
+
+
+	@Override
+	public String toString() {
+		return "TreeFamily{registryName=" + this.getRegistryName() + "}";
+	}
+
+	public String getDisplayString() {
+		return "TreeFamily{" +
+				"commonSpecies=" + commonSpecies +
+				", commonLeaves=" + commonLeaves +
+				", dynamicBranch=" + dynamicBranch +
+				", dynamicStrippedBranch=" + dynamicStrippedBranch +
+				", dynamicBranchItem=" + dynamicBranchItem +
+				", surfaceRoot=" + surfaceRoot +
+				", primitiveLog=" + primitiveLog +
+				", primitiveStrippedLog=" + primitiveStrippedLog +
+				", validBranches=" + validBranches +
+				", maxBranchRadius=" + maxBranchRadius +
+				", hasConiferVariants=" + hasConiferVariants +
+				", stick=" + stick +
+				", canSupportCocoa=" + canSupportCocoa +
+				", woodRingColor=" + woodRingColor +
+				", woodBarkColor=" + woodBarkColor +
+				", species=" + species +
+				", vanillaConnectables=" + vanillaConnectables +
+				'}';
+	}
+
+}

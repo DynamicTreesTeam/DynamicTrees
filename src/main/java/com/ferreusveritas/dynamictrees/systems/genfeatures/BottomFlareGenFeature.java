@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -54,7 +54,7 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 	 * @param rootPos The position of the rooty dirt block of the tree
 	 */
 	public void flareBottom(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species) {
-		TreeFamily family = species.getFamily();
+		Family family = species.getFamily();
 
 		//Put a cute little flare on the bottom of the dark oaks
 		int radius3 = TreeHelper.getRadius(world, rootPos.up(3));

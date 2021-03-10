@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
@@ -28,8 +27,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
@@ -50,7 +49,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.LinkedList;
 import java.util.Set;
@@ -133,7 +131,7 @@ public class DTRegistries {
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
 		Set<Block> treeBlocks = Sets.newHashSet();
-		TreeFamily.REGISTRY.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		Family.REGISTRY.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -163,7 +161,7 @@ public class DTRegistries {
 		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
 		
 		Set<Item> treeItems = Sets.newHashSet();
-		TreeFamily.REGISTRY.forEach(tree -> tree.getRegisterableItems(treeItems));
+		Family.REGISTRY.forEach(tree -> tree.getRegisterableItems(treeItems));
 
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));

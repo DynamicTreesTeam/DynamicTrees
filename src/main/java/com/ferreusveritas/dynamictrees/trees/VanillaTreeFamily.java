@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
  * 
  * @author ferreusveritas
  */
-public class VanillaTreeFamily extends TreeFamily {
+public class VanillaTreeFamily extends Family {
 	
 	public final DynamicTrees.VanillaWoodTypes woodType;
 	

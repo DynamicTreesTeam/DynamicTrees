@@ -26,7 +26,7 @@ public class CrimsonFungus extends NetherTreeFamily {
 
 	public class CrimsonSpecies extends BaseNetherFungiSpecies {
 
-		CrimsonSpecies(TreeFamily family){
+		CrimsonSpecies(Family family){
 			super(family.getRegistryName(), family);
 
 			this.setPrimitiveSapling(Blocks.CRIMSON_FUNGUS);
@@ -51,8 +51,8 @@ public class CrimsonFungus extends NetherTreeFamily {
 
 	public class MegaCrimsonSpecies extends MegaNetherFungiSpecies {
 
-		MegaCrimsonSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), "mega_"+treeFamily.getRegistryName().getPath()), treeFamily);
+		MegaCrimsonSpecies(Family family) {
+			super(new ResourceLocation(family.getRegistryName().getNamespace(), "mega_"+ family.getRegistryName().getPath()), family);
 
 			this.addGenFeature(WEEPING_VINES_FEATURE);
 		}

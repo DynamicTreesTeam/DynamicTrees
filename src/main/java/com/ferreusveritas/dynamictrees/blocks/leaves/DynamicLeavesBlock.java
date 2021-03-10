@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.*;
@@ -99,7 +99,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return getProperties(blockState).getTree();
 	}
 	
@@ -508,7 +508,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
-			TreeFamily family = signal.getSpecies().getFamily();
+			Family family = signal.getSpecies().getFamily();
 			family.getDynamicBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);
 			signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
 		}

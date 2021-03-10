@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.client;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,7 @@ public class ModelHelper {
 	 *
 	 * @param tree
 	 */
-	public static void regModel(TreeFamily tree) {
+	public static void regModel(Family tree) {
 		BranchBlock branchBlock = tree.getDynamicBranch();
 		ModelResourceLocation modelLocation = getBranchModelResourceLocation(branchBlock);
 

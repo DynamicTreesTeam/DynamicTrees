@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.init;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
@@ -16,7 +15,7 @@ import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -70,10 +69,10 @@ public class DTClient {
 
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
-		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
+		for(Family family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
-			if(family != TreeFamily.NULL_FAMILY) {
+			if(family != Family.NULL_FAMILY) {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);

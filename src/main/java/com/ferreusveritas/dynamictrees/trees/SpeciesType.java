@@ -18,9 +18,6 @@ public abstract class SpeciesType<T extends Species> {
 
     private static final Set<SpeciesType<?>> SPECIES_TYPES = Sets.newHashSet();
 
-    @SuppressWarnings("all")
-    public static final Class<SpeciesType<Species>> CLASS = (Class<SpeciesType<Species>>) TreeSpecies.TREE_SPECIES.getClass();
-
     public static boolean doesExist (final ResourceLocation registryName) {
         return get(registryName).isPresent();
     }
@@ -46,24 +43,24 @@ public abstract class SpeciesType<T extends Species> {
 
     /**
      * Constructs the {@link Species} class for this species type, using the common
-     * leaves from the given {@link TreeFamily}.
+     * leaves from the given {@link Family}.
      *
      * @param registryName The {@link ResourceLocation} for the species.
-     * @param treeFamily The {@link TreeFamily} the species belongs to.
+     * @param family The {@link Family} the species belongs to.
      * @return The {@link Species} object.
      */
-    public T construct (final ResourceLocation registryName, final TreeFamily treeFamily) {
-        return this.construct(registryName, treeFamily, treeFamily.getCommonLeaves());
+    public T construct (final ResourceLocation registryName, final Family family) {
+        return this.construct(registryName, family, family.getCommonLeaves());
     }
 
     /**
      * Constructs the {@link Species} class for this species type.
      *
      * @param registryName The {@link ResourceLocation} for the species.
-     * @param treeFamily The {@link TreeFamily} the species belongs to.
+     * @param family The {@link Family} the species belongs to.
      * @param leavesProperties The {@link LeavesProperties} for the species.
      * @return The {@link Species} object.
      */
-    public abstract T construct (final ResourceLocation registryName, final TreeFamily treeFamily, final LeavesProperties leavesProperties);
+    public abstract T construct (final ResourceLocation registryName, final Family family, final LeavesProperties leavesProperties);
 
 }

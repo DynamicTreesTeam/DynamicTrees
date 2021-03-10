@@ -13,7 +13,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -190,7 +190,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
-		TreeFamily thisTree = getFamily();
+		Family thisTree = getFamily();
 		
 		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);

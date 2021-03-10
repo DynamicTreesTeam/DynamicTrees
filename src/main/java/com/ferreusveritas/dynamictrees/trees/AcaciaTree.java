@@ -1,22 +1,18 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.google.common.collect.Lists;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-
-import java.util.List;
 
 public class AcaciaTree extends VanillaTreeFamily {
 	
 	public static class AcaciaSpecies extends Species {
 		
-		AcaciaSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		AcaciaSpecies(Family family) {
+			super(family.getRegistryName(), family);
 			
 			//Acacia Trees are short, very slowly growing trees
 			setBasicGrowingParameters(0.15f, 12.0f, 0, 3, 0.7f);

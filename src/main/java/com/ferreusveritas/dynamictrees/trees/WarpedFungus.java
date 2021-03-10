@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Set;
 
@@ -19,8 +18,8 @@ public class WarpedFungus extends NetherTreeFamily {
 
 	public class WarpedSpecies extends BaseNetherFungiSpecies {
 
-		WarpedSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		WarpedSpecies(Family family) {
+			super(family.getRegistryName(), family);
 
 			this.setPrimitiveSapling(Blocks.WARPED_FUNGUS);
 		}
@@ -42,8 +41,8 @@ public class WarpedFungus extends NetherTreeFamily {
 
 	public class MegaWarpedSpecies extends MegaNetherFungiSpecies {
 
-		MegaWarpedSpecies(TreeFamily treeFamily) {
-			super(new ResourceLocation(treeFamily.getRegistryName().getNamespace(), "mega_"+treeFamily.getRegistryName().getPath()), treeFamily);
+		MegaWarpedSpecies(Family family) {
+			super(new ResourceLocation(family.getRegistryName().getNamespace(), "mega_"+ family.getRegistryName().getPath()), family);
 		}
 
 		@Override

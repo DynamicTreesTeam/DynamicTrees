@@ -87,12 +87,14 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         this.joCodes.clear();
 
         preparedObject.forEach((resourceLocation, lines) -> {
-            Species species = TreeRegistry.findSpecies(resourceLocation);
+            final Species species = TreeRegistry.findSpecies(resourceLocation);
 
             lines.forEach(line -> {
-                String[] split = line.split(":");
+                final String[] split = line.split(":");
                 this.addCode(species, Integer.parseInt(split[0]), split[1]);
             });
+
+            LOGGER.debug("Successfully loaded JoCodes for species '{}'.", resourceLocation);
         });
     }
 

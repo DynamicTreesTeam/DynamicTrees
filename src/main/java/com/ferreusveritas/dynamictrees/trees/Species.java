@@ -79,7 +79,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	public final static Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
-		@Override public TreeFamily getFamily() { return TreeFamily.NULL_FAMILY; }
+		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public boolean isTransformable() { return false; }
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -99,7 +99,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public static IForgeRegistry<Species> REGISTRY;
 	
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected TreeFamily treeFamily = TreeFamily.NULL_FAMILY;
+	protected Family family = Family.NULL_FAMILY;
 	
 	/** Logic kit for standardized extended growth behavior */
 	protected GrowthLogicKit logicKit = GrowthLogicKits.NULL;
@@ -168,10 +168,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * the leavesProperties to the common type for the family
 	 *
 	 * @param name The simple name of the species e.g. "oak"
-	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
+	 * @param family The {@link Family} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, TreeFamily treeFamily) {
-		this(name, treeFamily, treeFamily.getCommonLeaves());
+	public Species(ResourceLocation name, Family family) {
+		this(name, family, family.getCommonLeaves());
 	}
 	
 	/**
@@ -179,13 +179,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 *
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param leavesProperties The properties of the leaves to be used for this species
-	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
+	 * @param family The {@link Family} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, TreeFamily treeFamily, LeavesProperties leavesProperties) {
+	public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
 		setRegistryName(name);
 		setUnlocalizedName(name.toString());
-		this.treeFamily = treeFamily;
-		this.treeFamily.addSpecies(this);
+		this.family = family;
+		this.family.addSpecies(this);
 		setLeavesProperties(leavesProperties);
 		
 		setStandardSoils();
@@ -203,20 +203,20 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		}
 	}
 	
-	public TreeFamily getFamily() {
-		return treeFamily;
+	public Family getFamily() {
+		return family;
 	}
 
-	public void setFamily(TreeFamily treeFamily) {
-		treeFamily.addSpecies(this);
-		this.treeFamily = treeFamily;
+	public void setFamily(Family family) {
+		family.addSpecies(this);
+		this.family = family;
 	}
 
 	/**
 	 * @return True if this species is the common of its tree.
 	 */
 	public boolean isCommonSpecies () {
-		return this.treeFamily.getCommonSpecies().equals(this);
+		return this.family.getCommonSpecies().equals(this);
 	}
 
 	public Species setUnlocalizedName(String name) {
@@ -424,7 +424,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return An {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return this.hasSeed() ? this.isCommonSpecies() ? new ItemStack(this.seed, qty) : this.treeFamily.getCommonSpecies().getSeedStack(qty) : ItemStack.EMPTY;
+		return this.hasSeed() ? new ItemStack(this.seed, qty) : !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeedStack(qty) : ItemStack.EMPTY;
 	}
 	
 	public boolean hasSeed() {
@@ -432,7 +432,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public Optional<Seed> getSeed() {
-		return !this.hasSeed() ? !this.isCommonSpecies() ? this.treeFamily.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
+		return !this.hasSeed() ? !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
 	}
 	
 	/**
@@ -520,7 +520,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	/**
-	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link TreeFamily} at
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link Family} at
 	 * random with no player interaction.
 	 *
 	 * @param world
@@ -703,7 +703,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public boolean transitionToTree(World world, BlockPos pos) {
 		
 		//Ensure planting conditions are right
-		TreeFamily family = getFamily();
+		Family family = getFamily();
 		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
@@ -881,7 +881,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
@@ -913,9 +913,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * A little internal convenience function for getting branch endpoints
 	 *
 	 * @param world The world
-	 * @param treePos The {@link BlockPos} of the base of the {@link TreeFamily} trunk
-	 * @param treeBase The tree part that is the base of the {@link TreeFamily} trunk.  Provided for easy analysis.
-	 * @return A list of all branch endpoints for the {@link TreeFamily}
+	 * @param treePos The {@link BlockPos} of the base of the {@link Family} trunk
+	 * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
+	 * @return A list of all branch endpoints for the {@link Family}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
 		FindEndsNode endFinder = new FindEndsNode();
@@ -928,8 +928,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 *
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link TreeFamily}
-	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
+	 * @param treePos The {@link BlockPos} of the trunk base for this {@link Family}
 	 * @param soilLife The soil life of the {@link RootyBlock}
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
@@ -1018,7 +1018,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural
 	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
@@ -1458,12 +1458,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	private Species megaSpecies = Species.NULL_SPECIES;
 
+	@Deprecated // This is no longer used.
 	public boolean isMega() {
 		return false;
 	}
 
 	public Species getMegaSpecies() {
-		return megaSpecies;
+		return this.megaSpecies;
 	}
 
 	public void setMegaSpecies(final Species megaSpecies) {
@@ -1669,7 +1670,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	public String getDisplayInfo() {
 		return "Species{" +
-				"treeFamily=" + treeFamily +
+				"treeFamily=" + family +
 				", registryName=" + this.getRegistryName() +
 				", logicKit=" + logicKit +
 				", tapering=" + tapering +

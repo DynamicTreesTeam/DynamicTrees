@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -86,13 +86,13 @@ public interface ITreePart {
 	MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal);
 
 	/**
-	* Get the appropriate {@link TreeFamily} this block is used to build.
+	* Get the appropriate {@link Family} this block is used to build.
 	*
 	* @param blockAccess Readonly access to blocks
 	* @param pos Position
 	* @return DynamicTree
 	*/
-	TreeFamily getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos);
+	Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos);
 
 	/**
 	* A branch requires 2 or more adjacent supporting neighbors at least one of which must be another branch

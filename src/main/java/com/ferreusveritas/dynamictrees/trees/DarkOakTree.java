@@ -18,7 +18,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-import java.util.List;
 import java.util.Random;
 
 import static com.ferreusveritas.dynamictrees.systems.genfeatures.BiomePredicateGenFeature.BIOME_PREDICATE;
@@ -30,8 +29,8 @@ public class DarkOakTree extends VanillaTreeFamily {
 	
 	public class DarkOakSpecies extends Species {
 
-		DarkOakSpecies(TreeFamily treeFamily) {
-			super(treeFamily.getRegistryName(), treeFamily);
+		DarkOakSpecies(Family family) {
+			super(family.getRegistryName(), family);
 			
 			//Dark Oak Trees are tall, slowly growing, thick trees
 			setBasicGrowingParameters(0.30f, 18.0f, 4, 6, 0.8f);

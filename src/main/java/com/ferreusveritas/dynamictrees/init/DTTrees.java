@@ -2,24 +2,21 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.*;
-
-import java.util.ArrayList;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
@@ -35,7 +32,7 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void registerTrees(final TreeFamilyRegistryEvent event) {
-		event.getRegistry().register(TreeFamily.NULL_FAMILY);
+		event.getRegistry().register(Family.NULL_FAMILY);
 	}
 
 	@SubscribeEvent
@@ -44,7 +41,7 @@ public class DTTrees {
 
 		registry.register(Species.NULL_SPECIES.setRegistryName(NULL));
 
-		TreeFamily.REGISTRY.forEach(family -> family.registerSpecies(registry));
+		Family.REGISTRY.forEach(family -> family.registerSpecies(registry));
 
 		// Registers fake species for generating mushrooms.
 		registry.registerAll(new Mushroom(true), new Mushroom(false));
@@ -64,16 +61,17 @@ public class DTTrees {
 		CellKit.REGISTRY = createRegistry(CellKit.class, CELL_KIT);
 		LeavesProperties.REGISTRY = createRegistry(LeavesProperties.class, LEAVES_PROPERTIES);
 		GrowthLogicKit.REGISTRY = createRegistry(GrowthLogicKit.class, GROWTH_LOGIC_KIT);
-		TreeFamily.REGISTRY = createRegistry(TreeFamily.class, TREE_FAMILY);
+		Family.REGISTRY = createRegistry(Family.class, TREE_FAMILY);
 		Species.REGISTRY = createRegistry(Species.class, SPECIES);
 		GenFeature.REGISTRY = createRegistry(GenFeature.class, GEN_FEATURE);
 
 		// Fire custom registry events.
-		FMLJavaModLoadingContext.get().getModEventBus().post(new CellKitRegistryEvent());
-		FMLJavaModLoadingContext.get().getModEventBus().post(new LeavesPropertiesRegistryEvent());
-		FMLJavaModLoadingContext.get().getModEventBus().post(new TreeFamilyRegistryEvent());
+		ModLoader.get().postEvent(new CellKitRegistryEvent());
+		ModLoader.get().postEvent(new LeavesPropertiesRegistryEvent());
+		ModLoader.get().postEvent(new TreeFamilyRegistryEvent());
 
 		DTResourceRegistries.setupTreesResourceManager();
+		JsonObjectGetters.registerRegistryEntryGetters();
 		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
 	}
 
@@ -107,9 +105,9 @@ public class DTTrees {
 		}
 	}
 
-	public static final class TreeFamilyRegistryEvent extends CustomRegistryEvent<TreeFamily> {
+	public static final class TreeFamilyRegistryEvent extends CustomRegistryEvent<Family> {
 		public TreeFamilyRegistryEvent() {
-			super(TreeFamily.REGISTRY);
+			super(Family.REGISTRY);
 		}
 	}
 

@@ -15,8 +15,8 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.StateNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -53,7 +53,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
-	private TreeFamily tree = TreeFamily.NULL_FAMILY; // The tree this branch type creates
+	private Family tree = Family.NULL_FAMILY; // The tree this branch type creates
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
 	
@@ -75,16 +75,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// TREE INFORMATION
 	///////////////////////////////////////////
 	
-	public void setFamily(TreeFamily tree) {
+	public void setFamily(Family tree) {
 		this.tree = tree;
 	}
 	
-	public TreeFamily getFamily() {
+	public Family getFamily() {
 		return tree;
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState state, IBlockReader blockAccess, BlockPos pos) {
+	public Family getFamily(BlockState state, IBlockReader blockAccess, BlockPos pos) {
 		return getFamily();
 	}
 	
@@ -325,7 +325,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does not have a leaves block in it because it was a branch
 			}
 			
-			TreeFamily family = species.getFamily();
+			Family family = species.getFamily();
 			BranchBlock familyBranch = family.getDynamicBranch();
 			int primaryThickness = (int) family.getPrimaryThickness();
 			

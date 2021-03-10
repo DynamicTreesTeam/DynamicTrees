@@ -46,7 +46,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
     }
 
     @Override
-    public void registerAppliers(final String applierRegistryName) {
+    public void registerAppliers(final String applierListIdentifier) {
         this.environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
 
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
@@ -95,18 +95,16 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                     return PropertyApplierResult.SUCCESS;
                 });
 
-        super.registerAppliers(applierRegistryName);
+        super.registerAppliers(applierListIdentifier);
     }
 
     @Override
     protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
-        preparedObject.forEach((resourceLocation, jsonElement) -> {
-            LOGGER.debug("Attempting to load species data for {}.", resourceLocation);
-
+        preparedObject.forEach((registryName, jsonElement) -> {
             final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
 
             if (!jsonObjectFetchResult.wasSuccessful()) {
-                LOGGER.warn("Skipping loading data for species '{}' due to error: {}", resourceLocation, jsonObjectFetchResult.getErrorMessage());
+                LOGGER.warn("Skipping loading data for species '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());
                 return;
             }
 
@@ -114,15 +112,15 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             final Species species;
 
             if (firstLoad) {
-                if (Species.REGISTRY.containsKey(resourceLocation)) {
-                    LOGGER.warn("Skipping loading species '{}' due to it already being registered.", resourceLocation);
+                if (Species.REGISTRY.containsKey(registryName)) {
+                    LOGGER.warn("Skipping loading species '{}' due to it already being registered.", registryName);
                     return;
                 }
 
                 SpeciesType<Species> speciesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, TreeSpecies.CLASS,
-                        "Error loading species type for species '" + resourceLocation + "' (defaulting to tree species) :", false);
-                final TreeFamily family = JsonHelper.getFromObjectOrWarn(jsonObject, FAMILY, TreeFamily.class,
-                        "Skipping loading tree family for species '" + resourceLocation + "' due to error:", true);
+                        "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
+                final Family family = JsonHelper.getFromObjectOrWarn(jsonObject, FAMILY, Family.class,
+                        "Skipping loading tree family for species '" + registryName + "' due to error:", true);
 
                 // If the family was not set we skip loading the species.
                 if (family == null)
@@ -133,15 +131,15 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                     speciesType = TreeSpecies.TREE_SPECIES;
 
                 // Construct the species class from initial setup properties.
-                species = speciesType.construct(resourceLocation, family);
+                species = speciesType.construct(registryName, family);
 
                 // Apply load appliers for things like generating seeds and saplings.
                 jsonObject.entrySet().forEach(entry -> readEntry(this.loadAppliers, species, entry.getKey(), entry.getValue()));
             } else {
-                species = Species.REGISTRY.getValue(resourceLocation);
+                species = Species.REGISTRY.getValue(registryName);
 
                 if (species == null || !species.isValid()) {
-                    LOGGER.warn("Skipping loading data for species '{}' due to it not being registered.", resourceLocation);
+                    LOGGER.warn("Skipping loading data for species '{}' due to it not being registered.", registryName);
                     return;
                 }
 
@@ -155,13 +153,15 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             // Apply universal appliers for both load and reload.
             jsonObject.entrySet().forEach(entry -> readEntry(this.appliers, species, entry.getKey(), entry.getValue()));
 
-            // If no acceptable soils were set, default to DIRT_LIKE.
+            // If no acceptable soils were set, default to the Species' standard soils.
             if (!species.hasAcceptableSoil())
-                species.addAcceptableSoils(DirtHelper.DIRT_LIKE);
+                species.setStandardSoils();
 
             if (firstLoad) {
                 Species.REGISTRY.register(species);
-                LOGGER.debug("Successfully registered species '{}' with data: {}", resourceLocation, species.getDisplayInfo());
+                LOGGER.debug("Successfully registered species '{}' with data: {}", registryName, species.getDisplayInfo());
+            } else {
+                LOGGER.debug("Loaded data for species '{}': {}.", registryName, species.getDisplayInfo());
             }
         });
 

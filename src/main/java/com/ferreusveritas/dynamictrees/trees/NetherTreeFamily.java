@@ -28,8 +28,8 @@ import java.util.Optional;
 public class NetherTreeFamily extends VanillaTreeFamily {
 
     public static class BaseNetherFungiSpecies extends Species{
-        BaseNetherFungiSpecies(ResourceLocation name, TreeFamily treeFamily) {
-            super(name, treeFamily);
+        BaseNetherFungiSpecies(ResourceLocation name, Family family) {
+            super(name, family);
 
             setBasicGrowingParameters(0f, 14.0f, 0, 4, 1f);
 
@@ -66,8 +66,8 @@ public class NetherTreeFamily extends VanillaTreeFamily {
     }
 
     public class MegaNetherFungiSpecies extends BaseNetherFungiSpecies {
-        MegaNetherFungiSpecies(ResourceLocation name, TreeFamily treeFamily) {
-            super(name, treeFamily);
+        MegaNetherFungiSpecies(ResourceLocation name, Family family) {
+            super(name, family);
 
             setBasicGrowingParameters(0f, 25.0f, 7, 20, 0.9f);
 

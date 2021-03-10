@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -113,7 +113,7 @@ public class CoordUtils {
 	 * Find a suitable position for seed drops or fruit placement using ray tracing.
 	 * 
 	 * @param world The world
-	 * @param treePos The block position of the {@link TreeFamily} trunk base.
+	 * @param treePos The block position of the {@link Family} trunk base.
 	 * @param branchPos The {@link BlockPos} of a {@link BranchBlock} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is BlockPos.ZERO
 	 */
