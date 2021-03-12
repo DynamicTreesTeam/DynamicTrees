@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.datapacks;
+package com.ferreusveritas.dynamictrees.api.treepacks;
 
 /**
  * An implementation of {@link IPropertyApplier} that assumes the application was

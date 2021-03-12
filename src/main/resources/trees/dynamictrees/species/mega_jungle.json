@@ -17,7 +17,7 @@
     },
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
-    "perfect_biomes": { "type": "forest" },
+    "perfect_biomes": { "type": "jungle" },
     "features" : [
         {
             "name": "dynamictrees:vines",

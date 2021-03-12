@@ -22,7 +22,7 @@ public class VanillaSaplingEventHandler {
 	public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
 		final BlockState state = event.getPlacedBlock();
 
-		LogManager.getLogger().debug(Species.REGISTRY.getValue(new ResourceLocation(DynamicTrees.MOD_ID, "spruce")).getDisplayInfo());
+		LogManager.getLogger().debug(Species.REGISTRY.get(new ResourceLocation(DynamicTrees.MOD_ID, "spruce")).getDisplayInfo());
 
 		if (!(event.getWorld() instanceof World) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state))
 			return;

@@ -6,8 +6,8 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,12 +31,11 @@ public class TreeRegistry {
 	//////////////////////////////
 
 	public static Species findSpecies(final String name) {
-		return findSpecies(new ResourceLocation(name));
+		return findSpecies(getResLoc(name));
 	}
 
 	public static Species findSpecies(final ResourceLocation name) {
-		final Species species = Species.REGISTRY.getValue(name);
-		return species == null ? Species.NULL_SPECIES : species;
+		return Species.REGISTRY.get(name);
 	}
 
 	/**
@@ -48,13 +47,10 @@ public class TreeRegistry {
 	 */
 	public static Species findSpeciesSloppy(final String name) {
 
-		ResourceLocation resourceLocation = new ResourceLocation(name);
-		if (DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {//Minecraft(Mojang) isn't likely to have registered any Dynamic Tree species.
-			resourceLocation = DynamicTrees.resLoc(resourceLocation.getPath());//Search DynamicTrees Domain instead
-		}
+		final ResourceLocation resourceLocation = getResLoc(name);
 
 		//Search specific domain first
-		if (Species.REGISTRY.containsKey(resourceLocation)) {
+		if (Species.REGISTRY.has(resourceLocation)) {
 			return findSpecies(resourceLocation);
 		}
 
@@ -69,7 +65,7 @@ public class TreeRegistry {
 	}
 
 	public static List<ResourceLocation> getSpeciesDirectory() {
-		return new ArrayList<>(Species.REGISTRY.getKeys());
+		return new ArrayList<>(Species.REGISTRY.getRegistryNames());
 	}
 
 	/**
@@ -96,7 +92,7 @@ public class TreeRegistry {
 	public static List<Species> getPotionTransformableSpecies () {
 		final List<Species> speciesList = getTransformableSpecies();
 		speciesList.removeIf(species -> {
-			Family family = species.getFamily();
+			final Family family = species.getFamily();
 
 			// Remove the species if it doesn't have seeds, or if it's not the common species and its seed is the same as the common species'.
 			return !species.hasSeed() || (species != family.getCommonSpecies() && species.getSeed() == family.getCommonSpecies().getSeed());
@@ -119,7 +115,7 @@ public class TreeRegistry {
 	// DROP HANDLING
 	//////////////////////////////
 
-	public static final ResourceLocation globalName = DynamicTrees.resLoc("global");
+	public static final ResourceLocation GLOBAL = DynamicTrees.resLoc("global");
 
 	/**
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
@@ -128,7 +124,7 @@ public class TreeRegistry {
 	 * @param dropCreator The {@link IDropCreator} to register.
 	 */
 	public static boolean registerDropCreator(@Nullable final ResourceLocation speciesName, final IDropCreator dropCreator) {
-		if(speciesName == null || speciesName.equals(globalName)) {
+		if (speciesName == null || speciesName.equals(GLOBAL)) {
 			return GLOBAL_DROP_CREATOR_STORAGE.addDropCreator(dropCreator);
 		} else {
 			return findSpecies(speciesName).addDropCreator(dropCreator);
@@ -136,11 +132,11 @@ public class TreeRegistry {
 	}
 
 	public static boolean registerGlobalDropCreator(final IDropCreator dropCreator){
-		return registerDropCreator(globalName, dropCreator);
+		return registerDropCreator(GLOBAL, dropCreator);
 	}
 
-	public static boolean removeDropCreator(@Nullable final ResourceLocation speciesName, ResourceLocation dropCreatorName) {
-		if(speciesName == null || speciesName.equals(globalName)) {
+	public static boolean removeDropCreator(@Nullable final ResourceLocation speciesName, final ResourceLocation dropCreatorName) {
+		if (speciesName == null || speciesName.equals(GLOBAL)) {
 			return GLOBAL_DROP_CREATOR_STORAGE.remDropCreator(dropCreatorName);
 		} else {
 			return findSpecies(speciesName).remDropCreator(dropCreatorName);
@@ -148,47 +144,56 @@ public class TreeRegistry {
 	}
 
 	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
-		Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<>();
-		dir.put(globalName, GLOBAL_DROP_CREATOR_STORAGE.getDropCreators());
+		final Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<>();
+		dir.put(GLOBAL, GLOBAL_DROP_CREATOR_STORAGE.getDropCreators());
 		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
 		return dir;
 	}
 
 	//////////////////////////////
-	// CELLKIT HANDLING
+	// CELL KIT HANDLING
 	//////////////////////////////
+
+	@Nullable
+	public static CellKit findCellKit(String name) {
+		return findCellKit(getResLoc(name));
+	}
 
 	@Nullable
 	public static CellKit findCellKit(ResourceLocation name) {
 		return CellKit.REGISTRY.getValue(name);
 	}
 
+	//////////////////////////////
+	// GROWTH LOGIC KIT HANDLING
+	//////////////////////////////
+
 	@Nullable
-	public static CellKit findCellKit(String name) {
-		ResourceLocation kitLocation = new ResourceLocation(name);
-		if (DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) { // Minecraft doesn't register cell kits.
-			kitLocation = DynamicTrees.resLoc(kitLocation.getPath()); // Default to "dynamictrees" instead.
-		}
-		return findCellKit(kitLocation);
+	public static GrowthLogicKit findGrowthLogicKit(String name) {
+		return findGrowthLogicKit(getResLoc(name));
 	}
 
-	//////////////////////////////
-	// GROWTHLOGICKIT HANDLING
-	//////////////////////////////
-
-	@Deprecated
 	@Nullable
 	public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
 		return GrowthLogicKit.REGISTRY.getValue(name);
 	}
 
-	@Nullable
-	public static GrowthLogicKit findGrowthLogicKit(String name) {
-		ResourceLocation kitLocation = new ResourceLocation(name);
-		if (DynamicTrees.MINECRAFT.equals(kitLocation.getNamespace())) { // Minecraft doesn't register growth logic kits.
-			kitLocation = DynamicTrees.resLoc(kitLocation.getPath()); // Default to "dynamictrees" instead.
+	public static ResourceLocation getResLoc (final String resLocStr) {
+		return processResLoc(new ResourceLocation(resLocStr));
+	}
+
+	/**
+	 * Changes namespace of resource location to "dynamictrees" as a default if it is set to Minecraft.
+	 * This is safe since Minecraft won't (or shouldn't) have used any of our registries.
+	 *
+	 * @param resourceLocation The {@link ResourceLocation} to process.
+	 * @return The {@link ResourceLocation} object.
+	 */
+	private static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
+		if (DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {
+			return DynamicTrees.resLoc(resourceLocation.getPath());
 		}
-		return findGrowthLogicKit(kitLocation);
+		return resourceLocation;
 	}
 
 }

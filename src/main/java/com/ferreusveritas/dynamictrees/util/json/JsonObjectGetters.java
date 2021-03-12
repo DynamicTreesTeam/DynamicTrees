@@ -168,14 +168,16 @@ public final class JsonObjectGetters {
     public static IJsonObjectGetter<Biome> BIOME_GETTER;
 
     public static IJsonObjectGetter<CellKit> CELL_KIT_GETTER;
-    public static IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER;
     public static IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER;
     public static IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER;
-    public static IJsonObjectGetter<Family> TREE_FAMILY_GETTER;
-    public static IJsonObjectGetter<Species> SPECIES_GETTER;
 
-    public static final IJsonObjectGetter<SpeciesType<Species>> SPECIES_TYPE_GETTER = register(TreeSpecies.CLASS, new SpeciesTypeGetter());
-    public static final IJsonObjectGetter<FamilyType<Family>> FAMILY_TYPE_GETTER = register(TreeFamily.CLASS, new FamilyTypeGetter());
+    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
+    public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY, "family"));
+    public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY, "species"));
+
+    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE_GETTER = register(LeavesProperties.Type.class, new EntryTypeGetter<>(LeavesProperties.REGISTRY));
+    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE_GETTER = register(Family.Type.class, new EntryTypeGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE_GETTER = register(Species.Type.class, new EntryTypeGetter<>(Species.REGISTRY));
 
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 
@@ -216,11 +218,8 @@ public final class JsonObjectGetters {
         BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
 
         CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
-        LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new ForgeRegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
         GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
         GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
-        TREE_FAMILY_GETTER = register(Family.class, new ForgeRegistryEntryGetter<>(Family.REGISTRY, "tree family"));
-        SPECIES_GETTER = register(Species.class, new ForgeRegistryEntryGetter<>(Species.REGISTRY, "species"));
     }
 
 }

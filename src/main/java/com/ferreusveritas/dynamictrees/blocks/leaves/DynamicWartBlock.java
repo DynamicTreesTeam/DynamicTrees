@@ -6,6 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -15,12 +16,8 @@ import net.minecraft.world.server.ServerWorld;
 
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
-    public DynamicWartBlock (LeavesProperties leavesProperties){
-        super(leavesProperties);
-    }
-
-    public DynamicWartBlock() {
-        super(Properties.create(Material.PLANTS, MaterialColor.RED).sound(SoundType.WART).tickRandomly());
+    public DynamicWartBlock (final LeavesProperties leavesProperties, final Properties properties) {
+        super(leavesProperties.getRegistryName() + "_wart", leavesProperties, properties);
     }
 
     @Override
@@ -38,5 +35,10 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) { }
+
+    @Override
+    protected boolean shouldDropForPlayer(PlayerEntity player) {
+        return true;
+    }
 
 }

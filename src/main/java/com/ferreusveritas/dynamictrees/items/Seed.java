@@ -34,7 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 
-
+// TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item implements IPlantable {
 	
 	private final Species species;//The tree this seed creates

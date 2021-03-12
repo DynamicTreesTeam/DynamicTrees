@@ -100,7 +100,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public void grow(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		if(canBlockStay(world, pos, state)) {
+		if (canBlockStay(world, pos, state)) {
 			if (getSpecies().canSaplingGrow(world, pos)){
 				getSpecies().transitionToTree(world, pos);
 			}

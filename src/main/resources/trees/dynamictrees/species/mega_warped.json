@@ -1,4 +1,5 @@
 {
+    "type": "dynamictrees:fungus",
     "family": "dynamictrees:warped",
     "tapering": 0,
     "signal_energy": 25.0,
@@ -6,7 +7,7 @@
     "lowest_branch_height": 20,
     "growth_rate": 0.9,
     "soil_longevity": 16,
-    "max_branch_radius": 24,
+    "max_branch_radius": 20,
     "leaves_properties": "dynamictrees:warped",
     "environment_factors" : {
         "cold": 0.25,

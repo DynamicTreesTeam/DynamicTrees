@@ -192,7 +192,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
 		Family thisTree = getFamily();
 		
-		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+		if (leavesProperties.getFamily() == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);

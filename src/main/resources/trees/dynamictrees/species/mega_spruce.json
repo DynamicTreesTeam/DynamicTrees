@@ -5,6 +5,7 @@
     "up_probability": 7,
     "lowest_branch_height": 5,
     "growth_rate": 0.9,
+    "soil_longevity": 16,
     "max_branch_radius": 24,
     "growth_logic_kit": "dynamictrees:mega_conifer",
     "leaves_properties": "dynamictrees:spruce",

@@ -1,6 +1,5 @@
 {
     "family": "dynamictrees:jungle",
-    "common": true,
     "tapering": 0.2,
     "signal_energy": 28.0,
     "up_probability": 3,

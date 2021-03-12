@@ -1,15 +1,10 @@
 {
     "common_leaves": "dynamictrees:jungle",
+    "common_species": "dynamictrees:jungle",
     "primitive_log": "minecraft:jungle_log",
     "primitive_stripped_log": "minecraft:stripped_jungle_log",
     "stick": "minecraft:stick",
     "max_branch_radius": 24,
     "generate_surface_root": true,
-    "species": [
-        {
-            "name": "dynamictrees:jungle",
-            "common": true
-        },
-        "dynamictrees:mega_jungle"
-    ]
+    "can_support_cocoa": true
 }

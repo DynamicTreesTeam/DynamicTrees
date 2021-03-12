@@ -15,6 +15,8 @@ import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.util.Registry;
+import com.ferreusveritas.dynamictrees.util.RegistryEntry;
 import com.google.common.collect.Sets;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -32,11 +34,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ import java.util.stream.Collectors;
 *
 * @author ferreusveritas
 */
-public class Family extends ForgeRegistryEntry<Family> {
+public class Family extends RegistryEntry<Family> {
 	
 	public final static Family NULL_FAMILY = new Family() {
 		@Override public void setupCommonSpecies(Species species) {}
@@ -66,16 +65,20 @@ public class Family extends ForgeRegistryEntry<Family> {
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
 		@Override public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) { return Species.NULL_SPECIES; }
+		@Override public void addConnectableVanillaLeaves(IConnectable connectable) {}
 	};
 
 	/**
-	 * The registry. This is used for registering and querying {@link Family} objects.
-	 *
-	 * <p>Add-ons should use {@link DTTrees.TreeFamilyRegistryEvent}, <b>not</b> Forge's registry event.</p>
+	 * Central registry for all {@link Family} objects.
 	 */
-	public static IForgeRegistry<Family> REGISTRY;
+	public static final Registry<Family, Type> REGISTRY = new Registry<>(Family.class, new Type(), NULL_FAMILY);
 
-	@Nonnull
+	public static class Type extends Registry.EntryType<Family> {
+		public Family construct (final ResourceLocation registryName) {
+			return new Family(registryName);
+		}
+	}
+
 	protected Species commonSpecies = Species.NULL_SPECIES;
 
 	protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
@@ -93,9 +96,6 @@ public class Family extends ForgeRegistryEntry<Family> {
 	private Block primitiveLog = Blocks.AIR;
 	/** The primitive stripped log to base the texture, drops, and other behavior from */
 	private Block primitiveStrippedLog = Blocks.AIR;
-
-	private ResourceLocation primitiveLogRegName;
-	private ResourceLocation primitiveStrippedLogRegName;
 
 	/** A list of branches the tree accepts as its own. Used for the falling tree renderer */
 	private final List<BranchBlock> validBranches = new LinkedList<>();
@@ -117,8 +117,6 @@ public class Family extends ForgeRegistryEntry<Family> {
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 
-	private ResourceLocation stickRegName;
-
 	@OnlyIn(Dist.CLIENT)
 	public int woodRingColor; // For rooty blocks
 	@OnlyIn(Dist.CLIENT)
@@ -138,8 +136,6 @@ public class Family extends ForgeRegistryEntry<Family> {
 	 */
 	public Family(ResourceLocation name) {
 		this.setRegistryName(name);
-
-		stick = Items.STICK;
 	}
 
 	public void setupBlocks() {
@@ -164,13 +160,13 @@ public class Family extends ForgeRegistryEntry<Family> {
 		return Sets.newHashSet();
 	}
 
-	public void registerSpecies(IForgeRegistry<Species> speciesRegistry) {
-		speciesRegistry.registerAll(this.species.toArray(new Species[0]));
-	}
-
 	public ResourceLocation getCommonSpeciesName() {
 		final ResourceLocation registryName = this.getRegistryName();
 		return registryName == null ? DTTrees.NULL : registryName;
+	}
+
+	public void setCommonSpecies(final Species species) {
+		this.commonSpecies = species;
 	}
 
 	public void setupCommonSpecies(final Species species) {
@@ -309,7 +305,7 @@ public class Family extends ForgeRegistryEntry<Family> {
 
 		// Prioritise the common species' blocks.
 		this.getCommonSpecies().getSapling().ifPresent(blockList::add);
-		this.getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
+//		this.getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
 
 		this.getSpecies().forEach(species -> {
 			if (species.isCommonSpecies())
@@ -426,7 +422,7 @@ public class Family extends ForgeRegistryEntry<Family> {
 	 * Used to set the type of stick that a tree drops when there's not enough wood volume for a log.
 	 *
 	 * @param item An itemstack of the stick
-	 * @return TreeFamily for chaining calls
+	 * @return {@link Family} for chaining calls
 	 */
 	protected Family setStick(Item item) {
 		stick = item;
@@ -440,11 +436,11 @@ public class Family extends ForgeRegistryEntry<Family> {
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		return new ItemStack(stick, MathHelper.clamp(qty, 0, 64));
+		return this.stick == null ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
 	}
 
-	public void setStickRegName(ResourceLocation stickRegName) {
-		this.stickRegName = stickRegName;
+	public void setCanSupportCocoa(boolean canSupportCocoa) {
+		this.canSupportCocoa = canSupportCocoa;
 	}
 
 	/**
@@ -454,7 +450,7 @@ public class Family extends ForgeRegistryEntry<Family> {
 	 *
 	 * @param primitiveLog A block object that is the log
 	 * @param primitiveLog An itemStack of the log item
-	 * @return TreeFamily for chaining calls
+	 * @return {@link Family} for chaining calls
 	 */
 	protected Family setPrimitiveLog(Block primitiveLog) {
 		this.primitiveLog = primitiveLog;
@@ -487,14 +483,6 @@ public class Family extends ForgeRegistryEntry<Family> {
 
 	public Block getPrimitiveStrippedLog() {
 		return primitiveStrippedLog;
-	}
-
-	public void setPrimitiveLogRegName(ResourceLocation primitiveLogRegName) {
-		this.primitiveLogRegName = primitiveLogRegName;
-	}
-
-	public void setPrimitiveStrippedLogRegName(ResourceLocation primitiveStrippedLogRegName) {
-		this.primitiveStrippedLogRegName = primitiveStrippedLogRegName;
 	}
 
 	private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
@@ -629,6 +617,10 @@ public class Family extends ForgeRegistryEntry<Family> {
 		this.vanillaConnectables.add(connectable);
 	}
 
+	public void removeConnectableVanillaLeaves(IConnectable connectable) {
+		this.vanillaConnectables.remove(connectable);
+	}
+
 	public boolean isCompatibleVanillaLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 
 		Block block = blockState.getBlock();
@@ -654,21 +646,20 @@ public class Family extends ForgeRegistryEntry<Family> {
 
 	public void setCommonLeaves (LeavesProperties properties) {
 		this.commonLeaves = properties;
-		properties.setTree(this);
+		properties.setFamily(this);
 	}
 
 	//////////////////////////////
 	// JAVA OBJECT STUFF
 	//////////////////////////////
 
-
 	@Override
 	public String toString() {
-		return "TreeFamily{registryName=" + this.getRegistryName() + "}";
+		return "Family{registryName=" + this.getRegistryName() + "}";
 	}
 
 	public String getDisplayString() {
-		return "TreeFamily{" +
+		return "Family{" +
 				"commonSpecies=" + commonSpecies +
 				", commonLeaves=" + commonLeaves +
 				", dynamicBranch=" + dynamicBranch +

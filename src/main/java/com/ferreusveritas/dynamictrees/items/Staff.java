@@ -283,7 +283,7 @@ public class Staff extends Item {
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
 		tooltip.add(new StringTextComponent("Tree: " + (species.isValid() ? species : "none")));
-		tooltip.add(new StringTextComponent("Code: ").append(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
+		tooltip.add(new StringTextComponent("Code: ").appendSibling(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
 	}
 
 	/**

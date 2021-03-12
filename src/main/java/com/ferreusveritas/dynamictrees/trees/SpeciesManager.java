@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.datapacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.datapacks.JsonPropertyApplier;
-import com.ferreusveritas.dynamictrees.api.datapacks.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
+import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
@@ -24,6 +25,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,7 +38,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
     /** A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on biome type). */
     private JsonPropertyApplierList<Species> environmentFactorAppliers;
 
-//    private Map<Species, ResourceLocation> megaSpeciesCache = new HashMap<>();
+    private Map<Species, ResourceLocation> megaSpeciesCache;
 
     public static final String TYPE = "type";
     public static final String FAMILY = "family";
@@ -48,6 +50,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
     @Override
     public void registerAppliers(final String applierListIdentifier) {
         this.environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
+        this.megaSpeciesCache = new HashMap<>();
 
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
@@ -61,9 +64,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             return ObjectFetchResult.success((world, pos) -> biomePredicateFetchResult.getValue().test(world.getBiome(pos)));
         });
 
-        // TODO: Make common species set in family Json.
-        this.loadAppliers.registerIfTrueApplier("common", species -> species.getFamily().setupCommonSpecies(species))
-                .registerIfTrueApplier("generate_seed", Species::generateSeed)
+        this.loadAppliers.registerIfTrueApplier("generate_seed", Species::generateSeed)
                 .registerIfTrueApplier("generate_sapling", Species::generateSapling);
 
         this.reloadAppliers.register("tapering", Float.class, Species::setTapering)
@@ -80,7 +81,9 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                         jsonObject.entrySet().forEach(entry -> readEntry(environmentFactorAppliers, species, entry.getKey(), entry.getValue())))
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
-                .register("mega_species", Species.class, Species::setMegaSpecies)
+                .register("mega_species", ResourceLocation.class, (species, registryName) -> {
+                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + registryName + "' was not found.")));
+                })
                 .register("seed", Seed.class, Species::setSeed)
                 .register("primitive_sapling", Block.class, Species::setPrimitiveSapling)
                 .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
@@ -100,6 +103,8 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
     @Override
     protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
+        Species.REGISTRY.unlock(); // Ensure registry is unlocked.
+
         preparedObject.forEach((registryName, jsonElement) -> {
             final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
 
@@ -110,14 +115,10 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
             final JsonObject jsonObject = jsonObjectFetchResult.getValue();
             final Species species;
+            final boolean newRegistry = !Species.REGISTRY.has(registryName);
 
-            if (firstLoad) {
-                if (Species.REGISTRY.containsKey(registryName)) {
-                    LOGGER.warn("Skipping loading species '{}' due to it already being registered.", registryName);
-                    return;
-                }
-
-                SpeciesType<Species> speciesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, TreeSpecies.CLASS,
+            if (newRegistry) {
+                Species.Type speciesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Species.Type.class,
                         "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
                 final Family family = JsonHelper.getFromObjectOrWarn(jsonObject, FAMILY, Family.class,
                         "Skipping loading tree family for species '" + registryName + "' due to error:", true);
@@ -128,24 +129,25 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
                 // Default to tree species if it wasn't set or couldn't be found.
                 if (speciesType == null)
-                    speciesType = TreeSpecies.TREE_SPECIES;
+                    speciesType = Species.REGISTRY.getDefaultType();
 
                 // Construct the species class from initial setup properties.
                 species = speciesType.construct(registryName, family);
 
-                // Apply load appliers for things like generating seeds and saplings.
-                jsonObject.entrySet().forEach(entry -> readEntry(this.loadAppliers, species, entry.getKey(), entry.getValue()));
-            } else {
-                species = Species.REGISTRY.getValue(registryName);
-
-                if (species == null || !species.isValid()) {
-                    LOGGER.warn("Skipping loading data for species '{}' due to it not being registered.", registryName);
-                    return;
+                if (firstLoad) {
+                    // Apply load appliers for things like generating seeds and saplings.
+                    jsonObject.entrySet().forEach(entry -> readEntry(this.loadAppliers, species, entry.getKey(), entry.getValue()));
                 }
+            } else {
+                species = Species.REGISTRY.get(registryName);
 
+                species.resetEnvFactors();
                 species.clearGenFeatures();
+                species.clearAcceptableGrowthBlocks();
                 species.clearAcceptableSoils();
+            }
 
+            if (!firstLoad) {
                 // Apply reload appliers.
                 jsonObject.entrySet().forEach(entry -> readEntry(this.reloadAppliers, species, entry.getKey(), entry.getValue()));
             }
@@ -157,7 +159,11 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             if (!species.hasAcceptableSoil())
                 species.setStandardSoils();
 
-            if (firstLoad) {
+            // If no gen features were set, default to the Species' defaults.
+            if (!species.areAnyGenFeatures())
+                species.setDefaultGenFeatures();
+
+            if (newRegistry) {
                 Species.REGISTRY.register(species);
                 LOGGER.debug("Successfully registered species '{}' with data: {}", registryName, species.getDisplayInfo());
             } else {
@@ -165,18 +171,22 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             }
         });
 
-        // The below is code for once our own registries are made.
+        if (firstLoad)
+            return;
 
-//        // Once all species are loaded, apply mega species.
-//        this.megaSpeciesCache.forEach((species, megaSpeciesRegName) -> {
-//            final Species megaSpecies = Species.REGISTRY.getValue(megaSpeciesRegName);
-//
-//            if (megaSpecies == null)
-//                LOGGER.warn("Could not find species '{}' to apply as mega species for '{}'.", megaSpeciesRegName, species.getRegistryName());
-//            else species.setMegaSpecies(megaSpecies);
-//        });
-//
-//        this.megaSpeciesCache.clear();
+        // Lock registry (don't lock on first load as registry events are fired after).
+        Species.REGISTRY.lock();
+
+        // Once all species are loaded, apply mega species.
+        this.megaSpeciesCache.forEach((species, megaSpeciesRegName) -> {
+            final Species megaSpecies = Species.REGISTRY.get(megaSpeciesRegName);
+
+            if (!megaSpecies.isValid())
+                LOGGER.warn("Could not find species '{}' to apply as mega species for '{}'.", megaSpeciesRegName, species.getRegistryName());
+            else species.setMegaSpecies(megaSpecies);
+        });
+
+        this.megaSpeciesCache.clear();
     }
 
     private static void readEntry (final JsonPropertyApplierList<Species> propertyAppliers, final Species species, final String key, final JsonElement jsonElement) {

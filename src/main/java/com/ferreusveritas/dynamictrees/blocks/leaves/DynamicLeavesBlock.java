@@ -34,6 +34,7 @@ import net.minecraft.loot.LootParameters;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -53,6 +54,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
 public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
@@ -61,17 +63,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
 
-	private static final Properties DEFAULT_PROPERTIES = AbstractBlock.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F)
-			.tickRandomly().sound(SoundType.PLANT).notSolid().setAllowsSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
-			.setSuffocates((s, r, p) -> false).setBlocksVision((s, r, p) -> false);
-
-	public DynamicLeavesBlock() {
-		this(DEFAULT_PROPERTIES);
+	public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties blockProperties) {
+		this(leavesProperties.getRegistryName() + "_leaves", leavesProperties, blockProperties);
 	}
 
-	public DynamicLeavesBlock(LeavesProperties leavesProperties) {
-		this(DEFAULT_PROPERTIES);
-		setProperties(leavesProperties);
+	public DynamicLeavesBlock(final String registryName, final LeavesProperties leavesProperties, final Properties properties) {
+		this(properties);
+		this.setProperties(leavesProperties);
+		this.setRegistryName(registryName);
 		leavesProperties.setDynamicLeavesState(getDefaultState());
 	}
 
@@ -100,7 +99,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return getProperties(blockState).getTree();
+		return getProperties(blockState).getFamily();
 	}
 	
 	// Get Leaves-specific flammability
@@ -542,18 +541,22 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		return ret;
 	}
 
+	protected boolean shouldDropForPlayer(final PlayerEntity player) {
+		return player.getHeldItemMainhand().getItem() instanceof ShearsItem;
+	}
+
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ArrayList<ItemStack> ret = new ArrayList<>();
 		Entity entity = builder.get(LootParameters.THIS_ENTITY);
 		PlayerEntity player = entity instanceof PlayerEntity? (PlayerEntity)entity : null;
 		int fortuneLevel = 0;
-		final Vector3d builderPos = builder.get(LootParameters.field_237457_g_);
+		final Vector3d builderPos = builder.get(LootParameters.ORIGIN);
 		final BlockPos builderBlockPos = new BlockPos(builderPos.getX(), builderPos.getY(), builderPos.getZ());
 		if (player != null){
 			ItemStack handStack = player.getHeldItemMainhand();
 			fortuneLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, handStack);
-			if (player.getHeldItemMainhand().getItem() instanceof ShearsItem){
+			if (this.shouldDropForPlayer(player)) {
 				return onSheared(player, player.getHeldItemMainhand(), builder.getWorld(), builderBlockPos, fortuneLevel);
 			}
 		}
@@ -579,7 +582,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 				BlockState state = access.getBlockState(dPos);
 				if(TreeHelper.isBranch(state)) {
 					BranchBlock branch = TreeHelper.getBranch(state);
-					if(branch.getFamily() == leavesProperties.getTree() && branch.getRadius(state) == 1) {
+					if(branch.getFamily() == leavesProperties.getFamily() && branch.getRadius(state) == 1) {
 						branchList.add(dPos);
 					}
 				}

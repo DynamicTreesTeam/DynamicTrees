@@ -1,17 +1,19 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import com.ferreusveritas.dynamictrees.util.Registry;
+import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -26,7 +28,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -44,11 +46,11 @@ import java.util.Random;
  * 
  * @author ferreusveritas
  */
-public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 	
-	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
-		@Override public LeavesProperties setTree(Family tree) { return this; }
-		@Override public Family getTree() { return Family.NULL_FAMILY; }
+	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties(DynamicTrees.resLoc("null")) {
+		@Override public LeavesProperties setFamily(Family family) { return this; }
+		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
 		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemStack.EMPTY; }
 		@Override public LeavesProperties setDynamicLeavesState(BlockState state) { return this; }
@@ -63,11 +65,15 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	};
 
 	/**
-	 * The registry. This is used for registering and querying {@link LeavesProperties} objects.
-	 *
-	 * <p>Add-ons should use {@link DTTrees.LeavesPropertiesRegistryEvent}, <b>not</b> Forge's registry event.</p>
+	 * Central registry for all {@link LeavesProperties} objects.
 	 */
-	public static IForgeRegistry<LeavesProperties> REGISTRY;
+	public static final Registry<LeavesProperties, Type> REGISTRY = new Registry<>(LeavesProperties.class, new Type(), NULL_PROPERTIES);
+
+	public static class Type extends Registry.EntryType<LeavesProperties> {
+		public LeavesProperties construct(final ResourceLocation registryName) {
+			return new LeavesProperties(registryName);
+		}
+	}
 
 	protected static final int maxHydro = 4;
 
@@ -76,10 +82,13 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	/** The primitive (vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	protected BlockState primitiveLeaves;
 
+	protected Family.IConnectable primitiveLeavesConnectable;
+
 	/** The {@link CellKit}, which is for leaves automata. */
 	protected CellKit cellKit;
 
-	protected Family tree = Family.NULL_FAMILY;
+	protected Family family = Family.NULL_FAMILY;
+	protected DynamicLeavesBlock dynamicLeavesBlock;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
@@ -113,29 +122,12 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 		return primitiveLeaves;
 	}
 
-	public void setPrimitiveLeaves(Block primitiveLeaves) {
-		this.primitiveLeaves = primitiveLeaves.getDefaultState();
-	}
-
-	public void onCommonSetup () {
-		final Block primitiveLeaves = this.getOrWarn(this.primitiveLeavesRegName, ForgeRegistries.BLOCKS, "primitive leaves");
-
-		if (primitiveLeaves != null)
+	public void setPrimitiveLeaves(final Block primitiveLeaves) {
+		if (this.primitiveLeaves == null || primitiveLeaves != this.primitiveLeaves.getBlock()) {
 			this.primitiveLeaves = primitiveLeaves.getDefaultState();
-	}
-
-	@Nullable
-	private <V extends IForgeRegistryEntry<V>> V getOrWarn(@Nullable final ResourceLocation registryName, final IForgeRegistry<V> registry, final String fieldName) {
-		if (registryName == null)
-			return null;
-
-		final V objectToSet = registry.getValue(registryName);
-
-		if (objectToSet == null || objectToSet == Items.AIR || objectToSet == Blocks.AIR) {
-			LogManager.getLogger().warn("Could not set {} for leaves properties '{}' from '{}'.", fieldName, this.getRegistryName(), registryName);
+			this.family.removeConnectableVanillaLeaves(this.primitiveLeavesConnectable);
+			this.family.addConnectableVanillaLeaves(state -> state.getBlock() == primitiveLeaves);
 		}
-
-		return objectToSet;
 	}
 
 	public ResourceLocation getPrimitiveLeavesRegName() {
@@ -154,6 +146,19 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	public ItemStack getPrimitiveLeavesItemStack() {
 		return new ItemStack(Item.BLOCK_TO_ITEM.get(getPrimitiveLeaves().getBlock()));
 	}
+
+	public Optional<DynamicLeavesBlock> getDynamicLeavesBlock() {
+		return Optional.ofNullable(this.dynamicLeavesBlock);
+	}
+
+	protected DynamicLeavesBlock createDynamicLeaves (final AbstractBlock.Properties properties) {
+		return new DynamicLeavesBlock(this, properties);
+	}
+
+	public void generateDynamicLeaves (final AbstractBlock.Properties properties) {
+		this.dynamicLeavesBlock = this.createDynamicLeaves(properties);
+		LeavesPaging.addLeavesBlockForModId(this.dynamicLeavesBlock, this.getRegistryName().getNamespace());
+	}
 	
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
 		//Cache all the blockStates to speed up worldgen
@@ -166,7 +171,7 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	}
 	
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[ maxHydro ];
+		return dynamicLeavesBlockHydroStates[maxHydro];
 	}
 	
 	public BlockState getDynamicLeavesState(int hydro) {
@@ -182,20 +187,20 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 	 * Used by the {@link DynamicLeavesBlock} to find out if it can pull hydro from a branch.
 	 *
 	 * @return The {@link Family} for these {@link LeavesProperties}.
-	 * */
-	public Family getTree() {
-		return tree;
+	 */
+	public Family getFamily() {
+		return family;
 	}
 
 	/**
 	 * Sets the type of tree these leaves connect to.
 	 *
-	 * @param tree The {@link Family} object to set.
+	 * @param family The {@link Family} object to set.
 	 * @return This {@link LeavesProperties} object.
 	 */
-	public LeavesProperties setTree(Family tree) {
-		this.tree = tree;
-		if (tree.isFireProof()) {
+	public LeavesProperties setFamily(Family family) {
+		this.family = family;
+		if (family.isFireProof()) {
 			flammability = 0;
 			fireSpreadSpeed = 0;
 		}
@@ -266,6 +271,12 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 		this.connectAnyRadius = connectAnyRadius;
 	}
 
+	public AbstractBlock.Properties getDefaultBlockProperties() {
+		return AbstractBlock.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F)
+				.tickRandomly().sound(SoundType.PLANT).notSolid().setAllowsSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+				.setSuffocates((s, r, p) -> false).setBlocksVision((s, r, p) -> false);
+	}
+
 	/**
 	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update.
 	 *
@@ -326,14 +337,14 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 
 	@OnlyIn(Dist.CLIENT)
 	public static void postInitClient() {
-		REGISTRY.getValues().forEach(LeavesProperties::processColor);
+		REGISTRY.getAll().forEach(LeavesProperties::processColor);
 	}
 
 	@Override
 	public String toString() {
 		return "LeavesProperties{" +
 				"primitiveLeaves=" + primitiveLeaves +
-				", tree=" + tree + '}';
+				", tree=" + family + '}';
 	}
 
 	public String getDisplayString() {
@@ -342,7 +353,7 @@ public class LeavesProperties extends ForgeRegistryEntry<LeavesProperties> {
 				", primitiveLeaves=" + primitiveLeaves +
 				", primitiveLeavesRegistryName=" + primitiveLeavesRegName +
 				", cellKit=" + cellKit +
-				", tree=" + tree +
+				", tree=" + family +
 				", dynamicLeavesBlockHydroStates=" + Arrays.toString(dynamicLeavesBlockHydroStates) +
 				", flammability=" + flammability +
 				", fireSpreadSpeed=" + fireSpreadSpeed +

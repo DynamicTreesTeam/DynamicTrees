@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.datapacks;
+package com.ferreusveritas.dynamictrees.api.treepacks;
 
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
@@ -6,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
 
 /**
  * @author Harley O'Connor

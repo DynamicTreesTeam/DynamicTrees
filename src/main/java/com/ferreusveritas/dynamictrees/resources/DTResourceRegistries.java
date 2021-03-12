@@ -14,7 +14,9 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 
@@ -52,7 +54,7 @@ public final class DTResourceRegistries {
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);
-        MinecraftForge.EVENT_BUS.post(addLoadListenerEvent);
+        ModLoader.get().postEvent(addLoadListenerEvent);
 
         ModList.get().getMods().forEach(modInfo -> {
             final String modId = modInfo.getModId();
@@ -98,8 +100,7 @@ public final class DTResourceRegistries {
         return biomeDatabaseManager;
     }
 
-    public static final class AddTreesLoadListenerEvent extends Event {
-
+    public static final class AddTreesLoadListenerEvent extends Event implements IModBusEvent {
         private final TreesResourceManager treesResourceManager;
 
         public AddTreesLoadListenerEvent(final TreesResourceManager treesResourceManager) {
@@ -109,7 +110,6 @@ public final class DTResourceRegistries {
         public TreesResourceManager getTreesResourceManager() {
             return treesResourceManager;
         }
-
     }
 
     @SubscribeEvent

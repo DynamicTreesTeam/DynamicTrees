@@ -30,7 +30,7 @@ public abstract class BlockWithDynamicHardness extends Block {
         this.fillStateContainer(builder);
 
         // Set the state container to use our custom BlockState class.
-        this.stateContainer = builder.func_235882_a_(Block::getDefaultState, DynamicHardnessBlockState::new);
+        this.stateContainer = builder.createStateContainer(Block::getDefaultState, DynamicHardnessBlockState::new);
 
         // Sets the default state to the current default state, but with our new BlockState class.
         this.setDefaultState(this.stateContainer.getBaseState());

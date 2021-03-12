@@ -1,16 +1,11 @@
 package com.ferreusveritas.dynamictrees.resources;
 
-import com.ferreusveritas.dynamictrees.api.datapacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

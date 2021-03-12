@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources;
 
-import com.ferreusveritas.dynamictrees.api.datapacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,6 +10,8 @@ import net.minecraftforge.fml.ModLoader;
  * @author Harley O'Connor
  */
 public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> {
+
+    protected static final String TYPE = "type";
 
     protected static final String JSON_EXTENSION = ".json";
     protected static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();

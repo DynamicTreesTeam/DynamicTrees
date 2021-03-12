@@ -1,13 +1,14 @@
-package com.ferreusveritas.dynamictrees.api.datapacks;
+package com.ferreusveritas.dynamictrees.api.treepacks;
 
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 
 /**
  * @author Harley O'Connor
  */
-public class JsonApplierRegistryEvent<T> extends Event implements IModBusEvent {
+public class JsonApplierRegistryEvent<T> extends GenericEvent<T> implements IModBusEvent {
 
     public static final String SPECIES = "species";
     public static final String FAMILY = "family";
@@ -20,6 +21,8 @@ public class JsonApplierRegistryEvent<T> extends Event implements IModBusEvent {
     private final String applierListIdentifier;
 
     public JsonApplierRegistryEvent(JsonPropertyApplierList<T> applierList, String applierListIdentifier) {
+        super(applierList.getObjectType());
+
         this.applierList = applierList;
         this.applierListIdentifier = applierListIdentifier;
     }

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.datapacks;
+package com.ferreusveritas.dynamictrees.api.treepacks;
 
 import com.google.gson.JsonElement;
 

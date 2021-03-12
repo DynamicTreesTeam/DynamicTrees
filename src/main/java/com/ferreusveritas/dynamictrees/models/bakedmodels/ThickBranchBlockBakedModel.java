@@ -3,8 +3,6 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingAtlasTexture;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -42,7 +40,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		this.thickRingsResLoc = thickRingsResLoc;
 	}
 
-	private boolean isTextureNull (TextureAtlasSprite sprite){
+	private boolean isTextureNull (@Nullable TextureAtlasSprite sprite){
 		return sprite == null || sprite.equals(ModelUtils.getTexture(new ResourceLocation("")));
 	}
 

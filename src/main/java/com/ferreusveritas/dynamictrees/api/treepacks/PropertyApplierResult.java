@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.datapacks;
+package com.ferreusveritas.dynamictrees.api.treepacks;
 
 /**
  * Stores an error message in the event of a property applier failure.

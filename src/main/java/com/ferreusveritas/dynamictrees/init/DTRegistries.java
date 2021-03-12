@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
@@ -123,15 +124,16 @@ public class DTRegistries {
 
 	@SubscribeEvent
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-		final Species appleOak = Species.REGISTRY.getValue(DynamicTrees.resLoc("apple_oak"));
+		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
-		if (appleOak != null)
+		if (appleOak.isValid())
 			appleBlock.setSpecies(appleOak);
 
 		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
 		
 		Set<Block> treeBlocks = Sets.newHashSet();
 		Family.REGISTRY.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+		LeavesProperties.REGISTRY.forEach(leavesProperties -> leavesProperties.getDynamicLeavesBlock().ifPresent(treeBlocks::add));
 
 		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
 		
@@ -231,7 +233,7 @@ public class DTRegistries {
 	public static final ItemGroup dynamicTreesTab = new ItemGroup(DynamicTrees.MOD_ID) {
 		@Override
 		public ItemStack createIcon() {
-			return TreeRegistry.findSpeciesSloppy(DynamicTrees.VanillaWoodTypes.oak.toString()).getSeedStack(1);
+			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
 		}
 	};
 	

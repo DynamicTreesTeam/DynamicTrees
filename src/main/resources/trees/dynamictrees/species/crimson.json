@@ -1,6 +1,6 @@
 {
+    "type": "dynamictrees:fungus",
     "family": "dynamictrees:crimson",
-    "common": true,
     "tapering": 0,
     "signal_energy": 14.0,
     "up_probability": 0,
@@ -21,7 +21,7 @@
             "name": "dynamictrees:vines",
             "properties": {
                 "vine_type": "ceiling",
-                "vine_block": "minecraft:weeping_vines_plant",
+                "block": "minecraft:weeping_vines_plant",
                 "tip_block": "minecraft:weeping_vines",
                 "max_length": 5,
                 "quantity": 7

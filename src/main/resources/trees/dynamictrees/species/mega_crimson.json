@@ -1,4 +1,5 @@
 {
+    "type": "dynamictrees:fungus",
     "family": "dynamictrees:crimson",
     "tapering": 0,
     "signal_energy": 25.0,
@@ -6,7 +7,7 @@
     "lowest_branch_height": 20,
     "growth_rate": 0.9,
     "soil_longevity": 16,
-    "max_branch_radius": 24,
+    "max_branch_radius": 20,
     "leaves_properties": "dynamictrees:crimson",
     "environment_factors" : {
         "cold": 0.25,
@@ -17,10 +18,10 @@
     "acceptable_growth_blocks": ["minecraft:crimson_nylium"],
     "features": [
         {
-            "name": "dynamictrees:weeping_vines",
+            "name": "dynamictrees:vines",
             "properties": {
                 "vine_type": "ceiling",
-                "vine_block": "minecraft:weeping_vines_plant",
+                "block": "minecraft:weeping_vines_plant",
                 "tip_block": "minecraft:weeping_vines",
                 "max_length": 5,
                 "quantity": 7

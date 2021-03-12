@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.api.datapacks.*;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.api.treepacks.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -102,6 +101,10 @@ public final class JsonPropertyApplierList<T> {
 
     public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IVoidPropertyApplier<E, V> applier) {
         return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+    }
+
+    public Class<T> getObjectType() {
+        return objectType;
     }
 
 }

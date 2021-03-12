@@ -17,7 +17,7 @@ public class VanillaTreeFamily extends Family {
 		super(new ResourceLocation(DynamicTrees.MOD_ID, wood.toString()));
 
 		woodType = wood;
-		getCommonLeaves().setTree(this);
+		getCommonLeaves().setFamily(this);
 
 		//Setup tree references
 		setPrimitiveLog(wood.getLog());
@@ -32,7 +32,7 @@ public class VanillaTreeFamily extends Family {
 	@SuppressWarnings("all")
 	@Override
 	public LeavesProperties getCommonLeaves() {
-		return LeavesProperties.REGISTRY.getValue(this.getRegistryName());
+		return LeavesProperties.REGISTRY.get(this.getRegistryName());
 	}
 
 }

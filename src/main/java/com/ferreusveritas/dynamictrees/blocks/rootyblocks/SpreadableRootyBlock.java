@@ -4,12 +4,9 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -61,7 +58,7 @@ public class SpreadableRootyBlock extends RootyBlock {
                 for(BlockPos blockpos : BlockPos.getAllInBoxMutable(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
                     BlockState blockstate = worldIn.getBlockState(blockpos);
                     for (Block block : rootyBlocks.keySet()){
-                        if (blockstate.isIn(block)) foundBlocks.add(block);
+                        if (blockstate.matchesBlock(block)) foundBlocks.add(block);
                     }
                 }
                 if (foundBlocks.size() > 0){

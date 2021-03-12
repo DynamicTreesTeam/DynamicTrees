@@ -20,7 +20,7 @@ import java.util.Random;
 public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     public DynamicTreeFeature () {
-        super(NoFeatureConfig.field_236558_a_);
+        super(NoFeatureConfig.CODEC);
         this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tree"));
     }
 

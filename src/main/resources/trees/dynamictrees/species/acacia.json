@@ -1,6 +1,5 @@
 {
     "family": "dynamictrees:acacia",
-    "common": true,
     "tapering": 0.15,
     "signal_energy": 12.0,
     "up_probability": 0,

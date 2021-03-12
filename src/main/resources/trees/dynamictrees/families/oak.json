@@ -1,19 +1,8 @@
 {
     "common_leaves": "dynamictrees:oak",
+    "common_species": "dynamictrees:oak",
     "primitive_log": "minecraft:oak_log",
     "primitive_stripped_log": "minecraft:stripped_oak_log",
     "stick": "minecraft:stick",
-    "max_branch_radius": 8,
-    "species": [
-        {
-            "name": "dynamictrees:oak",
-            "common": true
-        },
-        {
-            "name": "dynamictrees:apple_oak",
-            "generate_seed": true,
-            "generate_sapling": true
-        },
-        "dynamictrees:swamp_oak"
-    ]
+    "max_branch_radius": 8
 }

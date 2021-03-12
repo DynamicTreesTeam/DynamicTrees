@@ -1,13 +1,11 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.block.Block;
@@ -23,6 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(DynamicTrees.MOD_ID)
@@ -41,7 +40,8 @@ public class DynamicTrees {
 		THICKNESS,
 		VOLUME
 	}
-	
+
+	@Deprecated
 	public enum VanillaWoodTypes {
 		oak,
 		spruce,
@@ -97,7 +97,7 @@ public class DynamicTrees {
 		loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
 		loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-		DistExecutor.runWhenOn(Dist.CLIENT, ()->()-> clientStart(modEventBus));
+		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
 		TreeGenerator.setup();
 		
@@ -108,42 +108,28 @@ public class DynamicTrees {
 		
 		modEventBus.addListener(this::commonSetup);
 		modEventBus.addListener(this::clientSetup);
+		modEventBus.addListener(this::parallelDispatch);
 
 		EventHandlers.registerCommon();
 		CompatHandler.init();
 	}
 
-	//TODO: thick ring stitching
-	private static void clientStart(IEventBus modEventBus) {
-		//modEventBus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
-			//IResourceManager manager = Minecraft.getInstance().getResourceManager();
-			//if (manager instanceof IReloadableResourceManager){
-			//	ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
-			//	((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
-			//}
-		//});
+	private void clientSetup(final FMLClientSetupEvent event) {
+		DTClient.setup();
 	}
 
-	@SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event) {
-		DeferredWorkQueue.runLater(this::registerDendroRecipes);
-
+		// TODO: Fix this for new Json system.
 		for (Species species : Species.REGISTRY) {
 			final BlockState primitiveSaplingState = species.getPrimitiveSapling();
 
 			if (primitiveSaplingState != null)
 				TreeRegistry.registerSaplingReplacer(primitiveSaplingState, species);
 		}
-
-		LeavesProperties.REGISTRY.forEach(LeavesProperties::onCommonSetup);
 	}
 
-	private void clientSetup(final FMLClientSetupEvent event) {
-		DTClient.setup();
-	}
-	
-	private void registerDendroRecipes () {
-		DTRegistries.dendroPotion.registerRecipes();
+	private void parallelDispatch(final ParallelDispatchEvent event) {
+		event.enqueueWork(() -> DTRegistries.dendroPotion.registerRecipes());
 	}
 
 	public static ResourceLocation resLoc (final String path) {

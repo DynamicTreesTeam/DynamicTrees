@@ -43,7 +43,7 @@ public class MushroomFeatureCanceller<T extends IFeatureConfig> implements ITree
     }
 
     private List<IFeatureConfig> getConfigs (final TwoFeatureChoiceConfig twoFeatureConfig) {
-        return Arrays.asList(twoFeatureConfig.field_227285_a_.get().config, twoFeatureConfig.field_227286_b_.get().config);
+        return Arrays.asList(twoFeatureConfig.featureTrue.get().config, twoFeatureConfig.featureFalse.get().config);
     }
 
 }

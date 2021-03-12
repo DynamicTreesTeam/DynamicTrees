@@ -51,7 +51,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DTClient {
-	
+
+	//TODO: thick ring stitching
+	public static void clientStart() {
+//		FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
+//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
+//			if (manager instanceof IReloadableResourceManager){
+//				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+//				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
+//			}
+//		});
+	}
+
 	public static void setup() {
 
 		registerRenderLayers();
@@ -69,7 +80,7 @@ public class DTClient {
 
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
-		for(Family family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
+		for(Family family : Species.REGISTRY.getAll().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
 			if(family != Family.NULL_FAMILY) {
