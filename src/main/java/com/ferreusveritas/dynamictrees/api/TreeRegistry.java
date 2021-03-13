@@ -154,28 +154,24 @@ public class TreeRegistry {
 	// CELL KIT HANDLING
 	//////////////////////////////
 
-	@Nullable
 	public static CellKit findCellKit(String name) {
 		return findCellKit(getResLoc(name));
 	}
 
-	@Nullable
 	public static CellKit findCellKit(ResourceLocation name) {
-		return CellKit.REGISTRY.getValue(name);
+		return CellKit.REGISTRY.get(name);
 	}
 
 	//////////////////////////////
 	// GROWTH LOGIC KIT HANDLING
 	//////////////////////////////
 
-	@Nullable
-	public static GrowthLogicKit findGrowthLogicKit(String name) {
+	public static GrowthLogicKit findGrowthLogicKit(final String name) {
 		return findGrowthLogicKit(getResLoc(name));
 	}
 
-	@Nullable
 	public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
-		return GrowthLogicKit.REGISTRY.getValue(name);
+		return GrowthLogicKit.REGISTRY.get(name);
 	}
 
 	public static ResourceLocation getResLoc (final String resLocStr) {

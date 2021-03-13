@@ -14,7 +14,6 @@ import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
@@ -100,9 +99,9 @@ public class Species extends RegistryEntry<Species> {
 	/**
 	 * Central registry for all {@link Species} objects.
 	 */
-	public static final Registry<Species, Type> REGISTRY = new Registry<>(Species.class, new Type(), NULL_SPECIES);
+	public static final TypedRegistry<Species, Type> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, new Type());
 
-	public static class Type extends Registry.EntryType<Species> {
+	public static class Type extends TypedRegistry.EntryType<Species> {
 		public final Species construct(final ResourceLocation registryName, final Family family) {
 			return this.construct(registryName, family, family.getCommonLeaves());
 		}
@@ -116,7 +115,7 @@ public class Species extends RegistryEntry<Species> {
 	protected Family family = Family.NULL_FAMILY;
 	
 	/** Logic kit for standardized extended growth behavior */
-	protected GrowthLogicKit logicKit = GrowthLogicKits.NULL;
+	protected GrowthLogicKit logicKit = GrowthLogicKit.NULL_LOGIC;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;

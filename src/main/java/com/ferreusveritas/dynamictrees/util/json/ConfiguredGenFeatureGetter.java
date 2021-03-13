@@ -23,11 +23,15 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
 
     @SuppressWarnings("unchecked")
     private static final JsonPropertyApplierList<ConfiguredGenFeatureHolder> APPLIERS = new JsonPropertyApplierList<>(ConfiguredGenFeatureHolder.class)
-            .register("name", GenFeature.class,
-                    (configuredGenFeatureHolder, genFeature) -> configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) genFeature.getDefaultConfiguration())
+            .register("name", GenFeature.class, (configuredGenFeatureHolder, genFeature) ->
+                    configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) genFeature.getDefaultConfiguration())
             .register("properties", JsonObject.class,
                     (configuredGenFeatureHolder, jsonObject) -> {
                         final ConfiguredGenFeature<GenFeature> configuredGenFeature = configuredGenFeatureHolder.configuredGenFeature;
+
+                        if (configuredGenFeature == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || configuredGenFeature.getGenFeature() == null)
+                            return;
+
                         configuredGenFeature.getGenFeature().getRegisteredProperties().forEach(genFeatureProperty ->
                                 addProperty(configuredGenFeature, jsonObject, genFeatureProperty));
                     });
@@ -47,10 +51,10 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
 
             configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) fetchResult.getValue().getDefaultConfiguration();
         } else {
-            APPLIERS.applyAll(jsonObjectFetchResult.getValue(), configuredGenFeatureHolder);
+            APPLIERS.applyAll(jsonObjectFetchResult.getValue(), configuredGenFeatureHolder).forEach(failedResult -> LogManager.getLogger().warn("Error whilst getting Configured Gen Feature: {}", failedResult.getErrorMessage()));
         }
 
-        if (configuredGenFeatureHolder.configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL))
+        if (configuredGenFeatureHolder.configuredGenFeature.getGenFeature() == null || configuredGenFeatureHolder.configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL))
             return ObjectFetchResult.failure("Configured feature couldn't be found from name or wasn't given a name.");
 
         return ObjectFetchResult.success(configuredGenFeatureHolder.configuredGenFeature);

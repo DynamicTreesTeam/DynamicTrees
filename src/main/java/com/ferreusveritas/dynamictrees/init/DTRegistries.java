@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
@@ -30,6 +31,7 @@ import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.RegistryEntry;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
@@ -256,17 +258,17 @@ public class DTRegistries {
 	}
 
 	@SubscribeEvent
-	public static void onCellKitRegistry (final DTTrees.CellKitRegistryEvent event) {
+	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<CellKit> event) {
 		CellKits.register(event.getRegistry());
 	}
 
 	@SubscribeEvent
-	public static void onGrowthLogicKitRegistry (final RegistryEvent.Register<GrowthLogicKit> event) {
+	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<GrowthLogicKit> event) {
 		GrowthLogicKits.register(event.getRegistry());
 	}
 
 	@SubscribeEvent
-	public static void onGenFeatureRegistry (final RegistryEvent.Register<GenFeature> event) {
+	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<GenFeature> event) {
 		GenFeatures.register(event.getRegistry());
 	}
 

@@ -6,9 +6,11 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.util.TypedRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -48,7 +50,7 @@ import java.util.Random;
  */
 public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 	
-	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties(DynamicTrees.resLoc("null")) {
+	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties(DTTrees.NULL) {
 		@Override public LeavesProperties setFamily(Family family) { return this; }
 		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
@@ -56,7 +58,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 		@Override public LeavesProperties setDynamicLeavesState(BlockState state) { return this; }
 		@Override public BlockState getDynamicLeavesState() { return Blocks.AIR.getDefaultState(); }
 		@Override public BlockState getDynamicLeavesState(int hydro) { return Blocks.AIR.getDefaultState(); }
-		@Override public CellKit getCellKit() { return CellKits.NULL_CELL_KIT; }
+		@Override public CellKit getCellKit() { return CellKit.NULL_CELL_KIT; }
 		@Override public int getFlammability() { return 0; }
 		@Override public int getFireSpreadSpeed() { return 0; }
 		@Override public int getSmotherLeavesMax() { return 0; }
@@ -67,9 +69,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 	/**
 	 * Central registry for all {@link LeavesProperties} objects.
 	 */
-	public static final Registry<LeavesProperties, Type> REGISTRY = new Registry<>(LeavesProperties.class, new Type(), NULL_PROPERTIES);
+	public static final TypedRegistry<LeavesProperties, Type> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new Type());
 
-	public static class Type extends Registry.EntryType<LeavesProperties> {
+	public static class Type extends TypedRegistry.EntryType<LeavesProperties> {
 		public LeavesProperties construct(final ResourceLocation registryName) {
 			return new LeavesProperties(registryName);
 		}

@@ -19,10 +19,7 @@ public class BiomePredicateGenFeature extends GenFeature implements IPostGenFeat
 
 	public static final GenFeatureProperty<BiomePredicate> BIOME_PREDICATE = GenFeatureProperty.createProperty("biome_predicate", BiomePredicate.class);
 	public static final GenFeatureProperty<Boolean> ONLY_WORLD_GEN = GenFeatureProperty.createBooleanProperty("only_world_gen");
-
-	/** At the point this is called, {@link ConfiguredGenFeature#NULL_CONFIGURED_FEATURE_CLASS} returns null. */
-	@SuppressWarnings("all")
-	public static final GenFeatureProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = GenFeatureProperty.createProperty("gen_feature", (Class<ConfiguredGenFeature<GenFeature>>) new ConfiguredGenFeature<>(new GenFeature(DTTrees.NULL){}).getClass());
+	public static final GenFeatureProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = GenFeatureProperty.createProperty("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
 	public BiomePredicateGenFeature(ResourceLocation registryName) {
 		super(registryName, BIOME_PREDICATE, GEN_FEATURE, ONLY_WORLD_GEN);

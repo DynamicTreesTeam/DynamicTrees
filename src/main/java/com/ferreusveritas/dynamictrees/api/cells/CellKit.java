@@ -1,20 +1,28 @@
 package com.ferreusveritas.dynamictrees.api.cells;
 
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cells.LeafClusters;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.util.Registry;
+import com.ferreusveritas.dynamictrees.util.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 
-public abstract class CellKit extends ForgeRegistryEntry<CellKit> {
+public abstract class CellKit extends RegistryEntry<CellKit> {
+
+	public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
+		private final ICellSolver NULL_CELL_SOLVER = cells -> 0;
+
+		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULL_CELL; }
+		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULL_CELL; }
+		@Override public ICellSolver getCellSolver() { return NULL_CELL_SOLVER; }
+		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULL_MAP; }
+		@Override public int getDefaultHydration() { return 0; }
+	};
 
 	/**
-	 * The registry. This is used for registering and querying {@link CellKit} objects.
-	 *
-	 * <p>Add-ons should use {@link DTTrees.CellKitRegistryEvent}, <b>not</b> Forge's registry event.</p>
+	 * Central registry for all {@link CellKit} objects.
 	 */
-	public static IForgeRegistry<CellKit> REGISTRY;
+	public static final Registry<CellKit> REGISTRY = new Registry<>(CellKit.class, NULL_CELL_KIT);
 
 	public CellKit(final ResourceLocation registryName) {
 		this.setRegistryName(registryName);

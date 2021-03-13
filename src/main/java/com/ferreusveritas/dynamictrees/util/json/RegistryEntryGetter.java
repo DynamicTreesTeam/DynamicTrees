@@ -12,10 +12,10 @@ import net.minecraft.util.ResourceLocation;
  */
 public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements IJsonObjectGetter<T> {
 
-    private final Registry<T, ?> registry;
+    private final Registry<T> registry;
     private final String registryDisplayName;
 
-    public RegistryEntryGetter(Registry<T, ?> registry, String registryDisplayName) {
+    public RegistryEntryGetter(Registry<T> registry, String registryDisplayName) {
         this.registry = registry;
         this.registryDisplayName = registryDisplayName;
     }

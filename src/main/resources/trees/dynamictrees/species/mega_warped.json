@@ -18,16 +18,6 @@
     "acceptable_growth_blocks": ["minecraft:warped_nylium"],
     "features": [
         {
-            "name": "dynamictrees:weeping_vines",
-            "properties": {
-                "vine_type": "ceiling",
-                "vine_block": "minecraft:weeping_vines_plant",
-                "tip_block": "minecraft:weeping_vines",
-                "max_length": 5,
-                "quantity": 7
-            }
-        },
-        {
             "name": "dynamictrees:mound",
             "properties": {
                 "mound_cutoff_radius": 999

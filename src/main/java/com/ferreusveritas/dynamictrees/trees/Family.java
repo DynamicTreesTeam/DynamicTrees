@@ -15,8 +15,8 @@ import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.util.TypedRegistry;
 import com.google.common.collect.Sets;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -71,9 +71,9 @@ public class Family extends RegistryEntry<Family> {
 	/**
 	 * Central registry for all {@link Family} objects.
 	 */
-	public static final Registry<Family, Type> REGISTRY = new Registry<>(Family.class, new Type(), NULL_FAMILY);
+	public static final TypedRegistry<Family, Type> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, new Type());
 
-	public static class Type extends Registry.EntryType<Family> {
+	public static class Type extends TypedRegistry.EntryType<Family> {
 		public Family construct (final ResourceLocation registryName) {
 			return new Family(registryName);
 		}

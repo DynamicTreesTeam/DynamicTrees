@@ -8,23 +8,14 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
 import net.minecraft.util.Direction;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CellKits {
-	
-	private static final ICellSolver NULL_CELL_SOLVER = cells -> 0;
-	
-	public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
-		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULL_CELL; }
-		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULL_CELL; }
-		@Override public ICellSolver getCellSolver() { return NULL_CELL_SOLVER; }
-		@Override public SimpleVoxmap getLeafCluster() { return LeafClusters.NULL_MAP; }
-		@Override public int getDefaultHydration() { return 0; }
-	};
-	
+
 	public static final CellKit DECIDUOUS = new CellKit(DynamicTrees.resLoc("deciduous")) {
 
 		private final ICell[] normalCells = {
@@ -314,8 +305,8 @@ public class CellKits {
 		
 	};
 
-	public static void register(final IForgeRegistry<CellKit> registry) {
-		registry.registerAll(NULL_CELL_KIT, DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM);
+	public static void register(final Registry<CellKit> registry) {
+		registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM);
 	}
 
 	/**

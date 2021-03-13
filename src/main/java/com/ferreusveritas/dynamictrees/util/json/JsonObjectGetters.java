@@ -167,11 +167,10 @@ public final class JsonObjectGetters {
     public static IJsonObjectGetter<Item> ITEM_GETTER;
     public static IJsonObjectGetter<Biome> BIOME_GETTER;
 
-    public static IJsonObjectGetter<CellKit> CELL_KIT_GETTER;
-    public static IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER;
-    public static IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER;
-
+    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
     public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
+    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
+    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
     public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY, "family"));
     public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY, "species"));
 
@@ -216,10 +215,6 @@ public final class JsonObjectGetters {
         BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
         ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
         BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
-
-        CELL_KIT_GETTER = register(CellKit.class, new ForgeRegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
-        GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new ForgeRegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
-        GEN_FEATURE_GETTER = register(GenFeature.class, new ForgeRegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
     }
 
 }
