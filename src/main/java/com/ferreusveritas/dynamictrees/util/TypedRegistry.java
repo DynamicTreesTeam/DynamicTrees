@@ -53,7 +53,13 @@ public class TypedRegistry<V extends RegistryEntry<V>, T extends TypedRegistry.E
         this.defaultType = defaultType;
     }
 
-
+    /**
+     * Registers a custom {@link EntryType}, allowing custom sub-classes of the registry entry
+     * to be created and then referenced from Json via the registry name {@link ResourceLocation}.
+     *
+     * @param registryName The registry name {@link ResourceLocation}.
+     * @param type The {@link EntryType} to register as an extension of {@link T}.
+     */
     public final void registerType(final ResourceLocation registryName, final T type) {
         this.typeRegistry.put(registryName, type);
     }
@@ -87,6 +93,6 @@ public class TypedRegistry<V extends RegistryEntry<V>, T extends TypedRegistry.E
      *
      * @param <V> The {@link RegistryEntry} sub-class.
      */
-    public static class EntryType<V extends RegistryEntry<V>> {}
+    public static abstract class EntryType<V extends RegistryEntry<V>> {}
 
 }

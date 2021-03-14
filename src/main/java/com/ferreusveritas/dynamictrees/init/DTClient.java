@@ -14,8 +14,8 @@ import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -92,6 +92,7 @@ public class DTClient {
 			}
 		}
 	}
+
 	@OnlyIn(Dist.CLIENT)
 	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
 		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
@@ -122,15 +123,14 @@ public class DTClient {
 		return access != null && pos != null;
 	}
 
-	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
-		ForgeRegistries.BLOCKS.forEach(block -> {
-			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof BonsaiPotBlock) {
-				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
-			}
-//			if (block instanceof ThickBranchBlock)
-//				RenderTypeLookup.setRenderLayer(block, ThickRingTextureManager.BRANCH_SOLID);
-		});
+		RenderTypeLookup.setRenderLayer(DTRegistries.bonsaiPotBlock, RenderType.getCutoutMipped());
+
+		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
+				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
+
+//		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
+//				.forEach(block -> RenderTypeLookup.setRenderLayer(block , ThickRingTextureManager.BRANCH_SOLID));
 	}
 	
 	private static void registerColorHandlers() {

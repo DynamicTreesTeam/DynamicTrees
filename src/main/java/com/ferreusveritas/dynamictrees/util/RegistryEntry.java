@@ -9,7 +9,7 @@ import java.util.function.Consumer;
  *
  * @author Harley O'Connor
  */
-public class RegistryEntry<T extends RegistryEntry<T>> {
+public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
     private ResourceLocation registryName;
 

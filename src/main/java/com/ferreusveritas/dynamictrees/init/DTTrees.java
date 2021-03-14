@@ -46,20 +46,18 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
-		event.getRegistry().registerType(DynamicTrees.resLoc("wart"), new WartProperties.Type());
+		event.registerType(DynamicTrees.resLoc("wart"), new WartProperties.Type());
 	}
 
 	@SubscribeEvent
 	public static void registerFamilyTypes (final TypeRegistryEvent<Family> event) {
-		event.getRegistry().registerType(DynamicTrees.resLoc("fungus"), new FungusFamily.Type());
+		event.registerType(DynamicTrees.resLoc("fungus"), new FungusFamily.Type());
 	}
 
 	@SubscribeEvent
 	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
-		final TypedRegistry<Species, TypedRegistry.EntryType<Species>> registry = event.getRegistry();
-
-		registry.registerType(DynamicTrees.resLoc("fungus"), new FungusSpecies.Type());
-		registry.registerType(DynamicTrees.resLoc("dark_oak"), new DarkOakSpecies.Type());
+		event.registerType(DynamicTrees.resLoc("fungus"), new FungusSpecies.Type());
+		event.registerType(DynamicTrees.resLoc("dark_oak"), new DarkOakSpecies.Type());
 	}
 
 	public static final ResourceLocation NULL = resLoc("null");

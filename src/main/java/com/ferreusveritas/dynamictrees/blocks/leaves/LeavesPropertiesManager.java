@@ -67,7 +67,7 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
 
             if (newEntry) {
                 LeavesProperties.Type leavesPropertiesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, LeavesProperties.Type.class,
-                        "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
+                        "Error loading leaves properties type for leaves properties '" + registryName + "' (defaulting to base leaves properties) :", false);
 
                 if (leavesPropertiesType == null)
                     leavesPropertiesType = LeavesProperties.REGISTRY.getDefaultType();

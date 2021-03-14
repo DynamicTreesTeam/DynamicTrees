@@ -75,19 +75,19 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(entry.getValue());
 
             if (!jsonObjectFetchResult.wasSuccessful()) {
-                LOGGER.warn("Skipping loading data for species '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());
+                LOGGER.warn("Skipping loading data for family '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());
                 return;
             }
 
             final JsonObject jsonObject = jsonObjectFetchResult.getValue();
             final Family family;
-            final boolean newRegistry = !Species.REGISTRY.has(registryName);
+            final boolean newRegistry = !Family.REGISTRY.has(registryName);
 
             final Consumer<PropertyApplierResult> failureConsumer = failureResult -> LOGGER.warn("Error whilst loading tree family data for '{}': {}", registryName, failureResult.getErrorMessage());
 
             if (newRegistry) {
                 Family.Type familyType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Family.Type.class,
-                        "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
+                        "Error loading family type for family '" + registryName + "' (defaulting to tree family) :", false);
 
                 // Default to tree family if it wasn't set or couldn't be found.
                 if (familyType == null)

@@ -52,6 +52,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
+            // For Serene Seasons as it uses Mixins.
             properties 'mixin.env.disableRefMap' : 'true'
 
             mods {
@@ -117,9 +118,9 @@ jar {
         attributes([
                 "Specification-Title": project.name,
                 "Specification-Vendor": "ferreusveritas",
-                "Specification-Version": "${version}",
+                "Specification-Version": "1",
                 "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
+                "Implementation-Version": "${getArchiveVersion()}",
                 "Implementation-Vendor" :"ferreusveritas",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -127,11 +128,15 @@ jar {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allJava
 }
 
 jar.finalizedBy('reobfJar')
+
+artifacts {
+    archives sourcesJar
+}
 
 publishing {
     publications {
