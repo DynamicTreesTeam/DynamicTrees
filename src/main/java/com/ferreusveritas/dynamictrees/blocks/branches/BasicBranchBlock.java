@@ -23,7 +23,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -50,13 +49,13 @@ public class BasicBranchBlock extends BranchBlock {
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-	public BasicBranchBlock(Material material, ResourceLocation registryName) {
-		this(AbstractBlock.Properties.create(material), registryName);
+	public BasicBranchBlock(Material material) {
+		this(AbstractBlock.Properties.create(material));
 	}
 	
 	// Useful for more unique subclasses
-	public BasicBranchBlock(AbstractBlock.Properties properties, ResourceLocation registryName) {
-		super(properties.harvestLevel(0), registryName);
+	public BasicBranchBlock(AbstractBlock.Properties properties) {
+		super(properties.harvestLevel(0));
 
 		cacheBranchStates();
 	}
@@ -261,7 +260,7 @@ public class BasicBranchBlock extends BranchBlock {
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.NULL_TREE_PART) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.trunkShellBlock) {
+				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.TRUNK_SHELL) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}

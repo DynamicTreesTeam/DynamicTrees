@@ -53,8 +53,8 @@ public final class CreateStaffCommand extends SubCommand {
         if (!colour.startsWith("#"))
             colour = "#" + colour;
 
-        ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
-        DTRegistries.treeStaff.setSpecies(wandStack, species)
+        ItemStack wandStack =  new ItemStack(DTRegistries.STAFF, 1);
+        DTRegistries.STAFF.setSpecies(wandStack, species)
                 .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
                 .setColor(wandStack, colour)
                 .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))

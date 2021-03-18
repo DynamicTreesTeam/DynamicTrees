@@ -108,8 +108,9 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             this.appliers.applyAll(jsonObject.getAsJsonObject(), family).forEach(failureConsumer);
 
             if (newRegistry) {
-                if (firstLoad)
+                if (firstLoad) {
                     family.setupBlocks();
+                }
 
                 Family.REGISTRY.register(family);
                 LOGGER.debug("Loaded and registered tree family data: {}.", family.getDisplayString());

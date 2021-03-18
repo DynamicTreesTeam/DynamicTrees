@@ -56,14 +56,13 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	private Family tree = Family.NULL_FAMILY; // The tree this branch type creates
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
-	
-	public BranchBlock(Properties properties, ResourceLocation registryName){
-		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
-		this.setRegistryName(registryName);
+
+	public BranchBlock(Material material) {
+		this(Properties.create(material));
 	}
-	
-	public BranchBlock(Material material, ResourceLocation registryName) {
-		this(Properties.create(material), registryName);
+
+	public BranchBlock(Properties properties){
+		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
 	}
 
 	public BranchBlock setCanBeStripped(boolean truth){
@@ -351,7 +350,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, DTRegistries.blockStates.AIR, 3);
+					world.setBlockState(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 				}

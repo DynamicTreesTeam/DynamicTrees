@@ -24,7 +24,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -55,13 +54,8 @@ public class Staff extends Item {
 	private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
 	public Staff() {
-		this("staff");
-	}
-
-	public Staff(String name) {
 		super(new Item.Properties().maxStackSize(1)
 				.group(DTRegistries.dynamicTreesTab));
-		this.setRegistryName(name);
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));

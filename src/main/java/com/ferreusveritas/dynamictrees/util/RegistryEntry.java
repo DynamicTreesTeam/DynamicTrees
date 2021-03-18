@@ -12,15 +12,22 @@ import java.util.function.Consumer;
 public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
     private ResourceLocation registryName;
+    private boolean valid = true;
 
-    public RegistryEntry() { }
+    protected RegistryEntry() { }
 
-    public RegistryEntry(ResourceLocation registryName) {
+    protected RegistryEntry(ResourceLocation registryName) {
         this.registryName = registryName;
     }
 
+    @SuppressWarnings("unchecked")
+    protected T nullEntry () {
+        this.valid = false;
+        return (T) this;
+    }
+
     public boolean isValid () {
-        return true;
+        return this.valid;
     }
 
     @SuppressWarnings("unchecked")

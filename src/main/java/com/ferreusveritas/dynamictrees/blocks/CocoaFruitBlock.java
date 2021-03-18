@@ -11,19 +11,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 
 public class CocoaFruitBlock extends CocoaBlock {
-	
-	public static final String name = "cocoa_fruit";
-	
+
 	public CocoaFruitBlock() {
-		this(name);
-	}
-	
-	public CocoaFruitBlock(String name) {
 		super(Block.Properties.create(Material.PLANTS)
 				.tickRandomly()
 				.hardnessAndResistance(0.2F, 3.0F)
 				.sound(SoundType.WOOD));
-		setRegistryName(name);
 	}
 	
 	/**

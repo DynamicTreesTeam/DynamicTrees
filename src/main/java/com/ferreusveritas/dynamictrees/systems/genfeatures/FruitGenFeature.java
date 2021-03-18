@@ -34,7 +34,7 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 	@Override
 	public ConfiguredGenFeature<?> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.appleBlock)
+		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
 				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(RAY_DISTANCE, 5f).with(FRUITING_RADIUS, 8);
 	}
 

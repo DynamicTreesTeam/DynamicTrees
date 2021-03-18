@@ -8,7 +8,8 @@ import net.minecraft.world.World;
 
 public interface INodeInspector {
 
-	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir);
+	boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir);
 
-	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir);
+	boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir);
+
 }

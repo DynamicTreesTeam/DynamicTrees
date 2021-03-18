@@ -17,7 +17,6 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -45,18 +44,17 @@ public class SurfaceRootBlock extends Block {
 
 	private final Family family;
 
-	public SurfaceRootBlock(ResourceLocation registryName, Family family) {
-		this(Material.WOOD, registryName, family);
+	public SurfaceRootBlock(Family family) {
+		this(Material.WOOD, family);
 	}
 
-	public SurfaceRootBlock(Material material, ResourceLocation registryName, Family family) {
+	public SurfaceRootBlock(Material material, Family family) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
 				.hardnessAndResistance(2.5f, 1.0F)
 				.sound(SoundType.WOOD));
 
-		this.setRegistryName(registryName);
 		this.family = family;
 	}
 
@@ -197,7 +195,7 @@ public class SurfaceRootBlock extends Block {
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		BlockState upstate = world.getBlockState(pos.up());
 
-		if (upstate.getBlock() == DTRegistries.trunkShellBlock) {
+		if (upstate.getBlock() == DTRegistries.TRUNK_SHELL) {
 			world.setBlockState(pos, upstate);
 		}
 

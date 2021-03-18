@@ -12,7 +12,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -22,7 +21,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 
@@ -32,18 +30,18 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
-	public ThickBranchBlock(Material material, ResourceLocation registryName) {
-		this(Properties.create(material), registryName);
+	public ThickBranchBlock(Material material) {
+		this(Properties.create(material));
 	}
 
-	public ThickBranchBlock(Properties properties, ResourceLocation registryName) {
-		super(properties, registryName);
+	public ThickBranchBlock(Properties properties) {
+		super(properties);
 
 		cacheBranchThickStates();
 	}
 
 	public TrunkShellBlock getTrunkShell (){
-		return DTRegistries.trunkShellBlock;
+		return DTRegistries.TRUNK_SHELL;
 	}
 
 	//We can't override this function since the "otherBlock" will not have been created yet.

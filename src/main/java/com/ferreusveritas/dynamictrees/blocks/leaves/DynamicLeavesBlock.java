@@ -63,14 +63,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
 
-	public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties blockProperties) {
-		this(leavesProperties.getRegistryName() + "_leaves", leavesProperties, blockProperties);
-	}
-
-	public DynamicLeavesBlock(final String registryName, final LeavesProperties leavesProperties, final Properties properties) {
+	public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
 		this(properties);
 		this.setProperties(leavesProperties);
-		this.setRegistryName(registryName);
 		leavesProperties.setDynamicLeavesState(getDefaultState());
 	}
 

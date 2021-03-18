@@ -92,7 +92,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			Surround surr = Surround.values()[world.rand.nextInt(8)];
 			BlockPos dPos = treePos.add(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-				world.setBlockState(dPos, DTRegistries.trunkShellBlock.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+				world.setBlockState(dPos, DTRegistries.TRUNK_SHELL.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
 			this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
@@ -145,7 +145,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 	protected boolean isReplaceableWithRoots(IWorld world, BlockState placeState, BlockPos pos) {
 		Block block = placeState.getBlock();
-		if(block == Blocks.AIR || block == DTRegistries.trunkShellBlock) {
+		if(block == Blocks.AIR || block == DTRegistries.TRUNK_SHELL) {
 			return true;
 		}
 

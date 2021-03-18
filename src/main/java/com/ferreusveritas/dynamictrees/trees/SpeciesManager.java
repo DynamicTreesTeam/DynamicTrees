@@ -38,8 +38,6 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
     /** A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on biome type). */
     private JsonPropertyApplierList<Species> environmentFactorAppliers;
 
-    private Map<Species, ResourceLocation> megaSpeciesCache;
-
     public static final String TYPE = "type";
     public static final String FAMILY = "family";
 
@@ -50,7 +48,6 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
     @Override
     public void registerAppliers(final String applierListIdentifier) {
         this.environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
-        this.megaSpeciesCache = new HashMap<>();
 
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
@@ -176,17 +173,6 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
         // Lock registry (don't lock on first load as registry events are fired after).
         Species.REGISTRY.lock();
-
-        // Once all species are loaded, apply mega species.
-        this.megaSpeciesCache.forEach((species, megaSpeciesRegName) -> {
-            final Species megaSpecies = Species.REGISTRY.get(megaSpeciesRegName);
-
-            if (!megaSpecies.isValid())
-                LOGGER.warn("Could not find species '{}' to apply as mega species for '{}'.", megaSpeciesRegName, species.getRegistryName());
-            else species.setMegaSpecies(megaSpecies);
-        });
-
-        this.megaSpeciesCache.clear();
     }
 
     private static void readEntry (final JsonPropertyApplierList<Species> propertyAppliers, final Species species, final String key, final JsonElement jsonElement) {

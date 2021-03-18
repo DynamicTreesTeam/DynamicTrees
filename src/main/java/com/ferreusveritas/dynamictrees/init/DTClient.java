@@ -124,7 +124,7 @@ public class DTClient {
 	}
 
 	private static void registerRenderLayers () {
-		RenderTypeLookup.setRenderLayer(DTRegistries.bonsaiPotBlock, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(DTRegistries.BONSAI_POT, RenderType.getCutoutMipped());
 
 		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
 				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
@@ -155,16 +155,16 @@ public class DTClient {
 		}
 		
 		//Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(DTRegistries.bonsaiPotBlock, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
-				? DTRegistries.bonsaiPotBlock.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
+				? DTRegistries.BONSAI_POT.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		//ITEMS
 		
 		// Register Potion Colorizer
-		ModelHelper.regColorHandler(DTRegistries.dendroPotion, (stack, tint) -> DTRegistries.dendroPotion.getColor(stack, tint));
+		ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION, (stack, tint) -> DTRegistries.DENDRO_POTION.getColor(stack, tint));
 		
 		//Register Woodland Staff Colorizer
-		ModelHelper.regColorHandler(DTRegistries.treeStaff, (stack, tint) -> DTRegistries.treeStaff.getColor(stack, tint));
+		ModelHelper.regColorHandler(DTRegistries.STAFF, (stack, tint) -> DTRegistries.STAFF.getColor(stack, tint));
 		
 		//TREE PARTS
 		

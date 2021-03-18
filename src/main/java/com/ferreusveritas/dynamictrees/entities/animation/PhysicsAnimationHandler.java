@@ -86,7 +86,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		BlockPos pos = new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ());
 		BlockState collState = world.getBlockState(pos);
 
-		if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && collState.getBlock() != DTRegistries.trunkShellBlock) {
+		if(!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && collState.getBlock() != DTRegistries.TRUNK_SHELL) {
 			if(collState.getBlock() instanceof FlowingFluidBlock) {
 				//Undo the gravity
 				entity.setMotion(entity.getMotion().x, entity.getMotion().y + (AnimationConstants.TREE_GRAVITY), entity.getMotion().z);

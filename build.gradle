@@ -120,7 +120,7 @@ jar {
                 "Specification-Vendor": "ferreusveritas",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
-                "Implementation-Version": "${getArchiveVersion()}",
+                "Implementation-Version": "${version}",
                 "Implementation-Vendor" :"ferreusveritas",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])

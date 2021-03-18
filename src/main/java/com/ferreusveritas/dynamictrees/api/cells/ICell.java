@@ -4,10 +4,17 @@ import net.minecraft.util.Direction;
 
 public interface ICell {
 
-	//This is the actual value of the cell.
-	public int getValue();
-	
-	//This is the value the cell returns for a side
-	public int getValueFromSide(Direction side);
+	/**
+	 * @return The actual value of the cell.
+	 */
+	int getValue();
+
+	/**
+	 * Gets the value the cell returns for the given side.
+	 *
+	 * @param side The side's {@link Direction}.
+	 * @return The value for the given side.
+	 */
+	int getValueFromSide(Direction side);
 	
 }

@@ -43,9 +43,7 @@ import java.util.Random;
 public class TrunkShellBlock extends BlockWithDynamicHardness {
 	
 	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
-	
-	public static final String defaultName = "trunk_shell";
-	
+
 	public static class ShellMuse {
 		public final BlockState state;
 		public final BlockPos pos;
@@ -65,16 +63,10 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		}
 	}
 
-	public TrunkShellBlock(String name) {
+	public TrunkShellBlock() {
 		super(Block.Properties.create(Material.WOOD));
-		//setCreativeTab;
-		setRegistryName(name);
 	}
 
-	public TrunkShellBlock() {
-		this(defaultName);
-	}
-	
 	///////////////////////////////////////////
 	// BLOCKSTATE
 	///////////////////////////////////////////

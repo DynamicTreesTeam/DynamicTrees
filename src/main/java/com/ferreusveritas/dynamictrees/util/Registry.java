@@ -65,6 +65,12 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
     private final List<Runnable> onLockRunnables = new ArrayList<>();
 
     /**
+     * If this {@link Registry} is clearable, {@link #clear()} can be called, which wipes all
+     * the values and locks the registry.
+     */
+    private final boolean clearable;
+
+    /**
      * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
      * of the given {@link RegistryEntry}.
      *
@@ -83,9 +89,34 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      */
     public Registry(final String name, final Class<V> type, final V nullValue) {
+        this(name, type, nullValue, false);
+    }
+
+    /**
+     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
+     * of the given {@link RegistryEntry}.
+     *
+     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param nullValue A null entry. See {@link #nullValue} for more details.
+     * @param clearable True if {@link #clear()} can be called to wipe the registry.
+     */
+    public Registry(final Class<V> type, final V nullValue, final boolean clearable) {
+        this(type.getSimpleName(), type, nullValue, clearable);
+    }
+
+    /**
+     * Constructs a new {@link Registry}.
+     *
+     * @param name The {@link #name} for this {@link Registry}.
+     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param nullValue A null entry. See {@link #nullValue} for more details.
+     * @param clearable True if {@link #clear()} can be called to wipe the registry.
+     */
+    public Registry(final String name, final Class<V> type, final V nullValue, final boolean clearable) {
         this.name = name;
         this.type = type;
         this.nullValue = nullValue;
+        this.clearable = clearable;
 
         this.register(nullValue);
     }
@@ -201,6 +232,14 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
      */
     public final void runOnNextLock (final Runnable runnable) {
         this.onLockRunnables.add(runnable);
+    }
+
+    public final void clear () {
+        if (!this.clearable)
+            return;
+
+        this.entries.clear();
+        this.lock();
     }
 
     /**

@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
@@ -14,8 +15,8 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.TypedRegistry;
 import com.google.common.collect.Sets;
 import net.minecraft.block.*;
@@ -59,8 +60,6 @@ public class Family extends RegistryEntry<Family> {
 	public final static Family NULL_FAMILY = new Family() {
 		@Override public void setupCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
-		@Override public Set<Block> getRegisterableBlocks(Set<Block> blockList) { return blockList; }
-		@Override public Set<Item> getRegisterableItems(Set<Item> itemList) { return itemList; }
 		@Override public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) { return false; }
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
@@ -140,10 +139,10 @@ public class Family extends RegistryEntry<Family> {
 
 	public void setupBlocks() {
 		this.setDynamicBranch(this.createBranch());
-		this.setDynamicBranchItem(this.createBranchItem(this.dynamicBranch));
+		this.setDynamicBranchItem(this.createBranchItem(this.getBranchRegName(""), this.dynamicBranch));
 
 		if (this.hasStrippedBranch()) {
-			this.setDynamicStrippedBranch(this.createBranch("stripped_", "_branch"));
+			this.setDynamicStrippedBranch(this.createBranch(this.getBranchRegName("stripped_")));
 		}
 
 		if (this.hasSurfaceRoot()) {
@@ -161,8 +160,7 @@ public class Family extends RegistryEntry<Family> {
 	}
 
 	public ResourceLocation getCommonSpeciesName() {
-		final ResourceLocation registryName = this.getRegistryName();
-		return registryName == null ? DTTrees.NULL : registryName;
+		return this.getRegistryName();
 	}
 
 	public void setCommonSpecies(final Species species) {
@@ -237,10 +235,10 @@ public class Family extends RegistryEntry<Family> {
 							pos = pos.offset(hit.getFace());
 						}
 						if (world.isAirBlock(pos)) {
-							BlockState cocoaState = DTRegistries.cocoaFruitBlock.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+							BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
 							assert cocoaState != null;
 							Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
-							world.setBlockState(pos, DTRegistries.cocoaFruitBlock.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
+							world.setBlockState(pos, DTRegistries.COCOA_FRUIT.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
 							if (!player.isCreative()) {
 								heldItem.shrink(1);
 							}
@@ -271,7 +269,7 @@ public class Family extends RegistryEntry<Family> {
 	}
 
 	public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
-		if (getDynamicStrippedBranch() != null){
+		if (getDynamicStrippedBranch() != null) {
 			getDynamicBranch().stripBranch(state, world, pos, player, heldItem);
 
 			if (world.isRemote) {
@@ -281,59 +279,6 @@ public class Family extends RegistryEntry<Family> {
 			return true;
 		}
 		else return false;
-	}
-
-	///////////////////////////////////////////
-	// REGISTRATION
-	///////////////////////////////////////////
-
-	/**
-	 * Used to register the blocks this tree uses.  Mainly just the {@link BranchBlock}
-	 * We intentionally leave out leaves since they are shared between trees
-	 *
-	 *
-	 * @param blockList
-	 * @return */
-	public Set<Block> getRegisterableBlocks(Set<Block> blockList) {
-		blockList.add(getDynamicBranch());
-
-		if (this.hasStrippedBranch())
-			blockList.add(getDynamicStrippedBranch());
-
-		if (this.hasSurfaceRoot())
-			blockList.add(getSurfaceRoot());
-
-		// Prioritise the common species' blocks.
-		this.getCommonSpecies().getSapling().ifPresent(blockList::add);
-//		this.getCommonSpecies().getLeavesBlock().ifPresent(blockList::add);
-
-		this.getSpecies().forEach(species -> {
-			if (species.isCommonSpecies())
-				return;
-
-			species.getSapling().ifPresent(blockList::add);
-			species.getLeavesBlock().ifPresent(blockList::add);
-		});
-
-		return blockList;
-	}
-
-	/**
-	 * Used to register items the tree creates. Mostly for the {@link Seed}
-	 * If the developer provides the seed externally instead of having it
-	 * generated internally then the seed should be allowed to register here.
-	 * If this can't be the case then override this member function with a
-	 * dummy one.
-	 * @return
-	 * @param itemList
-	 */
-	public Set<Item> getRegisterableItems(Set<Item> itemList) {
-		//Register an itemBlock for the branch block
-		itemList.add(this.dynamicBranchItem);
-
-		this.species.forEach(species -> species.getSeed().ifPresent(itemList::add));
-
-		return itemList;
 	}
 
 
@@ -346,38 +291,77 @@ public class Family extends RegistryEntry<Family> {
 	}
 
 	/**
-	 * Override this to use a custom branch for the tree family
+	 * Creates the branch block. Can be overridden by sub-classes who want full control over
+	 * registry and instantiation of the branch.
 	 *
-	 * @return the branch to be created
+	 * @return The instantiated and registered {@link BranchBlock}.
 	 */
 	public BranchBlock createBranch() {
-		return createBranch("", "_branch");
+		return this.createBranch(this.getBranchRegName(""));
 	}
 
-	public BranchBlock createBranch(final String prefix, final String suffix) {
-		final ResourceLocation branchName = new ResourceLocation(this.getRegistryName().getNamespace(), prefix + this.getRegistryName().getPath() + suffix);
-		final BasicBranchBlock branch = isThick() ? new ThickBranchBlock(getBranchMaterial(), branchName) : new BasicBranchBlock(getBranchMaterial(), branchName);
-		if (isFireProof()) branch.setFireSpreadSpeed(0).setFlammability(0);
+	/**
+	 * Gets a branch name with the given prefix and <tt>_branch</tt> as the suffix.
+	 *
+	 * @param prefix The prefix.
+	 * @return The {@link ResourceLocation} registry name for the branch.
+	 */
+	private ResourceLocation getBranchRegName(final String prefix) {
+		return ResourceLocationUtils.suffix(ResourceLocationUtils.prefix(this.getRegistryName(), prefix), "_branch");
+	}
+
+	/**
+	 * Instantiates and sets up the actual {@link BranchBlock} object. Can be overridden by
+	 * sub-classes for custom branch blocks.
+	 *
+	 * @return The instantiated {@link BranchBlock}.
+	 */
+	protected BranchBlock createBranchBlock() {
+		final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getBranchMaterial()) : new BasicBranchBlock(this.getBranchMaterial());
+
+		if (this.isFireProof())
+			branch.setFireSpreadSpeed(0).setFlammability(0);
+
 		return branch;
 	}
 
-	public Item createBranchItem (BranchBlock branch) {
-		return new BlockItem(branch, new Item.Properties()).setRegistryName(branch.getRegistryName());
+	/**
+	 * Creates branch block and adds it to the relevant {@link RegistryHandler}.
+	 *
+	 * @param registryName The {@link ResourceLocation} registry name.
+	 * @return The created {@link BranchBlock}.
+	 */
+	protected BranchBlock createBranch(final ResourceLocation registryName) {
+		return RegistryHandler.addBlock(registryName, this.createBranchBlock());
 	}
 
-	protected Family setDynamicBranch(BranchBlock branch) {
-		dynamicBranch = branch;//Link the tree to the branch
-		dynamicBranch.setFamily(this);//Link the branch back to the tree
-		dynamicBranch.setCanBeStripped(hasStrippedBranch());//Allow the branch to be stripped if a stripped variant exists
-		addValidBranches(branch);
+	/**
+	 * Creates and registers a {@link BlockItem} for the given branch with the given
+	 * registry name.
+	 *
+	 * @param registryName The {@link ResourceLocation} registry name for the item.
+	 * @param branch The {@link BranchBlock} to create the {@link BlockItem} for.
+	 * @return The created and registered {@link BlockItem} object.
+	 */
+	public BlockItem createBranchItem (final ResourceLocation registryName, final BranchBlock branch) {
+		return RegistryHandler.addItem(registryName, new BlockItem(branch, new Item.Properties()));
+	}
+
+	protected Family setDynamicBranch(final BranchBlock branch) {
+		this.dynamicBranch = this.setupBranch(branch, this.hasStrippedBranch);
 		return this;
 	}
-	protected Family setDynamicStrippedBranch(BranchBlock branch) {
-		dynamicStrippedBranch = branch;//Link the tree to the branch
-		dynamicStrippedBranch.setFamily(this);//Link the branch back to the tree
-		dynamicStrippedBranch.setCanBeStripped(false);//Already stripped logs should not be able to be stripped again
-		addValidBranches(branch);
+
+	protected Family setDynamicStrippedBranch(final BranchBlock branch) {
+		this.dynamicStrippedBranch = this.setupBranch(branch, false);
 		return this;
+	}
+
+	protected BranchBlock setupBranch (final BranchBlock branchBlock, final boolean canBeStripped) {
+		branchBlock.setFamily(this); // Link the branch to the tree.
+		branchBlock.setCanBeStripped(canBeStripped);
+		this.addValidBranches(branchBlock); // Add the branch as a valid branch.
+		return branchBlock;
 	}
 
 	protected Family setDynamicBranchItem (Item branchItem) {
@@ -389,6 +373,7 @@ public class Family extends RegistryEntry<Family> {
 		return dynamicBranch;
 	}
 
+	@Nullable
 	public BranchBlock getDynamicStrippedBranch() {
 		return dynamicStrippedBranch;
 	}
@@ -496,7 +481,7 @@ public class Family extends RegistryEntry<Family> {
 
 	public boolean isFireProof () { return false; }
 
-	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity){
+	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
 		return SoundType.WOOD;
 	}
 
@@ -577,8 +562,7 @@ public class Family extends RegistryEntry<Family> {
 	}
 
 	public SurfaceRootBlock createSurfaceRoot () {
-		final ResourceLocation surfaceRootName = new ResourceLocation(this.getRegistryName().getNamespace(), this.getRegistryName().getPath() + "_root");
-		return new SurfaceRootBlock(surfaceRootName, this);
+		return RegistryHandler.addBlock(ResourceLocationUtils.suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
 	}
 
 	public SurfaceRootBlock getSurfaceRoot() {

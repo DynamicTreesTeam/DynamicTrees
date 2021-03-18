@@ -44,7 +44,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
             return 0;
         }
 
-        final DendroPotion dendroPotion = DTRegistries.dendroPotion;
+        final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION;
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);
 
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.

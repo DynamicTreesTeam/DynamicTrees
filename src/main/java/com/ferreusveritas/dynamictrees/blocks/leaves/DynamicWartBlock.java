@@ -1,9 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,7 +14,7 @@ import net.minecraft.world.server.ServerWorld;
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
     public DynamicWartBlock (final LeavesProperties leavesProperties, final Properties properties) {
-        super(leavesProperties.getRegistryName() + "_wart", leavesProperties, properties);
+        super(leavesProperties, properties);
     }
 
     @Override

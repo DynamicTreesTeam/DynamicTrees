@@ -6,7 +6,6 @@ import net.minecraft.util.Direction;
  * Cell that always returns 0
  * 
  * @author ferreusveritas
- *
  */
 public class CellNull implements ICell {
 

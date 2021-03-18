@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
@@ -14,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -28,16 +30,12 @@ import javax.annotation.Nullable;
 
 public class BonsaiPotBlock extends ContainerBlock {
 
-	public static final String NAME = "bonsai_pot";
+	public static final ResourceLocation REG_NAME = DynamicTrees.resLoc("bonsai_pot");
+
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
-	
+
 	public BonsaiPotBlock() {
-		this(NAME);
-	}
-	
-	public BonsaiPotBlock(String name) {
 		super(Block.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(0));
-		this.setRegistryName(name);
 	}
 
 	//////////////////////////////

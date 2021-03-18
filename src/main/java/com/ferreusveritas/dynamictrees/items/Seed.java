@@ -1,17 +1,12 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -25,7 +20,6 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -33,6 +27,9 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 // TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item implements IPlantable {
@@ -42,13 +39,11 @@ public class Seed extends Item implements IPlantable {
 	public Seed() {
 		super(new Item.Properties());
 		this.setRegistryName("null");
-		species = Species.NULL_SPECIES;
+		this.species = Species.NULL_SPECIES;
 	}
 	
 	public Seed(Species species) {
 		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
-		final ResourceLocation speciesRegName = species.getRegistryName();
-		this.setRegistryName(new ResourceLocation(speciesRegName.getNamespace(), speciesRegName.getPath() + "_seed"));
 		this.species = species;
 	}
 	

@@ -9,9 +9,9 @@ import net.minecraft.util.ResourceLocation;
 
 public abstract class CellKit extends RegistryEntry<CellKit> {
 
-	public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
-		private final ICellSolver NULL_CELL_SOLVER = cells -> 0;
+	public static final ICellSolver NULL_CELL_SOLVER = cells -> 0;
 
+	public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
 		@Override public ICell getCellForLeaves(int hydro) { return CellNull.NULL_CELL; }
 		@Override public ICell getCellForBranch(int radius, int meta) { return CellNull.NULL_CELL; }
 		@Override public ICellSolver getCellSolver() { return NULL_CELL_SOLVER; }
@@ -37,7 +37,7 @@ public abstract class CellKit extends RegistryEntry<CellKit> {
 	/** A voxel map of leaves blocks that are "stamped" on to the tree during generation */
 	public abstract SimpleVoxmap getLeafCluster();
 	
-	/** The default hydration level of a newly created leaf block [default = 4]**/
+	/** The default hydration level of a newly created leaf block [default = 4] **/
 	public abstract int getDefaultHydration();
 
 	@Override

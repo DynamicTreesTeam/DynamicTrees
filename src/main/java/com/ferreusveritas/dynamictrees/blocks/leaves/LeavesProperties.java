@@ -1,15 +1,15 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.TypedRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -29,9 +28,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -110,7 +106,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 	}
 	
 	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
-		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.blockStates.AIR;
+		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.BLOCK_STATES.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
 	}
@@ -157,8 +153,12 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 		return new DynamicLeavesBlock(this, properties);
 	}
 
+	protected ResourceLocation getDynamicLeavesRegName() {
+		return ResourceLocationUtils.suffix(this.getRegistryName(), "_leaves");
+	}
+
 	public void generateDynamicLeaves (final AbstractBlock.Properties properties) {
-		this.dynamicLeavesBlock = this.createDynamicLeaves(properties);
+		this.dynamicLeavesBlock = RegistryHandler.addBlock(this.getDynamicLeavesRegName(), this.createDynamicLeaves(properties));
 		LeavesPaging.addLeavesBlockForModId(this.dynamicLeavesBlock, this.getRegistryName().getNamespace());
 	}
 	

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
@@ -57,12 +58,13 @@ public class DynamicTrees {
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
 		TreeGenerator.setup();
-		
-		DTRegistries.setupBlocks();
-		DTRegistries.setupItems();
-		
-		DTRegistries.setupEntities();
-		
+
+		final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
+		RegistryHandler.REGISTRY.register(registryHandler);
+		modEventBus.register(registryHandler);
+
+		DTRegistries.setup();
+
 		modEventBus.addListener(this::commonSetup);
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::parallelDispatch);
@@ -86,7 +88,7 @@ public class DynamicTrees {
 	}
 
 	private void parallelDispatch(final ParallelDispatchEvent event) {
-		event.enqueueWork(() -> DTRegistries.dendroPotion.registerRecipes());
+		event.enqueueWork(() -> DTRegistries.DENDRO_POTION.registerRecipes());
 	}
 
 	public static ResourceLocation resLoc (final String path) {

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -22,7 +23,6 @@ import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -442,7 +442,7 @@ public class Species extends RegistryEntry<Species> {
 	 * in the appropriate registries.
 	 */
 	public Species generateSeed() {
-		return setSeed(new Seed(this));
+		return this.setSeed(RegistryHandler.addItem(ResourceLocationUtils.suffix(this.getRegistryName(), "_seed"), new Seed(this)));
 	}
 	
 	/**
@@ -643,8 +643,7 @@ public class Species extends RegistryEntry<Species> {
 	 * in the appropriate registries.
 	 */
 	public Species generateSapling() {
-		setSapling(new DynamicSaplingBlock(this));
-		return this;
+		return this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
 	}
 	
 	public Optional<DynamicSaplingBlock> getSapling() {
@@ -732,10 +731,8 @@ public class Species extends RegistryEntry<Species> {
 	}
 	
 	//This is used to load the sapling model
-	@Nullable
-	public ResourceLocation getSaplingName() {
-		if (getRegistryName() == null) return null;
-		return new ResourceLocation(getRegistryName().getNamespace(), getRegistryName().getPath() + "_sapling");
+	public ResourceLocation getSaplingRegName() {
+		return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
 	}
 	
 	public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {
@@ -1530,7 +1527,7 @@ public class Species extends RegistryEntry<Species> {
 	 * @return A {@link BonsaiPotBlock}
 	 */
 	public BonsaiPotBlock getBonsaiPot() {
-		return DTRegistries.bonsaiPotBlock;
+		return DTRegistries.BONSAI_POT;
 	}
 	
 	

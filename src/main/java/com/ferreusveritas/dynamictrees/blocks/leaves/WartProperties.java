@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -20,6 +21,11 @@ public final class WartProperties extends LeavesProperties {
         public LeavesProperties construct(ResourceLocation registryName) {
             return new WartProperties(registryName);
         }
+    }
+
+    @Override
+    protected ResourceLocation getDynamicLeavesRegName() {
+        return ResourceLocationUtils.suffix(this.getRegistryName(), "_wart");
     }
 
     @Override

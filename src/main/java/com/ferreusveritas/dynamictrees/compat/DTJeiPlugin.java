@@ -30,7 +30,7 @@ public final class DTJeiPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes (final ISubtypeRegistration registration) {
-        registration.useNbtForSubtypes(DTRegistries.dendroPotion);
+        registration.useNbtForSubtypes(DTRegistries.DENDRO_POTION);
     }
 
     @Override

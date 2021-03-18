@@ -4,26 +4,26 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
- * Manages Seasonal output rates
+ * Manages Seasonal output rates.
  *  
  * @author ferreusveritas
  */
 public interface ISeasonManager {
 	
-	public void updateTick(World world, long worldTicks);
+	void updateTick(World world, long worldTicks);
 	
-	public void flushMappings();
+	void flushMappings();
 	
-	public float getGrowthFactor(World world, BlockPos rootPos, float offset);
+	float getGrowthFactor(World world, BlockPos rootPos, float offset);
 	
-	public float getSeedDropFactor(World world, BlockPos rootPos, float offset);
+	float getSeedDropFactor(World world, BlockPos rootPos, float offset);
 	
-	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset, boolean getAsScan);
+	float getFruitProductionFactor(World world, BlockPos rootPos, float offset, boolean getAsScan);
 	
-	public Float getSeasonValue(World world, BlockPos rootPos);
+	Float getSeasonValue(World world, BlockPos rootPos);
 	
-	public boolean isTropical(World world, BlockPos rootPos);
+	boolean isTropical(World world, BlockPos rootPos);
 	
-	public boolean shouldSnowMelt(World world, BlockPos pos);
+	boolean shouldSnowMelt(World world, BlockPos pos);
 	
 }
