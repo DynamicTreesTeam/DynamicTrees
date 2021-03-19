@@ -203,9 +203,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return 1;
 	}
 	
-	public abstract int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags);
+	public abstract int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags);
 	
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir) {
 		return setRadius(world, pos, radius, originDir, 2);
 	}
 	
@@ -329,7 +329,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			int primaryThickness = (int) family.getPrimaryThickness();
 			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
-			for(BlockPos findPos : bounds.expand(3).iterate() ) {
+			for(BlockPos findPos : bounds.expand(3)) {
 				BlockState findState = world.getBlockState(findPos);
 				if( familyBranch.getRadius(findState) == primaryThickness ) { //Search for endpoints of the same tree family
 					Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();

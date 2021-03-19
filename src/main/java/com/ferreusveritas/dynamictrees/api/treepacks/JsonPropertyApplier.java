@@ -54,7 +54,7 @@ public class JsonPropertyApplier<T, V> {
     protected <S, R> PropertyApplierResult applyIfShould(final Object object, final JsonElement jsonElement, final Class<R> valueClass, final IPropertyApplier<S, R> applier) {
         final IJsonObjectGetter<R> valueGetter = JsonObjectGetters.getObjectGetter(valueClass);
 
-        if (!valueGetter.isValidGetter())
+        if (!valueGetter.isValid())
             return null;
 
         final ObjectFetchResult<R> fetchResult = valueGetter.get(jsonElement);

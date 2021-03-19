@@ -1,19 +1,19 @@
 {
-    "type": "dynamictrees:fungus",
-    "family": "dynamictrees:warped",
+    "type": "fungus",
+    "family": "warped",
     "tapering": 0,
     "signal_energy": 14.0,
     "up_probability": 0,
     "lowest_branch_height": 4,
     "growth_rate": 1,
-    "leaves_properties": "dynamictrees:warped",
+    "leaves_properties": "warped",
     "environment_factors" : {
         "cold": 0.25,
         "wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:warped_forest" },
-    "primitive_sapling": "minecraft:warped_fungus",
+    "primitive_sapling": "warped_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like"],
-    "acceptable_growth_blocks": ["minecraft:warped_nylium"],
-    "mega_species": "dynamictrees:mega_warped"
+    "acceptable_growth_blocks": ["warped_nylium"],
+    "mega_species": "mega_warped"
 }

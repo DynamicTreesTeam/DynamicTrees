@@ -11,6 +11,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+@SuppressWarnings("deprecation")
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
     public DynamicWartBlock (final LeavesProperties leavesProperties, final Properties properties) {
@@ -19,7 +20,7 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return getShape(state, worldIn, pos, context);
+        return this.getShape(state, worldIn, pos, context);
     }
 
     @Override
@@ -28,7 +29,9 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {}
+    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
+        entity.onLivingFall(fallDistance, 1.0F);
+    }
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) { }

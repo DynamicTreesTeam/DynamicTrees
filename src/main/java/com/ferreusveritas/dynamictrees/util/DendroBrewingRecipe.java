@@ -1,11 +1,12 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
-
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
 
 /**
+ * An implementation of {@link IBrewingRecipe} for the {@link DendroPotion} item.
+ *
  * @author Harley O'Connor
  */
 public final class DendroBrewingRecipe implements IBrewingRecipe {
@@ -35,7 +36,8 @@ public final class DendroBrewingRecipe implements IBrewingRecipe {
 	public ItemStack getOutput (final ItemStack inputStack, final ItemStack ingredientStack) {
 		if (!inputStack.isEmpty() && !ingredientStack.isEmpty() && isIngredient(ingredientStack)) {
 			// For transformation potion, only brew if it doesn't already have a tree tag (must check here too, in case potion is left in after being brewed).
-			if (!inputStack.getOrCreateTag().contains(DendroPotion.TREE_TAG_KEY)) return this.output.copy();
+			if (!inputStack.getOrCreateTag().contains(DendroPotion.TREE_TAG_KEY))
+				return this.output.copy();
 		}
 		
 		return ItemStack.EMPTY;

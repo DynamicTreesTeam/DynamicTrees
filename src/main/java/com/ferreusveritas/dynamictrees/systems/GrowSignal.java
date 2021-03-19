@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class GrowSignal {
 	
-	//Forward data
+	// Forward data
 	public float energy;
 	public Direction dir;
 	public int numTurns;
@@ -18,17 +18,20 @@ public class GrowSignal {
 	public BlockPos rootPos;
 	public BlockPos delta;
 	
-	//Back data
+	// Back data
 	public float radius;
 	public float tapering;
 	public boolean success;
-	
-	public boolean choked;//This indicates that the tree could not establish the needed trunk space(girth) and should stop growing
-	
-	//Utility
+
+	/**
+	 * A choked signal indicates that the tree could not establish the needed
+	 * space (girth) and so should stop growing.
+	 */
+	public boolean choked;
+
 	public Random rand;
 	
-	public GrowSignal(Species species, BlockPos rootPos, float energy) {
+	public GrowSignal(Species species, BlockPos rootPos, float energy, Random random) {
 		this.species = species;
 		this.energy = energy;
 		dir = Direction.UP;
@@ -36,7 +39,7 @@ public class GrowSignal {
 		numTurns = 0;
 		numSteps = 0;
 		tapering = 0.3f;
-		rand = new Random();
+		rand = random;
 		success = true;
 		choked = false;
 		
@@ -53,15 +56,15 @@ public class GrowSignal {
 		
 		delta = delta.offset(dir);
 		
-		if(--energy <= 0.0f) {
-			success = false;//Ran out of energy before it could grow
+		if (--energy <= 0.0f) {
+			success = false; // Ran out of energy before it could grow.
 		}
 		
 		return success;
 	}
 	
 	public boolean doTurn(Direction targetDir) {
-		if(dir != targetDir) {//Check for a direction change
+		if (dir != targetDir) { // Checks for a direction change.
 			dir = targetDir;
 			numTurns++;
 			return true;

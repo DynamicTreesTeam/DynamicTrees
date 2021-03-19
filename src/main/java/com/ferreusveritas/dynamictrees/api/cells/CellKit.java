@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.api.cells;
 
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.util.ResourceLocation;
 

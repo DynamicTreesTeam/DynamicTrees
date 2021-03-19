@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -20,16 +20,31 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
         this.registryName = registryName;
     }
 
+    /**
+     * Makes the current entry invalid.
+     *
+     * @return This {@link RegistryEntry}, for calling this in-line.
+     */
     @SuppressWarnings("unchecked")
     protected T nullEntry () {
         this.valid = false;
         return (T) this;
     }
 
+    /**
+     * @return True if the {@link RegistryEntry} is not null.
+     */
     public boolean isValid () {
         return this.valid;
     }
 
+    /**
+     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T},
+     * only if this {@link RegistryEntry} is valid.
+     *
+     * @param consumer The {@link Consumer} of type {@link T}.
+     * @return True if this {@link RegistryEntry} is valid.
+     */
     @SuppressWarnings("unchecked")
     public final boolean ifValid(final Consumer<T> consumer) {
         if (this.isValid()) {
@@ -47,6 +62,11 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     public final T setRegistryName(final ResourceLocation registryName) {
         this.registryName = registryName;
         return (T) this;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{registryName=" + this.getRegistryName() + "}";
     }
 
 }

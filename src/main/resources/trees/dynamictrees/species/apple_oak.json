@@ -1,5 +1,5 @@
 {
-    "family": "dynamictrees:oak",
+    "family": "oak",
     "generate_seed": true,
     "generate_sapling": true,
     "tapering": 0.4,
@@ -7,7 +7,7 @@
     "up_probability": 1,
     "lowest_branch_height": 4,
     "growth_rate": 0.7,
-    "leaves_properties": "dynamictrees:oak",
+    "leaves_properties": "oak",
     "environment_factors" : {
         "cold": 0.75,
         "hot": 0.75,
@@ -18,7 +18,7 @@
     "perfect_biomes": { "name": "minecraft:plains" },
     "features" : [
         {
-            "name": "dynamictrees:fruit",
+            "name": "fruit",
             "properties": {
                 "ray_distance": 4
             }

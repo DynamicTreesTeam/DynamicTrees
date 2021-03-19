@@ -22,13 +22,13 @@ public class BiomeDatabase {
 		@Override public void setSubterraneanBiome(boolean is) {}
 	};
 	
-	private final Map<ResourceLocation, BiomeEntry> biomeEntries = new HashMap<>();
+	private final Map<ResourceLocation, BiomeEntry> entries = new HashMap<>();
 
 	public BiomeEntry getEntry(@Nullable Biome biome) {
 		if (biome == null)
 			return BAD_ENTRY;
 
-		return this.biomeEntries.computeIfAbsent(biome.getRegistryName(), k -> new BiomeEntry(biome));
+		return this.entries.computeIfAbsent(biome.getRegistryName(), k -> new BiomeEntry(biome));
 	}
 
 	public BiomeEntry getEntry (ResourceLocation biomeResLoc) {
@@ -36,7 +36,7 @@ public class BiomeDatabase {
 	}
 	
 	public void clear() {
-		this.biomeEntries.clear();
+		this.entries.clear();
 	}
 	
 	public boolean isValid() {
@@ -53,7 +53,7 @@ public class BiomeDatabase {
 	}
 
 	public boolean isPopulated () {
-		return this.biomeEntries.size() > 0;
+		return this.entries.size() > 0;
 	}
 	
 	public static class BiomeEntry {

@@ -1,6 +1,6 @@
 {
-    "type": "dynamictrees:dark_oak",
-    "family": "dynamictrees:dark_oak",
+    "type": "dark_oak",
+    "family": "dark_oak",
     "tapering": 0.3,
     "signal_energy": 18.0,
     "up_probability": 4,
@@ -8,8 +8,8 @@
     "growth_rate": 0.8,
     "soil_longevity": 14,
     "max_branch_radius": 24,
-    "growth_logic_kit": "dynamictrees:dark_oak",
-    "leaves_properties": "dynamictrees:dark_oak",
+    "growth_logic_kit": "dark_oak",
+    "leaves_properties": "dark_oak",
     "environment_factors" : {
         "cold": 0.75,
         "hot": 0.5,
@@ -19,19 +19,19 @@
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "spooky", "name": "minecraft:.*" },
-    "primitive_sapling": "minecraft:dark_oak_sapling",
+    "primitive_sapling": "dark_oak_sapling",
     "features" : [
         {
-            "name": "dynamictrees:clear_volume",
+            "name": "clear_volume",
             "properties": {
                 "height": 6
             }
         },
         {
-            "name": "dynamictrees:biome_predicate",
+            "name": "biome_predicate",
             "properties": {
                 "gen_feature": {
-                    "name": "dynamictrees:huge_mushroom",
+                    "name": "huge_mushroom",
                     "properties": {
                         "max_mushrooms": 1,
                         "max_attempts": 3
@@ -41,20 +41,20 @@
             }
         },
         {
-            "name": "dynamictrees:rot_soil",
+            "name": "rot_soil",
             "properties": {
-                "rotted_soil": "minecraft:podzol"
+                "rotted_soil": "podzol"
             }
         },
         {
-            "name": "dynamictrees:mushroom_rot",
+            "name": "mushroom_rot",
             "properties": {
                 "_comment": "An alternate mushroom chance of -1 means that a red mushroom will always be generated.",
                 "alternate_mushroom_chance": -1
             }
         },
-        "dynamictrees:bottom_flare",
-        "dynamictrees:mound",
-        "dynamictrees:roots"
+        "bottom_flare",
+        "mound",
+        "roots"
     ]
 }

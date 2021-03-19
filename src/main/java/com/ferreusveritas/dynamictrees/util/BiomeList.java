@@ -4,7 +4,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * @author Harley O'Connor

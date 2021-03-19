@@ -1,33 +1,33 @@
 {
-    "type": "dynamictrees:fungus",
-    "family": "dynamictrees:crimson",
+    "type": "fungus",
+    "family": "crimson",
     "tapering": 0,
     "signal_energy": 14.0,
     "up_probability": 0,
     "lowest_branch_height": 4,
     "growth_rate": 1,
-    "leaves_properties": "dynamictrees:crimson",
+    "leaves_properties": "crimson",
     "environment_factors" : {
         "cold": 0.25,
         "wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:crimson_forest" },
-    "primitive_sapling": "minecraft:crimson_fungus",
+    "primitive_sapling": "crimson_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like"],
-    "acceptable_growth_blocks": ["minecraft:crimson_nylium"],
-    "mega_species": "dynamictrees:mega_crimson",
+    "acceptable_growth_blocks": ["crimson_nylium"],
+    "mega_species": "mega_crimson",
     "features": [
         {
-            "name": "dynamictrees:vines",
+            "name": "vines",
             "properties": {
                 "vine_type": "ceiling",
-                "block": "minecraft:weeping_vines_plant",
-                "tip_block": "minecraft:weeping_vines",
+                "block": "weeping_vines_plant",
+                "tip_block": "weeping_vines",
                 "max_length": 5,
                 "quantity": 7
             }
         },
-        "dynamictrees:clear_volume",
-        "dynamictrees:shroomlight"
+        "clear_volume",
+        "shroomlight"
     ]
 }

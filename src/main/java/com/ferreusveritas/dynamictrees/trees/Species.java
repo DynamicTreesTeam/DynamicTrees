@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
@@ -102,6 +104,11 @@ public class Species extends RegistryEntry<Species> {
 	public static final TypedRegistry<Species, Type> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, new Type());
 
 	public static class Type extends TypedRegistry.EntryType<Species> {
+		@Override
+		public Species construct(ResourceLocation registryName) {
+			throw new UnsupportedOperationException("Species does not support the use of Type#construct(ResourceLocation).");
+		}
+
 		public final Species construct(final ResourceLocation registryName, final Family family) {
 			return this.construct(registryName, family, family.getCommonLeaves());
 		}
@@ -161,6 +168,8 @@ public class Species extends RegistryEntry<Species> {
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map<BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
+
+	// TODO: Replace default env factors and gen features with a better way of setting defaults. Maybe a class like "setDefaults" that can be overridden by sub-classes.
 
 	/** Environment factor defaults. Can be used by sub-classes to set common environment factors. */
 	protected Map<BiomeDictionary.Type, Float> defaultEnvFactors = new HashMap<>();
@@ -337,23 +346,6 @@ public class Species extends RegistryEntry<Species> {
 	 */
 	public void setTransformable(boolean transformable) {
 		this.transformable = transformable;
-	}
-
-	/**
-	 * @return The primitive sapling's {@link BlockState}, for automatic registration of sapling replacers.
-	 */
-	@Nullable
-	public BlockState getPrimitiveSapling () {
-		return this.primitiveSapling;
-	}
-
-	public Species setPrimitiveSapling(Block primitiveSaplingBlock) {
-		return this.setPrimitiveSapling(primitiveSaplingBlock.getDefaultState());
-	}
-
-	public Species setPrimitiveSapling(BlockState primitiveSaplingState) {
-		this.primitiveSapling = primitiveSaplingState;
-		return this;
 	}
 
 	public boolean hasCommonOverride() {
@@ -1042,18 +1034,18 @@ public class Species extends RegistryEntry<Species> {
 		
 		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.treeGrowthMultiplier.get() * DTConfigs.treeGrowthFolding.get());
 		do {
-			if(soilLife > 0){
-				if(growthRate > random.nextFloat()) {
-					GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos));
+			if (soilLife > 0) {
+				if (growthRate > random.nextFloat()) {
+					final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos), world.rand);
 					boolean success = treeBase.growSignal(world, treePos, signal).success;
 					
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 					
-					if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+					if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 					}
 					
-					if(signal.choked) {
+					if (signal.choked) {
 						soilLife = 0;
 						rootyDirt.setSoilLife(world, rootPos, soilLife);
 						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
@@ -1088,46 +1080,47 @@ public class Species extends RegistryEntry<Species> {
 
 	/**
 	 * Selects a new direction for the branch(grow) signal to turn to.
-	 * This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
-	 * Can be overridden for different species but it's preferable to override customDirectionManipulation.
 	 *
-	 * @param world The World
-	 * @param pos
+	 * <p>This function uses a probability map to make the decision and is acted upon by the
+	 * GrowSignal() function in the branch block. Can be overridden for different species but
+	 * it's preferable to override customDirectionManipulation.</p>
+	 *
+	 * @param world The {@link World} object.
+	 * @param pos The {@link BlockPos} of the branch.
 	 * @param branch The branch block the GrowSignal is traveling in.
 	 * @param signal The grow signal.
-	 * @return
+	 * @return The selected {@link Direction}.
 	 */
 	public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
 		Direction originDir = signal.dir.getOpposite();
 		
-		//prevent branches on the ground
+		// prevent branches on the ground
 		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
 			return Direction.UP;
 		}
 		
-		int[] probMap = new int[6];//6 directions possible DUNSWE
+		int[] probMap = new int[6]; // 6 directions possible DUNSWE
 		
-		//Probability taking direction into account
-		probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability(): 0;//Favor up
-		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
+		// Probability taking direction into account
+		probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability(): 0; // Favor up
+		probMap[signal.dir.ordinal()] += getReinfTravel(); // Favor current direction
 		
-		//Create probability map for direction change
+		// Create probability map for direction change
 		for(Direction dir: Direction.values()) {
 			if(!dir.equals(originDir)) {
 				BlockPos deltaPos = pos.offset(dir);
-				//Check probability for surrounding blocks
-				//Typically Air:1, Leaves:2, Branches: 2+r
+				// Check probability for surrounding blocks
+				// Typically Air:1, Leaves:2, Branches: 2+r
 				BlockState deltaBlockState = world.getBlockState(deltaPos);
 				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
 			}
 		}
 		
-		//Do custom stuff or override probability map for various species
+		// Do custom stuff or override probability map for various species
 		probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
 		
-		//Select a direction from the probability map
-		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal);//Default to up if things are screwy
+		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap); // Select a direction from the probability map.
+		return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
 	}
 	
 	/** Species can override the probability map here **/
@@ -1141,20 +1134,20 @@ public class Species extends RegistryEntry<Species> {
 	}
 	
 	/**
-	 * Allows a species to do things after a grow event just occured.  Such as used
-	 * by Jungle trees to create cocoa pods on the trunk
+	 * Allows a species to do things after a grow event just occurred. Such as used
+	 * by Jungle trees to create cocoa pods on the trunk.
 	 *
 	 * @param world The world
 	 * @param rootPos The position of the rooty dirt block
 	 * @param treePos The position of the base trunk block of the tree(usually directly above the rooty dirt block)
 	 * @param soilLife The life of the soil block this tree is planted in
 	 * @param natural
-	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
-	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
+	 * 		If true then this member is being used to grow the tree naturally (create drops or fruit).
+	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning.
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			GenFeature genFeature = configuredGenFeature.getGenFeature();
+		for (final ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			final GenFeature genFeature = configuredGenFeature.getGenFeature();
 
 			if (!(genFeature instanceof IPostGrowFeature))
 				continue;
@@ -1175,7 +1168,7 @@ public class Species extends RegistryEntry<Species> {
 	 * @return true if the tree became diseased
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
-		if(soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
+		if (soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
 			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
 			return true;
 		}
@@ -1208,7 +1201,7 @@ public class Species extends RegistryEntry<Species> {
 	
 	/**
 	 *
-	 * @param world The World
+	 * @param world The {@link World} object.
 	 * @param pos
 	 * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
 	 */
@@ -1270,11 +1263,11 @@ public class Species extends RegistryEntry<Species> {
 	}
 
 	public static Biome getBiome (final RegistryKey<Biome> biomeKey) {
-		return ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName());
+		return Objects.requireNonNull(ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName()));
 	}
 
 	public static RegistryKey<Biome> getBiomeKey (final Biome biome) {
-		return RegistryKey.getOrCreateKey(net.minecraft.util.registry.Registry.BIOME_KEY, biome.getRegistryName());
+		return RegistryKey.getOrCreateKey(net.minecraft.util.registry.Registry.BIOME_KEY, Objects.requireNonNull(biome.getRegistryName()));
 	}
 	
 	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
@@ -1291,8 +1284,8 @@ public class Species extends RegistryEntry<Species> {
 	 */
 	@SafeVarargs
 	public static boolean isOneOfBiomes(RegistryKey<Biome> biomeToCheck, RegistryKey<Biome>... biomes) {
-		for(RegistryKey<Biome> biome: biomes) {
-			if(biomeToCheck.equals(biome)) {
+		for (RegistryKey<Biome> biome: biomes) {
+			if (biomeToCheck.equals(biome)) {
 				return true;
 			}
 		}
@@ -1308,11 +1301,12 @@ public class Species extends RegistryEntry<Species> {
 	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
 
 	/**
-	 * Pulls data from the SeasonManager to determine the rate of tree growth
+	 * Pulls data from the {@link com.ferreusveritas.dynamictrees.compat.seasons.SeasonManager} to determine
+	 * the rate of tree growth for the current season.
 	 *
-	 * @param world The world
-	 * @param rootPos the BlockPos of the Rooty Dirt
-	 * @return value from 0.0(no growth) to 1.0(full growth)
+	 * @param world The {@link World} object.
+	 * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
+	 * @return Factor from 0.0 (no growth) to 1.0 (full growth).
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
 		return DTConfigs.enableSeasonalGrowthFactor.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
@@ -1334,16 +1328,17 @@ public class Species extends RegistryEntry<Species> {
 	 * Values are OR'ed together for the return
 	 */
 	public int getSeasonalTooltipFlags(final World world) {
-		float seasonStart = 0.167f;
-		float seasonEnd = 0.833f;
-		float threshold = 0.75f;
+		final float seasonStart = 0.167f;
+		final float seasonEnd = 0.833f;
+		final float threshold = 0.75f;
 
-		if(FruitBlock.getFruitBlockForSpecies(this) != null) {
+		if (FruitBlock.getFruitBlockForSpecies(this) != null) {
 			int seasonFlags = 0;
-			for(int i = 0; i < 4; i++) {
-				float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonStart) * 64.0f), 0), true);
-				float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonEnd  ) * 64.0f), 0), true);
-				if(Math.min(prod1, prod2) >= threshold) {
+			for (int i = 0; i < 4; i++) {
+				final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart) * 64.0f), 0), true);
+				final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonEnd  ) * 64.0f), 0), true);
+
+				if (Math.min(prod1, prod2) >= threshold) {
 					seasonFlags |= 1 << i;
 				}
 			}
@@ -1355,11 +1350,11 @@ public class Species extends RegistryEntry<Species> {
 
 	/**
 	 * When seasons are active allow a seasonal time range where fruit growth does
-	 * not progress past the flower stage.  This allows for a flowery spring time.
+	 * not progress past the flower stage. This allows for a flowery spring time.
 	 *
-	 * @param min The minimum season value
-	 * @param max The maximum season value
-	 * @return
+	 * @param min The minimum season value.
+	 * @param max The maximum season value.
+	 * @return This {@link Species} object for chaining.
 	 */
 	public Species setFlowerSeasonHold(float min, float max) {
 		flowerSeasonHoldMin = min;
@@ -1379,14 +1374,13 @@ public class Species extends RegistryEntry<Species> {
 	@Nullable
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
-		//Bonemeal fertilizes the soil and causes a single growth pulse
-		if( canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
-			
+		// Bonemeal fertilizes the soil and causes a single growth pulse
+		if (canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
 			return new FertilizeSubstance().setAmount(1).setGrow(true);
 		}
 		
-		//Use substance provider interface if it's available
-		if(itemStack.getItem() instanceof ISubstanceEffectProvider) {
+		// Use substance provider interface if it's available
+		if (itemStack.getItem() instanceof ISubstanceEffectProvider) {
 			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
 			return provider.getSubstanceEffect(itemStack);
 		}
@@ -1404,11 +1398,10 @@ public class Species extends RegistryEntry<Species> {
 	 * @return true if item was used, false otherwise
 	 */
 	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, PlayerEntity player, Hand hand, ItemStack itemStack) {
+		final ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
-		ISubstanceEffect effect = getSubstanceEffect(itemStack);
-		
-		if(effect != null) {
-			if(effect.isLingering()) {
+		if (effect != null) {
+			if (effect.isLingering()) {
 				world.addEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
 			} else {
@@ -1434,9 +1427,9 @@ public class Species extends RegistryEntry<Species> {
 	 */
 	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
 		
-		if (heldItem != null) {//Something in the hand
-			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-				Species.consumePlayerItem(player, hand, heldItem);
+		if (heldItem != null) { // Ensure there is something in the player's hand.
+			if (applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
+				consumePlayerItem(player, hand, heldItem);
 				return true;
 			}
 		}
@@ -1452,15 +1445,14 @@ public class Species extends RegistryEntry<Species> {
 	 * @param heldItem The item to be consumed
 	 */
 	public static void consumePlayerItem(PlayerEntity player, Hand hand, ItemStack heldItem) {
-		if(!player.isCreative()) {
-			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
+		if (!player.isCreative()) {
+			if (heldItem.getItem() instanceof IEmptiable) { // A substance deployed from a refillable container.
+				final IEmptiable emptiable = (IEmptiable) heldItem.getItem();
 				player.setHeldItem(hand, emptiable.getEmptyContainer());
-			}
-			else if(heldItem.getItem() == Items.POTION) {//An actual potion
+			} else if(heldItem.getItem() == Items.POTION) { // An actual potion.
 				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
 			} else {
-				heldItem.shrink(1);//Just a regular item like bonemeal
+				heldItem.shrink(1); // Just a regular item like bonemeal.
 			}
 		}
 	}
@@ -1483,11 +1475,6 @@ public class Species extends RegistryEntry<Species> {
 	///////////////////////////////////////////
 
 	private Species megaSpecies = Species.NULL_SPECIES;
-
-	@Deprecated // This is no longer used.
-	public boolean isMega() {
-		return false;
-	}
 
 	public Species getMegaSpecies() {
 		return this.megaSpecies;
@@ -1512,7 +1499,7 @@ public class Species extends RegistryEntry<Species> {
 	 * @return
 	 */
 	@Nullable
-	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
+	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
 		return null;
 	}
 	
@@ -1521,10 +1508,10 @@ public class Species extends RegistryEntry<Species> {
 	//////////////////////////////
 	
 	/**
-	 * Provides the {@link BonsaiPotBlock} for this Species.  A mod can
-	 * derive it's own BonsaiPot subclass if it wants something custom.
+	 * Provides the {@link BonsaiPotBlock} for this Species. Custom {@link Type} objects can
+	 * derive their own {@link BonsaiPotBlock} sub-class if they want something custom.
 	 *
-	 * @return A {@link BonsaiPotBlock}
+	 * @return A {@link BonsaiPotBlock} object.
 	 */
 	public BonsaiPotBlock getBonsaiPot() {
 		return DTRegistries.BONSAI_POT;

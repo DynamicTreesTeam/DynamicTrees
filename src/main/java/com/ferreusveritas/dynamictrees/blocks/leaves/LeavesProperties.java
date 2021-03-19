@@ -8,9 +8,9 @@ import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -68,6 +68,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> {
 	public static final TypedRegistry<LeavesProperties, Type> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new Type());
 
 	public static class Type extends TypedRegistry.EntryType<LeavesProperties> {
+		@Override
 		public LeavesProperties construct(final ResourceLocation registryName) {
 			return new LeavesProperties(registryName);
 		}

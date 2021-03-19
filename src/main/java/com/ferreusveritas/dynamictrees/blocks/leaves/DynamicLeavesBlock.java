@@ -11,17 +11,15 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.BeeEntity;
@@ -34,7 +32,6 @@ import net.minecraft.loot.LootParameters;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -54,9 +51,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
 
 	protected static Random backupRng = new Random();
@@ -231,30 +228,27 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	 * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
 	 */
 	@Override
-	public boolean addLandingEffects(BlockState state1, ServerWorld worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	public boolean addLandingEffects(BlockState state1, ServerWorld world, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		return true;
-	}
-	
-	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.fullCube();
 	}
 
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		//this is for blocks that check the shape, for example snow.
-		if (context.getEntity() == null) return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
+		// This is for blocks that check the shape, for example snow.
+		if (context.getEntity() == null)
+			return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
 
-		if (DTConfigs.isLeavesPassable.get() || isEntityPassable(context)){
+		if (DTConfigs.isLeavesPassable.get() || this.isEntityPassable(context)){
 			return VoxelShapes.empty();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
 		}
-
 	}
+
 	public boolean isEntityPassable(ISelectionContext context){
 		return isEntityPassable(context.getEntity());
 	}
+
 	public boolean isEntityPassable(Entity entity){
 		if (entity instanceof ItemEntity)
 			return ((ItemEntity)entity).getItem().getItem() instanceof Seed;
@@ -266,7 +260,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	@Override
 	public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
 		
-		if(DTConfigs.canopyCrash.get() && entity instanceof LivingEntity) { //We are only interested in Living things crashing through the canopy.
+		if (DTConfigs.canopyCrash.get() && entity instanceof LivingEntity) { //We are only interested in Living things crashing through the canopy.
 			entity.fallDistance--;
 			
 			AxisAlignedBB aabb = entity.getBoundingBox();
@@ -283,23 +277,22 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			float volume = MathHelper.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
 			world.playSound(entity.getPosX(), entity.getPosY(), entity.getPosZ(), stepSound.getBreakSound(), SoundCategory.BLOCKS, volume, stepSound.getPitch(), false);
 			
-			for(int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) > 0); iy++) {
-				if(hasLeaves) {//This layer has leaves that can help break our fall
-					entity.fallDistance *= 0.66f;//For each layer we are crushing break the momentum
+			for (int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) > 0); iy++) {
+				if (hasLeaves) { // This layer has leaves that can help break our fall
+					entity.fallDistance *= 0.66f; // For each layer we are crushing break the momentum
 					hasLeaves = false;
 				}
-				for(int ix = minX; ix <= maxX; ix++) {
-					for(int iz = minZ; iz <= maxZ; iz++) {
+				for (int ix = minX; ix <= maxX; ix++) {
+					for (int iz = minZ; iz <= maxZ; iz++) {
 						BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
 						BlockState state = world.getBlockState(iPos);
-						if(TreeHelper.isLeaves(state)) {
-							hasLeaves = true;//This layer has leaves
+						if (TreeHelper.isLeaves(state)) {
+							hasLeaves = true; // This layer has leaves
 							DTClient.crushLeavesBlock(world, iPos, state, entity);
 							world.removeBlock(iPos, false);
-						} else
-							if (!world.isAirBlock(iPos)) {
-								crushing = false;//We hit something solid thus no longer crushing leaves layers
-							}
+						} else if (!world.isAirBlock(iPos)) {
+							crushing = false; // We hit something solid thus no longer crushing leaves layers
+						}
 					}
 				}
 			}
@@ -314,14 +307,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		else {
 			if (entity.getMotion().y < 0.0D && entity.fallDistance < 2.0f) {
 				entity.fallDistance = 0.0f;
-				entity.setMotion(entity.getMotion().x, entity.getMotion().y * 0.5D, entity.getMotion().z);//Slowly sink into the block
+				entity.setMotion(entity.getMotion().x, entity.getMotion().y * 0.5D, entity.getMotion().z); // Slowly sink into the block
 			} else
 				if (entity.getMotion().y > 0 && entity.getMotion().y < 0.25D) {
-					entity.setMotion(entity.getMotion().x, entity.getMotion().y + 0.025, entity.getMotion().z);//Allow a little climbing
+					entity.setMotion(entity.getMotion().x, entity.getMotion().y + 0.025, entity.getMotion().z); // Allow a little climbing
 				}
 			
-			entity.setSprinting(false);//One cannot sprint upon tree tops
-			entity.setMotion(entity.getMotion().x * 0.25D, entity.getMotion().y, entity.getMotion().z  * 0.25D);//Make travel slow and laborious
+			entity.setSprinting(false); // One cannot sprint upon tree tops
+			entity.setMotion(entity.getMotion().x * 0.25D, entity.getMotion().y, entity.getMotion().z  * 0.25D); // Make travel slow and laborious
 		}
 	}
 

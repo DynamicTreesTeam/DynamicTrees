@@ -25,6 +25,7 @@ repositories {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 ext.configFile = file "gradle.properties"
@@ -132,7 +133,21 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
-jar.finalizedBy('reobfJar')
+task writeNewPom {
+    doLast {
+        pom {
+            project {
+                groupId config.package_group
+                artifactId "${archivesBaseName}-${config.mc_version}"
+                version config.mod_version
+            }
+        }.whenConfigured {
+            pom -> pom.dependencies.clear()
+        }.writeTo("build/libs/${archivesBaseName}-${config.mc_version}-${config.mod_version}.pom")
+    }
+}
+
+jar.finalizedBy('reobfJar', 'writeNewPom')
 
 artifacts {
     archives sourcesJar

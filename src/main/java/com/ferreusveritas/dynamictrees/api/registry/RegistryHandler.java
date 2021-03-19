@@ -1,8 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
@@ -18,7 +16,13 @@ import java.util.Map;
 /**
  * Handles registries for the given mod ID in the constructor. Add-ons should instantiate
  * one of these in their constructor, registering it to {@link #REGISTRY} and the mod event
- * bus which can be obtained from {@link FMLJavaModLoadingContext#getModEventBus()}.
+ * bus such as is done below:<br><br><br>
+ *
+ * <pre>
+ * final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
+ * RegistryHandler.REGISTRY.register(registryHandler);
+ * FMLJavaModLoadingContext.get().getModEventBus().register(registryHandler);
+ * </pre>
  *
  * <p>The main purpose of this is to prevent Forge from complaining about blocks and items
  * for a different mod ID having their registry names set when the active mod container

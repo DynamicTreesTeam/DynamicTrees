@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
 import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
@@ -53,7 +52,7 @@ public class GenFeatureProperty<T> {
         if (jsonElement == null)
             return null;
 
-        if (!getter.isValidGetter()) {
+        if (!getter.isValid()) {
             LogManager.getLogger().warn("Tried to get class {} for gen feature property {}, but object getter was not registered.", this.type == null ? "null" : this.type.getSimpleName(), this.identifier);
             return null;
         }

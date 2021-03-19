@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;

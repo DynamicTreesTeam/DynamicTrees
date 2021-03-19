@@ -1,12 +1,12 @@
 {
-    "family": "dynamictrees:spruce",
+    "family": "spruce",
     "tapering": 0.25,
     "signal_energy": 16.0,
     "up_probability": 3,
     "lowest_branch_height": 3,
     "growth_rate": 0.9,
-    "growth_logic_kit": "dynamictrees:conifer",
-    "leaves_properties": "dynamictrees:spruce",
+    "growth_logic_kit": "conifer",
+    "leaves_properties": "spruce",
     "environment_factors" : {
         "hot": 0.50,
         "dry": 0.25,
@@ -15,15 +15,15 @@
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "coniferous" },
-    "primitive_sapling": "minecraft:spruce_sapling",
-    "mega_species": "dynamictrees:mega_spruce",
+    "primitive_sapling": "spruce_sapling",
+    "mega_species": "mega_spruce",
     "features" : [
         {
-            "name": "dynamictrees:conifer_topper",
+            "name": "conifer_topper",
             "properties": {
-                "leaves_properties": "dynamictrees:spruce"
+                "leaves_properties": "spruce"
             }
         },
-        "dynamictrees:podzol"
+        "podzol"
     ]
 }

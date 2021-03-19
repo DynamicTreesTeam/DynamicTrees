@@ -1,8 +1,8 @@
 {
-    "type": "dynamictrees:fungus",
-    "common_leaves": "dynamictrees:crimson",
-    "common_species": "dynamictrees:crimson",
-    "primitive_log": "minecraft:crimson_stem",
-    "primitive_stripped_log": "minecraft:stripped_crimson_stem",
+    "type": "fungus",
+    "common_leaves": "crimson",
+    "common_species": "crimson",
+    "primitive_log": "crimson_stem",
+    "primitive_stripped_log": "stripped_crimson_stem",
     "max_branch_radius": 24
 }

@@ -1,5 +1,5 @@
 {
-    "family": "dynamictrees:spruce",
+    "family": "spruce",
     "tapering": 0.25,
     "signal_energy": 24.0,
     "up_probability": 7,
@@ -7,8 +7,8 @@
     "growth_rate": 0.9,
     "soil_longevity": 16,
     "max_branch_radius": 24,
-    "growth_logic_kit": "dynamictrees:mega_conifer",
-    "leaves_properties": "dynamictrees:spruce",
+    "growth_logic_kit": "mega_conifer",
+    "leaves_properties": "spruce",
     "environment_factors" : {
         "hot": 0.50,
         "dry": 0.25,
@@ -20,18 +20,18 @@
     "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
     "features" : [
         {
-            "name": "dynamictrees:conifer_topper",
+            "name": "conifer_topper",
             "properties": {
-                "leaves_properties": "dynamictrees:spruce"
+                "leaves_properties": "spruce"
             }
         },
         {
-            "name": "dynamictrees:mound",
+            "name": "mound",
             "properties": {
                 "mound_cutoff_radius": 999
             }
         },
-        "dynamictrees:clear_volume",
-        "dynamictrees:podzol"
+        "clear_volume",
+        "podzol"
     ]
 }

@@ -1,15 +1,12 @@
 package com.ferreusveritas.dynamictrees;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,7 +15,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -65,7 +61,6 @@ public class DynamicTrees {
 
 		DTRegistries.setup();
 
-		modEventBus.addListener(this::commonSetup);
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::parallelDispatch);
 
@@ -77,18 +72,8 @@ public class DynamicTrees {
 		DTClient.setup();
 	}
 
-	private void commonSetup(final FMLCommonSetupEvent event) {
-		// TODO: Fix this for new Json system.
-		for (Species species : Species.REGISTRY) {
-			final BlockState primitiveSaplingState = species.getPrimitiveSapling();
-
-			if (primitiveSaplingState != null)
-				TreeRegistry.registerSaplingReplacer(primitiveSaplingState, species);
-		}
-	}
-
 	private void parallelDispatch(final ParallelDispatchEvent event) {
-		event.enqueueWork(() -> DTRegistries.DENDRO_POTION.registerRecipes());
+		event.enqueueWork(DTRegistries.DENDRO_POTION::registerRecipes);
 	}
 
 	public static ResourceLocation resLoc (final String path) {

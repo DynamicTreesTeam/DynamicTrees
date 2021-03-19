@@ -248,17 +248,17 @@ public class DTRegistries {
 	}
 
 	@SubscribeEvent
-	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<CellKit> event) {
+	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<CellKit> event) {
 		CellKits.register(event.getRegistry());
 	}
 
 	@SubscribeEvent
-	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<GrowthLogicKit> event) {
+	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GrowthLogicKit> event) {
 		GrowthLogicKits.register(event.getRegistry());
 	}
 
 	@SubscribeEvent
-	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.util.RegistryEvent<GenFeature> event) {
+	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
 		GenFeatures.register(event.getRegistry());
 	}
 

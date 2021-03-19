@@ -1,9 +1,9 @@
 {
-    "common_leaves": "dynamictrees:dark_oak",
-    "common_species": "dynamictrees:dark_oak",
-    "primitive_log": "minecraft:dark_oak_log",
-    "primitive_stripped_log": "minecraft:stripped_dark_oak_log",
-    "stick": "minecraft:stick",
+    "common_leaves": "dark_oak",
+    "common_species": "dark_oak",
+    "primitive_log": "dark_oak_log",
+    "primitive_stripped_log": "stripped_dark_oak_log",
+    "stick": "stick",
     "max_branch_radius": 24,
     "generate_surface_root": true,
     "conifer_variants": true

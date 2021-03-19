@@ -207,7 +207,7 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	@Override
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;

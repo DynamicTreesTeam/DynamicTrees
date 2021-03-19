@@ -19,6 +19,9 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
@@ -37,7 +40,7 @@ public final class JsonObjectGetters {
     /** Returned by {@link #getObjectGetter(Class)} if an object getter wasn't found. */
     public static final class NullObjectGetter<T> implements IJsonObjectGetter<T> {
         @Override
-        public boolean isValidGetter() {
+        public boolean isValid() {
             return false;
         }
 
@@ -74,9 +77,9 @@ public final class JsonObjectGetters {
     }
 
     /**
-     * Holds an {@link IJsonObjectGetter} for the relevant class.
+     * Holds an {@link IJsonObjectGetter} and the relevant {@link Class} of type {@link T}.
      *
-     * @param <T> The type of the object getter.
+     * @param <T> The type the object getter fetches.
      */
     private static final class JsonObjectGetterHolder<T> {
         private final Class<T> objectClass;
@@ -211,10 +214,19 @@ public final class JsonObjectGetters {
      * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid
      * giving null to the getters.
      */
-    public static void registerRegistryEntryGetters () {
+    public static void registerForgeEntryGetters() {
         BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block"));
         ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item"));
         BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
     }
+
+    public static void postRegistryEvent() {
+        ModLoader.get().postEvent(new RegistryEvent());
+    }
+
+    /**
+     * This event is posted for add-ons to register custom Json object getters at the right time.
+     */
+    public static final class RegistryEvent extends Event implements IModBusEvent { }
 
 }

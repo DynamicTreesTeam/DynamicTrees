@@ -1,9 +1,7 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 
 public class GrowthLogicKits {
 	

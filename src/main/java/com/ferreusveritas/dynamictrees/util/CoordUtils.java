@@ -26,7 +26,7 @@ import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class CoordUtils {
+public final class CoordUtils {
 
 	// Used for devs to simulate tree growing in different location hashes.
 	public static int coordXor = 0;

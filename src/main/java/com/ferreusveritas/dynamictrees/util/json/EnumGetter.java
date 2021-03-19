@@ -4,6 +4,9 @@ import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.google.gson.JsonElement;
 
 /**
+ * An {@link IJsonObjectGetter} for getting the given {@link Enum} of type {@link T} from a {@link JsonElement}.
+ *
+ * @param <T> The {@link Enum} type.
  * @author Harley O'Connor
  */
 public final class EnumGetter<T extends Enum<T>> implements IJsonObjectGetter<T> {
@@ -21,7 +24,7 @@ public final class EnumGetter<T extends Enum<T>> implements IJsonObjectGetter<T>
         if (!stringFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(stringFetchResult);
 
-        T fetchedEnum = EnumGetMethod.NAME_IGNORECASE.get(stringFetchResult.getValue(), this.enumType);
+        final T fetchedEnum = EnumGetMethod.NAME_IGNORECASE.get(stringFetchResult.getValue(), this.enumType);
 
         if (fetchedEnum == null)
             return ObjectFetchResult.failure("Couldn't get enum for '" + this.enumType + "' from value " + stringFetchResult.getValue());

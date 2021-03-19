@@ -1,8 +1,8 @@
 {
-    "type": "dynamictrees:fungus",
-    "common_leaves": "dynamictrees:warped",
-    "common_species": "dynamictrees:warped",
-    "primitive_log": "minecraft:warped_stem",
-    "primitive_stripped_log": "minecraft:stripped_warped_stem",
+    "type": "fungus",
+    "common_leaves": "warped",
+    "common_species": "warped",
+    "primitive_log": "warped_stem",
+    "primitive_stripped_log": "stripped_warped_stem",
     "max_branch_radius": 24
 }

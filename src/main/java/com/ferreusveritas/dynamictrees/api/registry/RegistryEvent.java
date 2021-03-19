@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.GenericEvent;

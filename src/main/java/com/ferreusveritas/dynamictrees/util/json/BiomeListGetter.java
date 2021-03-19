@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.IPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.IVoidPropertyApplier;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.google.gson.JsonElement;

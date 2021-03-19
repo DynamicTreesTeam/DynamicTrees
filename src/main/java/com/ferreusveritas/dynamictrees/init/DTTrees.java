@@ -8,9 +8,9 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.TypeRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,7 +33,7 @@ public class DTTrees {
 	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
 	@SubscribeEvent
-	public static void registerSpecies (final com.ferreusveritas.dynamictrees.util.RegistryEvent<Species> event) {
+	public static void registerSpecies (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
 		// Registers fake species for generating mushrooms.
 		event.getRegistry().registerAll(new Mushroom(true), new Mushroom(false));
 	}
@@ -68,9 +68,13 @@ public class DTTrees {
 			registry.postRegistryEvent();
 		});
 
-		// Register any registries from Json files.
 		DTResourceRegistries.setupTreesResourceManager();
-		JsonObjectGetters.registerRegistryEntryGetters();
+
+		// Register Forge registry entry getters and add-on Json object getters.
+		JsonObjectGetters.registerForgeEntryGetters();
+		JsonObjectGetters.postRegistryEvent();
+
+		// Register any registry entries from Json files.
 		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
 
 		// Lock all the registries.

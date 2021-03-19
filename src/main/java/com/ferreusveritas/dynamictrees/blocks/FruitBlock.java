@@ -51,6 +51,7 @@ public class FruitBlock extends Block implements IGrowable {
 
 	private static final Map<Species, FruitBlock> SPECIES_FRUIT_MAP = new HashMap<>();
 
+	@Nullable
 	public static FruitBlock getFruitBlockForSpecies(Species species) {
 		return SPECIES_FRUIT_MAP.getOrDefault(species, null);
 	}

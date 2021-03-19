@@ -1,9 +1,9 @@
 {
-    "family": "dynamictrees:oak",
+    "family": "oak",
     "tapering": 0.3,
     "signal_energy": 12.0,
     "growth_rate": 0.8,
-    "leaves_properties": "dynamictrees:oak",
+    "leaves_properties": "oak",
     "environment_factors" : {
         "cold": 0.75,
         "hot": 0.5,
@@ -13,15 +13,15 @@
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
     "perfect_biomes": { "types": [ "forest", "overworld" ] },
-    "primitive_sapling": "minecraft:oak_sapling",
+    "primitive_sapling": "oak_sapling",
     "features" : [
         {
-            "name": "dynamictrees:rot_soil",
+            "name": "rot_soil",
             "properties": {
-                "rotted_soil": "minecraft:podzol"
+                "rotted_soil": "podzol"
             }
         },
-        "dynamictrees:mushroom_rot",
-        "dynamictrees:bee_nest"
+        "mushroom_rot",
+        "bee_nest"
     ]
 }

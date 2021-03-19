@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
@@ -11,7 +12,6 @@ import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.Registry;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
@@ -25,7 +25,6 @@ import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -82,7 +81,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + registryName + "' was not found.")));
                 })
                 .register("seed", Seed.class, Species::setSeed)
-                .register("primitive_sapling", Block.class, Species::setPrimitiveSapling)
+                .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.getDefaultState(), species))
                 .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)

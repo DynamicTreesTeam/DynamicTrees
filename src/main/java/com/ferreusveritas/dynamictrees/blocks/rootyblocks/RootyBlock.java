@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
  *
@@ -62,8 +61,8 @@ import java.util.Random;
  * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link Family} family.
  * 
  * @author ferreusveritas
- *
  */
+@SuppressWarnings("deprecation")
 public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
@@ -226,7 +225,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		// TODO: Ensure ActionResultType is being used correctly.
 		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 	

@@ -23,6 +23,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
@@ -78,7 +79,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	}
 
 	@Override
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 
 		if (updateTrunkShells(world, pos, radius, flags)){
 			return super.setRadius(world, pos, radius, originDir, flags);

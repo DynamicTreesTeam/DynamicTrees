@@ -14,10 +14,9 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.google.common.collect.Sets;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -42,19 +41,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This structure describes a Tree Family whose member Species all have a common wood type.
+ * This structure describes a Family whose member Species all have a common branch.
  *
-* A {@link Family} is more or less just a definition of {@link BranchBlock} blocks.
-* It also defines the cellular automata function of the {@link BranchBlock}.  It defines the type of wood that
-* the tree is made of and consequently what kind of log you get when you cut it down.
-*
-* A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
-* It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
-* All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
-* species(the common species).
-*
-* @author ferreusveritas
-*/
+ * A {@link Family} is more or less just a definition of {@link BranchBlock} blocks.
+ * It also defines the cellular automata function of the {@link BranchBlock}.  It defines the type of wood that
+ * the tree is made of and consequently what kind of log you get when you cut it down.
+ *
+ * A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall, etc).
+ * It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
+ * All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
+ * species(the common species).
+ *
+ * @author ferreusveritas
+ */
 public class Family extends RegistryEntry<Family> {
 	
 	public final static Family NULL_FAMILY = new Family() {
@@ -73,6 +72,7 @@ public class Family extends RegistryEntry<Family> {
 	public static final TypedRegistry<Family, Type> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, new Type());
 
 	public static class Type extends TypedRegistry.EntryType<Family> {
+		@Override
 		public Family construct (final ResourceLocation registryName) {
 			return new Family(registryName);
 		}
@@ -223,7 +223,7 @@ public class Family extends RegistryEntry<Family> {
 	// INTERACTION
 	///////////////////////////////////////////
 
-	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
 
 		if (this.canSupportCocoa) {
 			BlockPos pos = hit.getPos();

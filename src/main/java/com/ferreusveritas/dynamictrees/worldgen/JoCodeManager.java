@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Manages {@link JoCode} objects, reading from datapacks. Can be used to call random JoCodes during worldgen.
+ * Manages {@link JoCode} objects, reading from tree packs. Can be used to call random JoCodes during worldgen.
  * Main instance stored in {@link DTResourceRegistries}.
  *
  * @author Harley O'Connor

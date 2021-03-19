@@ -185,7 +185,7 @@ public class TreeRegistry {
 	 * @param resourceLocation The {@link ResourceLocation} to process.
 	 * @return The {@link ResourceLocation} object.
 	 */
-	private static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
+	public static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
 		if (DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {
 			return DynamicTrees.resLoc(resourceLocation.getPath());
 		}

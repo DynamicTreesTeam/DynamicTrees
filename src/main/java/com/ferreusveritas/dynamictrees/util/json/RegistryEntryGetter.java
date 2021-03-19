@@ -1,12 +1,13 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.google.gson.JsonElement;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * Gets {@link RegistryEntry} objects from {@link Registry} object.
+ * Gets {@link RegistryEntry} object of type {@link T} from the given {@link Registry} object.
  *
  * @author Harley O'Connor
  */
@@ -27,7 +28,8 @@ public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements IJ
         if (!resourceLocationFetchResult.wasSuccessful())
             return ObjectFetchResult.failure(resourceLocationFetchResult.getErrorMessage());
 
-        final ResourceLocation registryName = resourceLocationFetchResult.getValue();
+        // Get and process registry name, so that if the namespace is 'minecraft' we instead default to 'dynamictrees'.
+        final ResourceLocation registryName = TreeRegistry.processResLoc(resourceLocationFetchResult.getValue());
 
         if (!this.registry.has(registryName))
             return ObjectFetchResult.failure("Json element referenced unregistered " + this.registryDisplayName + " '" + registryName + "'.");

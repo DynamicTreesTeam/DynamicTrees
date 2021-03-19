@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.google.gson.JsonElement;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * Gets an {@link com.ferreusveritas.dynamictrees.util.TypedRegistry.EntryType} from its registry name.
+ * Gets an {@link TypedRegistry.EntryType} from its registry name.
  *
  * @author Harley O'Connor
  */
@@ -25,8 +25,11 @@ public final class EntryTypeGetter<T extends TypedRegistry.EntryType<?>> impleme
         if (!resLocFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(resLocFetchResult);
 
-        return ObjectFetchResult.successOrFailure(this.registry.getType(resLocFetchResult.getValue()),
-                "Could not find " + registry.getName() + " for registry name '" + resLocFetchResult.getValue() + "'.");
+        // Get and process registry name, so that if the namespace is 'minecraft' we instead default to 'dynamictrees'.
+        final ResourceLocation registryName = TreeRegistry.processResLoc(resLocFetchResult.getValue());
+
+        return ObjectFetchResult.successOrFailure(this.registry.getType(registryName),
+                "Could not find " + registry.getName() + " for registry name '" + registryName + "'.");
     }
 
 }

@@ -9,8 +9,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenF
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
-import com.ferreusveritas.dynamictrees.util.Registry;
-import com.ferreusveritas.dynamictrees.util.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 

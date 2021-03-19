@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
@@ -28,12 +28,12 @@ public class TypedRegistry<V extends RegistryEntry<V>, T extends TypedRegistry.E
     private final T defaultType;
 
     /**
-     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
+     * Constructs a new {@link TypedRegistry} with the name being set to {@link Class#getSimpleName()}
      * of the given {@link RegistryEntry}.
      *
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
-     * @param defaultType The {@link EntryType} of the {@link RegistryEntry}.
+     * @param defaultType The {@link EntryType} for the base {@link RegistryEntry} extension.
      */
     public TypedRegistry(Class<V> type, V nullValue, T defaultType) {
         super(type, nullValue);
@@ -41,12 +41,12 @@ public class TypedRegistry<V extends RegistryEntry<V>, T extends TypedRegistry.E
     }
 
     /**
-     * Constructs a new {@link Registry}.
+     * Constructs a new {@link TypedRegistry}.
      *
      * @param name The {@link #name} for this {@link Registry}.
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
-     * @param defaultType The {@link EntryType} of the {@link RegistryEntry}.
+     * @param defaultType The {@link EntryType} for the base {@link RegistryEntry} extension.
      */
     public TypedRegistry(String name, Class<V> type, V nullValue, T defaultType) {
         super(name, type, nullValue);
@@ -93,6 +93,21 @@ public class TypedRegistry<V extends RegistryEntry<V>, T extends TypedRegistry.E
      *
      * @param <V> The {@link RegistryEntry} sub-class.
      */
-    public static abstract class EntryType<V extends RegistryEntry<V>> {}
+    public static abstract class EntryType<V extends RegistryEntry<V>> {
+
+        /**
+         * The most basic construction method, taking only a {@link ResourceLocation} registry
+         * name. Some sub-classes may decide to restrain the use of this method by throwing an
+         * {@link UnsupportedOperationException} if they require more parameters for construction,
+         * so tread with caution.
+         *
+         * @param registryName The {@link ResourceLocation} registry name.
+         * @return The constructed {@link RegistryEntry} of type {@link V}.
+         * @throws UnsupportedOperationException If construction of the {@link RegistryEntry}
+         * requires more than just a registry name.
+         */
+        public abstract V construct (final ResourceLocation registryName);
+
+    }
 
 }

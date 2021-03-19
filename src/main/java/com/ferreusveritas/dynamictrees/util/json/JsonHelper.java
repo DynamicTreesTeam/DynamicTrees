@@ -16,7 +16,6 @@ public class JsonHelper {
 
 	@Nullable
 	public static JsonElement load(@Nullable final File file) {
-
 		if (file != null && file.exists() && file.isFile() && file.canRead()) {
 			String fileName = file.getAbsolutePath();
 
@@ -74,6 +73,20 @@ public class JsonHelper {
 		return fetchResult.wasSuccessful() && fetchResult.getValue();
 	}
 
+	/**
+	 * Gets the value of type {@link T} from the {@link JsonObject} using the given key,
+	 * or null if it was not found. It also prints a warning with the given <tt>errorPrefix</tt>
+	 * if it was unsuccessful in fetching the type {@link T}, or if the element was not
+	 * found for the key if the <tt>required</tt> parameter is true.
+	 *
+	 * @param jsonObject The {@link JsonObject} to get from.
+	 * @param key The key of the value to get.
+	 * @param classToGet The {@link Class} object of type {@link T}.
+	 * @param errorPrefix The message to display as a prefix to the warning.
+	 * @param required True if the user should be warned if the element doesn't exist.
+	 * @param <T> The type of the {@link Object} to fetch.
+	 * @return The {@link Object} of type {@link T}, or null if it was not found or unsuccessful.
+	 */
 	@Nullable
 	public static <T> T getFromObjectOrWarn(final JsonObject jsonObject, final String key, final Class<T> classToGet, final String errorPrefix, final boolean required) {
 		if (!jsonObject.has(key)) {

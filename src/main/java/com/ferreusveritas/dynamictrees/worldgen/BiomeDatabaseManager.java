@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 /**
- * Manages {@link BiomeDatabase} objects, reading from datapacks. Main instance stored in
+ * Manages {@link BiomeDatabase} objects, reading from tree packs. Main instance stored in
  * {@link DTResourceRegistries}.
  *
  * @author Harley O'Connor
