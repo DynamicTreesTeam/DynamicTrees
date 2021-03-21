@@ -72,10 +72,8 @@ public final class FamilyManager extends JsonReloadListener<Family> {
     protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
         Family.REGISTRY.unlock(); // Ensure registry is unlocked.
 
-        for (final Map.Entry<ResourceLocation, JsonElement> entry : preparedObject.entrySet()) {
-            final ResourceLocation registryName = entry.getKey();
-
-            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(entry.getValue());
+        preparedObject.forEach((registryName, jsonElement) -> {
+            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
 
             if (!jsonObjectFetchResult.wasSuccessful()) {
                 LOGGER.warn("Skipping loading data for family '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());
@@ -83,6 +81,11 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             }
 
             final JsonObject jsonObject = jsonObjectFetchResult.getValue();
+
+            // Skip the current entry if it shouldn't load.
+            if (!this.shouldLoad(jsonObject, "Error loading data for family '" + registryName + "': "))
+                return;
+
             final Family family;
             final boolean newRegistry = !Family.REGISTRY.has(registryName);
 
@@ -124,7 +127,7 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             } else {
                 LOGGER.debug("Loaded data for tree family: {}.", family.getDisplayString());
             }
-        }
+        });
 
         // Lock registry (don't lock on first load as registry events are fired after).
         if (!firstLoad)

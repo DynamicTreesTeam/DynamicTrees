@@ -2,11 +2,16 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList}
@@ -65,6 +70,24 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      */
     protected void postApplierEvent (final JsonPropertyApplierList<?> applierList, final String applierListIdentifier) {
         ModLoader.get().postEvent(new JsonApplierRegistryEvent<>(applierList, applierListIdentifier));
+    }
+
+    /**
+     * Checks if the entry for the given {@link JsonObject} should load based on the {@link ModList}.
+     * This allows entries to only load if the given mod ID is loaded, which can be used by add-ons
+     * to create custom species types if, for example, dynamic trees plus is installed.
+     *
+     * @param jsonObject The {@link JsonObject} to check.
+     * @param warnPrefix The prefix to give the warning if
+     * @return Whether or not the given entry should load.
+     */
+    protected boolean shouldLoad(final JsonObject jsonObject, final String warnPrefix) {
+        final AtomicBoolean shouldLoad = new AtomicBoolean(true);
+
+        JsonHelper.JsonObjectReader.of(jsonObject).ifContains("only_if_loaded", String.class, modId ->
+                shouldLoad.set(ModList.get().isLoaded(modId))).elseWarn(warnPrefix);
+
+        return shouldLoad.get();
     }
 
     public JsonPropertyApplierList<V> getAppliers() {

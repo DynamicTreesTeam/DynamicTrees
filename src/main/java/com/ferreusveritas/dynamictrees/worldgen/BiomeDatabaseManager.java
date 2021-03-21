@@ -189,9 +189,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
             this.dimensionDatabases.put(dimensionalPopulator.getKey(), dimensionalDatabase);
 
-            dimensionalPopulator.getValue().forEach(jsonElement -> {
-                this.readPopulator(dimensionalDatabase, dimensionalPopulator.getKey(), jsonElement, false);
-            });
+            dimensionalPopulator.getValue().forEach(jsonElement ->
+                    this.readPopulator(dimensionalDatabase, dimensionalPopulator.getKey(), jsonElement, false));
         });
 
         // Blacklist certain dimensions according to the config.
@@ -238,6 +237,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
     private void readPopulatorSection (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonObject jsonObject, final boolean readCancellerOnly) {
         final AtomicReference<BiomeList> biomeList = new AtomicReference<>();
+
+        if (!this.shouldLoad(jsonObject, "Error loading populator '" + resourceLocation + "': "))
+            return;
 
         final JsonHelper.JsonObjectReader reader = JsonHelper.JsonObjectReader.of(jsonObject).ifContains(SELECT, selectElement ->
                 JsonHelper.JsonElementReader.of(selectElement).ifOfType(BiomeList.class, biomeList::set));

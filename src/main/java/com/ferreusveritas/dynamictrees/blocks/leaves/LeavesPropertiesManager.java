@@ -56,16 +56,18 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
     protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
         LeavesProperties.REGISTRY.unlock();
 
-        for (final Map.Entry<ResourceLocation, JsonElement> entry : preparedObject.entrySet()) {
-            final ResourceLocation registryName = entry.getKey();
-            final JsonElement jsonElement = entry.getValue();
-
+        preparedObject.forEach((registryName, jsonElement) -> {
             if (!jsonElement.isJsonObject()) {
                 LOGGER.warn("Skipping loading leaves properties '{}' as its root element is not a Json object.", registryName);
                 return;
             }
 
             final JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+            // Skip the current entry if it shouldn't load.
+            if (!this.shouldLoad(jsonObject, "Error loading data for leaves properties '" + registryName + "': "))
+                return;
+
             final boolean newEntry = !LeavesProperties.REGISTRY.has(registryName);
             final LeavesProperties leavesProperties;
             final Consumer<PropertyApplierResult> failureConsumer = failureResult -> LOGGER.warn("Error whilst loading leaves properties '{}': {}", registryName, failureResult.getErrorMessage());
@@ -107,7 +109,7 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
             } else {
                 LOGGER.debug("Loaded leaves properties data: {}.", leavesProperties.getDisplayString());
             }
-        }
+        });
 
         if (!firstLoad)
             LeavesProperties.REGISTRY.lock();

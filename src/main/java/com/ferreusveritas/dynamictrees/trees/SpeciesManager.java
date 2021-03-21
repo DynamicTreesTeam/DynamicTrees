@@ -24,6 +24,8 @@ import net.minecraft.block.Block;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -112,6 +114,11 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             }
 
             final JsonObject jsonObject = jsonObjectFetchResult.getValue();
+
+            // Skip the current entry if it shouldn't load.
+            if (!this.shouldLoad(jsonObject, "Error loading data for species '" + registryName + "': "))
+                return;
+
             final Species species;
             final boolean newRegistry = !Species.REGISTRY.has(registryName);
 
