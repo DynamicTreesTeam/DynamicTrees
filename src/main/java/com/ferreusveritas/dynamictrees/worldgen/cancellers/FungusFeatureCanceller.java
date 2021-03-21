@@ -1,6 +1,7 @@
-package com.ferreusveritas.dynamictrees.worldgen.canceller;
+package com.ferreusveritas.dynamictrees.worldgen.cancellers;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
@@ -12,23 +13,24 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
  *
  * @author Harley O'Connor
  */
-public class FungusFeatureCanceller<T extends IFeatureConfig> implements ITreeFeatureCanceller {
+public class FungusFeatureCanceller<T extends IFeatureConfig> extends FeatureCanceller {
 
     private final Class<T> fungusFeatureConfigClass;
 
-    public FungusFeatureCanceller(Class<T> fungusFeatureConfigClass) {
+    public FungusFeatureCanceller(final ResourceLocation registryName, final Class<T> fungusFeatureConfigClass) {
+        super(registryName);
         this.fungusFeatureConfigClass = fungusFeatureConfigClass;
     }
 
     @Override
-    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, ResourceLocation biomeResLoc, ITreeCanceller treeCanceller) {
+    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
         if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
 
         final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
         final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();
 
         return this.fungusFeatureConfigClass.isInstance(nextConfiguredFeature.config) && featureRegistryName != null &&
-                treeCanceller.shouldCancelFeature(biomeResLoc, featureRegistryName);
+                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
     }
 
 }

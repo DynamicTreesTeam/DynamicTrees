@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Manages a list of {@link JsonPropertyApplier} objects of type {@link T}, allowing for an
+ * easy way of storing, registering, and applying property appliers.
+ *
+ * @param <T> The type of {@link Object} the {@link JsonPropertyApplier} for this list are applying to.
  * @author Harley O'Connor
  */
 public final class JsonPropertyApplierList<T> {

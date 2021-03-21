@@ -1,11 +1,9 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
-import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.client.TooltipHandler;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -13,18 +11,9 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 public class CommonEventHandler {
-	
-	@SubscribeEvent
-	public void onLoadComplete(FMLLoadCompleteEvent event){
-		// Clears and locks registry handlers to free them from memory.
-		RegistryHandler.REGISTRY.clear();
 
-//			DTClient.discoverWoodColors();
-	}
-	
 	@SubscribeEvent
 	public void onWorldTick(TickEvent.WorldTickEvent event) {
 		if(event.side == LogicalSide.SERVER) {
@@ -41,11 +30,6 @@ public class CommonEventHandler {
 		if (event.getWorld().isRemote()){
 			DTClient.discoverWoodColors();
 		}
-	}
-
-	@SubscribeEvent
-	public void onWorldUnload (WorldEvent.Unload event) {
-		TreeCancellerJson.INSTANCE = null; // Reset tree canceller Json.
 	}
 
 	@SubscribeEvent

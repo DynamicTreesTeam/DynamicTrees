@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -10,6 +12,10 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenF
 import com.ferreusveritas.dynamictrees.trees.*;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
+import com.ferreusveritas.dynamictrees.worldgen.json.ChanceSelectorGetter;
+import com.ferreusveritas.dynamictrees.worldgen.json.DensitySelectorGetter;
+import com.ferreusveritas.dynamictrees.worldgen.json.SpeciesSelectorGetter;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -90,6 +96,8 @@ public final class JsonObjectGetters {
             this.objectGetter = objectGetter;
         }
     }
+
+    public static final IJsonObjectGetter<JsonElement> JSON_ELEMENT_GETTER = register(JsonElement.class, ObjectFetchResult::success);
 
     public static final IJsonObjectGetter<String> STRING_GETTER = register(String.class, jsonElement -> {
         if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isString())
@@ -176,6 +184,7 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
     public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY, "family"));
     public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY, "species"));
+    public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER_GETTER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY, "feature canceller"));
 
     public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE_GETTER = register(LeavesProperties.Type.class, new EntryTypeGetter<>(LeavesProperties.REGISTRY));
     public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE_GETTER = register(Family.Type.class, new EntryTypeGetter<>(Family.REGISTRY));
@@ -199,6 +208,7 @@ public final class JsonObjectGetters {
 
     // Random enum getters.
     public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE_GETTER = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
+    public static final IJsonObjectGetter<BiomeDatabase.Operation> OPERATION_GETTER = new EnumGetter<>(BiomeDatabase.Operation.class);
 
     public static final IJsonObjectGetter<BiomeList> BIOME_LIST_GETTER = register(BiomeList.class, new BiomeListGetter());
     public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE_GETTER = register(BiomePredicate.class, jsonElement -> {
@@ -209,6 +219,13 @@ public final class JsonObjectGetters {
 
         return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> currentBiome.getRegistryName().equals(biome.getRegistryName())));
     });
+
+    public static final IJsonObjectGetter<BiomePropertySelectors.ISpeciesSelector> SPECIES_SELECTOR_GETTER = register(
+            BiomePropertySelectors.ISpeciesSelector.class, new SpeciesSelectorGetter());
+    public static final IJsonObjectGetter<BiomePropertySelectors.IDensitySelector> DENSITY_SELECTOR_GETTER = register(
+            BiomePropertySelectors.IDensitySelector.class, new DensitySelectorGetter());
+    public static final IJsonObjectGetter<BiomePropertySelectors.IChanceSelector> CHANCE_SELECTOR_GETTER = register(
+            BiomePropertySelectors.IChanceSelector.class, new ChanceSelectorGetter());
 
     /**
      * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid

@@ -133,8 +133,9 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
      * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>
      *
      * @param value The {@link RegistryEntry} to register.
+     * @return This {@link Registry} object for chaining.
      */
-    public final void register(final V value) {
+    public final Registry<V> register(final V value) {
         final ResourceLocation registryName = value.getRegistryName();
 
         if (this.locked) {
@@ -146,6 +147,7 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
         }
 
         this.entries.add(value);
+        return this;
     }
 
     private String getErrorMessage (final V value, final ResourceLocation registryName, final String message) {
@@ -238,8 +240,8 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
         if (!this.clearable)
             return;
 
-        this.entries.clear();
         this.lock();
+        this.entries.clear();
     }
 
     /**

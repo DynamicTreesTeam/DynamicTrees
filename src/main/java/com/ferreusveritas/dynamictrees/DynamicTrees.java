@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -63,6 +65,7 @@ public class DynamicTrees {
 
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::parallelDispatch);
+		modEventBus.addListener(this::onCommonSetup);
 
 		EventHandlers.registerCommon();
 		CompatHandler.init();
@@ -74,6 +77,13 @@ public class DynamicTrees {
 
 	private void parallelDispatch(final ParallelDispatchEvent event) {
 		event.enqueueWork(DTRegistries.DENDRO_POTION::registerRecipes);
+	}
+
+	public void onCommonSetup(FMLLoadCompleteEvent event){
+		// Clears and locks registry handlers to free them from memory.
+		RegistryHandler.REGISTRY.clear();
+
+		DTResourceRegistries.getBiomeDatabaseManager().onCommonSetup();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

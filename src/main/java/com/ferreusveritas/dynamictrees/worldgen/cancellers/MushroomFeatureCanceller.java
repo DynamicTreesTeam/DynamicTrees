@@ -1,6 +1,7 @@
-package com.ferreusveritas.dynamictrees.worldgen.canceller;
+package com.ferreusveritas.dynamictrees.worldgen.cancellers;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.ITreeFeatureCanceller;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
@@ -17,16 +18,17 @@ import java.util.List;
  *
  * @author Harley O'Connor
  */
-public class MushroomFeatureCanceller<T extends IFeatureConfig> implements ITreeFeatureCanceller {
+public class MushroomFeatureCanceller<T extends IFeatureConfig> extends FeatureCanceller {
 
-    private final Class<T> fungusFeatureConfigClass;
+    private final Class<T> mushroomFeatureConfigClass;
 
-    public MushroomFeatureCanceller(final Class<T> fungusFeatureConfigClass) {
-        this.fungusFeatureConfigClass = fungusFeatureConfigClass;
+    public MushroomFeatureCanceller(final ResourceLocation registryName, final Class<T> mushroomFeatureConfigClass) {
+        super(registryName);
+        this.mushroomFeatureConfigClass = mushroomFeatureConfigClass;
     }
 
     @Override
-    public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final ResourceLocation biomeResLoc, final ITreeCanceller treeCanceller) {
+    public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final BiomePropertySelectors.FeatureCancellations featureCancellations) {
         if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
 
         final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
@@ -38,8 +40,8 @@ public class MushroomFeatureCanceller<T extends IFeatureConfig> implements ITree
         // Mushrooms come in TwoFeatureChoiceConfigs to select between brown and red.
         if (!(nextConfiguredFeature.config instanceof TwoFeatureChoiceConfig)) return false;
 
-        return getConfigs((TwoFeatureChoiceConfig) nextConfiguredFeature.config).stream().anyMatch(this.fungusFeatureConfigClass::isInstance) &&
-                treeCanceller.shouldCancelFeature(biomeResLoc, featureRegistryName);
+        return getConfigs((TwoFeatureChoiceConfig) nextConfiguredFeature.config).stream().anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
+                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
     }
 
     private List<IFeatureConfig> getConfigs (final TwoFeatureChoiceConfig twoFeatureConfig) {

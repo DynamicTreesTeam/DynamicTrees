@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
@@ -31,6 +32,9 @@ import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.TreeFeatureCanceller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -43,7 +47,10 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -260,6 +267,20 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
 		GenFeatures.register(event.getRegistry());
+	}
+
+	/** The vanilla tree canceller, which cancels any features whose config extends {@link BaseTreeFeatureConfig}. */
+	public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), BaseTreeFeatureConfig.class);
+
+	/** The vanilla fungus canceller, which cancels any features whose config extends {@link HugeFungusConfig}. */
+	public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.resLoc("fungus"), HugeFungusConfig.class);
+
+	/** The vanilla mushroom canceller, which cancels any features whose config extends {@link BigMushroomFeatureConfig}. */
+	public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.resLoc("mushroom"), BigMushroomFeatureConfig.class);
+
+	@SubscribeEvent
+	public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
+		event.getRegistry().registerAll(TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
 	}
 
 }

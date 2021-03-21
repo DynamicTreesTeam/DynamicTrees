@@ -37,9 +37,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class TrunkShellBlock extends BlockWithDynamicHardness {
 	
 	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
@@ -266,11 +268,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.INVISIBLE;
-	}
-
-	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return null;
 	}
 
 	@Override

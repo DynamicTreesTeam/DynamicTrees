@@ -1,12 +1,19 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.fml.ModLoader;
 
 /**
+ * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList}
+ * of type {@link V}.
+ *
+ * @param <T> The type of {@link Object} returned by {@link #prepare(IResourceManager)}.
+ * @param <V> The type of {@link Object} the {@link JsonPropertyApplierList} objects are applying to.
  * @author Harley O'Connor
  */
 public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> {
@@ -44,12 +51,20 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      * @param applierListIdentifier The identifier for the applier lists.
      */
     public void registerAppliers(final String applierListIdentifier) {
-        final ModLoader loader = ModLoader.get();
+        this.postApplierEvent(this.appliers, applierListIdentifier);
+        this.postApplierEvent(this.loadAppliers, applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
+        this.postApplierEvent(this.reloadAppliers, applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
+    }
 
-        // Post events so that add-ons can register additional appliers.
-        loader.postEvent(new JsonApplierRegistryEvent<>(this.appliers, applierListIdentifier));
-        loader.postEvent(new JsonApplierRegistryEvent<>(this.loadAppliers, applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX));
-        loader.postEvent(new JsonApplierRegistryEvent<>(this.reloadAppliers, applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX));
+    /**
+     * Creates a {@link JsonApplierRegistryEvent} instance for the given {@link JsonPropertyApplierList}
+     * and identifier, posting it to the mod event bus from {@link ModLoader}.
+     *
+     * @param applierList The {@link JsonPropertyApplierList} to post an applier event for.
+     * @param applierListIdentifier The identifier for the applier list.
+     */
+    protected void postApplierEvent (final JsonPropertyApplierList<?> applierList, final String applierListIdentifier) {
+        ModLoader.get().postEvent(new JsonApplierRegistryEvent<>(applierList, applierListIdentifier));
     }
 
     public JsonPropertyApplierList<V> getAppliers() {

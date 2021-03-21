@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Random;
 
-
 public class JsonMath {
 	
 	public MathOperator rootOp;

@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -79,6 +80,10 @@ public class DTTrees {
 
 		// Lock all the registries.
 		registries.forEach(Registry::lock);
+
+		// Register feature cancellers.
+		FeatureCanceller.REGISTRY.postRegistryEvent();
+		FeatureCanceller.REGISTRY.lock();
 	}
 
 	private static ResourceLocation resLoc (final String path) {

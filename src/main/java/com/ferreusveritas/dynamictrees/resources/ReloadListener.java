@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
  * A simplified version of {@link net.minecraft.client.resources.ReloadListener} that omits
  * things we don't use (namely profilers), and adds the load capability for initial loading.
  *
+ * @param <T> The type of {@link Object} returned by {@link #prepare(IResourceManager)}.
  * @author Harley O'Connor
  */
 public abstract class ReloadListener<T> {
@@ -53,9 +54,9 @@ public abstract class ReloadListener<T> {
      * Applies the given data.
      *
      * @param preparedObject The prepared/formatted data.
-     * @param resourceManagerIn The {@link IResourceManager} object.
+     * @param resourceManager The {@link IResourceManager} object.
      * @param firstLoad True if it's being called on first load (during game setup).
      */
-    protected abstract void apply(final T preparedObject, final IResourceManager resourceManagerIn, final boolean firstLoad);
+    protected abstract void apply(final T preparedObject, final IResourceManager resourceManager, final boolean firstLoad);
 
 }

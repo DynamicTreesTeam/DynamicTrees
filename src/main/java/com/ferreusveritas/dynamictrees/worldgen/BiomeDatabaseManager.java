@@ -1,29 +1,38 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
-import com.ferreusveritas.dynamictrees.api.events.BiomeDatabaseJsonCapabilityRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.events.BiomeDatabasePopulatorRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.events.PopulateDatabaseEvent;
-import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDatabasePopulator;
+import com.ferreusveritas.dynamictrees.api.events.AddFeatureCancellersEvent;
+import com.ferreusveritas.dynamictrees.api.events.PopulateDefaultDatabaseEvent;
+import com.ferreusveritas.dynamictrees.api.events.PopulateDimensionalDatabaseEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
+import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
+import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.*;
-import net.minecraft.profiler.EmptyProfiler;
-import net.minecraft.profiler.IProfiler;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraftforge.eventbus.api.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Manages {@link BiomeDatabase} objects, reading from tree packs. Main instance stored in
@@ -43,54 +52,149 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     private BiomeDatabase defaultDatabase = new BiomeDatabase();
     private final Map<ResourceLocation, BiomeDatabase> dimensionDatabases = Maps.newHashMap();
 
-    protected final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
+    private JsonPropertyApplierList<BiomeDatabase.Entry> biomeDatabaseAppliers;
+    private JsonPropertyApplierList<BiomePropertySelectors.FeatureCancellations> featureCancellationAppliers;
+
+    private final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
+
+    public static final String SELECT = "select";
+    public static final String APPLY = "apply";
+    public static final String WHITE = "white";
+    public static final String CANCELLERS = "cancellers";
+
+    private static final String METHOD = "method";
 
     public BiomeDatabaseManager() {
         super("world_gen", Object.class, "null");
     }
 
     @Override
-    protected void apply(final Map<ResourceLocation, List<Pair<String, JsonElement>>> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
+    public void registerAppliers(final String applierListIdentifier) {
+        this.biomeDatabaseAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class)
+                .register("species", JsonElement.class, (entry, jsonElement) -> {
+                    final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR_GETTER.get(jsonElement);
+
+                    if (!selectorFetchResult.wasSuccessful())
+                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+
+                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
+                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
+
+                    entry.getDatabase().setSpeciesSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
+                    return PropertyApplierResult.SUCCESS;
+                })
+                .register("density", JsonElement.class, (entry, jsonElement) -> {
+                    final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> selectorFetchResult = JsonObjectGetters.DENSITY_SELECTOR_GETTER.get(jsonElement);
+
+                    if (!selectorFetchResult.wasSuccessful())
+                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+
+                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
+                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
+
+                    entry.getDatabase().setDensitySelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
+                    return PropertyApplierResult.SUCCESS;
+                })
+                .register("chance", JsonElement.class, (entry, jsonElement) -> {
+                    final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> selectorFetchResult = JsonObjectGetters.CHANCE_SELECTOR_GETTER.get(jsonElement);
+
+                    if (!selectorFetchResult.wasSuccessful())
+                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+
+                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
+                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
+
+                    entry.getDatabase().setChanceSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
+                    return PropertyApplierResult.SUCCESS;
+                })
+                .register("multipass", Boolean.class, (entry, multipass) -> {
+                    if (!multipass)
+                        return;
+
+                    entry.getDatabase().setMultipass(entry.getBiome(), pass -> {
+                        switch(pass) {
+                            case 0: return 0; // Zero means to run as normal.
+                            case 1: return 5; // Return only radius 5 on pass 1.
+                            case 2: return 3; // Return only radius 3 on pass 2.
+                            default: return -1; // A negative number means to terminate.
+                        }
+                    });
+                })
+                .register("blacklist", Boolean.class, BiomeDatabase.Entry::setBlacklisted)
+                .register("forestness", Float.class, BiomeDatabase.Entry::setForestness)
+                .register("subterranean", Boolean.class, BiomeDatabase.Entry::setSubterraneanBiome)
+                .registerIfTrueApplier("reset", entry -> {
+                    final BiomeDatabase database = entry.getDatabase();
+                    final Biome biome = entry.getBiome();
+
+                    database.setSpeciesSelector(biome, (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection(), BiomeDatabase.Operation.REPLACE);
+                    database.setDensitySelector(biome, (rnd, nd) -> -1, BiomeDatabase.Operation.REPLACE);
+                    database.setChanceSelector(biome, (rnd, spc, rad) -> BiomePropertySelectors.EnumChance.UNHANDLED, BiomeDatabase.Operation.REPLACE);
+                    database.setForestness(biome, 0.0f);
+                    database.setIsSubterranean(biome, false);
+                    database.setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
+                });
+
+        this.featureCancellationAppliers = new JsonPropertyApplierList<>(BiomePropertySelectors.FeatureCancellations.class)
+                .register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
+                .registerArrayApplier("namespaces", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
+                .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
+                .registerArrayApplier("types", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller);
+
+        this.postApplierEvent(this.biomeDatabaseAppliers, "entry_appliers");
+        this.postApplierEvent(this.featureCancellationAppliers, "feature_cancellations");
+    }
+
+    private static ObjectFetchResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
+        final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+
+        // If there was no Json object or method element, default to replace.
+        if (!jsonObjectFetchResult.wasSuccessful() || !jsonObjectFetchResult.getValue().has(METHOD))
+            return ObjectFetchResult.success(BiomeDatabase.Operation.REPLACE);
+
+        final ObjectFetchResult<BiomeDatabase.Operation> operationFetchResult = JsonObjectGetters.OPERATION_GETTER.get(jsonObjectFetchResult.getValue().get(METHOD));
+
+        if (!operationFetchResult.wasSuccessful())
+            return ObjectFetchResult.failureFromOther(operationFetchResult);
+
+        return ObjectFetchResult.success(operationFetchResult.getValue());
+    }
+
+    @Override
+    protected void apply(Map<ResourceLocation, List<JsonElement>> preparedObject, IResourceManager resourceManager, boolean firstLoad) {
         // Ensure databases are reset.
         this.defaultDatabase = new BiomeDatabase();
         this.dimensionDatabases.clear();
         this.blacklistedDimensions.clear();
 
-        // If world gen is disabled, we don't populate the databases.
-        if (!WorldGenRegistry.isWorldGenEnabled()) {
+        // If world gen is disabled don't waste processing power reading these.
+        if (!WorldGenRegistry.isWorldGenEnabled())
             return;
-        }
 
-        this.registerJsonCapabilities(); // Registers Json capabilities for Populator Jsons.
+        final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
+        MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
 
-        BiomeDatabasePopulatorRegistryEvent event = new BiomeDatabasePopulatorRegistryEvent();
-        MinecraftForge.EVENT_BUS.post(event); // Allows add-ons to register custom populators.
+        final Event populateDefaultDatabaseEvent = new PopulateDefaultDatabaseEvent(this.defaultDatabase);
+        MinecraftForge.EVENT_BUS.post(populateDefaultDatabaseEvent);
 
-        // Stores the dimension database files, as they must be populated after the default database.
-        final Map<ResourceLocation, List<Pair<String, JsonElement>>> dimensionDatabasesData = Maps.newHashMap();
+        // TODO: Ordering should be checked.
+        preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
+                defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, false)));
 
-        // Register the default populators and fetch the dimension populator files.
-        preparedObject.forEach((resourceLocation, jsonFiles) ->
-            jsonFiles.forEach((elementPair) -> {
-                if (resourceLocation.getPath().equals(DEFAULT_POPULATOR_NAME)) {
-                    this.registerDefaultPopulator(event, resourceLocation, elementPair.getKey(), elementPair.getValue());
-                } else {
-                    dimensionDatabasesData.put(resourceLocation, jsonFiles);
-                }
-            })
-        );
+        final Event populateDimensionalDatabaseEvent = new PopulateDimensionalDatabaseEvent(this.dimensionDatabases, this.defaultDatabase);
+        MinecraftForge.EVENT_BUS.post(populateDimensionalDatabaseEvent);
 
-        IBiomeDatabasePopulator defaultPopulator = event.getPopulator();
-        defaultPopulator.populate(this.defaultDatabase); // Populate the default database.
+        preparedObject.entrySet().stream().filter(entry -> !this.isDefaultPopulator(entry)).forEach(dimensionalPopulator -> {
+            final BiomeDatabase dimensionalDatabase = BiomeDatabase.copyOf(this.defaultDatabase);
 
-        // Send out an event after the database has been populated.
-		MinecraftForge.EVENT_BUS.post(new PopulateDatabaseEvent(this.defaultDatabase, defaultPopulator));
+            this.dimensionDatabases.put(dimensionalPopulator.getKey(), dimensionalDatabase);
 
-		// Register dimension populators.
-        dimensionDatabasesData.forEach((resourceLocation, jsonFiles) ->
-                this.registerDimensionPopulators(defaultPopulator, resourceLocation, jsonFiles));
+            dimensionalPopulator.getValue().forEach(jsonElement -> {
+                this.readPopulator(dimensionalDatabase, dimensionalPopulator.getKey(), jsonElement, false);
+            });
+        });
 
-        // Blacklist certain dimensions according to the base config.
+        // Blacklist certain dimensions according to the config.
         DTConfigs.dimensionBlacklist.get().forEach(resourceLocationString -> {
             try {
                 this.blacklistedDimensions.add(new ResourceLocation(resourceLocationString));
@@ -98,89 +202,92 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 LOGGER.warn("Couldn't get resource location for dimension blacklist in config: " + e.getMessage());
             }
         });
-
-        // Cleanup all of the unused static objects.
-        JsonBiomeDatabasePopulator.cleanup();
     }
 
-    private void registerJsonCapabilities () {
-        BiomeDatabaseJsonCapabilityRegistryEvent capabilityEvent = new BiomeDatabaseJsonCapabilityRegistryEvent();
+    public void onCommonSetup() {
+        final Map<ResourceLocation, List<JsonElement>> preparedObject = this.prepare(DTResourceRegistries.TREES_RESOURCE_MANAGER);
 
-        //Register the main Json capabilities
-        JsonBiomeDatabasePopulator.registerJsonCapabilities(capabilityEvent);
+        // Ensure default database is reset.
+        this.defaultDatabase = new BiomeDatabase();
 
-        //Send out an event asking for Json Capabilities to be registered
-        MinecraftForge.EVENT_BUS.post(capabilityEvent);
+        // If world gen is disabled don't waste processing power reading these.
+        if (!WorldGenRegistry.isWorldGenEnabled())
+            return;
+
+        final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
+        MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
+
+        // TODO: Ordering should be checked.
+        preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
+                defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, true)));
     }
 
-    private void registerDefaultPopulator(BiomeDatabasePopulatorRegistryEvent event, ResourceLocation resourceLocation, String fileName, JsonElement jsonElement) {
-        if (!jsonElement.isJsonObject()) {
-            LOGGER.warn("Skipping loading default populator {} from {} as its root element is not a Json object.", resourceLocation, fileName);
+    private boolean isDefaultPopulator (final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
+        return entry.getKey().getPath().equals(DEFAULT_POPULATOR_NAME);
+    }
+
+    private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
+        JsonHelper.JsonElementReader.of(jsonElement)
+                .ifOfType(JsonArray.class, jsonArray ->
+                        jsonArray.forEach(element ->
+                                JsonHelper.JsonElementReader.of(element).ifOfType(JsonObject.class, jsonObject ->
+                                        this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly)
+                                )))
+                .elseWarn("Root element of populator '" + resourceLocation + "' was not a Json array.");
+    }
+
+    private void readPopulatorSection (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonObject jsonObject, final boolean readCancellerOnly) {
+        final AtomicReference<BiomeList> biomeList = new AtomicReference<>();
+
+        final JsonHelper.JsonObjectReader reader = JsonHelper.JsonObjectReader.of(jsonObject).ifContains(SELECT, selectElement ->
+                JsonHelper.JsonElementReader.of(selectElement).ifOfType(BiomeList.class, biomeList::set));
+
+        // Warn and don't reading the entry if we didn't get any biomes from it.
+        if (biomeList.get() == null || biomeList.get().size() < 1) {
+            LOGGER.warn("Couldn't get any biomes from Json object '{}' in '{}' populator.", jsonObject, resourceLocation);
             return;
         }
 
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-        boolean replace = this.shouldReplace(jsonObject);
-        JsonElement entries = jsonObject.get(ENTRIES);
-
-        if (entries == null) {
-            LOGGER.warn("Skipping loading default populator {} from {} as it had no entries.", resourceLocation, fileName);
-            return;
+        if (!readCancellerOnly) {
+            reader.ifContains(APPLY, applyElement ->
+                    JsonHelper.JsonElementReader.of(applyElement).ifOfType(JsonObject.class, applyObject -> {
+                        if (biomeList.get() == null || biomeList.get().size() == 0)
+                            LogManager.getLogger().warn("Tried to apply to null or empty biome list in '" + resourceLocation + "' populator.");
+                        else {
+                            biomeList.get().forEach(biome -> this.biomeDatabaseAppliers.applyAll(applyObject, database.getEntry(biome)));
+                        }
+                    }))
+            .ifContains(WHITE, String.class, str -> {
+                if (str.equalsIgnoreCase("all")) {
+                    database.getAllEntries().forEach(entry -> entry.setBlacklisted(false));
+                } else if (str.equalsIgnoreCase("selected")) {
+                    biomeList.get().forEach(biome -> database.getEntry(biome).setBlacklisted(false));
+                } else
+                    LOGGER.warn("Unknown value for key 'white' in populator '" + resourceLocation + "': '" + str + "'.");
+            }).elseWarn("Error parsing key 'white' in populator '" + resourceLocation + "': ");
         }
 
-        IBiomeDatabasePopulator populator = new JsonBiomeDatabasePopulator(entries, fileName);
+        if (database == this.defaultDatabase) {
+            reader.ifContains(CANCELLERS, JsonObject.class, cancellerObject -> {
+                final BiomePropertySelectors.FeatureCancellations featureCancellations = new BiomePropertySelectors.FeatureCancellations();
 
-        if (replace) {
-            event.replaceAll(populator);
-        } else {
-            if (resourceLocation.getNamespace().equals(DynamicTrees.MOD_ID)) {
-                event.registerAsFirst(populator);
-            } else {
-                event.register(populator);
-            }
+                this.featureCancellationAppliers.applyAll(cancellerObject, featureCancellations)
+                        .forEach(failureResult -> LOGGER.warn("Error whilst applying feature cancellations in '{}' populator: {}", resourceLocation, failureResult.getErrorMessage()));
+
+                final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.SPLICE_AFTER);
+                JsonHelper.JsonObjectReader.of(jsonObject).ifContains(METHOD, BiomeDatabase.Operation.class, operation::set)
+                        .elseWarn("Error getting method in '" + resourceLocation + "' populator (defaulting to splice after): ");
+
+                biomeList.get().forEach(biome -> {
+                    BiomePropertySelectors.FeatureCancellations currentFeatureCancellations = database.getEntry(biome).getFeatureCancellations();
+
+                    if (operation.get() == BiomeDatabase.Operation.REPLACE)
+                        currentFeatureCancellations.reset();
+
+                    currentFeatureCancellations.copyFrom(featureCancellations);
+                });
+            });
         }
-    }
-
-    private void registerDimensionPopulators(IBiomeDatabasePopulator defaultPopulator, ResourceLocation resourceLocation, List<Pair<String, JsonElement>> jsonFiles) {
-        BiomeDatabase dimensionDatabase = new BiomeDatabase();
-
-        // Populate with default entries.
-        defaultPopulator.populate(dimensionDatabase);
-
-        jsonFiles.forEach((elementPair) -> {
-            final String fileName = elementPair.getKey();
-            final JsonElement jsonElement = elementPair.getValue();
-
-            if (!jsonElement.isJsonObject()) {
-                LOGGER.warn("Skipping loading dimension populator for {} from {} as its root element is not a Json object.", resourceLocation, fileName);
-                return;
-            }
-
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-            boolean replace = this.shouldReplace(jsonObject);
-            JsonElement entries = jsonObject.get(ENTRIES);
-
-            if (entries == null) {
-                LOGGER.warn("Skipping loading default populator for {} from {} as it had no entries.", resourceLocation, fileName);
-                return;
-            }
-
-            if (replace) {
-                // If we are replacing all generation for this dimension, reset the database.
-                dimensionDatabase.clear();
-            }
-
-            // Populate with entries from current file.
-            new JsonBiomeDatabasePopulator(entries, fileName).populate(dimensionDatabase);
-        });
-
-        this.dimensionDatabases.put(resourceLocation, dimensionDatabase);
-    }
-
-    private boolean shouldReplace (JsonObject jsonObject) {
-        return JsonHelper.getOrDefault(jsonObject, REPLACE, false);
     }
 
     public BiomeDatabase getDefaultDatabase() {

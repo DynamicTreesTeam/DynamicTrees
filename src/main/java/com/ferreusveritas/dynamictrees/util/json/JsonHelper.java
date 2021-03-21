@@ -9,6 +9,9 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class JsonHelper {
 
@@ -103,6 +106,129 @@ public class JsonHelper {
 		}
 
 		return fetchResult.getValue();
+	}
+
+	public static JsonObjectReader ifContains (final JsonObject jsonObject, final String key, final Consumer<JsonElement> elementConsumer) {
+		return new JsonObjectReader(jsonObject).ifContains(key, elementConsumer);
+	}
+
+	public static final class JsonElementReader {
+		private final JsonElement jsonElement;
+		private boolean read = false;
+		private String lastError;
+		private List<Class<?>> attemptedClasses = new ArrayList<>();
+
+		private JsonElementReader(JsonElement jsonElement) {
+			this.jsonElement = jsonElement;
+		}
+
+		public <T> JsonElementReader ifOfType (final Class<T> typeClass, final Consumer<T> consumer) {
+			JsonObjectGetters.getObjectGetter(typeClass).get(jsonElement).ifSuccessful(value -> {
+				consumer.accept(value);
+				this.read = true;
+			}).otherwise(errorMessage -> this.lastError = errorMessage);
+			return this;
+		}
+
+		public <T> JsonElementReader elseIfOfType (final Class<T> typeClass, final Consumer<T> consumer) {
+			if (!this.read)
+				this.ifOfType(typeClass, consumer);
+			return this;
+		}
+
+		public JsonElementReader ifFailed(final Consumer<String> errorConsumer) {
+			if (!this.read && this.lastError != null)
+				errorConsumer.accept(this.lastError);
+			return this;
+		}
+
+		public JsonElementReader elseWarn (final String warningMessage) {
+			if (!this.read)
+				LogManager.getLogger().warn(warningMessage);
+			return this;
+		}
+
+		public JsonElementReader elseUnsupportedError(final Consumer<String> errorConsumer) {
+			if (!this.read) {
+				final StringBuilder stringBuilder = new StringBuilder("Element was not one of the following types: ");
+				for (int i = 0; i < this.attemptedClasses.size(); i++) {
+					stringBuilder.append(this.attemptedClasses.get(i)).append(i != this.attemptedClasses.size() - 1 ? "," : "");
+				}
+				errorConsumer.accept(stringBuilder.toString());
+			}
+			return this;
+		}
+
+		public String getLastError() {
+			return lastError;
+		}
+
+		public static JsonElementReader of (final JsonElement jsonElement) {
+			return new JsonElementReader(jsonElement);
+		}
+
+	}
+
+	public static final class JsonObjectReader {
+		private final JsonObject jsonObject;
+		private boolean read = false;
+		private String lastError;
+
+		private JsonObjectReader(JsonObject jsonObject) {
+			this.jsonObject = jsonObject;
+		}
+
+		public JsonObjectReader ifContains(final String key, final Consumer<JsonElement> elementConsumer) {
+			if (this.jsonObject.has(key)) {
+				elementConsumer.accept(this.jsonObject.get(key));
+				this.read = true;
+			}
+			return this;
+		}
+
+		public <T> JsonObjectReader ifContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
+			if (this.jsonObject.has(key)) {
+				this.lastError = JsonElementReader.of(this.jsonObject.get(key)).ifOfType(type, typeConsumer).getLastError();
+				this.read = true;
+			}
+			return this;
+		}
+
+		public JsonObjectReader elseIfContains(final String key, final Consumer<JsonElement> elementConsumer) {
+			if (!this.read)
+				this.ifContains(key, elementConsumer);
+			return this;
+		}
+
+		public <T> JsonObjectReader elseIfContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
+			if (!this.read)
+				this.ifContains(key, type, typeConsumer);
+			return this;
+		}
+
+		public JsonObjectReader elseWarn(final String errorPrefix) {
+			if (this.lastError != null) {
+				LogManager.getLogger().warn(errorPrefix + this.lastError);
+			}
+			return this;
+		}
+
+		public JsonObjectReader elseRun(final Runnable runnable) {
+			if (!this.read)
+				runnable.run();
+			return this;
+		}
+
+		public JsonObjectReader reset () {
+			this.read = false;
+			this.lastError = null;
+			return this;
+		}
+
+		public static JsonObjectReader of (final JsonObject jsonObject) {
+			return new JsonObjectReader(jsonObject);
+		}
+
 	}
 
 }

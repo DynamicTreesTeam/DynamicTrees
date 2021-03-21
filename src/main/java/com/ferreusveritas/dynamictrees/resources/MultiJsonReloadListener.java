@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Harley O'Connor
  */
-public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListener<Map<ResourceLocation, List<Pair<String, JsonElement>>>, V> {
+public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListener<Map<ResourceLocation, List<JsonElement>>, V> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -37,8 +37,8 @@ public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListen
     }
 
     @Override
-    protected Map<ResourceLocation, List<Pair<String, JsonElement>>> prepare(final IResourceManager resourceManager) {
-        final Map<ResourceLocation, List<Pair<String, JsonElement>>> map = Maps.newHashMap();
+    protected Map<ResourceLocation, List<JsonElement>> prepare(final IResourceManager resourceManager) {
+        final Map<ResourceLocation, List<JsonElement>> map = Maps.newHashMap();
         int i = folderName.length() + 1;
 
         for(ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
@@ -56,7 +56,7 @@ public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListen
                         return;
                     }
 
-                    map.computeIfAbsent(resourceLocation, l -> Lists.newArrayList()).add(Pair.of(resourceLocationIn.getPath(), jsonElement));
+                    map.computeIfAbsent(resourceLocation, l -> Lists.newArrayList()).add(jsonElement);
                 });
             } catch (IllegalArgumentException | IOException | JsonParseException e) {
                 LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, e);
