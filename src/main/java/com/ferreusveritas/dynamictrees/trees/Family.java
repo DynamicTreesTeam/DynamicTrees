@@ -2,7 +2,9 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
@@ -14,10 +16,7 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.google.common.collect.Sets;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -38,7 +37,6 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -54,7 +52,7 @@ import java.util.stream.Collectors;
  *
  * @author ferreusveritas
  */
-public class Family extends RegistryEntry<Family> {
+public class Family extends RegistryEntry<Family> implements IResettable<Family> {
 	
 	public final static Family NULL_FAMILY = new Family() {
 		@Override public void setupCommonSpecies(Species species) {}
@@ -150,19 +148,6 @@ public class Family extends RegistryEntry<Family> {
 		}
 	}
 
-	public Set<Species> createSpecies() {
-		this.setupCommonSpecies(new Species(this.getCommonSpeciesName(), this, this.getCommonLeaves()));
-		return this.getExtraSpeciesNames().stream().map(registryName -> new Species(registryName, this, this.getCommonLeaves())).collect(Collectors.toSet());
-	}
-
-	public Set<ResourceLocation> getExtraSpeciesNames() {
-		return Sets.newHashSet();
-	}
-
-	public ResourceLocation getCommonSpeciesName() {
-		return this.getRegistryName();
-	}
-
 	public void setCommonSpecies(final Species species) {
 		this.commonSpecies = species;
 	}
@@ -186,15 +171,6 @@ public class Family extends RegistryEntry<Family> {
 
 	public Set<Species> getSpecies () {
 		return this.species;
-	}
-
-	/**
-	 * Resets common species and clears all registered species. This allows for users to override
-	 * all species using the trees folder.
-	 */
-	public void resetSpecies () {
-		this.commonSpecies = Species.NULL_SPECIES;
-		this.species.clear();
 	}
 
 	///////////////////////////////////////////

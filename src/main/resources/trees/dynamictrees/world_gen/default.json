@@ -184,10 +184,10 @@
     }
   },
   {
-    "__comment": "Cancel fungi features from namespace 'minecraft' in the nether forests.",
+    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests.",
     "select": { "name": "minecraft:.*forest", "type": "nether" },
     "cancellers": {
-      "type": "fungi",
+      "type": "fungus",
       "namespace": "minecraft"
     }
   },

@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import net.minecraft.block.*;
@@ -44,7 +45,7 @@ import java.util.Random;
  * 
  * @author ferreusveritas
  */
-public class LeavesProperties extends RegistryEntry<LeavesProperties> {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> implements IResettable<LeavesProperties> {
 	
 	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties(DTTrees.NULL) {
 		@Override public LeavesProperties setFamily(Family family) { return this; }

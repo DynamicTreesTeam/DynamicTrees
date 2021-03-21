@@ -48,6 +48,7 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius);
 
+        this.postApplierEvent(this.blockPropertyAppliers, "leaves_block_property");
         super.registerAppliers(applierListIdentifier);
     }
 
@@ -81,18 +82,24 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
                 if (firstLoad) {
                     this.loadAppliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
 
-                    final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties();
-                    this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEach(failureConsumer);
-                    leavesProperties.generateDynamicLeaves(blockProperties);
+                    // Generate block by default, but allow it to be turned off.
+                    if (JsonHelper.getOrDefault(jsonObject, "generate_block", true)) {
+                        final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties();
+                        this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEach(failureConsumer);
+                        leavesProperties.generateDynamicLeaves(blockProperties);
+                    }
                 }
             } else {
-                leavesProperties = LeavesProperties.REGISTRY.get(registryName);
+                leavesProperties = LeavesProperties.REGISTRY.get(registryName).reset().setPreReloadDefaults();
             }
 
             if (!firstLoad)
                 this.reloadAppliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
 
             this.appliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
+
+            if (!firstLoad)
+                leavesProperties.setPostReloadDefaults();
 
             if (newEntry) {
                 LeavesProperties.REGISTRY.register(leavesProperties);

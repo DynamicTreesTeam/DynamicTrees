@@ -16,7 +16,7 @@ public final class DarkOakSpecies extends Species {
 
     @Override
     public int getLowestBranchHeight(World world, BlockPos pos) {
-        return (int) (super.getLowestBranchHeight(world, pos) * biomeSuitability(world, pos));
+        return (int) (super.getLowestBranchHeight(world, pos) * this.biomeSuitability(world, pos));
     }
 
     @Override

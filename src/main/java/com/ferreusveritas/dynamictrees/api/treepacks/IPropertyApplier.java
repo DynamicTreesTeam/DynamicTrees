@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.api.treepacks;
 /**
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface IPropertyApplier<T, V> {
 
     /**

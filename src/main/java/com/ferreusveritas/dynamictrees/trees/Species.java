@@ -81,7 +81,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiPredicate;
 
-public class Species extends RegistryEntry<Species> {
+public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
 	public static final Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
@@ -169,16 +169,9 @@ public class Species extends RegistryEntry<Species> {
 	/** A map of environmental biome factors that change a tree's suitability */
 	protected Map<BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
 
-	// TODO: Replace default env factors and gen features with a better way of setting defaults. Maybe a class like "setDefaults" that can be overridden by sub-classes.
-
-	/** Environment factor defaults. Can be used by sub-classes to set common environment factors. */
-	protected Map<BiomeDictionary.Type, Float> defaultEnvFactors = new HashMap<>();
-
 	protected List<Biome> perfectBiomes = new ArrayList<>();
 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
-
-	protected final List<ConfiguredGenFeature<?>> defaultGenFeatures = new ArrayList<>();
 
 	/** A {@link BiPredicate} that returns true if this species should override the common in the given position. */
 	protected ICommonOverride commonOverride;
@@ -211,15 +204,66 @@ public class Species extends RegistryEntry<Species> {
 	 * @param family The {@link Family} that this species belongs to.
 	 */
 	public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
-		setRegistryName(name);
-		setUnlocalizedName(name.toString());
+		this.setRegistryName(name);
+		this.setUnlocalizedName(name.toString());
 		this.family = family;
 		this.family.addSpecies(this);
-		setLeavesProperties(leavesProperties);
-		
-		setStandardSoils();
-		
-		addDropCreator(new LogDropCreator());
+		this.setLeavesProperties(leavesProperties);
+
+		this.addDropCreator(new LogDropCreator());
+	}
+
+	/**
+	 * Resets this {@link Species} object's environment factors, gen features, acceptable
+	 * blocks for growth, and acceptable soils. May also be overridden by sub-classes that
+	 * need lists to be cleared on reload, for example.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species reset () {
+		this.envFactors.clear();
+		this.genFeatures.clear();
+		this.acceptableBlocksForGrowth.clear();
+
+		this.clearAcceptableSoils();
+
+		return this;
+	}
+
+	/**
+	 * Can be overridden by sub-classes for setting defaults for things before reload,
+	 * such as {@link #envFactors}.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species setPreReloadDefaults() {
+		return this.setDefaultGrowingParameters();
+	}
+
+	/**
+	 * Can be overridden by sub-classes for setting defaults for things after reload.
+	 * This is for defaults like lists, and so defaults should only be set if there was
+	 * nothing set by the Json.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species setPostReloadDefaults() {
+		// If there is no acceptable soil set, use the standard soils.
+		if (!this.hasAcceptableSoil())
+			this.setStandardSoils();
+		return this;
+	}
+
+	/**
+	 * Can be overridden by sub-classes to set the default growing parameters.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	public Species setDefaultGrowingParameters() {
+		return this;
 	}
 
 	public Family getFamily() {
@@ -343,9 +387,11 @@ public class Species extends RegistryEntry<Species> {
 	 * more details.
 	 *
 	 * @param transformable True if it should be transformable.
+	 * @return This {@link Species} for chaining.
 	 */
-	public void setTransformable(boolean transformable) {
+	public Species setTransformable(boolean transformable) {
 		this.transformable = transformable;
+		return this;
 	}
 
 	public boolean hasCommonOverride() {
@@ -661,10 +707,6 @@ public class Species extends RegistryEntry<Species> {
 
 	public void addAcceptableBlockForGrowth (final Block block) {
 		this.acceptableBlocksForGrowth.add(block);
-	}
-
-	public void clearAcceptableGrowthBlocks () {
-		this.acceptableBlocksForGrowth.clear();
 	}
 
 	/**
@@ -1187,19 +1229,6 @@ public class Species extends RegistryEntry<Species> {
 	}
 
 	/**
-	 * Resets {@link #envFactors} to {@link #defaultEnvFactors}.
-	 */
-	public void resetEnvFactors() {
-		this.envFactors.clear();
-		this.envFactors.putAll(this.defaultEnvFactors);
-	}
-
-	public Species defaultEnvFactor(BiomeDictionary.Type type, float factor) {
-		this.defaultEnvFactors.put(type, factor);
-		return this;
-	}
-	
-	/**
 	 *
 	 * @param world The {@link World} object.
 	 * @param pos
@@ -1579,32 +1608,8 @@ public class Species extends RegistryEntry<Species> {
 		return this;
 	}
 
-	public Species defaultGenFeature(GenFeature genFeature) {
-		return this.defaultGenFeature(genFeature.getDefaultConfiguration());
-	}
-
-	public Species defaultGenFeature(ConfiguredGenFeature<?> configuredGenFeature) {
-		this.defaultGenFeatures.add(configuredGenFeature);
-		return this;
-	}
-
-	/**
-	 * Clears gen features. Used by {@link SpeciesManager} so duplicate gen features
-	 * aren't added on datapack reload.
-	 *
-	 * @return This {@link Species} object.
-	 */
-	public Species clearGenFeatures () {
-		this.genFeatures.clear();
-		return this;
-	}
-
 	public boolean areAnyGenFeatures () {
 		return this.genFeatures.size() > 0;
-	}
-
-	public void setDefaultGenFeatures () {
-		this.genFeatures.addAll(this.defaultGenFeatures);
 	}
 
 	/**

@@ -34,12 +34,12 @@ public class GroundFinder implements IGroundFinder {
 		final BlockPos.Mutable pos = new BlockPos.Mutable(start.getX(), 0, start.getZ());
 		final ArrayList<Integer> layers = new ArrayList<>();
 
-		while(inNetherRange(pos)) {
-			while(!isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit air
-			while(isReplaceable(world, pos) && inNetherRange(pos))  { pos.move(Direction.DOWN); } // Move down 1 block at a time until we hit not-air
+		while (inNetherRange(pos)) {
+			while (!isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit air
+			while (isReplaceable(world, pos) && inNetherRange(pos))  { pos.move(Direction.DOWN); } // Move down 1 block at a time until we hit not-air
 			layers.add(pos.getY()); //Record this position
 			pos.move(Direction.UP, 16); //Move up 16 blocks
-			while(isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit ground
+			while (isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit ground
 		}
 
 		// Discard the last result as it's just the top of the biome(bedrock for nether)
@@ -68,7 +68,7 @@ public class GroundFinder implements IGroundFinder {
 		final IChunk chunk = world.getChunk(start); // We'll use a chunk for the search so we don't have to keep looking up the chunk for every block
 		final BlockPos.Mutable mPos = new BlockPos.Mutable(start.getX(), world.getHeight(Heightmap.Type.WORLD_SURFACE_WG, start.getX(), start.getZ()), start.getZ()).move(Direction.UP, 2); // Mutable allows us to change the test position easily
 
-		while(inOverworldRange(mPos)) {
+		while (inOverworldRange(mPos)) {
 			final BlockState state = chunk.getBlockState(mPos);
 			final Block testBlock = state.getBlock();
 

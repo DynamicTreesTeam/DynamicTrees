@@ -18,6 +18,8 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.block.Block;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -133,14 +135,10 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 if (firstLoad) {
                     // Apply load appliers for things like generating seeds and saplings.
                     jsonObject.entrySet().forEach(entry -> readEntry(this.loadAppliers, species, entry.getKey(), entry.getValue()));
-                }
+                } else species.setPreReloadDefaults();
             } else {
-                species = Species.REGISTRY.get(registryName);
-
-                species.resetEnvFactors();
-                species.clearGenFeatures();
-                species.clearAcceptableGrowthBlocks();
-                species.clearAcceptableSoils();
+                // Species is already registered, so reset it and apply pre-reload defaults.
+                species = Species.REGISTRY.get(registryName).reset().setPreReloadDefaults();
             }
 
             if (!firstLoad) {
@@ -151,13 +149,8 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             // Apply universal appliers for both load and reload.
             jsonObject.entrySet().forEach(entry -> readEntry(this.appliers, species, entry.getKey(), entry.getValue()));
 
-            // If no acceptable soils were set, default to the Species' standard soils.
-            if (!species.hasAcceptableSoil())
-                species.setStandardSoils();
-
-            // If no gen features were set, default to the Species' defaults.
-            if (!species.areAnyGenFeatures())
-                species.setDefaultGenFeatures();
+            if (!firstLoad)
+                species.setPostReloadDefaults();
 
             if (newRegistry) {
                 Species.REGISTRY.register(species);

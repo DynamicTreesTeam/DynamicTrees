@@ -21,20 +21,29 @@ public final class FungusSpecies extends Species {
 
     public FungusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
+    }
 
+    @Override
+    public Species setDefaultGrowingParameters() {
         this.setBasicGrowingParameters(0f, 14.0f, 0, 4, 1f);
-
-        // Add default environment factors.
-        this.defaultEnvFactor(BiomeDictionary.Type.COLD, 0.25f).defaultEnvFactor(BiomeDictionary.Type.WET, 0.75f);
-
-        // Add default gen features.
-        this.defaultGenFeature(GenFeatures.CLEAR_VOLUME)
-                .defaultGenFeature(GenFeatures.SHROOMLIGHT);
+        return super.setDefaultGrowingParameters();
     }
 
     @Override
     protected void setStandardSoils() {
         this.addAcceptableSoils(DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE);
+    }
+
+    @Override
+    public Species setPreReloadDefaults() {
+        return super.setPreReloadDefaults().envFactor(BiomeDictionary.Type.COLD, 0.25f).envFactor(BiomeDictionary.Type.WET, 0.75f);
+    }
+
+    @Override
+    public Species setPostReloadDefaults() {
+        if (!this.areAnyGenFeatures())
+            this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
+        return super.setPostReloadDefaults();
     }
 
     @Override

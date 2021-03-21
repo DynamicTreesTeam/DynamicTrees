@@ -101,14 +101,18 @@ public final class FamilyManager extends JsonReloadListener<Family> {
 
                 if (firstLoad)
                     this.loadAppliers.applyAll(jsonObject, family).forEach(failureConsumer);
+                else family.setPreReloadDefaults();
             } else {
-                family = Family.REGISTRY.get(registryName);
+                family = Family.REGISTRY.get(registryName).reset().setPreReloadDefaults();
             }
 
             if (!firstLoad)
                 this.reloadAppliers.applyAll(jsonObject, family).forEach(failureConsumer);
 
             this.appliers.applyAll(jsonObject.getAsJsonObject(), family).forEach(failureConsumer);
+
+            if (!firstLoad)
+                family.setPostReloadDefaults();
 
             if (newRegistry) {
                 if (firstLoad) {
