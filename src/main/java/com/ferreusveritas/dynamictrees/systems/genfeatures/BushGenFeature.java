@@ -37,7 +37,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(LOG_BLOCK, Blocks.OAK_LOG).with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
 				.with(SECONDARY_LEAVES_BLOCK, null);
 	}

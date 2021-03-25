@@ -178,17 +178,17 @@ public final class JsonObjectGetters {
     public static IJsonObjectGetter<Item> ITEM_GETTER;
     public static IJsonObjectGetter<Biome> BIOME_GETTER;
 
-    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY, "cell kit"));
-    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY, "leaves properties"));
-    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY, "growth logic kit"));
-    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY, "gen feature"));
-    public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY, "family"));
-    public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY, "species"));
-    public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER_GETTER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY, "feature canceller"));
+    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY));
+    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY));
+    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY));
+    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY));
+    public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
+    public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER_GETTER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
 
-    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE_GETTER = register(LeavesProperties.Type.class, new EntryTypeGetter<>(LeavesProperties.REGISTRY));
-    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE_GETTER = register(Family.Type.class, new EntryTypeGetter<>(Family.REGISTRY));
-    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE_GETTER = register(Species.Type.class, new EntryTypeGetter<>(Species.REGISTRY));
+    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE_GETTER = register(LeavesProperties.Type.class, new RegistryEntryTypeGetter<>(LeavesProperties.REGISTRY));
+    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE_GETTER = register(Family.Type.class, new RegistryEntryTypeGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE_GETTER = register(Species.Type.class, new RegistryEntryTypeGetter<>(Species.REGISTRY));
 
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 

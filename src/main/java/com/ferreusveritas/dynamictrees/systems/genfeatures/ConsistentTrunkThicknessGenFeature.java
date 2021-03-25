@@ -24,7 +24,7 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MAX_HEIGHT, 32);
 	}
 

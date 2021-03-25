@@ -12,5 +12,6 @@ import java.util.function.BiPredicate;
  *
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface CanGrowPredicate extends BiPredicate<World, BlockPos> {
 }

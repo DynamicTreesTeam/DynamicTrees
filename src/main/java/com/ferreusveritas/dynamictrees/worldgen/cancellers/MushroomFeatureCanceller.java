@@ -16,6 +16,7 @@ import java.util.List;
  * mushroom features. It cancels any features that have a config that extends the given class, and are
  * inside a {@link TwoFeatureChoiceConfig}.
  *
+ * @param <T> An {@link IFeatureConfig} which should be cancelled.
  * @author Harley O'Connor
  */
 public class MushroomFeatureCanceller<T extends IFeatureConfig> extends FeatureCanceller {

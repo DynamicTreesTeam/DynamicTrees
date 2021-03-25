@@ -26,23 +26,24 @@ public class BiomePredicateGenFeature extends GenFeature implements IPostGenFeat
 	}
 
 	@Override
-	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(BIOME_PREDICATE, i -> true).with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE).with(ONLY_WORLD_GEN, false);
 	}
 
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
-		ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
+		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+		final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
 
 		if (configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
 			return false;
 
-		GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
+		final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
 
 		if (genFeatureToPlace instanceof IPostGenFeature && !(configuredGenFeature.get(ONLY_WORLD_GEN) && !worldGen) && configuredGenFeature.get(BIOME_PREDICATE).test(biome)) {
 			return ((IPostGenFeature) genFeatureToPlace).postGeneration(configuredGenFeatureToPlace, world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState, seasonValue, seasonFruitProductionFactor);
 		}
+
 		return false;
 	}
 

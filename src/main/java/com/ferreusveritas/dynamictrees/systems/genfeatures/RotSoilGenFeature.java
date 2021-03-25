@@ -26,7 +26,7 @@ public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature 
     }
 
     @Override
-    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(ROTTED_SOIL, Blocks.DIRT);
     }
 

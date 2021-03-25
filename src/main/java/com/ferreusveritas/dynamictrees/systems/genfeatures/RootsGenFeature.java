@@ -68,7 +68,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MIN_TRUNK_RADIUS, 13).with(LEVEL_LIMIT, 2);
 	}
 

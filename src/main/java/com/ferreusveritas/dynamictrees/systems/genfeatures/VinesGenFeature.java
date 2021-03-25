@@ -48,7 +48,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(QUANTITY, 4).with(MAX_LENGTH, 8).with(VERTICAL_SPREAD, 60f)
 				.with(RAY_DISTANCE, 5f).with(BLOCK, Blocks.VINE).with(TIP_BLOCK, null).with(VINE_TYPE, VineType.SIDE);
 	}

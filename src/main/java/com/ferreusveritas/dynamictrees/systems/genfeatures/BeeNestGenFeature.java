@@ -60,7 +60,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     @Override
-    public ConfiguredGenFeature<?> createDefaultConfiguration() {
+    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos)->{
             if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
             //Default flower check predicate, straight from the sapling class

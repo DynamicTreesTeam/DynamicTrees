@@ -6,72 +6,43 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenF
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Harley O'Connor
  */
 public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> {
 
-    private static final class ConfiguredGenFeatureHolder {
-        private ConfiguredGenFeature<GenFeature> configuredGenFeature;
-
-        private ConfiguredGenFeatureHolder(ConfiguredGenFeature<GenFeature> configuredGenFeature) {
-            this.configuredGenFeature = configuredGenFeature;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static final JsonPropertyApplierList<ConfiguredGenFeatureHolder> APPLIERS = new JsonPropertyApplierList<>(ConfiguredGenFeatureHolder.class)
-            .register("name", GenFeature.class, (configuredGenFeatureHolder, genFeature) ->
-                    configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) genFeature.getDefaultConfiguration())
-            .register("properties", JsonObject.class,
-                    (configuredGenFeatureHolder, jsonObject) -> {
-                        final ConfiguredGenFeature<GenFeature> configuredGenFeature = configuredGenFeatureHolder.configuredGenFeature;
-
-                        if (configuredGenFeature == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || configuredGenFeature.getGenFeature() == null)
-                            return;
-
-                        configuredGenFeature.getGenFeature().getRegisteredProperties().forEach(genFeatureProperty ->
-                                addProperty(configuredGenFeature, jsonObject, genFeatureProperty));
-                    });
-
-    @SuppressWarnings("unchecked")
     @Override
     public ObjectFetchResult<ConfiguredGenFeature<GenFeature>> get(final JsonElement jsonElement) {
-        final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+        final ObjectFetchResult<ConfiguredGenFeature<GenFeature>> configuredGenFeature = new ObjectFetchResult<>();
 
-        final ConfiguredGenFeatureHolder configuredGenFeatureHolder = new ConfiguredGenFeatureHolder(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE);
+        // TODO: Check error logging here.
+        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(GenFeature.class, genFeature -> configuredGenFeature.setValue(genFeature.getDefaultConfiguration()))
+                .ifFailed(configuredGenFeature::setErrorMessage)
+                .elseIfOfType(JsonObject.class, jsonObject ->
+                    JsonHelper.JsonObjectReader.of(jsonObject).ifContains("name", GenFeature.class, genFeature -> configuredGenFeature.setValue(genFeature.getDefaultConfiguration()))
+                            .ifContains("properties", JsonObject.class, propertiesObject -> {
+                                if (configuredGenFeature.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || configuredGenFeature.getValue().getGenFeature() == null)
+                                    return;
 
-        if (!jsonObjectFetchResult.wasSuccessful()) {
-            final ObjectFetchResult<GenFeature> fetchResult = JsonObjectGetters.GEN_FEATURE_GETTER.get(jsonElement);
+                                configuredGenFeature.getValue().getGenFeature().getRegisteredProperties().forEach(genFeatureProperty ->
+                                        addProperty(configuredGenFeature, propertiesObject, genFeatureProperty));
+                            })
+                );
 
-            if (!fetchResult.wasSuccessful())
-                return ObjectFetchResult.failureFromOther(fetchResult);
-
-            configuredGenFeatureHolder.configuredGenFeature = (ConfiguredGenFeature<GenFeature>) fetchResult.getValue().getDefaultConfiguration();
-        } else {
-            APPLIERS.applyAll(jsonObjectFetchResult.getValue(), configuredGenFeatureHolder).forEach(failedResult -> LogManager.getLogger().warn("Error whilst getting Configured Gen Feature: {}", failedResult.getErrorMessage()));
-        }
-
-        if (configuredGenFeatureHolder.configuredGenFeature.getGenFeature() == null || configuredGenFeatureHolder.configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL))
+        if (configuredGenFeature.getValue().getGenFeature() == null || configuredGenFeature.getValue().getGenFeature().getRegistryName().equals(DTTrees.NULL))
             return ObjectFetchResult.failure("Configured feature couldn't be found from name or wasn't given a name.");
 
-        return ObjectFetchResult.success(configuredGenFeatureHolder.configuredGenFeature);
+        return configuredGenFeature;
     }
 
-    private static <T> void addProperty(final ConfiguredGenFeature<?> configuredGenFeature, final JsonObject propertiesObject, final GenFeatureProperty<T> genFeatureProperty) {
+    private static <T> void addProperty(final ObjectFetchResult<ConfiguredGenFeature<GenFeature>> fetchResult, final JsonObject propertiesObject, final GenFeatureProperty<T> genFeatureProperty) {
         final ObjectFetchResult<T> propertyValueFetchResult = genFeatureProperty.getValueFromJsonObject(propertiesObject);
 
         if (propertyValueFetchResult == null)
             return;
 
-        if (!propertyValueFetchResult.wasSuccessful()) {
-            LogManager.getLogger().warn("Error whilst getting gen feature property: {}", propertyValueFetchResult.getErrorMessage());
-            return;
-        }
-
-        configuredGenFeature.with(genFeatureProperty, propertyValueFetchResult.getValue());
+        propertyValueFetchResult.ifSuccessful(value -> fetchResult.getValue().with(genFeatureProperty, value)).otherwise(fetchResult::addWarning);
     }
 
 }

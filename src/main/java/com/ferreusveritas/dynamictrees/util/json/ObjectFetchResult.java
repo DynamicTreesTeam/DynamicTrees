@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Stores the value or the error that came from trying to fetch an object from a
@@ -18,6 +20,9 @@ public final class ObjectFetchResult<T> {
     private T value;
     private String errorMessage;
 
+    private String previousValue;
+
+    // TODO: Actually log these.
     private final List<String> warnings = new ArrayList<>();
 
     public ObjectFetchResult() {}
@@ -32,6 +37,38 @@ public final class ObjectFetchResult<T> {
 
     public boolean wasSuccessful () {
         return this.value != null;
+    }
+
+    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
+        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+        if (this.value != null) {
+            final String previousValue = this.value.toString();
+            mappedFetchResult.value = conversionFunction.apply(this.value);
+
+            if (mappedFetchResult.value == null)
+                mappedFetchResult.setErrorMessage(nullError.replace("{previous_value}", previousValue));
+        }
+        return mappedFetchResult;
+    }
+
+    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
+        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+        if (this.value != null) {
+            final String previousValue = this.value.toString();
+            final V value = conversionFunction.apply(this.value);
+
+            if (value != null && validator.test(value)) mappedFetchResult.setValue(value);
+            else mappedFetchResult.setErrorMessage(invalidError.replace("{previous_value}", previousValue));
+        }
+        return mappedFetchResult;
+    }
+
+    public ObjectFetchResult<T> validate (final Predicate<T> validationPredicate, final String errorMessage) {
+        if (this.value != null && !validationPredicate.test(this.value)) {
+            this.errorMessage = errorMessage.replace("{previous_value}", this.previousValue);
+            this.value = null;
+        }
+        return this;
     }
 
     public ObjectFetchResult<T> addWarning(final String warning) {
@@ -78,6 +115,13 @@ public final class ObjectFetchResult<T> {
         return this;
     }
 
+    public ObjectFetchResult<T> setValueOrFailure (@Nullable final T value, final String errorMessage) {
+        if (value == null)
+            this.errorMessage = errorMessage;
+        else this.value = value;
+        return this;
+    }
+
     /**
      * Gets the error message. {@link #wasSuccessful()} should be checked first, as if the fetch
      * succeeded this will be null.
@@ -97,10 +141,16 @@ public final class ObjectFetchResult<T> {
         return warnings;
     }
 
-    public void copyFrom(final ObjectFetchResult<T> otherFetchResult) {
+    public ObjectFetchResult<T> copyFrom(final ObjectFetchResult<T> otherFetchResult) {
         this.value = otherFetchResult.value;
-        this.errorMessage = otherFetchResult.getErrorMessage();
+        this.copyErrorsFrom(otherFetchResult);
+        return this;
+    }
+
+    public ObjectFetchResult<T> copyErrorsFrom(final ObjectFetchResult<?> otherFetchResult) {
+        this.errorMessage = otherFetchResult.errorMessage;
         this.warnings.addAll(otherFetchResult.warnings);
+        return this;
     }
 
     public static <T> ObjectFetchResult<T> success (final T value) {

@@ -31,7 +31,7 @@ public class MushroomRotGenFeature extends GenFeature implements IPostRotGenFeat
     }
 
     @Override
-    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(MUSHROOM, Blocks.BROWN_MUSHROOM).with(ALTERNATE_MUSHROOM, Blocks.RED_MUSHROOM).with(ALTERNATE_MUSHROOM_CHANCE, .25f);
     }
 

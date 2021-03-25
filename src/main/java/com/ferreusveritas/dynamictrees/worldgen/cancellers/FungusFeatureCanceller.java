@@ -11,6 +11,7 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
  * This class is an alternate version of {@link TreeFeatureCanceller} specifically made for cancelling
  * fungus features. It cancels any features that have a config that extends the given class.
  *
+ * @param <T> An {@link IFeatureConfig} which should be cancelled.
  * @author Harley O'Connor
  */
 public class FungusFeatureCanceller<T extends IFeatureConfig> extends FeatureCanceller {

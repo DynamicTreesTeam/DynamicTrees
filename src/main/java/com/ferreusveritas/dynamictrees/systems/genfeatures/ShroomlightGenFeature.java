@@ -43,7 +43,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     }
 
     @Override
-    protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT).with(MAX_HEIGHT, 32)
                 .with(CAN_GROW_PREDICATE, (world, blockPos) -> world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE).with(PLACE_CHANCE, .4f);
     }

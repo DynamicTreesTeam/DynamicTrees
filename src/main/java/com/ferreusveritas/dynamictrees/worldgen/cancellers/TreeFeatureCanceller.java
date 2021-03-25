@@ -10,6 +10,7 @@ import net.minecraft.world.gen.feature.*;
  * have a config that extends the given class, or that extends {@link MultipleRandomFeatureConfig} and
  * contains a feature that has a config extending the given class. <br>
  *
+ * @param <T> An {@link IFeatureConfig} which should be cancelled.
  * @author Harley O'Connor
  */
 public class TreeFeatureCanceller<T extends IFeatureConfig> extends FeatureCanceller {

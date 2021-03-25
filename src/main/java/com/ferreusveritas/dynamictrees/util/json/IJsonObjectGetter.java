@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
  * @param <T> The type of the {@link Object} to be fetched.
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface IJsonObjectGetter<T> {
 
     default boolean isValid() {

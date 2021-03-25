@@ -133,7 +133,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	public void registerRecipes() {
-		ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
+		final ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
 
 		Collections.addAll(brewingRecipes, this.getRecipe(awkwardStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)),
 				this.getRecipe(Items.SLIME_BALL, DendroPotionType.DEPLETION),

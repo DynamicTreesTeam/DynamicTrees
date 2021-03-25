@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.AddFeatureCancellersEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDefaultDatabaseEvent;
@@ -29,6 +30,7 @@ import net.minecraftforge.eventbus.api.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -177,7 +179,18 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         final Event populateDefaultDatabaseEvent = new PopulateDefaultDatabaseEvent(this.defaultDatabase);
         MinecraftForge.EVENT_BUS.post(populateDefaultDatabaseEvent);
 
-        // TODO: Ordering should be checked.
+        {
+            final ResourceLocation defaultPopulator = DynamicTrees.resLoc(DEFAULT_POPULATOR_NAME);
+
+            // It's important we do our populator first, or we override others.
+            for (JsonElement populatorElement : preparedObject.getOrDefault(defaultPopulator, Collections.emptyList())) {
+                this.readPopulator(this.defaultDatabase, defaultPopulator, populatorElement, false);
+            }
+
+            preparedObject.remove(defaultPopulator);
+        }
+
+        // Read other default populators.
         preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
                 defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, false)));
 
@@ -216,7 +229,6 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
         MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
 
-        // TODO: Ordering should be checked.
         preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
                 defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, true)));
     }

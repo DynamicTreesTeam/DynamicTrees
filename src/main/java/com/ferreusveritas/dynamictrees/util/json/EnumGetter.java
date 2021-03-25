@@ -19,17 +19,8 @@ public final class EnumGetter<T extends Enum<T>> implements IJsonObjectGetter<T>
 
     @Override
     public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        final ObjectFetchResult<String> stringFetchResult = JsonObjectGetters.STRING_GETTER.get(jsonElement);
-
-        if (!stringFetchResult.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(stringFetchResult);
-
-        final T fetchedEnum = EnumGetMethod.NAME_IGNORECASE.get(stringFetchResult.getValue(), this.enumType);
-
-        if (fetchedEnum == null)
-            return ObjectFetchResult.failure("Couldn't get enum for '" + this.enumType + "' from value " + stringFetchResult.getValue());
-
-        return ObjectFetchResult.success(fetchedEnum);
+        return JsonObjectGetters.STRING_GETTER.get(jsonElement).map(enumStr -> EnumGetMethod.NAME_IGNORECASE.get(enumStr, this.enumType),
+                "Couldn't get enum " + this.enumType + " from value '{previous_value}'.");
     }
 
 

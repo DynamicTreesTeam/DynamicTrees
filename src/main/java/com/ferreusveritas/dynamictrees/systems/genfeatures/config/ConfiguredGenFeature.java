@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.google.common.collect.Maps;
@@ -16,7 +15,7 @@ import java.util.Map;
  *
  * @author Harley O'Connor
  */
-public class ConfiguredGenFeature<T extends GenFeature> {
+public class ConfiguredGenFeature<GF extends GenFeature> {
 
     /** A null configured gen feature. Mainly used for getting the class with the
      * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE_GETTER}. */
@@ -25,10 +24,10 @@ public class ConfiguredGenFeature<T extends GenFeature> {
     @SuppressWarnings("unchecked")
     public static final Class<ConfiguredGenFeature<GenFeature>> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature<GenFeature>>) NULL_CONFIGURED_FEATURE.getClass();
 
-    private final T genFeature;
+    private final GF genFeature;
     private final Map<GenFeatureProperty<?>, GenFeaturePropertyValue<?>> properties = Maps.newHashMap();
 
-    public ConfiguredGenFeature(T genFeature) {
+    public ConfiguredGenFeature(GF genFeature) {
         this.genFeature = genFeature;
     }
 
@@ -42,7 +41,7 @@ public class ConfiguredGenFeature<T extends GenFeature> {
      * @return This {@link ConfiguredGenFeature} after adding the property.
      * @throws ReportedException if the property given is not registered to the {@link GenFeature}.
      */
-    public <V> ConfiguredGenFeature<T> with (GenFeatureProperty<V> genFeatureProperty, V value) {
+    public <V> ConfiguredGenFeature<GF> with (GenFeatureProperty<V> genFeatureProperty, V value) {
         if (!this.genFeature.isPropertyRegistered(genFeatureProperty)) {
             CrashReport crashReport = CrashReport.makeCrashReport(new IllegalArgumentException(), "Tried to add unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" + genFeatureProperty.getType() + "' to gen feature '" + this.genFeature.getRegistryName() + "'.");
             crashReport.makeCategory("Adding property to a gen feature.");
@@ -83,7 +82,7 @@ public class ConfiguredGenFeature<T extends GenFeature> {
         return genFeatureProperty.getType().cast(this.properties.get(genFeatureProperty).getValue());
     }
 
-    public T getGenFeature() {
+    public GF getGenFeature() {
         return genFeature;
     }
 
@@ -92,11 +91,11 @@ public class ConfiguredGenFeature<T extends GenFeature> {
      * used for making sure the default configuration isn't changed.
      *
      * @param configuredGenFeature The {@link ConfiguredGenFeature} to copy.
-     * @param <V> The {@link GenFeature} type.
+     * @param <GF> The {@link GenFeature} type.
      * @return The duplicate {@link ConfiguredGenFeature}.
      */
-    public static <V extends GenFeature> ConfiguredGenFeature<V> copyOf (ConfiguredGenFeature<V> configuredGenFeature) {
-        ConfiguredGenFeature<V> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.genFeature);
+    public static <GF extends GenFeature> ConfiguredGenFeature<GF> copyOf (ConfiguredGenFeature<GF> configuredGenFeature) {
+        ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.genFeature);
         duplicateGenFeature.properties.putAll(configuredGenFeature.properties);
         return duplicateGenFeature;
     }

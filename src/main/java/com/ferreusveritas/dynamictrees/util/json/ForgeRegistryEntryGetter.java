@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
 import com.google.gson.JsonElement;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -23,14 +22,8 @@ public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> imp
 
     @Override
     public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        final ObjectFetchResult<ResourceLocation> resourceLocationFetchResult = JsonObjectGetters.RESOURCE_LOCATION_GETTER.get(jsonElement);
-
-        if (!resourceLocationFetchResult.wasSuccessful())
-            return ObjectFetchResult.failure(resourceLocationFetchResult.getErrorMessage());
-
-        final ResourceLocation resourceLocation = resourceLocationFetchResult.getValue();
-        return ObjectFetchResult.successOrFailure(this.registry.getValue(resourceLocation),
-                "Json element referenced unregistered " + this.registryDisplayName + " '" + resourceLocation + "'.");
+        return JsonObjectGetters.RESOURCE_LOCATION_GETTER.get(jsonElement).map(this.registry::getValue,
+                "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
     }
 
 }

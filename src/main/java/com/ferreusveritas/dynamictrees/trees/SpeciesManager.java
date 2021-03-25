@@ -82,7 +82,8 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, (species, registryName) -> {
-                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + registryName + "' was not found.")));
+                    final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
                 })
                 .register("seed", Seed.class, Species::setSeed)
                 .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.getDefaultState(), species))

@@ -4,13 +4,13 @@ import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 
@@ -42,7 +42,7 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
      */
     public static final Registry<GenFeature> REGISTRY = new Registry<>(GenFeature.class, NULL_GEN_FEATURE);
 
-    private final ConfiguredGenFeature<?> defaultConfiguration;
+    private final ConfiguredGenFeature<GenFeature> defaultConfiguration;
 
     /** A set of properties that can be used by this {@link GenFeature}. */
     private final Set<GenFeatureProperty<?>> registeredProperties = Sets.newHashSet();
@@ -60,7 +60,7 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
      *
      * @return The default {@link ConfiguredGenFeature}.
      */
-    protected ConfiguredGenFeature<?> createDefaultConfiguration () {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration () {
         return new ConfiguredGenFeature<>(this);
     }
 
@@ -102,7 +102,7 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
      *
      * @return A copy of the default configuration.
      */
-    public ConfiguredGenFeature<?> getDefaultConfiguration() {
+    public ConfiguredGenFeature<GenFeature> getDefaultConfiguration() {
         return ConfiguredGenFeature.copyOf(this.defaultConfiguration);
     }
 
@@ -115,7 +115,7 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
      * @param <V> The type of the value being added.
      * @return The {@link ConfiguredGenFeature} object created.
      */
-    public <V> ConfiguredGenFeature<?> with (GenFeatureProperty<V> featureProperty, V value) {
+    public <V> ConfiguredGenFeature<GenFeature> with (GenFeatureProperty<V> featureProperty, V value) {
         return this.getDefaultConfiguration().with(featureProperty, value);
     }
 

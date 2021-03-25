@@ -8,6 +8,8 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Collections;
+
 /**
  * @author Harley O'Connor
  */
@@ -36,8 +38,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
         final ObjectFetchResult<Biome> biomeFetchResult = JsonObjectGetters.BIOME_GETTER.get(jsonElement);
 
         if (biomeFetchResult.wasSuccessful()) {
-            biomes = new BiomeList();
-            biomes.add(biomeFetchResult.getValue());
+            biomes = new BiomeList(Collections.singletonList(biomeFetchResult.getValue()));
         } else {
             if (!jsonElement.isJsonObject())
                 return ObjectFetchResult.failureFromOther(biomeFetchResult);

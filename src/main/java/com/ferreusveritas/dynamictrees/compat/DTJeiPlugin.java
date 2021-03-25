@@ -25,7 +25,7 @@ public final class DTJeiPlugin implements IModPlugin {
 
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(DynamicTrees.MOD_ID, DynamicTrees.MOD_ID);
+        return DynamicTrees.resLoc(DynamicTrees.MOD_ID);
     }
 
     @Override
@@ -38,12 +38,13 @@ public final class DTJeiPlugin implements IModPlugin {
         final IVanillaRecipeFactory factory = registration.getVanillaRecipeFactory();
         final List<IJeiBrewingRecipe> brewingRecipes = new ArrayList<>();
 
-        DendroPotion.brewingRecipes.forEach(recipe -> brewingRecipes.add(makeJeiBrewingRecipe(factory, recipe.getInput(), recipe.getIngredient(), recipe.getOutput())));
+        DendroPotion.brewingRecipes.forEach(recipe ->
+                brewingRecipes.add(makeJeiBrewingRecipe(factory, recipe.getInput(), recipe.getIngredient(), recipe.getOutput())));
 
         registration.addRecipes(brewingRecipes, VanillaRecipeCategoryUid.BREWING);
     }
 
-    public static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {
+    private static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {
         return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output);
     }
 

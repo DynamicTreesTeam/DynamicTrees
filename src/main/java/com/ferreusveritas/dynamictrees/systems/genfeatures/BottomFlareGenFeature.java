@@ -28,7 +28,7 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MIN_RADIUS, 6);
 	}
 

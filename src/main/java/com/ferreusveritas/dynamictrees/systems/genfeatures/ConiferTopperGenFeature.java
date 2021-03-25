@@ -26,7 +26,7 @@ public class ConiferTopperGenFeature extends GenFeature implements IPostGenFeatu
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
 	}
 
