@@ -77,7 +77,7 @@ public class WailaBranchHandler implements IWailaDataProvider {
 		
 		if(species != Species.NULLSPECIES) {
 			
-			if(species != species.getFamily().getCommonSpecies()) {
+			if(species.showSpeciesOnWaila()) {
 				tooltip.add("Species: " + species.getLocalizedName());
 			}
 			

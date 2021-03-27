@@ -1276,6 +1276,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean useDefaultWailaBody (){
 		return true;
 	}
+
+	/**
+	 * 
+	 * @return true to show the species name on the Waila Display. By default, it shows only non-common species
+	 */
+	public boolean showSpeciesOnWaila (){
+		return this != getFamily().getCommonSpecies();
+	}
 	
 	///////////////////////////////////////////
 	// MEGANESS
