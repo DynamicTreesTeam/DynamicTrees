@@ -1,37 +1,25 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.ferreusveritas.dynamictrees.api.WorldGenRegistry.BiomeDataBaseJsonCapabilityRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IBiomeDataBasePopulator;
 import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
-import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeApplier;
-import com.ferreusveritas.dynamictrees.worldgen.json.IJsonBiomeSelector;
-import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierChance;
-import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierDensity;
-import com.ferreusveritas.dynamictrees.worldgen.json.JsonBiomePropertyApplierSpecies;
+import com.ferreusveritas.dynamictrees.worldgen.json.*;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	
@@ -89,22 +77,32 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		
 		event.register(TYPE, jsonElement -> {
 			if(jsonElement != null) {
+				List<BiomeDictionary.Type> typesWhiteList = new ArrayList<>();
+				List<BiomeDictionary.Type> typesBlackList = new ArrayList<>();
+
 				if (jsonElement.isJsonPrimitive()) {
 					String typeMatch = jsonElement.getAsString();
-					List<BiomeDictionary.Type> types = Arrays.asList(typeMatch.split(",")).stream().map(BiomeDictionary.Type::getType).collect(Collectors.toList());
-					return b -> biomeHasTypes(b, types);
-				} else 
-				if (jsonElement.isJsonArray()) {
-					List<BiomeDictionary.Type> types = new ArrayList<>();
+					List<String> matches = Arrays.stream(typeMatch.split(",")).collect(Collectors.toList());
+					for (String match : matches){
+						if (match.toCharArray()[0] == '!')
+							typesBlackList.add(BiomeDictionary.Type.getType(match.substring(1)));
+						else
+							typesWhiteList.add(BiomeDictionary.Type.getType(match));
+					}
+				} else if (jsonElement.isJsonArray()) {
 					for(JsonElement element : jsonElement.getAsJsonArray()) {
 						if(element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-							types.add(BiomeDictionary.Type.getType(element.getAsString()));
+							String stringElem = element.getAsString();
+							if (stringElem.toCharArray()[0] == '!')
+								typesBlackList.add(BiomeDictionary.Type.getType(stringElem.substring(1)));
+							else
+								typesWhiteList.add(BiomeDictionary.Type.getType(stringElem));
 						}
 					}
-					return b -> biomeHasTypes(b, types);
 				}
+				return b -> biomeHasTypes(b, typesWhiteList) && (typesBlackList.size() == 0 || !biomeHasTypes(b, typesBlackList));
 			}
-						
+
 			return b -> false;
 		});
 		
