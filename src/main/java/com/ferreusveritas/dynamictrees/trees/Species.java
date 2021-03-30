@@ -288,7 +288,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return tapering;
 	}
 	
-	//Rare species require TileEntity Storage
+	/** Rare species require TileEntity Storage */
 	public boolean getRequiresTileEntity(World world, BlockPos pos) {
 		return requiresTileEntity;
 	}
@@ -323,10 +323,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return leavesProperties;
 	}
 
+	/** Adds the leaves properties passed as valid leaves for the Species.
+	 * This is used by the tree felling animation to render multiple blocks */
 	public void addValidLeavesBlocks(ILeavesProperties... leaves){
 		this.validLeaves.addAll(Arrays.asList(leaves));
 	}
 
+	/** @return the index in the validLeaves List of the blockState passed.
+	 * If the block is not in the list, the index for the default leaves is returned (0) */
 	public int getLeavesBlockIndex(IBlockState state) {
 		if (!(state.getBlock() instanceof BlockDynamicLeaves))
 			return 0;
@@ -335,6 +339,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return this.getLeavesBlockIndex(dynamicLeaves.getProperties(state));
 	}
 
+	/** @return the index in the validLeaves List of the properties passed.
+	 * If the block is not in the list, the index for the default leaves is returned (0) */
 	public int getLeavesBlockIndex(ILeavesProperties leavesProperties) {
 		int index = this.validLeaves.indexOf(leavesProperties);
 
@@ -345,15 +351,13 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 		return index;
 	}
-	
-	public List<ILeavesProperties> getValidLeaves () {
-		return this.validLeaves;
-	}
 
+	/** @return the leaves properties of the index passed in validLeaves */
 	public ILeavesProperties getValidLeavesProperties(int index) {
 		return this.validLeaves.get(index);
 	}
 
+	/** @return the blockState of the index passed in validLeaves */
 	public IBlockState getValidLeavesBlock(int index) {
 		return this.getValidLeavesProperties(index).getDynamicLeavesState();
 	}

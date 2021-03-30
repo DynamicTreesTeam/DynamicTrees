@@ -1,9 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -128,14 +125,16 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 			}
 		}
 		
-		return allAir && flatGeneratorInfo.getBiome() != Biome.getIdForBiome(Biomes.VOID) ? false : flatGeneratorInfo.getWorldFeatures().containsKey("decoration");
+		return (!allAir || flatGeneratorInfo.getBiome() == Biome.getIdForBiome(Biomes.VOID)) && flatGeneratorInfo.getWorldFeatures().containsKey("decoration");
 	}
 
+	/** This is used to override the very specific edge cases where the world is flat and is air but need trees nontheless */
+	public static List<Integer> dimensionForceGeneration = new LinkedList<>();
+	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if(world.getWorldType() == WorldType.FLAT && !flatWorldsDecoration.computeIfAbsent(world.provider.getDimension(), d -> isFlatWorldDecorated(world))) {
+		if(!dimensionForceGeneration.contains(world.provider.getDimension()) && world.getWorldType() == WorldType.FLAT && !flatWorldsDecoration.computeIfAbsent(world.provider.getDimension(), d -> isFlatWorldDecorated(world))) 
 			return;
-		}
 		TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		BiomeDataBase dbase = treeGenerator.getBiomeDataBase(world);
 		if(dbase != TreeGenerator.DIMENSIONBLACKLISTED) {
