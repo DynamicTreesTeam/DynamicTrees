@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -129,11 +130,11 @@ public class WorldGeneratorTrees implements IWorldGenerator {
 	}
 
 	/** This is used to override the very specific edge cases where the world is flat and is air but need trees nontheless */
-	public static List<Integer> dimensionForceGeneration = new LinkedList<>();
+	public static List<Predicate<World>> dimensionForceGeneration = new LinkedList<>();
 	
 	@Override
 	public void generate(Random randomUnused, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-		if(!dimensionForceGeneration.contains(world.provider.getDimension()) && world.getWorldType() == WorldType.FLAT && !flatWorldsDecoration.computeIfAbsent(world.provider.getDimension(), d -> isFlatWorldDecorated(world))) 
+		if(dimensionForceGeneration.stream().noneMatch(p -> p.test(world)) && world.getWorldType() == WorldType.FLAT && !flatWorldsDecoration.computeIfAbsent(world.provider.getDimension(), d -> isFlatWorldDecorated(world))) 
 			return;
 		TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		BiomeDataBase dbase = treeGenerator.getBiomeDataBase(world);
