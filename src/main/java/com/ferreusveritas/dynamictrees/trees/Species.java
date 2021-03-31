@@ -152,8 +152,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
 
 	//Seeds
-	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
-	/** Hold damage value for seed items with multiple variants */
+	/** The seed used to reproduce this species.  Drops from the tree and can plant itself *
+	* Hold damage value for seed items with multiple variants */
 	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
 	protected IBlockState saplingBlock;
@@ -165,6 +165,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
+	
+	private Species megaSpecies;
 	
 	protected IFullGenFeature genFeatureOverride;
 	protected List<IPreGenFeature> preGenFeatures;
@@ -211,6 +213,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		setStandardSoils();
 		seedStack = new ItemStack(Seed.NULLSEED);
 		saplingBlock = Blocks.AIR.getDefaultState();
+		megaSpecies = NULLSPECIES;
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
@@ -829,7 +832,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
 	
-	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+	static private final EnumFacing[] upFirst = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 	
 	/**
 	* Handle rotting branches
@@ -1292,15 +1295,29 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	///////////////////////////////////////////
 	// MEGANESS
 	///////////////////////////////////////////
-	
+
+	/**
+	 * @return true if this species is a Mega variant of another species
+	 */
 	public boolean isMega() {
 		return false;
 	}
-	
+
+	/**
+	 * @return the Mega variant of this species. if it has none it returns NULLSPECIES
+	 * Override to set a custom megaSpecies.
+	 */
 	public Species getMegaSpecies() {
-		return Species.NULLSPECIES;
+		return megaSpecies;
 	}
-	
+
+	/**
+	 * @param megaSpecies new Mega variant of this species if it has none. Will not change existing variant
+	 */
+	public void setMegaSpecies(Species megaSpecies) { 
+		if (this.megaSpecies == NULLSPECIES)
+			this.megaSpecies = megaSpecies;
+	}
 	
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
