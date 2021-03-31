@@ -4,6 +4,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.blocks.MimicProperty;
@@ -244,7 +245,15 @@ public class BlockRootyWater extends BlockRooty {
 		super.harvestBlock(worldIn, player, pos, state, te, stack);
 		worldIn.setBlockState(pos, Blocks.WATER.getDefaultState());
 	}
-	
+
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		IBlockState upState = world.getBlockState(pos.up());
+		if (TreeHelper.isBranch(upState))
+			return new ItemStack(TreeHelper.getBranch(upState).getFamily().getDynamicBranch());
+		return ItemStack.EMPTY;
+	}
+
 	@Override
 	public IBlockState getMimic(IBlockAccess access, BlockPos pos) {
 		return  Blocks.WATER.getDefaultState();
