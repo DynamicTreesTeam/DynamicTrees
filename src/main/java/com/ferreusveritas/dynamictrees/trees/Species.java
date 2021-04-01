@@ -37,6 +37,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.models.ModelEntityFallingTree;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -85,6 +86,8 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import org.apache.logging.log4j.LogManager;
+
+import javax.annotation.Nullable;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
@@ -365,6 +368,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return this.getValidLeavesProperties(index).getDynamicLeavesState();
 	}
 
+	public int colorTreeQuads (int defaultColor, ModelEntityFallingTree.TreeQuadData treeQuad, @Nullable EntityFallingTree entity){
+		return defaultColor;
+	}
+	
 	///////////////////////////////////////////
 	//SEEDS
 	///////////////////////////////////////////

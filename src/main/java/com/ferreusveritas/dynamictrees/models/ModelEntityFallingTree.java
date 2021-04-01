@@ -70,7 +70,7 @@ public class ModelEntityFallingTree {
 				int radius = ((BlockBranch) exState.getBlock()).getRadius(exState);
 				float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;
 				IBakedModel branchModel = dispatcher.getModelForState(exState.getClean());//Since we source the blockState from the destruction data it will always be the same
-				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }), 0xFFFFFFFF));
+				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }), 0xFFFFFFFF, exState.getClean()));
 
 				//Draw the rest of the tree/branch
 				for(int index = 0; index < destructionData.getNumBranches(); index++) {
@@ -79,7 +79,7 @@ public class ModelEntityFallingTree {
 					if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
 						branchModel = dispatcher.getModelForState(exState.getClean());
 					BlockPos relPos = destructionData.getBranchRelPos(index);
-					treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(relPos)), 0xFFFFFFFF));
+					treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(relPos)), 0xFFFFFFFF, exState.getClean()));
 				}
 
 				//Draw the leaves
@@ -91,7 +91,7 @@ public class ModelEntityFallingTree {
 							leafState = ((IExtendedBlockState) leafState).getClean();
 						}
 						treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey())), 
-							species.getLeavesProperties().foliageColorMultiplier(leafState, world, cutPos)));				
+							species.getLeavesProperties().foliageColorMultiplier(leafState, world, cutPos), leafState));				
 					}
 				} else {
 					for (int index = 0; index < destructionData.getNumLeaves(); index++) {
@@ -99,7 +99,7 @@ public class ModelEntityFallingTree {
 						IBlockState state = destructionData.getLeavesBlockState(index);
 						IBakedModel leavesModel = dispatcher.getModelForState(state);
 						treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, state, new Vec3d(relPos)), 
-							destructionData.getLeavesProperties(index).foliageColorMultiplier(state, world, cutPos.add(relPos))));
+							destructionData.getLeavesProperties(index).foliageColorMultiplier(state, world, cutPos.add(relPos)), state));
 					}
 				}
 			}
@@ -108,16 +108,18 @@ public class ModelEntityFallingTree {
 		return treeQuads;
 	}
 	
-	public static List<TreeQuadData> toTreeQuadData (List<BakedQuad> bakedQuads, int color) {
-		return bakedQuads.stream().map(bakedQuad -> new TreeQuadData(bakedQuad, color)).collect(Collectors.toList());
+	public static List<TreeQuadData> toTreeQuadData (List<BakedQuad> bakedQuads, int color, IBlockState state) {
+		return bakedQuads.stream().map(bakedQuad -> new TreeQuadData(bakedQuad, color, state)).collect(Collectors.toList());
 	}
 	
 	public static final class TreeQuadData {
 		public final BakedQuad bakedQuad;
+		public final IBlockState state;
 		public final int color;
 
-		public TreeQuadData(BakedQuad bakedQuad, int color) {
+		public TreeQuadData(BakedQuad bakedQuad, int color, IBlockState state) {
 			this.bakedQuad = bakedQuad;
+			this.state = state;
 			this.color = color;
 		}
 	}

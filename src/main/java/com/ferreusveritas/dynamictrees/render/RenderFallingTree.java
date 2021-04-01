@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.render;
 
 import java.util.List;
 
+import com.ferreusveritas.dynamictrees.trees.Species;
 import org.lwjgl.opengl.GL11;
 
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
@@ -62,8 +63,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		}
 		
 		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks);
-		
-		this.drawBakedQuads(treeModel.getQuadData(), brightnessIn);
+		this.drawBakedQuads(treeModel.getQuadData(), brightnessIn, entity.getDestroyData().species, entity);
 		
 		GlStateManager.popMatrix();
 		GlStateManager.enableLighting();
@@ -75,19 +75,20 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		IBlockState fire = Blocks.FIRE.getDefaultState();
 		IBakedModel model = dispatcher.getModelForState(fire);
-		drawBakedQuads(ModelEntityFallingTree.toTreeQuadData(QuadManipulator.getQuads(model, fire), 0xFFFFFFFF), 255);
+		drawBakedQuads(ModelEntityFallingTree.toTreeQuadData(QuadManipulator.getQuads(model, fire), 0xFFFFFFFF, fire), 255, null, null);
 		GlStateManager.popMatrix();
 	}
 	
 	//TODO: Convert to IBakedModel and eliminate this mess
-	public void drawBakedQuads(List<ModelEntityFallingTree.TreeQuadData> inQuads, int brightness) {
+	public void drawBakedQuads(List<ModelEntityFallingTree.TreeQuadData> inQuads, int brightness, Species species, EntityFallingTree entity) {
 		final Tessellator tessellator = Tessellator.getInstance();
 		final BufferBuilder buffer = tessellator.getBuffer();
 		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		
 		for (ModelEntityFallingTree.TreeQuadData treeQuad: inQuads) {
-			this.drawBakedQuad(buffer, treeQuad.bakedQuad, brightness, treeQuad.color);
+			int color = species==null ? treeQuad.color : species.colorTreeQuads(treeQuad.color, treeQuad, entity);
+			this.drawBakedQuad(buffer, treeQuad.bakedQuad, brightness, color);
 		}
 		
 		tessellator.draw();
