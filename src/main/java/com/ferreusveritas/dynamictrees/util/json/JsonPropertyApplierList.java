@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Manages a list of {@link JsonPropertyApplier} objects of type {@link T}, allowing for an
@@ -17,6 +18,28 @@ import java.util.Map;
  */
 public final class JsonPropertyApplierList<T> {
 
+    public static final class PropertyApplierResultList extends ArrayList<PropertyApplierResult> {
+
+        public PropertyApplierResultList forEachError(final Consumer<String> errorConsumer) {
+            this.forEach(propertyApplierResult -> errorConsumer.accept(propertyApplierResult.getErrorMessage()));
+            return this;
+        }
+
+        public PropertyApplierResultList forEachWarning(final Consumer<String> warningConsumer) {
+            this.forEach(propertyApplierResult -> propertyApplierResult.getWarnings().forEach(warningConsumer));
+            return this;
+        }
+
+        public PropertyApplierResultList forEachErrorWarning(final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+            this.forEach(propertyApplierResult -> {
+                errorConsumer.accept(propertyApplierResult.getErrorMessage());
+                propertyApplierResult.getWarnings().forEach(warningConsumer);
+            });
+            return this;
+        }
+
+    }
+
     private final Class<T> objectType;
     private final List<JsonPropertyApplier<? extends T, ?>> appliers = new ArrayList<>();
 
@@ -24,8 +47,8 @@ public final class JsonPropertyApplierList<T> {
         this.objectType = objectType;
     }
 
-    public List<PropertyApplierResult> applyAll(final JsonObject jsonObject, final T object) {
-        final List<PropertyApplierResult> failureResults = new ArrayList<>();
+    public PropertyApplierResultList applyAll(final JsonObject jsonObject, final T object) {
+        final PropertyApplierResultList failureResults = new PropertyApplierResultList();
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             final PropertyApplierResult result = this.apply(object, entry.getKey(), entry.getValue());
@@ -40,7 +63,9 @@ public final class JsonPropertyApplierList<T> {
     public PropertyApplierResult apply(final T object, final String key, final JsonElement jsonElement) {
         // If the element is a comment, ignore it and move onto next entry.
         if (JsonHelper.isComment(jsonElement))
-            return PropertyApplierResult.SUCCESS;
+            return PropertyApplierResult.success();
+
+        final List<String> warnings = new ArrayList<>();
 
         for (final JsonPropertyApplier<? extends T, ?> applier : this.appliers) {
             if (!applier.getObjectClass().isInstance(object))
@@ -56,10 +81,11 @@ public final class JsonPropertyApplierList<T> {
             if (!result.wasSuccessful())
                 return result;
 
+            warnings.addAll(result.getWarnings());
             break; // We have read (or tried to read) this entry, so move onto the next.
         }
 
-        return PropertyApplierResult.SUCCESS;
+        return PropertyApplierResult.success(warnings);
     }
 
     public <E extends T> JsonPropertyApplierList<T> register (final JsonPropertyApplier<E, ?> applier) {

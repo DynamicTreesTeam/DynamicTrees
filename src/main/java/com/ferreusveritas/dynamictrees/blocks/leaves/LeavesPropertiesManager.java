@@ -1,25 +1,19 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
-import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
-import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.LeavesBlock;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -70,7 +64,9 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
 
             final boolean newEntry = !LeavesProperties.REGISTRY.has(registryName);
             final LeavesProperties leavesProperties;
-            final Consumer<PropertyApplierResult> failureConsumer = failureResult -> LOGGER.warn("Error whilst loading leaves properties '{}': {}", registryName, failureResult.getErrorMessage());
+
+            final Consumer<String> errorConsumer = errorMessage -> LOGGER.error("Error whilst loading leaves properties '{}': {}", registryName, errorMessage);
+            final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading leaves properties '{}': {}", registryName, warningMessage);
 
             if (newEntry) {
                 LeavesProperties.Type leavesPropertiesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, LeavesProperties.Type.class,
@@ -82,12 +78,12 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
                 leavesProperties = leavesPropertiesType.construct(registryName);
 
                 if (firstLoad) {
-                    this.loadAppliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
+                    this.loadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);
 
                     // Generate block by default, but allow it to be turned off.
                     if (JsonHelper.getOrDefault(jsonObject, "generate_block", true)) {
                         final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties();
-                        this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEach(failureConsumer);
+                        this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEachErrorWarning(errorConsumer, warningConsumer);
                         leavesProperties.generateDynamicLeaves(blockProperties);
                     }
                 }
@@ -96,9 +92,9 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
             }
 
             if (!firstLoad)
-                this.reloadAppliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
+                this.reloadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);
 
-            this.appliers.applyAll(jsonObject, leavesProperties).forEach(failureConsumer);
+            this.appliers.applyAll(jsonObject, leavesProperties).forEachError(errorConsumer).forEachErrorWarning(errorConsumer, warningConsumer);
 
             if (!firstLoad)
                 leavesProperties.setPostReloadDefaults();

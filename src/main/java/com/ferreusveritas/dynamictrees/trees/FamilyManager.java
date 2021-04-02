@@ -89,7 +89,8 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             final Family family;
             final boolean newRegistry = !Family.REGISTRY.has(registryName);
 
-            final Consumer<PropertyApplierResult> failureConsumer = failureResult -> LOGGER.warn("Error whilst loading tree family data for '{}': {}", registryName, failureResult.getErrorMessage());
+            final Consumer<String> errorConsumer = errorMessage -> LOGGER.error("Error whilst loading tree family '{}': {}", registryName, errorMessage);
+            final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading tree family '{}': {}", registryName, warningMessage);
 
             if (newRegistry) {
                 Family.Type familyType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Family.Type.class,
@@ -103,16 +104,16 @@ public final class FamilyManager extends JsonReloadListener<Family> {
                 family = familyType.construct(registryName);
 
                 if (firstLoad)
-                    this.loadAppliers.applyAll(jsonObject, family).forEach(failureConsumer);
+                    this.loadAppliers.applyAll(jsonObject, family).forEachErrorWarning(errorConsumer, warningConsumer);
                 else family.setPreReloadDefaults();
             } else {
                 family = Family.REGISTRY.get(registryName).reset().setPreReloadDefaults();
             }
 
             if (!firstLoad)
-                this.reloadAppliers.applyAll(jsonObject, family).forEach(failureConsumer);
+                this.reloadAppliers.applyAll(jsonObject, family).forEachErrorWarning(errorConsumer, warningConsumer);
 
-            this.appliers.applyAll(jsonObject.getAsJsonObject(), family).forEach(failureConsumer);
+            this.appliers.applyAll(jsonObject.getAsJsonObject(), family).forEachErrorWarning(errorConsumer, warningConsumer);
 
             if (!firstLoad)
                 family.setPostReloadDefaults();

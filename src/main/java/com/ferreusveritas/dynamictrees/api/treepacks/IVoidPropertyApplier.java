@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
+import java.util.List;
+
 /**
  * An implementation of {@link IPropertyApplier} that assumes the application was
  * successful, calling {@link IVoidPropertyApplier#applySuccessful(Object, Object)}
- * and returning {@link PropertyApplierResult#SUCCESS}.
+ * and returning {@link PropertyApplierResult#success()}.
  *
  * @author Harley O'Connor
  */
@@ -12,7 +14,7 @@ public interface IVoidPropertyApplier<T, V> extends IPropertyApplier<T, V> {
     @Override
     default PropertyApplierResult apply(final T object, final V value) {
         this.applySuccessful(object, value);
-        return PropertyApplierResult.SUCCESS;
+        return PropertyApplierResult.success();
     }
 
     /**

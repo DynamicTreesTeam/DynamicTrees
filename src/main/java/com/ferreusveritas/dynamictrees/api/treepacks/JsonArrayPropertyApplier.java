@@ -1,11 +1,14 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
+import com.ferreusveritas.dynamictrees.util.Null;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Harley O'Connor
@@ -27,12 +30,13 @@ public class JsonArrayPropertyApplier<T, V> extends JsonPropertyApplier<T, V> {
         if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object) || !arrayFetchResult.wasSuccessful())
             return null;
 
+        final List<String> warnings = new ArrayList<>();
         final JsonArray jsonArray = arrayFetchResult.getValue();
 
         for (final JsonElement element : jsonArray)
-            this.jsonApplier.applyIfShould(object, element, this.valueClass, this.jsonApplier.propertyApplier);
+            Null.ifNonnull(this.jsonApplier.applyIfShould(object, element, this.valueClass, this.jsonApplier.propertyApplier), result -> warnings.addAll(result.getWarnings()));
 
-        return PropertyApplierResult.SUCCESS;
+        return PropertyApplierResult.success(warnings);
     }
 
     private static class PropertyApplier<T, V> extends JsonPropertyApplier<T, V> {

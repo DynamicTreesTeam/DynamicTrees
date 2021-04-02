@@ -160,8 +160,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	protected Seed seed = null;
 	/** A blockState that will turn itself into this tree */
 	protected DynamicSaplingBlock saplingBlock = null;
-	/** The primitive (vanilla) sapling, used for sapling replacements. */
-	protected BlockState primitiveSapling = null;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
 	
@@ -1718,7 +1716,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 				", validLeaves=" + validLeaves +
 				", seed=" + seed +
 				", saplingBlock=" + saplingBlock +
-				", primitiveSapling=" + primitiveSapling +
 				", dropCreatorStorage=" + dropCreatorStorage +
 				", envFactors=" + envFactors +
 				", genFeatures=" + genFeatures +

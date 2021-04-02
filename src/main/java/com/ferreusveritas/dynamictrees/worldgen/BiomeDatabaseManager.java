@@ -18,7 +18,6 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
@@ -77,37 +76,37 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR_GETTER.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
-                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+                        return PropertyApplierResult.failure(selectorFetchResult);
 
                     final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
                     getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
 
                     entry.getDatabase().setSpeciesSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.SUCCESS;
+                    return PropertyApplierResult.success();
                 })
                 .register("density", JsonElement.class, (entry, jsonElement) -> {
                     final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> selectorFetchResult = JsonObjectGetters.DENSITY_SELECTOR_GETTER.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
-                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+                        return PropertyApplierResult.failure(selectorFetchResult);
 
                     final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
                     getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
 
                     entry.getDatabase().setDensitySelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.SUCCESS;
+                    return PropertyApplierResult.success();
                 })
                 .register("chance", JsonElement.class, (entry, jsonElement) -> {
                     final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> selectorFetchResult = JsonObjectGetters.CHANCE_SELECTOR_GETTER.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
-                        return new PropertyApplierResult(selectorFetchResult.getErrorMessage());
+                        return PropertyApplierResult.failure(selectorFetchResult);
 
                     final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
                     getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
 
                     entry.getDatabase().setChanceSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.SUCCESS;
+                    return PropertyApplierResult.success();
                 })
                 .register("multipass", Boolean.class, (entry, multipass) -> {
                     if (!multipass)
@@ -238,12 +237,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
-        JsonHelper.JsonElementReader.of(jsonElement)
-                .ifOfType(JsonArray.class, jsonArray ->
-                        jsonArray.forEach(element ->
-                                JsonHelper.JsonElementReader.of(element).ifOfType(JsonObject.class, jsonObject ->
-                                        this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly)
-                                )))
+        JsonHelper.JsonElementReader.of(jsonElement).ifArrayForEach(JsonObject.class, jsonObject ->
+                this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly))
                 .elseWarn("Root element of populator '" + resourceLocation + "' was not a Json array.");
     }
 
@@ -286,7 +281,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 final BiomePropertySelectors.FeatureCancellations featureCancellations = new BiomePropertySelectors.FeatureCancellations();
 
                 this.featureCancellationAppliers.applyAll(cancellerObject, featureCancellations)
-                        .forEach(failureResult -> LOGGER.warn("Error whilst applying feature cancellations in '{}' populator: {}", resourceLocation, failureResult.getErrorMessage()));
+                        .forEach(failureResult -> LOGGER.error("Error whilst applying feature cancellations in '{}' populator: {}", resourceLocation, failureResult.getErrorMessage()));
 
                 final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.SPLICE_AFTER);
                 JsonHelper.JsonObjectReader.of(jsonObject).ifContains(METHOD, BiomeDatabase.Operation.class, operation::set)

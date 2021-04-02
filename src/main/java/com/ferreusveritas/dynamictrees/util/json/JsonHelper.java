@@ -116,7 +116,7 @@ public class JsonHelper {
 		private final JsonElement jsonElement;
 		private boolean read = false;
 		private String lastError;
-		private List<Class<?>> attemptedClasses = new ArrayList<>();
+		private final List<Class<?>> attemptedClasses = new ArrayList<>();
 
 		private JsonElementReader(JsonElement jsonElement) {
 			this.jsonElement = jsonElement;
@@ -127,6 +127,15 @@ public class JsonHelper {
 				consumer.accept(value);
 				this.read = true;
 			}).otherwise(errorMessage -> this.lastError = errorMessage);
+			return this;
+		}
+
+		public <T> JsonElementReader ifArrayForEach (final Class<T> typeClass, final Consumer<T> consumer) {
+			JsonObjectGetters.JSON_ARRAY_GETTER.get(jsonElement).ifSuccessful(jsonArray -> {
+				jsonArray.forEach(arrayElement -> JsonObjectGetters.getObjectGetter(typeClass).get(arrayElement)
+						.ifSuccessful(consumer).otherwise(errorMessage -> this.lastError = errorMessage));
+				this.read = true;
+			});
 			return this;
 		}
 

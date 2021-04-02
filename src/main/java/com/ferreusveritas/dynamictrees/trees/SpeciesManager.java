@@ -18,18 +18,16 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.block.Block;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author Harley O'Connor
@@ -78,7 +76,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 .register("growth_logic_kit", GrowthLogicKit.class, Species::setGrowthLogicKit)
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("environment_factors", JsonObject.class, (species, jsonObject) ->
-                        jsonObject.entrySet().forEach(entry -> readEntry(environmentFactorAppliers, species, entry.getKey(), entry.getValue())))
+                        this.environmentFactorAppliers.applyAll(jsonObject, species).forEach(failureMessage -> LOGGER.warn("Error applying environment factor for species '{}': {}", species.getRegistryName(), failureMessage)))
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, (species, registryName) -> {
@@ -93,10 +91,10 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), Species::addGenFeature)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
                     if (DirtHelper.getSoilFlags(acceptableSoil) == 0)
-                        return new PropertyApplierResult("Could not find acceptable soil '" + acceptableSoil + "'.");
+                        return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
 
                     species.addAcceptableSoils(acceptableSoil);
-                    return PropertyApplierResult.SUCCESS;
+                    return PropertyApplierResult.success();
                 });
 
         super.registerAppliers(applierListIdentifier);
@@ -123,6 +121,9 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             final Species species;
             final boolean newRegistry = !Species.REGISTRY.has(registryName);
 
+            final Consumer<String> errorConsumer = errorMessage -> LOGGER.error("Error whilst loading species '{}': {}", registryName, errorMessage);
+            final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading species '{}': {}", registryName, warningMessage);
+
             if (newRegistry) {
                 Species.Type speciesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Species.Type.class,
                         "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
@@ -142,7 +143,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
                 if (firstLoad) {
                     // Apply load appliers for things like generating seeds and saplings.
-                    jsonObject.entrySet().forEach(entry -> readEntry(this.loadAppliers, species, entry.getKey(), entry.getValue()));
+                    this.loadAppliers.applyAll(jsonObject, species).forEachErrorWarning(errorConsumer, warningConsumer);
                 } else species.setPreReloadDefaults();
             } else {
                 // Species is already registered, so reset it and apply pre-reload defaults.
@@ -151,11 +152,11 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
             if (!firstLoad) {
                 // Apply reload appliers.
-                jsonObject.entrySet().forEach(entry -> readEntry(this.reloadAppliers, species, entry.getKey(), entry.getValue()));
+                this.reloadAppliers.applyAll(jsonObject, species).forEachErrorWarning(errorConsumer, warningConsumer);
             }
 
             // Apply universal appliers for both load and reload.
-            jsonObject.entrySet().forEach(entry -> readEntry(this.appliers, species, entry.getKey(), entry.getValue()));
+            this.appliers.applyAll(jsonObject, species).forEachErrorWarning(errorConsumer, warningConsumer);
 
             if (!firstLoad)
                 species.setPostReloadDefaults();
@@ -173,13 +174,6 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
 
         // Lock registry (don't lock on first load as registry events are fired after).
         Species.REGISTRY.lock();
-    }
-
-    private static void readEntry (final JsonPropertyApplierList<Species> propertyAppliers, final Species species, final String key, final JsonElement jsonElement) {
-        final PropertyApplierResult result = propertyAppliers.apply(species, key, jsonElement);
-
-        if (!result.wasSuccessful())
-            LOGGER.warn("Failure applying key '{}': {}", key, result.getErrorMessage());
     }
 
 }

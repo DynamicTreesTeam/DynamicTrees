@@ -60,7 +60,7 @@ public class JsonPropertyApplier<T, V> {
         final ObjectFetchResult<R> fetchResult = valueGetter.get(jsonElement);
 
         return fetchResult.wasSuccessful() ? applier.apply((S) object, fetchResult.getValue()) :
-                new PropertyApplierResult(fetchResult.getErrorMessage());
+                PropertyApplierResult.failure(fetchResult);
     }
 
     public Class<T> getObjectClass() {
