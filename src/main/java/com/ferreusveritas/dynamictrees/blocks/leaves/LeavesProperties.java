@@ -33,6 +33,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -77,8 +78,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public static final TypedRegistry<LeavesProperties> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
 	protected static final int maxHydro = 4;
-
-	protected ResourceLocation primitiveLeavesRegName;
 
 	/** The primitive (vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	protected BlockState primitiveLeaves;
@@ -130,14 +129,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 			this.family.removeConnectableVanillaLeaves(this.primitiveLeavesConnectable);
 			this.family.addConnectableVanillaLeaves(state -> state.getBlock() == primitiveLeaves);
 		}
-	}
-
-	public ResourceLocation getPrimitiveLeavesRegName() {
-		return primitiveLeavesRegName;
-	}
-
-	public void setPrimitiveLeavesRegName(ResourceLocation primitiveLeavesRegName) {
-		this.primitiveLeavesRegName = primitiveLeavesRegName;
 	}
 
 	/**
@@ -351,22 +342,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	@Override
-	public String toString() {
-		return "LeavesProperties{" +
-				"primitiveLeaves=" + primitiveLeaves +
-				", tree=" + family + '}';
+	public String toReloadDataString() {
+		return this.getString(Pair.of("primitiveLeaves", this.primitiveLeaves), Pair.of("cellKit", this.cellKit),
+				Pair.of("smotherLeavesMax", this.smotherLeavesMax), Pair.of("lightRequirement", this.lightRequirement),
+				Pair.of("fireSpreadSpeed", this.fireSpreadSpeed), Pair.of("flammability", this.flammability),
+				Pair.of("connectAnyRadius", this.connectAnyRadius));
 	}
 
-	public String getDisplayString() {
-		return "LeavesProperties{" +
-				"registryName=" + this.getRegistryName() +
-				", primitiveLeaves=" + primitiveLeaves +
-				", primitiveLeavesRegistryName=" + primitiveLeavesRegName +
-				", cellKit=" + cellKit +
-				", tree=" + family +
-				", dynamicLeavesBlockHydroStates=" + Arrays.toString(dynamicLeavesBlockHydroStates) +
-				", flammability=" + flammability +
-				", fireSpreadSpeed=" + fireSpreadSpeed +
-				'}';
-	}
 }

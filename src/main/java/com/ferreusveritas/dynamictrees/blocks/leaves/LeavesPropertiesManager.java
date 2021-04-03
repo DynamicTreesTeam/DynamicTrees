@@ -1,37 +1,29 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
+import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ToolType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * @author Harley O'Connor
  */
-public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProperties> {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListener<LeavesProperties> {
 
     private JsonPropertyApplierList<AbstractBlock.Properties> blockPropertyAppliers;
 
     public LeavesPropertiesManager() {
-        super("leaves_properties", LeavesProperties.class, "leaves_properties");
+        super(LeavesProperties.REGISTRY, JsonApplierRegistryEvent.LEAVES_PROPERTIES);
     }
 
     @Override
@@ -68,68 +60,15 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
     }
 
     @Override
-    protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
-        LeavesProperties.REGISTRY.unlock();
+    protected void preLoad(JsonObject jsonObject, LeavesProperties leavesProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        // Generate block by default, but allow it to be turned off.
+        if (JsonHelper.getOrDefault(jsonObject, "generate_block", Boolean.class, true)) {
+            final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, leavesProperties.getDefaultMaterial());
+            final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties(material, JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, material.getColor()));
 
-        preparedObject.forEach((registryName, jsonElement) -> {
-            if (!jsonElement.isJsonObject()) {
-                LOGGER.warn("Skipping loading leaves properties '{}' as its root element is not a Json object.", registryName);
-                return;
-            }
-
-            final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonElement.getAsJsonObject(), registryName);
-
-            // Skip the current entry if it shouldn't load.
-            if (!this.shouldLoad(jsonObject, "Error loading data for leaves properties '" + registryName + "': "))
-                return;
-
-            final boolean newEntry = !LeavesProperties.REGISTRY.has(registryName);
-            final LeavesProperties leavesProperties;
-
-            final Consumer<String> errorConsumer = errorMessage -> LOGGER.error("Error whilst loading leaves properties '{}': {}", registryName, errorMessage);
-            final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading leaves properties '{}': {}", registryName, warningMessage);
-
-            if (newEntry) {
-                leavesProperties = LeavesProperties.REGISTRY.getType(jsonObject, registryName).decode(jsonObject);
-
-                // Stop loading this species (error should have been logged already).
-                if (leavesProperties == null)
-                    return;
-
-                if (firstLoad) {
-                    this.loadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);
-
-                    // Generate block by default, but allow it to be turned off.
-                    if (JsonHelper.getOrDefault(jsonObject, "generate_block", Boolean.class, true)) {
-                        final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, leavesProperties.getDefaultMaterial());
-                        final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties(material, JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, material.getColor()));
-
-                        this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEachErrorWarning(errorConsumer, warningConsumer);
-                        leavesProperties.generateDynamicLeaves(blockProperties);
-                    }
-                }
-            } else {
-                leavesProperties = LeavesProperties.REGISTRY.get(registryName).reset().setPreReloadDefaults();
-            }
-
-            if (!firstLoad)
-                this.reloadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);
-
-            this.appliers.applyAll(jsonObject, leavesProperties).forEachError(errorConsumer).forEachErrorWarning(errorConsumer, warningConsumer);
-
-            if (!firstLoad)
-                leavesProperties.setPostReloadDefaults();
-
-            if (newEntry) {
-                LeavesProperties.REGISTRY.register(leavesProperties);
-                LOGGER.debug("Loaded and registered leaves properties: {}.", leavesProperties.getDisplayString());
-            } else {
-                LOGGER.debug("Loaded leaves properties data: {}.", leavesProperties.getDisplayString());
-            }
-        });
-
-        if (!firstLoad)
-            LeavesProperties.REGISTRY.lock();
+            this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEachErrorWarning(errorConsumer, warningConsumer);
+            leavesProperties.generateDynamicLeaves(blockProperties);
+        }
     }
 
 }

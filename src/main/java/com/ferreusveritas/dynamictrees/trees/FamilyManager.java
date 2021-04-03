@@ -1,22 +1,16 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
-import com.google.gson.JsonElement;
+import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -24,12 +18,12 @@ import java.util.function.Consumer;
  *
  * @author Harley O'Connor
  */
-public final class FamilyManager extends JsonReloadListener<Family> {
+public final class FamilyManager extends JsonRegistryEntryReloadListener<Family> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public FamilyManager() {
-        super("families", Family.class, JsonApplierRegistryEvent.FAMILY);
+        super(Family.REGISTRY, "families", JsonApplierRegistryEvent.FAMILY);
     }
 
     @Override
@@ -68,67 +62,8 @@ public final class FamilyManager extends JsonReloadListener<Family> {
     }
 
     @Override
-    protected void apply(final Map<ResourceLocation, JsonElement> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
-        Family.REGISTRY.unlock(); // Ensure registry is unlocked.
-
-        preparedObject.forEach((registryName, jsonElement) -> {
-            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
-
-            if (!jsonObjectFetchResult.wasSuccessful()) {
-                LOGGER.warn("Skipping loading data for family '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());
-                return;
-            }
-
-            final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonObjectFetchResult.getValue(), registryName);
-
-            // Skip the current entry if it shouldn't load.
-            if (!this.shouldLoad(jsonObject, "Error loading data for family '" + registryName + "': "))
-                return;
-
-            final Family family;
-            final boolean newRegistry = !Family.REGISTRY.has(registryName);
-
-            final Consumer<String> errorConsumer = errorMessage -> LOGGER.error("Error whilst loading tree family '{}': {}", registryName, errorMessage);
-            final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading tree family '{}': {}", registryName, warningMessage);
-
-            if (newRegistry) {
-                // Construct the tree family class from initial setup properties.
-                family = Family.REGISTRY.getType(jsonObject, registryName).decode(jsonObject);
-
-                // Stop loading this family (error should have been logged already).
-                if (family == null)
-                    return;
-
-                if (firstLoad)
-                    this.loadAppliers.applyAll(jsonObject, family).forEachErrorWarning(errorConsumer, warningConsumer);
-                else family.setPreReloadDefaults();
-            } else {
-                family = Family.REGISTRY.get(registryName).reset().setPreReloadDefaults();
-            }
-
-            if (!firstLoad)
-                this.reloadAppliers.applyAll(jsonObject, family).forEachErrorWarning(errorConsumer, warningConsumer);
-
-            this.appliers.applyAll(jsonObject.getAsJsonObject(), family).forEachErrorWarning(errorConsumer, warningConsumer);
-
-            if (!firstLoad)
-                family.setPostReloadDefaults();
-
-            if (newRegistry) {
-                if (firstLoad) {
-                    family.setupBlocks();
-                }
-
-                Family.REGISTRY.register(family);
-                LOGGER.debug("Loaded and registered tree family data: {}.", family.getDisplayString());
-            } else {
-                LOGGER.debug("Loaded data for tree family: {}.", family.getDisplayString());
-            }
-        });
-
-        // Lock registry (don't lock on first load as registry events are fired after).
-        if (!firstLoad)
-            Family.REGISTRY.lock();
+    protected void postLoad(JsonObject jsonObject, Family family, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        family.setupBlocks();
     }
 
 }

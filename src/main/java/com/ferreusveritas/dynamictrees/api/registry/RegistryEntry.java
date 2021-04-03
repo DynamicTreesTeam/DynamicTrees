@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Consumer;
 
@@ -67,6 +68,26 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{registryName=" + this.getRegistryName() + "}";
+    }
+
+    public String toLoadDataString() {
+        return this.toString();
+    }
+
+    public String toReloadDataString() {
+        return this.toString();
+    }
+
+    @SafeVarargs
+    public final String getString(final Pair<String, Object>... propertyPairs) {
+        final StringBuilder stringBuilder = new StringBuilder(this.getClass().getSimpleName() + "{registryName=" + this.getRegistryName() + ", ");
+
+        for (int i = 0; i < propertyPairs.length; i++) {
+            final Pair<String, Object> currentProperty = propertyPairs[i];
+            stringBuilder.append(currentProperty.getKey()).append("=").append(currentProperty.getValue()).append(i != propertyPairs.length - 1 ? ", " : "}");
+        }
+
+        return stringBuilder.toString();
     }
 
 }

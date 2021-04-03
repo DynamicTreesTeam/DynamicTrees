@@ -1,12 +1,10 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -14,15 +12,12 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.apache.logging.log4j.LogManager;
 
 public class VanillaSaplingEventHandler {
 
 	@SubscribeEvent
 	public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
 		final BlockState state = event.getPlacedBlock();
-
-		LogManager.getLogger().debug(Species.REGISTRY.get(new ResourceLocation(DynamicTrees.MOD_ID, "spruce")).getDisplayInfo());
 
 		if (!(event.getWorld() instanceof World) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state))
 			return;

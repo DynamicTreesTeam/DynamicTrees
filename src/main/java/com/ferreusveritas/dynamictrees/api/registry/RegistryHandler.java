@@ -11,6 +11,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -119,6 +120,26 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
      */
     public RegistryHandler(final String modId) {
         super(new ResourceLocation(modId, modId));
+    }
+
+    @Nullable
+    public Block getBlock(final ResourceLocation registryName) {
+        return this.blocks.get(registryName);
+    }
+
+    @Nullable
+    public ResourceLocation getRegName(final Block block) {
+        return this.blocks.entrySet().stream().filter(entry -> entry.getValue() == block).map(Map.Entry::getKey).findAny().orElse(null);
+    }
+
+    @Nullable
+    public Item getItem(final ResourceLocation registryName) {
+        return this.items.get(registryName);
+    }
+
+    @Nullable
+    public ResourceLocation getRegName(final Item item) {
+        return this.items.entrySet().stream().filter(entry -> entry.getValue() == item).map(Map.Entry::getKey).findAny().orElse(null);
     }
 
     public void putBlock(final ResourceLocation registryName, final Block block) {

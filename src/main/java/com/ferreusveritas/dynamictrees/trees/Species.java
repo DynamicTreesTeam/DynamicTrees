@@ -78,6 +78,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -1538,10 +1539,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	//////////////////////////////
 	
 	/**
-	 * Provides the {@link BonsaiPotBlock} for this Species. Custom {@link Type} objects can
-	 * derive their own {@link BonsaiPotBlock} sub-class if they want something custom.
+	 * Provides the {@link BonsaiPotBlock} for this Species. {@link Species} subclasses can
+	 * derive their own {@link BonsaiPotBlock} subclass if they want something custom.
 	 *
-	 * @return A {@link BonsaiPotBlock} object.
+	 * @return The {@link BonsaiPotBlock} for this {@link Species}.
 	 */
 	public BonsaiPotBlock getBonsaiPot() {
 		return DTRegistries.BONSAI_POT;
@@ -1702,30 +1703,25 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return getRegistryName().toString();
 	}
 
+	@Override
+	public String toLoadDataString() {
+		final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
+		return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed) : null),
+				Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock) + "}" : null));
+	}
 
-	public String getDisplayInfo() {
-		return "Species{" +
-				"treeFamily=" + family +
-				", registryName=" + this.getRegistryName() +
-				", logicKit=" + logicKit +
-				", tapering=" + tapering +
-				", upProbability=" + upProbability +
-				", lowestBranchHeight=" + lowestBranchHeight +
-				", signalEnergy=" + signalEnergy +
-				", growthRate=" + growthRate +
-				", soilLongevity=" + soilLongevity +
-				", soilTypeFlags=" + soilTypeFlags +
-				", leavesProperties=" + leavesProperties +
-				", validLeaves=" + validLeaves +
-				", seed=" + seed +
-				", saplingBlock=" + saplingBlock +
-				", dropCreatorStorage=" + dropCreatorStorage +
-				", envFactors=" + envFactors +
-				", genFeatures=" + genFeatures +
-				", unlocalizedName='" + this.unlocalizedName + '\'' +
-				", flowerSeasonHoldMin=" + flowerSeasonHoldMin +
-				", flowerSeasonHoldMax=" + flowerSeasonHoldMax +
-				'}';
+	@Override
+	public String toReloadDataString() {
+		return this.getString(Pair.of("tapering", this.tapering), Pair.of("upProbability", this.upProbability),
+				Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
+				Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
+				Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
+				Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
+				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
+				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
+				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(DTRegistries.BLOCK_STATES.AIR)),
+				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
+				Pair.of("genFeatures", this.genFeatures));
 	}
 
 }

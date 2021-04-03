@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -614,26 +615,18 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return "Family{registryName=" + this.getRegistryName() + "}";
 	}
 
-	public String getDisplayString() {
-		return "Family{" +
-				"commonSpecies=" + commonSpecies +
-				", commonLeaves=" + commonLeaves +
-				", dynamicBranch=" + dynamicBranch +
-				", dynamicStrippedBranch=" + dynamicStrippedBranch +
-				", dynamicBranchItem=" + dynamicBranchItem +
-				", surfaceRoot=" + surfaceRoot +
-				", primitiveLog=" + primitiveLog +
-				", primitiveStrippedLog=" + primitiveStrippedLog +
-				", validBranches=" + validBranches +
-				", maxBranchRadius=" + maxBranchRadius +
-				", hasConiferVariants=" + hasConiferVariants +
-				", stick=" + stick +
-				", canSupportCocoa=" + canSupportCocoa +
-				", woodRingColor=" + woodRingColor +
-				", woodBarkColor=" + woodBarkColor +
-				", species=" + species +
-				", vanillaConnectables=" + vanillaConnectables +
-				'}';
+	@Override
+	public String toLoadDataString() {
+		return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
+				Pair.of("hasSurfaceRoot", this.hasSurfaceRoot), Pair.of("hasStrippedBranch", this.hasStrippedBranch));
+	}
+
+	@Override
+	public String toReloadDataString() {
+		return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
+				Pair.of("commonSpecies", this.commonSpecies), Pair.of("primitiveLog", this.primitiveLog),
+				Pair.of("primitiveStrippedLog", this.primitiveStrippedLog), Pair.of("stick", this.stick),
+				Pair.of("hasConiferVariants", this.hasConiferVariants), Pair.of("canSupportCocoa", this.canSupportCocoa));
 	}
 
 }
