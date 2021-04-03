@@ -16,8 +16,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(DynamicTrees.MOD_ID)
@@ -64,7 +63,6 @@ public class DynamicTrees {
 		DTRegistries.setup();
 
 		modEventBus.addListener(this::clientSetup);
-		modEventBus.addListener(this::parallelDispatch);
 		modEventBus.addListener(this::onCommonSetup);
 
 		EventHandlers.registerCommon();
@@ -75,13 +73,11 @@ public class DynamicTrees {
 		DTClient.setup();
 	}
 
-	private void parallelDispatch(final ParallelDispatchEvent event) {
-		event.enqueueWork(DTRegistries.DENDRO_POTION::registerRecipes);
-	}
-
-	public void onCommonSetup(FMLLoadCompleteEvent event){
+	public void onCommonSetup(final FMLCommonSetupEvent event) {
 		// Clears and locks registry handlers to free them from memory.
 		RegistryHandler.REGISTRY.clear();
+
+		DTRegistries.DENDRO_POTION.registerRecipes();
 
 		DTResourceRegistries.getBiomeDatabaseManager().onCommonSetup();
 	}

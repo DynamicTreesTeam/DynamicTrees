@@ -16,7 +16,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -89,11 +88,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	@Override
 	public void fillItemGroup(final ItemGroup group, final NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+		if (!this.isInGroup(group)) {
 			for (final DendroPotionType potion : DendroPotionType.values()) {
 				if (potion.getActive()) {
-					final ItemStack potionStack = new ItemStack(this, 1);
-					items.add(this.applyIndexTag(potionStack, potion.getIndex()));
+					items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
 				}
 			}
 		}
@@ -121,7 +119,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		final CompoundNBT nbtTag = itemStack.getOrCreateTag();
 
 		if (nbtTag.contains(TREE_TAG_KEY)) {
-			return TreeRegistry.findSpecies(new ResourceLocation(nbtTag.getString(TREE_TAG_KEY)));
+			return TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY));
 		}
 
 		return null;
@@ -131,7 +129,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		itemStack.getOrCreateTag().putString(TREE_TAG_KEY, species.getRegistryName().toString());
 		return itemStack;
 	}
-	
+
 	public void registerRecipes() {
 		final ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
 
@@ -144,8 +142,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				this.getRecipe(Items.PRISMARINE_CRYSTALS, DendroPotionType.TRANSFORM));
 
 		for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
-			final ItemStack outputStack = setTargetSpecies(this.getPotionStack(DendroPotionType.TRANSFORM), species);
-			brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1), outputStack));
+			brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1),
+					this.setTargetSpecies(this.getPotionStack(DendroPotionType.TRANSFORM), species)));
 		}
 		
 		brewingRecipes.forEach(BrewingRecipeRegistry::addRecipe);

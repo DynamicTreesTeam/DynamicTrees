@@ -40,30 +40,26 @@ public class TooltipHandler {
 	}
 	
 	public static void applySeasonalTooltips(List<ITextComponent> tipList, int flags) {
-		if(flags != 0) {
-			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons"));
+		if (flags != 0) {
+			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons").appendString(":"));
 			
-			if((flags & 15) == 15) {
-				tipList.add(appendToStart("§d", new TranslationTextComponent("desc.sereneseasons.year_round")));
+			if ((flags & 15) == 15) {
+				tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.year_round").mergeStyle(TextFormatting.LIGHT_PURPLE)));
 			} else {
 				if ((flags & 1) != 0) {
-					tipList.add(appendToStart("§a", new TranslationTextComponent("desc.sereneseasons.spring")));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.spring").mergeStyle(TextFormatting.GREEN)));
 				}
 				if ((flags & 2) != 0) {
-					tipList.add(appendToStart("§e", new TranslationTextComponent("desc.sereneseasons.summer")));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.summer").mergeStyle(TextFormatting.YELLOW)));
 				}
 				if ((flags & 4) != 0) {
-					tipList.add(appendToStart("§6", new TranslationTextComponent("desc.sereneseasons.autumn")));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.autumn").mergeStyle(TextFormatting.GOLD)));
 				}
 				if ((flags & 8) != 0) {
-					tipList.add(appendToStart("§b", new TranslationTextComponent("desc.sereneseasons.winter")));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.winter").mergeStyle(TextFormatting.AQUA)));
 				}
 			}
 		}
 	}
 
-	private static ITextComponent appendToStart(final String string, final ITextComponent textComponent) {
-		return new StringTextComponent(string).appendSibling(textComponent);
-	}
-	
 }
