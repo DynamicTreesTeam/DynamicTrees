@@ -9,9 +9,11 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.trees.*;
+import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.ReflectionHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.json.ChanceSelectorGetter;
 import com.ferreusveritas.dynamictrees.worldgen.json.DensitySelectorGetter;
@@ -20,19 +22,26 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Holds {@link IJsonObjectGetter} objects, which can be used to obtain objects from
@@ -40,7 +49,7 @@ import java.util.*;
  *
  * @author Harley O'Connor
  */
-// TODO: Find another way of initialising so that calling them early doesn't lead to feeding registry entry getters null.
+@SuppressWarnings("unused")
 public final class JsonObjectGetters {
 
     private static final Set<JsonObjectGetterHolder<?>> OBJECT_GETTERS = Sets.newHashSet();
@@ -99,72 +108,44 @@ public final class JsonObjectGetters {
         }
     }
 
-    public static final IJsonObjectGetter<JsonElement> JSON_ELEMENT_GETTER = register(JsonElement.class, ObjectFetchResult::success);
+    public static final IJsonObjectGetter<JsonElement> JSON_ELEMENT = register(JsonElement.class, ObjectFetchResult::success);
 
-    public static final IJsonObjectGetter<String> STRING_GETTER = register(String.class, jsonElement -> {
-        if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isString())
-            return ObjectFetchResult.failure("Json element was not a string.");
+    public static final IJsonObjectGetter<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, jsonElement -> {
+        if (!jsonElement.isJsonPrimitive()) {
+            return ObjectFetchResult.failure("Json element was not a json primitive.");
+        }
 
-        return ObjectFetchResult.success(jsonElement.getAsString());
+        return ObjectFetchResult.success(jsonElement.getAsJsonPrimitive());
     });
 
-    public static final IJsonObjectGetter<Boolean> BOOLEAN_GETTER = register(Boolean.class, jsonElement -> {
-        if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isBoolean())
-            return ObjectFetchResult.failure("Json element was not a boolean.");
-
-        return ObjectFetchResult.success(jsonElement.getAsBoolean());
-    });
-
-    public static final IJsonObjectGetter<Number> NUMBER_GETTER = register(Number.class, jsonElement -> {
-        if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isNumber())
-            return ObjectFetchResult.failure("Json element was not a number.");
-
-        return ObjectFetchResult.success(jsonElement.getAsNumber());
-    });
-
-    public static final IJsonObjectGetter<Integer> INTEGER_GETTER = register(Integer.class, jsonElement -> {
-        final ObjectFetchResult<Number> numberFetch = NUMBER_GETTER.get(jsonElement);
-
-        if (!numberFetch.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(numberFetch);
-
-        return ObjectFetchResult.success(numberFetch.getValue().intValue());
-    });
-
-    public static final IJsonObjectGetter<Double> DOUBLE_GETTER = register(Double.class, jsonElement -> {
-        final ObjectFetchResult<Number> numberFetch = NUMBER_GETTER.get(jsonElement);
-
-        if (!numberFetch.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(numberFetch);
-
-        return ObjectFetchResult.success(numberFetch.getValue().doubleValue());
-    });
-
-    public static final IJsonObjectGetter<Float> FLOAT_GETTER = register(Float.class, jsonElement -> {
-        final ObjectFetchResult<Number> numberFetch = NUMBER_GETTER.get(jsonElement);
-
-        if (!numberFetch.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(numberFetch);
-
-        return ObjectFetchResult.success(numberFetch.getValue().floatValue());
-    });
-
-    public static final IJsonObjectGetter<JsonObject> JSON_OBJECT_GETTER = register(JsonObject.class, jsonElement -> {
+    public static final IJsonObjectGetter<JsonObject> JSON_OBJECT = register(JsonObject.class, jsonElement -> {
         if (!jsonElement.isJsonObject())
             return ObjectFetchResult.failure("Json element was not a json object.");
 
         return ObjectFetchResult.success(jsonElement.getAsJsonObject());
     });
 
-    public static final IJsonObjectGetter<JsonArray> JSON_ARRAY_GETTER = register(JsonArray.class, jsonElement -> {
+    public static final IJsonObjectGetter<JsonArray> JSON_ARRAY = register(JsonArray.class, jsonElement -> {
         if (!jsonElement.isJsonArray())
             return ObjectFetchResult.failure("Json element was not a json array.");
 
         return ObjectFetchResult.success(jsonElement.getAsJsonArray());
     });
 
-    public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION_GETTER = register(ResourceLocation.class, jsonElement -> {
-        final ObjectFetchResult<String> stringFetchResult = STRING_GETTER.get(jsonElement);
+    public static final IJsonObjectGetter<Boolean> BOOLEAN = register(Boolean.class, jsonElement -> JSON_PRIMITIVE.get(jsonElement).mapIfValid(JsonPrimitive::isBoolean, "Could not get boolean from '{value}'.", JsonPrimitive::getAsBoolean));
+    public static final IJsonObjectGetter<Number> NUMBER = register(Number.class, jsonElement -> JSON_PRIMITIVE.get(jsonElement).mapIfValid(JsonPrimitive::isNumber, "Could not get number from '{value}'.", JsonPrimitive::getAsNumber));
+    public static final IJsonObjectGetter<String> STRING = register(String.class, jsonElement -> JSON_PRIMITIVE.get(jsonElement).mapIfValid(JsonPrimitive::isString, "Could not get string from '{value}'.", JsonPrimitive::getAsString));
+
+    public static final IJsonObjectGetter<Byte> BYTE = register(Byte.class, jsonElement -> NUMBER.get(jsonElement).map(Number::byteValue));
+    public static final IJsonObjectGetter<Short> SHORT = register(Short.class, jsonElement -> NUMBER.get(jsonElement).map(Number::shortValue));
+    public static final IJsonObjectGetter<Integer> INTEGER = register(Integer.class, jsonElement -> NUMBER.get(jsonElement).map(Number::intValue));
+    public static final IJsonObjectGetter<Long> LONG = register(Long.class, jsonElement -> NUMBER.get(jsonElement).map(Number::longValue));
+
+    public static final IJsonObjectGetter<Float> FLOAT = register(Float.class, jsonElement -> NUMBER.get(jsonElement).map(Number::floatValue));
+    public static final IJsonObjectGetter<Double> DOUBLE = register(Double.class, jsonElement -> NUMBER.get(jsonElement).map(Number::doubleValue));
+
+    public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, jsonElement -> {
+        final ObjectFetchResult<String> stringFetchResult = STRING.get(jsonElement);
 
         if (!stringFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(stringFetchResult);
@@ -176,67 +157,64 @@ public final class JsonObjectGetters {
         }
     });
 
-    public static IJsonObjectGetter<Block> BLOCK_GETTER;
-    public static IJsonObjectGetter<Item> ITEM_GETTER;
-    public static IJsonObjectGetter<Biome> BIOME_GETTER;
+    public static IJsonObjectGetter<Block> BLOCK;
+    public static IJsonObjectGetter<Item> ITEM;
+    public static IJsonObjectGetter<Biome> BIOME;
 
-    public static final IJsonObjectGetter<CellKit> CELL_KIT_GETTER = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY));
-    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES_GETTER = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY));
-    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT_GETTER = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY));
-    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE_GETTER = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY));
-    public static final IJsonObjectGetter<Family> FAMILY_GETTER = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY));
-    public static final IJsonObjectGetter<Species> SPECIES_GETTER = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
-    public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER_GETTER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
+    public static final IJsonObjectGetter<CellKit> CELL_KIT = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY));
+    public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY));
+    public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY));
+    public static final IJsonObjectGetter<GenFeature> GEN_FEATURE = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY));
+    public static final IJsonObjectGetter<Family> FAMILY = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<Species> SPECIES = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
+    public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
 
-    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE_GETTER = register(LeavesProperties.Type.class, new RegistryEntryTypeGetter<>(LeavesProperties.REGISTRY));
-    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE_GETTER = register(Family.Type.class, new RegistryEntryTypeGetter<>(Family.REGISTRY));
-    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE_GETTER = register(Species.Type.class, new RegistryEntryTypeGetter<>(Species.REGISTRY));
+    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE = register(LeavesProperties.Type.class, new RegistryEntryTypeGetter<>(LeavesProperties.REGISTRY));
+    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE = register(Family.Type.class, new RegistryEntryTypeGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE = register(Species.Type.class, new RegistryEntryTypeGetter<>(Species.REGISTRY));
 
-    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE_GETTER = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
+    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 
-    public static final IJsonObjectGetter<Seed> SEED_GETTER = register(Seed.class, jsonElement -> {
-        final ObjectFetchResult<Item> itemFetchResult = ITEM_GETTER.get(jsonElement);
-
-        if (!itemFetchResult.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(itemFetchResult);
-
-        final Item item = itemFetchResult.getValue();
-
-        if (!(item instanceof Seed))
-            return ObjectFetchResult.failure("Item '" + item.getRegistryName() + "' was not a Seed.");
-
-        return ObjectFetchResult.success(((Seed) item));
-    });
+    public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));
 
     // Random enum getters.
-    public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE_GETTER = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
-    public static final IJsonObjectGetter<BiomeDatabase.Operation> OPERATION_GETTER = new EnumGetter<>(BiomeDatabase.Operation.class);
+    public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
+    public static final IJsonObjectGetter<BiomeDatabase.Operation> OPERATION = new EnumGetter<>(BiomeDatabase.Operation.class);
 
-    public static final IJsonObjectGetter<BiomeList> BIOME_LIST_GETTER = register(BiomeList.class, new BiomeListGetter());
-    public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE_GETTER = register(BiomePredicate.class, jsonElement -> {
-        final ObjectFetchResult<BiomeList> biomeListFetchResult = BIOME_LIST_GETTER.get(jsonElement);
+    public static final IJsonObjectGetter<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListGetter());
+    public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement -> {
+        final ObjectFetchResult<BiomeList> biomeListFetchResult = BIOME_LIST.get(jsonElement);
 
         if (!biomeListFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(biomeListFetchResult);
 
-        return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> currentBiome.getRegistryName().equals(biome.getRegistryName())));
+        return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> Objects.equals(currentBiome.getRegistryName(), biome.getRegistryName())));
     });
 
-    public static final IJsonObjectGetter<BiomePropertySelectors.ISpeciesSelector> SPECIES_SELECTOR_GETTER = register(
+    public static final IJsonObjectGetter<BiomePropertySelectors.ISpeciesSelector> SPECIES_SELECTOR = register(
             BiomePropertySelectors.ISpeciesSelector.class, new SpeciesSelectorGetter());
-    public static final IJsonObjectGetter<BiomePropertySelectors.IDensitySelector> DENSITY_SELECTOR_GETTER = register(
+    public static final IJsonObjectGetter<BiomePropertySelectors.IDensitySelector> DENSITY_SELECTOR = register(
             BiomePropertySelectors.IDensitySelector.class, new DensitySelectorGetter());
-    public static final IJsonObjectGetter<BiomePropertySelectors.IChanceSelector> CHANCE_SELECTOR_GETTER = register(
+    public static final IJsonObjectGetter<BiomePropertySelectors.IChanceSelector> CHANCE_SELECTOR = register(
             BiomePropertySelectors.IChanceSelector.class, new ChanceSelectorGetter());
+
+    public static final IJsonObjectGetter<Material> MATERIAL = register(Material.class, new FieldGetter<>(Material.class));
+    public static final IJsonObjectGetter<MaterialColor> MATERIAL_COLOR = register(MaterialColor.class, new FieldGetter<>(MaterialColor.class));
+    public static final IJsonObjectGetter<SoundType> SOUND_TYPE = register(SoundType.class, new FieldGetter<>(SoundType.class));
+
+    private static final Map<String, ToolType> TOOL_TYPES = ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
+
+    public static final IJsonObjectGetter<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
+            STRING.get(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from '{previous_value}'."));
 
     /**
      * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid
      * giving null to the getters.
      */
     public static void registerForgeEntryGetters() {
-        BLOCK_GETTER = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block", block -> block != Blocks.AIR));
-        ITEM_GETTER = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item", item -> item != Items.AIR));
-        BIOME_GETTER = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
+        BLOCK = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block", block -> block != Blocks.AIR));
+        ITEM = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item", item -> item != Items.AIR));
+        BIOME = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
     }
 
     public static void postRegistryEvent() {

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.util.StackLocatorUtil;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -20,9 +21,6 @@ public final class ObjectFetchResult<T> {
     private T value;
     private String errorMessage;
 
-    private String previousValue;
-
-    // TODO: Actually log these.
     private final List<String> warnings = new ArrayList<>();
 
     public ObjectFetchResult() {}
@@ -37,6 +35,13 @@ public final class ObjectFetchResult<T> {
 
     public boolean wasSuccessful () {
         return this.value != null;
+    }
+
+    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction) {
+        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+        if (this.value != null)
+            mappedFetchResult.value = conversionFunction.apply(this.value);
+        return mappedFetchResult;
     }
 
     public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
@@ -63,12 +68,14 @@ public final class ObjectFetchResult<T> {
         return mappedFetchResult;
     }
 
-    public ObjectFetchResult<T> validate (final Predicate<T> validationPredicate, final String errorMessage) {
-        if (this.value != null && !validationPredicate.test(this.value)) {
-            this.errorMessage = errorMessage.replace("{previous_value}", this.previousValue);
-            this.value = null;
+    public <V> ObjectFetchResult<V> mapIfValid(final Predicate<T> validator, final String invalidError, final Function<T, V> conversionFunction) {
+        ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+        if (this.value != null) {
+            if (validator.test(this.value)) {
+                mappedFetchResult = this.map(conversionFunction, "Internal error.");
+            } else mappedFetchResult.setErrorMessage(invalidError.replace("{value}", this.value.toString()));
         }
-        return this;
+        return mappedFetchResult;
     }
 
     public ObjectFetchResult<T> addWarning(final String warning) {
@@ -96,7 +103,7 @@ public final class ObjectFetchResult<T> {
 
     public ObjectFetchResult<T> otherwiseWarn(final String warnPrefix) {
         if (!this.wasSuccessful())
-            LogManager.getLogger().warn(warnPrefix + this.getErrorMessage());
+            LogManager.getLogger(StackLocatorUtil.getCallerClass(1)).warn(warnPrefix + this.getErrorMessage());
         return this;
     }
 
@@ -134,6 +141,12 @@ public final class ObjectFetchResult<T> {
 
     public ObjectFetchResult<T> setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+        return this;
+    }
+
+    public ObjectFetchResult<T> setErrorMessageIfUnsetAndNull(String errorMessage) {
+        if (this.value == null && this.errorMessage == null)
+            this.setErrorMessage(errorMessage);
         return this;
     }
 

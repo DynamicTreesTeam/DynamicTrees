@@ -18,7 +18,6 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.block.Block;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -54,7 +53,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 .forEach(this.environmentFactorAppliers::register);
 
         JsonObjectGetters.register(Species.ICommonOverride.class, jsonElement -> {
-            final ObjectFetchResult<BiomePredicate> biomePredicateFetchResult = JsonObjectGetters.BIOME_PREDICATE_GETTER.get(jsonElement);
+            final ObjectFetchResult<BiomePredicate> biomePredicateFetchResult = JsonObjectGetters.BIOME_PREDICATE.get(jsonElement);
 
             if (!biomePredicateFetchResult.wasSuccessful())
                 return ObjectFetchResult.failureFromOther(biomePredicateFetchResult);
@@ -105,7 +104,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
         Species.REGISTRY.unlock(); // Ensure registry is unlocked.
 
         preparedObject.forEach((registryName, jsonElement) -> {
-            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
 
             if (!jsonObjectFetchResult.wasSuccessful()) {
                 LOGGER.warn("Skipping loading data for species '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());

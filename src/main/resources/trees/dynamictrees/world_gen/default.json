@@ -73,6 +73,7 @@
     "apply": {
       "species" : "jungle",
       "density": 0.4,
+      "chance": 1.0,
       "forestness" : 1.0
     }
   },

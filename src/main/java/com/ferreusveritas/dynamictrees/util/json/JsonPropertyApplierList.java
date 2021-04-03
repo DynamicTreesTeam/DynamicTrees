@@ -79,13 +79,13 @@ public final class JsonPropertyApplierList<T> {
 
             // If the application wasn't successful, return the error.
             if (!result.wasSuccessful())
-                return result;
+                return result.addErrorPrefix("[" + key + "] ").addWarningsPrefix("[" + key + "] ");
 
             warnings.addAll(result.getWarnings());
             break; // We have read (or tried to read) this entry, so move onto the next.
         }
 
-        return PropertyApplierResult.success(warnings);
+        return PropertyApplierResult.success(warnings).addWarningsPrefix("[" + key + "] ");
     }
 
     public <E extends T> JsonPropertyApplierList<T> register (final JsonPropertyApplier<E, ?> applier) {

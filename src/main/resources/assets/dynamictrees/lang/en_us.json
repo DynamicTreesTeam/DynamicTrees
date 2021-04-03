@@ -68,12 +68,5 @@
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
 
-  "tooltip.season.fertile_seasons": "Fertile Seasons:",
-  "tooltip.season.year_round": "§dYear-Round",
-  "tooltip.season.spring": "§aSpring",
-  "tooltip.season.summer": "§eSummer",
-  "tooltip.season.autumn": "§6Autumn",
-  "tooltip.season.winter": "§bWinter",
-
   "block.dynamictrees.rooty_water":"Water Roots"
 }

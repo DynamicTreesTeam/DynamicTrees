@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
 /**
  * @author Harley O'Connor
  */
-public interface IJsonBiomeObjectGetter<T> extends IJsonObjectGetter<T> {
+public interface IJsonBiomeDatabaseObjectGetter<T> extends IJsonObjectGetter<T> {
 
     String DEFAULT = "...";
 

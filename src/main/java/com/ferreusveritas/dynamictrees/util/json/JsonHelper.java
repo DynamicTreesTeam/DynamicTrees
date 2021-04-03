@@ -42,7 +42,7 @@ public class JsonHelper {
 	 * @return True if {@link JsonElement} is a comment.
 	 */
 	public static boolean isComment(final JsonElement jsonElement) {
-		final ObjectFetchResult<String> fetchResult = JsonObjectGetters.STRING_GETTER.get(jsonElement);
+		final ObjectFetchResult<String> fetchResult = JsonObjectGetters.STRING.get(jsonElement);
 		return fetchResult.wasSuccessful() && isComment(fetchResult.getValue());
 	}
 
@@ -65,15 +65,14 @@ public class JsonHelper {
 	 * @param defaultValue The default value if it couldn't be obtained.
 	 * @return The boolean value.
 	 */
-	@SuppressWarnings("boxing")
-	public static boolean getOrDefault (final JsonObject jsonObject, final String elementName, final boolean defaultValue) {
+	public static <T> T getOrDefault (final JsonObject jsonObject, final String elementName, final Class<T> type, final T defaultValue) {
 		final JsonElement element = jsonObject.get(elementName);
 
 		if (element == null)
 			return defaultValue;
 
-		final ObjectFetchResult<Boolean> fetchResult = JsonObjectGetters.BOOLEAN_GETTER.get(element);
-		return fetchResult.wasSuccessful() && fetchResult.getValue();
+		final T result = JsonObjectGetters.getObjectGetter(type).get(element).getValue();
+		return result == null ? defaultValue : result;
 	}
 
 	/**
@@ -131,7 +130,7 @@ public class JsonHelper {
 		}
 
 		public <T> JsonElementReader ifArrayForEach (final Class<T> typeClass, final Consumer<T> consumer) {
-			JsonObjectGetters.JSON_ARRAY_GETTER.get(jsonElement).ifSuccessful(jsonArray -> {
+			JsonObjectGetters.JSON_ARRAY.get(jsonElement).ifSuccessful(jsonArray -> {
 				jsonArray.forEach(arrayElement -> JsonObjectGetters.getObjectGetter(typeClass).get(arrayElement)
 						.ifSuccessful(consumer).otherwise(errorMessage -> this.lastError = errorMessage));
 				this.read = true;

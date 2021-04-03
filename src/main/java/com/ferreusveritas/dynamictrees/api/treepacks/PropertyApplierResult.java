@@ -13,7 +13,7 @@ import java.util.List;
 public final class PropertyApplierResult {
 
     /** Stores the error message, or null to signify there was none. */
-    private final String errorMessage;
+    private String errorMessage;
 
     /** Stores any warnings. */
     private final List<String> warnings;
@@ -35,8 +35,18 @@ public final class PropertyApplierResult {
         return errorMessage;
     }
 
+    public PropertyApplierResult addErrorPrefix(final String prefix) {
+        this.errorMessage = prefix + this.errorMessage;
+        return this;
+    }
+
     public List<String> getWarnings() {
         return warnings;
+    }
+
+    public PropertyApplierResult addWarningsPrefix(final String prefix) {
+        this.warnings.forEach(warning -> warning = prefix + warning);
+        return this;
     }
 
     public static PropertyApplierResult success () {

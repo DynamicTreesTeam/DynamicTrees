@@ -140,8 +140,8 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
 		//TODO: Deal with 1.14's new loot drop system.  For now just return a fresh array.
-		List<ItemStack> drops = new ArrayList<>();
-		drops.add(getSpecies().getSeedStack(1));
+		final List<ItemStack> drops = new ArrayList<>();
+		drops.add(this.getSpecies().getSeedStack(1));
 		return drops;
 	}
 	

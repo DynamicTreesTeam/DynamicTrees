@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author Harley O'Connor
  */
-public final class SpeciesSelectorGetter implements IJsonBiomeObjectGetter<BiomePropertySelectors.ISpeciesSelector> {
+public final class SpeciesSelectorGetter implements IJsonBiomeDatabaseObjectGetter<BiomePropertySelectors.ISpeciesSelector> {
 
     @Override
     public ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> get(final JsonElement jsonElement) {
@@ -50,7 +50,7 @@ public final class SpeciesSelectorGetter implements IJsonBiomeObjectGetter<Biome
 
     private ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> getRandomSpeciesSelector(final JsonElement jsonElement) {
         final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = new ObjectFetchResult<>();
-        final ObjectFetchResult<JsonObject> objectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+        final ObjectFetchResult<JsonObject> objectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
 
         if (!objectFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(objectFetchResult);

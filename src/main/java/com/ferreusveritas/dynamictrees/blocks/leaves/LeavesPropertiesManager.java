@@ -8,8 +8,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ToolType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +36,23 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
     @Override
     public void registerAppliers(final String applierListIdentifier) {
         this.blockPropertyAppliers = new JsonPropertyApplierList<>(AbstractBlock.Properties.class);
-        this.blockPropertyAppliers.register("hardness", Float.class, AbstractBlock.Properties::hardnessAndResistance);
+        this.blockPropertyAppliers.registerIfTrueApplier("does_not_block_movement", AbstractBlock.Properties::doesNotBlockMovement)
+                .registerIfTrueApplier("not_solid", AbstractBlock.Properties::notSolid)
+                .register("harvest_level", Integer.class, AbstractBlock.Properties::harvestLevel)
+                .register("harvest_tool", ToolType.class, AbstractBlock.Properties::harvestTool)
+                .register("slipperiness", Float.class, AbstractBlock.Properties::slipperiness)
+                .register("speed_factor", Float.class, AbstractBlock.Properties::speedFactor)
+                .register("jump_factor", Float.class, AbstractBlock.Properties::jumpFactor)
+                .register("sound", SoundType.class, AbstractBlock.Properties::sound)
+                .register("hardness", Float.class, (properties, hardness) -> properties.hardnessAndResistance(hardness, properties.resistance))
+                .register("resistance", Float.class, (properties, resistance) -> properties.hardnessAndResistance(properties.hardness, resistance))
+                .registerIfTrueApplier("zero_hardness_and_resistance", AbstractBlock.Properties::zeroHardnessAndResistance)
+                .register("hardness_and_resistance", Float.class, AbstractBlock.Properties::hardnessAndResistance)
+                .registerIfTrueApplier("tick_randomly", AbstractBlock.Properties::tickRandomly)
+                .registerIfTrueApplier("variable_opacity", AbstractBlock.Properties::variableOpacity)
+                .registerIfTrueApplier("no_drops", AbstractBlock.Properties::noDrops)
+                .registerIfTrueApplier("air", AbstractBlock.Properties::setAir)
+                .registerIfTrueApplier("requires_tool", AbstractBlock.Properties::setRequiresTool);
 
         this.reloadAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
@@ -81,8 +101,10 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
                     this.loadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);
 
                     // Generate block by default, but allow it to be turned off.
-                    if (JsonHelper.getOrDefault(jsonObject, "generate_block", true)) {
-                        final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties();
+                    if (JsonHelper.getOrDefault(jsonObject, "generate_block", Boolean.class, true)) {
+                        final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, leavesProperties.getDefaultMaterial());
+                        final AbstractBlock.Properties blockProperties = leavesProperties.getDefaultBlockProperties(material, JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, material.getColor()));
+
                         this.blockPropertyAppliers.applyAll(jsonObject, blockProperties).forEachErrorWarning(errorConsumer, warningConsumer);
                         leavesProperties.generateDynamicLeaves(blockProperties);
                     }

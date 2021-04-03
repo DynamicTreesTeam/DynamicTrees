@@ -35,7 +35,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
     public ObjectFetchResult<BiomeList> get (final JsonElement jsonElement) {
         final BiomeList biomes;
 
-        final ObjectFetchResult<Biome> biomeFetchResult = JsonObjectGetters.BIOME_GETTER.get(jsonElement);
+        final ObjectFetchResult<Biome> biomeFetchResult = JsonObjectGetters.BIOME.get(jsonElement);
 
         if (biomeFetchResult.wasSuccessful()) {
             biomes = new BiomeList(Collections.singletonList(biomeFetchResult.getValue()));

@@ -25,7 +25,7 @@ public class JsonArrayPropertyApplier<T, V> extends JsonPropertyApplier<T, V> {
     @Nullable
     @Override
     public PropertyApplierResult applyIfShould(String keyIn, Object object, JsonElement jsonElement) {
-        final ObjectFetchResult<JsonArray> arrayFetchResult = JsonObjectGetters.JSON_ARRAY_GETTER.get(jsonElement);
+        final ObjectFetchResult<JsonArray> arrayFetchResult = JsonObjectGetters.JSON_ARRAY.get(jsonElement);
 
         if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object) || !arrayFetchResult.wasSuccessful())
             return null;

@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
  *
  * @author Harley O'Connor
  */
-public final class ChanceSelectorGetter implements IJsonBiomeObjectGetter<BiomePropertySelectors.IChanceSelector> {
+public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGetter<BiomePropertySelectors.IChanceSelector> {
 
     @Override
     public ObjectFetchResult<BiomePropertySelectors.IChanceSelector> get(JsonElement jsonElement) {

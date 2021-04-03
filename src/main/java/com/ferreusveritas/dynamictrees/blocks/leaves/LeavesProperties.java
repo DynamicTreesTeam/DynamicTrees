@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityType;
@@ -275,8 +276,12 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		this.connectAnyRadius = connectAnyRadius;
 	}
 
-	public AbstractBlock.Properties getDefaultBlockProperties() {
-		return AbstractBlock.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F)
+	public Material getDefaultMaterial() {
+		return Material.LEAVES;
+	}
+
+	public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
+		return AbstractBlock.Properties.create(material, materialColor).hardnessAndResistance(0.2F)
 				.tickRandomly().sound(SoundType.PLANT).notSolid().setAllowsSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
 				.setSuffocates((s, r, p) -> false).setBlocksVision((s, r, p) -> false);
 	}

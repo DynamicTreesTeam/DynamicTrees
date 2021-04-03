@@ -20,7 +20,7 @@ public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements IJ
 
     @Override
     public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        return JsonObjectGetters.RESOURCE_LOCATION_GETTER.get(jsonElement).map(registryName -> this.registry.get(TreeRegistry.processResLoc(registryName)),
+        return JsonObjectGetters.RESOURCE_LOCATION.get(jsonElement).map(registryName -> this.registry.get(TreeRegistry.processResLoc(registryName)),
                 RegistryEntry::isValid, "Could not find " + this.registry.getName() + " for registry name '{previous_value}'.");
     }
 

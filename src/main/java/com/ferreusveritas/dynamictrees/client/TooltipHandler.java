@@ -41,25 +41,29 @@ public class TooltipHandler {
 	
 	public static void applySeasonalTooltips(List<ITextComponent> tipList, int flags) {
 		if(flags != 0) {
-			tipList.add(new TranslationTextComponent("tooltip.season.fertile_seasons"));
+			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons"));
 			
 			if((flags & 15) == 15) {
-				tipList.add(new TranslationTextComponent("tooltip.season.year_round"));
+				tipList.add(appendToStart("§d", new TranslationTextComponent("desc.sereneseasons.year_round")));
 			} else {
 				if ((flags & 1) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.spring"));
+					tipList.add(appendToStart("§a", new TranslationTextComponent("desc.sereneseasons.spring")));
 				}
 				if ((flags & 2) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.summer"));
+					tipList.add(appendToStart("§e", new TranslationTextComponent("desc.sereneseasons.summer")));
 				}
 				if ((flags & 4) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.autumn"));
+					tipList.add(appendToStart("§6", new TranslationTextComponent("desc.sereneseasons.autumn")));
 				}
 				if ((flags & 8) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.winter"));
+					tipList.add(appendToStart("§b", new TranslationTextComponent("desc.sereneseasons.winter")));
 				}
 			}
 		}
+	}
+
+	private static ITextComponent appendToStart(final String string, final ITextComponent textComponent) {
+		return new StringTextComponent(string).appendSibling(textComponent);
 	}
 	
 }

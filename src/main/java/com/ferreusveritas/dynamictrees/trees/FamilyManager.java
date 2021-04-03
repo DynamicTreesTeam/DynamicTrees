@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
@@ -73,7 +72,7 @@ public final class FamilyManager extends JsonReloadListener<Family> {
         Family.REGISTRY.unlock(); // Ensure registry is unlocked.
 
         preparedObject.forEach((registryName, jsonElement) -> {
-            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+            final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
 
             if (!jsonObjectFetchResult.wasSuccessful()) {
                 LOGGER.warn("Skipping loading data for family '{}' due to error: {}", registryName, jsonObjectFetchResult.getErrorMessage());

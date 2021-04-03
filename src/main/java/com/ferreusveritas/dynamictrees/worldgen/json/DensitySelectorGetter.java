@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Harley O'Connor
  */
-public final class DensitySelectorGetter implements IJsonBiomeObjectGetter<BiomePropertySelectors.IDensitySelector> {
+public final class DensitySelectorGetter implements IJsonBiomeDatabaseObjectGetter<BiomePropertySelectors.IDensitySelector> {
 
     @Override
     public ObjectFetchResult<BiomePropertySelectors.IDensitySelector> get(JsonElement jsonElement) {
@@ -34,7 +34,7 @@ public final class DensitySelectorGetter implements IJsonBiomeObjectGetter<Biome
         final List<Float> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
-            JsonObjectGetters.FLOAT_GETTER.get(element).ifSuccessful(parameters::add)
+            JsonObjectGetters.FLOAT.get(element).ifSuccessful(parameters::add)
                     .otherwiseWarn("Error whilst applying density selector: ");
         }
 

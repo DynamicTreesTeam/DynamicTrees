@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -22,9 +21,6 @@ public final class WorldGenEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
-        if (!WorldGenRegistry.isWorldGenEnabled())
-            return;
-
         event.getGeneration().withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.withConfiguration(new NoFeatureConfig()));
     }
 
@@ -39,9 +35,6 @@ public final class WorldGenEventHandler {
         // Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
         // This may just have to be an unfortunate consequence to Dynamic Trees for now, as without making an overly complex system I can't see any other
         // way of removing features to rectify this.
-
-        if (!WorldGenRegistry.isWorldGenEnabled())
-            return;
 
         final ResourceLocation biomeResLoc = event.getName();
 

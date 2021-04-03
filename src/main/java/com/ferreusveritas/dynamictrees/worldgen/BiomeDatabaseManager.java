@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.WorldGenRegistry;
 import com.ferreusveritas.dynamictrees.api.events.AddFeatureCancellersEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDefaultDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDimensionalDatabaseEvent;
@@ -45,7 +44,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String DEFAULT_POPULATOR_NAME = "default";
+    private static final String DEFAULT_POPULATOR = "default";
 
     private static final String REPLACE = "replace";
     private static final String ENTRIES = "entries";
@@ -73,7 +72,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     public void registerAppliers(final String applierListIdentifier) {
         this.biomeDatabaseAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class)
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR_GETTER.get(jsonElement);
+                    final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
                         return PropertyApplierResult.failure(selectorFetchResult);
@@ -85,7 +84,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     return PropertyApplierResult.success();
                 })
                 .register("density", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> selectorFetchResult = JsonObjectGetters.DENSITY_SELECTOR_GETTER.get(jsonElement);
+                    final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> selectorFetchResult = JsonObjectGetters.DENSITY_SELECTOR.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
                         return PropertyApplierResult.failure(selectorFetchResult);
@@ -97,7 +96,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     return PropertyApplierResult.success();
                 })
                 .register("chance", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> selectorFetchResult = JsonObjectGetters.CHANCE_SELECTOR_GETTER.get(jsonElement);
+                    final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> selectorFetchResult = JsonObjectGetters.CHANCE_SELECTOR.get(jsonElement);
 
                     if (!selectorFetchResult.wasSuccessful())
                         return PropertyApplierResult.failure(selectorFetchResult);
@@ -147,13 +146,13 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     private static ObjectFetchResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
-        final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT_GETTER.get(jsonElement);
+        final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
 
         // If there was no Json object or method element, default to replace.
         if (!jsonObjectFetchResult.wasSuccessful() || !jsonObjectFetchResult.getValue().has(METHOD))
             return ObjectFetchResult.success(BiomeDatabase.Operation.REPLACE);
 
-        final ObjectFetchResult<BiomeDatabase.Operation> operationFetchResult = JsonObjectGetters.OPERATION_GETTER.get(jsonObjectFetchResult.getValue().get(METHOD));
+        final ObjectFetchResult<BiomeDatabase.Operation> operationFetchResult = JsonObjectGetters.OPERATION.get(jsonObjectFetchResult.getValue().get(METHOD));
 
         if (!operationFetchResult.wasSuccessful())
             return ObjectFetchResult.failureFromOther(operationFetchResult);
@@ -169,7 +168,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.blacklistedDimensions.clear();
 
         // If world gen is disabled don't waste processing power reading these.
-        if (!WorldGenRegistry.isWorldGenEnabled())
+        if (!DTConfigs.worldGen.get())
             return;
 
         final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
@@ -179,7 +178,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         MinecraftForge.EVENT_BUS.post(populateDefaultDatabaseEvent);
 
         {
-            final ResourceLocation defaultPopulator = DynamicTrees.resLoc(DEFAULT_POPULATOR_NAME);
+            final ResourceLocation defaultPopulator = DynamicTrees.resLoc(DEFAULT_POPULATOR);
 
             // It's important we do our populator first, or we override others.
             for (JsonElement populatorElement : preparedObject.getOrDefault(defaultPopulator, Collections.emptyList())) {
@@ -222,7 +221,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.defaultDatabase = new BiomeDatabase();
 
         // If world gen is disabled don't waste processing power reading these.
-        if (!WorldGenRegistry.isWorldGenEnabled())
+        if (!DTConfigs.worldGen.get())
             return;
 
         final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
@@ -233,7 +232,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     private boolean isDefaultPopulator (final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
-        return entry.getKey().getPath().equals(DEFAULT_POPULATOR_NAME);
+        return entry.getKey().getPath().equals(DEFAULT_POPULATOR);
     }
 
     private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {

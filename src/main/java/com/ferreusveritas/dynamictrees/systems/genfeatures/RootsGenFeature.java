@@ -15,9 +15,9 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.TriFunction;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -154,8 +154,9 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		return material.isReplaceable() && material != Material.WATER && material != Material.LAVA;
 	}
 
-	public void setScaler(TriFunction<Integer, Integer, Integer, Integer> scaler) {
+	public RootsGenFeature setScaler(TriFunction<Integer, Integer, Integer, Integer> scaler) {
 		this.scaler = scaler;
+		return this;
 	}
 
 }

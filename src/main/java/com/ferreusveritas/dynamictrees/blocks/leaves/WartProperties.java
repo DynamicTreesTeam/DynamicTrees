@@ -34,9 +34,13 @@ public final class WartProperties extends LeavesProperties {
     }
 
     @Override
-    public AbstractBlock.Properties getDefaultBlockProperties() {
-        // TODO: Dynamic material colour setting.
-        return AbstractBlock.Properties.create(Material.ORGANIC, MaterialColor.WARPED_WART).hardnessAndResistance(1.0F).sound(SoundType.WART);
+    public Material getDefaultMaterial() {
+        return Material.ORGANIC;
+    }
+
+    @Override
+    public AbstractBlock.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
+        return AbstractBlock.Properties.create(material, materialColor).hardnessAndResistance(1.0F).sound(SoundType.WART).tickRandomly();
     }
 
 }

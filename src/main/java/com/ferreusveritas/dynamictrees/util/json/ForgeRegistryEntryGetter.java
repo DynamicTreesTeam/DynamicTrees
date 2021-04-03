@@ -31,7 +31,7 @@ public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> imp
 
     @Override
     public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        return JsonObjectGetters.RESOURCE_LOCATION_GETTER.get(jsonElement).map(this.registry::getValue,
+        return JsonObjectGetters.RESOURCE_LOCATION.get(jsonElement).map(this.registry::getValue,
                 this.validator, "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
     }
 
