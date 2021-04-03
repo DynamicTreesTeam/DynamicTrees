@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -9,6 +10,8 @@ import net.minecraft.world.World;
  * @author Harley O'Connor
  */
 public final class DarkOakSpecies extends Species {
+
+    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(DarkOakSpecies::new);
 
     public DarkOakSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
@@ -22,13 +25,6 @@ public final class DarkOakSpecies extends Species {
     @Override
     public float getGrowthRate(World world, BlockPos pos) {
         return super.getGrowthRate(world, pos) * biomeSuitability(world, pos);
-    }
-
-    public static class Type extends Species.Type {
-        @Override
-        public Species construct(ResourceLocation registryName, Family family, LeavesProperties leavesProperties) {
-            return new DarkOakSpecies(registryName, family, leavesProperties);
-        }
     }
 
 }

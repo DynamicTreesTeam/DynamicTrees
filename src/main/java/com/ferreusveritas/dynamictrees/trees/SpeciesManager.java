@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
@@ -111,7 +112,7 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
                 return;
             }
 
-            final JsonObject jsonObject = jsonObjectFetchResult.getValue();
+            final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonObjectFetchResult.getValue(), registryName);
 
             // Skip the current entry if it shouldn't load.
             if (!this.shouldLoad(jsonObject, "Error loading data for species '" + registryName + "': "))
@@ -124,21 +125,11 @@ public final class SpeciesManager extends JsonReloadListener<Species> {
             final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading species '{}': {}", registryName, warningMessage);
 
             if (newRegistry) {
-                Species.Type speciesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Species.Type.class,
-                        "Error loading species type for species '" + registryName + "' (defaulting to tree species) :", false);
-                final Family family = JsonHelper.getFromObjectOrWarn(jsonObject, FAMILY, Family.class,
-                        "Skipping loading tree family for species '" + registryName + "' due to error:", true);
+                species = Species.REGISTRY.getType(jsonObject, registryName).decode(jsonObject);
 
-                // If the family was not set we skip loading the species.
-                if (family == null)
+                // Stop loading this species (error should have been logged already).
+                if (species == null)
                     return;
-
-                // Default to tree species if it wasn't set or couldn't be found.
-                if (speciesType == null)
-                    speciesType = Species.REGISTRY.getDefaultType();
-
-                // Construct the species class from initial setup properties.
-                species = speciesType.construct(registryName, family);
 
                 if (firstLoad) {
                     // Apply load appliers for things like generating seeds and saplings.

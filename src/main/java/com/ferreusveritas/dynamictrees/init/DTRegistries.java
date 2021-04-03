@@ -229,7 +229,7 @@ public class DTRegistries {
 	///////////////////////////////////////////
 
 	/** This is the creative tab that holds all DT items */
-	public static final ItemGroup dynamicTreesTab = new ItemGroup(DynamicTrees.MOD_ID) {
+	public static final ItemGroup ITEM_GROUP = new ItemGroup(DynamicTrees.MOD_ID) {
 		@Override
 		public ItemStack createIcon() {
 			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);

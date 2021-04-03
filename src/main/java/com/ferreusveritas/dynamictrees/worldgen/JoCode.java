@@ -37,9 +37,9 @@ import java.util.Optional;
  */
 public class JoCode {
 	
-	static private final String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	static protected final byte forkCode = 6;
-	static protected final byte returnCode = 7;
+	private static final String BASE_64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	protected static final byte FORK_CODE = 6;
+	protected static final byte RETURN_CODE = 7;
 	
 	public byte[] instructions = new byte[0];
 	protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
@@ -237,8 +237,8 @@ public class JoCode {
 		while(codePos < instructions.length) {
 			int code = getCode(codePos);
 			switch(code) {
-				case forkCode: codePos = generateFork(world, species, codePos + 1, pos, disabled); break;
-				case returnCode: return codePos + 1;
+				case FORK_CODE: codePos = generateFork(world, species, codePos + 1, pos, disabled); break;
+				case RETURN_CODE: return codePos + 1;
 				default:
 					Direction dir = Direction.byIndex(code);
 					pos = pos.offset(dir);
@@ -357,13 +357,13 @@ public class JoCode {
 		}
 		
 		if((instructions.size() & 1) == 1) {//Check if odd
-			instructions.add(returnCode);//Add a return code to even up the series
+			instructions.add(RETURN_CODE);//Add a return code to even up the series
 		}
 		
 		//Smallest Base64 encoder ever.
 		String code = "";
 		for(int b = 0; b < instructions.size(); b+=2) {
-			code += base64.charAt(instructions.get(b) << 3 | instructions.get(b + 1));
+			code += BASE_64.charAt(instructions.get(b) << 3 | instructions.get(b + 1));
 		}
 		
 		return code;
@@ -383,7 +383,7 @@ public class JoCode {
 	 */
 	public static class CodeCompiler {
 		
-		ArrayList<Byte> instructions;
+		final ArrayList<Byte> instructions;
 		
 		public CodeCompiler() {
 			instructions = new ArrayList<>();
@@ -398,7 +398,7 @@ public class JoCode {
 			
 			//Smallest Base64 decoder ever.
 			for(int i = 0; i < code.length(); i++) {
-				int sixbits = base64.indexOf(code.charAt(i));
+				int sixbits = BASE_64.indexOf(code.charAt(i));
 				if(sixbits != -1) {
 					addInstruction((byte) (sixbits >> 3));
 					addInstruction((byte) (sixbits & 7));
@@ -417,11 +417,11 @@ public class JoCode {
 		}
 		
 		public void addReturn() {
-			instructions.add(returnCode);
+			instructions.add(RETURN_CODE);
 		}
 		
 		public void addFork() {
-			instructions.add(forkCode);
+			instructions.add(FORK_CODE);
 		}
 		
 		public byte[] compile() {

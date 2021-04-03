@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
@@ -76,7 +77,7 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
                 return;
             }
 
-            final JsonObject jsonObject = jsonElement.getAsJsonObject();
+            final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonElement.getAsJsonObject(), registryName);
 
             // Skip the current entry if it shouldn't load.
             if (!this.shouldLoad(jsonObject, "Error loading data for leaves properties '" + registryName + "': "))
@@ -89,13 +90,11 @@ public final class LeavesPropertiesManager extends JsonReloadListener<LeavesProp
             final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading leaves properties '{}': {}", registryName, warningMessage);
 
             if (newEntry) {
-                LeavesProperties.Type leavesPropertiesType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, LeavesProperties.Type.class,
-                        "Error loading leaves properties type for leaves properties '" + registryName + "' (defaulting to base leaves properties) :", false);
+                leavesProperties = LeavesProperties.REGISTRY.getType(jsonObject, registryName).decode(jsonObject);
 
-                if (leavesPropertiesType == null)
-                    leavesPropertiesType = LeavesProperties.REGISTRY.getDefaultType();
-
-                leavesProperties = leavesPropertiesType.construct(registryName);
+                // Stop loading this species (error should have been logged already).
+                if (leavesProperties == null)
+                    return;
 
                 if (firstLoad) {
                     this.loadAppliers.applyAll(jsonObject, leavesProperties).forEachErrorWarning(errorConsumer, warningConsumer);

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.SoundType;
@@ -12,15 +13,10 @@ import net.minecraft.util.ResourceLocation;
  */
 public final class WartProperties extends LeavesProperties {
 
+    public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(WartProperties::new);
+
     public WartProperties(final ResourceLocation registryName) {
         super(registryName);
-    }
-
-    public static class Type extends LeavesProperties.Type {
-        @Override
-        public LeavesProperties construct(ResourceLocation registryName) {
-            return new WartProperties(registryName);
-        }
     }
 
     @Override

@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
-    public static final Registry<RegistryHandler> REGISTRY = new Registry<>(RegistryHandler.class, new RegistryHandler("null").nullEntry(), true);
+    public static final Registry<RegistryHandler> REGISTRY = new Registry<>(RegistryHandler.class, new RegistryHandler("null"), true);
 
     /**
      * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler

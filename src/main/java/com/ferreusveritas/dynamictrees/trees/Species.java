@@ -46,6 +46,9 @@ import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Function3;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -95,28 +98,28 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
-		@Override public boolean isValid() { return false; }
 	};
+
+	public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
+
+	public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+		return TypedRegistry.newType(createDefaultCodec(constructor));
+	}
+
+	public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+		return RecordCodecBuilder.create(instance -> instance
+				.group( ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString())
+								.forGetter(Species::getRegistryName),
+						Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
+						LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
+								LeavesProperties.NULL_PROPERTIES).forGetter(Species::getLeavesProperties))
+				.apply(instance, constructor));
+	}
 
 	/**
 	 * Central registry for all {@link Species} objects.
 	 */
-	public static final TypedRegistry<Species, Type> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, new Type());
-
-	public static class Type extends TypedRegistry.EntryType<Species> {
-		@Override
-		public Species construct(ResourceLocation registryName) {
-			throw new UnsupportedOperationException("Species does not support the use of Type#construct(ResourceLocation).");
-		}
-
-		public final Species construct(final ResourceLocation registryName, final Family family) {
-			return this.construct(registryName, family, family.getCommonLeaves());
-		}
-
-		public Species construct(final ResourceLocation registryName, final Family family, final LeavesProperties leavesProperties) {
-			return new Species(registryName, family, leavesProperties);
-		}
-	}
+	public static final TypedRegistry<Species> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, TYPE);
 
 	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family */
 	protected Family family = Family.NULL_FAMILY;
@@ -206,7 +209,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.setUnlocalizedName(name.toString());
 		this.family = family;
 		this.family.addSpecies(this);
-		this.setLeavesProperties(leavesProperties);
+		this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
 
 		this.addDropCreator(new LogDropCreator());
 	}

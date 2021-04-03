@@ -55,7 +55,7 @@ public class Staff extends Item {
 
 	public Staff() {
 		super(new Item.Properties().maxStackSize(1)
-				.group(DTRegistries.dynamicTreesTab));
+				.group(DTRegistries.ITEM_GROUP));
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));

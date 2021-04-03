@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
@@ -79,7 +79,7 @@ public final class FamilyManager extends JsonReloadListener<Family> {
                 return;
             }
 
-            final JsonObject jsonObject = jsonObjectFetchResult.getValue();
+            final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonObjectFetchResult.getValue(), registryName);
 
             // Skip the current entry if it shouldn't load.
             if (!this.shouldLoad(jsonObject, "Error loading data for family '" + registryName + "': "))
@@ -92,15 +92,12 @@ public final class FamilyManager extends JsonReloadListener<Family> {
             final Consumer<String> warningConsumer = warningMessage -> LOGGER.warn("Warning whilst loading tree family '{}': {}", registryName, warningMessage);
 
             if (newRegistry) {
-                Family.Type familyType = JsonHelper.getFromObjectOrWarn(jsonObject, TYPE, Family.Type.class,
-                        "Error loading family type for family '" + registryName + "' (defaulting to tree family) :", false);
-
-                // Default to tree family if it wasn't set or couldn't be found.
-                if (familyType == null)
-                    familyType = Family.REGISTRY.getDefaultType();
-
                 // Construct the tree family class from initial setup properties.
-                family = familyType.construct(registryName);
+                family = Family.REGISTRY.getType(jsonObject, registryName).decode(jsonObject);
+
+                // Stop loading this family (error should have been logged already).
+                if (family == null)
+                    return;
 
                 if (firstLoad)
                     this.loadAppliers.applyAll(jsonObject, family).forEachErrorWarning(errorConsumer, warningConsumer);

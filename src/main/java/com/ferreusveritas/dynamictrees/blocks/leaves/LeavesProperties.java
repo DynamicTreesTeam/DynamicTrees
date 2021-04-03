@@ -1,17 +1,20 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -47,8 +50,12 @@ import java.util.Random;
  * @author ferreusveritas
  */
 public class LeavesProperties extends RegistryEntry<LeavesProperties> implements IResettable<LeavesProperties> {
+
+	public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
+			.group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
+			.apply(instance, LeavesProperties::new));
 	
-	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties(DTTrees.NULL) {
+	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
 		@Override public LeavesProperties setFamily(Family family) { return this; }
 		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
@@ -62,19 +69,12 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		@Override public int getSmotherLeavesMax() { return 0; }
 		@Override public int getLightRequirement() { return 15; }
 		@Override public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return false; }
-	};
+	}.setRegistryName(DTTrees.NULL);
 
 	/**
 	 * Central registry for all {@link LeavesProperties} objects.
 	 */
-	public static final TypedRegistry<LeavesProperties, Type> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new Type());
-
-	public static class Type extends TypedRegistry.EntryType<LeavesProperties> {
-		@Override
-		public LeavesProperties construct(final ResourceLocation registryName) {
-			return new LeavesProperties(registryName);
-		}
-	}
+	public static final TypedRegistry<LeavesProperties> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
 	protected static final int maxHydro = 4;
 
@@ -88,7 +88,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	/** The {@link CellKit}, which is for leaves automata. */
 	protected CellKit cellKit;
 
-	protected Family family = Family.NULL_FAMILY;
+	protected Family family;
 	protected DynamicLeavesBlock dynamicLeavesBlock;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
@@ -98,7 +98,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	protected int lightRequirement = 13;
 	protected boolean connectAnyRadius = false;
 
-	private LeavesProperties() {}
+	private LeavesProperties() { }
 
 	public LeavesProperties(final ResourceLocation registryName) {
 		this(null, registryName);
@@ -109,6 +109,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 	
 	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
+		this.family = Family.NULL_FAMILY;
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : DTRegistries.BLOCK_STATES.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);

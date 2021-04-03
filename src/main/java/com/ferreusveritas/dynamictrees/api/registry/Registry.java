@@ -1,6 +1,14 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -70,6 +78,8 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
      */
     private final boolean clearable;
 
+    private final Codec<V> getterCodec;
+
     /**
      * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
      * of the given {@link RegistryEntry}.
@@ -115,8 +125,9 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
     public Registry(final String name, final Class<V> type, final V nullValue, final boolean clearable) {
         this.name = name;
         this.type = type;
-        this.nullValue = nullValue;
+        this.nullValue = nullValue.nullEntry();
         this.clearable = clearable;
+        this.getterCodec = ResourceLocation.CODEC.comapFlatMap(this::getAsDataResult, RegistryEntry::getRegistryName);
 
         this.register(nullValue);
     }
@@ -170,9 +181,17 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
         return this.getRegistryNames().contains(registryName);
     }
 
+    public final Optional<V> getOptional(final ResourceLocation registryName) {
+        return this.entries.stream().filter(entry -> entry.getRegistryName().equals(registryName)).findFirst();
+    }
+
     public final V get(final ResourceLocation registryName) {
-        final Optional<V> optionalValue = this.entries.stream().filter(entry -> entry.getRegistryName().equals(registryName)).findFirst();
-        return optionalValue.orElse(this.nullValue);
+        return this.getOptional(registryName).orElse(this.nullValue);
+    }
+
+    public final DataResult<V> getAsDataResult(final ResourceLocation registryName) {
+        return this.getOptional(TreeRegistry.processResLoc(registryName)).map(DataResult::success)
+                .orElse(DataResult.error("Could not find " + this.name + " '" + registryName + "'."));
     }
 
     /**
@@ -242,6 +261,10 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
 
         this.lock();
         this.entries.clear();
+    }
+
+    public Codec<V> getGetterCodec() {
+        return getterCodec;
     }
 
     /**

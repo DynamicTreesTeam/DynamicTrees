@@ -169,10 +169,6 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<Species> SPECIES = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
     public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
 
-    public static final IJsonObjectGetter<LeavesProperties.Type> LEAVES_PROPERTIES_TYPE = register(LeavesProperties.Type.class, new RegistryEntryTypeGetter<>(LeavesProperties.REGISTRY));
-    public static final IJsonObjectGetter<Family.Type> FAMILY_TYPE = register(Family.Type.class, new RegistryEntryTypeGetter<>(Family.REGISTRY));
-    public static final IJsonObjectGetter<Species.Type> SPECIES_TYPE = register(Species.Type.class, new RegistryEntryTypeGetter<>(Species.REGISTRY));
-
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.Entity;
@@ -14,6 +15,8 @@ import javax.annotation.Nullable;
  */
 public final class FungusFamily extends Family {
 
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(FungusFamily::new);
+
     public FungusFamily (ResourceLocation name) {
         super(name);
     }
@@ -25,12 +28,5 @@ public final class FungusFamily extends Family {
 
     @Override
     public boolean isFireProof() { return true; }
-
-    public static class Type extends Family.Type {
-        @Override
-        public FungusFamily construct(ResourceLocation registryName) {
-            return new FungusFamily(registryName);
-        }
-    }
 
 }

@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -32,6 +33,8 @@ import java.util.concurrent.Executor;
  */
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public final class DTResourceRegistries {
+
+    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.resLoc("registry_name");
 
     public static final String TREES = "trees";
 

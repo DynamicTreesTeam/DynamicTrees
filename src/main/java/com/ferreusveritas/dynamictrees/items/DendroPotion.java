@@ -78,7 +78,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	};
 
 	public DendroPotion() {
-		super(new Item.Properties().group(DTRegistries.dynamicTreesTab).maxStackSize(1));
+		super(new Item.Properties().group(DTRegistries.ITEM_GROUP).maxStackSize(1));
 	}
 	
 	public ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {

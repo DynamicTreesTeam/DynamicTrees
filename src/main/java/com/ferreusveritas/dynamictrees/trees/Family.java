@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -16,6 +15,7 @@ import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -53,7 +53,9 @@ import java.util.*;
  * @author ferreusveritas
  */
 public class Family extends RegistryEntry<Family> implements IResettable<Family> {
-	
+
+	public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
+
 	public final static Family NULL_FAMILY = new Family() {
 		@Override public void setupCommonSpecies(Species species) {}
 		@Override public Species getCommonSpecies() { return Species.NULL_SPECIES; }
@@ -67,16 +69,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	/**
 	 * Central registry for all {@link Family} objects.
 	 */
-	public static final TypedRegistry<Family, Type> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, new Type());
+	public static final TypedRegistry<Family> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, TYPE);
 
-	public static class Type extends TypedRegistry.EntryType<Family> {
-		@Override
-		public Family construct (final ResourceLocation registryName) {
-			return new Family(registryName);
-		}
-	}
-
-	protected Species commonSpecies = Species.NULL_SPECIES;
+	protected Species commonSpecies;
 
 	protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
 
@@ -122,8 +117,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	/** A list of child species, added to when tree family is set for species. */
 	private final Set<Species> species = new HashSet<>();
 
-	public Family() {
-		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null"));
+	private Family() {
+		this.setRegistryName(DTTrees.NULL);
 	}
 
 	/**
@@ -133,6 +128,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 */
 	public Family(ResourceLocation name) {
 		this.setRegistryName(name);
+		this.commonSpecies = Species.NULL_SPECIES;
 	}
 
 	public void setupBlocks() {

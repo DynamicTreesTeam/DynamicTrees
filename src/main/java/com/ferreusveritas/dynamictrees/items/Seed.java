@@ -43,7 +43,7 @@ public class Seed extends Item implements IPlantable {
 	}
 	
 	public Seed(Species species) {
-		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
+		super(new Item.Properties().group(DTRegistries.ITEM_GROUP));
 		this.species = species;
 	}
 	

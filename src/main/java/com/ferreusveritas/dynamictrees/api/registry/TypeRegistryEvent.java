@@ -18,9 +18,9 @@ import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
  */
 public final class TypeRegistryEvent<V extends RegistryEntry<V>> extends GenericEvent<V> implements IModBusEvent {
 
-    private final TypedRegistry<V, TypedRegistry.EntryType<V>> registry;
+    private final TypedRegistry<V> registry;
 
-    public TypeRegistryEvent(final TypedRegistry<V, TypedRegistry.EntryType<V>> registry) {
+    public TypeRegistryEvent(final TypedRegistry<V> registry) {
         super(registry.getType());
         this.registry = registry;
     }

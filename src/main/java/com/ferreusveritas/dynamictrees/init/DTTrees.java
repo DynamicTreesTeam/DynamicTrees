@@ -2,6 +2,9 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
@@ -9,9 +12,6 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -41,18 +41,18 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
-		event.registerType(DynamicTrees.resLoc("wart"), new WartProperties.Type());
+		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerFamilyTypes (final TypeRegistryEvent<Family> event) {
-		event.registerType(DynamicTrees.resLoc("fungus"), new FungusFamily.Type());
+		event.registerType(DynamicTrees.resLoc("fungus"), FungusFamily.TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
-		event.registerType(DynamicTrees.resLoc("fungus"), new FungusSpecies.Type());
-		event.registerType(DynamicTrees.resLoc("dark_oak"), new DarkOakSpecies.Type());
+		event.registerType(DynamicTrees.resLoc("fungus"), FungusSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("dark_oak"), DarkOakSpecies.TYPE);
 	}
 
 	public static final ResourceLocation NULL = resLoc("null");
@@ -64,7 +64,7 @@ public class DTTrees {
 		// Register all registry entry types, and then all registries.
 		registries.forEach(registry -> {
 			if (registry instanceof TypedRegistry)
-				((TypedRegistry<?, ?>) registry).postTypeRegistryEvent();
+				((TypedRegistry<?>) registry).postTypeRegistryEvent();
 
 			registry.postRegistryEvent();
 		});
