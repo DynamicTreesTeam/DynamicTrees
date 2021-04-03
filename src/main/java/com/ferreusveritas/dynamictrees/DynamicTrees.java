@@ -56,9 +56,7 @@ public class DynamicTrees {
 
 		TreeGenerator.setup();
 
-		final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
-		RegistryHandler.REGISTRY.register(registryHandler);
-		modEventBus.register(registryHandler);
+		RegistryHandler.setup(MOD_ID);
 
 		DTRegistries.setup();
 

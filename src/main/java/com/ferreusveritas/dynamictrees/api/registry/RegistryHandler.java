@@ -16,14 +16,7 @@ import java.util.Map;
 
 /**
  * Handles registries for the given mod ID in the constructor. Add-ons should instantiate
- * one of these in their constructor, registering it to {@link #REGISTRY} and the mod event
- * bus such as is done below:<br><br><br>
- *
- * <pre>
- * final RegistryHandler registryHandler = new RegistryHandler(MOD_ID);
- * RegistryHandler.REGISTRY.register(registryHandler);
- * FMLJavaModLoadingContext.get().getModEventBus().register(registryHandler);
- * </pre>
+ * one of these in their constructor by calling {@link #setup(String)} with their mod ID.
  *
  * <p>The main purpose of this is to prevent Forge from complaining about blocks and items
  * for a different mod ID having their registry names set when the active mod container
@@ -34,6 +27,19 @@ import java.util.Map;
 public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     public static final Registry<RegistryHandler> REGISTRY = new Registry<>(RegistryHandler.class, new RegistryHandler("null"), true);
+
+    /**
+     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering,
+     * and subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant
+     * mod constructor!
+     *
+     * @param modId The {@code mod ID} to setup for.
+     */
+    public static void setup(final String modId) {
+        final RegistryHandler registryHandler = new RegistryHandler(modId);
+        RegistryHandler.REGISTRY.register(registryHandler);
+        FMLJavaModLoadingContext.get().getModEventBus().register(registryHandler);
+    }
 
     /**
      * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler
