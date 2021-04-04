@@ -3,18 +3,20 @@ package com.ferreusveritas.dynamictrees.trees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.*;
+import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
@@ -22,28 +24,35 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.LeavesStickDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
-import net.minecraft.block.*;
+import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Function3;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -61,27 +70,26 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.*;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiPredicate;
 
-public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> {
+public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
-	private static final JoCodeManager JO_CODE_MANAGER = DTDataPackRegistries.JO_CODE_MANAGER;
-	
-	public final static Species NULL_SPECIES = new Species() {
+	public static final Species NULL_SPECIES = new Species() {
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
-		@Override public TreeFamily getFamily() { return TreeFamily.NULL_FAMILY; }
+		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public boolean isTransformable() { return false; }
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
@@ -92,75 +100,102 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
-	
+
+	public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
+
+	public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+		return TypedRegistry.newType(createDefaultCodec(constructor));
+	}
+
+	public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+		return RecordCodecBuilder.create(instance -> instance
+				.group( ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString())
+								.forGetter(Species::getRegistryName),
+						Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
+						LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
+								LeavesProperties.NULL_PROPERTIES).forGetter(Species::getLeavesProperties))
+				.apply(instance, constructor));
+	}
+
 	/**
-	 * Mods should use this to register their {@link Species}
-	 *
-	 * Places the species in a central registry.
+	 * Central registry for all {@link Species} objects.
 	 */
-	public static IForgeRegistry<Species> REGISTRY;
-	
-	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family*/
-	protected TreeFamily treeFamily = TreeFamily.NULL_FAMILY;
+	public static final TypedRegistry<Species> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, TYPE);
+
+	/** The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family */
+	protected Family family = Family.NULL_FAMILY;
 	
 	/** Logic kit for standardized extended growth behavior */
-	protected GrowthLogicKit logicKit = GrowthLogicKits.NULL;
+	protected GrowthLogicKit logicKit = GrowthLogicKit.NULL_LOGIC;
 	
 	/** How quickly the branch thickens on it's own without branch merges [default = 0.3] */
 	protected float tapering = 0.3f;
 	/** The probability that the direction decider will choose up out of the other possible direction weights [default = 2] */
 	protected int upProbability = 2;
-	/** Number of blocks high we have to be before a branch is allowed to form [default = 3](Just high enough to walk under)*/
+	/** Number of blocks high we have to be before a branch is allowed to form [default = 3] (Just high enough to walk under) */
 	protected int lowestBranchHeight = 3;
 	/** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
 	protected float signalEnergy = 16.0f;
-	/** Ideal growth rate [default = 1.0]*/
+	/** Ideal growth rate [default = 1.0] */
 	protected float growthRate = 1.0f;
-	/** Ideal soil longevity [default = 8]*/
+	/** Ideal soil longevity [default = 8] */
 	protected int soilLongevity = 8;
-	/** The tags for the types of soil the tree can be planted on**/
+	/** The tags for the types of soil the tree can be planted on */
 	protected int soilTypeFlags = 0;
-	
-	private boolean requiresTileEntity = false;
+
+	// TODO: Make sure this is implemented properly.
+	protected int maxBranchRadius = 8;
+
+	/** Stores whether or not this species can be transformed to another, if true and this species has it's own seed a
+	 * transformation potion will also be automatically created. */
+	private boolean transformable = true;
+
+	/** If this is not empty, saplings will only grow when planted on these blocks. */
+	protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
 
 	//Leaves
-	protected ILeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
+	protected LeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
 
 	/** A list of leaf blocks the species accepts as its own. Used for the falling tree renderer */
-	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
+	private final List<LeavesProperties> validLeaves = new LinkedList<>();
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
 	protected Seed seed = null;
 	/** A blockState that will turn itself into this tree */
 	protected DynamicSaplingBlock saplingBlock = null;
-	/** The primitive (vanilla) sapling, used for sapling replacements. */
-	protected BlockState primitiveSapling = null;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
-	protected Map <BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
+	protected Map<BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
+
+	protected List<Biome> perfectBiomes = new ArrayList<>();
 
 	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
+
+	/** A {@link BiPredicate} that returns true if this species should override the common in the given position. */
+	protected ICommonOverride commonOverride;
 
 	private String unlocalizedName = "";
 
 	/**
-	 * Constructor should only used by {@link #NULL_SPECIES}.
+	 * Blank constructor for {@link #NULL_SPECIES}.
 	 */
-	public Species() {}
+	public Species() {
+		this.setRegistryName(DTTrees.NULL);
+	}
 
 	/**
 	 * Constructor suitable for derivative mods that defaults
 	 * the leavesProperties to the common type for the family
 	 *
 	 * @param name The simple name of the species e.g. "oak"
-	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
+	 * @param family The {@link Family} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, TreeFamily treeFamily) {
-		this(name, treeFamily, treeFamily.getCommonLeaves());
+	public Species(ResourceLocation name, Family family) {
+		this(name, family, family.getCommonLeaves());
 	}
 	
 	/**
@@ -168,39 +203,89 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 *
 	 * @param name The simple name of the species e.g. "oak"
 	 * @param leavesProperties The properties of the leaves to be used for this species
-	 * @param treeFamily The {@link TreeFamily} that this species belongs to.
+	 * @param family The {@link Family} that this species belongs to.
 	 */
-	public Species(ResourceLocation name, TreeFamily treeFamily, ILeavesProperties leavesProperties) {
-		setRegistryName(name);
-		setUnlocalizedName(name.toString());
-		this.treeFamily = treeFamily;
-		setLeavesProperties(leavesProperties);
-		
-		setStandardSoils();
-		
-		addDropCreator(new LogDropCreator());
-	}
-	
-	public boolean isValid() {
-		return this != NULL_SPECIES;
-	}
-	
-	public void ifValid(Consumer<Species> c) {
-		if(isValid()) {
-			c.accept(this);
-		}
-	}
-	
-	public TreeFamily getFamily() {
-		return treeFamily;
+	public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+		this.setRegistryName(name);
+		this.setUnlocalizedName(name.toString());
+		this.family = family;
+		this.family.addSpecies(this);
+		this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
+
+		this.addDropCreator(new LogDropCreator());
 	}
 
-	public void setFamily(TreeFamily treeFamily) {
-		this.treeFamily = treeFamily;
+	/**
+	 * Resets this {@link Species} object's environment factors, gen features, acceptable
+	 * blocks for growth, and acceptable soils. May also be overridden by sub-classes that
+	 * need lists to be cleared on reload, for example.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species reset () {
+		this.envFactors.clear();
+		this.genFeatures.clear();
+		this.acceptableBlocksForGrowth.clear();
+
+		this.clearAcceptableSoils();
+
+		return this;
+	}
+
+	/**
+	 * Can be overridden by sub-classes for setting defaults for things before reload,
+	 * such as {@link #envFactors}.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species setPreReloadDefaults() {
+		return this.setDefaultGrowingParameters();
+	}
+
+	/**
+	 * Can be overridden by sub-classes for setting defaults for things after reload.
+	 * This is for defaults like lists, and so defaults should only be set if there was
+	 * nothing set by the Json.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	@Override
+	public Species setPostReloadDefaults() {
+		// If there is no acceptable soil set, use the standard soils.
+		if (!this.hasAcceptableSoil())
+			this.setStandardSoils();
+		return this;
+	}
+
+	/**
+	 * Can be overridden by sub-classes to set the default growing parameters.
+	 *
+	 * @return This {@link Species} object for chaining.
+	 */
+	public Species setDefaultGrowingParameters() {
+		return this;
+	}
+
+	public Family getFamily() {
+		return family;
+	}
+
+	public void setFamily(Family family) {
+		family.addSpecies(this);
+		this.family = family;
+	}
+
+	/**
+	 * @return True if this species is the common of its tree.
+	 */
+	public boolean isCommonSpecies () {
+		return this.family.getCommonSpecies().equals(this);
 	}
 
 	public Species setUnlocalizedName(String name) {
-		unlocalizedName = name;
+		this.unlocalizedName = "species." + name.replace(":", ".");
 		return this;
 	}
 
@@ -209,7 +294,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	public String getUnlocalizedName() {
-		return "species." + this.unlocalizedName.replace(':','.');
+		return this.unlocalizedName;
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -249,7 +334,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this.growthRate * this.seasonalGrowthFactor(world, rootPos);
 	}
 	
-	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in.*/
+	/** Probability reinforcer for up direction which is arguably the direction most trees generally grow in. */
 	public int getUpProbability() {
 		return upProbability;
 	}
@@ -275,79 +360,86 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public float getTapering() {
 		return tapering;
 	}
-	
-	//Rare species require TileEntity Storage
-	public boolean getRequiresTileEntity(IWorld world, BlockPos pos) {
-		return requiresTileEntity;
-	}
-	
-	public void setRequiresTileEntity(boolean truth) {
-		requiresTileEntity = truth;
+
+	/**
+	 * Works out if this {@link Species} will require a {@link SpeciesTileEntity} at the given position.
+	 * It should require one if it's not the common species and it's not in its common species override for
+	 * the given position.
+	 *
+	 * @param world The {@link IWorld} the tree is being planted in.
+	 * @param pos The {@link BlockPos} at which the tree is being planted at.
+	 * @return True if it will require a {@link SpeciesTileEntity}.
+	 */
+	public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
+		return !this.isCommonSpecies() && !this.shouldOverrideCommon(world, pos);
 	}
 
 	/**
-	 * Override and return false on things like cactus species which should not be
-	 * transformed to/from. If true and this species has it's own seed a transformation
-	 * potion will also be automatically created.
+	 * Returns whether or not this species can be transformed to another. See {@link #transformable} for
+	 * more details.
 	 *
 	 * @return True if it can be transformed to, false if not.
 	 */
 	public boolean isTransformable () {
-		return true;
+		return this.transformable;
 	}
 
 	/**
-	 * @return The primitive sapling's {@link BlockState}, for automatic registration of sapling replacers.
+	 * Sets whether or not this species can be transformed to another. See {@link #transformable} for
+	 * more details.
+	 *
+	 * @param transformable True if it should be transformable.
+	 * @return This {@link Species} for chaining.
 	 */
-	@Nullable
-	public BlockState getPrimitiveSapling () {
-		return this.primitiveSapling;
-	}
-
-	public Species setPrimitiveSapling(Block primitiveSaplingBlock) {
-		return this.setPrimitiveSapling(primitiveSaplingBlock.getDefaultState());
-	}
-
-	public Species setPrimitiveSapling(BlockState primitiveSaplingState) {
-		this.primitiveSapling = primitiveSaplingState;
+	public Species setTransformable(boolean transformable) {
+		this.transformable = transformable;
 		return this;
 	}
+
+	public boolean hasCommonOverride() {
+		return this.commonOverride != null;
+	}
+
+	public void setCommonOverride(final ICommonOverride commonOverride) {
+		this.commonOverride = commonOverride;
+	}
+
+	public boolean shouldOverrideCommon(final IWorld world, final BlockPos trunkPos) {
+		return this.hasCommonOverride() && this.commonOverride.test(world, trunkPos);
+	}
+
+	public interface ICommonOverride extends BiPredicate<IWorld, BlockPos> {}
 
 	///////////////////////////////////////////
 	//LEAVES
 	///////////////////////////////////////////
 	
-	public Species setLeavesProperties(ILeavesProperties leavesProperties) {
+	public Species setLeavesProperties(LeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
 		addValidLeafBlocks(leavesProperties);
 		return this;
 	}
 	
-	public ILeavesProperties getLeavesProperties() {
+	public LeavesProperties getLeavesProperties() {
 		return leavesProperties;
 	}
 
 	public Optional<DynamicLeavesBlock> getLeavesBlock() {
-		DynamicLeavesBlock block = null;
-		if (getLeavesProperties().hasDynamicLeavesBlock()){
-			BlockState leavesState = getLeavesProperties().getDynamicLeavesState();
-			if (leavesState!=null && leavesState.getBlock() instanceof DynamicLeavesBlock)
-				block = (DynamicLeavesBlock) leavesState.getBlock();
-		} else if (getLeavesProperties().getPrimitiveLeaves() != null && !getLeavesProperties().getPrimitiveLeaves().getBlock().equals(Blocks.AIR)) {
-			block = createLeavesBlock(getLeavesProperties());
+		return this.leavesProperties.getDynamicLeavesBlock();
+	}
+
+	public DynamicLeavesBlock createLeavesBlock(LeavesProperties leavesProperties) {
+//		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
+//		block.setRegistryName(getRegistryName() + "_leaves");
+//		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
+		return null;
+	}
+
+	public void addValidLeafBlocks (LeavesProperties... leaves){
+		for (LeavesProperties leaf : leaves) {
+			if (!this.validLeaves.contains(leaf))
+				this.validLeaves.add(leaf);
 		}
-		return Optional.ofNullable(block);
-	}
-
-	public DynamicLeavesBlock createLeavesBlock(ILeavesProperties leavesProperties) {
-		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
-		block.setRegistryName(getRegistryName() + "_leaves");
-		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
-		return block;
-	}
-
-	public void addValidLeafBlocks (ILeavesProperties... leaves){
-		validLeaves.addAll(Arrays.asList(leaves));
 	}
 
 	public int getLeafBlockIndex (DynamicLeavesBlock block){
@@ -374,15 +466,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return An {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return hasSeed() ? new ItemStack(seed, qty) : ItemStack.EMPTY;
+		return this.hasSeed() ? new ItemStack(this.seed, qty) : !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeedStack(qty) : ItemStack.EMPTY;
 	}
 	
 	public boolean hasSeed() {
-		return seed != null;
+		return this.seed != null;
 	}
 	
 	public Optional<Seed> getSeed() {
-		return Optional.ofNullable(seed);
+		return !this.hasSeed() ? !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
 	}
 	
 	/**
@@ -390,7 +482,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * in the appropriate registries.
 	 */
 	public Species generateSeed() {
-		return setSeed(new Seed(this));
+		return this.setSeed(RegistryHandler.addItem(ResourceLocationUtils.suffix(this.getRegistryName(), "_seed"), new Seed(this)));
 	}
 	
 	/**
@@ -427,18 +519,18 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		addDropCreator(new SeedDropCreator().setCustomSeedDrop(customSeed));
 		return this;
 	}
+
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
 		addDropCreator(new SeedDropCreator(rarity).setCustomSeedDrop(customSeed));
 		return this;
 	}
 
 	public Species setupStandardStickDropping() {
-		addDropCreator(new LeavesStickDropCreator(this));
-		return this;
+		return this.setupStandardStickDropping(1);
 	}
 
 	public Species setupStandardStickDropping (float rarity) {
-		addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
+		this.addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
 		return this;
 	}
 
@@ -470,7 +562,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	/**
-	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link TreeFamily} at
+	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link Family} at
 	 * random with no player interaction.
 	 *
 	 * @param world
@@ -591,8 +683,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * in the appropriate registries.
 	 */
 	public Species generateSapling() {
-		setSapling(new DynamicSaplingBlock(this));
-		return this;
+		return this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
 	}
 	
 	public Optional<DynamicSaplingBlock> getSapling() {
@@ -616,8 +707,20 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return false;
 	}
 
-	//If false is returned the sapling will not grow and bonemeal will not work
-	public boolean canSaplingGrow(World world, BlockPos pos) {return true;}
+	public void addAcceptableBlockForGrowth (final Block block) {
+		this.acceptableBlocksForGrowth.add(block);
+	}
+
+	/**
+	 * Checks if the sapling can grow at the given position.
+	 *
+	 * @param world The {@link World} object.
+	 * @param pos The {@link BlockPos} the sapling is on.
+	 * @return True if it can grow.
+	 */
+	public boolean canSaplingGrow(World world, BlockPos pos) {
+		return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == world.getBlockState(pos.down()).getBlock());
+	}
 
 	//Returns whether the sapling should be able to grow without player intervention
 	public boolean canSaplingGrowNaturally(World world, BlockPos pos) {
@@ -641,13 +744,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public boolean transitionToTree(World world, BlockPos pos) {
 		
 		//Ensure planting conditions are right
-		TreeFamily family = getFamily();
+		Family family = getFamily();
 		if(world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
 			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			
-			if(getRequiresTileEntity(world, pos)) {
+			if (doesRequireTileEntity(world, pos)) {
 				SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
 				world.setTileEntity(pos.down(), speciesTE);
 				speciesTE.setSpecies(this);
@@ -664,10 +767,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	//This is used to load the sapling model
-	@Nullable
-	public ResourceLocation getSaplingName() {
-		if (getRegistryName() == null) return null;
-		return new ResourceLocation(getRegistryName().getNamespace(), getRegistryName().getPath() + "_sapling");
+	public ResourceLocation getSaplingRegName() {
+		return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
 	}
 	
 	public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {
@@ -712,7 +813,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
-		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.IS_VARIANT, this.getRequiresTileEntity(world, rootPos)), 3);
+		world.setBlockState(rootPos, rootyBlock.getDefaultState().with(RootyBlock.FERTILITY, life).with(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
 	}
 	
 	public Species setSoilLongevity(int longevity) {
@@ -725,11 +826,15 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	public boolean isThick() {
-		return false;
+		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
 	}
-	
-	public int maxBranchRadius() {
-		return isThick() ? ThickBranchBlock.RADMAX_THICK : BranchBlock.RADMAX_NORMAL;
+
+	public int getMaxBranchRadius() {
+		return this.maxBranchRadius;
+	}
+
+	public void setMaxBranchRadius(int maxBranchRadius) {
+		this.maxBranchRadius = MathHelper.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
 	}
 
 	public Species addAcceptableSoils(String ... soilTypes) {
@@ -755,6 +860,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	protected void setStandardSoils() {
 		addAcceptableSoils(DirtHelper.DIRT_LIKE);
+	}
+
+	public boolean hasAcceptableSoil () {
+		return this.soilTypeFlags != 0;
 	}
 
 	/**
@@ -792,7 +901,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return
 	 */
 	public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
-		return isAcceptableSoil(world, pos, soilBlockState);
+		final boolean isAcceptableSoil = isAcceptableSoil(world, pos, soilBlockState);
+
+		// If the block is water, check the block below it is valid soil (and not water).
+		if (isAcceptableSoil && soilBlockState.getBlock() == Blocks.WATER) {
+			final BlockPos down = pos.down();
+			final BlockState downState = world.getBlockState(pos.down());
+
+			return downState.getBlock() != Blocks.WATER && this.isAcceptableSoil(world, down, downState);
+		}
+
+		return isAcceptableSoil;
 	}
 	
 	
@@ -811,7 +930,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
@@ -843,9 +962,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * A little internal convenience function for getting branch endpoints
 	 *
 	 * @param world The world
-	 * @param treePos The {@link BlockPos} of the base of the {@link TreeFamily} trunk
-	 * @param treeBase The tree part that is the base of the {@link TreeFamily} trunk.  Provided for easy analysis.
-	 * @return A list of all branch endpoints for the {@link TreeFamily}
+	 * @param treePos The {@link BlockPos} of the base of the {@link Family} trunk
+	 * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
+	 * @return A list of all branch endpoints for the {@link Family}
 	 */
 	final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
 		FindEndsNode endFinder = new FindEndsNode();
@@ -854,12 +973,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	/**
-	 * A rot handler.
+	 * A postRot handler.
 	 *
 	 * @param world The world
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
-	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link TreeFamily}
-	 * @param treePos The {@link BlockPos} of the trunk base for this {@link TreeFamily}
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
+	 * @param treePos The {@link BlockPos} of the trunk base for this {@link Family}
 	 * @param soilLife The soil life of the {@link RootyBlock}
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
@@ -892,8 +1011,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	
 	/**
 	 * Handle rotting branches
+	 *
 	 * @param world The world
-	 * @param pos
+	 * @param pos The {@link BlockPos}.
 	 * @param neighborCount Count of neighbors reinforcing this block
 	 * @param radius The radius of the branch
 	 * @param random Access to a random number generator
@@ -901,38 +1021,43 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if the branch should rot
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
-		
-		if(radius <= 1) {
+		if (radius <= 1) {
 			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-			for(Direction dir: upFirst) {
-				if(leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
+			for (Direction dir: upFirst) {
+				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.offset(dir), 0)) {
 					return false;
 				}
 			}
 		}
 		
-		if(rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
+		if (rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
-			if(branch != null) {
+			if (branch != null) {
 				branch.rot(world, pos);
 			}
+			this.postRot(world, pos, neighborCount, radius, random, rapid);
 			return true;
 		}
 		
 		return false;
 	}
+
+	private void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final Random random, final boolean rapid) {
+		this.genFeatures.stream().filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature).forEach(configuredGenFeature ->
+				((IPostRotGenFeature) configuredGenFeature.getGenFeature()).postRot(configuredGenFeature, world, pos, neighborCount, radius, random, rapid));
+	}
 	
 	/**
-	 * Provides the chance that a log will rot.
+	 * Provides the chance that a log will postRot.
 	 *
 	 * @param world The world
 	 * @param pos The {@link BlockPos} of the {@link BranchBlock}
 	 * @param rand A random number generator
 	 * @param radius The radius of the {@link BranchBlock}
-	 * @return The chance this will rot. 0.0(never) -> 1.0(always)
+	 * @return The chance this will postRot. 0.0(never) -> 1.0(always)
 	 */
 	public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
-		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to rot
+		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to postRot
 	}
 	
 	/**
@@ -942,7 +1067,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
 	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
-	 * @param treePos The {@link BlockPos} of the {@link TreeFamily} trunk base.
+	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural
 	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
@@ -953,18 +1078,18 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		
 		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.treeGrowthMultiplier.get() * DTConfigs.treeGrowthFolding.get());
 		do {
-			if(soilLife > 0){
-				if(growthRate > random.nextFloat()) {
-					GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos));
+			if (soilLife > 0) {
+				if (growthRate > random.nextFloat()) {
+					final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos), world.rand);
 					boolean success = treeBase.growSignal(world, treePos, signal).success;
 					
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 					
-					if(soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+					if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 					}
 					
-					if(signal.choked) {
+					if (signal.choked) {
 						soilLife = 0;
 						rootyDirt.setSoilLife(world, rootPos, soilLife);
 						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
@@ -999,46 +1124,47 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	/**
 	 * Selects a new direction for the branch(grow) signal to turn to.
-	 * This function uses a probability map to make the decision and is acted upon by the GrowSignal() function in the branch block.
-	 * Can be overridden for different species but it's preferable to override customDirectionManipulation.
 	 *
-	 * @param world The World
-	 * @param pos
+	 * <p>This function uses a probability map to make the decision and is acted upon by the
+	 * GrowSignal() function in the branch block. Can be overridden for different species but
+	 * it's preferable to override customDirectionManipulation.</p>
+	 *
+	 * @param world The {@link World} object.
+	 * @param pos The {@link BlockPos} of the branch.
 	 * @param branch The branch block the GrowSignal is traveling in.
 	 * @param signal The grow signal.
-	 * @return
+	 * @return The selected {@link Direction}.
 	 */
 	public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
 		Direction originDir = signal.dir.getOpposite();
 		
-		//prevent branches on the ground
+		// prevent branches on the ground
 		if(signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
 			return Direction.UP;
 		}
 		
-		int[] probMap = new int[6];//6 directions possible DUNSWE
+		int[] probMap = new int[6]; // 6 directions possible DUNSWE
 		
-		//Probability taking direction into account
-		probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability(): 0;//Favor up
-		probMap[signal.dir.ordinal()] += getReinfTravel(); //Favor current direction
+		// Probability taking direction into account
+		probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability(): 0; // Favor up
+		probMap[signal.dir.ordinal()] += getReinfTravel(); // Favor current direction
 		
-		//Create probability map for direction change
+		// Create probability map for direction change
 		for(Direction dir: Direction.values()) {
 			if(!dir.equals(originDir)) {
 				BlockPos deltaPos = pos.offset(dir);
-				//Check probability for surrounding blocks
-				//Typically Air:1, Leaves:2, Branches: 2+r
+				// Check probability for surrounding blocks
+				// Typically Air:1, Leaves:2, Branches: 2+r
 				BlockState deltaBlockState = world.getBlockState(deltaPos);
 				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
 			}
 		}
 		
-		//Do custom stuff or override probability map for various species
+		// Do custom stuff or override probability map for various species
 		probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
 		
-		//Select a direction from the probability map
-		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal);//Default to up if things are screwy
+		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap); // Select a direction from the probability map.
+		return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
 	}
 	
 	/** Species can override the probability map here **/
@@ -1052,20 +1178,20 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	}
 	
 	/**
-	 * Allows a species to do things after a grow event just occured.  Such as used
-	 * by Jungle trees to create cocoa pods on the trunk
+	 * Allows a species to do things after a grow event just occurred. Such as used
+	 * by Jungle trees to create cocoa pods on the trunk.
 	 *
 	 * @param world The world
 	 * @param rootPos The position of the rooty dirt block
 	 * @param treePos The position of the base trunk block of the tree(usually directly above the rooty dirt block)
 	 * @param soilLife The life of the soil block this tree is planted in
 	 * @param natural
-	 * 		If true then this member is being used to grow the tree naturally(create drops or fruit).
-	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
+	 * 		If true then this member is being used to grow the tree naturally (create drops or fruit).
+	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning.
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
-		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			GenFeature genFeature = configuredGenFeature.getGenFeature();
+		for (final ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
+			final GenFeature genFeature = configuredGenFeature.getGenFeature();
 
 			if (!(genFeature instanceof IPostGrowFeature))
 				continue;
@@ -1086,7 +1212,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if the tree became diseased
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
-		if(soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
+		if (soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
 			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
 			return true;
 		}
@@ -1103,10 +1229,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		envFactors.put(type, factor);
 		return this;
 	}
-	
+
 	/**
 	 *
-	 * @param world The World
+	 * @param world The {@link World} object.
 	 * @param pos
 	 * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
 	 */
@@ -1117,28 +1243,40 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		//An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
 		BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
 		MinecraftForge.EVENT_BUS.post(suitabilityEvent);
-		if(suitabilityEvent.isHandled()) {
+		if (suitabilityEvent.isHandled()) {
 			return suitabilityEvent.getSuitability();
 		}
 		
 		float ugs = (float)(double) DTConfigs.scaleBiomeGrowthRate.get();//universal growth scalar
 		
-		if(ugs == 1.0f || isBiomePerfect(getBiomeKey(biome))) {
+		if (ugs == 1.0f || this.isBiomePerfect(biome)) {
 			return 1.0f;
 		}
 		
 		float suit = defaultSuitability();
 		
-		for(BiomeDictionary.Type t : BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName()))) {
+		for (BiomeDictionary.Type t : BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(net.minecraft.util.registry.Registry.BIOME_KEY, biome.getRegistryName()))) {
 			suit *= envFactors.getOrDefault(t, 1.0f);
 		}
 		
 		//Linear interpolation of suitability with universal growth scalar
 		suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 		
-		return (float)MathHelper.clamp(suit, 0.0f, 1.0f);
+		return MathHelper.clamp(suit, 0.0f, 1.0f);
 	}
-	
+
+	/**
+	 * Used to determine if the provided {@link Biome} argument will yield
+	 * unhindered growth to Maximum potential. This has the affect of the
+	 * suitability being 100%(or 1.0f)
+	 *
+	 * @param biome The biome being tested
+	 * @return True if biome is "perfect" false otherwise.
+	 */
+	public boolean isBiomePerfect(final Biome biome) {
+		return this.perfectBiomes.contains(biome);
+	}
+
 	/**
 	 * Used to determine if the provided {@link Biome} argument will yield
 	 * unhindered growth to Maximum potential. This has the affect of the
@@ -1151,12 +1289,16 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return false;
 	}
 
+	public List<Biome> getPerfectBiomes() {
+		return perfectBiomes;
+	}
+
 	public static Biome getBiome (final RegistryKey<Biome> biomeKey) {
-		return ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName());
+		return Objects.requireNonNull(ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName()));
 	}
 
 	public static RegistryKey<Biome> getBiomeKey (final Biome biome) {
-		return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
+		return RegistryKey.getOrCreateKey(net.minecraft.util.registry.Registry.BIOME_KEY, Objects.requireNonNull(biome.getRegistryName()));
 	}
 	
 	/** A value that determines what a tree's suitability is before climate manipulation occurs. */
@@ -1173,8 +1315,8 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	@SafeVarargs
 	public static boolean isOneOfBiomes(RegistryKey<Biome> biomeToCheck, RegistryKey<Biome>... biomes) {
-		for(RegistryKey<Biome> biome: biomes) {
-			if(biomeToCheck.equals(biome)) {
+		for (RegistryKey<Biome> biome: biomes) {
+			if (biomeToCheck.equals(biome)) {
 				return true;
 			}
 		}
@@ -1190,11 +1332,12 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
 
 	/**
-	 * Pulls data from the SeasonManager to determine the rate of tree growth
+	 * Pulls data from the {@link com.ferreusveritas.dynamictrees.compat.seasons.SeasonManager} to determine
+	 * the rate of tree growth for the current season.
 	 *
-	 * @param world The world
-	 * @param rootPos the BlockPos of the Rooty Dirt
-	 * @return value from 0.0(no growth) to 1.0(full growth)
+	 * @param world The {@link World} object.
+	 * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
+	 * @return Factor from 0.0 (no growth) to 1.0 (full growth).
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
 		return DTConfigs.enableSeasonalGrowthFactor.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
@@ -1216,16 +1359,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * Values are OR'ed together for the return
 	 */
 	public int getSeasonalTooltipFlags(final World world) {
-		float seasonStart = 0.167f;
-		float seasonEnd = 0.833f;
-		float threshold = 0.75f;
+		final float seasonStart = 0.167f;
+		final float seasonEnd = 0.833f;
+		final float threshold = 0.75f;
 
-		if(FruitBlock.getFruitBlockForSpecies(this) != null) {
+		if (FruitBlock.getFruitBlockForSpecies(this) != null) {
 			int seasonFlags = 0;
-			for(int i = 0; i < 4; i++) {
-				float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonStart) * 64.0f), 0), true);
-				float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int)((i + seasonEnd  ) * 64.0f), 0), true);
-				if(Math.min(prod1, prod2) >= threshold) {
+			for (int i = 0; i < 4; i++) {
+				final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart) * 64.0f), 0), true);
+				final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonEnd  ) * 64.0f), 0), true);
+
+				if (Math.min(prod1, prod2) >= threshold) {
 					seasonFlags |= 1 << i;
 				}
 			}
@@ -1237,11 +1381,11 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 
 	/**
 	 * When seasons are active allow a seasonal time range where fruit growth does
-	 * not progress past the flower stage.  This allows for a flowery spring time.
+	 * not progress past the flower stage. This allows for a flowery spring time.
 	 *
-	 * @param min The minimum season value
-	 * @param max The maximum season value
-	 * @return
+	 * @param min The minimum season value.
+	 * @param max The maximum season value.
+	 * @return This {@link Species} object for chaining.
 	 */
 	public Species setFlowerSeasonHold(float min, float max) {
 		flowerSeasonHoldMin = min;
@@ -1249,7 +1393,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return this;
 	}
 
-	public boolean testFlowerSeasonHold(float seasonValue) {
+	public boolean testFlowerSeasonHold(Float seasonValue) {
 		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin, flowerSeasonHoldMax);
 	}
 
@@ -1261,14 +1405,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	@Nullable
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		
-		//Bonemeal fertilizes the soil and causes a single growth pulse
-		if( canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
-			
+		// Bonemeal fertilizes the soil and causes a single growth pulse
+		if (canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
 			return new FertilizeSubstance().setAmount(1).setGrow(true);
 		}
 		
-		//Use substance provider interface if it's available
-		if(itemStack.getItem() instanceof ISubstanceEffectProvider) {
+		// Use substance provider interface if it's available
+		if (itemStack.getItem() instanceof ISubstanceEffectProvider) {
 			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
 			return provider.getSubstanceEffect(itemStack);
 		}
@@ -1286,11 +1429,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if item was used, false otherwise
 	 */
 	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, PlayerEntity player, Hand hand, ItemStack itemStack) {
+		final ISubstanceEffect effect = getSubstanceEffect(itemStack);
 		
-		ISubstanceEffect effect = getSubstanceEffect(itemStack);
-		
-		if(effect != null) {
-			if(effect.isLingering()) {
+		if (effect != null) {
+			if (effect.isLingering()) {
 				world.addEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
 			} else {
@@ -1316,9 +1458,9 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 */
 	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
 		
-		if (heldItem != null) {//Something in the hand
-			if(applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-				Species.consumePlayerItem(player, hand, heldItem);
+		if (heldItem != null) { // Ensure there is something in the player's hand.
+			if (applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
+				consumePlayerItem(player, hand, heldItem);
 				return true;
 			}
 		}
@@ -1334,15 +1476,14 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @param heldItem The item to be consumed
 	 */
 	public static void consumePlayerItem(PlayerEntity player, Hand hand, ItemStack heldItem) {
-		if(!player.isCreative()) {
-			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
+		if (!player.isCreative()) {
+			if (heldItem.getItem() instanceof IEmptiable) { // A substance deployed from a refillable container.
+				final IEmptiable emptiable = (IEmptiable) heldItem.getItem();
 				player.setHeldItem(hand, emptiable.getEmptyContainer());
-			}
-			else if(heldItem.getItem() == Items.POTION) {//An actual potion
+			} else if(heldItem.getItem() == Items.POTION) { // An actual potion.
 				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
 			} else {
-				heldItem.shrink(1);//Just a regular item like bonemeal
+				heldItem.shrink(1); // Just a regular item like bonemeal.
 			}
 		}
 	}
@@ -1363,16 +1504,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	///////////////////////////////////////////
 	// MEGANESS
 	///////////////////////////////////////////
-	
-	public boolean isMega() {
-		return false;
-	}
-	
+
+	private Species megaSpecies = Species.NULL_SPECIES;
+
 	public Species getMegaSpecies() {
-		return Species.NULL_SPECIES;
+		return this.megaSpecies;
 	}
-	
-	
+
+	public void setMegaSpecies(final Species megaSpecies) {
+		this.megaSpecies = megaSpecies;
+	}
+
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
 	///////////////////////////////////////////
@@ -1388,7 +1530,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return
 	 */
 	@Nullable
-	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
+	public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
 		return null;
 	}
 	
@@ -1397,13 +1539,13 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	//////////////////////////////
 	
 	/**
-	 * Provides the {@link BonsaiPotBlock} for this Species.  A mod can
-	 * derive it's own BonsaiPot subclass if it wants something custom.
+	 * Provides the {@link BonsaiPotBlock} for this Species. {@link Species} subclasses can
+	 * derive their own {@link BonsaiPotBlock} subclass if they want something custom.
 	 *
-	 * @return A {@link BonsaiPotBlock}
+	 * @return The {@link BonsaiPotBlock} for this {@link Species}.
 	 */
 	public BonsaiPotBlock getBonsaiPot() {
-		return DTRegistries.bonsaiPotBlock;
+		return DTRegistries.BONSAI_POT;
 	}
 	
 	
@@ -1423,17 +1565,17 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return true if tree was generated. false otherwise.
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		
 		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
 			GenFeature genFeature = configuredGenFeature.getGenFeature();
 			if (genFeature instanceof IFullGenFeature) {
 				return ((IFullGenFeature) genFeature).generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds);
 			}
 		}
-		
+
+		final JoCodeManager joCodeManager = DTResourceRegistries.getJoCodeManager();
 		Direction facing = CoordUtils.getRandomDir(random);
-		if(!JO_CODE_MANAGER.getCodes(this).isEmpty()) {
-			JoCode code = JO_CODE_MANAGER.getRandomCode(this, radius, random);
+		if(!joCodeManager.getCodes(this).isEmpty()) {
+			JoCode code = joCodeManager.getRandomCode(this, radius, random);
 			if(code != null) {
 				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;
@@ -1454,8 +1596,7 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	 * @return This {@link Species} object.
 	 */
 	public Species addGenFeature(GenFeature feature) {
-		this.genFeatures.add(feature.getDefaultConfiguration());
-		return this;
+		return this.addGenFeature(feature.getDefaultConfiguration());
 	}
 
 	/**
@@ -1467,6 +1608,10 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 	public Species addGenFeature(ConfiguredGenFeature<?> configuredGenFeature) {
 		this.genFeatures.add(configuredGenFeature);
 		return this;
+	}
+
+	public boolean areAnyGenFeatures () {
+		return this.genFeatures.size() > 0;
 	}
 
 	/**
@@ -1558,31 +1703,25 @@ public class Species extends ForgeRegistryEntry.UncheckedRegistryEntry<Species> 
 		return getRegistryName().toString();
 	}
 
+	@Override
+	public String toLoadDataString() {
+		final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
+		return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed) : null),
+				Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock) + "}" : null));
+	}
 
-	public String getDisplayInfo() {
-		return "Species{" +
-				"treeFamily=" + treeFamily +
-				", logicKit=" + logicKit +
-				", tapering=" + tapering +
-				", upProbability=" + upProbability +
-				", lowestBranchHeight=" + lowestBranchHeight +
-				", signalEnergy=" + signalEnergy +
-				", growthRate=" + growthRate +
-				", soilLongevity=" + soilLongevity +
-				", soilTypeFlags=" + soilTypeFlags +
-				", requiresTileEntity=" + requiresTileEntity +
-				", leavesProperties=" + leavesProperties +
-				", validLeaves=" + validLeaves +
-				", seed=" + seed +
-				", saplingBlock=" + saplingBlock +
-				", primitiveSapling=" + primitiveSapling +
-				", dropCreatorStorage=" + dropCreatorStorage +
-				", envFactors=" + envFactors +
-				", genFeatures=" + genFeatures +
-				", unlocalizedName='" + unlocalizedName + '\'' +
-				", flowerSeasonHoldMin=" + flowerSeasonHoldMin +
-				", flowerSeasonHoldMax=" + flowerSeasonHoldMax +
-				'}';
+	@Override
+	public String toReloadDataString() {
+		return this.getString(Pair.of("tapering", this.tapering), Pair.of("upProbability", this.upProbability),
+				Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
+				Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
+				Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
+				Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
+				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
+				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
+				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(DTRegistries.BLOCK_STATES.AIR)),
+				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
+				Pair.of("genFeatures", this.genFeatures));
 	}
 
 }

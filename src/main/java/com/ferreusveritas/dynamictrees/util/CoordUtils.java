@@ -1,12 +1,11 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.Direction;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,7 +26,7 @@ import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class CoordUtils {
+public final class CoordUtils {
 
 	// Used for devs to simulate tree growing in different location hashes.
 	public static int coordXor = 0;
@@ -89,7 +87,8 @@ public class CoordUtils {
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
 			return ((IWorldReader) blockReader).isBlockLoaded(pos);
-		} else return (blockReader instanceof EmptyBlockReader || blockReader instanceof ChunkRenderCache ||
+		} else return (blockReader instanceof EmptyBlockReader ||
+				blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
 				blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
 	}
 
@@ -114,7 +113,7 @@ public class CoordUtils {
 	 * Find a suitable position for seed drops or fruit placement using ray tracing.
 	 * 
 	 * @param world The world
-	 * @param treePos The block position of the {@link TreeFamily} trunk base.
+	 * @param treePos The block position of the {@link Family} trunk base.
 	 * @param branchPos The {@link BlockPos} of a {@link BranchBlock} selected as a fruit target
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is BlockPos.ZERO
 	 */

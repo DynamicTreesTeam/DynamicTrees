@@ -2,13 +2,13 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Provides the forest density for a given biome.
@@ -28,6 +28,37 @@ public class BiomePropertySelectors {
 
 	public interface ISpeciesSelector {
 		SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random);
+	}
+
+	public static final class FeatureCancellations {
+		private final Collection<String> namespaces = new HashSet<>();
+		private final Collection<FeatureCanceller> featureCancellers = new HashSet<>();
+
+		public void putNamespace (final String namespace) {
+			this.namespaces.add(namespace);
+		}
+
+		public boolean shouldCancelNamespace(final String namespace) {
+			return this.namespaces.contains(namespace);
+		}
+
+		public void putCanceller(final FeatureCanceller featureCanceller) {
+			this.featureCancellers.add(featureCanceller);
+		}
+
+		public void copyFrom(final FeatureCancellations featureCancellations) {
+			this.namespaces.addAll(featureCancellations.namespaces);
+			this.featureCancellers.addAll(featureCancellations.featureCancellers);
+		}
+
+		public void reset() {
+			this.namespaces.clear();
+			this.featureCancellers.clear();
+		}
+
+		public Collection<FeatureCanceller> getFeatureCancellers () {
+			return this.featureCancellers;
+		}
 	}
 
 	/**

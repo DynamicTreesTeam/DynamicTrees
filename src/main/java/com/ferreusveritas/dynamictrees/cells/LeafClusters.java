@@ -11,9 +11,9 @@ import net.minecraft.util.math.BlockPos;
  */
 public class LeafClusters {
 
-	public static final SimpleVoxmap NULLMAP = new SimpleVoxmap(1, 1, 1, new byte[] { 0 });
+	public static final SimpleVoxmap NULL_MAP = new SimpleVoxmap(1, 1, 1, new byte[] { 0 });
 	
-	public static final SimpleVoxmap deciduous = new SimpleVoxmap(5, 4, 5, new byte[] {
+	public static final SimpleVoxmap DECIDUOUS = new SimpleVoxmap(5, 4, 5, new byte[] {
 			//Layer 0 (Bottom)
 			0, 0, 0, 0, 0,
 			0, 1, 1, 1, 0,
@@ -45,7 +45,7 @@ public class LeafClusters {
 	}).setCenter(new BlockPos(2, 1, 2));
 	
 	
-	public static final SimpleVoxmap conifer = new SimpleVoxmap(5, 2, 5, new byte[] {
+	public static final SimpleVoxmap CONIFER = new SimpleVoxmap(5, 2, 5, new byte[] {
 			
 			//Layer 0(Bottom)
 			0, 0, 1, 0, 0,
@@ -64,7 +64,7 @@ public class LeafClusters {
 	}).setCenter(new BlockPos(2, 0, 2));
 	
 	
-	public static final SimpleVoxmap acacia = new SimpleVoxmap(7, 2, 7, new byte[] {
+	public static final SimpleVoxmap ACACIA = new SimpleVoxmap(7, 2, 7, new byte[] {
 			
 			//Layer 0(Bottom)
 			0, 0, 1, 1, 1, 0, 0,
@@ -87,7 +87,7 @@ public class LeafClusters {
 	}).setCenter(new BlockPos(3, 0, 3));
 	
 	
-	public static final SimpleVoxmap darkoak = new SimpleVoxmap(7, 5, 7, new byte[] {
+	public static final SimpleVoxmap DARK_OAK = new SimpleVoxmap(7, 5, 7, new byte[] {
 			
 			//Layer 0(Bottom)
 			0, 0, 0, 0, 0, 0, 0,
@@ -137,9 +137,9 @@ public class LeafClusters {
 		}).setCenter(new BlockPos(3, 1, 3));
 	
 	
-	public static final SimpleVoxmap bare = new SimpleVoxmap(1, 1, 1, new byte[] { 0x20 });
+	public static final SimpleVoxmap BARE = new SimpleVoxmap(1, 1, 1, new byte[] { 0x20 });
 	
-	public static final SimpleVoxmap palm = new SimpleVoxmap(3, 3, 3, new byte[] {
+	public static final SimpleVoxmap PALM = new SimpleVoxmap(3, 3, 3, new byte[] {
 			
 			//Layer 0(Bottom)
 			0, 0, 0,
@@ -158,7 +158,7 @@ public class LeafClusters {
 			
 	}).setCenter(new BlockPos(3, 0, 3));
 	
-	public static final SimpleVoxmap bush = new SimpleVoxmap(5, 2, 5, new byte[] {
+	public static final SimpleVoxmap BUSH = new SimpleVoxmap(5, 2, 5, new byte[] {
 			0, 1, 1, 1, 0,
 			1, 2, 3, 2, 1,
 			1, 3, 0, 3, 1,

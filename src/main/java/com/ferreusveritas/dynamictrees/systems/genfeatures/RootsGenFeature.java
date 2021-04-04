@@ -15,9 +15,9 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.TriFunction;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -68,7 +68,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MIN_TRUNK_RADIUS, 13).with(LEVEL_LIMIT, 2);
 	}
 
@@ -92,7 +92,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			Surround surr = Surround.values()[world.rand.nextInt(8)];
 			BlockPos dPos = treePos.add(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-				world.setBlockState(dPos, DTRegistries.trunkShellBlock.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+				world.setBlockState(dPos, DTRegistries.TRUNK_SHELL.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
 			this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
@@ -145,7 +145,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 	protected boolean isReplaceableWithRoots(IWorld world, BlockState placeState, BlockPos pos) {
 		Block block = placeState.getBlock();
-		if(block == Blocks.AIR || block == DTRegistries.trunkShellBlock) {
+		if(block == Blocks.AIR || block == DTRegistries.TRUNK_SHELL) {
 			return true;
 		}
 
@@ -154,8 +154,9 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		return material.isReplaceable() && material != Material.WATER && material != Material.LAVA;
 	}
 
-	public void setScaler(TriFunction<Integer, Integer, Integer, Integer> scaler) {
+	public RootsGenFeature setScaler(TriFunction<Integer, Integer, Integer, Integer> scaler) {
 		this.scaler = scaler;
+		return this;
 	}
 
 }

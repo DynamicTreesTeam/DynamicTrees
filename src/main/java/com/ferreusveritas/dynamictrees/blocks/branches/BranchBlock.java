@@ -15,8 +15,8 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.StateNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -53,17 +53,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public static final int RADMAX_NORMAL = 8;
 	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 	
-	private TreeFamily tree = TreeFamily.NULL_FAMILY; // The tree this branch type creates
+	private Family tree = Family.NULL_FAMILY; // The tree this branch type creates
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
-	
-	public BranchBlock(Properties properties, String name){
-		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
-		this.setRegistryName(name);
+
+	public BranchBlock(Material material) {
+		this(Properties.create(material));
 	}
-	
-	public BranchBlock(Material material, String name) {
-		this(Properties.create(material), name);
+
+	public BranchBlock(Properties properties){
+		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
 	}
 
 	public BranchBlock setCanBeStripped(boolean truth){
@@ -75,16 +74,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// TREE INFORMATION
 	///////////////////////////////////////////
 	
-	public void setFamily(TreeFamily tree) {
+	public void setFamily(Family tree) {
 		this.tree = tree;
 	}
 	
-	public TreeFamily getFamily() {
+	public Family getFamily() {
 		return tree;
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState state, IBlockReader blockAccess, BlockPos pos) {
+	public Family getFamily(BlockState state, IBlockReader blockAccess, BlockPos pos) {
 		return getFamily();
 	}
 	
@@ -118,10 +117,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param pos The branch block position
 	 * @param radius The radius of the branch that's the subject of rotting
 	 * @param rand A random number generator for convenience
-	 * @param rapid If true then unsupported branch rot will occur regardless of chance value.
-	 * 		This will also rot the entire unsupported branch at once.
-	 * 		True if this rot is happening under a generation scenario as opposed to natural tree updates
-	 * @return true if the branch was destroyed because of rot
+	 * @param rapid If true then unsupported branch postRot will occur regardless of chance value.
+	 * 		This will also postRot the entire unsupported branch at once.
+	 * 		True if this postRot is happening under a generation scenario as opposed to natural tree updates
+	 * @return true if the branch was destroyed because of postRot
 	 */
 	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
 	
@@ -204,9 +203,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return 1;
 	}
 	
-	public abstract int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags);
+	public abstract int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags);
 	
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir) {
 		return setRadius(world, pos, radius, originDir, 2);
 	}
 	
@@ -325,12 +324,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does not have a leaves block in it because it was a branch
 			}
 			
-			TreeFamily family = species.getFamily();
+			Family family = species.getFamily();
 			BranchBlock familyBranch = family.getDynamicBranch();
 			int primaryThickness = (int) family.getPrimaryThickness();
 			
 			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
-			for(BlockPos findPos : bounds.expand(3).iterate() ) {
+			for(BlockPos findPos : bounds.expand(3)) {
 				BlockState findState = world.getBlockState(findPos);
 				if( familyBranch.getRadius(findState) == primaryThickness ) { //Search for endpoints of the same tree family
 					Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
@@ -351,7 +350,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, DTRegistries.blockStates.AIR, 3);
+					world.setBlockState(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 				}
@@ -559,23 +558,24 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	// EXPLOSIONS AND FIRE
 	///////////////////////////////////////////
-	
+
 	// Explosive harvesting methods will likely result in mostly sticks but I'm okay with that since it kinda makes sense.
 	@Override
 	public void onExplosionDestroy(World world, BlockPos pos, Explosion explosion) {
 		BlockState state = world.getBlockState(pos);
-		if(state.getBlock() == this) {
+		if (state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(world, pos);
 			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
 			NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
 			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
 			FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 			
-			if(treeEntity != null) {
+			if (treeEntity != null) {
 				Vector3d expPos = explosion.getPosition();
 				LivingEntity placer = explosion.getExplosivePlacedBy();
-				//Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
-				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity)placer).isCharged() ? 6 : 3) : 4;
+				// TODO: Use an access transformer to get the actual size.
+				// Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
+				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity) placer).isCharged() ? 6 : 3) : 4;
 				double distance = Math.sqrt(treeEntity.getDistanceSq(expPos.x, expPos.y, expPos.z));
 				if (distance / size <= 1.0D && distance != 0.0D) {
 					treeEntity.addVelocity((treeEntity.getPosX() - expPos.x) / distance, (treeEntity.getPosY() - expPos.y) / distance, (treeEntity.getPosZ() - expPos.z) / distance);

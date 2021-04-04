@@ -73,9 +73,10 @@ public abstract class SubCommand {
         ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
 
         if (this.takesCoordinates) {
+            subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3());
+
             if (this.executesWithCoordinates)
-                subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3()).executes(this::execute);
-            else subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3());
+                subSubCommandBuilder.executes(this::execute);
         }
 
         if (this.extraArguments != null) {

@@ -5,16 +5,16 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.Block;
@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
  *
@@ -59,11 +58,11 @@ import java.util.Random;
  *  You can't determine a species of a tree family by location alone (e.g. Swamp Oak by biome)
  * 	The species is rare and you don't want to commit all the resources necessary to make a whole tree family(e.g. Apple Oak)
  * 
- * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link TreeFamily} family.
+ * This is a great method for creating numerous fruit species(Pam's Harvestcraft) under one {@link Family} family.
  * 
  * @author ferreusveritas
- *
  */
+@SuppressWarnings("deprecation")
 public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
@@ -226,7 +225,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		// TODO: Ensure ActionResultType is being used correctly.
 		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 	
@@ -275,8 +273,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesTree) {
-		return CellNull.NULLCELL;
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
+		return CellNull.NULL_CELL;
 	}
 	
 	@Override
@@ -340,25 +338,26 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState rootyState, IBlockReader blockAccess, BlockPos rootPos) {
+	public Family getFamily(BlockState rootyState, IBlockReader blockAccess, BlockPos rootPos) {
 		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
 		BlockState treeState = blockAccess.getBlockState(treePos);
-		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULL_FAMILY;
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : Family.NULL_FAMILY;
 	}
-	
+
+	@Nullable
 	private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
 		return (SpeciesTileEntity) world.getTileEntity(pos);
 	}
 	
 	/**
-	 * Rooty Dirt can report whatever {@link TreeFamily} species it wants to be.
+	 * Rooty Dirt can report whatever {@link Family} species it wants to be.
 	 * We'll use a stored value to determine the species for the {@link TileEntity} version.
 	 * Otherwise we'll just make it report whatever {@link DynamicTrees} the above
 	 * {@link BranchBlock} says it is.
 	 */
 	public Species getSpecies(BlockState state, IWorld world, BlockPos rootPos) {
 		
-		TreeFamily tree = getFamily(state, world, rootPos);
+		Family tree = getFamily(state, world, rootPos);
 		
 		SpeciesTileEntity rootyDirtTE = getTileEntitySpecies(world, rootPos);
 

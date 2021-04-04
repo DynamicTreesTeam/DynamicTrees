@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
@@ -23,8 +23,8 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesTree) {
-		return CellNull.NULLCELL;
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
+		return CellNull.NULL_CELL;
 	}
 
 	@Override
@@ -73,8 +73,8 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public TreeFamily getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return TreeFamily.NULL_FAMILY;
+	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		return Family.NULL_FAMILY;
 	}
 	
 	public final TreePartType getTreePartType() {

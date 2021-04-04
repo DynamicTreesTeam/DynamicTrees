@@ -1,25 +1,21 @@
 package com.ferreusveritas.dynamictrees.init;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesJson;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
-import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -55,7 +51,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DTClient {
-	
+
+	//TODO: thick ring stitching
+	public static void clientStart() {
+//		FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
+//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
+//			if (manager instanceof IReloadableResourceManager){
+//				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
+//				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
+//			}
+//		});
+	}
+
 	public static void setup() {
 
 		registerRenderLayers();
@@ -65,7 +72,7 @@ public class DTClient {
 		registerColorHandlers();
 //		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 		
-		LeavesPropertiesJson.postInitClient();
+		LeavesProperties.postInitClient();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -73,10 +80,10 @@ public class DTClient {
 
 		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
-		for(TreeFamily family : Species.REGISTRY.getValues().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
+		for(Family family : Species.REGISTRY.getAll().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
-			if(family != TreeFamily.NULL_FAMILY) {
+			if(family != Family.NULL_FAMILY) {
 				BlockState state = family.getPrimitiveLog().getDefaultState();
 				if(state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
@@ -85,6 +92,7 @@ public class DTClient {
 			}
 		}
 	}
+
 	@OnlyIn(Dist.CLIENT)
 	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
 		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
@@ -115,15 +123,14 @@ public class DTClient {
 		return access != null && pos != null;
 	}
 
-	// TODO: Find a cleaner way of doing this.
 	private static void registerRenderLayers () {
-		ForgeRegistries.BLOCKS.forEach(block -> {
-			if (block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof BonsaiPotBlock) {
-				RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped());
-			}
-//			if (block instanceof ThickBranchBlock)
-//				RenderTypeLookup.setRenderLayer(block, ThickRingTextureManager.BRANCH_SOLID);
-		});
+		RenderTypeLookup.setRenderLayer(DTRegistries.BONSAI_POT, RenderType.getCutoutMipped());
+
+		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
+				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
+
+//		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
+//				.forEach(block -> RenderTypeLookup.setRenderLayer(block , ThickRingTextureManager.BRANCH_SOLID));
 	}
 	
 	private static void registerColorHandlers() {
@@ -148,16 +155,16 @@ public class DTClient {
 		}
 		
 		//Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(DTRegistries.bonsaiPotBlock, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
-				? DTRegistries.bonsaiPotBlock.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
+				? DTRegistries.BONSAI_POT.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		//ITEMS
 		
 		// Register Potion Colorizer
-		ModelHelper.regColorHandler(DTRegistries.dendroPotion, (stack, tint) -> DTRegistries.dendroPotion.getColor(stack, tint));
+		ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION, (stack, tint) -> DTRegistries.DENDRO_POTION.getColor(stack, tint));
 		
 		//Register Woodland Staff Colorizer
-		ModelHelper.regColorHandler(DTRegistries.treeStaff, (stack, tint) -> DTRegistries.treeStaff.getColor(stack, tint));
+		ModelHelper.regColorHandler(DTRegistries.STAFF, (stack, tint) -> DTRegistries.STAFF.getColor(stack, tint));
 		
 		//TREE PARTS
 		
@@ -170,9 +177,9 @@ public class DTClient {
 		}
 		
 		//Register Leaves Colorizers
-		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesListForModId(DynamicTrees.MOD_ID)) {
-			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) ->{
-						ILeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
+		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesList()) {
+			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> {
+						LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
 						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
 					}
 			);
@@ -196,7 +203,7 @@ public class DTClient {
 		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.lingeringEffector, new LingeringEffectorRenderer.Factory());
 	}
 	
-	private static int getFoliageColor(ILeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
+	private static int getFoliageColor(LeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {
 		return leavesProperties.foliageColorMultiplier(blockState, world, pos);
 	}
 	
@@ -236,7 +243,7 @@ public class DTClient {
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
 			if(treePart instanceof DynamicLeavesBlock) {
 				DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
-				ILeavesProperties leavesProperties = leaves.getProperties(blockState);
+				LeavesProperties leavesProperties = leaves.getProperties(blockState);
 				int color = getFoliageColor(leavesProperties, world, blockState, pos);
 				float r = (color >> 16 & 255) / 255.0F;
 				float g = (color >> 8 & 255) / 255.0F;

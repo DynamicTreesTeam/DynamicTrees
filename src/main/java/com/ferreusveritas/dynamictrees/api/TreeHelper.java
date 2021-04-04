@@ -143,7 +143,7 @@ public class TreeHelper {
 		
 		BlockState blockState = world.getBlockState(pos);
 		
-		if(blockState.getBlock() == DTRegistries.trunkShellBlock) {
+		if(blockState.getBlock() == DTRegistries.TRUNK_SHELL) {
 			TrunkShellBlock.ShellMuse muse = ((TrunkShellBlock)blockState.getBlock()).getMuse(world, blockState, pos);
 			if(muse != null) {
 				return muse.pos;

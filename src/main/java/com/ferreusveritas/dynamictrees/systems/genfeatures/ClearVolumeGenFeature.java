@@ -21,7 +21,7 @@ public class ClearVolumeGenFeature extends GenFeature implements IPreGenFeature 
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(HEIGHT, 8);
 	}
 

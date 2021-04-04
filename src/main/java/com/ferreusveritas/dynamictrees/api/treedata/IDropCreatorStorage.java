@@ -6,12 +6,12 @@ import java.util.Map;
 
 public interface IDropCreatorStorage extends IDropCreator {
 
-	public boolean addDropCreator(IDropCreator dropCreator);
+	boolean addDropCreator(IDropCreator dropCreator);
 
-	public IDropCreator findDropCreator(ResourceLocation name);
+	IDropCreator findDropCreator(ResourceLocation name);
 	
-	public boolean remDropCreator(ResourceLocation name);
+	boolean remDropCreator(ResourceLocation name);
 	
-	public Map<ResourceLocation, IDropCreator> getDropCreators();
+	Map<ResourceLocation, IDropCreator> getDropCreators();
 	
 }

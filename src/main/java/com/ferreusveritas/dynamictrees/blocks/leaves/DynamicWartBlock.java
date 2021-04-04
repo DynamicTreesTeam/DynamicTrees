@@ -1,12 +1,9 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -14,19 +11,16 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+@SuppressWarnings("deprecation")
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
-    public DynamicWartBlock (ILeavesProperties leavesProperties){
-        super(leavesProperties);
-    }
-
-    public DynamicWartBlock() {
-        super(Properties.create(Material.PLANTS, MaterialColor.RED).sound(SoundType.WART).tickRandomly());
+    public DynamicWartBlock (final LeavesProperties leavesProperties, final Properties properties) {
+        super(leavesProperties, properties);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return getShape(state, worldIn, pos, context);
+        return this.getShape(state, worldIn, pos, context);
     }
 
     @Override
@@ -35,9 +29,16 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {}
+    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
+        entity.onLivingFall(fallDistance, 1.0F);
+    }
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) { }
+
+    @Override
+    protected boolean shouldDropForPlayer(PlayerEntity player) {
+        return true;
+    }
 
 }

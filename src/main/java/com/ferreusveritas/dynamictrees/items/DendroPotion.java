@@ -1,42 +1,30 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.substances.DepleteSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.FreezeSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.MegaSubstance;
-import com.ferreusveritas.dynamictrees.systems.substances.TransformSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.PotionItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
 	
@@ -44,7 +32,6 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	public static final String INDEX_TAG_KEY = "potion_index";
 	public static final String TREE_TAG_KEY = "target";
-	public static final String NAME = "dendro_potion";
 
 	public enum DendroPotionType {
 		BIOCHAR(    0, true, "biochar",     0x27231c),
@@ -89,14 +76,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			return new TranslationTextComponent("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : ""));
 		}
 	};
-	
+
 	public DendroPotion() {
-		this(NAME);
-	}
-	
-	public DendroPotion(String name) {
-		super(new Item.Properties().group(DTRegistries.dynamicTreesTab).maxStackSize(1));
-		this.setRegistryName(name);
+		super(new Item.Properties().group(DTRegistries.ITEM_GROUP).maxStackSize(1));
 	}
 	
 	public ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {
@@ -106,11 +88,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	@Override
 	public void fillItemGroup(final ItemGroup group, final NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+		if (!this.isInGroup(group)) {
 			for (final DendroPotionType potion : DendroPotionType.values()) {
 				if (potion.getActive()) {
-					final ItemStack potionStack = new ItemStack(this, 1);
-					items.add(this.applyIndexTag(potionStack, potion.getIndex()));
+					items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
 				}
 			}
 		}
@@ -138,7 +119,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		final CompoundNBT nbtTag = itemStack.getOrCreateTag();
 
 		if (nbtTag.contains(TREE_TAG_KEY)) {
-			return TreeRegistry.findSpecies(new ResourceLocation(nbtTag.getString(TREE_TAG_KEY)));
+			return TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY));
 		}
 
 		return null;
@@ -148,9 +129,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		itemStack.getOrCreateTag().putString(TREE_TAG_KEY, species.getRegistryName().toString());
 		return itemStack;
 	}
-	
+
 	public void registerRecipes() {
-		ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
+		final ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
 
 		Collections.addAll(brewingRecipes, this.getRecipe(awkwardStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)),
 				this.getRecipe(Items.SLIME_BALL, DendroPotionType.DEPLETION),
@@ -161,8 +142,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 				this.getRecipe(Items.PRISMARINE_CRYSTALS, DendroPotionType.TRANSFORM));
 
 		for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
-			final ItemStack outputStack = setTargetSpecies(this.getPotionStack(DendroPotionType.TRANSFORM), species);
-			brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1), outputStack));
+			brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1),
+					this.setTargetSpecies(this.getPotionStack(DendroPotionType.TRANSFORM), species)));
 		}
 		
 		brewingRecipes.forEach(BrewingRecipeRegistry::addRecipe);

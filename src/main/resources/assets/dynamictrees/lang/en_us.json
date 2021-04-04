@@ -19,7 +19,7 @@
   "species.dynamictrees.mega_jungle": "Mega Jungle",
   "species.dynamictrees.dark_oak": "Dark Oak",
   "species.dynamictrees.acacia": "Acacia",
-  "species.dynamictrees.apple": "Apple",
+  "species.dynamictrees.apple_oak": "Apple Oak",
   "species.dynamictrees.crimson": "Crimson",
   "species.dynamictrees.mega_crimson": "Mega Crimson",
   "species.dynamictrees.warped": "Warped",
@@ -31,7 +31,7 @@
   "item.dynamictrees.jungle_seed":"Jungle Pod",
   "item.dynamictrees.dark_oak_seed":"Dark Oak Acorn",
   "item.dynamictrees.acacia_seed":"Acacia Seed",
-  "item.dynamictrees.apple_seed":"Apple Pip",
+  "item.dynamictrees.apple_oak_seed":"Apple Pip",
   "item.dynamictrees.crimson_seed":"Crimson Cap",
   "item.dynamictrees.warped_seed":"Warped Cap",
 
@@ -67,13 +67,6 @@
   "potion.transform.description.empty": "§7Base tree potion for brewing transformations",
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
-
-  "tooltip.season.fertile_seasons": "Fertile Seasons:",
-  "tooltip.season.year_round": "§dYear-Round",
-  "tooltip.season.spring": "§aSpring",
-  "tooltip.season.summer": "§eSummer",
-  "tooltip.season.autumn": "§6Autumn",
-  "tooltip.season.winter": "§bWinter",
 
   "block.dynamictrees.rooty_water":"Water Roots"
 }

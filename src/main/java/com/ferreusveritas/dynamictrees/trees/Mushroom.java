@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.HugeMushroomGenFeature;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
 
 public class Mushroom extends Species {
 	
@@ -14,7 +13,7 @@ public class Mushroom extends Species {
 	public Mushroom(boolean redcap) {
 		this.redcap = redcap;
 
-		this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, (redcap ? "red" : "brown") + "_mushroom"));
+		this.setRegistryName(DynamicTrees.resLoc((redcap ? "red" : "brown") + "_mushroom"));
 		this.setStandardSoils();
 
 		this.addGenFeature(GenFeatures.HUGE_MUSHROOM.with(HugeMushroomGenFeature.MUSHROOM_BLOCK,

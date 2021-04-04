@@ -21,9 +21,9 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
@@ -31,18 +31,18 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
-	public ThickBranchBlock(Material material, String name) {
-		this(Properties.create(material),name);
+	public ThickBranchBlock(Material material) {
+		this(Properties.create(material));
 	}
 
-	public ThickBranchBlock(Properties properties, String name) {
-		super(properties, name);
+	public ThickBranchBlock(Properties properties) {
+		super(properties);
 
 		cacheBranchThickStates();
 	}
 
 	public TrunkShellBlock getTrunkShell (){
-		return DTRegistries.trunkShellBlock;
+		return DTRegistries.TRUNK_SHELL;
 	}
 
 	//We can't override this function since the "otherBlock" will not have been created yet.
@@ -79,7 +79,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	}
 
 	@Override
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 
 		if (updateTrunkShells(world, pos, radius, flags)){
 			return super.setRadius(world, pos, radius, originDir, flags);

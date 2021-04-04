@@ -5,15 +5,15 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -49,13 +49,13 @@ public class BasicBranchBlock extends BranchBlock {
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-	public BasicBranchBlock(Material material, String name) {
-		this(AbstractBlock.Properties.create(material), name);
+	public BasicBranchBlock(Material material) {
+		this(AbstractBlock.Properties.create(material));
 	}
 	
 	// Useful for more unique subclasses
-	public BasicBranchBlock(AbstractBlock.Properties properties, String name) {
-		super(properties.harvestLevel(0), name);
+	public BasicBranchBlock(AbstractBlock.Properties properties) {
+		super(properties.harvestLevel(0));
 
 		cacheBranchStates();
 	}
@@ -119,7 +119,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
-			return false;//Bail out if not in rapid mode and the rot chance fails
+			return false;//Bail out if not in rapid mode and the postRot chance fails
 		}
 		
 		// Rooty dirt below the block counts as a branch in this instance
@@ -137,7 +137,7 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid);// Unreinforced branches are destroyed
 		
-		if(rapid && didRot) {// Speedily rot back dead branches if this block rotted
+		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
 				BlockState neighState = world.getBlockState(neighPos);
@@ -157,10 +157,9 @@ public class BasicBranchBlock extends BranchBlock {
 
 	@Override
 	public float getHardness (IBlockReader worldIn, BlockPos pos) {
-		int radius = getRadius(worldIn.getBlockState(pos));
-		float hardness = getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		hardness = (float) Math.min(hardness, DTConfigs.maxTreeHardness.get());//So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-		return hardness;
+		final int radius = this.getRadius(worldIn.getBlockState(pos));
+		final float hardness = this.getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+		return (float) Math.min(hardness, DTConfigs.maxTreeHardness.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 
 	@Override
@@ -189,16 +188,16 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, ILeavesProperties leavesProperties) {
-		TreeFamily thisTree = getFamily();
+	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
+		Family thisTree = getFamily();
 		
-		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+		if (leavesProperties.getFamily() == thisTree) {// The requesting leaves must match the tree for hydration to occur
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
 			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
 		} else {
-			return CellNull.NULLCELL;
+			return CellNull.NULL_CELL;
 		}
 	}
 	
@@ -208,7 +207,7 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	@Override
-	public int setRadius(IWorld world, BlockPos pos, int radius, Direction originDir, int flags) {
+	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
 		world.setBlockState(pos, getStateForRadius(radius), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
@@ -261,7 +260,7 @@ public class BasicBranchBlock extends BranchBlock {
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.NULL_TREE_PART) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.trunkShellBlock) {
+				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.TRUNK_SHELL) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}
@@ -289,7 +288,7 @@ public class BasicBranchBlock extends BranchBlock {
 			//Only continue to set radii if the tree growth isn't choked out
 			if(!signal.choked) {
 				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-				int maxRadius = inTrunk ? species.maxBranchRadius() : Math.min(species.maxBranchRadius(), RADMAX_NORMAL);
+				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), RADMAX_NORMAL);
 				
 				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)

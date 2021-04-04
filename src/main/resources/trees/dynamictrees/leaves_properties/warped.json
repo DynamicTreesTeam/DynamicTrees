@@ -1,0 +1,8 @@
+{
+  "type": "dynamictrees:wart",
+  "primitive_leaves": "minecraft:warped_wart_block",
+  "light_requirement": 0,
+  "fire_spread": 0,
+  "flammability": 0,
+  "material_color": "WARPED_WART"
+}

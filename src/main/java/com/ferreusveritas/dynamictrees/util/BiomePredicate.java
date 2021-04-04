@@ -11,5 +11,6 @@ import java.util.function.Predicate;
  *
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface BiomePredicate extends Predicate<Biome> {
 }

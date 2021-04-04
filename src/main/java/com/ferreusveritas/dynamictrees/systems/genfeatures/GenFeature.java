@@ -4,14 +4,15 @@ import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -25,7 +26,7 @@ import java.util.Set;
  *
  * @author Harley O'Connor
  */
-public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
+public abstract class GenFeature extends RegistryEntry<GenFeature> {
 
     // Common properties.
     public static final GenFeatureProperty<Float> VERTICAL_SPREAD = GenFeatureProperty.createFloatProperty("vertical_spread");
@@ -34,10 +35,14 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
     public static final GenFeatureProperty<Integer> MAX_HEIGHT = GenFeatureProperty.createIntegerProperty("max_height");
     public static final GenFeatureProperty<CanGrowPredicate> CAN_GROW_PREDICATE = GenFeatureProperty.createProperty("can_grow_predicate", CanGrowPredicate.class);
 
-    /** The registry. This is used for registering and querying {@link GenFeature} objects. */
-    public static IForgeRegistry<GenFeature> REGISTRY;
+    public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {};
 
-    private final ConfiguredGenFeature<?> defaultConfiguration;
+    /**
+     * Central registry for all {@link GenFeature} objects.
+     */
+    public static final Registry<GenFeature> REGISTRY = new Registry<>(GenFeature.class, NULL_GEN_FEATURE);
+
+    private final ConfiguredGenFeature<GenFeature> defaultConfiguration;
 
     /** A set of properties that can be used by this {@link GenFeature}. */
     private final Set<GenFeatureProperty<?>> registeredProperties = Sets.newHashSet();
@@ -55,7 +60,7 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
      *
      * @return The default {@link ConfiguredGenFeature}.
      */
-    protected ConfiguredGenFeature<?> createDefaultConfiguration () {
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration () {
         return new ConfiguredGenFeature<>(this);
     }
 
@@ -81,13 +86,23 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
     }
 
     /**
+     * Gets the {@link Set} of {@link GenFeatureProperty} objects registered to this
+     * {@link GenFeature}.
+     *
+     * @return The {@link Set} of {@link GenFeatureProperty} for this {@link GenFeature}.
+     */
+    public Set<GenFeatureProperty<?>> getRegisteredProperties() {
+        return registeredProperties;
+    }
+
+    /**
      * Gets the default configuration. For sub-classes, do not use this to add default
      * properties, use <tt>createDefaultConfiguration</tt>. This returns a copy of the
      * default configuration, so any default properties will not be set.
      *
      * @return A copy of the default configuration.
      */
-    public ConfiguredGenFeature<?> getDefaultConfiguration() {
+    public ConfiguredGenFeature<GenFeature> getDefaultConfiguration() {
         return ConfiguredGenFeature.copyOf(this.defaultConfiguration);
     }
 
@@ -100,8 +115,15 @@ public abstract class GenFeature extends ForgeRegistryEntry<GenFeature> {
      * @param <V> The type of the value being added.
      * @return The {@link ConfiguredGenFeature} object created.
      */
-    public <V> ConfiguredGenFeature<?> with (GenFeatureProperty<V> featureProperty, V value) {
+    public <V> ConfiguredGenFeature<GenFeature> with (GenFeatureProperty<V> featureProperty, V value) {
         return this.getDefaultConfiguration().with(featureProperty, value);
+    }
+
+    @Override
+    public String toString() {
+        return "GenFeature{" +
+                "registryName=" + this.getRegistryName() +
+                '}';
     }
 
 }

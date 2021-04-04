@@ -17,7 +17,7 @@
   "species.dynamictrees.mega_jungle": "Мега тропічне",
   "species.dynamictrees.dark_oak": "Темный дуб",
   "species.dynamictrees.acacia": "Акація",
-  "species.dynamictrees.apple": "Яблуня",
+  "species.dynamictrees.apple_oak": "Яблуня",
 
   "item.dynamictrees.oak_seed":"Жолудь дуба",
   "item.dynamictrees.spruce_seed":"Шишка смереки",
@@ -25,7 +25,7 @@
   "item.dynamictrees.jungle_seed":"Стручок джунглів",
   "item.dynamictrees.dark_oak_seed":"Жолудь темного дуба",
   "item.dynamictrees.acacia_seed":"Насіння акації",
-  "item.dynamictrees.apple_seed":"Яблучне зернятко",
+  "item.dynamictrees.apple_oak_seed":"Яблучне зернятко",
 
   "item.dynamictrees.dendro_potion.biochar": "Основне зілля",
   "item.dynamictrees.dendro_potion.depletion":"Зілля виснаження",

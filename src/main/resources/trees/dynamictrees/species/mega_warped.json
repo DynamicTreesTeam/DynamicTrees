@@ -1,0 +1,30 @@
+{
+    "type": "fungus",
+    "family": "warped",
+    "tapering": 0,
+    "signal_energy": 25.0,
+    "up_probability": 7,
+    "lowest_branch_height": 20,
+    "growth_rate": 0.9,
+    "soil_longevity": 16,
+    "max_branch_radius": 20,
+    "leaves_properties": "warped",
+    "environment_factors" : {
+        "cold": 0.25,
+        "wet": 0.75
+    },
+    "perfect_biomes": { "name": "minecraft:warped_forest" },
+    "acceptable_soils": ["nether_soil_like", "fungus_like"],
+    "acceptable_growth_blocks": ["warped_nylium"],
+    "features": [
+        {
+            "name": "mound",
+            "properties": {
+                "mound_cutoff_radius": 999
+            }
+        },
+        "consistent_trunk",
+        "clear_volume",
+        "shroomlight"
+    ]
+}

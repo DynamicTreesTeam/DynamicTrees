@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -27,9 +26,9 @@ import java.util.function.Predicate;
 
 public class BushGenFeature extends GenFeature implements IFullGenFeature, IPostGenFeature {
 
-	public static final GenFeatureProperty<Block> LOG_BLOCK = new GenFeatureBlockProperty("log");
-	public static final GenFeatureProperty<Block> LEAVES_BLOCK = new GenFeatureBlockProperty("leaves");
-	public static final GenFeatureProperty<Block> SECONDARY_LEAVES_BLOCK = new GenFeatureBlockProperty("secondary_leaves");
+	public static final GenFeatureProperty<Block> LOG_BLOCK = GenFeatureProperty.createBlockProperty("log");
+	public static final GenFeatureProperty<Block> LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("leaves");
+	public static final GenFeatureProperty<Block> SECONDARY_LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("secondary_leaves");
 
 	private Predicate<Biome> biomePredicate = i -> true;
 
@@ -38,7 +37,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(LOG_BLOCK, Blocks.OAK_LOG).with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
 				.with(SECONDARY_LEAVES_BLOCK, null);
 	}
@@ -81,7 +80,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
 				world.setBlockState(pos, configuredGenFeature.get(LOG_BLOCK).getDefaultState(), 3);
 
-				SimpleVoxmap leafMap = LeafClusters.bush;
+				SimpleVoxmap leafMap = LeafClusters.BUSH;
 				BlockPos.Mutable leafPos = new BlockPos.Mutable();
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );

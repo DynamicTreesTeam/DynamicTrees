@@ -48,11 +48,10 @@ public class FruitBlock extends Block implements IGrowable {
 	};
 	
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
-	
-	public static final String name = "apple_fruit";
 
 	private static final Map<Species, FruitBlock> SPECIES_FRUIT_MAP = new HashMap<>();
 
+	@Nullable
 	public static FruitBlock getFruitBlockForSpecies(Species species) {
 		return SPECIES_FRUIT_MAP.getOrDefault(species, null);
 	}
@@ -60,17 +59,12 @@ public class FruitBlock extends Block implements IGrowable {
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
 	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
 	protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
-	protected Species species = Species.NULL_SPECIES;
+	private Species species;
 
 	public FruitBlock() {
-		this(name);
-	}
-
-	public FruitBlock(String name) {
 		super(Properties.create(Material.PLANTS)
 				.tickRandomly()
 				.hardnessAndResistance(0.3f));
-		this.setRegistryName(name);
 	}
 
 	public FruitBlock setBonemealable(boolean bonemealable) {
@@ -88,7 +82,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public Species getSpecies() {
-		return species;
+		return this.species == null ? Species.NULL_SPECIES : this.species;
 	}
 
 	@Override
@@ -125,7 +119,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockState(pos, DTRegistries.blockStates.AIR); break;
+					case ROT: world.setBlockState(pos, DTRegistries.BLOCK_STATES.AIR); break;
 				}
 			}
 		}
@@ -149,7 +143,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockState(pos, DTRegistries.blockStates.AIR);
+		world.setBlockState(pos, DTRegistries.BLOCK_STATES.AIR);
 	}
 
 	@Override

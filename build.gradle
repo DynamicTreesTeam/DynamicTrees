@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
@@ -25,6 +25,7 @@ repositories {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 ext.configFile = file "gradle.properties"
@@ -38,10 +39,10 @@ version = "${config.mc_version}-${config.mod_version}"
 group = config.package_group
 archivesBaseName = config.mod_name
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    mappings channel: 'snapshot', version: "${config.mappings_version}"
+    mappings channel: 'snapshot', version: "${config.mappings_version}-${config.mc_version}"
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -49,13 +50,10 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            // For Serene Seasons as it uses Mixins
+            // For Serene Seasons as it uses Mixins.
             properties 'mixin.env.disableRefMap' : 'true'
 
             mods {
@@ -68,10 +66,7 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -84,10 +79,7 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             args '--mod', 'dynamictrees', '--all', '--output', file('src/generated/resources/')
@@ -127,7 +119,7 @@ jar {
         attributes([
                 "Specification-Title": project.name,
                 "Specification-Vendor": "ferreusveritas",
-                "Specification-Version": "${version}",
+                "Specification-Version": "1",
                 "Implementation-Title": project.name,
                 "Implementation-Version": "${version}",
                 "Implementation-Vendor" :"ferreusveritas",
@@ -137,20 +129,34 @@ jar {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allJava
 }
 
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
+task writeNewPom {
+    doLast {
+        pom {
+            project {
+                groupId config.package_group
+                artifactId "${archivesBaseName}-${config.mc_version}"
+                version config.mod_version
+            }
+        }.whenConfigured {
+            pom -> pom.dependencies.clear()
+        }.writeTo("build/libs/${archivesBaseName}-${config.mc_version}-${config.mod_version}.pom")
+    }
+}
+
+jar.finalizedBy('reobfJar', 'writeNewPom')
+
+artifacts {
+    archives sourcesJar
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact reobfArtifact
+            artifact jar
         }
     }
     repositories {

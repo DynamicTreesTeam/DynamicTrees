@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -20,13 +20,13 @@ import java.util.Random;
 public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     public DynamicTreeFeature () {
-        super(NoFeatureConfig.field_236558_a_);
+        super(NoFeatureConfig.CODEC);
         this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tree"));
     }
 
     @Override
     public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-		final BiomeDatabaseManager biomeDatabaseManager = DTDataPackRegistries.BIOME_DATABASE_MANAGER;
+		final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.getBiomeDatabaseManager();
         final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		final ServerWorld serverWorld = world.getWorld();
 		final ResourceLocation dimensionRegistryName = serverWorld.getDimensionKey().getLocation();

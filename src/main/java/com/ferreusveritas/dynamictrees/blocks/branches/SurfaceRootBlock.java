@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import net.minecraft.block.Block;
@@ -42,20 +42,19 @@ public class SurfaceRootBlock extends Block {
 
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
 
-	private final TreeFamily family;
+	private final Family family;
 
-	public SurfaceRootBlock(String name, TreeFamily family) {
-		this(Material.WOOD, name, family);
+	public SurfaceRootBlock(Family family) {
+		this(Material.WOOD, family);
 	}
 
-	public SurfaceRootBlock(Material material, String name, TreeFamily family) {
+	public SurfaceRootBlock(Material material, Family family) {
 		super(Block.Properties.create(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
 				.hardnessAndResistance(2.5f, 1.0F)
 				.sound(SoundType.WOOD));
 
-		this.setRegistryName(name);
 		this.family = family;
 	}
 
@@ -196,7 +195,7 @@ public class SurfaceRootBlock extends Block {
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		BlockState upstate = world.getBlockState(pos.up());
 
-		if (upstate.getBlock() == DTRegistries.trunkShellBlock) {
+		if (upstate.getBlock() == DTRegistries.TRUNK_SHELL) {
 			world.setBlockState(pos, upstate);
 		}
 

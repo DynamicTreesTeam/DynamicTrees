@@ -6,11 +6,10 @@ import net.minecraft.util.Direction;
  * Cell that always returns 0
  * 
  * @author ferreusveritas
- *
  */
 public class CellNull implements ICell {
 
-	public static final CellNull NULLCELL = new CellNull();
+	public static final CellNull NULL_CELL = new CellNull();
 	
 	@Override
 	public int getValue() {

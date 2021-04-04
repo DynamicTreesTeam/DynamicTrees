@@ -25,7 +25,7 @@ import net.minecraft.world.World;
  */
 public class StorageDropCreator implements IDropCreatorStorage {
 	
-	private HashMap<ResourceLocation, IDropCreator> dropCreators = new HashMap<ResourceLocation, IDropCreator>();
+	private final HashMap<ResourceLocation, IDropCreator> dropCreators = new HashMap<>();
 	
 	@Override
 	public ResourceLocation getName() {
@@ -34,7 +34,7 @@ public class StorageDropCreator implements IDropCreatorStorage {
 	
 	@Override
 	public boolean addDropCreator(IDropCreator dropCreator) {
-		dropCreators.put(dropCreator.getName(), dropCreator);
+		this.dropCreators.put(dropCreator.getName(), dropCreator);
 		return true;
 	}
 	
@@ -50,12 +50,12 @@ public class StorageDropCreator implements IDropCreatorStorage {
 	
 	@Override
 	public Map<ResourceLocation, IDropCreator> getDropCreators() {
-		return new HashMap<ResourceLocation, IDropCreator>(dropCreators);
+		return new HashMap<>(dropCreators);
 	}
 	
 	private List<ItemStack> makeDropListIfNull(List<ItemStack> dropList) {
 		if(dropList == null) {
-			dropList = new ArrayList<ItemStack>();
+			dropList = new ArrayList<>();
 		}
 		return dropList;
 	}
@@ -102,5 +102,12 @@ public class StorageDropCreator implements IDropCreatorStorage {
 		
 		return dropList;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "StorageDropCreator{" +
+				"dropCreators=" + dropCreators +
+				'}';
+	}
+
 }

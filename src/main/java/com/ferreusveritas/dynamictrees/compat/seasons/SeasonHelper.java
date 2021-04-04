@@ -83,7 +83,7 @@ public class SeasonHelper {
 	 * @param SeasonB chronological season boundary ending
 	 * @return
 	 */
-	static public boolean isSeasonBetween(float testValue, float SeasonA, float SeasonB) {
+	static public boolean isSeasonBetween(Float testValue, float SeasonA, float SeasonB) {
 		
 		testValue %= 4.0f;
 		SeasonA %= 4.0f;

@@ -5,9 +5,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -26,7 +24,7 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MAX_HEIGHT, 32);
 	}
 
@@ -66,7 +64,7 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 			int currentTreeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
 			int tallestTreeHeight = species.getLowestBranchHeight();
 			if (currentTreeHeight <= tallestTreeHeight){
-				int radiusToSet = (int)(species.maxBranchRadius() * 0.8 * (currentTreeHeight / (float)tallestTreeHeight));
+				int radiusToSet = (int)(species.getMaxBranchRadius() * 0.8 * (currentTreeHeight / (float)tallestTreeHeight));
 				if (radiusToSet > currentRadius){
 					for (int i = 1; i < currentTreeHeight; i++){
 						BranchBlock branch =TreeHelper.getBranch(world.getBlockState(rootPos.up(i)));

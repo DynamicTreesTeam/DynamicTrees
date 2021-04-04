@@ -9,7 +9,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 
 import java.util.ArrayList;
@@ -21,25 +20,30 @@ import java.util.ArrayList;
  */
 public class GroundFinder implements IGroundFinder {
 
-	protected boolean inNetherRange(final BlockPos pos) {
-		return pos.getY() >= 0 && pos.getY() <= 128;
-	}
-
 	protected boolean isReplaceable(final IWorld world, final BlockPos pos){
 		return world.isAirBlock(pos) && !world.getBlockState(pos).getMaterial().isLiquid();
 	}
 
+	protected boolean inRange(final BlockPos pos, final int minY, final int maxY) {
+		return pos.getY() >= minY && pos.getY() <= maxY;
+	}
+
+	protected int getTopY(final IWorld world, final BlockPos pos) {
+		return world.getChunk(pos).getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
+	}
+
 	protected ArrayList<Integer> findSubterraneanLayerHeights(final IWorld world, final BlockPos start) {
+		final int maxY = this.getTopY(world, start);
 
 		final BlockPos.Mutable pos = new BlockPos.Mutable(start.getX(), 0, start.getZ());
 		final ArrayList<Integer> layers = new ArrayList<>();
 
-		while(inNetherRange(pos)) {
-			while(!isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit air
-			while(isReplaceable(world, pos) && inNetherRange(pos))  { pos.move(Direction.DOWN); } // Move down 1 block at a time until we hit not-air
-			layers.add(pos.getY()); //Record this position
-			pos.move(Direction.UP, 16); //Move up 16 blocks
-			while(isReplaceable(world, pos) && inNetherRange(pos)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit ground
+		while (this.inRange(pos, 0, maxY)) {
+			while (!isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit air
+			while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY))  { pos.move(Direction.DOWN); } // Move down 1 block at a time until we hit not-air
+			layers.add(pos.getY()); // Record this position
+			pos.move(Direction.UP, 16); // Move up 16 blocks
+			while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) { pos.move(Direction.UP, 4); } // Zip up 4 blocks at a time until we hit ground
 		}
 
 		// Discard the last result as it's just the top of the biome(bedrock for nether)
@@ -60,16 +64,14 @@ public class GroundFinder implements IGroundFinder {
 		return new BlockPos(start.getX(), y, start.getZ());
 	}
 
-	protected boolean inOverworldRange(final BlockPos pos) {
-		return pos.getY() >= 0 && pos.getY() <= 255;
-	}
+	protected BlockPos findOverworldGround(final IWorld world, final BlockPos pos) {
+		final int initialY = world.getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ()) + 1;
 
-	protected BlockPos findOverworldGround(final IWorld world, final BlockPos start) {
-		final IChunk chunk = world.getChunk(start); // We'll use a chunk for the search so we don't have to keep looking up the chunk for every block
-		final BlockPos.Mutable mPos = new BlockPos.Mutable(start.getX(), world.getHeight(Heightmap.Type.WORLD_SURFACE_WG, start.getX(), start.getZ()), start.getZ()).move(Direction.UP, 2); // Mutable allows us to change the test position easily
+		// Use world surface worldgen heightmap to find the ground position.
+		final BlockPos.Mutable groundPos = new BlockPos.Mutable(pos.getX(), initialY, pos.getZ());
 
-		while(inOverworldRange(mPos)) {
-			final BlockState state = chunk.getBlockState(mPos);
+		while (this.inRange(groundPos, 0, initialY)) {
+			final BlockState state = world.getBlockState(groundPos);
 			final Block testBlock = state.getBlock();
 
 			if (testBlock != Blocks.AIR) {
@@ -77,20 +79,20 @@ public class GroundFinder implements IGroundFinder {
 
 				if (material == Material.EARTH || material == Material.WATER || // These will account for > 90% of blocks in the world so we can solve this early
 						(state.getMaterial().blocksMovement() &&
-								material != Material.LEAVES)) {
-					return mPos.toImmutable();
+								material != Material.LEAVES /* && block#isFoliage? */)) {
+					return groundPos.toImmutable();
 				}
 			}
 
-			mPos.move(Direction.DOWN);
+			groundPos.move(Direction.DOWN);
 		}
 
 		return BlockPos.ZERO;
 	}
 
 	@Override
-	public BlockPos findGround(final BiomeDatabase.BiomeEntry biomeEntry, final ISeedReader world, final BlockPos start) {
-		return biomeEntry.isSubterraneanBiome() ? findSubterraneanGround(world, start) : findOverworldGround(world, start);
+	public BlockPos findGround(final BiomeDatabase.Entry entry, final ISeedReader world, final BlockPos start) {
+		return entry.isSubterraneanBiome() ? findSubterraneanGround(world, start) : findOverworldGround(world, start);
 	}
 
 }

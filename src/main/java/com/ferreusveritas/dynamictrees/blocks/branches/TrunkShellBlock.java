@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -36,15 +37,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class TrunkShellBlock extends BlockWithDynamicHardness {
 	
 	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
-	
-	public static final String defaultName = "trunk_shell";
-	
+
 	public static class ShellMuse {
 		public final BlockState state;
 		public final BlockPos pos;
@@ -64,16 +65,10 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		}
 	}
 
-	public TrunkShellBlock(String name) {
+	public TrunkShellBlock() {
 		super(Block.Properties.create(Material.WOOD));
-		//setCreativeTab;
-		setRegistryName(name);
 	}
 
-	public TrunkShellBlock() {
-		this(defaultName);
-	}
-	
 	///////////////////////////////////////////
 	// BLOCKSTATE
 	///////////////////////////////////////////
@@ -149,7 +144,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos, @Nonnull BlockPos originalPos) {
 		Surround museDir = getMuseDir(state, pos);
 		BlockPos musePos = pos.add(museDir.getOffset());
-		BlockState museState = access.getBlockState(musePos);
+		BlockState museState = CoordUtils.getStateSafe(access, musePos);
+
+		if (museState == null)
+			return null;
+
 		Block block = museState.getBlock();
 		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
@@ -269,11 +268,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.INVISIBLE;
-	}
-
-	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return null;
 	}
 
 	@Override

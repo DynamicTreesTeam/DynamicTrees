@@ -3,16 +3,18 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
+import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -23,34 +25,38 @@ import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.cancellers.TreeFeatureCanceller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -59,27 +65,36 @@ public class DTRegistries {
 	// BLOCKS
 	///////////////////////////////////////////
 
-	public static FruitBlock appleBlock;
-	public static CocoaFruitBlock cocoaFruitBlock;
-	public static BonsaiPotBlock bonsaiPotBlock;
-	public static TrunkShellBlock trunkShellBlock;
-	
-	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
-	
-	public static final CommonBlockStates blockStates = new CommonBlockStates();
-	
-	public static void setupBlocks() {
-		bonsaiPotBlock = new BonsaiPotBlock();//Bonsai Pot
-		cocoaFruitBlock = new CocoaFruitBlock();//Modified Cocoa pods
-		appleBlock = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));//Apple
-		trunkShellBlock = new TrunkShellBlock();
+	/** An apple fruit block. */
+	public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));
 
+	/** A modified cocoa fruit block (for dynamic trees). */
+	public static final CocoaFruitBlock COCOA_FRUIT = new CocoaFruitBlock();
+
+	/** A bonsai pot block, which is a normal pot but for dynamic saplings. */
+	public static final BonsaiPotBlock BONSAI_POT = new BonsaiPotBlock();
+
+	/** A trunk shell block, which is the outer block for thick branches. */
+	public static final TrunkShellBlock TRUNK_SHELL = new TrunkShellBlock();
+
+	public static final CommonBlockStates BLOCK_STATES = new CommonBlockStates();
+	
+	public static void setup() {
+		setupBlocks();
 		setUpSoils();
 		setupConnectables();
-		setupLeavesProperties();
+		setupItems();
+		setupEntities();
 	}
 
-	private static void setUpSoils(){
+	public static void setupBlocks() {
+		RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
+		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa_fruit"), COCOA_FRUIT);
+		RegistryHandler.addBlock(BonsaiPotBlock.REG_NAME, BONSAI_POT);
+		RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
+	}
+
+	private static void setUpSoils() {
 		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRT_LIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRT_LIKE);
 		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRT_LIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM));
@@ -104,11 +119,12 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
 	}
 
-	public static void setupConnectables(){
+	public static void setupConnectables() {
 		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,side)->{
 			if (side == Direction.DOWN) return 1;
 			return 0;
 		});
+
 		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,side)->{
 			if (side == Direction.DOWN){
 				BlockState branchState = world.getBlockState(pos.offset(Direction.UP));
@@ -123,84 +139,68 @@ public class DTRegistries {
 		});
 	}
 
-	private static void setupLeavesProperties() {
-		leaves = LeavesPaging.build(new ResourceLocation(DynamicTrees.MOD_ID, "leaves/common.json"));
-	}
-	
 	@SubscribeEvent
-	public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-		IForgeRegistry<Block> registry = blockRegistryEvent.getRegistry();
-		
-		ArrayList<Block> treeBlocks = new ArrayList<Block>();
-		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
+	public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
+		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
-		registry.registerAll(bonsaiPotBlock, cocoaFruitBlock, appleBlock, trunkShellBlock);
-		
-		registry.registerAll(treeBlocks.toArray(new Block[0]));
+		if (appleOak.isValid())
+			APPLE_FRUIT.setSpecies(appleOak);
 
 		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MOD_ID)){
-			registry.register(rooty);
+			event.getRegistry().register(rooty);
 		}
 	}
 	
 	///////////////////////////////////////////
 	// ITEMS
 	///////////////////////////////////////////
-	
-	public static DendroPotion dendroPotion;
-	public static DirtBucket dirtBucket;
-	public static Staff treeStaff;
-	
-	public static void setupItems() {
-		dendroPotion = new DendroPotion();//Potions
-		dirtBucket = new DirtBucket();//Dirt Bucket
-		treeStaff = new Staff();//Creative Mode Staff
-	}
-	
-	@SubscribeEvent
-	public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
-		IForgeRegistry<Item> registry = itemRegistryEvent.getRegistry();
-		
-		ArrayList<Item> treeItems = new ArrayList<>();
-		DTTrees.baseFamilies.forEach(tree -> tree.getRegisterableItems(treeItems));
 
-		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
-		registry.registerAll(treeItems.toArray(new Item[0]));
+	/** A custom potion called the Dendro Potion, houses all tree potions. */
+	public static final DendroPotion DENDRO_POTION = new DendroPotion();
+
+	/** A bucket of dirt item, for crafting saplings into seeds and vice versa. */
+	public static final DirtBucket DIRT_BUCKET = new DirtBucket();
+
+	/** A staff, a creative tool for copying and pasting tree shapes. */
+	public static final Staff STAFF = new Staff();
+
+	public static void setupItems() {
+		RegistryHandler.addItem(DynamicTrees.resLoc("dendro_potion"), DENDRO_POTION);
+		RegistryHandler.addItem(DynamicTrees.resLoc("dirt_bucket"), DIRT_BUCKET);
+		RegistryHandler.addItem(DynamicTrees.resLoc("staff"), STAFF);
 	}
-	
+
 	///////////////////////////////////////////
 	// ENTITIES
 	///////////////////////////////////////////
 	
-	public final static String FALLING_TREE = "falling_tree";
-	public final static String LINGERING_EFFECTOR = "lingering_effector";
+	public final static String FALLING_TREE_ID = "falling_tree";
+	public final static String LINGERING_EFFECTOR_ID = "lingering_effector";
 	
 	public static EntityType<FallingTreeEntity> fallingTree;
 	public static EntityType<LingeringEffectorEntity> lingeringEffector;
 
-	public static void setupEntities() {
+	private static void setupEntities() {
 		fallingTree = EntityType.Builder.create(FallingTreeEntity::new, EntityClassification.MISC)
 				.setShouldReceiveVelocityUpdates(true)
 				.setTrackingRange(512)
 				.setUpdateInterval(Integer.MAX_VALUE)
 				.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(fallingTree, world))
-				.build(FALLING_TREE);
+				.build(FALLING_TREE_ID);
 
 		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)
-				// Giving it growth substance works for now as it's the only lingering substance, however in the future this should be changed in the future.
+				// Giving it growth substance works for now as it's the only lingering substance, however this should be changed in the future.
 				.setCustomClientFactory((spawnEntity, world) ->
 						new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), new GrowthSubstance()))
-				.build(LINGERING_EFFECTOR);
+				.build(LINGERING_EFFECTOR_ID);
 	}
 	
 	@SubscribeEvent
 	public static void onEntitiesRegistry(final RegistryEvent.Register<EntityType<?>> entityRegistryEvent) {
-		setupEntities();
-		
 		IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
 		
-		registry.registerAll(fallingTree.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, FALLING_TREE)),
-				lingeringEffector.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, LINGERING_EFFECTOR)));
+		registry.registerAll(fallingTree.setRegistryName(DynamicTrees.resLoc(FALLING_TREE_ID)),
+				lingeringEffector.setRegistryName(DynamicTrees.resLoc(LINGERING_EFFECTOR_ID)));
 	}
 	
 	///////////////////////////////////////////
@@ -213,15 +213,15 @@ public class DTRegistries {
 	public static void setupTileEntities() {
 		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
 		speciesTE = TileEntityType.Builder.create(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
-		bonsaiTE = TileEntityType.Builder.create(BonsaiTileEntity::new, bonsaiPotBlock).build(null);
+		bonsaiTE = TileEntityType.Builder.create(BonsaiTileEntity::new, BONSAI_POT).build(null);
 	}
 	
 	@SubscribeEvent
 	public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
 		setupTileEntities();
 		
-		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(bonsaiPotBlock.getRegistryName()));
-		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tile_entity_species")));
+		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(BonsaiPotBlock.REG_NAME));
+		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
 	}
 	
 	///////////////////////////////////////////
@@ -229,10 +229,10 @@ public class DTRegistries {
 	///////////////////////////////////////////
 
 	/** This is the creative tab that holds all DT items */
-	public static final ItemGroup dynamicTreesTab = new ItemGroup(DynamicTrees.MOD_ID) {
+	public static final ItemGroup ITEM_GROUP = new ItemGroup(DynamicTrees.MOD_ID) {
 		@Override
 		public ItemStack createIcon() {
-			return TreeRegistry.findSpeciesSloppy(DynamicTrees.VanillaWoodTypes.oak.toString()).getSeedStack(1);
+			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
 		}
 	};
 	
@@ -255,8 +255,32 @@ public class DTRegistries {
 	}
 
 	@SubscribeEvent
-	public static void onGrowthLogicKitRegistry (final RegistryEvent.Register<GrowthLogicKit> event) {
+	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<CellKit> event) {
+		CellKits.register(event.getRegistry());
+	}
+
+	@SubscribeEvent
+	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GrowthLogicKit> event) {
 		GrowthLogicKits.register(event.getRegistry());
+	}
+
+	@SubscribeEvent
+	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
+		GenFeatures.register(event.getRegistry());
+	}
+
+	/** The vanilla tree canceller, which cancels any features whose config extends {@link BaseTreeFeatureConfig}. */
+	public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), BaseTreeFeatureConfig.class);
+
+	/** The vanilla fungus canceller, which cancels any features whose config extends {@link HugeFungusConfig}. */
+	public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.resLoc("fungus"), HugeFungusConfig.class);
+
+	/** The vanilla mushroom canceller, which cancels any features whose config extends {@link BigMushroomFeatureConfig}. */
+	public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.resLoc("mushroom"), BigMushroomFeatureConfig.class);
+
+	@SubscribeEvent
+	public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
+		event.getRegistry().registerAll(TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
 	}
 
 }

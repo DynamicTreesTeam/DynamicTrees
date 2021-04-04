@@ -33,7 +33,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements I
 	}
 
 	@Override
-	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MAX_MUSHROOMS, 2).with(MAX_ATTEMPTS, 4);
 	}
 

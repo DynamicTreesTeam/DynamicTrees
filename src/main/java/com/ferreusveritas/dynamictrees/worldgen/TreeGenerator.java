@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUn
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.BiomeEntry;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Entry;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
@@ -103,9 +103,12 @@ public class TreeGenerator {
 		BlockPos pos = new BlockPos(circle.x, 0, circle.z);
 
 		Biome biome = world.getBiome(pos);
-		BiomeEntry biomeEntry = biomeDataBase.getEntry(biome);
+		Entry entry = biomeDataBase.getEntry(biome);
 
-		pos = groundFinder.findGround(biomeEntry, world, pos);
+		if (entry.isBlacklisted())
+			return EnumGeneratorResult.UNHANDLED_BIOME;
+
+		pos = groundFinder.findGround(entry, world, pos);
 
 		if(pos == BlockPos.ZERO) {
 			return EnumGeneratorResult.NO_GROUND;
@@ -117,14 +120,14 @@ public class TreeGenerator {
 
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 
-		BiomePropertySelectors.ISpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+		BiomePropertySelectors.ISpeciesSelector speciesSelector = entry.getSpeciesSelector();
 		SpeciesSelection speciesSelection = speciesSelector.getSpecies(pos, dirtState, random);
-		if(speciesSelection.isHandled()) {
+		if (speciesSelection.isHandled()) {
 			Species species = speciesSelection.getSpecies();
-			if(species.isValid()) {
-				if(species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
-					if(biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if(!species.generate(world.getWorld(), world, pos, biome, random, circle.radius, safeBounds)) {
+			if (species.isValid()) {
+				if (species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
+					if (entry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
+						if (!species.generate(world.getWorld(), world, pos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.FAIL_GENERATION;
 						}
 					} else {
@@ -140,12 +143,12 @@ public class TreeGenerator {
 			result = EnumGeneratorResult.UNHANDLED_BIOME;
 		}
 
-		//Display wool circles for testing the circle growing algorithm
-		if(DTConfigs.worldGenDebug.get()) {
+		// Display concrete circles for testing the circle growing algorithm.
+		if (DTConfigs.worldGenDebug.get()) {
 			makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
 		}
 
-		circle.add(-8, -8);//Move the circle back to normal coords
+		circle.add(-8, -8); // Move the circle back to normal coords.
 
 		return result;
 	}

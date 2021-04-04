@@ -15,12 +15,12 @@ import net.minecraft.world.biome.Biome;
  */
 public interface IBiomeSuitabilityDecider {
 
-	public Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
+	Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
 
 	/** Decision interface for handling the event */
-	public class Decision {
-		private boolean handled;//The handling indicator
-		private float suitability;//The payload
+	class Decision {
+		private final boolean handled; // The handling indicator
+		private float suitability; // The payload
 
 		/** Create via this constructor to leave the event unhandled so another decider can potentially handle it. */
 		public Decision() {

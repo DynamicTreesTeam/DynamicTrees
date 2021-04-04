@@ -40,26 +40,26 @@ public class TooltipHandler {
 	}
 	
 	public static void applySeasonalTooltips(List<ITextComponent> tipList, int flags) {
-		if(flags != 0) {
-			tipList.add(new TranslationTextComponent("tooltip.season.fertile_seasons"));
+		if (flags != 0) {
+			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons").appendString(":"));
 			
-			if((flags & 15) == 15) {
-				tipList.add(new TranslationTextComponent("tooltip.season.year_round"));
+			if ((flags & 15) == 15) {
+				tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.year_round").mergeStyle(TextFormatting.LIGHT_PURPLE)));
 			} else {
 				if ((flags & 1) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.spring"));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.spring").mergeStyle(TextFormatting.GREEN)));
 				}
 				if ((flags & 2) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.summer"));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.summer").mergeStyle(TextFormatting.YELLOW)));
 				}
 				if ((flags & 4) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.autumn"));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.autumn").mergeStyle(TextFormatting.GOLD)));
 				}
 				if ((flags & 8) != 0) {
-					tipList.add(new TranslationTextComponent("tooltip.season.winter"));
+					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.winter").mergeStyle(TextFormatting.AQUA)));
 				}
 			}
 		}
 	}
-	
+
 }

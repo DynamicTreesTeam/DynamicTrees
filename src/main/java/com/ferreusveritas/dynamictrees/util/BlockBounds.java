@@ -4,32 +4,32 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
+import java.util.Iterator;
 import java.util.List;
 
-public class BlockBounds {
+public class BlockBounds implements Iterable<BlockPos> {
 
 	public static final BlockBounds INVALID = new BlockBounds() {
 		@Override public boolean inBounds(BlockPos pos) { return false; }
 	};
 	
-	private int minX, minY, minZ;
-	private int maxX, maxY, maxZ;
+	private int minX, minY, minZ, maxX, maxY, maxZ;
 	
 	private BlockBounds() { }
 	
 	public BlockBounds(BlockPos pos) {
-		minX = maxX = pos.getX();
-		minY = maxY = pos.getY();
-		minZ = maxZ = pos.getZ();
+		this.minX = this.maxX = pos.getX();
+		this.minY = this.maxY = pos.getY();
+		this.minZ = this.maxZ = pos.getZ();
 	}
 	
 	public BlockBounds(BlockPos min, BlockPos max) {
-		minX = min.getX();
-		minY = min.getY();
-		minZ = min.getZ();
-		maxX = max.getX();
-		maxY = max.getY();
-		maxZ = max.getZ();
+		this.minX = min.getX();
+		this.minY = min.getY();
+		this.minZ = min.getZ();
+		this.maxX = max.getX();
+		this.maxY = max.getY();
+		this.maxZ = max.getZ();
 	}
 	
 	public BlockBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
@@ -42,22 +42,22 @@ public class BlockBounds {
 	}
 	
 	public BlockBounds(ChunkPos cPos) {
-		minX = cPos.getXStart();
-		minY = 0;
-		minZ = cPos.getZStart();
+		this.minX = cPos.getXStart();
+		this.minY = 0;
+		this.minZ = cPos.getZStart();
 
-		maxX = cPos.getXEnd();
-		maxY = 255;
-		maxZ = cPos.getZEnd();
+		this.maxX = cPos.getXEnd();
+		this.maxY = 255;
+		this.maxZ = cPos.getZEnd();
 	}
 	
 	public BlockBounds(BlockBounds other) {
-		minX = other.minX;
-		minY = other.minY;
-		minZ = other.minZ;
-		maxX = other.maxX;
-		maxY = other.maxY;
-		maxZ = other.maxZ;
+		this.minX = other.minX;
+		this.minY = other.minY;
+		this.minZ = other.minZ;
+		this.maxX = other.maxX;
+		this.maxY = other.maxY;
+		this.maxZ = other.maxZ;
 	}
 	
 	public BlockBounds(List<BlockPos> blockPosList) {
@@ -66,75 +66,68 @@ public class BlockBounds {
 	}
 	
 	public BlockBounds union(BlockPos pos) {
-		
-		if(pos.getX() < minX) {
-			minX = pos.getX();
-		}
-		else
-		if(pos.getX() > maxX) {
-			maxX = pos.getX();
+		if (pos.getX() < this.minX) {
+			this.minX = pos.getX();
+		} else if (pos.getX() > this.maxX) {
+			this.maxX = pos.getX();
 		}
 		
-		if(pos.getY() < minY) {
-			minY = pos.getY();
-		}
-		else
-		if(pos.getY() > maxY) {
-			maxY = pos.getY();
+		if (pos.getY() < this.minY) {
+			this.minY = pos.getY();
+		} else if (pos.getY() > this.maxY) {
+			this.maxY = pos.getY();
 		}
 
-		if(pos.getZ() < minZ) {
-			minZ = pos.getZ();
-		}
-		else
-		if(pos.getZ() > maxZ) {
-			maxZ = pos.getZ();
+		if (pos.getZ() < this.minZ) {
+			this.minZ = pos.getZ();
+		} else if (pos.getZ() > this.maxZ) {
+			this.maxZ = pos.getZ();
 		}
 		
 		return this;
 	}
 	
 	public BlockBounds union(List<BlockPos> blockPosList) {
-		blockPosList.forEach(b -> union(b));
+		blockPosList.forEach(this::union);
 		return this;
 	}
 	
 	public boolean inBounds(BlockPos pos) {
-		return !(	pos.getX() < minX ||
-					pos.getX() > maxX ||
-					pos.getY() < minY ||
-					pos.getY() > maxY ||
-					pos.getZ() < minZ ||
-					pos.getZ() > maxZ );
+		return !(	pos.getX() < this.minX ||
+					pos.getX() > this.maxX ||
+					pos.getY() < this.minY ||
+					pos.getY() > this.maxY ||
+					pos.getZ() < this.minZ ||
+					pos.getZ() > this.maxZ);
 	}
 	
 	public BlockPos getMin() {
-		return new BlockPos(minX, minY, minZ);
+		return new BlockPos(this.minX, this.minY, this.minZ);
 	}
 	
 	public BlockPos getMax() {
-		return new BlockPos(maxX, maxY, maxZ);
+		return new BlockPos(this.maxX, this.maxY, this.maxZ);
 	}
 
 	public BlockBounds shrink(Direction dir, int amount) {
 		switch(dir) {
-			case DOWN: minY += amount; break;
-			case UP: maxY -= amount; break;
-			case NORTH: minZ += amount; break;
-			case SOUTH: maxZ -= amount; break;
-			case WEST: minX += amount; break;
-			case EAST: maxX -= amount; break;
+			case DOWN: this.minY += amount; break;
+			case UP: this.maxY -= amount; break;
+			case NORTH: this.minZ += amount; break;
+			case SOUTH: this.maxZ -= amount; break;
+			case WEST: this.minX += amount; break;
+			case EAST: this.maxX -= amount; break;
 		}
 		return this;
 	}
 	
 	public BlockBounds move(int x, int y, int z) {
-		minX += x;
-		minY += y;
-		minZ += z;
-		maxX += x;
-		maxY += y;
-		maxZ += z;
+		this.minX += x;
+		this.minY += y;
+		this.minZ += z;
+		this.maxX += x;
+		this.maxY += y;
+		this.maxZ += z;
 		return this;
 	}
 	
@@ -143,37 +136,38 @@ public class BlockBounds {
 	}
 	
 	public BlockBounds expand(int amount) {
-		minX -= amount;
-		minY -= amount;
-		minZ -= amount;
-		maxX += amount;
-		maxY += amount;
-		maxZ += amount;
+		this.minX -= amount;
+		this.minY -= amount;
+		this.minZ -= amount;
+		this.maxX += amount;
+		this.maxY += amount;
+		this.maxZ += amount;
 		return this;
 	}
 	
 	public BlockBounds shrink(int amount) {
 		return expand(-amount);
 	}
-	
-	public Iterable<BlockPos> iterate() {
-		return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
+
+	@Override
+	public Iterator<BlockPos> iterator() {
+		return BlockPos.getAllInBoxMutable(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ).iterator();
 	}
-	
+
 	public int getXSize() {
-		return maxX - minX + 1;
+		return this.maxX - this.minX + 1;
 	}
 	
 	public int getYSize() {
-		return maxY - minY + 1;
+		return this.maxY - this.minY + 1;
 	}
 	
 	public int getZSize() {
-		return maxZ - minZ + 1;
+		return this.maxZ - this.minZ + 1;
 	}
 	
 	@Override
 	public String toString() {
-		return this != INVALID ? "Bounds{x1=" + minX + ", y1=" + minY + ", z1=" + minZ + " -> x2=" + maxX + ", y2=" + maxY + ", z2=" + maxZ + "}" : "Invalid";
+		return this != INVALID ? "Bounds{x1=" + this.minX + ", y1=" + this.minY + ", z1=" + this.minZ + " -> x2=" + this.maxX + ", y2=" + this.maxY + ", z2=" + this.maxZ + "}" : "Invalid";
 	}
 }

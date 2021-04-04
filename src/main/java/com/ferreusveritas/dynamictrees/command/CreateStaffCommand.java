@@ -25,7 +25,7 @@ public final class CreateStaffCommand extends SubCommand {
         this.defaultToExecute = false;
 
         // Add extra arguments.
-        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getKeys(), builder))
+        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getRegistryNames(), builder))
                 .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
                         .then(Commands.argument(CommandConstants.COLOR_ARGUMENT, HexColorArgument.hex())
                                 .then(Commands.argument(CommandConstants.READ_ONLY_ARGUMENT, BoolArgumentType.bool())
@@ -53,8 +53,8 @@ public final class CreateStaffCommand extends SubCommand {
         if (!colour.startsWith("#"))
             colour = "#" + colour;
 
-        ItemStack wandStack =  new ItemStack(DTRegistries.treeStaff, 1);
-        DTRegistries.treeStaff.setSpecies(wandStack, species)
+        ItemStack wandStack =  new ItemStack(DTRegistries.STAFF, 1);
+        DTRegistries.STAFF.setSpecies(wandStack, species)
                 .setCode(wandStack, StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT))
                 .setColor(wandStack, colour)
                 .setReadOnly(wandStack, BoolArgumentType.getBool(context, CommandConstants.READ_ONLY_ARGUMENT))

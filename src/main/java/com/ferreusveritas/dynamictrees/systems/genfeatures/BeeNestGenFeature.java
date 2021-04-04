@@ -5,10 +5,8 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BeehiveBlock;
@@ -33,6 +31,7 @@ import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.BiomeDictionary;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -47,25 +46,23 @@ import java.util.function.BiFunction;
  */
 public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Block> NEST_BLOCK = new GenFeatureBlockProperty("nest");
+    public static final GenFeatureProperty<Block> NEST_BLOCK = GenFeatureProperty.createBlockProperty("nest");
     public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
     private static final double vanillaGenChanceForest = 0.002f;
     private static final double vanillaGrowChance = 0.001f;
-
-    private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
-
-    public BeeNestGenFeature (ResourceLocation registryName){
+    
+    public BeeNestGenFeature (ResourceLocation registryName) {
         super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION);
     }
 
     @Override
-    public ConfiguredGenFeature<?> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos)->{
+    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
             if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
-            //Default flower check predicate, straight from the sapling class
+            // Default flower check predicate, straight from the sapling class
             for(BlockPos blockpos : BlockPos.Mutable.getAllInBoxMutable(pos.down().north(2).west(2), pos.up().south(2).east(2))) {
                 if (world.getBlockState(blockpos).isIn(BlockTags.FLOWERS)) {
                     return true;
@@ -73,7 +70,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
             }
             return false;
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
-            //Default biome check chance function. Uses vanilla chances
+            // Default biome check chance function. Uses vanilla chances
             RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Objects.requireNonNull(world.getNoiseBiomeRaw(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
                 return vanillaGenChancePlains;
@@ -99,7 +96,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
     }
 
-    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen){
+    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
         Block nestBlock = configuredGenFeature.get(NEST_BLOCK);
 
         int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
@@ -109,7 +106,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
         List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(world, rootPos, treeHeight);
-        if (validSpaces.size() > 0){
+        if (validSpaces.size() > 0) {
             Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
             Direction chosenDir = chosenSpace.getValue().get(world.getRandom().nextInt(chosenSpace.getValue().size()));
@@ -119,7 +116,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
         return false;
     }
 
-    private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen){
+    private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen) {
         int honeyLevel = worldGen? world.getRandom().nextInt(6) : 0;
         BlockState nestState = nestBlock.getDefaultState();
         if (nestState.hasProperty(BeehiveBlock.FACING)) nestState = nestState.with(BeehiveBlock.FACING, faceDir);
@@ -143,20 +140,21 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     //This just fetches a World instance from an IWorld instance, since IWorld cannot be used to create bees.
-    private World worldFromIWorld (IWorld iWorld){
-        if (iWorld instanceof WorldGenRegion){
-            return  ((WorldGenRegion)iWorld).getWorld();
-        } else if (iWorld instanceof World){
-            return  (World)iWorld;
+    @Nullable
+    private World worldFromIWorld (IWorld iWorld) {
+        if (iWorld instanceof WorldGenRegion) {
+            return ((WorldGenRegion)iWorld).getWorld();
+        } else if (iWorld instanceof World) {
+            return (World)iWorld;
         }
         return null;
     }
 
-    private boolean nestAlreadyPresent(IWorld world, Block nestBlock, BlockPos rootPos, int maxHeight){
-        for (int y = 2; y < maxHeight; y++){
+    private boolean nestAlreadyPresent(IWorld world, Block nestBlock, BlockPos rootPos, int maxHeight) {
+        for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.up(y);
-            for (Direction dir : HORIZONTALS){
-                if (world.getBlockState(trunkPos.offset(dir)).getBlock() == nestBlock){
+            for (Direction dir : CoordUtils.HORIZONTALS) {
+                if (world.getBlockState(trunkPos.offset(dir)).getBlock() == nestBlock) {
                     return true;
                 }
             }
@@ -164,9 +162,9 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
         return false;
     }
 
-    private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight){
+    private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight) {
         for (int i = 1; i < maxHeight; i++) {
-            if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
+            if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))) {
                 return i - 1;
             }
         }
@@ -174,22 +172,22 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight){
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight) {
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
-        for (int y = 2; y < maxHeight; y++){
+        for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.up(y);
-            for (Direction dir : HORIZONTALS){
+            for (Direction dir : CoordUtils.HORIZONTALS) {
                 BlockPos sidePos = trunkPos.offset(dir);
-                if (world.isAirBlock(sidePos) && TreeHelper.isBranch(world.getBlockState(sidePos.up()))){
+                if (world.isAirBlock(sidePos) && TreeHelper.isBranch(world.getBlockState(sidePos.up()))) {
 
                     //the valid positions must also have a face facing towards air, otherwise bees wouldn't be able to exist the nest.
                     List<Direction> validDirs = new LinkedList<>();
-                    for (Direction dir2 : HORIZONTALS){
-                        if (world.isAirBlock(sidePos.offset(dir2))){
+                    for (Direction dir2 : CoordUtils.HORIZONTALS) {
+                        if (world.isAirBlock(sidePos.offset(dir2))) {
                             validDirs.add(dir2);
                         }
                     }
-                    if (validDirs.size() > 0){
+                    if (validDirs.size() > 0) {
                         validSpaces.add(Pair.of(sidePos, validDirs));
                     }
                 }

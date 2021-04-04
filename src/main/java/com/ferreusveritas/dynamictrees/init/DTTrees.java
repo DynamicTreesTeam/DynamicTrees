@@ -1,105 +1,93 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ObjectHolder;
-import net.minecraftforge.registries.RegistryBuilder;
-import org.lwjgl.system.CallbackI;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
-	
-	public static final String NULL = "null";
 
-	public static VanillaTreeFamily OAK;
-	public static VanillaTreeFamily BIRCH;
-	public static VanillaTreeFamily SPRUCE;
-	public static VanillaTreeFamily JUNGLE;
-	public static VanillaTreeFamily DARK_OAK;
-	public static VanillaTreeFamily ACACIA;
-	public static VanillaTreeFamily CRIMSON;
-	public static VanillaTreeFamily WARPED;
-	
-	public static final String CONIFER = "conifer";
-	
-	public static ArrayList<VanillaTreeFamily> baseFamilies = new ArrayList<>();
+	public static ResourceLocation OAK = DynamicTrees.resLoc("oak");
+	public static ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
+	public static ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
+	public static ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
+	public static ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
+	public static ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
+	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
+	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
-	/**
-	 * Pay Attn! This should be run after the Dynamic Trees Mod
-	 * has created it's Blocks and Items.  These trees depend
-	 * on the Dynamic Sapling
-	 */
-	public static void setupTrees() {
-		Species.REGISTRY.register(Species.NULL_SPECIES.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "null")));
-
-		OAK = new OakTree();
-		BIRCH = new BirchTree();
-		SPRUCE = new SpruceTree();
-		JUNGLE = new JungleTree();
-		DARK_OAK = new DarkOakTree();
-		ACACIA = new AcaciaTree();
-		CRIMSON = new CrimsonFungus();
-		WARPED = new WarpedFungus();
-
-		Collections.addAll(baseFamilies, OAK, BIRCH, SPRUCE, JUNGLE, DARK_OAK, ACACIA, CRIMSON, WARPED);
-
-		baseFamilies.forEach(TreeFamily.REGISTRY::register);
-		baseFamilies.forEach(family -> family.registerSpecies(Species.REGISTRY));
-
-		// Registers a fake species for generating mushrooms
-		Species.REGISTRY.register(new Mushroom(true));
-		Species.REGISTRY.register(new Mushroom(false));
+	@SubscribeEvent
+	public static void registerSpecies (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
+		// Registers fake species for generating mushrooms.
+		event.getRegistry().registerAll(new Mushroom(true), new Mushroom(false));
 	}
-	
+
+	@SubscribeEvent
+	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
+		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerFamilyTypes (final TypeRegistryEvent<Family> event) {
+		event.registerType(DynamicTrees.resLoc("fungus"), FungusFamily.TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
+		event.registerType(DynamicTrees.resLoc("fungus"), FungusSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("dark_oak"), DarkOakSpecies.TYPE);
+	}
+
+	public static final ResourceLocation NULL = resLoc("null");
+
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
-		GrowthLogicKit.REGISTRY = new RegistryBuilder<GrowthLogicKit>()
-				.setName(resLoc("growth_logic_kit"))
-				.setDefaultKey(resLoc("null"))
-				.disableSaving()
-				.setType(GrowthLogicKit.class)
-				.setIDRange(0, Integer.MAX_VALUE - 1)
-				.create();
+		final List<Registry<?>> registries = Arrays.asList(CellKit.REGISTRY, LeavesProperties.REGISTRY, GrowthLogicKit.REGISTRY, GenFeature.REGISTRY, Family.REGISTRY, Species.REGISTRY);
 
-		TreeFamily.REGISTRY = new RegistryBuilder<TreeFamily>()
-				.setName(resLoc("tree_family"))
-				.setDefaultKey(resLoc("null"))
-				.disableSaving()
-				.setType(TreeFamily.class)
-				.setIDRange(0, Integer.MAX_VALUE - 1)
-				.create();
+		// Register all registry entry types, and then all registries.
+		registries.forEach(registry -> {
+			if (registry instanceof TypedRegistry)
+				((TypedRegistry<?>) registry).postTypeRegistryEvent();
 
-		Species.REGISTRY = new RegistryBuilder<Species>()
-				.setName(resLoc( "species"))
-				.setDefaultKey(resLoc( "null"))
-				.disableSaving()
-				.setType(Species.class)
-				.setIDRange(0, Integer.MAX_VALUE - 1)
-				.create();
+			registry.postRegistryEvent();
+		});
 
-		GenFeature.REGISTRY = new RegistryBuilder<GenFeature>()
-				.setName(resLoc( "gen_feature"))
-				.setDefaultKey(resLoc( "null"))
-				.disableSaving()
-				.setType(GenFeature.class)
-				.setIDRange(0, Integer.MAX_VALUE - 1)
-				.create();
-		
-		setupTrees();
+		DTResourceRegistries.setupTreesResourceManager();
+
+		// Register Forge registry entry getters and add-on Json object getters.
+		JsonObjectGetters.registerForgeEntryGetters();
+		JsonObjectGetters.postRegistryEvent();
+
+		// Register any registry entries from Json files.
+		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
+
+		// Lock all the registries.
+		registries.forEach(Registry::lock);
+
+		// Register feature cancellers.
+		FeatureCanceller.REGISTRY.postRegistryEvent();
+		FeatureCanceller.REGISTRY.lock();
 	}
 
 	private static ResourceLocation resLoc (final String path) {
-		return new ResourceLocation(DynamicTrees.MOD_ID, path);
+		return DynamicTrees.resLoc(path);
 	}
 
 }

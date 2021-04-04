@@ -11,7 +11,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 /**
-* Destroys all thin(radius == 1) branches on a tree.. leaving it to rot.
+* Destroys all thin(radius == 1) branches on a tree.. leaving it to postRot.
 * @author ferreusveritas
 */
 public class DiseaseNode implements INodeInspector {

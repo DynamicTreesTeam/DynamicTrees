@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.client.TooltipHandler;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.worldgen.canceller.TreeCancellerJson;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -14,12 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 public class CommonEventHandler {
-	
-	//	@SubscribeEvent
-	//	public void onLoadComplete(FMLLoadCompleteEvent event){
-	//		DTClient.discoverWoodColors();
-	//	}
-	
+
 	@SubscribeEvent
 	public void onWorldTick(TickEvent.WorldTickEvent event) {
 		if(event.side == LogicalSide.SERVER) {
@@ -36,11 +30,6 @@ public class CommonEventHandler {
 		if (event.getWorld().isRemote()){
 			DTClient.discoverWoodColors();
 		}
-	}
-
-	@SubscribeEvent
-	public void onWorldUnload (WorldEvent.Unload event) {
-		TreeCancellerJson.INSTANCE = null; // Reset tree canceller Json.
 	}
 
 	@SubscribeEvent

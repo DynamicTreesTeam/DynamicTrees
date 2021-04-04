@@ -10,7 +10,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 public class InflatorNode implements INodeInspector {
 	
@@ -76,7 +75,7 @@ public class InflatorNode implements INodeInspector {
 				radius = (float)Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 				
 				//Ensure the branch is never inflated past it's species maximum
-				int maxRadius = species.maxBranchRadius();
+				int maxRadius = species.getMaxBranchRadius();
 				if(radius > maxRadius) {
 					radius = maxRadius;
 				}

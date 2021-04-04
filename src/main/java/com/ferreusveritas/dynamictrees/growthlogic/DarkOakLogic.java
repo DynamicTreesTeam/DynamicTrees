@@ -65,7 +65,7 @@ public class DarkOakLogic extends GrowthLogicKit {
 
 	@Override
 	public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {
-		return signalEnergy;
+		return signalEnergy * species.biomeSuitability(world, pos);
 	}
 	
 }

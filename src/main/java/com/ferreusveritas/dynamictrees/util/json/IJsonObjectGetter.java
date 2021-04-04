@@ -3,11 +3,17 @@ package com.ferreusveritas.dynamictrees.util.json;
 import com.google.gson.JsonElement;
 
 /**
- * Handles getting an object of type <tt>T</tt> from a {@link JsonElement}.
+ * Handles getting an {@link Object} of type {@link T} from a {@link JsonElement}.
  *
+ * @param <T> The type of the {@link Object} to be fetched.
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface IJsonObjectGetter<T> {
+
+    default boolean isValid() {
+        return true;
+    }
 
     /**
      * Attempts to fetch the object from the given {@link JsonElement}.

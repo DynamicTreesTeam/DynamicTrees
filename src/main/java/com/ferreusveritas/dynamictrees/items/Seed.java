@@ -1,19 +1,12 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTDataPackRegistries;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
-import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -35,16 +28,22 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 
+import javax.annotation.Nullable;
+import java.util.List;
 
+// TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item implements IPlantable {
 	
-	private Species species;//The tree this seed creates
+	private final Species species;//The tree this seed creates
 	
-	public Seed() { super(new Item.Properties());setRegistryName("null"); species = Species.NULL_SPECIES;}
+	public Seed() {
+		super(new Item.Properties());
+		this.setRegistryName("null");
+		this.species = Species.NULL_SPECIES;
+	}
 	
 	public Seed(Species species) {
-		super(new Item.Properties().group(DTRegistries.dynamicTreesTab));
-		setRegistryName(species.getRegistryName().getPath() + "_seed");
+		super(new Item.Properties().group(DTRegistries.ITEM_GROUP));
 		this.species = species;
 	}
 	
@@ -105,7 +104,7 @@ public class Seed extends Item implements IPlantable {
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
 		
 		if(DTConfigs.seedOnlyForest.get()) {
-			plantChance *= DTDataPackRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.getDimensionKey().getLocation())
+			plantChance *= DTResourceRegistries.getBiomeDatabaseManager().getDimensionDatabase(world.getDimensionKey().getLocation())
 					.getForestness(world.getBiome(pos));
 		}
 		

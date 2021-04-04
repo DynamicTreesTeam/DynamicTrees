@@ -1,17 +1,21 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
+import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
+import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.block.Block;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 
 /**
- * Base Property class for {@link ConfiguredGenFeature} objects. Stores a property's identifier
- * and class type. The base implementation should only be used by {@link JsonPrimitive} types, and
- * in the future will be limited to this only (sub-classes will need to be created for other objects).
+ * Class for holding properties of {@link ConfiguredGenFeature} objects. Stores a property's identifier
+ * and class type, handling getting {@link Object}s of type {@link T} from {@link JsonElement}s.
  *
+ * @param <T> The type of the property being held.
  * @author Harley O'Connor
  */
 public class GenFeatureProperty<T> {
@@ -33,43 +37,38 @@ public class GenFeatureProperty<T> {
     }
 
     /**
-     * Gets the property from the given {@link JsonObject}, or null if it was not found.
-     * Note that the base implementation of this method only handles {@link JsonPrimitive} objects,
-     * for handling other types of value a sub-class will be needed with an implementation of this.
+     * Gets an {@link ObjectFetchResult} for the property's value from the given {@link JsonObject},
+     * or null if it was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
-     * @return The {@link GenFeaturePropertyValue}.
+     * @return The an {@link ObjectFetchResult} for the property value, or null if it wasn't found.
      */
     @Nullable
-    public GenFeaturePropertyValue<T> getFromJsonObject (JsonObject jsonObject) {
-        JsonElement jsonElement = jsonObject.get(this.identifier);
+    public ObjectFetchResult<T> getValueFromJsonObject(JsonObject jsonObject) {
+        final JsonElement jsonElement = jsonObject.get(this.identifier);
 
-        if (jsonElement == null || !jsonElement.isJsonPrimitive())
+        if (jsonElement == null)
             return null;
 
-        final T value = JsonHelper.getFromPrimitive(jsonElement.getAsJsonPrimitive(), this.type);
+        final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
 
-        if (value == null)
-            return null;
+        if (!getter.isValid())
+            return ObjectFetchResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
+                    "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
 
-        return new GenFeaturePropertyValue<>(value);
+        return getter.get(jsonElement);
     }
 
     /**
      * Creates a new {@link GenFeatureProperty} from the identifier and class given.
      *
-     * @deprecated For custom class types, sub-classes should be used with an implementation of
-     * <tt>getFromJsonObject</tt> so that the value can be obtained from Json. This method will
-     * be made private soon.
      * @param identifier The identifier for the property.
      * @param type The {@link Class} of the value the property will store.
      * @param <T> The value the property will store.
      * @return The new {@link GenFeatureProperty} object.
      */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<?> type) {
-        return new GenFeatureProperty<>(identifier, (Class<T>) type);
+    public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<T> type) {
+        return new GenFeatureProperty<>(identifier, type);
     }
 
     public static GenFeatureProperty<String> createStringProperty(String identifier) {
@@ -89,11 +88,23 @@ public class GenFeatureProperty<T> {
     }
 
     public static GenFeatureProperty<Float> createDoubleProperty(String identifier) {
-        return createProperty(identifier, Double.class);
+        return createProperty(identifier, Float.class);
     }
 
     public static GenFeatureProperty<Float> createFloatProperty(String identifier) {
         return createProperty(identifier, Float.class);
+    }
+
+    public static GenFeatureProperty<Block> createBlockProperty(String identifier) {
+        return createProperty(identifier, Block.class);
+    }
+
+    @Override
+    public String toString() {
+        return "GenFeatureProperty{" +
+                "identifier='" + identifier + '\'' +
+                ", type=" + type +
+                '}';
     }
 
 }

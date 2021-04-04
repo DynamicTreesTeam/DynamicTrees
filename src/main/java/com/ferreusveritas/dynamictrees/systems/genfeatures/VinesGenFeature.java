@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureBlockProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -40,18 +39,18 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 	protected final BooleanProperty[] sideVineStates = new BooleanProperty[] {null, null, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
 
 	public static final GenFeatureProperty<Integer> MAX_LENGTH = GenFeatureProperty.createIntegerProperty("max_length");
-	public static final GenFeatureProperty<Block> VINE_BLOCK = new GenFeatureBlockProperty("vine");
-	public static final GenFeatureProperty<Block> TIP_BLOCK = new GenFeatureBlockProperty("vine_tip");
+	public static final GenFeatureProperty<Block> BLOCK = GenFeatureProperty.createBlockProperty("block");
+	public static final GenFeatureProperty<Block> TIP_BLOCK = GenFeatureProperty.createBlockProperty("tip_block");
 	public static final GenFeatureProperty<VineType> VINE_TYPE = GenFeatureProperty.createProperty("vine_type", VineType.class);
 
 	public VinesGenFeature(ResourceLocation registryName) {
-		super(registryName, QUANTITY, MAX_LENGTH, VERTICAL_SPREAD, RAY_DISTANCE, VINE_BLOCK, TIP_BLOCK, VINE_TYPE);
+		super(registryName, QUANTITY, MAX_LENGTH, VERTICAL_SPREAD, RAY_DISTANCE, BLOCK, TIP_BLOCK, VINE_TYPE);
 	}
 
 	@Override
-	public ConfiguredGenFeature<?> createDefaultConfiguration() {
+	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(QUANTITY, 4).with(MAX_LENGTH, 8).with(VERTICAL_SPREAD, 60f)
-				.with(RAY_DISTANCE, 5f).with(VINE_BLOCK, Blocks.VINE).with(TIP_BLOCK, null).with(VINE_TYPE, VineType.SIDE);
+				.with(RAY_DISTANCE, 5f).with(BLOCK, Blocks.VINE).with(TIP_BLOCK, null).with(VINE_TYPE, VineType.SIDE);
 	}
 
 	@Override
@@ -90,7 +89,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 		BooleanProperty vineSide = sideVineStates[result.getFace().getOpposite().getIndex()];
 		if(vineSide == null) return;
 
-		BlockState vineState = configuredGenFeature.get(VINE_BLOCK).getDefaultState().with(vineSide, true);
+		BlockState vineState = configuredGenFeature.get(BLOCK).getDefaultState().with(vineSide, true);
 		this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH),
 				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE));
 	}
@@ -107,7 +106,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 
 		if (vinePos == BlockPos.ZERO) return;
 
-		this.placeVines(world, vinePos, configuredGenFeature.get(VINE_BLOCK).getDefaultState(), configuredGenFeature.get(MAX_LENGTH),
+		this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).getDefaultState(), configuredGenFeature.get(MAX_LENGTH),
 				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE));
 	}
 

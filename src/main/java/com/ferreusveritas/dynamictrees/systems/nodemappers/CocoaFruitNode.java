@@ -34,7 +34,7 @@ public class CocoaFruitNode implements INodeInspector {
 					BlockPos deltaPos = pos.offset(dir);
 					if (world.isAirBlock(deltaPos)) {
 						if (!dir.getAxis().isHorizontal()) dir = Direction.NORTH;
-						world.setBlockState(deltaPos, DTRegistries.cocoaFruitBlock.getDefaultState().with(CocoaBlock.HORIZONTAL_FACING, dir.getOpposite()).with(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
+						world.setBlockState(deltaPos, DTRegistries.COCOA_FRUIT.getDefaultState().with(CocoaBlock.HORIZONTAL_FACING, dir.getOpposite()).with(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;

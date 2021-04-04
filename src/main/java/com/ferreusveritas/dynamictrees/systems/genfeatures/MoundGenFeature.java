@@ -38,7 +38,7 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 	}
 
 	@Override
-	protected ConfiguredGenFeature<?> createDefaultConfiguration() {
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(MOUND_CUTOFF_RADIUS, 5);
 	}
 
