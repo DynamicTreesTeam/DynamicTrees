@@ -103,7 +103,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param branch
 	 * @return
 	 */
-	public boolean isSameTree(BranchBlock branch) {
+	public boolean isSameTree(@Nullable final BranchBlock branch) {
 		return branch != null && getFamily() == branch.getFamily();
 	}
 	
@@ -564,29 +564,25 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	// Explosive harvesting methods will likely result in mostly sticks but I'm okay with that since it kinda makes sense.
 	@Override
-	public void wasExploded(World world, BlockPos pos, Explosion explosion) {
-		BlockState state = world.getBlockState(pos);
-		if (state.getBlock() == this) {
-			Species species = TreeHelper.getExactSpecies(world, pos);
-			BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
-			NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
-			List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
-			FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
-			
-			if (treeEntity != null) {
-				Vector3d expPos = explosion.getPosition();
-				LivingEntity placer = explosion.getSourceMob();
-				// TODO: Use an access transformer to get the actual size.
-				// Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
-				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity) placer).isPowered() ? 6 : 3) : 4;
-				double distance = Math.sqrt(treeEntity.distanceToSqr(expPos.x, expPos.y, expPos.z));
-				if (distance / size <= 1.0D && distance != 0.0D) {
-					treeEntity.push((treeEntity.getX() - expPos.x) / distance, (treeEntity.getY() - expPos.y) / distance, (treeEntity.getZ() - expPos.z) / distance);
-				}
-			}
+	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
+		final Species species = TreeHelper.getExactSpecies(world, pos);
+		final BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
+		final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
+		final List<ItemStack> woodDropList = getLogDrops(world, pos, species, woodVolume);
+		final FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
+
+		if (treeEntity != null) {
+			final Vector3d expPos = explosion.getPosition();
+			final double distance = Math.sqrt(treeEntity.distanceToSqr(expPos.x, expPos.y, expPos.z));
+
+			if (distance / explosion.radius <= 1.0D && distance != 0.0D)
+				treeEntity.push((treeEntity.getX() - expPos.x) / distance, (treeEntity.getY() - expPos.y) / distance,
+						(treeEntity.getZ() - expPos.z) / distance);
 		}
+
+		this.wasExploded(world, pos, explosion);
 	}
-	
+
 	@Override
 	public final TreePartType getTreePartType() {
 		return TreePartType.BRANCH;
