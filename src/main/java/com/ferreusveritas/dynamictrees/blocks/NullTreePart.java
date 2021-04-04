@@ -17,6 +17,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
+
 public class NullTreePart implements ITreePart {
 	
 	//This is a safe dump for blocks that aren't tree parts

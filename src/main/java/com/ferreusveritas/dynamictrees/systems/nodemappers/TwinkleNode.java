@@ -21,7 +21,7 @@ public class TwinkleNode implements INodeInspector {
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		if(world.isRemote() && TreeHelper.isBranch(blockState)) {
+		if(world.isClientSide() && TreeHelper.isBranch(blockState)) {
 			DTClient.spawnParticles(world, this.particleType, pos.getX(), pos.getY(), pos.getZ(), this.numParticles, world.getRandom());
 		}
 		return false;

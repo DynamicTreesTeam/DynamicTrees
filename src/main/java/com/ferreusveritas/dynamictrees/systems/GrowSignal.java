@@ -54,7 +54,7 @@ public class GrowSignal {
 	public boolean step() {
 		numSteps++;
 		
-		delta = delta.offset(dir);
+		delta = delta.relative(dir);
 		
 		if (--energy <= 0.0f) {
 			success = false; // Ran out of energy before it could grow.

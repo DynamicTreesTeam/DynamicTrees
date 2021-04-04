@@ -46,9 +46,9 @@ public class DestroyerNode implements INodeInspector {
 		if (BranchConnectables.isBlockConnectable(blockState.getBlock()) &&
 				BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromDir.getOpposite()) > 0){
 				if (player != null && world instanceof World){
-					TileEntity te = world.getTileEntity(pos);
+					TileEntity te = world.getBlockEntity(pos);
 					blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));
-					blockState.getBlock().harvestBlock((World) world, player, pos, blockState, te, player.getHeldItemMainhand());
+					blockState.getBlock().playerDestroy((World) world, player, pos, blockState, te, player.getMainHandItem());
 				} else {
 					world.removeBlock(pos, false);
 				}
@@ -61,7 +61,7 @@ public class DestroyerNode implements INodeInspector {
 			if(branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
 				endPoints.add(pos);
 			}
-			world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);//Destroy the branch and notify the client
+			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);//Destroy the branch and notify the client
 		}
 		
 		return true;

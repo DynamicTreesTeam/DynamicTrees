@@ -34,7 +34,7 @@ public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
     protected final ResourceLocation ringsResLoc;
 
     public BranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.DEFAULT, ItemOverrideList.EMPTY.getOverrides());
+        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemCameraTransforms.NO_TRANSFORMS, ItemOverrideList.EMPTY.getOverrides());
 
         this.modelResLoc = modelResLoc;
         this.barkResLoc = barkResLoc;

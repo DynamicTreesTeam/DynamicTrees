@@ -31,12 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable {
 	
 	protected Species species;
 	
 	public DynamicSaplingBlock(Species species) {
-		super(Properties.create(Material.PLANTS).sound(SoundType.PLANT).tickRandomly());
+		super(Properties.of(Material.PLANT).sound(SoundType.GRASS).randomTicks());
 		this.species = species;
 	}
 
@@ -50,12 +52,12 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	}
 	
 	@Override
-	public boolean canGrow(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
+	public boolean isValidBonemealTarget(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
 		return getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
 	}
 	
 	@Override
-	public boolean canUseBonemeal(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public boolean isBonemealSuccess(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		return getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
 	}
 	
@@ -76,13 +78,13 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		if (getSpecies().canSaplingGrowNaturally(worldIn, pos))
-			this.grow(worldIn, rand, pos, state);
+			this.performBonemeal(worldIn, rand, pos, state);
 	}
 
 	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(Direction dir: CoordUtils.HORIZONTALS) {
-			BlockState blockState = world.getBlockState(pos.offset(dir));
+			BlockState blockState = world.getBlockState(pos.relative(dir));
 			Block block = blockState.getBlock();
 			if(TreeHelper.isBranch(block) || block instanceof DynamicSaplingBlock) {
 				return false;
@@ -90,7 +92,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 		}
 		
 		//Air above and acceptable soil below
-		return world.isAirBlock(pos.up()) && species.isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()));
+		return world.isEmptyBlock(pos.above()) && species.isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()));
 	}
 	
 	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
@@ -98,7 +100,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	}
 
 	@Override
-	public void grow(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+	public void performBonemeal(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		if (canBlockStay(world, pos, state)) {
 			if (getSpecies().canSaplingGrow(world, pos)){
 				getSpecies().transitionToTree(world, pos);
@@ -126,13 +128,13 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	}
 	
 	protected void dropBlock(World world, BlockState state, BlockPos pos) {
-		world.addEntity(new ItemEntity(world, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, getSpecies().getSeedStack(1)));
+		world.addFreshEntity(new ItemEntity(world, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, getSpecies().getSeedStack(1)));
 		world.removeBlock(pos, false);
 	}
 	
 	@Nonnull
 	@Override
-	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
 		return getSpecies().getSeedStack(1);
 	}
 	
@@ -167,7 +169,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
-		return species.getSapling().get().getDefaultState();
+		return species.getSapling().get().defaultBlockState();
 	}
 	
 }

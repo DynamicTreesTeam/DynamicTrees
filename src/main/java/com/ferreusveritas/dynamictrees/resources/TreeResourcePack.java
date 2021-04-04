@@ -33,7 +33,7 @@ public class TreeResourcePack extends ResourcePack {
     }
 
     @Override
-    public InputStream getResourceStream(@Nullable ResourcePackType type, ResourceLocation location) throws IOException {
+    public InputStream getResource(@Nullable ResourcePackType type, ResourceLocation location) throws IOException {
         final Path path = this.getPath(location.getNamespace(), location.getPath());
         if(!Files.exists(path))
             throw new FileNotFoundException("Could not find tree resource for path '" + path + "'.");
@@ -41,19 +41,19 @@ public class TreeResourcePack extends ResourcePack {
     }
 
     @Override
-    protected InputStream getInputStream(String resourcePath) throws IOException {
+    protected InputStream getResource(String resourcePath) throws IOException {
         // We never use this method, so just throw an exception.
         throw new ResourcePackFileNotFoundException(this.file, resourcePath);
     }
 
     @Override
-    protected boolean resourceExists(String resourcePath) {
+    protected boolean hasResource(String resourcePath) {
         // We never use this method, so just return false.
         return false;
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(@Nullable ResourcePackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
+    public Collection<ResourceLocation> getResources(@Nullable ResourcePackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
         try {
             Path root = this.getPath(namespace);
             Path inputPath = root.getFileSystem().getPath(pathIn);
@@ -75,11 +75,11 @@ public class TreeResourcePack extends ResourcePack {
     }
 
     public Set<String> getResourceNamespaces() {
-        return this.getResourceNamespaces(null);
+        return this.getNamespaces(null);
     }
 
     @Override
-    public Set<String> getResourceNamespaces(@Nullable final ResourcePackType type) {
+    public Set<String> getNamespaces(@Nullable final ResourcePackType type) {
         try {
             Path root = this.getPath();
 

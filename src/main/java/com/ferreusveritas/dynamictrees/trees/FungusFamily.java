@@ -23,7 +23,7 @@ public final class FungusFamily extends Family {
 
     @Override
     public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return SoundType.HYPHAE;
+        return SoundType.STEM;
     }
 
     @Override

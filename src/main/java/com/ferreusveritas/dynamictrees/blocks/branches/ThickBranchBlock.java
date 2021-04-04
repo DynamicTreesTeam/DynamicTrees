@@ -25,6 +25,8 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	public static final int RADMAX_THICK = 24;
@@ -32,7 +34,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, RADMAX_THICK); //39 ?
 
 	public ThickBranchBlock(Material material) {
-		this(Properties.create(material));
+		this(Properties.of(material));
 	}
 
 	public ThickBranchBlock(Properties properties) {
@@ -50,20 +52,20 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	public void cacheBranchStates() { }
 
 	@Override
-	public void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	public void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(RADIUS_DOUBLE);
 	}
 
 	public void cacheBranchThickStates() {
-		setDefaultState(this.getStateContainer().getBaseState().with(RADIUS_DOUBLE, 1));
+		registerDefaultState(this.getStateDefinition().any().setValue(RADIUS_DOUBLE, 1));
 
 		branchStates = new BlockState[RADMAX_THICK + 1];
 
 		//Cache the branch blocks states for rapid lookup
-		branchStates[0] = Blocks.AIR.getDefaultState();
+		branchStates[0] = Blocks.AIR.defaultBlockState();
 
 		for(int radius = 1; radius <= RADMAX_THICK; radius++) {
-			branchStates[radius] = getDefaultState().with(ThickBranchBlock.RADIUS_DOUBLE, radius);
+			branchStates[radius] = defaultBlockState().setValue(ThickBranchBlock.RADIUS_DOUBLE, radius);
 		}
 	}
 
@@ -75,7 +77,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	public int getRadius(BlockState blockState) {
 		if (!(blockState.getBlock() instanceof ThickBranchBlock))
 			return super.getRadius(blockState);
-		return isSameTree(blockState) ? MathHelper.clamp(blockState.get(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
+		return isSameTree(blockState) ? MathHelper.clamp(blockState.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
 	}
 
 	@Override
@@ -105,7 +107,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 		ReplaceableState[] repStates = new ReplaceableState[8];
 
 		for(Surround dir : Surround.values()) {
-			BlockPos dPos = pos.add(dir.getOffset());
+			BlockPos dPos = pos.offset(dir.getOffset());
 			ReplaceableState rep = getReplaceability(world, dPos, pos);
 			repStates[dir.ordinal()] = rep;
 			if (rep == ReplaceableState.BLOCKING) {
@@ -116,10 +118,10 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 		if(setable) {
 			for(Surround dir : Surround.values()) {
-				BlockPos dPos = pos.add(dir.getOffset());
+				BlockPos dPos = pos.offset(dir.getOffset());
 				ReplaceableState rep = repStates[dir.ordinal()];
 				if(rep == ReplaceableState.REPLACEABLE) {
-					world.setBlockState(dPos, getTrunkShell().getDefaultState().with(TrunkShellBlock.CORE_DIR, dir.getOpposite()), flags);
+					world.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()), flags);
 				}
 			}
 			return true;
@@ -136,7 +138,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
-		final BlockPos deltaPos = pos.offset(side);
+		final BlockPos deltaPos = pos.relative(side);
 		final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
 		if (blockState == null)
@@ -162,8 +164,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 		if(block instanceof TrunkShellBlock) {
 			//Determine if this shell belongs to the trunk.  Block otherwise.
-			Surround surr = state.get(TrunkShellBlock.CORE_DIR);
-			return pos.add(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
+			Surround surr = state.getValue(TrunkShellBlock.CORE_DIR);
+			return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
 		}
 
 		if(state.getMaterial().isReplaceable() || block instanceof BushBlock) {

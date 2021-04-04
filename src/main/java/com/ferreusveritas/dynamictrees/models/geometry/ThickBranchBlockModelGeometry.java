@@ -43,7 +43,7 @@ public class ThickBranchBlockModelGeometry extends BranchBlockModelGeometry {
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
         Collection<RenderMaterial> renderMaterials = super.getTextures(owner, modelGetter, missingTextureErrors);
 
-        renderMaterials.add(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, this.thickRingsResLoc));
+        renderMaterials.add(new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, this.thickRingsResLoc));
 
         return renderMaterials;
     }

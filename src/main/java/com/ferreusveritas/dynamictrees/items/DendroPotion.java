@@ -78,7 +78,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	};
 
 	public DendroPotion() {
-		super(new Item.Properties().group(DTRegistries.ITEM_GROUP).maxStackSize(1));
+		super(new Item.Properties().tab(DTRegistries.ITEM_GROUP).stacksTo(1));
 	}
 	
 	public ItemStack applyIndexTag (final ItemStack potionStack, final int potionIndex) {
@@ -87,8 +87,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 	
 	@Override
-	public void fillItemGroup(final ItemGroup group, final NonNullList<ItemStack> items) {
-		if (!this.isInGroup(group)) {
+	public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> items) {
+		if (!this.allowdedIn(group)) {
 			for (final DendroPotionType potion : DendroPotionType.values()) {
 				if (potion.getActive()) {
 					items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
@@ -131,7 +131,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	public void registerRecipes() {
-		final ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potion.getPotionTypeForName("awkward"));
+		final ItemStack awkwardStack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potion.byName("awkward"));
 
 		Collections.addAll(brewingRecipes, this.getRecipe(awkwardStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)),
 				this.getRecipe(Items.SLIME_BALL, DendroPotionType.DEPLETION),
@@ -174,13 +174,13 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack stack) {
-		return new TranslationTextComponent(super.getName().getString() + "." + getPotionType(stack).getName());
+	public ITextComponent getName(ItemStack stack) {
+		return new TranslationTextComponent(super.getDescription().getString() + "." + getPotionType(stack).getName());
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		final DendroPotionType potionType = getPotionType(stack);
 		

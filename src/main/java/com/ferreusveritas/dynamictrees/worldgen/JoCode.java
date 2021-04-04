@@ -50,7 +50,7 @@ public class JoCode {
 	 * @param facing A final rotation applied to the code after creation
 	 */
 	public JoCode(World world, BlockPos rootPos, Direction facing) {
-		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
+		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.above()));
 		
 		if(branch.isPresent()) {
 			CoderNode coder = new CoderNode();
@@ -164,7 +164,7 @@ public class JoCode {
 			generateFork(world, species, 0, rootPos, false);
 			
 			//Establish a position for the bottom block of the trunk
-			BlockPos treePos = rootPos.up();
+			BlockPos treePos = rootPos.above();
 			
 			//Fix branch thicknesses and map out leaf locations
 			BlockState treeState = world.getBlockState(treePos);
@@ -186,7 +186,7 @@ public class JoCode {
 					if(safeBounds.inBounds(cellPos, false)) {
 						BlockState testBlockState = world.getBlockState(cellPos);
 						if(testBlockState.canBeReplacedByLeaves(world, cellPos)) {
-							world.setBlockState(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
+							world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
 						}
 					} else {
 						leafMap.setVoxel(cellPos, (byte) 0);
@@ -217,7 +217,7 @@ public class JoCode {
 				addSnow(leafMap, world, rootPos, biome);
 				
 			} else { //The growth failed.. turn the soil back to what it was
-				world.setBlockState(rootPos, initialDirtState, careful ? 3 : 2);
+				world.setBlock(rootPos, initialDirtState, careful ? 3 : 2);
 			}
 		}
 	}
@@ -240,8 +240,8 @@ public class JoCode {
 				case FORK_CODE: codePos = generateFork(world, species, codePos + 1, pos, disabled); break;
 				case RETURN_CODE: return codePos + 1;
 				default:
-					Direction dir = Direction.byIndex(code);
-					pos = pos.offset(dir);
+					Direction dir = Direction.from3DDataValue(code);
+					pos = pos.relative(dir);
 					if(!disabled) {
 						disabled = setBlockForGeneration(world, species, pos, dir, careful, codePos + 1 == instructions.length);
 					}
@@ -316,7 +316,7 @@ public class JoCode {
 	protected boolean isClearOfNearbyBranches(IWorld world, BlockPos pos, Direction except) {
 		
 		for(Direction dir: Direction.values()) {
-			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.offset(dir))) != null) {
+			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.relative(dir))) != null) {
 				return false;
 			}
 		}
@@ -326,15 +326,15 @@ public class JoCode {
 	
 	protected void addSnow(SimpleVoxmap leafMap, IWorld world, BlockPos rootPos, Biome biome) {
 		
-		if(biome.getTemperature() < 0.4f) {
+		if(biome.getBaseTemperature() < 0.4f) {
 			for (BlockPos.Mutable top : leafMap.getTops() ) {
-				if ( world.getNoiseBiomeRaw(rootPos.getX(), rootPos.getY(), rootPos.getZ()).doesSnowGenerate(world, rootPos) ) {
+				if ( world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ()).shouldSnow(world, rootPos) ) {
 					BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
 					int yOffset = 0;
 					do {
 						BlockState state = world.getBlockState(iPos);
 						if(state.getMaterial() == Material.AIR) {
-							world.setBlockState(iPos, Blocks.SNOW.getDefaultState(), 2);
+							world.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
 							break;
 						}
 						else if (state.getBlock() == Blocks.SNOW) {

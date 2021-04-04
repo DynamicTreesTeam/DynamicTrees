@@ -44,7 +44,7 @@ public class TreeHelper {
 		BlockState rootyState = world.getBlockState(rootPos);
 		RootyBlock dirt = TreeHelper.getRooty(rootyState);
 		if(dirt != null) {
-			dirt.updateTree(rootyState, world, rootPos, world.rand, false);
+			dirt.updateTree(rootyState, world, rootPos, world.random, false);
 			ageVolume(world, rootPos, 8, 32, 1, SafeChunkBounds.ANY);//blindly age a cuboid volume
 		}
 	}
@@ -84,7 +84,7 @@ public class TreeHelper {
 							iterMap.setVoxel(iPos, (byte) newHydro);
 							//Copy all the surrounding values from the leafMap to the iterMap since they now also have potential to change
 							for(Direction dir: Direction.values()) {
-								BlockPos dPos = iPos.offset(dir);
+								BlockPos dPos = iPos.relative(dir);
 								iterMap.setVoxel(dPos, leafMap.getVoxel(dPos));
 							}
 						}
@@ -113,7 +113,7 @@ public class TreeHelper {
 	 */
 	public static void ageVolume(IWorld world, BlockPos treePos, int halfWidth, int height, int iterations, SafeChunkBounds safeBounds){
 		//Slow and dirty iteration over a cuboid volume.  Try to avoid this by using a voxmap if you can
-		Iterable<BlockPos> iterable = BlockPos.getAllInBoxMutable(treePos.add(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.add(new BlockPos(halfWidth, height, halfWidth)));
+		Iterable<BlockPos> iterable = BlockPos.betweenClosed(treePos.offset(new BlockPos(-halfWidth, 0, -halfWidth)), treePos.offset(new BlockPos(halfWidth, height, halfWidth)));
 		for(int i = 0; i < iterations; i++) {
 			for(BlockPos iPos: iterable) {
 				BlockState blockState = world.getBlockState(iPos);
@@ -253,7 +253,7 @@ public class TreeHelper {
 	 * @param num
 	 */
 	public static void treeParticles(World world, BlockPos rootPos, BasicParticleType type, int num) {
-		if(world.isRemote) {
+		if(world.isClientSide) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new TwinkleNode(type, num)));
 		}
 	}

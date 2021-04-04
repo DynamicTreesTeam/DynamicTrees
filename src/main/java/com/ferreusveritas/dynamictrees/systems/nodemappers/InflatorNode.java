@@ -49,7 +49,7 @@ public class InflatorNode implements INodeInspector {
 			for(Direction dir: Direction.values()) {
 				if(!dir.equals(fromDir)) {//Don't count where the signal originated from
 					
-					BlockPos dPos = pos.offset(dir);
+					BlockPos dPos = pos.relative(dir);
 					
 					if(dPos.equals(last)) {//or the branch we just came back from
 						isTwig = false;//on the return journey if the block we just came from is a branch we are obviously not the endpoint(twig)

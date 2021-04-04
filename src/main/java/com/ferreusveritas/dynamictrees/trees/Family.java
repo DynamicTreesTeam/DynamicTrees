@@ -199,19 +199,19 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
 
 		if (this.canSupportCocoa) {
-			BlockPos pos = hit.getPos();
+			BlockPos pos = hit.getBlockPos();
 			if(heldItem != null) {
 				if(heldItem.getItem() == Items.COCOA_BEANS) {
 					BranchBlock branch = TreeHelper.getBranch(state);
 					if(branch != null && branch.getRadius(state) == 8) {
-						if(hit.getFace() != Direction.UP && hit.getFace() != Direction.DOWN) {
-							pos = pos.offset(hit.getFace());
+						if(hit.getDirection() != Direction.UP && hit.getDirection() != Direction.DOWN) {
+							pos = pos.relative(hit.getDirection());
 						}
-						if (world.isAirBlock(pos)) {
+						if (world.isEmptyBlock(pos)) {
 							BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
 							assert cocoaState != null;
-							Direction facing = cocoaState.get(HorizontalBlock.HORIZONTAL_FACING);
-							world.setBlockState(pos, DTRegistries.COCOA_FRUIT.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, facing), 2);
+							Direction facing = cocoaState.getValue(HorizontalBlock.FACING);
+							world.setBlock(pos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(HorizontalBlock.FACING, facing), 2);
 							if (!player.isCreative()) {
 								heldItem.shrink(1);
 							}
@@ -245,8 +245,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		if (getDynamicStrippedBranch() != null) {
 			getDynamicBranch().stripBranch(state, world, pos, player, heldItem);
 
-			if (world.isRemote) {
-				world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+			if (world.isClientSide) {
+				world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
 				WailaOther.invalidateWailaPosition();
 			}
 			return true;
@@ -478,7 +478,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		int radius = branch.getRadius(blockState);
 		int meta = MetadataCell.NONE;
 		if(hasConiferVariants && radius == 1) {
-			if(blockAccess.getBlockState(pos.down()).getBlock() == branch) {
+			if(blockAccess.getBlockState(pos.below()).getBlock() == branch) {
 				meta = MetadataCell.CONIFERTOP;
 			}
 		}

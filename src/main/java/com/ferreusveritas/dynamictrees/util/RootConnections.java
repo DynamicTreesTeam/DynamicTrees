@@ -39,11 +39,11 @@ public class RootConnections extends Connections {
     @Override
     public void setRadius(Direction dir, int radius) {
         // Surface radii uses horizontal index, so use that instead.
-        this.radii[dir.getHorizontalIndex()] = radius;
+        this.radii[dir.get2DDataValue()] = radius;
     }
 
     public void setConnectionLevel (Direction dir, ConnectionLevel connectionLevel) {
-        this.connectionLevels[dir.getHorizontalIndex()] = connectionLevel;
+        this.connectionLevels[dir.get2DDataValue()] = connectionLevel;
     }
 
     public void setConnectionLevels(ConnectionLevel[] connectionLevels) {
@@ -73,7 +73,7 @@ public class RootConnections extends Connections {
         }
 
         @Override
-        public String getString() {
+        public String getSerializedName() {
             return toString().toLowerCase();
         }
 

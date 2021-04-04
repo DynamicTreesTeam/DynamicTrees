@@ -50,13 +50,13 @@ public class TransformNode implements INodeInspector {
 	}
 	
 	public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
-		if (!world.isRemote()) {
-			BlockPos.getAllInBox(twigPos.add(-3, -3, -3), twigPos.add(3, 3, 3)).forEach(leavesPos -> {
+		if (!world.isClientSide()) {
+			BlockPos.betweenClosedStream(twigPos.offset(-3, -3, -3), twigPos.offset(3, 3, 3)).forEach(leavesPos -> {
 				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					BlockState state = world.getBlockState(leavesPos);
 					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
-						int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.get(DynamicLeavesBlock.DISTANCE) : 2;
-						world.setBlockState(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
+						int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
+						world.setBlock(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
 					}
 				}
 			});

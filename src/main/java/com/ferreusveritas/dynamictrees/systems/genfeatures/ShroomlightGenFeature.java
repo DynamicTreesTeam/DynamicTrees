@@ -55,7 +55,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
 
     @Override
     public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.up())) return false;
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above())) return false;
 
         return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, false);
     }
@@ -69,11 +69,11 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
             if (worldGen){
                 for (BlockPos chosenSpace : validSpaces){
                     if (world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE))
-                        world.setBlockState(chosenSpace, shroomlightBlock.getDefaultState(), 2);
+                        world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
                 }
             } else {
                 BlockPos chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
-                world.setBlockState(chosenSpace, shroomlightBlock.getDefaultState(), 2);
+                world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
             }
             return true;
         }
@@ -82,7 +82,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
 
     private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight){
         for (int i = 1; i < maxHeight; i++) {
-            if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
+            if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))){
                 return i-1;
             }
         }
@@ -93,10 +93,10 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     private List<BlockPos> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight){
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++){
-            BlockPos trunkPos = rootPos.up(y);
+            BlockPos trunkPos = rootPos.above(y);
             for (Direction dir : HORIZONTALS){
-                BlockPos sidePos = trunkPos.offset(dir);
-                if ((world.isAirBlock(sidePos) || world.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(world.getBlockState(sidePos.up())))
+                BlockPos sidePos = trunkPos.relative(dir);
+                if ((world.isEmptyBlock(sidePos) || world.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(world.getBlockState(sidePos.above())))
                     validSpaces.add(sidePos);
             }
         }

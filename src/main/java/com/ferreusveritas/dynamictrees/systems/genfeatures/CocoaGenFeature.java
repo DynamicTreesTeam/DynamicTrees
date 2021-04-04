@@ -25,8 +25,8 @@ public class CocoaGenFeature extends GenFeature implements IPostGenFeature, IPos
 
 	@Override
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-		if (soilLife == 0 && world.rand.nextInt() % 16 == 0) {
-			if (species.seasonalFruitProductionFactor(world, treePos) > world.rand.nextFloat()) {
+		if (soilLife == 0 && world.random.nextInt() % 16 == 0) {
+			if (species.seasonalFruitProductionFactor(world, treePos) > world.random.nextFloat()) {
 				this.addCocoa(world, rootPos, false);
 			}
 		}

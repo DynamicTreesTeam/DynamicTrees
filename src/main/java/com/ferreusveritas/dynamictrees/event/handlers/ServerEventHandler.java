@@ -10,7 +10,7 @@ public class ServerEventHandler {
     @SubscribeEvent
     public void onServerStart (final FMLServerStartingEvent event) {
         // Register DT command.
-        new DTCommand().registerDTCommand(event.getServer().getCommandManager().getDispatcher());
+        new DTCommand().registerDTCommand(event.getServer().getCommands().getDispatcher());
         SeasonHelper.getSeasonManager().flushMappings();
     }
 

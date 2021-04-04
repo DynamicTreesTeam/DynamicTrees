@@ -45,8 +45,8 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		entity.dataAnimationHandler = new HandlerData();
 		FallingTreeEntity.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 
-		BlockPos belowBlock = entity.getDestroyData().cutPos.down();
-		if(entity.world.getBlockState(belowBlock).isSolidSide(entity.world, belowBlock, Direction.UP)) {
+		BlockPos belowBlock = entity.getDestroyData().cutPos.below();
+		if(entity.level.getBlockState(belowBlock).isFaceSturdy(entity.level, belowBlock, Direction.UP)) {
 			entity.setOnGround(true);
 			return;
 		}
@@ -63,31 +63,31 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 			addRotation(entity, fallSpeed);
 		}
 
-		entity.setMotion(entity.getMotion().x, entity.getMotion().y - AnimationConstants.TREE_GRAVITY, entity.getMotion().z);
-		entity.setPosition(entity.getPosX(), entity.getPosY() + entity.getMotion().y, entity.getPosZ());
+		entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y - AnimationConstants.TREE_GRAVITY, entity.getDeltaMovement().z);
+		entity.setPos(entity.getX(), entity.getY() + entity.getDeltaMovement().y, entity.getZ());
 
 		{//Handle entire entity falling and collisions with it's base and the ground
-			World world = entity.world;
+			World world = entity.level;
 			int radius = 8;
 			BlockState state = entity.getDestroyData().getBranchBlockState(0);
 			if(TreeHelper.isBranch(state)) {
 				radius = ((BranchBlock)state.getBlock()).getRadius(state);
 			}
-			AxisAlignedBB fallBox = new AxisAlignedBB(entity.getPosX() - radius, entity.getPosY(), entity.getPosZ() - radius, entity.getPosX() + radius, entity.getPosY() + 1.0, entity.getPosZ() + radius);
-			BlockPos pos = new BlockPos(entity.getPosX(), entity.getPosY(), entity.getPosZ());
+			AxisAlignedBB fallBox = new AxisAlignedBB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
+			BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
 			BlockState collState = world.getBlockState(pos);
 
-			VoxelShape shape = collState.getCollisionShape(world, pos);
+			VoxelShape shape = collState.getBlockSupportShape(world, pos);
 			AxisAlignedBB collBox = new AxisAlignedBB(0,0,0,0,0,0);
 			if (!shape.isEmpty()){
-				collBox = collState.getCollisionShape(world, pos).getBoundingBox();
+				collBox = collState.getBlockSupportShape(world, pos).bounds();
 			}
 
-			collBox = collBox.offset(pos);
+			collBox = collBox.move(pos);
 			if(fallBox.intersects(collBox)) {
-				entity.setMotion(entity.getMotion().x, 0, entity.getMotion().z);
-				entity.setPosition(entity.getPosX(), collBox.maxY, entity.getPosZ());
-				entity.prevPosY = entity.getPosY();
+				entity.setDeltaMovement(entity.getDeltaMovement().x, 0, entity.getDeltaMovement().z);
+				entity.setPos(entity.getX(), collBox.maxY, entity.getZ());
+				entity.yo = entity.getY();
 				entity.setOnGround(true);
 			}
 		}
@@ -100,8 +100,8 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		}
 
 		//Crush living things with clumsy dead trees
-		World world = entity.world;
-		if(DTConfigs.enableFallingTreeDamage.get() && !world.isRemote) {
+		World world = entity.level;
+		if(DTConfigs.enableFallingTreeDamage.get() && !world.isClientSide) {
 			List<LivingEntity> elist = testEntityCollision(entity);
 			for(LivingEntity living: elist) {
 				if(!getData(entity).entitiesHit.contains(living)) {
@@ -109,14 +109,14 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 					float damage = entity.getDestroyData().woodVolume.getVolume() * Math.abs(fallSpeed) * 3f;
 					if(getData(entity).bounces == 0 && damage > 2) {
 						//System.out.println("damage: " + damage);
-						living.setMotion(
-								living.getMotion().x + (world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getXOffset() * damage * 0.2f),
-								living.getMotion().y + (world.rand.nextFloat() * fallSpeed * 0.25f),
-								living.getMotion().z + (world.rand.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getZOffset() * damage * 0.2f));
-						living.setMotion(living.getMotion().x + (world.rand.nextFloat() - 0.5), living.getMotion().y, living.getMotion().z + (world.rand.nextFloat() - 0.5));
+						living.setDeltaMovement(
+								living.getDeltaMovement().x + (world.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepX() * damage * 0.2f),
+								living.getDeltaMovement().y + (world.random.nextFloat() * fallSpeed * 0.25f),
+								living.getDeltaMovement().z + (world.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepZ() * damage * 0.2f));
+						living.setDeltaMovement(living.getDeltaMovement().x + (world.random.nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (world.random.nextFloat() - 0.5));
 						damage *= DTConfigs.fallingTreeDamageMultiplier.get();
 						//System.out.println("Tree Falling Damage: " + damage + "/" + living.getHealth());
-						living.attackEntityFrom(AnimationConstants.TREE_DAMAGE, damage);
+						living.hurt(AnimationConstants.TREE_DAMAGE, damage);
 					}
 				}
 			}
@@ -135,15 +135,15 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 	private boolean testCollision(FallingTreeEntity entity) {
 		Direction toolDir = entity.getDestroyData().toolDir;
 
-		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.rotationYaw : entity.rotationPitch;
+		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.yRot : entity.xRot;
 
-		int offsetX = toolDir.getXOffset();
-		int offsetZ = toolDir.getZOffset();
+		int offsetX = toolDir.getStepX();
+		int offsetZ = toolDir.getStepZ();
 		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
-		float xbase = (float) (entity.getPosX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
-		float ybase = (float) (entity.getPosY() - (h * 0.5f) + (v * 0.5f));
-		float zbase = (float) (entity.getPosZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float xbase = (float) (entity.getX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float ybase = (float) (entity.getY() - (h * 0.5f) + (v * 0.5f));
+		float zbase = (float) (entity.getZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 
 		int trunkHeight = entity.getDestroyData().trunkHeight;
 		float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
@@ -158,7 +158,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 			float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, maxRadius);
 			AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 
-			if(!entity.world.hasNoCollisions(entity, testBB)) {
+			if(!entity.level.noCollision(entity, testBB)) {
 				return true;
 			}
 		}
@@ -170,32 +170,32 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		Direction toolDir = entity.getDestroyData().toolDir;
 
 		switch(toolDir) {
-			case NORTH: entity.rotationPitch += delta; break;
-			case SOUTH: entity.rotationPitch -= delta; break;
-			case WEST: entity.rotationYaw += delta; break;
-			case EAST: entity.rotationYaw -= delta; break;
+			case NORTH: entity.xRot += delta; break;
+			case SOUTH: entity.xRot -= delta; break;
+			case WEST: entity.yRot += delta; break;
+			case EAST: entity.yRot -= delta; break;
 			default: break;
 		}
 
-		entity.rotationPitch = MathHelper.wrapDegrees(entity.rotationPitch);
-		entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw);
+		entity.xRot = MathHelper.wrapDegrees(entity.xRot);
+		entity.yRot = MathHelper.wrapDegrees(entity.yRot);
 	}
 
 	public List<LivingEntity> testEntityCollision(FallingTreeEntity entity) {
 
-		World world = entity.world;
+		World world = entity.level;
 
 		Direction toolDir = entity.getDestroyData().toolDir;
 
-		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.rotationYaw : entity.rotationPitch;
+		float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.yRot : entity.xRot;
 
-		int offsetX = toolDir.getXOffset();
-		int offsetZ = toolDir.getZOffset();
+		int offsetX = toolDir.getStepX();
+		int offsetZ = toolDir.getStepZ();
 		float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
 		float v = MathHelper.cos((float) Math.toRadians(actingAngle));
-		float xbase = (float) (entity.getPosX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
-		float ybase = (float) (entity.getPosY() - (h * 0.5f) + (v * 0.5f));
-		float zbase = (float) (entity.getPosZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float xbase = (float) (entity.getX() + offsetX * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
+		float ybase = (float) (entity.getY() - (h * 0.5f) + (v * 0.5f));
+		float zbase = (float) (entity.getZ() + offsetZ * ( - (0.5f) + (v * 0.5f) + (h * 0.5f) ) );
 		int trunkHeight = entity.getDestroyData().trunkHeight;
 		float segX = xbase + h * (trunkHeight - 1) * offsetX;
 		float segY = ybase + v * (trunkHeight - 1);
@@ -206,10 +206,10 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 		Vector3d vec3d1 = new Vector3d(xbase, ybase, zbase);
 		Vector3d vec3d2 = new Vector3d(segX, segY, segZ);
 
-		return world.getEntitiesInAABBexcluding(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
+		return world.getEntities(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
 				entity1 -> {
-					if(entity1 instanceof LivingEntity && entity1.canBeCollidedWith()) {
-						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(maxRadius);
+					if(entity1 instanceof LivingEntity && entity1.isPickable()) {
+						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().inflate(maxRadius);
 						return axisalignedbb.contains(vec3d1) || axisalignedbb.intersects(vec3d1, vec3d2);
 					}
 					return false;
@@ -220,19 +220,19 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 
 	@Override
 	public void dropPayload(FallingTreeEntity entity) {
-		World world = entity.world;
+		World world = entity.level;
 		BlockPos cutPos = entity.getDestroyData().cutPos;
-		entity.getPayload().forEach(i -> Block.spawnAsEntity(world, cutPos, i));
+		entity.getPayload().forEach(i -> Block.popResource(world, cutPos, i));
 	}
 
 	@Override
 	public boolean shouldDie(FallingTreeEntity entity) {
 
 		boolean dead =
-			Math.abs(entity.rotationPitch) >= 160 ||
-			Math.abs(entity.rotationYaw) >= 160 ||
+			Math.abs(entity.xRot) >= 160 ||
+			Math.abs(entity.yRot) >= 160 ||
 			entity.landed ||
-			entity.ticksExisted > 120 + (entity.getDestroyData().trunkHeight);
+			entity.tickCount > 120 + (entity.getDestroyData().trunkHeight);
 
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 		if(dead) {
@@ -246,19 +246,19 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 	@OnlyIn(Dist.CLIENT)
 	public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
 
-		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationYaw, entity.rotationYaw, partialTicks));
-		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.prevRotationPitch, entity.rotationPitch, partialTicks));
+		float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
+		float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
 
 		//Vec3d mc = entity.getMassCenter();
 
 		int radius = entity.getDestroyData().getBranchRadius(0);
 
 		Direction toolDir = entity.getDestroyData().toolDir;
-		Vector3d toolVec = new Vector3d(toolDir.getXOffset(), toolDir.getYOffset(), toolDir.getZOffset()).scale(radius / 16.0f);
+		Vector3d toolVec = new Vector3d(toolDir.getStepX(), toolDir.getStepY(), toolDir.getStepZ()).scale(radius / 16.0f);
 
 		matrixStack.translate(-toolVec.x, -toolVec.y, -toolVec.z);
-		matrixStack.rotate(new Quaternion(new Vector3f(0, 0, 1), -yaw, true));
-		matrixStack.rotate(new Quaternion(new Vector3f(1, 0, 0), pit, true));
+		matrixStack.mulPose(new Quaternion(new Vector3f(0, 0, 1), -yaw, true));
+		matrixStack.mulPose(new Quaternion(new Vector3f(1, 0, 0), pit, true));
 		matrixStack.translate(toolVec.x, toolVec.y, toolVec.z);
 
 		matrixStack.translate(-0.5, 0, -0.5);

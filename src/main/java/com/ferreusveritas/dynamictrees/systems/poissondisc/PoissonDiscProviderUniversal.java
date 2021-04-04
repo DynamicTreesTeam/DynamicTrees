@@ -26,7 +26,7 @@ public class PoissonDiscProviderUniversal {
 	}
 
 	public IPoissonDiscProvider getProvider(ServerWorld world) {
-		return providerMap.computeIfAbsent(world.getDimensionKey().getLocation(), k -> createCircleProvider(world));
+		return providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world));
 	}
 
 	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, ChunkPos chunkPos) {
@@ -35,7 +35,7 @@ public class PoissonDiscProviderUniversal {
 	}
 
 	public void unloadWorld(ServerWorld world) {
-		this.providerMap.remove(world.getDimensionKey().getLocation());
+		this.providerMap.remove(world.dimension().location());
 	}
 
 	public void setChunkPoissonData(ServerWorld world, ChunkPos chunkPos, byte[] circleData) {

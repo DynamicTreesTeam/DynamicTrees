@@ -32,7 +32,7 @@ public abstract class JsonReloadListener<V> extends JsonApplierReloadListener<Ma
         final Map<ResourceLocation, JsonElement> map = Maps.newHashMap();
         int i = this.folderName.length() + 1;
 
-        for (ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
+        for (ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
             final String resourcePath = resourceLocationIn.getPath();
             final ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(),
                     resourcePath.substring(i, resourcePath.length() - JSON_EXTENSION_LENGTH));

@@ -83,13 +83,13 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 
 		if (result == null) return;
 
-		BlockPos vinePos = result.getPos().offset(result.getFace());
+		BlockPos vinePos = result.getBlockPos().relative(result.getDirection());
 		if (vinePos == BlockPos.ZERO || !safeBounds.inBounds(vinePos, true)) return;
 
-		BooleanProperty vineSide = sideVineStates[result.getFace().getOpposite().getIndex()];
+		BooleanProperty vineSide = sideVineStates[result.getDirection().getOpposite().get3DDataValue()];
 		if(vineSide == null) return;
 
-		BlockState vineState = configuredGenFeature.get(BLOCK).getDefaultState().with(vineSide, true);
+		BlockState vineState = configuredGenFeature.get(BLOCK).defaultBlockState().setValue(vineSide, true);
 		this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH),
 				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE));
 	}
@@ -106,7 +106,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 
 		if (vinePos == BlockPos.ZERO) return;
 
-		this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).getDefaultState(), configuredGenFeature.get(MAX_LENGTH),
+		this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).defaultBlockState(), configuredGenFeature.get(MAX_LENGTH),
 				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE));
 	}
 
@@ -130,9 +130,9 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature {
 		BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
 
 		for (int i = 0; i < len; i++) {
-			if (world.isAirBlock(mPos)) {
+			if (world.isEmptyBlock(mPos)) {
 				// Set the current block either to a vine block or a tip block if it's set.
-				world.setBlockState(mPos, tipBlock != null && i == len - 1 ? tipBlock.getDefaultState() : vinesState, 3);
+				world.setBlock(mPos, tipBlock != null && i == len - 1 ? tipBlock.defaultBlockState() : vinesState, 3);
 				// Move current position down/up depending on vine type.
 				mPos.setY(mPos.getY() + (vineType != VineType.FLOOR ? - 1 : 1));
 			} else {

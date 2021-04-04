@@ -51,6 +51,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
+import net.minecraft.block.AbstractBlock.Properties;
+
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
  *
@@ -70,12 +73,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	private final Block primitiveDirt;
 	
 	public RootyBlock(Block primitiveDirt) {
-		this(Properties.from(primitiveDirt).tickRandomly(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt); //ModLoadingContext.get().getActiveNamespace();
+		this(Properties.copy(primitiveDirt).randomTicks(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt); //ModLoadingContext.get().getActiveNamespace();
 	}
 	public RootyBlock (Properties properties, String name, Block primitiveDirt){
 		super(properties);
 		setRegistryName(new ResourceLocation(ModLoadingContext.get().getActiveNamespace(),name));
-		setDefaultState(getDefaultState().with(FERTILITY, 0).with(IS_VARIANT, false));
+		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
 		this.primitiveDirt = primitiveDirt;
 	}
 	
@@ -88,7 +91,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FERTILITY).add(IS_VARIANT);
 	}
 	
@@ -100,14 +103,14 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	@Nullable
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (state.get(IS_VARIANT))
+		if (state.getValue(IS_VARIANT))
 			return new SpeciesTileEntity();
 		return null;
 	}
 
 	@Override
 	public boolean hasTileEntity(BlockState state) {
-		return state.get(IS_VARIANT);
+		return state.getValue(IS_VARIANT);
 	}
 
 	@Override
@@ -137,7 +140,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			Species species = getSpecies(rootyState, world, rootPos);
 			
 			if(species.isValid()) {
-				BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
+				BlockPos treePos = rootPos.relative(getTrunkDirection(world, rootPos));
 				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
 				if(treeBase != TreeHelper.NULL_TREE_PART) {
 					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, natural);
@@ -146,7 +149,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			
 			if(!viable) {
 				//TODO: Attempt to destroy what's left of the tree before setting rooty to dirt
-				world.setBlockState(rootPos, getDecayBlockState(rootyState, world, rootPos), 3);
+				world.setBlock(rootPos, getDecayBlockState(rootyState, world, rootPos), 3);
 			}
 			
 		}
@@ -162,18 +165,18 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @return
 	 */
 	public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-		return primitiveDirt.getDefaultState();
+		return primitiveDirt.defaultBlockState();
 	}
 	
 	//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
 	public void doDecay(World world, BlockPos rootPos, BlockState rootyState, Species species) {
-		if(!world.isRemote) {
+		if(!world.isClientSide) {
 			if(TreeHelper.isRooty(rootyState)) {
-				updateTree(rootyState, world, rootPos, world.rand, true);//This will turn the rooty dirt back to it's default soil block. Usually dirt or sand
+				updateTree(rootyState, world, rootPos, world.random, true);//This will turn the rooty dirt back to it's default soil block. Usually dirt or sand
 				BlockState newState = world.getBlockState(rootPos);
 				
 				if(!TreeHelper.isRooty(newState)) { //Make sure we're not still a rooty block
-					world.setBlockState(rootPos, getDecayBlockState(rootyState, world, rootPos));
+					world.setBlockAndUpdate(rootPos, getDecayBlockState(rootyState, world, rootPos));
 //					if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
 //						return;
 //					}
@@ -200,48 +203,48 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		return primitiveDirt.getDefaultState().getDrops(builder);
+		return primitiveDirt.defaultBlockState().getDrops(builder);
 	}
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return primitiveDirt.getPickBlock(primitiveDirt.getDefaultState(), target, world, pos, player);
+		return primitiveDirt.getPickBlock(primitiveDirt.defaultBlockState(), target, world, pos, player);
 	}
 
 	@Override
 	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		return (float) (primitiveDirt.getDefaultState().getBlockHardness(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
+		return (float) (primitiveDirt.defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
 	}
 
 	@Override
-	public boolean hasComparatorInputOverride(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public int getComparatorInputOverride(BlockState blockState, World world, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState blockState, World world, BlockPos pos) {
 		return getSoilLife(blockState, world, pos);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getHeldItem(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 	
 	
 	public void destroyTree(World world, BlockPos rootPos) {
-		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.up()));
+		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.above()));
 		
 		if(branch.isPresent()) {
-			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.up(), Direction.DOWN, true, null);
+			BranchDestructionData destroyData = branch.get().destroyBranchFromNode(world, rootPos.above(), Direction.DOWN, true, null);
 			FallingTreeEntity.dropTree(world, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
 		}
 	}
 	
 	@Override
-	public void onBlockHarvested(World world, @Nonnull BlockPos pos, BlockState state, @Nonnull PlayerEntity player) {
+	public void playerWillDestroy(World world, @Nonnull BlockPos pos, BlockState state, @Nonnull PlayerEntity player) {
 		destroyTree(world, pos);
-		super.onBlockHarvested(world, pos, state, player);
+		super.playerWillDestroy(world, pos, state, player);
 	}
 	
 	@Override
@@ -251,14 +254,14 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	public int getSoilLife(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return blockState.get(FERTILITY);
+		return blockState.getValue(FERTILITY);
 	}
 	
 	public void setSoilLife(World world, BlockPos rootPos, int life) {
 		Species species = getSpecies(world.getBlockState(rootPos), world, rootPos);
 		BlockState currentState = world.getBlockState(rootPos);
-		world.setBlockState(rootPos, currentState.with(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
-		world.notifyNeighborsOfStateChange(rootPos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
+		world.setBlock(rootPos, currentState.setValue(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
+		world.updateNeighborsAt(rootPos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
 		setSpecies(world, rootPos, species);
 		
 	}
@@ -309,7 +312,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 */
 	public MapSignal startAnalysis(IWorld world, BlockPos rootPos, MapSignal signal) {
 		Direction dir = getTrunkDirection(world, rootPos);
-		BlockPos treePos = rootPos.offset(dir);
+		BlockPos treePos = rootPos.relative(dir);
 		BlockState treeState = world.getBlockState(treePos);
 		
 		TreeHelper.getTreePart(treeState).analyse(treeState, world, treePos, null, signal);
@@ -339,14 +342,14 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public Family getFamily(BlockState rootyState, IBlockReader blockAccess, BlockPos rootPos) {
-		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
+		BlockPos treePos = rootPos.relative(getTrunkDirection(blockAccess, rootPos));
 		BlockState treeState = blockAccess.getBlockState(treePos);
 		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : Family.NULL_FAMILY;
 	}
 
 	@Nullable
 	private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
-		return (SpeciesTileEntity) world.getTileEntity(pos);
+		return (SpeciesTileEntity) world.getBlockEntity(pos);
 	}
 	
 	/**
@@ -368,7 +371,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			}
 		}
 		
-		return tree.getSpeciesForLocation(world, rootPos.offset(getTrunkDirection(world, rootPos)));
+		return tree.getSpeciesForLocation(world, rootPos.relative(getTrunkDirection(world, rootPos)));
 	}
 	
 	public void setSpecies(World world, BlockPos rootPos, Species species) {
@@ -380,7 +383,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Nonnull
 	@Override
-	public PushReaction getPushReaction(BlockState state) {
+	public PushReaction getPistonPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
 	}
 	

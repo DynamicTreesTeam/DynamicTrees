@@ -47,11 +47,11 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
             return quads;
         }
 
-        final BlockState saplingState = species.getSapling().get().getDefaultState();
+        final BlockState saplingState = species.getSapling().get().defaultBlockState();
 
-        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        IBakedModel potModel = dispatcher.getModelForState(potState);
-        IBakedModel saplingModel = dispatcher.getModelForState(saplingState);
+        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        IBakedModel potModel = dispatcher.getBlockModel(potState);
+        IBakedModel saplingModel = dispatcher.getBlockModel(saplingState);
 
         quads.addAll(potModel.getQuads(potState, side, rand, extraData));
         quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vector3d(0, 0.25, 0), rand, extraData)));
@@ -60,8 +60,8 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     }
 
     @Override
-	public boolean isAmbientOcclusion() {
-		return this.basePotModel.isAmbientOcclusion();
+	public boolean useAmbientOcclusion() {
+		return this.basePotModel.useAmbientOcclusion();
 	}
 
 	@Override
@@ -70,18 +70,18 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
 	}
 
 	@Override
-	public boolean isBuiltInRenderer() {
+	public boolean isCustomRenderer() {
 		return true;
 	}
 
     @Override
-    public boolean isSideLit() {
+    public boolean usesBlockLight() {
         return false;
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture() {
-        return this.basePotModel.getParticleTexture();
+    public TextureAtlasSprite getParticleIcon() {
+        return this.basePotModel.getParticleIcon();
     }
 
     @Override

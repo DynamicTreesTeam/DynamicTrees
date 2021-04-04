@@ -32,10 +32,10 @@ public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature 
 
     @Override
     public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
-        if (!TreeHelper.isRooty(world.getBlockState(pos.down())))
+        if (!TreeHelper.isRooty(world.getBlockState(pos.below())))
             return;
 
-        world.setBlockState(pos.down(), configuredGenFeature.get(ROTTED_SOIL).getDefaultState(), 3); // Change rooty dirt to rotted soil.
+        world.setBlock(pos.below(), configuredGenFeature.get(ROTTED_SOIL).defaultBlockState(), 3); // Change rooty dirt to rotted soil.
     }
 
 }

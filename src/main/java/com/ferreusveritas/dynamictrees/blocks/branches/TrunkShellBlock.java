@@ -66,14 +66,14 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	}
 
 	public TrunkShellBlock() {
-		super(Block.Properties.create(Material.WOOD));
+		super(Block.Properties.of(Material.WOOD));
 	}
 
 	///////////////////////////////////////////
 	// BLOCKSTATE
 	///////////////////////////////////////////
 
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(CORE_DIR);
 	}
 
@@ -100,9 +100,9 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		ShellMuse muse = getMuse(worldIn, state, pos);
-		return muse != null ? muse.state.getBlock().getPlayerRelativeBlockHardness(muse.state, player, worldIn, muse.pos) : 0.0f;
+		return muse != null ? muse.state.getBlock().getDestroyProgress(muse.state, player, worldIn, muse.pos) : 0.0f;
 	}
 
 	@Override
@@ -124,12 +124,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	}
 
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext useContext) {
-		return getMuse(useContext.getWorld(), useContext.getPos()) == null;
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
+		return getMuse(useContext.getLevel(), useContext.getClickedPos()) == null;
 	}
 
 	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {
-		return state.get(CORE_DIR);
+		return state.getValue(CORE_DIR);
 	}
 
 	@Nullable
@@ -143,7 +143,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	@Nullable
 	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos, @Nonnull BlockPos originalPos) {
 		Surround museDir = getMuseDir(state, pos);
-		BlockPos musePos = pos.add(museDir.getOffset());
+		BlockPos musePos = pos.offset(museDir.getOffset());
 		BlockState museState = CoordUtils.getStateSafe(access, musePos);
 
 		if (museState == null)
@@ -154,7 +154,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
 		} else if (block instanceof TrunkShellBlock){ //If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse
 			final Vector3i offset = ((TrunkShellBlock)block).getMuseDir(museState, musePos).getOffset();
-			if (new Vector3d(offset.getX(), offset.getY(), offset.getZ()).add(new Vector3d(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSquared() > 2.25){
+			if (new Vector3d(offset.getX(), offset.getY(), offset.getZ()).add(new Vector3d(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSqr() > 2.25){
 				return (((TrunkShellBlock)block).getMuseUnchecked(access, museState, musePos, originalPos));
 			}
 		}
@@ -181,8 +181,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public void scheduleForClearing(IBlockReader access, BlockPos pos) {
 		if(access instanceof World) {
 			World world = (World) access;
-			if(!world.isRemote) {
-				world.getPendingBlockTicks().scheduleTick(pos.toImmutable(), this, 0, TickPriority.HIGH);
+			if(!world.isClientSide) {
+				world.getBlockTicks().scheduleTick(pos.immutable(), this, 0, TickPriority.HIGH);
 			}
 		}
 	}
@@ -197,7 +197,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		ShellMuse muse = getMuse(reader, state, pos);
 		if (muse != null){
 			VoxelShape shape = muse.state.getShape(reader, muse.pos);
-			return VoxelShapes.create(shape.getBoundingBox().offset(muse.museOffset));
+			return VoxelShapes.create(shape.bounds().move(muse.museOffset));
 		} else {
 			return VoxelShapes.empty();//NULL_AABB;
 		}
@@ -225,7 +225,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	//TODO: This may not even be necessary
 	protected Surround findDetachedMuse(World world, BlockPos pos) {
 		for(Surround s: Surround.values()) {
-			BlockState state = world.getBlockState(pos.add(s.getOffset()));
+			BlockState state = world.getBlockState(pos.offset(s.getOffset()));
 			if(state.getBlock() instanceof IMusable) {
 				return s;
 			}
@@ -235,21 +235,21 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 
 	//TODO: This may not even be necessary
 	@Override
-	public void onPlayerDestroy(IWorld world, BlockPos pos, BlockState state) {
+	public void destroy(IWorld world, BlockPos pos, BlockState state) {
 		BlockState newState = world.getBlockState(pos);
 		if(newState.getBlock() == Blocks.AIR) {
 			Surround surr = findDetachedMuse((World) world, pos);
 			if(surr != null) {
-				world.setBlockState(pos, getDefaultState().with(CORE_DIR, surr), 1);
+				world.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surr), 1);
 			}
 		}
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		ShellMuse muse = getMuse(world, pos);
 		if(muse != null) {
-			return muse.state.getBlock().onBlockActivated(muse.state, world, muse.pos, playerIn, hand, hit);
+			return muse.state.getBlock().use(muse.state, world, muse.pos, playerIn, hand, hit);
 		}
 
 		return ActionResultType.FAIL;
@@ -266,12 +266,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.INVISIBLE;
 	}
 
 	@Override
-	public PushReaction getPushReaction(BlockState state) {
+	public PushReaction getPistonPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
 	}
 
@@ -296,7 +296,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 			BlockState museState = muse.state;
 			BlockPos musePos = muse.pos;
 
-			manager.addBlockDestroyEffects(musePos, museState);
+			manager.destroy(musePos, museState);
 		}
 		return true;
 	}
@@ -306,7 +306,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
 		BlockPos shellPos;
 		if (target instanceof BlockRayTraceResult){
-			shellPos = ((BlockRayTraceResult)target).getPos();
+			shellPos = ((BlockRayTraceResult)target).getBlockPos();
 		} else {
 			return false;
 		}
@@ -317,17 +317,17 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 
 			BlockState museState = muse.state;
 			BlockPos musePos = muse.pos;
-			Random rand = world.rand;
+			Random rand = world.random;
 
 			int x = musePos.getX();
 			int y = musePos.getY();
 			int z = musePos.getZ();
-			AxisAlignedBB axisalignedbb = museState.getCollisionShape(world, musePos).getBoundingBox();
+			AxisAlignedBB axisalignedbb = museState.getBlockSupportShape(world, musePos).bounds();
 			double d0 = x + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - 0.2D) + 0.1D + axisalignedbb.minX;
 			double d1 = y + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - 0.2D) + 0.1D + axisalignedbb.minY;
 			double d2 = z + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - 0.2D) + 0.1D + axisalignedbb.minZ;
 
-			switch(((BlockRayTraceResult) target).getFace()) {
+			switch(((BlockRayTraceResult) target).getDirection()) {
 				case DOWN:  d1 = y + axisalignedbb.minY - 0.1D; break;
 				case UP:    d1 = y + axisalignedbb.maxY + 0.1D; break;
 				case NORTH: d2 = z + axisalignedbb.minZ - 0.1D; break;

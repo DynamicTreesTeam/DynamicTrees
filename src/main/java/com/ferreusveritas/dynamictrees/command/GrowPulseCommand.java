@@ -24,7 +24,7 @@ public final class GrowPulseCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getWorld();
+        final World world = context.getSource().getLevel();
         final BlockPos pos = this.getPositionArg(context);
         final BlockState state = world.getBlockState(pos);
 

@@ -99,8 +99,8 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 
 		NativeImage frame = majPixbuf.toNativeImage();
 
-		this.frames[0] = frame;
-		this.uploadMipmaps();
+		this.mainImage[0] = frame;
+		this.uploadFirstFrame();
 	}
 
 	private PixelBuffer createMajorTexture(PixelBuffer baseBuffer) {
@@ -129,17 +129,17 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 			int edge = 2;
 			int pixbufSel = 0;
 			for(Direction dir : CoordUtils.HORIZONTALS) { //SWNE
-				Direction ovr = dir.rotateY();
-				int offX = dir.getXOffset();
-				int offY = dir.getZOffset();
+				Direction ovr = dir.getClockWise();
+				int offX = dir.getStepX();
+				int offY = dir.getStepZ();
 				int compX = (offX == 1 ? -6 : 0) + (dir.getAxis() == Axis.Z ? -2 : 0);
 				int compY = (offY == 1 ? -6 : 0) + (dir.getAxis() == Axis.X ? -2 : 0);
 				int startX = offX * (14 + nesting * 6);
 				int startY = offY * (14 + nesting * 6);
 				for(int way = -1; way <= 1; way+=2) {
 					for(int i = 0; i < 4 + nesting; i++) {
-						int rowX = ovr.getXOffset() * i * way * 4;
-						int rowY = ovr.getZOffset() * i * way * 4;
+						int rowX = ovr.getStepX() * i * way * 4;
+						int rowY = ovr.getStepZ() * i * way * 4;
 						int realX = centerX + startX + compX + rowX;
 						int realY = centerY + startY + compY + rowY;
 						edges[((pixbufSel++ * 13402141) >> 1) & 3].blit(majPixbuf, realX * scale, realY * scale, edge);

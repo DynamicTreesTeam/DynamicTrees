@@ -17,7 +17,7 @@ public class FertilizeSubstance implements ISubstanceEffect {
 		final RootyBlock dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 
 		if (dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
-			if (world.isRemote) {
+			if (world.isClientSide) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
 			} else {
 				if (grow) TreeHelper.growPulse(world, rootPos);

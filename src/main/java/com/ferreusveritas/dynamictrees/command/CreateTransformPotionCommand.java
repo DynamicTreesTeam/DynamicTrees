@@ -24,8 +24,8 @@ public final class CreateTransformPotionCommand extends SubCommand {
         this.executesWithCoordinates = false;
         this.defaultToExecute = false;
 
-        this.extraArguments = Commands.argument(CommandConstants.TREE_FAMILY_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
+        this.extraArguments = Commands.argument(CommandConstants.TREE_FAMILY_ARGUMENT, ResourceLocationArgument.id())
+                .suggests((context, builder) -> ISuggestionProvider.suggestResource(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
     }
 
     @Override
@@ -36,11 +36,11 @@ public final class CreateTransformPotionCommand extends SubCommand {
     @Override
     protected int execute(CommandContext<CommandSource> context) {
         final BlockPos pos = this.getPositionArg(context);
-        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.TREE_FAMILY_ARGUMENT));
+        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.TREE_FAMILY_ARGUMENT));
 
         // Ensure species given exists.
         if (!species.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.TREE_FAMILY_ARGUMENT)));
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.TREE_FAMILY_ARGUMENT)));
             return 0;
         }
 
@@ -50,7 +50,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
-        ItemUtils.spawnItemStack(context.getSource().getWorld(), pos, dendroPotionStack, true); // Spawn potion in the world.
+        ItemUtils.spawnItemStack(context.getSource().getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
 
         return 1;
     }

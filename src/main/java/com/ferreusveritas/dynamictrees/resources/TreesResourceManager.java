@@ -58,18 +58,18 @@ public final class TreesResourceManager implements IResourceManager {
     }
 
     @Override
-    public Set<String> getResourceNamespaces() {
-        return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack.getResourceNamespaces(null)).flatMap(Collection::stream).collect(Collectors.toSet());
+    public Set<String> getNamespaces() {
+        return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack.getNamespaces(null)).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override
     public IResource getResource(final ResourceLocation resourceLocationIn) throws IOException {
-        final List<IResource> resources = this.getAllResources(resourceLocationIn);
+        final List<IResource> resources = this.getResources(resourceLocationIn);
 
         if (resources.size() < 1)
             throw new FileNotFoundException("Could not find path '" + resourceLocationIn + "' in any tree packs.");
 
-        return this.getAllResources(resourceLocationIn).get(resources.size() - 1);
+        return this.getResources(resourceLocationIn).get(resources.size() - 1);
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class TreesResourceManager implements IResourceManager {
     }
 
     @Override
-    public List<IResource> getAllResources(ResourceLocation resourceLocationIn) throws IOException {
+    public List<IResource> getResources(ResourceLocation resourceLocationIn) throws IOException {
         final List<IResource> resources = new ArrayList<>();
 
         // Add ModTreeResourcePacks resources first so that the user's changes in /trees take priority.
@@ -96,7 +96,7 @@ public final class TreesResourceManager implements IResourceManager {
             InputStream stream;
 
             try {
-                stream = resourcePack.getResourceStream(null, resourceLocationIn);
+                stream = resourcePack.getResource(null, resourceLocationIn);
             } catch (IOException e) {
                 continue;
             }
@@ -106,14 +106,14 @@ public final class TreesResourceManager implements IResourceManager {
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(String path, Predicate<String> filter) {
+    public Collection<ResourceLocation> listResources(String path, Predicate<String> filter) {
         return this.resourcePacks.stream().map(resourcePack -> resourcePack.getResourceNamespaces().stream()
-                .map(namespace -> resourcePack.getAllResourceLocations(null, namespace, path, Integer.MAX_VALUE, filter))
+                .map(namespace -> resourcePack.getResources(null, namespace, path, Integer.MAX_VALUE, filter))
                 .flatMap(Collection::stream).collect(Collectors.toSet())).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override
-    public Stream<IResourcePack> getResourcePackStream() {
+    public Stream<IResourcePack> listPacks() {
         return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack);
     }
 

@@ -45,7 +45,7 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 
 	private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight){
 		for (int i = 1; i < maxHeight; i++) {
-			if (!TreeHelper.isBranch(world.getBlockState(rootPos.up(i)))){
+			if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))){
 				return i - 1;
 			}
 		}
@@ -59,7 +59,7 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 	 * @param rootPos The position of the rooty dirt block of the tree
 	 */
 	public void setTrunkThickness(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species) {
-		int currentRadius = TreeHelper.getRadius(world, rootPos.up());
+		int currentRadius = TreeHelper.getRadius(world, rootPos.above());
 		if (currentRadius > 0){
 			int currentTreeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
 			int tallestTreeHeight = species.getLowestBranchHeight();
@@ -67,9 +67,9 @@ public class ConsistentTrunkThicknessGenFeature extends GenFeature implements IP
 				int radiusToSet = (int)(species.getMaxBranchRadius() * 0.8 * (currentTreeHeight / (float)tallestTreeHeight));
 				if (radiusToSet > currentRadius){
 					for (int i = 1; i < currentTreeHeight; i++){
-						BranchBlock branch =TreeHelper.getBranch(world.getBlockState(rootPos.up(i)));
+						BranchBlock branch =TreeHelper.getBranch(world.getBlockState(rootPos.above(i)));
 						if (branch == null) return;
-						branch.setRadius(world, rootPos.up(i), radiusToSet, Direction.DOWN);
+						branch.setRadius(world, rootPos.above(i), radiusToSet, Direction.DOWN);
 					}
 				}
 			}

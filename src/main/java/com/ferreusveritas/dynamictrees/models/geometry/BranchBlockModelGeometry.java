@@ -65,7 +65,7 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
     @SuppressWarnings("deprecation")
     @Override
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        return this.textures.stream().map(resourceLocation -> new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, resourceLocation))
+        return this.textures.stream().map(resourceLocation -> new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, resourceLocation))
                 .collect(Collectors.toList());
     }
 

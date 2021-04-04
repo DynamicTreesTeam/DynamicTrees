@@ -57,18 +57,18 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 	public BlockPos preGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		if(radius >= configuredGenFeature.get(MOUND_CUTOFF_RADIUS) && safeBounds != SafeChunkBounds.ANY) {//worldgen test
 			BlockState initialDirtState = world.getBlockState(rootPos);
-			BlockState initialUnderState = world.getBlockState(rootPos.down());
+			BlockState initialUnderState = world.getBlockState(rootPos.below());
 			
-			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.EARTH && initialUnderState.getMaterial() != Material.ROCK)) {
-				Biome biome = world.getNoiseBiomeRaw(rootPos.getX(), rootPos.getY(), rootPos.getZ());
-				initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
+			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)) {
+				Biome biome = world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ());
+				initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
 			}
 			
-			rootPos = rootPos.up();
+			rootPos = rootPos.above();
 			
 			for(Cell cell: moundMap.getAllNonZeroCells()) {
 				BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
-				world.setBlockState(rootPos.add(cell.getPos()), placeState, 3);
+				world.setBlock(rootPos.offset(cell.getPos()), placeState, 3);
 			}
 		}
 		
@@ -83,16 +83,16 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		if(radius < configuredGenFeature.get(MOUND_CUTOFF_RADIUS) && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
-			BlockPos treePos = rootPos.up();
-			BlockState belowState = world.getBlockState(rootPos.down());
+			BlockPos treePos = rootPos.above();
+			BlockState belowState = world.getBlockState(rootPos.below());
 			
 			//Place dirt blocks around rooty dirt block if tree has a > 8 radius
 			BlockState branchState = world.getBlockState(treePos);
 			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.RADMAX_NORMAL) {
 				for(Surround dir: Surround.values()) {
-					BlockPos dPos = rootPos.add(dir.getOffset());
-					world.setBlockState(dPos, initialDirtState, 3);
-					world.setBlockState(dPos.down(), belowState, 3);
+					BlockPos dPos = rootPos.offset(dir.getOffset());
+					world.setBlock(dPos, initialDirtState, 3);
+					world.setBlock(dPos.below(), belowState, 3);
 				}
 				return true;
 			}

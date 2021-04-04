@@ -28,7 +28,7 @@ public class TransformSubstance implements ISubstanceEffect {
 		if (dirt != null && toSpecies != null) {
 			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
 			if (fromSpecies.isTransformable() && fromSpecies!= toSpecies) {
-				if (world.isRemote) {
+				if (world.isClientSide) {
 					TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
 				} else {
 					dirt.startAnalysis(world, rootPos, new MapSignal(new TransformNode(fromSpecies, toSpecies)));

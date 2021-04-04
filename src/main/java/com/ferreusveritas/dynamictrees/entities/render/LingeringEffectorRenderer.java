@@ -22,7 +22,7 @@ public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorE
     }
 
     @Override
-    public ResourceLocation getEntityTexture(LingeringEffectorEntity entity) {
+    public ResourceLocation getTextureLocation(LingeringEffectorEntity entity) {
         return null;
     }
 

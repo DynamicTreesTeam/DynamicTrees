@@ -172,7 +172,7 @@ public class SimpleVoxmap {
 	}
 	
 	public SimpleVoxmap filter(BlockPos from, BlockPos to, IFilterOp op) {
-		for(BlockPos pos : BlockPos.getAllInBoxMutable(from, to) ) {
+		for(BlockPos pos : BlockPos.betweenClosed(from, to) ) {
 			setVoxel(pos, op.getOp(getVoxel(pos)));
 		}
 		return this;
@@ -325,7 +325,7 @@ public class SimpleVoxmap {
 							
 							byte value = (byte) (data[++dataPos] & mask);
 							if(value > 0) {
-								dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+								dPos.set(x - center.getX(), y - center.getY(), z - center.getZ());
 								return workingCell.setValue(value);
 							}
 						}
@@ -395,7 +395,7 @@ public class SimpleVoxmap {
 
 							if((data[++dataPos] & mask) > 0) {
 								yclean = false; //We found non-zero data.  Therefore this y layer is dirty
-								return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+								return dPos.set(x - center.getX(), y - center.getY(), z - center.getZ());
 							}
 						}
 
@@ -444,7 +444,7 @@ public class SimpleVoxmap {
 							
 							while(y >= 0) {
 								if(data[dataPos] != 0) {
-									return dPos.setPos(x - center.getX(), y - center.getY(), z - center.getZ());
+									return dPos.set(x - center.getX(), y - center.getY(), z - center.getZ());
 								}
 								dataPos -= layerSize;
 								y--;

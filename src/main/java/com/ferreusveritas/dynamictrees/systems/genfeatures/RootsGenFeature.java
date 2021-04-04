@@ -75,7 +75,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 
-		BlockPos treePos = rootPos.up();
+		BlockPos treePos = rootPos.above();
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 
 		if (trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
@@ -89,10 +89,10 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 
 		if(soilLife > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
-			Surround surr = Surround.values()[world.rand.nextInt(8)];
-			BlockPos dPos = treePos.add(surr.getOffset());
+			Surround surr = Surround.values()[world.random.nextInt(8)];
+			BlockPos dPos = treePos.offset(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-				world.setBlockState(dPos, DTRegistries.TRUNK_SHELL.getDefaultState().with(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+				world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
 			this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
@@ -112,11 +112,11 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	protected void nextRoot(IWorld world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
 
 		for(int depth = 0; depth < 2; depth++) {
-			BlockPos currPos = trunkPos.add(pos).up(height - depth);
+			BlockPos currPos = trunkPos.offset(pos).above(height - depth);
 			BlockState placeState = world.getBlockState(currPos);
-			BlockState belowState = world.getBlockState(currPos.down());
+			BlockState belowState = world.getBlockState(currPos.below());
 
-			boolean onNormalCube = belowState.isNormalCube(world, currPos.down());
+			boolean onNormalCube = belowState.isRedstoneConductor(world, currPos.below());
 
 			if(pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
 				if(radius > 0) {
@@ -125,7 +125,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 				if(onNormalCube) {
 					for(Direction dir: CoordUtils.HORIZONTALS) {
 						if(dir != fromDir) {
-							BlockPos dPos = pos.offset(dir);
+							BlockPos dPos = pos.relative(dir);
 							int nextRad = this.scaler.apply((int) rootMap.getVoxel(dPos), trunkRadius, minTrunkRadius);
 							if(pos != BlockPos.ZERO && nextRad >= radius) {
 								nextRad = radius - 1;

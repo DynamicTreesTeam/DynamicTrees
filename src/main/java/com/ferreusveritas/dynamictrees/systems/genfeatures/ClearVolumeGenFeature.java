@@ -28,7 +28,7 @@ public class ClearVolumeGenFeature extends GenFeature implements IPreGenFeature 
 	@Override
 	public BlockPos preGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		//Erase a volume of blocks that could potentially get in the way
-		for(BlockPos pos : BlockPos.getAllInBoxMutable(rootPos.add(new Vector3i(-1,  1, -1)), rootPos.add(new Vector3i(1, configuredGenFeature.get(HEIGHT), 1)))) {
+		for(BlockPos pos : BlockPos.betweenClosed(rootPos.offset(new Vector3i(-1,  1, -1)), rootPos.offset(new Vector3i(1, configuredGenFeature.get(HEIGHT), 1)))) {
 			world.removeBlock(pos, false);
 		}
 		return rootPos;

@@ -24,11 +24,11 @@ public final class CompatHandler {
 
     public static void initSereneSeasons() {
         SeasonManager seasonManager = new SeasonManager(
-                world -> SeasonsConfig.isDimensionWhitelisted(world.getDimensionKey()) ?
+                world -> SeasonsConfig.isDimensionWhitelisted(world.dimension()) ?
                         new Tuple<>(new SeasonProviderSereneSeasons(), new SeasonGrowthCalculatorActive()) :
                         new Tuple<>(new SeasonProviderNull(), new SeasonGrowthCalculatorNull())
         );
-        seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(RegistryKey.getOrCreateKey(Registry.BIOME_KEY,
+        seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(RegistryKey.create(Registry.BIOME_REGISTRY,
                 Objects.requireNonNull(world.getBiome(pos).getRegistryName()))));
         SeasonHelper.setSeasonManager(seasonManager);
     }

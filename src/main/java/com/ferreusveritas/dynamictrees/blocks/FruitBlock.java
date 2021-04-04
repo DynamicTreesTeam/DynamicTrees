@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 @SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements IGrowable {
 
@@ -62,9 +64,9 @@ public class FruitBlock extends Block implements IGrowable {
 	private Species species;
 
 	public FruitBlock() {
-		super(Properties.create(Material.PLANTS)
-				.tickRandomly()
-				.hardnessAndResistance(0.3f));
+		super(Properties.of(Material.PLANT)
+				.randomTicks()
+				.strength(0.3f));
 	}
 
 	public FruitBlock setBonemealable(boolean bonemealable) {
@@ -92,7 +94,7 @@ public class FruitBlock extends Block implements IGrowable {
 			return;
 		}
 
-		int age = state.get(AGE);
+		int age = state.getValue(AGE);
 		Float season = SeasonHelper.getSeasonValue(world, pos);
 
 		if(season != null && getSpecies().isValid()) { //Non-Null means we are season capable
@@ -109,7 +111,7 @@ public class FruitBlock extends Block implements IGrowable {
 			boolean doGrow = rand.nextFloat() < getGrowthChance(world, pos);
 			boolean eventGrow = net.minecraftforge.common.ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
 			if(season != null ? doGrow || eventGrow : eventGrow) { //Prevent a seasons mod from canceling the growth, we handle that ourselves
-				world.setBlockState(pos, state.with(AGE, age + 1), 2);
+				world.setBlock(pos, state.setValue(AGE, age + 1), 2);
 				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(world, pos, state);
 			}
 		} else {
@@ -119,7 +121,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockState(pos, DTRegistries.BLOCK_STATES.AIR); break;
+					case ROT: world.setBlockAndUpdate(pos, DTRegistries.BLOCK_STATES.AIR); break;
 				}
 			}
 		}
@@ -143,7 +145,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockState(pos, DTRegistries.BLOCK_STATES.AIR);
+		world.setBlockAndUpdate(pos, DTRegistries.BLOCK_STATES.AIR);
 	}
 
 	@Override
@@ -159,8 +161,8 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (state.get(AGE) >= 3 ) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (state.getValue(AGE) >= 3 ) {
 			this.dropBlock(worldIn, state, pos);
 			return ActionResultType.SUCCESS;
 		}
@@ -169,9 +171,9 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	private void dropBlock(World worldIn, BlockState state, BlockPos pos) {
-		worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-		if (state.get(AGE) >= 3) {
-			worldIn.addEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop()));
+		worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+		if (state.getValue(AGE) >= 3) {
+			worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop()));
 		}
 	}
 
@@ -189,7 +191,7 @@ public class FruitBlock extends Block implements IGrowable {
 	 * @return True if it should drop (leaves are not above).
 	 */
 	public boolean shouldBlockDrop(IBlockReader world, BlockPos pos, BlockState state) {
-		return !(world.getBlockState(pos.up()).getBlock() instanceof LeavesBlock);
+		return !(world.getBlockState(pos.above()).getBlock() instanceof LeavesBlock);
 	}
 
 
@@ -198,21 +200,21 @@ public class FruitBlock extends Block implements IGrowable {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean canGrow(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
-		return state.get(AGE) < 3;
+	public boolean isValidBonemealTarget(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
+		return state.getValue(AGE) < 3;
 	}
 
 	@Override
-	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(World world, Random rand, BlockPos pos, BlockState state) {
 		return bonemealable;
 	}
 
 	@Override
-	public void grow(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
-		int age = state.get(AGE);
+	public void performBonemeal(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
+		int age = state.getValue(AGE);
 		int newAge = MathHelper.clamp(age + 1, 0, 3);
 		if(newAge != age) {
-			world.setBlockState(pos, state.with(AGE, newAge), 2);
+			world.setBlock(pos, state.setValue(AGE, newAge), 2);
 		}
 	}
 
@@ -225,7 +227,7 @@ public class FruitBlock extends Block implements IGrowable {
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		List<ItemStack> drops = super.getDrops(state, builder);
-		if(state.get(AGE) >= 3) {
+		if(state.getValue(AGE) >= 3) {
 			ItemStack toDrop = getFruitDrop();
 			if(!toDrop.isEmpty()) {
 				drops.add(toDrop);
@@ -251,7 +253,7 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.create(FRUIT_AABB[state.get(AGE)]);
+		return VoxelShapes.create(FRUIT_AABB[state.getValue(AGE)]);
 	}
 
 	///////////////////////////////////////////
@@ -259,12 +261,12 @@ public class FruitBlock extends Block implements IGrowable {
 	///////////////////////////////////////////
 
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(AGE);
 	}
 
 	public BlockState getStateForAge(int age) {
-		return getDefaultState().with(AGE, age);
+		return defaultBlockState().setValue(AGE, age);
 	}
 
 	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {

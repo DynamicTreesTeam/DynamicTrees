@@ -25,7 +25,7 @@ public final class SetTreeCommand extends SubCommand {
         this.defaultToExecute = false;
 
         // Register extra arguments.
-        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getRegistryNames(), builder))
+        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.id()).suggests((context, builder) -> ISuggestionProvider.suggestResource(Species.REGISTRY.getRegistryNames(), builder))
                 .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Collections.singletonList("JP"), builder))
                         .then(Commands.argument(CommandConstants.TURNS_ARGUMENT, IntegerArgumentType.integer())
                                 .executes(this::execute)));
@@ -44,12 +44,12 @@ public final class SetTreeCommand extends SubCommand {
         final BlockPos pos = this.getPositionArg(context);
 
         if (!species.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
 
-        ServerWorld world = context.getSource().getWorld();
-        species.getJoCode(joCode).rotate(Direction.byHorizontalIndex(turns)).setCareful(true).generate(world, world, species, pos.offset(Direction.DOWN), context.getSource().getWorld().getBiome(pos), Direction.SOUTH, 8, SafeChunkBounds.ANY);
+        ServerWorld world = context.getSource().getLevel();
+        species.getJoCode(joCode).rotate(Direction.from2DDataValue(turns)).setCareful(true).generate(world, world, species, pos.relative(Direction.DOWN), context.getSource().getLevel().getBiome(pos), Direction.SOUTH, 8, SafeChunkBounds.ANY);
         return 1;
     }
 

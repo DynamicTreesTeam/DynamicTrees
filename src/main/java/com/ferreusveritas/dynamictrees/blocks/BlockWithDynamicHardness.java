@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 /**
  * An abstract class to allow for Blocks with dynamic hardness.
  *
@@ -27,13 +29,13 @@ public abstract class BlockWithDynamicHardness extends Block {
 
         // Create and fill a new state container.
         final StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
-        this.fillStateContainer(builder);
+        this.createBlockStateDefinition(builder);
 
         // Set the state container to use our custom BlockState class.
-        this.stateContainer = builder.createStateContainer(Block::getDefaultState, DynamicHardnessBlockState::new);
+        this.stateDefinition = builder.create(Block::defaultBlockState, DynamicHardnessBlockState::new);
 
         // Sets the default state to the current default state, but with our new BlockState class.
-        this.setDefaultState(this.stateContainer.getBaseState());
+        this.registerDefaultState(this.stateDefinition.any());
     }
 
     /**
@@ -58,7 +60,7 @@ public abstract class BlockWithDynamicHardness extends Block {
         }
 
         @Override
-        public float getBlockHardness (IBlockReader worldIn, BlockPos pos) {
+        public float getDestroySpeed (IBlockReader worldIn, BlockPos pos) {
             return getHardness(worldIn, pos);
         }
 

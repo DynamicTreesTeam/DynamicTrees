@@ -38,9 +38,9 @@ public class CoderNode implements INodeInspector {
 		//We've reached the end of a branch and we're starting again.
 		for(int i = links.size() - 1; i >= 0; i--) {//We start at the end because that's the most likely place we came from
 			Link l = links.get(i);
-			if(	pos.getX() + fromDir.getXOffset() == l.pos.getX() &&
-				pos.getY() + fromDir.getYOffset() == l.pos.getY() &&
-				pos.getZ() + fromDir.getZOffset() == l.pos.getZ()) {
+			if(	pos.getX() + fromDir.getStepX() == l.pos.getX() &&
+				pos.getY() + fromDir.getStepY() == l.pos.getY() &&
+				pos.getZ() + fromDir.getStepZ() == l.pos.getZ()) {
 				//Create linkage
 				l.links[fromDir.getOpposite().ordinal()] = link;
 				link.links[fromDir.ordinal()] = l;

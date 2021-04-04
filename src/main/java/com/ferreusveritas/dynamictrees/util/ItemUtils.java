@@ -34,16 +34,16 @@ public final class ItemUtils {
     public static void spawnItemStack (World world, BlockPos pos, ItemStack stack, boolean searchForAir) {
         if (searchForAir) {
             // Goes up one block at a time until an air block to spawn on is found.
-            while (!world.isAirBlock(pos))
-                pos = pos.up();
+            while (!world.isEmptyBlock(pos))
+                pos = pos.above();
         }
 
         // Create the item entity, spawning it in the centre of the position given.
         final ItemEntity itemEntity = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
         // Make sure the item entity has no motion.
-        itemEntity.setMotion(0, 0, 0);
+        itemEntity.setDeltaMovement(0, 0, 0);
         // Add (spawn) the item to the world.
-        world.addEntity(itemEntity);
+        world.addFreshEntity(itemEntity);
     }
 
 }

@@ -127,7 +127,7 @@ public class DTRegistries {
 
 		BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state,world,pos,side)->{
 			if (side == Direction.DOWN){
-				BlockState branchState = world.getBlockState(pos.offset(Direction.UP));
+				BlockState branchState = world.getBlockState(pos.relative(Direction.UP));
 				BranchBlock branch = TreeHelper.getBranch(branchState);
 				if (branch != null){
 					return MathHelper.clamp(branch.getRadius(branchState) - 1, 1, 8);
@@ -181,14 +181,14 @@ public class DTRegistries {
 	public static EntityType<LingeringEffectorEntity> lingeringEffector;
 
 	private static void setupEntities() {
-		fallingTree = EntityType.Builder.create(FallingTreeEntity::new, EntityClassification.MISC)
+		fallingTree = EntityType.Builder.of(FallingTreeEntity::new, EntityClassification.MISC)
 				.setShouldReceiveVelocityUpdates(true)
 				.setTrackingRange(512)
 				.setUpdateInterval(Integer.MAX_VALUE)
 				.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(fallingTree, world))
 				.build(FALLING_TREE_ID);
 
-		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>create(LingeringEffectorEntity::new, EntityClassification.MISC)
+		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, EntityClassification.MISC)
 				// Giving it growth substance works for now as it's the only lingering substance, however this should be changed in the future.
 				.setCustomClientFactory((spawnEntity, world) ->
 						new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), new GrowthSubstance()))
@@ -212,8 +212,8 @@ public class DTRegistries {
 	
 	public static void setupTileEntities() {
 		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
-		speciesTE = TileEntityType.Builder.create(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
-		bonsaiTE = TileEntityType.Builder.create(BonsaiTileEntity::new, BONSAI_POT).build(null);
+		speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
+		bonsaiTE = TileEntityType.Builder.of(BonsaiTileEntity::new, BONSAI_POT).build(null);
 	}
 	
 	@SubscribeEvent
@@ -231,20 +231,20 @@ public class DTRegistries {
 	/** This is the creative tab that holds all DT items */
 	public static final ItemGroup ITEM_GROUP = new ItemGroup(DynamicTrees.MOD_ID) {
 		@Override
-		public ItemStack createIcon() {
+		public ItemStack makeIcon() {
 			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
 		}
 	};
 	
 	public static final class CommonBlockStates {
-		public final BlockState AIR = Blocks.AIR.getDefaultState();
-		public final BlockState DIRT = Blocks.DIRT.getDefaultState();
-		public final BlockState COARSE_DIRT = Blocks.COARSE_DIRT.getDefaultState();
-		public final BlockState SAND = Blocks.SAND.getDefaultState();
-		public final BlockState GRASS = Blocks.GRASS.getDefaultState();
-		public final BlockState PODZOL = Blocks.PODZOL.getDefaultState();
-		public final BlockState RED_MUSHROOM = Blocks.RED_MUSHROOM.getDefaultState();
-		public final BlockState BROWN_MUSHROOM = Blocks.BROWN_MUSHROOM.getDefaultState();
+		public final BlockState AIR = Blocks.AIR.defaultBlockState();
+		public final BlockState DIRT = Blocks.DIRT.defaultBlockState();
+		public final BlockState COARSE_DIRT = Blocks.COARSE_DIRT.defaultBlockState();
+		public final BlockState SAND = Blocks.SAND.defaultBlockState();
+		public final BlockState GRASS = Blocks.GRASS.defaultBlockState();
+		public final BlockState PODZOL = Blocks.PODZOL.defaultBlockState();
+		public final BlockState RED_MUSHROOM = Blocks.RED_MUSHROOM.defaultBlockState();
+		public final BlockState BROWN_MUSHROOM = Blocks.BROWN_MUSHROOM.defaultBlockState();
 	}
 
 	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();

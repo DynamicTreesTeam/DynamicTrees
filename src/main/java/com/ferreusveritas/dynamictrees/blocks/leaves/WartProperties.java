@@ -31,12 +31,12 @@ public final class WartProperties extends LeavesProperties {
 
     @Override
     public Material getDefaultMaterial() {
-        return Material.ORGANIC;
+        return Material.GRASS;
     }
 
     @Override
     public AbstractBlock.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
-        return AbstractBlock.Properties.create(material, materialColor).hardnessAndResistance(1.0F).sound(SoundType.WART).tickRandomly();
+        return AbstractBlock.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK).randomTicks();
     }
 
 }

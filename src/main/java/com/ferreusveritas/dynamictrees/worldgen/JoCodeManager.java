@@ -45,7 +45,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     protected Map<ResourceLocation, List<String>> prepare(final IResourceManager resourceManager) {
         final Map<ResourceLocation, List<String>> joCodeFiles = new HashMap<>();
 
-        for (ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName,
+        for (ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName,
                 (fileName) -> fileName.endsWith(TEXT_EXTENSION))) {
             String resLocStr = resourceLocationIn.getPath();
             ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(), resLocStr.substring(this.folderName.length() + 1, resLocStr.length() - TEXT_EXTENSION_LENGTH));

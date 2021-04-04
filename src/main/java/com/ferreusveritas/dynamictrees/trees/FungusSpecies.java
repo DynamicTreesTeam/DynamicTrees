@@ -58,7 +58,7 @@ public final class FungusSpecies extends Species {
 
     @Override
     public VoxelShape getSaplingShape() {
-        return VoxelShapes.create(0.25f, 0.0f, 0.25f, 0.75f, 0.5f, 0.75f);
+        return VoxelShapes.box(0.25f, 0.0f, 0.25f, 0.75f, 0.5f, 0.75f);
     }
 
 }

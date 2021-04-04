@@ -82,7 +82,7 @@ public class ConiferLogic extends GrowthLogicKit {
 		long day = world.getGameTime() / 24000L;
 		int month = (int)day / 30;//Change the hashs every in-game month
 		
-		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.up(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
+		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.above(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
 	}
 	
 }

@@ -54,12 +54,12 @@ public class Staff extends Item {
 	private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
 	public Staff() {
-		super(new Item.Properties().maxStackSize(1)
-				.group(DTRegistries.ITEM_GROUP));
+		super(new Item.Properties().stacksTo(1)
+				.tab(DTRegistries.ITEM_GROUP));
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
-		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
+		builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
+		builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
 		this.attributeModifiers = builder.build();
 	}
 	
@@ -73,7 +73,7 @@ public class Staff extends Item {
 	}
 	
 	@Override
-	public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
+	public boolean mineBlock(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
 		if(state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
 			if(decUses(stack)) {
 				stack.shrink(1);
@@ -84,11 +84,11 @@ public class Staff extends Item {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		World world = context.getWorld();
-		ItemStack heldStack = context.getPlayer().getHeldItem(context.getHand());
+	public ActionResultType useOn(ItemUseContext context) {
+		World world = context.getLevel();
+		ItemStack heldStack = context.getPlayer().getItemInHand(context.getHand());
 
-		BlockPos pos = context.getPos();
+		BlockPos pos = context.getClickedPos();
 		BlockState state = world.getBlockState(pos);
 
 		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
@@ -98,11 +98,11 @@ public class Staff extends Item {
 		if(!isReadOnly(heldStack) && treePart.isRootNode()) {
 			Species species = TreeHelper.getExactSpecies(world, rootPos);
 			if(species.isValid()) {
-				if(!context.getPlayer().isSneaking()) {
-					String code = new JoCode(world, rootPos, context.getPlayer().getHorizontalFacing()).toString();
+				if(!context.getPlayer().isShiftKeyDown()) {
+					String code = new JoCode(world, rootPos, context.getPlayer().getDirection()).toString();
 					setCode(heldStack, code);
-					if(world.isRemote) { // Make sure this doesn't run on the server
-						Minecraft.getInstance().keyboardListener.setClipboardString(code); // Put the code in the system clipboard to annoy everyone.
+					if(world.isClientSide) { // Make sure this doesn't run on the server
+						Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
 					}
 				}
 				setSpecies(heldStack, species);
@@ -113,7 +113,7 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species.isValid() && species.isAcceptableSoil(world, pos, state)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos), context.getPlayer().getHorizontalFacing(), 8, SafeChunkBounds.ANY);
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
 			if(hasMaxUses(heldStack)) {
 				if(decUses(heldStack)) {
 					heldStack.shrink(1);//If the player is in creative this will have no effect.
@@ -274,10 +274,10 @@ public class Staff extends Item {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
 		tooltip.add(new StringTextComponent("Tree: " + (species.isValid() ? species : "none")));
-		tooltip.add(new StringTextComponent("Code: ").appendSibling(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
+		tooltip.add(new StringTextComponent("Code: ").append(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
 	}
 
 	/**

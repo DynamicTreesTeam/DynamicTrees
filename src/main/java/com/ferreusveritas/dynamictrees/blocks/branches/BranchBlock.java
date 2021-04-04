@@ -47,6 +47,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
+import net.minecraft.block.AbstractBlock.Properties;
+
 @SuppressWarnings("deprecation")
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
@@ -58,7 +61,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	private boolean canBeStripped;
 
 	public BranchBlock(Material material) {
-		this(Properties.create(material));
+		this(Properties.of(material));
 	}
 
 	public BranchBlock(Properties properties){
@@ -141,8 +144,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	
 	@Deprecated
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		net.minecraft.item.ItemStack heldItem = player.getHeldItem(hand);
+	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+		net.minecraft.item.ItemStack heldItem = player.getItemInHand(hand);
 		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 
@@ -164,7 +167,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	//this prevents bees and other mobs from getting stuck in branches
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 
@@ -179,7 +182,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if(state.getBlock().equals(this)) {
 			int coreRadius = getRadius(state);
 			for(Direction dir: Direction.values()) {
-				BlockPos deltaPos = pos.offset(dir);
+				BlockPos deltaPos = pos.relative(dir);
 				BlockState neighborBlockState = world.getBlockState(deltaPos);
 				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
 				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
@@ -190,7 +193,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 
@@ -274,7 +277,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		//Calculate main trunk height
 		int trunkHeight = 1;
-		for(BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.up()) {
+		for(BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.above()) {
 			trunkHeight++;
 		}
 		
@@ -308,7 +311,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 */
 	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, BlockState> destroyedLeaves, List<ItemStackPos> drops) {
 		
-		if (!world.isRemote && !endPoints.isEmpty()) {
+		if (!world.isClientSide && !endPoints.isEmpty()) {
 			
 			//Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius
 			BlockBounds bounds = new BlockBounds(endPoints).expand(3);
@@ -318,7 +321,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			
 			//For each of the endpoints add a 7x7 destruction volume around it
 			for(BlockPos endPos : endPoints) {
-				for(BlockPos leafPos : BlockPos.getAllInBoxMutable(endPos.add(-3, -3, -3), endPos.add(3, 3, 3)) ) {
+				for(BlockPos leafPos : BlockPos.betweenClosed(endPos.offset(-3, -3, -3), endPos.offset(3, 3, 3)) ) {
 					vmap.setVoxel(leafPos, (byte) 1);//Flag this position for destruction
 				}
 				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does not have a leaves block in it because it was a branch
@@ -347,10 +350,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				BlockState blockState = world.getBlockState(pos);
 				if( family.isCompatibleGenericLeaves(blockState, world, pos) ) {
 					dropList.clear();
-					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
-					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
+					species.getTreeHarvestDrops(world, pos, dropList, world.random);
+					BlockPos imPos = pos.immutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlockState(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
+					world.setBlock(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
 					destroyedLeaves.put(relPos, blockState);
 					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 				}
@@ -398,14 +401,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		// TODO: Check method of getting player reach distance (ForgeMod.REACH_DISTANCE.get()?)
 		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
 		BlockRayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
-		Direction toolDir = rtResult != null ? (entity.isSneaking() ? rtResult.getFace().getOpposite() : rtResult.getFace()) : Direction.DOWN;
+		Direction toolDir = rtResult != null ? (entity.isShiftKeyDown() ? rtResult.getDirection().getOpposite() : rtResult.getDirection()) : Direction.DOWN;
 		
 		//Do the actual destruction
 		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, entity);
 		
 		//Get all of the wood drops
-		ItemStack heldItem = entity.getHeldItemMainhand();
-		int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, heldItem);
+		ItemStack heldItem = entity.getMainHandItem();
+		int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
 		float fortuneFactor = 1.0f + 0.25f * fortune;
 		NetVolumeNode.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
 		woodVolume.multiplyVolume(fortuneFactor);
@@ -414,7 +417,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		final float chance = 1.0f;
 
 		//Build the final wood drop list taking chance into consideration
-		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.rand.nextFloat() <= chance).collect(Collectors.toList());
+		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.random.nextFloat() <= chance).collect(Collectors.toList());
 		
 		//This will drop the EntityFallingTree into the world
 		FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
@@ -467,9 +470,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	@Nullable
 	public BlockRayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
 		Vector3d vec3d = entity.getEyePosition(partialTicks);
-		Vector3d vec3d1 = entity.getLook(partialTicks);
+		Vector3d vec3d1 = entity.getViewVector(partialTicks);
 		Vector3d vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-		return entity.world.rayTraceBlocks(new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
+		return entity.level.clip(new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
 	}
 	
 	
@@ -496,7 +499,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			damage--; // Minecraft already damaged the tool by one unit
 
 		if(damage > 0) {
-			heldItem.damageItem(damage, entity, LivingEntity::tick);
+			heldItem.hurtAndBreak(damage, entity, LivingEntity::tick);
 		}
 	}
 
@@ -505,24 +508,24 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	@Override
-	public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-		if(!world.isRemote && destroyMode == DynamicTrees.EnumDestroyMode.SLOPPY) {
+	public void playerDestroy(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+		if(!world.isClientSide && destroyMode == DynamicTrees.EnumDestroyMode.SLOPPY) {
 			//System.out.println("Sloppy break detected at: " + pos);
 			BlockState toBlockState = world.getBlockState(pos);
 			Block toBlock = toBlockState.getBlock();
 			if(toBlock == Blocks.AIR) {
-				world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+				world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
 				sloppyBreak(world, pos, DestroyType.VOID);
 			} else
 				if(toBlock == Blocks.FIRE) { //Block has burned
-					world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+					world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
 					sloppyBreak(world, pos, DestroyType.FIRE);
 					//world.setBlockState(pos, Blocks.FIRE.getDefaultState());  <-- FIXME: Causes overflow
 				} else
 					if(toBlock == Blocks.STONE) { //Likely destroyed by the Pyroclasm mod's volcanic lava
-						world.setBlockState(pos, state, 0);//Set the block back and attempt a proper breaking
+						world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
 						sloppyBreak(world, pos, DestroyType.VOID);
-						world.setBlockState(pos, toBlockState);//Set back to stone
+						world.setBlockAndUpdate(pos, toBlockState);//Set back to stone
 					} else {
 						if(DTConfigs.worldGenDebug.get()) {
 							System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
@@ -533,7 +536,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	// Super member also does nothing
 	@Override
-	public void onBlockHarvested(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+	public void playerWillDestroy(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 	}
 	
 	/**
@@ -551,7 +554,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// We do not allow the tree branches to be pushed by a piston for reasons that should be obvious if you
 	// are paying attention.
 	@Override
-	public PushReaction getPushReaction(BlockState state) {
+	public PushReaction getPistonPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
 	}
 	
@@ -561,7 +564,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	// Explosive harvesting methods will likely result in mostly sticks but I'm okay with that since it kinda makes sense.
 	@Override
-	public void onExplosionDestroy(World world, BlockPos pos, Explosion explosion) {
+	public void wasExploded(World world, BlockPos pos, Explosion explosion) {
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() == this) {
 			Species species = TreeHelper.getExactSpecies(world, pos);
@@ -572,13 +575,13 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			
 			if (treeEntity != null) {
 				Vector3d expPos = explosion.getPosition();
-				LivingEntity placer = explosion.getExplosivePlacedBy();
+				LivingEntity placer = explosion.getSourceMob();
 				// TODO: Use an access transformer to get the actual size.
 				// Since the size of an explosion is private we have to make some assumptions.. TNT: 4, Creeper: 3, Creeper+: 6
-				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity) placer).isCharged() ? 6 : 3) : 4;
-				double distance = Math.sqrt(treeEntity.getDistanceSq(expPos.x, expPos.y, expPos.z));
+				float size = (placer instanceof CreeperEntity) ? (((CreeperEntity) placer).isPowered() ? 6 : 3) : 4;
+				double distance = Math.sqrt(treeEntity.distanceToSqr(expPos.x, expPos.y, expPos.z));
 				if (distance / size <= 1.0D && distance != 0.0D) {
-					treeEntity.addVelocity((treeEntity.getPosX() - expPos.x) / distance, (treeEntity.getPosY() - expPos.y) / distance, (treeEntity.getPosZ() - expPos.z) / distance);
+					treeEntity.push((treeEntity.getX() - expPos.x) / distance, (treeEntity.getY() - expPos.y) / distance, (treeEntity.getZ() - expPos.z) / distance);
 				}
 			}
 		}

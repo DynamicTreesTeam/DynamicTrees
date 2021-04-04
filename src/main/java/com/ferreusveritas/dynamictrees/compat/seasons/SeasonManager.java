@@ -30,7 +30,7 @@ public class SeasonManager implements ISeasonManager {
 	}
 	
 	private SeasonContext getContext(World world) {
-		return seasonContextMap.computeIfAbsent(world.getDimensionKey().getLocation(), d -> {
+		return seasonContextMap.computeIfAbsent(world.dimension().location(), d -> {
 			Tuple<ISeasonProvider, ISeasonGrowthCalculator> tuple = createProvider(world);
 			return new SeasonContext(tuple.getA(), tuple.getB());
 		});
@@ -47,7 +47,7 @@ public class SeasonManager implements ISeasonManager {
 	
 	static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough 
 	
-	private BiPredicate<World, BlockPos> isTropical = (world, rootPos) -> world.getNoiseBiomeRaw(rootPos.getX(), rootPos.getY(), rootPos.getZ()).getTemperature() > TROPICAL_THRESHHOLD;
+	private BiPredicate<World, BlockPos> isTropical = (world, rootPos) -> world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ()).getBaseTemperature() > TROPICAL_THRESHHOLD;
 	
 	/**
 	 * Set the global predicate that determines if a world location is tropical.
@@ -83,7 +83,7 @@ public class SeasonManager implements ISeasonManager {
 	@Override
 	public float getFruitProductionFactor(World world, BlockPos rootPos, float offset, boolean getAsScan) {
 		if (getAsScan) {
-			return getFruitProductionFactorAsScan(world.getDimensionKey().getLocation(), rootPos, offset);
+			return getFruitProductionFactorAsScan(world.dimension().location(), rootPos, offset);
 		}
 
 		SeasonContext context = getContext(world);

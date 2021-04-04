@@ -59,11 +59,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
 		@Override public LeavesProperties setFamily(Family family) { return this; }
 		@Override public Family getFamily() { return Family.NULL_FAMILY; }
-		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.getDefaultState(); }
+		@Override public BlockState getPrimitiveLeaves() { return Blocks.AIR.defaultBlockState(); }
 		@Override public ItemStack getPrimitiveLeavesItemStack() { return ItemStack.EMPTY; }
 		@Override public LeavesProperties setDynamicLeavesState(BlockState state) { return this; }
-		@Override public BlockState getDynamicLeavesState() { return Blocks.AIR.getDefaultState(); }
-		@Override public BlockState getDynamicLeavesState(int hydro) { return Blocks.AIR.getDefaultState(); }
+		@Override public BlockState getDynamicLeavesState() { return Blocks.AIR.defaultBlockState(); }
+		@Override public BlockState getDynamicLeavesState(int hydro) { return Blocks.AIR.defaultBlockState(); }
 		@Override public CellKit getCellKit() { return CellKit.NULL_CELL_KIT; }
 		@Override public int getFlammability() { return 0; }
 		@Override public int getFireSpreadSpeed() { return 0; }
@@ -125,7 +125,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	public void setPrimitiveLeaves(final Block primitiveLeaves) {
 		if (this.primitiveLeaves == null || primitiveLeaves != this.primitiveLeaves.getBlock()) {
-			this.primitiveLeaves = primitiveLeaves.getDefaultState();
+			this.primitiveLeaves = primitiveLeaves.defaultBlockState();
 			this.family.removeConnectableVanillaLeaves(this.primitiveLeavesConnectable);
 			this.family.addConnectableVanillaLeaves(state -> state.getBlock() == primitiveLeaves);
 		}
@@ -137,7 +137,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * @return The {@link ItemStack} object.
 	 */
 	public ItemStack getPrimitiveLeavesItemStack() {
-		return new ItemStack(Item.BLOCK_TO_ITEM.get(getPrimitiveLeaves().getBlock()));
+		return new ItemStack(Item.BY_BLOCK.get(getPrimitiveLeaves().getBlock()));
 	}
 
 	public Optional<DynamicLeavesBlock> getDynamicLeavesBlock() {
@@ -159,9 +159,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
 		//Cache all the blockStates to speed up worldgen
-		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.getDefaultState();
+		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.defaultBlockState();
 		for(int i = 1; i <= maxHydro; i++) {
-			dynamicLeavesBlockHydroStates[i] = state.with(DynamicLeavesBlock.DISTANCE, i);
+			dynamicLeavesBlockHydroStates[i] = state.setValue(DynamicLeavesBlock.DISTANCE, i);
 		}
 		
 		return this;
@@ -273,9 +273,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-		return AbstractBlock.Properties.create(material, materialColor).hardnessAndResistance(0.2F)
-				.tickRandomly().sound(SoundType.PLANT).notSolid().setAllowsSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
-				.setSuffocates((s, r, p) -> false).setBlocksVision((s, r, p) -> false);
+		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F)
+				.randomTicks().sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+				.isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
 	}
 
 	/**

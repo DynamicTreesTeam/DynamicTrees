@@ -30,11 +30,11 @@ public class CocoaFruitNode implements INodeInspector {
 				BranchBlock branch = TreeHelper.getBranch(blockState);
 				if(branch != null && branch.getRadius(blockState) == 8) {
 					int side = (hashCode % 4) + 2;
-					Direction dir = Direction.byIndex(side);
-					BlockPos deltaPos = pos.offset(dir);
-					if (world.isAirBlock(deltaPos)) {
+					Direction dir = Direction.from3DDataValue(side);
+					BlockPos deltaPos = pos.relative(dir);
+					if (world.isEmptyBlock(deltaPos)) {
 						if (!dir.getAxis().isHorizontal()) dir = Direction.NORTH;
-						world.setBlockState(deltaPos, DTRegistries.COCOA_FRUIT.getDefaultState().with(CocoaBlock.HORIZONTAL_FACING, dir.getOpposite()).with(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
+						world.setBlock(deltaPos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(CocoaBlock.FACING, dir.getOpposite()).setValue(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
 					}
 				} else {
 					finished = true;

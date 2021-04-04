@@ -29,7 +29,7 @@ public class FutureBreak {
 	}
 	
 	public static void add(FutureBreak fb) {
-		if(!fb.world.isRemote) {
+		if(!fb.world.isClientSide) {
 			futureBreaks.add(fb);
 		}
 	}

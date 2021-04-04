@@ -99,8 +99,8 @@ public class BranchDestructionData {
 		tag.putInt("cutx", cutPos.getX());
 		tag.putInt("cuty", cutPos.getY());
 		tag.putInt("cutz", cutPos.getZ());
-		tag.putInt("cutdir", cutDir.getIndex());
-		tag.putInt("tooldir", toolDir.getIndex());
+		tag.putInt("cutdir", cutDir.get3DDataValue());
+		tag.putInt("tooldir", toolDir.get3DDataValue());
 		tag.putInt("trunkheight", trunkHeight);
 		return tag;
 	}
@@ -158,7 +158,7 @@ public class BranchDestructionData {
 		int result = 0;
 		int[] radii = exState.getAllRadii();
 		for(Direction face : Direction.values()) {
-			int faceIndex = face.getIndex();
+			int faceIndex = face.get3DDataValue();
 			int rad = radii[faceIndex];
 			result |= (rad & 0x1F) << (faceIndex * 5);//5 bits per face * 6 faces = 30bits
 		}
@@ -200,8 +200,8 @@ public class BranchDestructionData {
 		int encodedConnections = destroyedBranchesConnections[index];
 		
 		for(Direction face : Direction.values()) {
-			int rad = (encodedConnections >> (face.getIndex() * 5) & 0x1F);
-			connections[face.getIndex()] = Math.max(0, rad);
+			int rad = (encodedConnections >> (face.get3DDataValue() * 5) & 0x1F);
+			connections[face.get3DDataValue()] = Math.max(0, rad);
 		}
 	}
 	
@@ -251,7 +251,7 @@ public class BranchDestructionData {
 	}
 	
 	private int encodeLeavesPos(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
-		return	(state.get(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
+		return	(state.getValue(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
 	}
 
 	private int encodeLeavesBlocks (DynamicLeavesBlock block, Species species){
@@ -281,7 +281,7 @@ public class BranchDestructionData {
 	public BlockState getLeavesBlockState(int index) {
 		DynamicLeavesBlock leaves = species.getValidLeafBlock(destroyedLeavesBlockIndex[index]);
 		if(leaves != null) {
-			return leaves.getDefaultState();
+			return leaves.defaultBlockState();
 		}
 		return null;
 	}
@@ -347,15 +347,15 @@ public class BranchDestructionData {
 		switch(posType) {
 			default:
 			case BRANCHES:
-				getter = absolute ? i -> getBranchRelPos(i).add(cutPos) : this::getBranchRelPos;
+				getter = absolute ? i -> getBranchRelPos(i).offset(cutPos) : this::getBranchRelPos;
 				limit = getNumBranches();
 				break;
 			case ENDPOINTS:
-				getter = absolute ? i -> getEndPointRelPos(i).add(cutPos) : this::getEndPointRelPos;
+				getter = absolute ? i -> getEndPointRelPos(i).offset(cutPos) : this::getEndPointRelPos;
 				limit = getNumEndpoints();
 				break;
 			case LEAVES:
-				getter = absolute ? i -> getLeavesRelPos(i).add(cutPos) : this::getLeavesRelPos;
+				getter = absolute ? i -> getLeavesRelPos(i).offset(cutPos) : this::getLeavesRelPos;
 				limit = getNumLeaves();
 				break;
 		}
