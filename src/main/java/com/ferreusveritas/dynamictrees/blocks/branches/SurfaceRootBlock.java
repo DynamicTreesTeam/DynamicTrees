@@ -49,10 +49,10 @@ public class SurfaceRootBlock extends Block {
 	}
 
 	public SurfaceRootBlock(Material material, Family family) {
-		super(Block.Properties.create(material)
+		super(Block.Properties.of(material)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
-				.hardnessAndResistance(2.5f, 1.0F)
+				.strength(2.5f, 1.0F)
 				.sound(SoundType.WOOD));
 
 		this.family = family;
@@ -83,21 +83,21 @@ public class SurfaceRootBlock extends Block {
 	///////////////////////////////////////////
 
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(RADIUS, GROUNDED);
 	}
 
 	public int getRadius(BlockState blockState) {
-		return blockState.getBlock() == this ? blockState.get(RADIUS) : 0;
+		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
 	}
 
 	public int setRadius(IWorld world, BlockPos pos, int radius, int flags) {
-		world.setBlockState(pos, getStateForRadius(radius), flags);
+		world.setBlock(pos, getStateForRadius(radius), flags);
 		return radius;
 	}
 
 	public BlockState getStateForRadius(int radius) {
-		return getDefaultState().with(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
+		return defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
 	}
 
 	public int getMaxRadius() {
@@ -151,8 +151,8 @@ public class SurfaceRootBlock extends Block {
 				double radialHeight = getRadialHeight(r) / 16.0;
 				double gap = 0.5 - radius;
 				AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight, radius);
-				aabb = aabb.expand(dir.getXOffset() * gap, 0, dir.getZOffset() * gap).offset(0.5, 0.0, 0.5);
-				shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+				aabb = aabb.expandTowards(dir.getStepX() * gap, 0, dir.getStepZ() * gap).move(0.5, 0.0, 0.5);
+				shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
 			}
 		}
 
@@ -160,7 +160,7 @@ public class SurfaceRootBlock extends Block {
 			double radius = thisRadius / 16.0;
 			double radialHeight = getRadialHeight(thisRadius) / 16.0;
 			AxisAlignedBB aabb = new AxisAlignedBB(0.5 - radius, 0, 0.5 - radius, 0.5 + radius, radialHeight, 0.5 + radius);
-			shape = VoxelShapes.combine(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
+			shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
 		}
 
 		return shape;
@@ -170,15 +170,15 @@ public class SurfaceRootBlock extends Block {
 		if (!side.getAxis().isHorizontal())
 			return null;
 
-		BlockPos dPos = pos.offset(side);
+		BlockPos dPos = pos.relative(side);
 		BlockState state = CoordUtils.getStateSafe(blockReader, dPos);
-		final BlockState upState = CoordUtils.getStateSafe(blockReader, pos.up());
+		final BlockState upState = CoordUtils.getStateSafe(blockReader, pos.above());
 
-		final RootConnections.ConnectionLevel level = (upState != null && upState.getBlock() == Blocks.AIR && state != null && state.isNormalCube(blockReader, dPos)) ?
+		final RootConnections.ConnectionLevel level = (upState != null && upState.getBlock() == Blocks.AIR && state != null && state.isRedstoneConductor(blockReader, dPos)) ?
 				RootConnections.ConnectionLevel.HIGH : (state != null && state.getBlock() == Blocks.AIR ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
 
 		if (level != RootConnections.ConnectionLevel.MID) {
-			dPos = dPos.up(level.getYOffset());
+			dPos = dPos.above(level.getYOffset());
 			state = CoordUtils.getStateSafe(blockReader, dPos);
 		}
 
@@ -193,14 +193,14 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
-		BlockState upstate = world.getBlockState(pos.up());
+		BlockState upstate = world.getBlockState(pos.above());
 
 		if (upstate.getBlock() == DTRegistries.TRUNK_SHELL) {
-			world.setBlockState(pos, upstate);
+			world.setBlockAndUpdate(pos, upstate);
 		}
 
 		for(Direction dir : CoordUtils.HORIZONTALS) {
-			BlockPos dPos = pos.offset(dir).down();
+			BlockPos dPos = pos.relative(dir).below();
 			world.getBlockState(dPos).neighborChanged(world, dPos, this, pos, false);
 		}
 
@@ -216,12 +216,12 @@ public class SurfaceRootBlock extends Block {
 
 	protected boolean canBlockStay(World world, BlockPos pos, BlockState state) {
 
-		BlockPos below = pos.down();
+		BlockPos below = pos.below();
 		BlockState belowState = world.getBlockState(below);
 
 		int thisRadius = getRadius(state);
 
-		if(belowState.isNormalCube(world,below)) { // If a branch is sitting on a solid block
+		if(belowState.isRedstoneConductor(world,below)) { // If a branch is sitting on a solid block
 			for(Direction dir : CoordUtils.HORIZONTALS) {
 				RootConnection conn = getSideConnectionRadius(world, pos, dir);
 				if(conn != null && conn.radius > thisRadius) {

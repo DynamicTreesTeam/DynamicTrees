@@ -31,7 +31,7 @@ public abstract class ReloadListener<T> {
      * @return The {@link CompletableFuture<Void>} that loads the relevant data.
      */
     public CompletableFuture<Void> load (final IResourceManager resourceManager) {
-        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.getServerExecutor())
+        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
                 .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, true));
     }
 
@@ -43,7 +43,7 @@ public abstract class ReloadListener<T> {
      */
     public CompletableFuture<Void> reload (final IFutureReloadListener.IStage stage, final IResourceManager resourceManager, final Executor backgroundExecutor, final Executor gameExecutor) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), backgroundExecutor)
-                .thenCompose(stage::markCompleteAwaitingOthers)
+                .thenCompose(stage::wait)
                 .thenAcceptAsync(preparedObject -> this.apply(preparedObject, resourceManager, false), gameExecutor);
     }
 

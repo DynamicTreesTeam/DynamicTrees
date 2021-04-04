@@ -56,16 +56,16 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements I
 				int xOff = (int) (MathHelper.sin(angle) * (radius - 1));
 				int zOff = (int) (MathHelper.cos(angle) * (radius - 1));
 				
-				BlockPos mushPos = rootPos.add(xOff, 0, zOff);
+				BlockPos mushPos = rootPos.offset(xOff, 0, zOff);
 				
-				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).up();
+				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).above();
 				
 				if(safeBounds.inBounds(mushPos, true)) {
 					int maxHeight = lowest.getY() - mushPos.getY();
 					if(maxHeight >= 2) {
 						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 						
-						if(this.setHeight(height).generate(configuredGenFeature, world, mushPos.down(), species, biome, rand, radius, safeBounds)) {
+						if(this.setHeight(height).generate(configuredGenFeature, world, mushPos.below(), species, biome, rand, radius, safeBounds)) {
 							if(++success >= configuredGenFeature.get(MAX_MUSHROOMS)) {
 								return true;
 							}

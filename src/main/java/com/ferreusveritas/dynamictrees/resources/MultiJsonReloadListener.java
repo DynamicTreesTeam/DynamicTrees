@@ -41,13 +41,13 @@ public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListen
         final Map<ResourceLocation, List<JsonElement>> map = Maps.newHashMap();
         int i = folderName.length() + 1;
 
-        for(ResourceLocation resourceLocationIn : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
+        for(ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
             final String resourcePath = resourceLocationIn.getPath();
             final ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(),
                     resourcePath.substring(i, resourcePath.length() - JSON_EXTENSION_LENGTH));
 
             try {
-                resourceManager.getAllResources(resourceLocationIn).forEach(resource -> {
+                resourceManager.getResources(resourceLocationIn).forEach(resource -> {
                     final Reader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
                     final JsonElement jsonElement = JSONUtils.fromJson(this.gson, reader, JsonElement.class);
 

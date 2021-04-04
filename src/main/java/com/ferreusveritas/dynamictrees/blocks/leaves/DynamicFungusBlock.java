@@ -13,10 +13,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ToolType;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class DynamicFungusBlock extends DynamicLeavesBlock {
 
     public DynamicFungusBlock() {
-        super(Properties.create(Material.WOOD).tickRandomly().hardnessAndResistance(0.2F).sound(SoundType.WOOD).harvestTool(ToolType.AXE));
+        super(Properties.of(Material.WOOD).randomTicks().strength(0.2F).sound(SoundType.WOOD).harvestTool(ToolType.AXE));
     }
 
     @Override
@@ -30,9 +32,9 @@ public class DynamicFungusBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {}
+    public void fallOn(World world, BlockPos pos, Entity entity, float fallDistance) {}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) { }
+    public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) { }
 
 }

@@ -31,14 +31,14 @@ public final class AddFeatureCancellersEvent extends Event {
     }
 
     public void registerFeatureCancellations (final RegistryKey<Biome> biome, final FeatureCanceller... featureCancellers) {
-        final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.getLocation());
+        final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
         for (final FeatureCanceller featureCanceller : featureCancellers)
             featureCancellations.putCanceller(featureCanceller);
     }
 
     public void registerNamespaces (final RegistryKey<Biome> biome, final String... namespaces) {
-        final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.getLocation());
+        final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
         for (final String namespace : namespaces)
             featureCancellations.putNamespace(namespace);

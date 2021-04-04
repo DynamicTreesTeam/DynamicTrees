@@ -27,16 +27,16 @@ public class LingeringEffectorEntity extends Entity {
 
 	public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
 		this(DTRegistries.lingeringEffector, world);
-		this.stepHeight = 1f;
-		this.noClip = true;
+		this.maxUpStep = 1f;
+		this.noPhysics = true;
 		this.setBlockPos(pos);
 		this.effect = effect;
 
 		if(this.effect != null) {
 			//Search for existing effectors with the same effect in the same place
-			for(LingeringEffectorEntity effector : world.getEntitiesWithinAABB(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
+			for(LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
 				if(effector.getBlockPos().equals(pos) && effector.getEffect().getName().equals(effect.getName())) {
-					effector.onKillCommand();//Kill old effector if it's the same
+					effector.kill();//Kill old effector if it's the same
 				}
 			}
 		}
@@ -44,7 +44,7 @@ public class LingeringEffectorEntity extends Entity {
 
 	public void setBlockPos(BlockPos pos) {
 		blockPos = pos;
-		setPosition(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
+		setPos(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
 	}
 
 	public BlockPos getBlockPos() {
@@ -56,33 +56,33 @@ public class LingeringEffectorEntity extends Entity {
 	}
 
 	@Override
-	protected void registerData() {}
+	protected void defineSynchedData() {}
 
 	@Override
-	protected void readAdditional(CompoundNBT compound) {}
+	protected void readAdditionalSaveData(CompoundNBT compound) {}
 
 	@Override
-	protected void writeAdditional(CompoundNBT compound) { }
+	protected void addAdditionalSaveData(CompoundNBT compound) { }
 
 	@Override
 	public void tick() {
 		super.tick();
 
 		if(effect != null) {
-			BlockState blockState = world.getBlockState(blockPos);
+			BlockState blockState = level.getBlockState(blockPos);
 
 			if(blockState.getBlock() instanceof RootyBlock) {
-				if(!effect.update(world, blockPos, ticksExisted)) {
-					onKillCommand();
+				if(!effect.update(level, blockPos, tickCount)) {
+					kill();
 				}
 			} else {
-				onKillCommand();
+				kill();
 			}
 		}
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 

@@ -36,9 +36,9 @@ public class ConiferTopperGenFeature extends GenFeature implements IPostGenFeatu
 		BlockPos highest = Collections.max(endPoints, Comparator.comparingInt(Vector3i::getY));
 		LeavesProperties leavesProperties = configuredGenFeature.get(LEAVES_PROPERTIES);
 
-		world.setBlockState(highest.up(1), leavesProperties.getDynamicLeavesState(4), 3);
-		world.setBlockState(highest.up(2), leavesProperties.getDynamicLeavesState(3), 3);
-		world.setBlockState(highest.up(3), leavesProperties.getDynamicLeavesState(1), 3);
+		world.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
+		world.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);
+		world.setBlock(highest.above(3), leavesProperties.getDynamicLeavesState(1), 3);
 
 		return true;
 	}

@@ -36,7 +36,7 @@ public class Connections {
 	 * @param radius The connection radius for that direction.
 	 */
 	public void setRadius (Direction dir, int radius){
-		radii[dir.getIndex()] = radius;
+		radii[dir.get3DDataValue()] = radius;
 	}
 
 	public int[] getAllRadii (){

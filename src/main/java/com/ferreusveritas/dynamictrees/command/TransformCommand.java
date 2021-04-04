@@ -28,8 +28,8 @@ public final class TransformCommand extends SubCommand {
         this.executesWithCoordinates = false;
         this.defaultToExecute = false;
 
-        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation())
-                .suggests((context, builder) -> ISuggestionProvider.suggestIterable(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
+        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.id())
+                .suggests((context, builder) -> ISuggestionProvider.suggestResource(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
     }
 
     @Override
@@ -44,12 +44,12 @@ public final class TransformCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getWorld();
-        final BlockPos pos = Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-        final Species toSpecies = TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+        final World world = context.getSource().getLevel();
+        final BlockPos pos = Vec3Argument.getCoordinates(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        final Species toSpecies = TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT));
 
         if (!toSpecies.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
 

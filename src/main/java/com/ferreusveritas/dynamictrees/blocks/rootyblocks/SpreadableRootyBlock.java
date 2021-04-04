@@ -49,53 +49,53 @@ public class SpreadableRootyBlock extends RootyBlock {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (spreadItem != null){
-            ItemStack handStack = player.getHeldItem(handIn);
+            ItemStack handStack = player.getItemInHand(handIn);
             if (handStack.getItem().equals(spreadItem)){
                 List<Block> foundBlocks = new LinkedList<>();
 
-                for(BlockPos blockpos : BlockPos.getAllInBoxMutable(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+                for(BlockPos blockpos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
                     BlockState blockstate = worldIn.getBlockState(blockpos);
                     for (Block block : rootyBlocks.keySet()){
-                        if (blockstate.matchesBlock(block)) foundBlocks.add(block);
+                        if (blockstate.is(block)) foundBlocks.add(block);
                     }
                 }
                 if (foundBlocks.size() > 0){
-                    if (!worldIn.isRemote()){
-                        int blockInt = worldIn.rand.nextInt(foundBlocks.size());
-                        worldIn.setBlockState(pos, rootyBlocks.get(foundBlocks.get(blockInt)).getDefaultState(), 3);
+                    if (!worldIn.isClientSide()){
+                        int blockInt = worldIn.random.nextInt(foundBlocks.size());
+                        worldIn.setBlock(pos, rootyBlocks.get(foundBlocks.get(blockInt)).defaultBlockState(), 3);
                     }
                     if (!player.isCreative()) handStack.shrink(1);
-                    DTClient.spawnParticles(worldIn, ParticleTypes.HAPPY_VILLAGER, pos.up(),2 + worldIn.rand.nextInt(5), worldIn.rand);
+                    DTClient.spawnParticles(worldIn, ParticleTypes.HAPPY_VILLAGER, pos.above(),2 + worldIn.random.nextInt(5), worldIn.random);
                     return ActionResultType.SUCCESS;
                 }
             }
         }
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        return super.use(state, worldIn, pos, player, handIn, hit);
     }
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         super.randomTick(state, world, pos, random);
         //this is a similar behaviour to vanilla grass spreading but inverted to be handled by the dirt block
-        if (!world.isRemote && requiredLight != null)
+        if (!world.isClientSide && requiredLight != null)
         {
             if (!world.isAreaLoaded(pos, 3)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light and spreading
-            if (world.getLight(pos.up()) >= requiredLight)
+            if (world.getMaxLocalRawBrightness(pos.above()) >= requiredLight)
             {
                 for (int i = 0; i < 4; ++i)
                 {
-                    BlockPos thatPos = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
+                    BlockPos thatPos = pos.offset(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
 
-                    if (thatPos.getY() >= 0 && thatPos.getY() < 256 && !world.isBlockLoaded(thatPos)) return;
+                    if (thatPos.getY() >= 0 && thatPos.getY() < 256 && !world.hasChunkAt(thatPos)) return;
 
-                    BlockState thatStateUp = world.getBlockState(thatPos.up());
+                    BlockState thatStateUp = world.getBlockState(thatPos.above());
                     BlockState thatState = world.getBlockState(thatPos);
 
                     for (Map.Entry<Block, RootyBlock> entry : rootyBlocks.entrySet()){
-                        if ((thatState.getBlock() == entry.getKey() || thatState.getBlock() == entry.getValue()) && world.getLight(pos.up()) >= requiredLight && thatStateUp.getOpacity(world, thatPos.up()) <= 2) {
-                            world.setBlockState(pos, entry.getValue().getDefaultState().with(FERTILITY, world.getBlockState(pos).get(FERTILITY)));
+                        if ((thatState.getBlock() == entry.getKey() || thatState.getBlock() == entry.getValue()) && world.getMaxLocalRawBrightness(pos.above()) >= requiredLight && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
+                            world.setBlockAndUpdate(pos, entry.getValue().defaultBlockState().setValue(FERTILITY, world.getBlockState(pos).getValue(FERTILITY)));
                             return;
                         }
                     }

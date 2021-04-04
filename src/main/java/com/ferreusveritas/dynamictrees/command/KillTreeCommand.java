@@ -23,7 +23,7 @@ public final class KillTreeCommand extends SubCommand {
 
     @Override
     protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getWorld();
+        final World world = context.getSource().getLevel();
         final BlockPos rootPos = this.getRootPos(context, world);
 
         if (rootPos == BlockPos.ZERO) {

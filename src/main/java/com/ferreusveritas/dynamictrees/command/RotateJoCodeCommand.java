@@ -29,7 +29,7 @@ public final class RotateJoCodeCommand extends SubCommand {
     @Override
     protected int execute(CommandContext<CommandSource> context) {
         final int turns = (3 - (IntegerArgumentType.getInteger(context, CommandConstants.TURNS_ARGUMENT) % 4)) + 3;
-        final String code = new JoCode(StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT)).rotate(Direction.byHorizontalIndex(turns)).toString();
+        final String code = new JoCode(StringArgumentType.getString(context, CommandConstants.JO_CODE_ARGUMENT)).rotate(Direction.from2DDataValue(turns)).toString();
 
         this.sendMessage(context, new StringTextComponent(code));
 

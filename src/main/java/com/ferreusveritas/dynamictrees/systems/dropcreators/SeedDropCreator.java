@@ -97,7 +97,7 @@ public class SeedDropCreator extends DropCreator {
 
 		float seasonFactor = 1.0f;
 
-		if(!world.isRemote) {
+		if(!world.isClientSide) {
 			seasonFactor = species.seasonalSeedDropFactor(world, breakPos);
 		}
 

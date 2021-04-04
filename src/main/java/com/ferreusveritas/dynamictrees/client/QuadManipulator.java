@@ -66,8 +66,8 @@ public class QuadManipulator {
 		ArrayList<BakedQuad> outQuads = new ArrayList<>();
 
 		for(BakedQuad inQuad: inQuads) {
-			BakedQuad quadCopy = new BakedQuad(inQuad.getVertexData().clone(), inQuad.getTintIndex(), inQuad.getFace(), inQuad.getSprite(), inQuad.applyDiffuseLighting());
-			int[] vertexData = quadCopy.getVertexData();
+			BakedQuad quadCopy = new BakedQuad(inQuad.getVertices().clone(), inQuad.getTintIndex(), inQuad.getDirection(), inQuad.getSprite(), inQuad.isShade());
+			int[] vertexData = quadCopy.getVertices();
 			for(int i = 0; i < vertexData.length; i += DefaultVertexFormats.BLOCK.getIntegerSize()) {
 				int pos = 0;
 				for(VertexFormatElement vfe: DefaultVertexFormats.BLOCK.getElements()) {
@@ -83,7 +83,7 @@ public class QuadManipulator {
 						vertexData[i + pos + 2] = Float.floatToIntBits(z);
 						break;
 					}
-					pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
+					pos += vfe.getByteSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
 				}
 			}
 
@@ -112,7 +112,7 @@ public class QuadManipulator {
 	}
 
 	public static IBakedModel getModel(BlockState state) {
-		return Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);//This gives us earlier access
+		return Minecraft.getInstance().getBlockRenderer().getBlockModel(state);//This gives us earlier access
 	}
 	
 	public static ResourceLocation getModelTexture(IBakedModel model, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter, BlockState state, Direction dir) {
@@ -125,10 +125,10 @@ public class QuadManipulator {
 			float closest = Float.POSITIVE_INFINITY;
 			ResourceLocation closestTex = new ResourceLocation("missingno");
 			if(model != null) {
-				for(ResourceLocation tex : model.getParticleTexture().getDependencies()) {
+				for(ResourceLocation tex : model.getParticleIcon().getDependencies()) {
 					TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
-					float u = tas.getInterpolatedU(8);
-					float v = tas.getInterpolatedV(8);
+					float u = tas.getU(8);
+					float v = tas.getV(8);
 					sprites.add(tas);
 					float du = u - uvs[0];
 					float dv = v - uvs[1];
@@ -147,19 +147,19 @@ public class QuadManipulator {
 	}
 
 	public static float[] getSpriteUVFromBlockState(BlockState state, Direction side) {
-		IBakedModel bakedModel = getModelManager().getBlockModelShapes().getModel(state);
+		IBakedModel bakedModel = getModelManager().getBlockModelShaper().getBlockModel(state);
 		List<BakedQuad> quads = new ArrayList<BakedQuad>();
 		quads.addAll(bakedModel.getQuads(state, side, null, null));
 		quads.addAll(bakedModel.getQuads(state, null, null, null));
 
-		Optional<BakedQuad> quad = quads.stream().filter( q -> q.getFace() == side ).findFirst();
+		Optional<BakedQuad> quad = quads.stream().filter( q -> q.getDirection() == side ).findFirst();
 
 		if(quad.isPresent()) {
 
 			float u = 0.0f;
 			float v = 0.0f;
 
-			int[] vertexData = quad.get().getVertexData();
+			int[] vertexData = quad.get().getVertices();
 			int numVertices = 0;
 			for(int i = 0; i < vertexData.length; i += DefaultVertexFormats.BLOCK.getIntegerSize()) {
 				int pos = 0;
@@ -168,7 +168,7 @@ public class QuadManipulator {
 						u += Float.intBitsToFloat(vertexData[i + pos + 0]);
 						v += Float.intBitsToFloat(vertexData[i + pos + 1]);
 					}
-					pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
+					pos += vfe.getByteSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
 				}
 				numVertices++;
 			}

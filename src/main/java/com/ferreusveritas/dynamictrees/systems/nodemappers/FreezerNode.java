@@ -40,12 +40,12 @@ public class FreezerNode implements INodeInspector {
 	
 	//Clumsy hack to freeze leaves
 	public void freezeSurroundingLeaves(IWorld world, BranchBlock branch, BlockPos twigPos) {
-		if (!world.isRemote()/* && !world.restoringBlockSnapshots*/) { // do not drop items while restoring blockstates, prevents item dupe
+		if (!world.isClientSide()/* && !world.restoringBlockSnapshots*/) { // do not drop items while restoring blockstates, prevents item dupe
 			Family tree = branch.getFamily();
 			BlockState primLeaves = species.getLeavesProperties().getPrimitiveLeaves();
-			BlockPos.getAllInBox(twigPos.add(-freezeRadius, -freezeRadius, -freezeRadius), twigPos.add(freezeRadius, freezeRadius, freezeRadius)).forEach(leavesPos -> {
+			BlockPos.betweenClosedStream(twigPos.offset(-freezeRadius, -freezeRadius, -freezeRadius), twigPos.offset(freezeRadius, freezeRadius, freezeRadius)).forEach(leavesPos -> {
 				if (tree.isCompatibleGenericLeaves(world.getBlockState(leavesPos), world, leavesPos)) {
-					world.setBlockState(leavesPos, primLeaves.with(LeavesBlock.PERSISTENT, true), 2);
+					world.setBlock(leavesPos, primLeaves.setValue(LeavesBlock.PERSISTENT, true), 2);
 				}
 			});
 		}

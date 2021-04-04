@@ -13,17 +13,17 @@ import net.minecraft.world.IWorldReader;
 public class CocoaFruitBlock extends CocoaBlock {
 
 	public CocoaFruitBlock() {
-		super(Block.Properties.create(Material.PLANTS)
-				.tickRandomly()
-				.hardnessAndResistance(0.2F, 3.0F)
+		super(Block.Properties.of(Material.PLANT)
+				.randomTicks()
+				.strength(0.2F, 3.0F)
 				.sound(SoundType.WOOD));
 	}
 	
 	/**
 	* Can this block stay at this position.  Similar to canPlaceBlockAt except gets checked often with plants.
 	*/
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		BlockState logState = worldIn.getBlockState(pos.offset(state.get(HORIZONTAL_FACING)));
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		BlockState logState = worldIn.getBlockState(pos.relative(state.getValue(FACING)));
 		BranchBlock branch = TreeHelper.getBranch(logState);
 		return branch != null && branch.getRadius(logState) == 8 && branch.getFamily().canSupportCocoa;
 	}

@@ -65,7 +65,7 @@ public abstract class SubCommand {
     public ArgumentBuilder<CommandSource, ?> register() {
         LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName());
 
-        subCommandBuilder.requires(commandSource -> commandSource.hasPermissionLevel(this.getPermissionLevel()));
+        subCommandBuilder.requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()));
 
         if (this.defaultToExecute)
             subCommandBuilder.executes(this::execute);
@@ -98,19 +98,19 @@ public abstract class SubCommand {
      * @param message The message to send.
      */
     protected void sendMessage (CommandContext<CommandSource> context, ITextComponent message) {
-        context.getSource().sendFeedback(message, true);
+        context.getSource().sendSuccess(message, true);
     }
 
     protected BlockPos getPositionArg (CommandContext<CommandSource> context) {
-        return Vec3Argument.getLocation(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+        return Vec3Argument.getCoordinates(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
     }
 
     protected Species getSpeciesArg (CommandContext<CommandSource> context) {
-        return TreeRegistry.findSpecies(ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT));
+        return TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT));
     }
 
     protected BlockPos getRootPos (CommandContext<CommandSource> context) {
-        return this.getRootPos(context, context.getSource().getWorld());
+        return this.getRootPos(context, context.getSource().getLevel());
     }
 
     protected BlockPos getRootPos (CommandContext<CommandSource> context, World world) {

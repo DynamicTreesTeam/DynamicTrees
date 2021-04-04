@@ -15,17 +15,17 @@ public class ModelTrackerCacheEntityFallingTree {
 	public static Map<Integer, FallingTreeEntityModel> modelMap = new ConcurrentHashMap<>();
 	
 	public static FallingTreeEntityModel getModel(FallingTreeEntity entity) {
-		return modelMap.computeIfAbsent(entity.getEntityId(), e -> new FallingTreeEntityModel(entity) );
+		return modelMap.computeIfAbsent(entity.getId(), e -> new FallingTreeEntityModel(entity) );
 	}
 	
 	public static void cleanupModels(World world, FallingTreeEntity entity) {
-		modelMap.remove(entity.getEntityId());
+		modelMap.remove(entity.getId());
 		cleanupModels(world);
 	}
 	
 	public static void cleanupModels(World world) {
 		modelMap = modelMap.entrySet().stream()
-				.filter( map -> world.getEntityByID(map.getKey()) != null )
+				.filter( map -> world.getEntity(map.getKey()) != null )
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 }

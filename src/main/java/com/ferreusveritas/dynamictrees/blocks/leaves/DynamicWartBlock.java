@@ -11,6 +11,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 @SuppressWarnings("deprecation")
 public class DynamicWartBlock extends DynamicLeavesBlock {
 
@@ -29,12 +31,12 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void onFallenUpon(World world, BlockPos pos, Entity entity, float fallDistance) {
-        entity.onLivingFall(fallDistance, 1.0F);
+    public void fallOn(World world, BlockPos pos, Entity entity, float fallDistance) {
+        entity.causeFallDamage(fallDistance, 1.0F);
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) { }
+    public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) { }
 
     @Override
     protected boolean shouldDropForPlayer(PlayerEntity player) {

@@ -42,13 +42,13 @@ public class BlockBounds implements Iterable<BlockPos> {
 	}
 	
 	public BlockBounds(ChunkPos cPos) {
-		this.minX = cPos.getXStart();
+		this.minX = cPos.getMinBlockX();
 		this.minY = 0;
-		this.minZ = cPos.getZStart();
+		this.minZ = cPos.getMinBlockZ();
 
-		this.maxX = cPos.getXEnd();
+		this.maxX = cPos.getMaxBlockX();
 		this.maxY = 255;
-		this.maxZ = cPos.getZEnd();
+		this.maxZ = cPos.getMaxBlockZ();
 	}
 	
 	public BlockBounds(BlockBounds other) {
@@ -151,7 +151,7 @@ public class BlockBounds implements Iterable<BlockPos> {
 
 	@Override
 	public Iterator<BlockPos> iterator() {
-		return BlockPos.getAllInBoxMutable(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ).iterator();
+		return BlockPos.betweenClosed(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ).iterator();
 	}
 
 	public int getXSize() {

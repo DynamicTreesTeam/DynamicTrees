@@ -19,17 +19,17 @@ import javax.annotation.Nullable;
 public class DirtBucket extends Item {
 
 	public DirtBucket() {
-		super(new Item.Properties().maxStackSize(1).group(DTRegistries.ITEM_GROUP));
+		super(new Item.Properties().stacksTo(1).tab(DTRegistries.ITEM_GROUP));
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
+	public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		
-		final ItemStack itemStack = player.getHeldItem(hand);
+		final ItemStack itemStack = player.getItemInHand(hand);
 		final BlockRayTraceResult blockRayTraceResult;
 
 		{
-			blockRayTraceResult = rayTrace(world, player, RayTraceContext.FluidMode.NONE);
+			blockRayTraceResult = getPlayerPOVHitResult(world, player, RayTraceContext.FluidMode.NONE);
 			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
 				return new ActionResult<>(ActionResultType.FAIL, itemStack);
 			}
@@ -39,15 +39,15 @@ public class DirtBucket extends Item {
 			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
 				return new ActionResult<>(ActionResultType.PASS, itemStack);
 			} else {
-				final BlockPos pos = blockRayTraceResult.getPos();
+				final BlockPos pos = blockRayTraceResult.getBlockPos();
 				
-				if (!world.isBlockModifiable(player, pos)) {
+				if (!world.mayInteract(player, pos)) {
 					return new ActionResult<>(ActionResultType.FAIL, itemStack);
 				} else {
 					final boolean isReplacable = world.getBlockState(pos).getMaterial().isReplaceable();
-					final BlockPos workingPos = isReplacable && blockRayTraceResult.getFace() == Direction.UP ? pos : pos.offset(blockRayTraceResult.getFace());
+					final BlockPos workingPos = isReplacable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
 					
-					if (!player.canPlayerEdit(workingPos, blockRayTraceResult.getFace(), itemStack)) {
+					if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
 						return new ActionResult<>(ActionResultType.FAIL, itemStack);
 					} else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
 						//						player.addStat(Stats.BLOCK_USED.getObjectUseStats(this));
@@ -64,12 +64,12 @@ public class DirtBucket extends Item {
 	
 	public boolean tryPlaceContainedDirt(@Nullable PlayerEntity player, World world, BlockPos posIn) {
 		if (world.getBlockState(posIn).getMaterial().isReplaceable()) {
-			if (!world.isRemote) {
+			if (!world.isClientSide) {
 				world.destroyBlock(posIn, true);
 			}
 			
-			world.playSound(player, posIn, SoundEvents.BLOCK_GRAVEL_PLACE, SoundCategory.BLOCKS, 1.0F, 0.8F);
-			world.setBlockState(posIn, Blocks.DIRT.getDefaultState(), 11);
+			world.playSound(player, posIn, SoundEvents.GRAVEL_PLACE, SoundCategory.BLOCKS, 1.0F, 0.8F);
+			world.setBlock(posIn, Blocks.DIRT.defaultBlockState(), 11);
 			return true;
 		}
 

@@ -24,7 +24,7 @@ public class AnimationHandlers {
 			super.initMotion(entity);
 			
 			Direction cutDir = entity.getDestroyData().cutDir;
-			entity.addVelocity(cutDir.getOpposite().getXOffset() * 0.1,cutDir.getOpposite().getYOffset() * 0.1,cutDir.getOpposite().getZOffset() * 0.1);
+			entity.push(cutDir.getOpposite().getStepX() * 0.1,cutDir.getOpposite().getStepY() * 0.1,cutDir.getOpposite().getStepZ() * 0.1);
 		}
 		
 	};
@@ -38,7 +38,7 @@ public class AnimationHandlers {
 		}
 		
 		public boolean shouldDie(FallingTreeEntity entity) {
-			return entity.landed || entity.ticksExisted > 200;
+			return entity.landed || entity.tickCount > 200;
 		}
 		
 	};

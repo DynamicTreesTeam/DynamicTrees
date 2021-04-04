@@ -27,7 +27,7 @@ public class CommonEventHandler {
 	
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		if (event.getWorld().isRemote()){
+		if (event.getWorld().isClientSide()){
 			DTClient.discoverWoodColors();
 		}
 	}

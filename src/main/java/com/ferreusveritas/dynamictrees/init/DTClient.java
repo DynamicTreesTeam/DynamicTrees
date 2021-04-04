@@ -78,13 +78,13 @@ public class DTClient {
 	@OnlyIn(Dist.CLIENT)
 	public static void discoverWoodColors() {
 
-		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getTextureAtlas(AtlasTexture.LOCATION_BLOCKS);
 		
 		for(Family family : Species.REGISTRY.getAll().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
 			if(family != Family.NULL_FAMILY) {
-				BlockState state = family.getPrimitiveLog().getDefaultState();
+				BlockState state = family.getPrimitiveLog().defaultBlockState();
 				if(state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
 					family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
@@ -95,7 +95,7 @@ public class DTClient {
 
 	@OnlyIn(Dist.CLIENT)
 	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
-		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state);
+		IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
 		List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE);
 		if (quads.isEmpty()) //if the quad list is empty, means there is no face on that side, so we try with null
 			quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
@@ -124,10 +124,10 @@ public class DTClient {
 	}
 
 	private static void registerRenderLayers () {
-		RenderTypeLookup.setRenderLayer(DTRegistries.BONSAI_POT, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(DTRegistries.BONSAI_POT, RenderType.cutoutMipped());
 
 		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
-				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.getCutoutMipped()));
+				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped()));
 
 //		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
 //				.forEach(block -> RenderTypeLookup.setRenderLayer(block , ThickRingTextureManager.BRANCH_SOLID));
@@ -146,7 +146,7 @@ public class DTClient {
 		for (RootyBlock roots : RootyBlockHelper.generateListForRegistry(false)){
 			blockColors.register((state, world, pos, tintIndex) -> {
 				switch(tintIndex) {
-					case 0: return blockColors.getColor(roots.getPrimitiveDirt().getDefaultState(), world, pos, tintIndex);
+					case 0: return blockColors.getColor(roots.getPrimitiveDirt().defaultBlockState(), world, pos, tintIndex);
 					case 1: return state.getBlock() instanceof RootyBlock ? roots.rootColor(state, world, pos) : white;
 					default: return white;
 				}
@@ -189,8 +189,8 @@ public class DTClient {
 	
 	private static void registerJsonColorMultipliers() {
 		//Register programmable custom block color providers for LeavesPropertiesJson
-		BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> FoliageColors.getBirch());
-		BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> FoliageColors.getSpruce());
+		BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> FoliageColors.getBirchColor());
+		BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> FoliageColors.getEvergreenColor());
 	}
 	
 	public static void registerClientEventHandlers() {
@@ -212,8 +212,8 @@ public class DTClient {
 	///////////////////////////////////////////
 	
 	private static void addDustParticle(World world, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
-		if(world.isRemote) {
-			Particle particle = Minecraft.getInstance().particles.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
+		if(world.isClientSide) {
+			Particle particle = Minecraft.getInstance().particleEngine.createParticle(new BlockParticleData(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
 			assert particle != null;
 			particle.setColor(r, g, b);
 		}
@@ -232,14 +232,14 @@ public class DTClient {
 	}
 	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
 	public static void spawnParticle(IWorld world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
-		if(world.isRemote()) {
+		if(world.isClientSide()) {
 			world.addParticle(particleType, x, y, z, mx, my, mz);
 		}
 	}
 	
 	public static void crushLeavesBlock(World world, BlockPos pos, BlockState blockState, Entity entity) {
-		if(world.isRemote) {
-			Random random = world.rand;
+		if(world.isClientSide) {
+			Random random = world.random;
 			ITreePart treePart = TreeHelper.getTreePart(blockState);
 			if(treePart instanceof DynamicLeavesBlock) {
 				DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
@@ -255,7 +255,7 @@ public class DTClient {
 								double fx = pos.getX() + dx / 8.0;
 								double fy = pos.getY() + dy / 8.0;
 								double fz = pos.getZ() + dz / 8.0;
-								addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.getMotion().y, 0, blockState, r, g, b);
+								addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.getDeltaMovement().y, 0, blockState, r, g, b);
 							}
 						}
 					}

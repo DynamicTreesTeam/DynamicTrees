@@ -27,7 +27,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 	public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ServerWorld world) {
 		this.noiseGenerator = new PerlinNoiseGenerator(new SharedSeedRandom(96), new ArrayList<>(Collections.singletonList(1)));
 		this.world = world;
-		this.dimensionRegistryName = world.getDimensionKey().getRegistryName();
+		this.dimensionRegistryName = world.dimension().getRegistryName();
 		this.treeGenerator = treeGenerator;
 	}
 
@@ -39,10 +39,10 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		}
 
 		final double scale = 128; // Effectively scales up the noisemap
-		final Biome biome = this.world.getNoiseBiomeRaw(x + 8, 0, z + 8); // Placement is offset by +8,+8
+		final Biome biome = this.world.getUncachedNoiseBiome(x + 8, 0, z + 8); // Placement is offset by +8,+8
 
-		final double noiseDensity = (this.noiseGenerator.noiseAt(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
-		final double density = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(this.world.rand, noiseDensity);
+		final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
+		final double density = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(this.world.random, noiseDensity);
 		final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
 
 		// Oh Joy. Random can potentially start with the same number for each chunk. Let's just
@@ -59,7 +59,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		this.pass = pass;
 
 		if (pass == 0) {
-			final Biome biome = this.world.getNoiseBiomeRaw((chunkX << 4) + 8, 0, (chunkZ << 4) + 8); // Aim at center of chunk
+			final Biome biome = this.world.getUncachedNoiseBiome((chunkX << 4) + 8, 0, (chunkZ << 4) + 8); // Aim at center of chunk
 			this.chunkMultipass = this.biomeDatabaseManager.getDimensionDatabase(this.dimensionRegistryName).getMultipass(biome);
 		}
 

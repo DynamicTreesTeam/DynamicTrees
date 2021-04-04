@@ -35,7 +35,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 			List<BlockPos> endPoints = endFinder.getEnds();
 			if(!endPoints.isEmpty()) {
 
-				Random random = world.rand;
+				Random random = world.random;
 				BlockPos pos = endPoints.get(random.nextInt(endPoints.size()));
 
 				int x = pos.getX() + random.nextInt(5) - 2;
@@ -47,7 +47,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 
 					BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
 
-					if(!world.isAirBlock(offPos)) {
+					if(!world.isEmptyBlock(offPos)) {
 						Block block = world.getBlockState(offPos).getBlock();
 
 						if(block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock) { //Skip past Mushrooms and branches on the way down
@@ -55,15 +55,15 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 						}
 						else
 							if(block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {//Kill Plants
-								if(world.getLightFor(LightType.SKY, offPos) <= darkThreshold) {
-									world.setBlockState(pos, Blocks.AIR.getDefaultState());
+								if(world.getBrightness(LightType.SKY, offPos) <= darkThreshold) {
+									world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 								}
 								continue;
 							}
 							else
 								if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
-									if(world.getLightFor(LightType.SKY, offPos.up()) <= darkThreshold) {
-										world.setBlockState(offPos, DTRegistries.BLOCK_STATES.PODZOL);
+									if(world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
+										world.setBlockAndUpdate(offPos, DTRegistries.BLOCK_STATES.PODZOL);
 									} else {
 										spreadPodzol(world, pos);
 									}
@@ -80,12 +80,12 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 		int podzolish = 0;
 
 		for(Direction dir: CoordUtils.HORIZONTALS) {
-			BlockPos deltaPos = pos.offset(dir);
+			BlockPos deltaPos = pos.relative(dir);
 			Block testBlock = world.getBlockState(deltaPos).getBlock();
 			podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
 			podzolish += testBlock instanceof RootyBlock ? 1 : 0;
 			if(podzolish >= 3) {
-				world.setBlockState(pos, DTRegistries.BLOCK_STATES.PODZOL);
+				world.setBlockAndUpdate(pos, DTRegistries.BLOCK_STATES.PODZOL);
 				break;
 			}
 		}

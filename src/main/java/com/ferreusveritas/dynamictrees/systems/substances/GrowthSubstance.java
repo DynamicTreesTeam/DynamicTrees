@@ -22,7 +22,7 @@ public class GrowthSubstance implements ISubstanceEffect {
 			return false; //Time's up
 		}
 
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			if (deltaTicks % 8 == 0) {//Run twinkles every 8 ticks.
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.EFFECT, 2);
 			}

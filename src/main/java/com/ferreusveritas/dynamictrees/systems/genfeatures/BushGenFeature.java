@@ -69,25 +69,25 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 
 		for (int i = 0; i < 2; i++) {
 			int rad = MathHelper.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
-			Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).rotateYaw((float) (random.nextFloat() * Math.PI * 2)));
+			Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (random.nextFloat() * Math.PI * 2)));
 			BlockPos vPos = new BlockPos(v);
 			if (!safeBounds.inBounds(vPos, true)) continue;
 
 			BlockPos pos = CoordUtils.findGround(world, vPos);
 			BlockState soilBlockState = world.getBlockState(pos);
 
-			pos = pos.up();
+			pos = pos.above();
 			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
-				world.setBlockState(pos, configuredGenFeature.get(LOG_BLOCK).getDefaultState(), 3);
+				world.setBlock(pos, configuredGenFeature.get(LOG_BLOCK).defaultBlockState(), 3);
 
 				SimpleVoxmap leafMap = LeafClusters.BUSH;
 				BlockPos.Mutable leafPos = new BlockPos.Mutable();
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
-					leafPos.setPos( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
+					leafPos.set( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						world.setBlockState(leafPos, ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
+						world.setBlock(leafPos, ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
 								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK))
-								.getDefaultState().with(LeavesBlock.PERSISTENT, true), 3);
+								.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true), 3);
 					}
 				}
 			}

@@ -81,7 +81,7 @@ public class WailaBranchHandler implements IComponentProvider {
 				tooltip.add(new StringTextComponent("Species: " + species.getLocalizedName()));
 			}
 
-			if(Minecraft.getInstance().gameSettings.advancedItemTooltips) {
+			if(Minecraft.getInstance().options.advancedItemTooltips) {
 				tooltip.add(new StringTextComponent(TextFormatting.DARK_GRAY + species.getRegistryName().toString()));
 			}
 

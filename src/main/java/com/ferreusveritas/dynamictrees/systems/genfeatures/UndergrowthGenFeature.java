@@ -35,7 +35,7 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
 			for(int i = 0; i < 2; i++) {
 
 				int rad = MathHelper.clamp(world.getRandom().nextInt(radius - 2) + 2, 2, radius - 1);
-				Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).rotateYaw((float) (world.getRandom().nextFloat() * Math.PI * 2)));
+				Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (world.getRandom().nextFloat() * Math.PI * 2)));
 				BlockPos vPos = new BlockPos(v);
 				if (!safeBounds.inBounds(vPos, true)) continue;
 
@@ -44,17 +44,17 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
 
 				if(species.isAcceptableSoil(world, pos, soilBlockState)) {
 					int type = world.getRandom().nextInt(2);
-					world.setBlockState(pos, (type == 0 ? Blocks.OAK_LOG : Blocks.JUNGLE_LOG).getDefaultState(), 2);
-					pos = pos.up(world.getRandom().nextInt(3));
+					world.setBlock(pos, (type == 0 ? Blocks.OAK_LOG : Blocks.JUNGLE_LOG).defaultBlockState(), 2);
+					pos = pos.above(world.getRandom().nextInt(3));
 
-					BlockState leavesState = (type == 0 ? Blocks.OAK_LEAVES : Blocks.JUNGLE_LEAVES).getDefaultState().with(LeavesBlock.PERSISTENT, true);
+					BlockState leavesState = (type == 0 ? Blocks.OAK_LEAVES : Blocks.JUNGLE_LEAVES).defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
 
 					SimpleVoxmap leafMap = species.getLeavesProperties().getCellKit().getLeafCluster();
 					BlockPos.Mutable leafPos = new BlockPos.Mutable();
 					for(BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
-						leafPos.setPos(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
+						leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 						if(safeBounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 && world.getBlockState(leafPos).canBeReplacedByLeaves(world, leafPos)) {
-							world.setBlockState(leafPos, leavesState, 2);
+							world.setBlock(leafPos, leavesState, 2);
 						}
 					}
 				}

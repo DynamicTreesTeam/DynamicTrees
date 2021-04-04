@@ -16,12 +16,12 @@ public class DarkOakLogic extends GrowthLogicKit {
 
 	@Override
 	public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
-		probMap[Direction.UP.getIndex()] = 4;
+		probMap[Direction.UP.get3DDataValue()] = 4;
 		
 		//Disallow up/down turns after having turned out of the trunk once.
 		if(!signal.isInTrunk()) {
-			probMap[Direction.UP.getIndex()] = 0;
-			probMap[Direction.DOWN.getIndex()] = 0;
+			probMap[Direction.UP.get3DDataValue()] = 0;
+			probMap[Direction.DOWN.get3DDataValue()] = 0;
 			probMap[signal.dir.ordinal()] *= 0.35;//Promotes the zag of the horizontal branches
 		}
 		
@@ -34,7 +34,7 @@ public class DarkOakLogic extends GrowthLogicKit {
 		}
 		
 		//Ensure that the branch gets out of the trunk at least two blocks so it won't interfere with new side branches at the same level 
-		if(signal.numTurns == 1 && signal.delta.distanceSq(0, signal.delta.getY(), 0, true) == 1.0 ) {
+		if(signal.numTurns == 1 && signal.delta.distSqr(0, signal.delta.getY(), 0, true) == 1.0 ) {
 			for(Direction dir: CoordUtils.HORIZONTALS) {
 				if(signal.dir != dir) {
 					probMap[dir.ordinal()] = 0;

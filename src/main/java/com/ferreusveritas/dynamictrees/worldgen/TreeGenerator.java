@@ -76,7 +76,7 @@ public class TreeGenerator {
 	}
 
 	private BlockState getConcreteByColor(DyeColor color){
-		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete"))).getDefaultState();
+		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete"))).defaultBlockState();
 	}
 
 	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
@@ -92,7 +92,7 @@ public class TreeGenerator {
 			BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			DyeColor color = resultType.getColor();
 			safeBounds.setBlockState(world, pos, getConcreteByColor(color), true);
-			safeBounds.setBlockState(world, pos.up(), getConcreteByColor(color), true);
+			safeBounds.setBlockState(world, pos.above(), getConcreteByColor(color), true);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class TreeGenerator {
 			if (species.isValid()) {
 				if (species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if (entry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if (!species.generate(world.getWorld(), world, pos, biome, random, circle.radius, safeBounds)) {
+						if (!species.generate(world.getLevel(), world, pos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.FAIL_GENERATION;
 						}
 					} else {

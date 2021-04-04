@@ -11,7 +11,7 @@ public class WailaRootyWaterHandler implements IComponentProvider {
 
 	@Override
 	public void appendHead(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
-		tooltip.add(new StringTextComponent(TextFormatting.WHITE + new TranslationTextComponent(accessor.getBlock().getTranslationKey()).getString()));
+		tooltip.add(new StringTextComponent(TextFormatting.WHITE + new TranslationTextComponent(accessor.getBlock().getDescriptionId()).getString()));
 	}
 
 }

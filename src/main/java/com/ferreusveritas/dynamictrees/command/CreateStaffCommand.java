@@ -25,7 +25,7 @@ public final class CreateStaffCommand extends SubCommand {
         this.defaultToExecute = false;
 
         // Add extra arguments.
-        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.resourceLocation()).suggests((context, builder) -> ISuggestionProvider.suggestIterable(Species.REGISTRY.getRegistryNames(), builder))
+        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.id()).suggests((context, builder) -> ISuggestionProvider.suggestResource(Species.REGISTRY.getRegistryNames(), builder))
                 .then(Commands.argument(CommandConstants.JO_CODE_ARGUMENT, StringArgumentType.string()).suggests((context, builder) -> ISuggestionProvider.suggest(Arrays.asList("JP"), builder))
                         .then(Commands.argument(CommandConstants.COLOR_ARGUMENT, HexColorArgument.hex())
                                 .then(Commands.argument(CommandConstants.READ_ONLY_ARGUMENT, BoolArgumentType.bool())
@@ -46,7 +46,7 @@ public final class CreateStaffCommand extends SubCommand {
 
         // Ensure species given exists.
         if (!species.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getResourceLocation(context, CommandConstants.SPECIES_ARGUMENT)));
+            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT)));
             return 0;
         }
 
@@ -61,7 +61,7 @@ public final class CreateStaffCommand extends SubCommand {
                 .setMaxUses(wandStack, maxUses)
                 .setUses(wandStack, maxUses);
 
-        ItemUtils.spawnItemStack(context.getSource().getWorld(), pos, wandStack, true);
+        ItemUtils.spawnItemStack(context.getSource().getLevel(), pos, wandStack, true);
 
         return 1;
     }

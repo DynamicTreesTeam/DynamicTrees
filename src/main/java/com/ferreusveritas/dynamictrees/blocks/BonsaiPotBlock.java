@@ -35,7 +35,7 @@ public class BonsaiPotBlock extends ContainerBlock {
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
 	public BonsaiPotBlock() {
-		super(Block.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(0));
+		super(Block.Properties.of(Material.DECORATION).strength(0));
 	}
 
 	//////////////////////////////
@@ -58,7 +58,7 @@ public class BonsaiPotBlock extends ContainerBlock {
 
 	public BlockState getPotState(World world, BlockPos pos) {
 		BonsaiTileEntity bonsaiPotTE = this.getTileEntityBonsai(world, pos);
-		return bonsaiPotTE != null ? bonsaiPotTE.getPot() : Blocks.FLOWER_POT.getDefaultState();
+		return bonsaiPotTE != null ? bonsaiPotTE.getPot() : Blocks.FLOWER_POT.defaultBlockState();
 	}
 
 	public boolean setPotState(World world, BlockState potState, BlockPos pos) {
@@ -77,12 +77,12 @@ public class BonsaiPotBlock extends ContainerBlock {
 
 	@Nullable
 	private BonsaiTileEntity getTileEntityBonsai (IBlockReader world, BlockPos pos) {
-		TileEntity tileEntity = world.getTileEntity(pos);
+		TileEntity tileEntity = world.getBlockEntity(pos);
 		return tileEntity instanceof BonsaiTileEntity ? (BonsaiTileEntity) tileEntity : null;
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new BonsaiTileEntity();
 	}
 
@@ -93,8 +93,8 @@ public class BonsaiPotBlock extends ContainerBlock {
 
 	// Unlike a regular flower pot this is only used to eject the contents
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		ItemStack heldItem = player.getHeldItem(hand);
+	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+		ItemStack heldItem = player.getItemInHand(hand);
 
 		if (hand == Hand.MAIN_HAND && heldItem.getItem() == Items.AIR) { // Empty hand
 			Species species = this.getSpecies(world, pos);
@@ -102,12 +102,12 @@ public class BonsaiPotBlock extends ContainerBlock {
 			if (!species.isValid())
 				return ActionResultType.PASS;
 
-			if(!world.isRemote) {
+			if(!world.isClientSide) {
 				ItemStack seedStack = species.getSeedStack(1);
-				world.addEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
+				world.addFreshEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), seedStack));
 			}
 
-			world.setBlockState(pos, getPotState(world, pos)); // Return back to an empty pot
+			world.setBlockAndUpdate(pos, getPotState(world, pos)); // Return back to an empty pot
 
 			return ActionResultType.SUCCESS;
 		}
@@ -140,9 +140,9 @@ public class BonsaiPotBlock extends ContainerBlock {
 
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-		if (!world.getBlockState(pos.down()).isSolidSide(world, pos, Direction.UP)) {
+		if (!world.getBlockState(pos.below()).isFaceSturdy(world, pos, Direction.UP)) {
 			this.spawnDrops(world, pos);
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
 	}
 
@@ -153,10 +153,10 @@ public class BonsaiPotBlock extends ContainerBlock {
 	}
 
 	@Override
-	public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-		super.harvestBlock(world, player, pos, state, te, stack);
+	public void playerDestroy(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+		super.playerDestroy(world, player, pos, state, te, stack);
 		this.spawnDrops(world, pos);
-		world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 	}
 
 	public void spawnDrops(World world, BlockPos pos) {
@@ -182,7 +182,7 @@ public class BonsaiPotBlock extends ContainerBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 

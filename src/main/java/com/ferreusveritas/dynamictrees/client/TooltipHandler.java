@@ -28,35 +28,35 @@ public class TooltipHandler {
 		Seed seed = (Seed) item;
 
 		PlayerEntity player = event.getPlayer();
-		if(player == null || player.world == null || SeasonHelper.getSeasonValue(player.world, BlockPos.ZERO) == null)
+		if(player == null || player.level == null || SeasonHelper.getSeasonValue(player.level, BlockPos.ZERO) == null)
 			return;
 
 		Species species = seed.getSpecies();
 		if (species == null || !species.isValid())
 			return;
 
-		int flags = seed.getSpecies().getSeasonalTooltipFlags(player.world);
+		int flags = seed.getSpecies().getSeasonalTooltipFlags(player.level);
 		applySeasonalTooltips(event.getToolTip(), flags);
 	}
 	
 	public static void applySeasonalTooltips(List<ITextComponent> tipList, int flags) {
 		if (flags != 0) {
-			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons").appendString(":"));
+			tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons").append(":"));
 			
 			if ((flags & 15) == 15) {
-				tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.year_round").mergeStyle(TextFormatting.LIGHT_PURPLE)));
+				tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.year_round").withStyle(TextFormatting.LIGHT_PURPLE)));
 			} else {
 				if ((flags & 1) != 0) {
-					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.spring").mergeStyle(TextFormatting.GREEN)));
+					tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.spring").withStyle(TextFormatting.GREEN)));
 				}
 				if ((flags & 2) != 0) {
-					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.summer").mergeStyle(TextFormatting.YELLOW)));
+					tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.summer").withStyle(TextFormatting.YELLOW)));
 				}
 				if ((flags & 4) != 0) {
-					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.autumn").mergeStyle(TextFormatting.GOLD)));
+					tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.autumn").withStyle(TextFormatting.GOLD)));
 				}
 				if ((flags & 8) != 0) {
-					tipList.add(new StringTextComponent(" ").appendSibling(new TranslationTextComponent("desc.sereneseasons.winter").mergeStyle(TextFormatting.AQUA)));
+					tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.winter").withStyle(TextFormatting.AQUA)));
 				}
 			}
 		}

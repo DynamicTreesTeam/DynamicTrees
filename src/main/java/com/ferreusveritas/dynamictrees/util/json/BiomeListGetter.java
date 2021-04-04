@@ -16,7 +16,7 @@ import java.util.Collections;
 public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
-            biomeList.removeIf(biome -> BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()))
+            biomeList.removeIf(biome -> BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()))
                     .stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase())));
 
     private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->

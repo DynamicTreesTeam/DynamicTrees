@@ -43,8 +43,8 @@ public class ConfiguredGenFeature<GF extends GenFeature> {
      */
     public <V> ConfiguredGenFeature<GF> with (GenFeatureProperty<V> genFeatureProperty, V value) {
         if (!this.genFeature.isPropertyRegistered(genFeatureProperty)) {
-            CrashReport crashReport = CrashReport.makeCrashReport(new IllegalArgumentException(), "Tried to add unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" + genFeatureProperty.getType() + "' to gen feature '" + this.genFeature.getRegistryName() + "'.");
-            crashReport.makeCategory("Adding property to a gen feature.");
+            CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" + genFeatureProperty.getType() + "' to gen feature '" + this.genFeature.getRegistryName() + "'.");
+            crashReport.addCategory("Adding property to a gen feature.");
             throw new ReportedException(crashReport);
         }
 
@@ -74,8 +74,8 @@ public class ConfiguredGenFeature<GF extends GenFeature> {
      */
     public <V> V get (GenFeatureProperty<V> genFeatureProperty) {
         if (!this.has(genFeatureProperty)) {
-            CrashReport crashReport = CrashReport.makeCrashReport(new IllegalStateException(), "Tried to obtain gen feature property '" + genFeatureProperty.getIdentifier() + "' from '" + genFeature.getRegistryName() + "' that did not exist.");
-            crashReport.makeCategory("Getting property from a configured gen feature.");
+            CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain gen feature property '" + genFeatureProperty.getIdentifier() + "' from '" + genFeature.getRegistryName() + "' that did not exist.");
+            crashReport.addCategory("Getting property from a configured gen feature.");
             throw new ReportedException(crashReport);
         }
 

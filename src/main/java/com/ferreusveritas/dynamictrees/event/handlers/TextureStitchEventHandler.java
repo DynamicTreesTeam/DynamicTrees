@@ -21,8 +21,8 @@ public class TextureStitchEventHandler {
 
     @SubscribeEvent
     public static void onTextureStitchEventPre(TextureStitchEvent.Pre event) {
-        ResourceLocation eventAtlasLocation = event.getMap().getTextureLocation();
-        if (eventAtlasLocation.equals(AtlasTexture.LOCATION_BLOCKS_TEXTURE)) {
+        ResourceLocation eventAtlasLocation = event.getMap().location();
+        if (eventAtlasLocation.equals(AtlasTexture.LOCATION_BLOCKS)) {
             SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
 
             List<ResourceLocation> ringLocationsToGenerate = new LinkedList<>();

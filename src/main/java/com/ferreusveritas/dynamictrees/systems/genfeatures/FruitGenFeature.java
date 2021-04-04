@@ -45,7 +45,7 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			qty *= seasonFruitProductionFactor;
 			for(int i = 0; i < qty; i++) {
 				BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
-				addFruit(configuredGenFeature, world, species, rootPos.up(), endPoint, true, false, safeBounds, seasonValue);
+				addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, true, false, safeBounds, seasonValue);
 			}
 			return true;
 		}
@@ -58,15 +58,15 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 
 		if(branch != null && branch.getRadius(blockState) >= configuredGenFeature.get(FRUITING_RADIUS) && natural) {
-			if (species.seasonalFruitProductionFactor(world, rootPos) > world.rand.nextFloat()) {
+			if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
 				FindEndsNode endFinder = new FindEndsNode();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 				List<BlockPos> endPoints = endFinder.getEnds();
 				int qty = configuredGenFeature.get(QUANTITY);
 				if (!endPoints.isEmpty()) {
 					for (int i = 0; i < qty; i++) {
-						BlockPos endPoint = endPoints.get(world.rand.nextInt(endPoints.size()));
-						addFruit(configuredGenFeature, world, species, rootPos.up(), endPoint, false, true, SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
+						BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
+						addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, false, true, SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
 					}
 				}
 			}
@@ -81,7 +81,7 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			if (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
 				FruitBlock fruitBlock = configuredGenFeature.get(FRUIT_BLOCK);
 				BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
-				world.setBlockState(fruitPos, setState, 3);
+				world.setBlock(fruitPos, setState, 3);
 			}
 		}
 	}

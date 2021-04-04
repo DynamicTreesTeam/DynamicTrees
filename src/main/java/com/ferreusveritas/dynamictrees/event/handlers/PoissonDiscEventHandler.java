@@ -23,7 +23,7 @@ public class PoissonDiscEventHandler {
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
         IWorld world = event.getWorld();
-		if(!world.isRemote()) {
+		if(!world.isClientSide()) {
 			TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld((ServerWorld) world);//clears the circles
 		}
 	}
@@ -31,7 +31,7 @@ public class PoissonDiscEventHandler {
 	@SubscribeEvent
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
         IWorld world = event.getWorld();
-		if (world != null && !world.isRemote()) {
+		if (world != null && !world.isClientSide()) {
 			byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
 			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
 
@@ -49,7 +49,7 @@ public class PoissonDiscEventHandler {
 		event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
 
 		// This has helped eliminate some chunk data but hasn't prevented freezing.
-		if (!world.getChunkProvider().isChunkLoaded(chunkPos))
+		if (!world.getChunkSource().isEntityTickingChunk(chunkPos))
 			cp.unloadChunkPoissonData(world, chunkPos);
 	}
 

@@ -50,7 +50,7 @@ public class BasicBranchBlock extends BranchBlock {
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
 	public BasicBranchBlock(Material material) {
-		this(AbstractBlock.Properties.create(material));
+		this(AbstractBlock.Properties.of(material));
 	}
 	
 	// Useful for more unique subclasses
@@ -77,14 +77,14 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 
 	public void cacheBranchStates() {
-		this.setDefaultState(stateContainer.getBaseState().with(RADIUS, 1));
+		this.registerDefaultState(stateDefinition.any().setValue(RADIUS, 1));
 		
 		branchStates = new BlockState[RADMAX_NORMAL + 1];
 		
 		//Cache the branch blocks states for rapid lookup
-		branchStates[0] = Blocks.AIR.getDefaultState();
+		branchStates[0] = Blocks.AIR.defaultBlockState();
 		for(int radius = 1; radius <= RADMAX_NORMAL; radius++) {
-			branchStates[radius] = getDefaultState().with(BasicBranchBlock.RADIUS, radius);
+			branchStates[radius] = defaultBlockState().setValue(BasicBranchBlock.RADIUS, radius);
 		}
 	}
 	
@@ -92,7 +92,7 @@ public class BasicBranchBlock extends BranchBlock {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 	
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(RADIUS);
 	}
 	
@@ -127,7 +127,7 @@ public class BasicBranchBlock extends BranchBlock {
 		int neigh = 0;// High Nybble is count of branches, Low Nybble is any reinforcing treepart(including branches)
 		
 		for (Direction dir : Direction.values()) {
-			BlockPos deltaPos = pos.offset(dir);
+			BlockPos deltaPos = pos.relative(dir);
 			BlockState deltaBlockState = world.getBlockState(deltaPos);
 			neigh += TreeHelper.getTreePart(deltaBlockState).branchSupport(deltaBlockState, world, this, deltaPos, dir, radius);
 			if (getBranchSupport(neigh) >= 1 && getLeavesSupport(neigh) >= 2) {// Need two neighbors.. one of which must be another branch
@@ -139,7 +139,7 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
-				BlockPos neighPos = pos.offset(dir);// the neighbors might be rotted too.
+				BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
 				BlockState neighState = world.getBlockState(neighPos);
 				if(neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
 					checkForRot(world, neighPos, species, getRadius(neighState), rand, 1.0f, true);
@@ -158,7 +158,7 @@ public class BasicBranchBlock extends BranchBlock {
 	@Override
 	public float getHardness (IBlockReader worldIn, BlockPos pos) {
 		final int radius = this.getRadius(worldIn.getBlockState(pos));
-		final float hardness = this.getFamily().getPrimitiveLog().getDefaultState().getBlockHardness(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+		final float hardness = this.getFamily().getPrimitiveLog().defaultBlockState().getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
 		return (float) Math.min(hardness, DTConfigs.maxTreeHardness.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 
@@ -203,13 +203,13 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int getRadius(BlockState blockState) {
-		return isSameTree(blockState) ? blockState.get(RADIUS) : 0;
+		return isSameTree(blockState) ? blockState.getValue(RADIUS) : 0;
 	}
 	
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
-		world.setBlockState(pos, getStateForRadius(radius), flags);
+		world.setBlock(pos, getStateForRadius(radius), flags);
 		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
 		return radius;
 	}
@@ -253,14 +253,14 @@ public class BasicBranchBlock extends BranchBlock {
 			signal.doTurn(targetDir);
 			
 			{
-				BlockPos deltaPos = pos.offset(targetDir);
+				BlockPos deltaPos = pos.relative(targetDir);
 				BlockState deltaState = world.getBlockState(deltaPos);
 				
 				// Pass grow signal to next block in path
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.NULL_TREE_PART) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isAirBlock(deltaPos) || deltaState.getBlock() == DTRegistries.TRUNK_SHELL) {
+				} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() == DTRegistries.TRUNK_SHELL) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}
@@ -270,7 +270,7 @@ public class BasicBranchBlock extends BranchBlock {
 			
 			for (Direction dir : Direction.values()) {
 				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-					BlockPos deltaPos = pos.offset(dir);
+					BlockPos deltaPos = pos.relative(dir);
 					
 					// If it is decided to implement a special block(like a squirrel hole, tree
 					// swing, rotting, burned or infested branch, etc) then this new block could be
@@ -322,7 +322,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		int thisRadiusInt = getRadius(state);
 		double radius = thisRadiusInt / 16.0;
-		VoxelShape core = VoxelShapes.create(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+		VoxelShape core = VoxelShapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 		
 		for (Direction dir : Direction.values()) {
 			int sideRadiusInt = Math.min(getSideConnectionRadius(worldIn, pos, thisRadiusInt, dir), thisRadiusInt);
@@ -330,7 +330,7 @@ public class BasicBranchBlock extends BranchBlock {
 			if (sideRadius > 0.0f) {
 				double gap = 0.5f - sideRadius;
 				AxisAlignedBB aabb = new AxisAlignedBB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
-				aabb = aabb.expand(dir.getXOffset() * gap, dir.getYOffset() * gap, dir.getZOffset() * gap);
+				aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
 				core = VoxelShapes.or(core, VoxelShapes.create(aabb));
 			}
 		}
@@ -344,7 +344,7 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
-		final BlockPos deltaPos = pos.offset(side);
+		final BlockPos deltaPos = pos.relative(side);
 		final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
 		// If adjacent block is not loaded assume there is no connection.
@@ -383,7 +383,7 @@ public class BasicBranchBlock extends BranchBlock {
 			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (Direction dir : Direction.values()) {// Spread signal in various directions
 				if (dir != fromDir) {// don't count where the signal originated from
-					BlockPos deltaPos = pos.offset(dir);
+					BlockPos deltaPos = pos.relative(dir);
 					
 					BlockState deltaState = world.getBlockState(deltaPos);
 					ITreePart treePart = TreeHelper.getTreePart(deltaState);

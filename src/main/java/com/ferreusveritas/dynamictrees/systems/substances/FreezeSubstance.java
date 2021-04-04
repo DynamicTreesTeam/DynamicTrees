@@ -20,7 +20,7 @@ public class FreezeSubstance implements ISubstanceEffect {
  		final Species species = dirt.getSpecies(rootyState, world, rootPos);
 
  		if (species != Species.NULL_SPECIES && dirt != null) {
- 			if (world.isRemote) {
+ 			if (world.isClientSide) {
  				TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
  			} else {
  				dirt.startAnalysis(world, rootPos, new MapSignal(new FreezerNode(species)));

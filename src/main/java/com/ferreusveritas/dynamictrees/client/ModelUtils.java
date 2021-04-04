@@ -64,16 +64,16 @@ public class ModelUtils {
 	}
 	
 	public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation modelRotation, ResourceLocation modelResLoc) {
-		return new FaceBakery().bakeQuad(blockPart.positionFrom, blockPart.positionTo, partFace, atlasSprite, dir, modelRotation, blockPart.partRotation, true, modelResLoc);
+		return new FaceBakery().bakeQuad(blockPart.from, blockPart.to, partFace, atlasSprite, dir, modelRotation, blockPart.rotation, true, modelResLoc);
 	}
 
 	@SuppressWarnings("deprecation")
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-		return getTexture(resLoc, AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+		return getTexture(resLoc, AtlasTexture.LOCATION_BLOCKS);
 	}
 
 	public static TextureAtlasSprite getTexture(ResourceLocation resLoc, ResourceLocation atlasResLoc) {
-		return Minecraft.getInstance().getAtlasSpriteGetter(atlasResLoc).apply(resLoc);
+		return Minecraft.getInstance().getTextureAtlas(atlasResLoc).apply(resLoc);
 	}
 
 }

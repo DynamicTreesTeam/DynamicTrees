@@ -50,7 +50,7 @@ public class SafeChunkBounds {
 
 		for(Tile t : tiles) {
 			ChunkPos cp = new ChunkPos(pos.x + t.pos.x, pos.z + t.pos.z);
-			boolean c = world.getChunkProvider().getChunk(cp.x, cp.z, ChunkStatus.EMPTY, false) != null;
+			boolean c = world.getChunkSource().getChunk(cp.x, cp.z, ChunkStatus.EMPTY, false) != null;
 			chunkBounds[t.index] = c ? new BlockBounds(cp) : BlockBounds.INVALID;
 		}
 
@@ -59,8 +59,8 @@ public class SafeChunkBounds {
 			if(curr != BlockBounds.INVALID) {
 				for(Direction dir : CoordUtils.HORIZONTALS) {
 					boolean validDir = false;
-					if((t.borders & (1 << dir.getIndex())) != 0) {
-						BlockBounds adjTile = chunkBounds[t.index + dir.getXOffset() + dir.getZOffset() * 4];
+					if((t.borders & (1 << dir.get3DDataValue())) != 0) {
+						BlockBounds adjTile = chunkBounds[t.index + dir.getStepX() + dir.getStepZ() * 4];
 						validDir = adjTile != BlockBounds.INVALID;
 					}
 					if(!validDir) {
@@ -102,7 +102,7 @@ public class SafeChunkBounds {
 	
 	public void setBlockState(IWorld world, BlockPos pos, BlockState state, int flags, boolean gap) {
 		if(inBounds(pos, gap)) {
-			world.setBlockState(pos, state, flags);
+			world.setBlock(pos, state, flags);
 		}
 	}
 	

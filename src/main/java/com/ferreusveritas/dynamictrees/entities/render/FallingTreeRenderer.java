@@ -24,8 +24,8 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(FallingTreeEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(FallingTreeEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 
 	@Override
@@ -36,13 +36,13 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 			return;
 		}
 
-		this.renderManager.textureManager.bindTexture(this.getEntityTexture(entity));
+		this.entityRenderDispatcher.textureManager.bind(this.getTextureLocation(entity));
 
 		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
 
-		matrixStack.push();
+		matrixStack.pushPose();
 
-		IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.getEntityCutout(this.getEntityTexture(entity)));
+		IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
 
 //		if(entity.onFire) {
 //			renderFire(matrixStack, vertexBuilder);
@@ -55,9 +55,9 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
 
-		treeModel.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1,1,1, 1.0F);
+		treeModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1,1,1, 1.0F);
 
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 
 //	private void renderFire(MatrixStack matrixStack, IVertexBuilder buffer) {

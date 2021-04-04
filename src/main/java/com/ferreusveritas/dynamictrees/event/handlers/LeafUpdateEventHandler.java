@@ -16,7 +16,7 @@ public class LeafUpdateEventHandler {
 	public void UpdateNeighbour(BlockEvent.NeighborNotifyEvent event) {
 		IWorld world = event.getWorld();
 		for (Direction facing : event.getNotifiedSides()) {
-			BlockPos blockPos = event.getPos().offset(facing);
+			BlockPos blockPos = event.getPos().relative(facing);
 			if(TreeHelper.isLeaves(world.getBlockState(blockPos))) {
 				event.setCanceled(true);
 			}

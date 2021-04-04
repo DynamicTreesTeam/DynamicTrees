@@ -35,38 +35,38 @@ public class SpeciesTileEntity extends TileEntity {
 	
 	public void setSpecies(Species species) {
 		this.species = species;
-		this.markDirty();
+		this.setChanged();
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT tag) {
+	public void load(BlockState state, CompoundNBT tag) {
 		if(tag.contains("species")) {
 			ResourceLocation speciesName = new ResourceLocation(tag.getString("species"));
 			species = TreeRegistry.findSpecies(speciesName);
 		}
-		super.read(state, tag);
+		super.load(state, tag);
 	}
 
 	@Nonnull
 	@Override
-	public CompoundNBT write(CompoundNBT tag) {
+	public CompoundNBT save(CompoundNBT tag) {
 		tag.putString("species", species.getRegistryName().toString());
-		return super.write(tag);
+		return super.save(tag);
 	}
 
 	@Nullable
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 0, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 0, this.getUpdateTag());
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		read(getBlockState(), pkt.getNbtCompound());
+		load(getBlockState(), pkt.getTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return write(new CompoundNBT());
+		return save(new CompoundNBT());
 	}
 
 }

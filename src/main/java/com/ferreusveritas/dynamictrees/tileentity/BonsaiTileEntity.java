@@ -39,7 +39,7 @@ public class BonsaiTileEntity extends TileEntity {
 	public static final ModelProperty<BlockState> POT_MIMIC = new ModelProperty<>();
 	public static final ModelProperty<Species> SPECIES = new ModelProperty<>();
 
-	private BlockState potState = Blocks.FLOWER_POT.getDefaultState();
+	private BlockState potState = Blocks.FLOWER_POT.defaultBlockState();
 	private Species species = Species.NULL_SPECIES;
 
 	public BonsaiTileEntity() {
@@ -52,8 +52,8 @@ public class BonsaiTileEntity extends TileEntity {
 
 	public void setSpecies(Species species) {
 		this.species = species;
-		this.markDirty();
-		world.notifyBlockUpdate(pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+		this.setChanged();
+		level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
 	}
 
 	public BlockState getPot() {
@@ -62,55 +62,55 @@ public class BonsaiTileEntity extends TileEntity {
 	
 	public void setPot(BlockState newPotState) {
 		if(newPotState.getBlock() instanceof FlowerPotBlock) {
-			this.potState = newPotState.getBlock().getDefaultState();
+			this.potState = newPotState.getBlock().defaultBlockState();
 		} else {
-			this.potState = Blocks.FLOWER_POT.getDefaultState();
+			this.potState = Blocks.FLOWER_POT.defaultBlockState();
 		}
-		this.markDirty();
-		world.notifyBlockUpdate(pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+		this.setChanged();
+		level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
 		CompoundNBT tag = super.getUpdateTag();
-		this.write(tag);
+		this.save(tag);
 		return tag;
 	}
 
 	@Nullable
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(pos, 1, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(worldPosition, 1, this.getUpdateTag());
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		BlockState oldPotState = potState;
-		this.handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		this.handleUpdateTag(this.getBlockState(), pkt.getTag());
 
 		if (!oldPotState.equals(potState)) {
 			ModelDataManager.requestModelDataRefresh(this);
-			world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
 		}
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT tag) {
+	public void load(BlockState state, CompoundNBT tag) {
 		if(tag.contains(POT_MIMIC_TAG)) {
 			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(tag.getString(POT_MIMIC_TAG)));
-			potState = block != Blocks.AIR ? block.getDefaultState() : Blocks.FLOWER_POT.getDefaultState();
+			potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
 		}
 		if (tag.contains(SPECIES_TAG)) {
 			this.species = TreeRegistry.findSpecies(tag.getString(SPECIES_TAG));
 		}
-		super.read(state, tag);
+		super.load(state, tag);
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT tag) {
+	public CompoundNBT save(CompoundNBT tag) {
 		tag.putString(POT_MIMIC_TAG, potState.getBlock().getRegistryName().toString());
 		tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
-		return super.write(tag);
+		return super.save(tag);
 	}
 
 	@Nonnull

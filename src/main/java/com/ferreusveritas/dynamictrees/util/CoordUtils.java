@@ -50,12 +50,12 @@ public final class CoordUtils {
 			this.name = name;
 			BlockPos pos = BlockPos.ZERO;
 			for(Direction d : dirs) {
-				pos = pos.add(d.getDirectionVec());
+				pos = pos.offset(d.getNormal());
 			}
 			this.offset = pos;
 		}
 
-		public String getString() {
+		public String getSerializedName() {
 			return name;
 		}
 		
@@ -75,7 +75,7 @@ public final class CoordUtils {
 	public static boolean isSurroundedByLoadedChunks(World world, BlockPos pos) {
 		for(Surround surr: CoordUtils.Surround.values()) {
 			Vector3i dir = surr.getOffset();
-			if(!world.getChunkProvider().isChunkLoaded(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))){
+			if(!world.getChunkSource().isEntityTickingChunk(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))){
 				return false;
 			}
 		}
@@ -86,7 +86,7 @@ public final class CoordUtils {
 	@SuppressWarnings("deprecation")
 	public static boolean isBlockLoaded (IBlockReader blockReader, BlockPos pos) {
 		if (blockReader instanceof IWorldReader) {
-			return ((IWorldReader) blockReader).isBlockLoaded(pos);
+			return ((IWorldReader) blockReader).hasChunkAt(pos);
 		} else return (blockReader instanceof EmptyBlockReader ||
 				blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
 				blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
@@ -122,12 +122,12 @@ public final class CoordUtils {
 		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.getRandom().nextInt(3), safeBounds);
 
 		if(result != null) {
-			BlockPos hitPos = new BlockPos(result.getHitVec());
+			BlockPos hitPos = new BlockPos(result.getLocation());
 			if(hitPos != BlockPos.ZERO) {
 				do { //Run straight down until we hit a block that's non compatible leaves.
-					hitPos = hitPos.down();
+					hitPos = hitPos.below();
 				} while(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
-				if(world.isAirBlock(hitPos)) {//If that block is air then we have a winner.
+				if(world.isEmptyBlock(hitPos)) {//If that block is air then we have a winner.
 					return hitPos;
 				}
 			}
@@ -152,18 +152,18 @@ public final class CoordUtils {
 		vOut = vOut.normalize(). //Normalize to unit vector
 				add(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to spreadVer degrees
 				normalize(). //Re-normalize to unit vector
-				rotateYaw((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- spreadHor
+				yRot((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- spreadHor
 				scale(distance); //Vary the view distance
 
 		Vector3d branchVec = new Vector3d(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
 		Vector3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
 		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
 
-		if(!safeBounds.inBounds(vantagePos, false) || world.isAirBlock(vantagePos)) {//The observing block must be in free space
+		if(!safeBounds.inBounds(vantagePos, false) || world.isEmptyBlock(vantagePos)) {//The observing block must be in free space
 			RayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
 			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
 			if (result != null){
-				final BlockPos hitPos = new BlockPos(result.getHitVec());
+				final BlockPos hitPos = new BlockPos(result.getLocation());
 				if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
 					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 						return result;
@@ -188,20 +188,20 @@ public final class CoordUtils {
 	 */
 	public static BlockRayTraceResult rayTraceBlocks(IWorld world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
 		return getRayTraceVector(context, (fromContext, blockPos) -> {
-			BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.getDefaultState();
-			FluidState fluidState = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.getDefaultState();
+			BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.defaultBlockState();
+			FluidState fluidState = safeBounds.inBounds(blockPos, false) ?  world.getFluidState(blockPos) : Fluids.EMPTY.defaultFluidState();
 			Vector3d startVec = fromContext.getStartVector();
 			Vector3d endVec = fromContext.getEndVector();
 			VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, world, blockPos) : VoxelShapes.empty();
-			BlockRayTraceResult blockraytraceresult = world.rayTraceBlocks(startVec, endVec, blockPos, voxelshape, blockstate);
+			BlockRayTraceResult blockraytraceresult = world.clipWithInteractionOverride(startVec, endVec, blockPos, voxelshape, blockstate);
 			VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(fluidState, world, blockPos) : VoxelShapes.empty();
-			BlockRayTraceResult blockraytraceresult1 = voxelshape1.rayTrace(startVec, endVec, blockPos);
-			double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult.getHitVec());
-			double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().squareDistanceTo(blockraytraceresult1.getHitVec());
+			BlockRayTraceResult blockraytraceresult1 = voxelshape1.clip(startVec, endVec, blockPos);
+			double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult.getLocation());
+			double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult1.getLocation());
 			return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
 		}, (context1) -> {
 			Vector3d vec3d = context1.getStartVector().subtract(context1.getEndVector());
-			return BlockRayTraceResult.createMiss(context1.getEndVector(), Direction.getFacingFromVector(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context1.getEndVector()));
+			return BlockRayTraceResult.miss(context1.getEndVector(), Direction.getNearest(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context1.getEndVector()));
 		});
 	}
 
@@ -228,9 +228,9 @@ public final class CoordUtils {
 				double d6 = vantX - lookX;
 				double d7 = vantY - lookY;
 				double d8 = vantZ - lookZ;
-				int l = MathHelper.signum(d6);
-				int i1 = MathHelper.signum(d7);
-				int j1 = MathHelper.signum(d8);
+				int l = MathHelper.sign(d6);
+				int i1 = MathHelper.sign(d7);
+				int j1 = MathHelper.sign(d8);
 				double d9 = l == 0 ? Double.MAX_VALUE : (double)l / d6;
 				double d10 = i1 == 0 ? Double.MAX_VALUE : (double)i1 / d7;
 				double d11 = j1 == 0 ? Double.MAX_VALUE : (double)j1 / d8;
@@ -255,7 +255,7 @@ public final class CoordUtils {
 						d14 += d11;
 					}
 
-					T t1 = biFunction.apply(context, blockpos$mutableblockpos.setPos(i, j, k));
+					T t1 = biFunction.apply(context, blockpos$mutableblockpos.set(i, j, k));
 					if (t1 != null) {
 						return t1;
 					}
@@ -291,11 +291,11 @@ public final class CoordUtils {
 		}
 
 		public VoxelShape getBlockShape(BlockState state, IBlockReader world, BlockPos pos) {
-			return this.blockMode.get(state, world, pos, ISelectionContext.dummy());
+			return this.blockMode.get(state, world, pos, ISelectionContext.empty());
 		}
 
 		public VoxelShape getFluidShape(FluidState state, IBlockReader world, BlockPos pos) {
-			return this.fluidMode.test(state) ? state.getShape(world, pos) : VoxelShapes.empty();
+			return this.fluidMode.canPick(state) ? state.getShape(world, pos) : VoxelShapes.empty();
 		}
 	}
 
@@ -308,12 +308,12 @@ public final class CoordUtils {
 		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
 		
 		//Rise up until we are no longer in a solid block
-		while(world.getBlockState(pos).isSolid()) {
-			pos.setPos(pos.getX(), pos.getY() + 1, pos.getZ());
+		while(world.getBlockState(pos).canOcclude()) {
+			pos.set(pos.getX(), pos.getY() + 1, pos.getZ());
 		}
 		//Dive down until we are again
-		while(!world.getBlockState(pos).isSolid() && pos.getY() > 50) {
-			pos.setPos(pos.getX(), pos.getY() - 1, pos.getZ());
+		while(!world.getBlockState(pos).canOcclude() && pos.getY() > 50) {
+			pos.set(pos.getX(), pos.getY() - 1, pos.getZ());
 		}
 		return pos;
 	}
@@ -352,7 +352,7 @@ public final class CoordUtils {
 							if(currentDir < HORIZONTALS.length) {
 								Direction face = HORIZONTALS[currentDir++];
 								if(face != ignore) {
-									return pos.offset(face);
+									return pos.relative(face);
 								}
 							} else {
 								return this.endOfData();

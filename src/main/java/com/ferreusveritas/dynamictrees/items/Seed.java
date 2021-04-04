@@ -43,7 +43,7 @@ public class Seed extends Item implements IPlantable {
 	}
 	
 	public Seed(Species species) {
-		super(new Item.Properties().group(DTRegistries.ITEM_GROUP));
+		super(new Item.Properties().tab(DTRegistries.ITEM_GROUP));
 		this.species = species;
 	}
 	
@@ -60,11 +60,11 @@ public class Seed extends Item implements IPlantable {
 			}
 		}
 		
-		if(entityItem.ticksExisted >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
-			World world = entityItem.world;
-			if(!world.isRemote) {//Server side only
+		if(entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
+			World world = entityItem.level;
+			if(!world.isClientSide) {//Server side only
 				ItemStack seedStack = entityItem.getItem();
-				BlockPos pos = new BlockPos(entityItem.getPosition());
+				BlockPos pos = new BlockPos(entityItem.blockPosition());
 				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(), pos, shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
 				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
@@ -72,7 +72,7 @@ public class Seed extends Item implements IPlantable {
 				}
 				seedStack.setCount(0);
 			}
-			entityItem.onKillCommand();
+			entityItem.kill();
 		}
 		
 		return false;
@@ -84,7 +84,7 @@ public class Seed extends Item implements IPlantable {
 			String joCode = getCode(seedStack);
 			if(!joCode.isEmpty()) {
 				world.removeBlock(pos, false);//Remove the newly created dynamic sapling
-				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.down(), world.getBiome(pos), planter != null ? planter.getHorizontalFacing() : Direction.NORTH, 8, SafeChunkBounds.ANY);
+				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
 			}
 			return true;
 		}
@@ -97,14 +97,14 @@ public class Seed extends Item implements IPlantable {
 			return true;
 		}
 		
-		if(!world.canBlockSeeSky(pos)) {
+		if(!world.canSeeSkyFromBelowWater(pos)) {
 			return false;
 		}
 		
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
 		
 		if(DTConfigs.seedOnlyForest.get()) {
-			plantChance *= DTResourceRegistries.getBiomeDatabaseManager().getDimensionDatabase(world.getDimensionKey().getLocation())
+			plantChance *= DTResourceRegistries.getBiomeDatabaseManager().getDimensionDatabase(world.dimension().location())
 					.getForestness(world.getBiome(pos));
 		}
 		
@@ -115,7 +115,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		plantChance = 1.0f - accum;
 		
-		return plantChance > world.rand.nextFloat();
+		return plantChance > world.random.nextFloat();
 	}
 	
 	public boolean hasForcePlant(ItemStack seedStack) {
@@ -150,19 +150,19 @@ public class Seed extends Item implements IPlantable {
 	}
 
 	public ActionResultType onItemUseFlowerPot(ItemUseContext context) {
-		World world = context.getWorld();
-		BlockPos pos = context.getPos();
+		World world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		BlockState emptyPotState = world.getBlockState(pos);
 		Block emptyPotBlock = emptyPotState.getBlock();
 
-		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.getDefaultState())
+		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState())
 			return ActionResultType.PASS;
 
 		BonsaiPotBlock bonsaiPot = this.getSpecies().getBonsaiPot();
-		world.setBlockState(pos, bonsaiPot.getDefaultState());
+		world.setBlockAndUpdate(pos, bonsaiPot.defaultBlockState());
 
-		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.getDefaultState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
-			context.getItem().shrink(1);
+		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.defaultBlockState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
+			context.getItemInHand().shrink(1);
 			return ActionResultType.SUCCESS;
 		}
 
@@ -171,18 +171,18 @@ public class Seed extends Item implements IPlantable {
 	
 	public ActionResultType onItemUsePlantSeed(ItemUseContext context) {
 		
-		BlockState state = context.getWorld().getBlockState(context.getPos());
-		BlockPos pos = context.getPos();
-		Direction facing = context.getFace();
+		BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+		BlockPos pos = context.getClickedPos();
+		Direction facing = context.getClickedFace();
 		if(state.getMaterial().isReplaceable()) {
-			pos = pos.down();
+			pos = pos.below();
 			facing = Direction.UP;
 		}
 		
 		if (facing == Direction.UP) {//Ensure this seed is only used on the top side of a block
-			if (context.getPlayer().canPlayerEdit(pos, facing, context.getItem()) && context.getPlayer().canPlayerEdit(pos.up(), facing, context.getItem())) {//Ensure permissions to edit block
-				if(doPlanting(context.getWorld(), pos.up(), context.getPlayer(), context.getItem())) {
-					context.getItem().shrink(1);
+			if (context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
+				if(doPlanting(context.getLevel(), pos.above(), context.getPlayer(), context.getItemInHand())) {
+					context.getItemInHand().shrink(1);
 					return ActionResultType.SUCCESS;
 				}
 			}
@@ -202,7 +202,7 @@ public class Seed extends Item implements IPlantable {
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public ActionResultType useOn(ItemUseContext context) {
 		// Handle planting seed interaction.
 		if(onItemUsePlantSeed(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
@@ -212,8 +212,8 @@ public class Seed extends Item implements IPlantable {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, world, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, world, tooltip, flagIn);
 		
 		if(stack.hasTag()) {
 			String joCode = getCode(stack);
@@ -238,7 +238,7 @@ public class Seed extends Item implements IPlantable {
 	
 	@Override
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
-		return getSpecies().getSapling().map(Block::getDefaultState).orElse(Blocks.AIR.getDefaultState());
+		return getSpecies().getSapling().map(Block::defaultBlockState).orElse(Blocks.AIR.defaultBlockState());
 	}
 	
 }

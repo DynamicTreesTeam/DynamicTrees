@@ -71,7 +71,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
 	public IBakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
 
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).setTexture(bark);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
 		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 
 		final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[] { Direction.UP, Direction.DOWN };
@@ -83,12 +83,12 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		offsets.add(new Vector3i(0, 0, 0));//Center
 
 		for (Direction face: run) {
-			final Vector3i dirVector = face.getDirectionVec();
+			final Vector3i dirVector = face.getNormal();
 
 			for (Vector3i offset : offsets) {
-				if (face.getAxis() == Axis.Y || new Vector3d(dirVector.getX(), dirVector.getY(), dirVector.getZ()).add(new Vector3d(offset.getX(), offset.getY(), offset.getZ())).lengthSquared() > 2.25) { //This means that the dir and face share a common direction
+				if (face.getAxis() == Axis.Y || new Vector3d(dirVector.getX(), dirVector.getY(), dirVector.getZ()).add(new Vector3d(offset.getX(), offset.getY(), offset.getZ())).lengthSqr() > 2.25) { //This means that the dir and face share a common direction
 					Vector3d scaledOffset = new Vector3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
-					AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
+					AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
 
 					Vector3f[] limits = ModelUtils.AABBLimits(partBoundary);
 
@@ -98,7 +98,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 					mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 
 					BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
-					builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), bark, face, ModelRotation.X0_Y0, this.modelResLoc));
+					builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, ModelRotation.X0_Y0, this.modelResLoc));
 				}
 
 			}
@@ -108,7 +108,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 	}
 
 	public IBakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).setTexture(ring);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).particle(ring);
 		AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 		int wholeVolumeWidth = 48;
 
@@ -121,7 +121,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
 		for (Vector3i offset : offsets) {
 			Vector3d scaledOffset = new Vector3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16); // Scale the dimensions to match standard minecraft texels
-			AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(scaledOffset).intersect(wholeVolume);
+			AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
 
 			Vector3f posFrom = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
 			Vector3f posTo = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
@@ -146,7 +146,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 			mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
 
 			BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), ring, face, ModelRotation.X0_Y0, this.modelResLoc));
+			builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, ModelRotation.X0_Y0, this.modelResLoc));
 		}
 
 		return builder.build();
@@ -185,16 +185,16 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		}
 
 		if (forceRingDir != null){
-			connections[forceRingDir.getIndex()] = 0;
+			connections[forceRingDir.get3DDataValue()] = 0;
 			quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData));
 		}
 
 		for (Direction face : Direction.values()) {
 			quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
 			if (face == Direction.UP || face == Direction.DOWN) {
-				if (connections[face.getIndex()] < 1) {
+				if (connections[face.get3DDataValue()] < 1) {
 					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
-				} else if (connections[face.getIndex()] < coreRadius) {
+				} else if (connections[face.get3DDataValue()] < coreRadius) {
 					quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
 				}
 			}

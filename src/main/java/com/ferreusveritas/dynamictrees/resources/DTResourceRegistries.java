@@ -26,6 +26,8 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import net.minecraft.resources.IFutureReloadListener.IStage;
+
 /**
  * Holds and registers data pack entries ({@link IFutureReloadListener} objects).
  *
@@ -72,7 +74,7 @@ public final class DTResourceRegistries {
         // Add dynamic trees last so other add-ons take priority.
         registerModTreePack(ModList.get().getModFileById(DynamicTrees.MOD_ID).getFile());
 
-        LogManager.getLogger().debug("Successfully loaded " + TREES_RESOURCE_MANAGER.getResourcePackStream().count() + " tree packs.");
+        LogManager.getLogger().debug("Successfully loaded " + TREES_RESOURCE_MANAGER.listPacks().count() + " tree packs.");
     }
 
     private static void registerModTreePack (IModFile modFile) {

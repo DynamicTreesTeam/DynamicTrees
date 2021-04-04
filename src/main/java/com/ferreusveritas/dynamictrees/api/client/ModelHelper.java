@@ -49,7 +49,7 @@ public class ModelHelper {
 
 	public static void regModel(Block block) {
 		if(block != Blocks.AIR) {
-			regModel(Item.getItemFromBlock(block));
+			regModel(Item.byBlock(block));
 		}
 	}
 

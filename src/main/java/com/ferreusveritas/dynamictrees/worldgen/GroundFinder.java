@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class GroundFinder implements IGroundFinder {
 
 	protected boolean isReplaceable(final IWorld world, final BlockPos pos){
-		return world.isAirBlock(pos) && !world.getBlockState(pos).getMaterial().isLiquid();
+		return world.isEmptyBlock(pos) && !world.getBlockState(pos).getMaterial().isLiquid();
 	}
 
 	protected boolean inRange(final BlockPos pos, final int minY, final int maxY) {
@@ -29,7 +29,7 @@ public class GroundFinder implements IGroundFinder {
 	}
 
 	protected int getTopY(final IWorld world, final BlockPos pos) {
-		return world.getChunk(pos).getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
+		return world.getChunk(pos).getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
 	}
 
 	protected ArrayList<Integer> findSubterraneanLayerHeights(final IWorld world, final BlockPos start) {
@@ -77,10 +77,10 @@ public class GroundFinder implements IGroundFinder {
 			if (testBlock != Blocks.AIR) {
 				final Material material = state.getMaterial();
 
-				if (material == Material.EARTH || material == Material.WATER || // These will account for > 90% of blocks in the world so we can solve this early
-						(state.getMaterial().blocksMovement() &&
+				if (material == Material.DIRT || material == Material.WATER || // These will account for > 90% of blocks in the world so we can solve this early
+						(state.getMaterial().blocksMotion() &&
 								material != Material.LEAVES /* && block#isFoliage? */)) {
-					return groundPos.toImmutable();
+					return groundPos.immutable();
 				}
 			}
 

@@ -46,7 +46,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 			int radius = r + 1;
 			if(radius < 8) {
 				for(Direction dir: CoordUtils.HORIZONTALS) {
-					int horIndex = dir.getHorizontalIndex();
+					int horIndex = dir.get2DDataValue();
 					sleeves[horIndex][r] = bakeSleeve(radius, dir);
 					verts[horIndex][r] = bakeVert(radius, dir);
 				}
@@ -66,11 +66,11 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		//Work in double units(*2)
 		int dradius = radius * 2;
 		int halfSize = (16 - dradius) / 2;
-		int halfSizeX = dir.getXOffset() != 0 ? halfSize : dradius;
-		int halfSizeZ = dir.getZOffset() != 0 ? halfSize : dradius;
+		int halfSizeX = dir.getStepX() != 0 ? halfSize : dradius;
+		int halfSizeZ = dir.getStepZ() != 0 ? halfSize : dradius;
 		int move = 16 - halfSize;
-		int centerX = 16 + (dir.getXOffset() * move);
-		int centerZ = 16 + (dir.getZOffset() * move);
+		int centerX = 16 + (dir.getStepX() * move);
+		int centerZ = 16 + (dir.getStepZ() * move);
 
 		Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2, 0, (centerZ - halfSizeZ) / 2);
 		Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2, radialHeight, (centerZ + halfSizeZ) / 2);
@@ -98,11 +98,11 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		}
 
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(this.barkTexture);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(this.barkTexture);
 
-		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
+		for(Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), this.barkTexture, face, ModelRotation.X0_Y0, this.modelResLoc));
+			builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), this.barkTexture, face, ModelRotation.X0_Y0, this.modelResLoc));
 		}
 
 		return builder.build();
@@ -110,13 +110,13 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
 	private IBakedModel bakeVert(int radius, Direction dir) {
 		int radialHeight = getRadialHeight(radius);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(this.barkTexture);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(this.barkTexture);
 
 		AxisAlignedBB partBoundary = new AxisAlignedBB(8 - radius, radialHeight, 8 - radius, 8 + radius, 16 + radialHeight, 8 + radius)
-			.offset(dir.getXOffset() * 7, 0, dir.getZOffset() * 7);
+			.move(dir.getStepX() * 7, 0, dir.getStepZ() * 7);
 
 		for(int i = 0; i < 2; i++) {
-			AxisAlignedBB pieceBoundary = partBoundary.intersect(new AxisAlignedBB(0, 0, 0, 16, 16, 16).offset(0, 16 * i, 0));
+			AxisAlignedBB pieceBoundary = partBoundary.intersect(new AxisAlignedBB(0, 0, 0, 16, 16, 16).move(0, 16 * i, 0));
 
 			for (Direction face: Direction.values()) {
 				Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
@@ -127,7 +127,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 				Vector3f limits[] = ModelUtils.AABBLimits(pieceBoundary);
 
 				BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
-				builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, part.mapFaces.get(face), this.barkTexture, face, ModelRotation.X0_Y0, this.modelResLoc));
+				builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), this.barkTexture, face, ModelRotation.X0_Y0, this.modelResLoc));
 			}
 		}
 
@@ -155,11 +155,11 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		}
 
 		BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).setTexture(icon);
+		SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrideList.EMPTY).particle(icon);
 
-		for(Map.Entry<Direction, BlockPartFace> e : part.mapFaces.entrySet()) {
+		for(Map.Entry<Direction, BlockPartFace> e : part.faces.entrySet()) {
 			Direction face = e.getKey();
-			builder.addFaceQuad(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
+			builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, ModelRotation.X0_Y0, this.modelResLoc));
 		}
 
 		return builder.build();
@@ -193,7 +193,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		}
 		int coreDir = this.resolveCoreDir(sourceDir);
 
-		boolean isGrounded = state.get(SurfaceRootBlock.GROUNDED) == Boolean.TRUE;
+		boolean isGrounded = state.getValue(SurfaceRootBlock.GROUNDED) == Boolean.TRUE;
 
 		for (Direction face : Direction.values()) {
 			//Get quads for core model
@@ -204,7 +204,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 			//Get quads for sleeves models
 			if (coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
 				for (Direction connDir : CoordUtils.HORIZONTALS) {
-					int idx = connDir.getHorizontalIndex();
+					int idx = connDir.get2DDataValue();
 					int connRadius = connections[idx];
 					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
 					if (connRadius > 0) {//  && (connRadius == 1 || side != connDir)) {
@@ -241,7 +241,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 		Direction sourceDir = null;
 
 		for (Direction dir: CoordUtils.HORIZONTALS){
-			int horIndex = dir.getHorizontalIndex();
+			int horIndex = dir.get2DDataValue();
 			int connRadius = connections[horIndex];
 			if (connRadius > largestConnection){
 				largestConnection = connRadius;
@@ -271,7 +271,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 	}
 
 	@Override
-	public boolean isAmbientOcclusion() {
+	public boolean useAmbientOcclusion() {
 		return true;
 	}
 
@@ -281,12 +281,12 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 	}
 
 	@Override
-	public boolean isBuiltInRenderer() {
+	public boolean isCustomRenderer() {
 		return true;
 	}
 
 	@Override
-	public TextureAtlasSprite getParticleTexture() {
+	public TextureAtlasSprite getParticleIcon() {
 		return this.barkTexture;
 	}
 
@@ -296,7 +296,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public boolean usesBlockLight() {
 		return false;
 	}
 

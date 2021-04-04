@@ -50,7 +50,7 @@ import java.util.*;
  */
 public class FallingTreeEntity extends Entity implements IModelTracker {
 
-	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.createKey(FallingTreeEntity.class, DataSerializers.COMPOUND_NBT);
+	public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.defineId(FallingTreeEntity.class, DataSerializers.COMPOUND_TAG);
 	
 	//Not needed in client
 	protected List<ItemStack> payload = new ArrayList<>(0);
@@ -105,7 +105,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		if(destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
 			System.err.println("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
 			new Exception().printStackTrace();
-			onKillCommand();
+			kill();
 			return this;
 		}
 		BlockPos cutPos = destroyData.cutPos;
@@ -113,7 +113,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		this.destroyType = destroyType;
 		this.onFire = destroyType == DestroyType.FIRE;
 
-		this.setRawPosition(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
+		this.setPosRaw(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
 
 		int numBlocks = destroyData.getNumBranches();
 		geomCenter = new Vector3d(0, 0, 0);
@@ -159,13 +159,13 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	public void setupFromNBT(CompoundNBT tag) {
 		destroyData = new BranchDestructionData(tag);
 		if(destroyData.getNumBranches() == 0) {
-			onKillCommand();
+			kill();
 		}
 		destroyType = DestroyType.values()[tag.getInt("destroytype")];
 		geomCenter = new Vector3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 		massCenter = new Vector3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
 		buildAABBFromDestroyData(destroyData);
-		setBoundingBox(normAABB.offset(this.getPosX(), this.getPosY(), this.getPosZ()));
+		setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
 		onFire = tag.getBoolean("onfire");
 	}
 
@@ -194,27 +194,27 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 		
 		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
-			BlockState state = world.getBlockState(absPos);
+			BlockState state = level.getBlockState(absPos);
 			if(TreeHelper.isTreePart(state)) {
-				world.setBlockState(absPos, DTRegistries.BLOCK_STATES.AIR, 0);////The client needs to set it's blocks to air
+				level.setBlock(absPos, DTRegistries.BLOCK_STATES.AIR, 0);////The client needs to set it's blocks to air
 				renderBounds.union(absPos);//Expand the re-render volume to include this block
 			}
 		}
 		
 		cleanupShellBlocks(destroyData);
 		
-		Minecraft.getInstance().worldRenderer.markBlockRangeForRenderUpdate(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
+		Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
 	}
 	
 	protected void cleanupShellBlocks(BranchDestructionData destroyData) {
 		BlockPos cutPos = destroyData.cutPos;
 		for(int i = 0; i < destroyData.getNumBranches(); i++) {
 			if(destroyData.getBranchRadius(i) > 8) {
-				BlockPos pos = destroyData.getBranchRelPos(i).add(cutPos);
+				BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
 				for(Surround dir: Surround.values()) {
-					BlockPos dPos = pos.add(dir.getOffset());
-					if(world.getBlockState(dPos).getBlock() == DTRegistries.TRUNK_SHELL) {
-						world.removeBlock(dPos, false);
+					BlockPos dPos = pos.offset(dir.getOffset());
+					if(level.getBlockState(dPos).getBlock() == DTRegistries.TRUNK_SHELL) {
+						level.removeBlock(dPos, false);
 					}
 				}
 			}
@@ -226,14 +226,14 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		normAABB = new AxisAlignedBB(BlockPos.ZERO);
 		
 		for(BlockPos relPos: destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
-			normAABB = normAABB.union(new AxisAlignedBB(relPos));
+			normAABB = normAABB.minmax(new AxisAlignedBB(relPos));
 		}
 		
 		//Adjust the bounding box to account for the tree falling over
 		double height = normAABB.maxY - normAABB.minY;
 		double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
 		double grow = Math.max(0, height - (width / 2) ) + 2;
-		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
+		normAABB = normAABB.inflate(grow + 4, 4, grow + 4);
 		
 		return normAABB;
 	}
@@ -255,35 +255,35 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	}
 	
 	@Override
-	public void setPosition(double x, double y, double z) {
+	public void setPos(double x, double y, double z) {
 		//This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
-		this.setRawPosition(x, y, z);
+		this.setPosRaw(x, y, z);
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-		this.setBoundingBox(normAABB != null ? normAABB.offset(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
+		this.setBoundingBox(normAABB != null ? normAABB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
 	}
 	
 	@Override
 	public void tick() {
 		super.tick();
 		
-		if(world.isRemote && !clientBuilt) {
+		if(level.isClientSide && !clientBuilt) {
 			buildClient();
 			if(!isAlive()) {
 				return;
 			}
 		}
 		
-		if(!world.isRemote && firstUpdate) {
+		if(!level.isClientSide && firstUpdate) {
 			updateNeighbors();
 		}
 		
 		handleMotion();
 		
-		setBoundingBox(normAABB.offset(this.getPosX(), this.getPosY(), this.getPosZ()));
+		setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
 		
 		if(shouldDie()) {
 			dropPayLoad();
-			onKillCommand();
+			kill();
 			modelCleanup();
 		}
 		
@@ -303,7 +303,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		//Gather a list of all of the non-destroyed blocks surrounding each destroyed block
 		for(BlockPos d: destroyed) {
 			for(Direction dir: Direction.values()) {
-				BlockPos dPos = d.offset(dir);
+				BlockPos dPos = d.relative(dir);
 				if(!destroyed.contains(dPos)) {
 					toUpdate.add(dPos);
 				}
@@ -311,7 +311,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		}
 		
 		//Update each of the blocks that need to be updated
-		toUpdate.forEach(pos -> world.neighborChanged(pos, Blocks.AIR, pos));
+		toUpdate.forEach(pos -> level.neighborChanged(pos, Blocks.AIR, pos));
 	}
 	
 	protected IAnimationHandler selectAnimationHandler() {
@@ -345,7 +345,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void modelCleanup() {
-		ModelTrackerCacheEntityFallingTree.cleanupModels(world, this);
+		ModelTrackerCacheEntityFallingTree.cleanupModels(level, this);
 	}
 	
 	public void handleMotion() {
@@ -358,13 +358,13 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	}
 	
 	public void dropPayLoad() {
-		if(!world.isRemote) {
+		if(!level.isClientSide) {
 			currentAnimationHandler.dropPayload(this);
 		}
 	}
 	
 	public boolean shouldDie() {
-		return ticksExisted > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
+		return tickCount > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -381,18 +381,18 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	 * @param entity The {@link FallingTreeEntity} object.
 	 */
 	public static void standardDropLogsPayload(FallingTreeEntity entity) {
-		World world = entity.world;
-		if(!world.isRemote) {
+		World world = entity.level;
+		if(!world.isClientSide) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
 			entity.getPayload().forEach(i -> spawnItemAsEntity(world, cutPos, i));
 		}
 	}
 	
 	public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
-		World world = entity.world;
-		if(!world.isRemote) {
+		World world = entity.level;
+		if(!world.isClientSide) {
 			BlockPos cutPos = entity.getDestroyData().cutPos;
-			entity.getDestroyData().leavesDrops.forEach(bis -> Block.spawnAsEntity(world, cutPos.add(bis.pos), bis.stack));
+			entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(world, cutPos.offset(bis.pos), bis.stack));
 		}
 	}
 	
@@ -400,28 +400,28 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	 * Same as Block.spawnAsEntity only this arrests the entityItem's random motion. Useful for CC turtles to pick up the loot.
 	 */
 	public static void spawnItemAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
-		if (!worldIn.isRemote && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.DO_TILE_DROPS) && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+		if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ItemEntity entityitem = new ItemEntity(worldIn, (double)pos.getX() + 0.5F, (double)pos.getY() + 0.5F, (double)pos.getZ() + 0.5F, stack);
-			entityitem.setVelocity(0,0,0);
-			entityitem.setDefaultPickupDelay();
-			worldIn.addEntity(entityitem);
+			entityitem.lerpMotion(0,0,0);
+			entityitem.setDefaultPickUpDelay();
+			worldIn.addFreshEntity(entityitem);
 		}
 	}
 	
 	@Override
-	protected void registerData() {
-		getDataManager().register(voxelDataParameter, new CompoundNBT());
+	protected void defineSynchedData() {
+		getEntityData().define(voxelDataParameter, new CompoundNBT());
 	}
 	
 	public void cleanupRootyDirt() {
 		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		if(!world.isRemote) {
-			BlockPos rootPos = getDestroyData().cutPos.down();
-			BlockState belowState = world.getBlockState(rootPos);
+		if(!level.isClientSide) {
+			BlockPos rootPos = getDestroyData().cutPos.below();
+			BlockState belowState = level.getBlockState(rootPos);
 			
 			if(TreeHelper.isRooty(belowState)) {
 				RootyBlock rootyBlock = (RootyBlock) belowState.getBlock();
-				rootyBlock.doDecay(world, rootPos, belowState, getDestroyData().species);
+				rootyBlock.doDecay(level, rootPos, belowState, getDestroyData().species);
 			}
 		}
 	}
@@ -429,16 +429,16 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	
 	//This is shipped off to the clients
 	public void setVoxelData(CompoundNBT tag) {
-		setBoundingBox(buildAABBFromDestroyData(destroyData).offset(this.getPosX(), this.getPosY(), this.getPosZ()));
-		getDataManager().set(voxelDataParameter, tag);
+		setBoundingBox(buildAABBFromDestroyData(destroyData).move(this.getX(), this.getY(), this.getZ()));
+		getEntityData().set(voxelDataParameter, tag);
 	}
 	
 	public CompoundNBT getVoxelData() {
-		return getDataManager().get(voxelDataParameter);
+		return getEntityData().get(voxelDataParameter);
 	}
 	
 	@Override
-	protected void readAdditional(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundNBT compound) {
 		CompoundNBT vox = (CompoundNBT) compound.get("vox");
 		setupFromNBT(vox);
 		setVoxelData(vox);
@@ -449,7 +449,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 			for (INBT tag : Objects.requireNonNull(nbtList)) {
 				if(tag instanceof CompoundNBT) {
 					CompoundNBT compTag = (CompoundNBT) tag;
-					this.payload.add(ItemStack.read(compTag));
+					this.payload.add(ItemStack.of(compTag));
 				}
 			}
 		}
@@ -457,7 +457,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	}
 	
 	@Override
-	protected void writeAdditional(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundNBT compound) {
 		compound.put("vox", getVoxelData());
 		
 		if(!payload.isEmpty()) {
@@ -473,17 +473,17 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 
 	@Nonnull
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	public static FallingTreeEntity dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
 		//Spawn the appropriate item entities into the world
-		if(!world.isRemote) {// Only spawn entities server side
+		if(!world.isClientSide) {// Only spawn entities server side
 			// Falling tree currently has severe rendering issues.
 			FallingTreeEntity entity = new FallingTreeEntity(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
 			if(entity.isAlive()) {
-				world.addEntity(entity);
+				world.addFreshEntity(entity);
 			}
 			return entity;
 		}

@@ -57,11 +57,11 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 		Family family = species.getFamily();
 
 		//Put a cute little flare on the bottom of the dark oaks
-		int radius3 = TreeHelper.getRadius(world, rootPos.up(3));
+		int radius3 = TreeHelper.getRadius(world, rootPos.above(3));
 
 		if(radius3 > configuredGenFeature.get(MIN_RADIUS)) {
-			family.getDynamicBranch().setRadius(world, rootPos.up(2), radius3 + 1, Direction.UP);
-			family.getDynamicBranch().setRadius(world, rootPos.up(1), radius3 + 2, Direction.UP);
+			family.getDynamicBranch().setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
+			family.getDynamicBranch().setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);
 		}
 	}
 	
