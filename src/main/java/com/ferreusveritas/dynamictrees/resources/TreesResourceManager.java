@@ -11,9 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,14 +46,11 @@ public final class TreesResourceManager implements IResourceManager {
     }
 
     public void load () {
-        this.reloadListeners.forEach(reloadListener -> reloadListener.load(this));
-        Collections.reverse(this.reloadListeners); // Reverse order so completable futures are executed in the correct order.
+        this.reloadListeners.forEach(reloadListener -> reloadListener.load(this).join());
     }
 
-    public List<CompletableFuture<?>> reload (final IFutureReloadListener.IStage stage, final Executor backgroundExecutor, final Executor gameExecutor) {
-        final List<CompletableFuture<?>> completableFutures = new ArrayList<>();
-        this.reloadListeners.forEach(reloadListener -> completableFutures.add(reloadListener.reload(stage, this, backgroundExecutor, gameExecutor)));
-        return completableFutures;
+    public void reload (final IFutureReloadListener.IStage stage, final Executor backgroundExecutor, final Executor gameExecutor) {
+        this.reloadListeners.forEach(reloadListener -> reloadListener.reload(stage, this, backgroundExecutor, gameExecutor).join());
     }
 
     public void addResourcePack (final TreeResourcePack treeResourcePack) {
@@ -62,9 +59,7 @@ public final class TreesResourceManager implements IResourceManager {
 
     @Override
     public Set<String> getResourceNamespaces() {
-        final Set<String> namespaces = new HashSet<>();
-        this.resourcePacks.forEach(treeResourcePack -> namespaces.addAll(treeResourcePack.getResourceNamespaces(null)));
-        return namespaces;
+        return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack.getResourceNamespaces(null)).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override
@@ -74,7 +69,7 @@ public final class TreesResourceManager implements IResourceManager {
         if (resources.size() < 1)
             throw new FileNotFoundException("Could not find path '" + resourceLocationIn + "' in any tree packs.");
 
-        return this.getAllResources(resourceLocationIn).get(0);
+        return this.getAllResources(resourceLocationIn).get(resources.size() - 1);
     }
 
     @Override
@@ -86,32 +81,35 @@ public final class TreesResourceManager implements IResourceManager {
     public List<IResource> getAllResources(ResourceLocation resourceLocationIn) throws IOException {
         final List<IResource> resources = new ArrayList<>();
 
-        for (final TreeResourcePack resourcePack : this.resourcePacks) {
+        // Add ModTreeResourcePacks resources first so that the user's changes in /trees take priority.
+        this.addResources(resources, this.resourcePacks.stream().filter(resourcePack -> resourcePack instanceof ModTreeResourcePack)
+                .collect(Collectors.toList()), resourceLocationIn);
+
+        this.addResources(resources, this.resourcePacks.stream().filter(resourcePack -> !(resourcePack instanceof ModTreeResourcePack))
+                .collect(Collectors.toList()), resourceLocationIn);
+
+        return resources;
+    }
+
+    private void addResources(final List<IResource> resources, final List<TreeResourcePack> resourcePacks, ResourceLocation resourceLocationIn) {
+        for (final TreeResourcePack resourcePack : resourcePacks) {
             InputStream stream;
 
             try {
                 stream = resourcePack.getResourceStream(null, resourceLocationIn);
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 continue;
             }
 
             resources.add(new SimpleResource("", resourceLocationIn, stream, null));
         }
-
-        return resources;
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(String pathIn, Predicate<String> filter) {
-        final Set<ResourceLocation> resourceLocations = Sets.newHashSet();
-
-        for (final TreeResourcePack resourcePack : this.resourcePacks) {
-            for (final String namespace : resourcePack.getResourceNamespaces(null)) {
-                resourceLocations.addAll(resourcePack.getAllResourceLocations(null, namespace, pathIn, Integer.MAX_VALUE, filter));
-            }
-        }
-
-        return resourceLocations;
+    public Collection<ResourceLocation> getAllResourceLocations(String path, Predicate<String> filter) {
+        return this.resourcePacks.stream().map(resourcePack -> resourcePack.getResourceNamespaces().stream()
+                .map(namespace -> resourcePack.getAllResourceLocations(null, namespace, path, Integer.MAX_VALUE, filter))
+                .flatMap(Collection::stream).collect(Collectors.toSet())).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override

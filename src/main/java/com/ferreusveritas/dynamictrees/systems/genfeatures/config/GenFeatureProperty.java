@@ -12,10 +12,10 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 
 /**
- * Base Property class for {@link ConfiguredGenFeature} objects. Stores a property's identifier
- * and class type. The base implementation should only be used by {@link JsonPrimitive} types, and
- * in the future will be limited to this only (sub-classes will need to be created for other objects).
+ * Class for holding properties of {@link ConfiguredGenFeature} objects. Stores a property's identifier
+ * and class type, handling getting {@link Object}s of type {@link T} from {@link JsonElement}s.
  *
+ * @param <T> The type of the property being held.
  * @author Harley O'Connor
  */
 public class GenFeatureProperty<T> {
@@ -47,15 +47,14 @@ public class GenFeatureProperty<T> {
     public ObjectFetchResult<T> getValueFromJsonObject(JsonObject jsonObject) {
         final JsonElement jsonElement = jsonObject.get(this.identifier);
 
-        final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
-
         if (jsonElement == null)
             return null;
 
-        if (!getter.isValid()) {
-            LogManager.getLogger().warn("Tried to get class {} for gen feature property {}, but object getter was not registered.", this.type == null ? "null" : this.type.getSimpleName(), this.identifier);
-            return null;
-        }
+        final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
+
+        if (!getter.isValid())
+            return ObjectFetchResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
+                    "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
 
         return getter.get(jsonElement);
     }

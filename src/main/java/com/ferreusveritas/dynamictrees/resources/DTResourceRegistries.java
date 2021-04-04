@@ -124,7 +124,7 @@ public final class DTResourceRegistries {
         @Override
         public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager, IProfiler preparationsProfiler, IProfiler reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
             // Reload all reload listeners in the trees resource manager.
-            return CompletableFuture.allOf(TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor).toArray(new CompletableFuture<?>[0]));
+            return CompletableFuture.runAsync(() -> TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor));
         }
     }
 

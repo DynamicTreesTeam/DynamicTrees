@@ -125,7 +125,7 @@ public class JsonHelper {
 			JsonObjectGetters.getObjectGetter(typeClass).get(jsonElement).ifSuccessful(value -> {
 				consumer.accept(value);
 				this.read = true;
-			}).otherwise(errorMessage -> this.lastError = errorMessage);
+			}).otherwise(errorMessage -> this.lastError = errorMessage).otherwise(() -> this.attemptedClasses.add(typeClass));
 			return this;
 		}
 
@@ -134,7 +134,7 @@ public class JsonHelper {
 				jsonArray.forEach(arrayElement -> JsonObjectGetters.getObjectGetter(typeClass).get(arrayElement)
 						.ifSuccessful(consumer).otherwise(errorMessage -> this.lastError = errorMessage));
 				this.read = true;
-			});
+			}).otherwise(() -> this.attemptedClasses.add(typeClass));
 			return this;
 		}
 
@@ -160,7 +160,7 @@ public class JsonHelper {
 			if (!this.read) {
 				final StringBuilder stringBuilder = new StringBuilder("Element was not one of the following types: ");
 				for (int i = 0; i < this.attemptedClasses.size(); i++) {
-					stringBuilder.append(this.attemptedClasses.get(i)).append(i != this.attemptedClasses.size() - 1 ? "," : "");
+					stringBuilder.append(this.attemptedClasses.get(i)).append(i != this.attemptedClasses.size() - 1 ? ", " : "");
 				}
 				errorConsumer.accept(stringBuilder.toString());
 			}

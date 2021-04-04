@@ -191,7 +191,7 @@ public class BiomeDatabase {
 				});
 				break;
 			case SPLICE_AFTER:
-				entry.setSpeciesSelector( (pos, dirt, rnd) -> {
+				entry.setSpeciesSelector((pos, dirt, rnd) -> {
 					SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
 					return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
 				});

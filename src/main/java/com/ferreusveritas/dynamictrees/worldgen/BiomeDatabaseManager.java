@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -45,9 +46,6 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DEFAULT_POPULATOR = "default";
-
-    private static final String REPLACE = "replace";
-    private static final String ENTRIES = "entries";
 
     private BiomeDatabase defaultDatabase = new BiomeDatabase();
     private final Map<ResourceLocation, BiomeDatabase> dimensionDatabases = Maps.newHashMap();
@@ -322,6 +320,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     @Override
-    public void load(IResourceManager resourceManager) { }
+    public CompletableFuture<Void> load(IResourceManager resourceManager) {
+        return CompletableFuture.runAsync(() -> {});
+    }
 
 }

@@ -74,6 +74,10 @@ public class TreeResourcePack extends ResourcePack {
         }
     }
 
+    public Set<String> getResourceNamespaces() {
+        return this.getResourceNamespaces(null);
+    }
+
     @Override
     public Set<String> getResourceNamespaces(@Nullable final ResourcePackType type) {
         try {

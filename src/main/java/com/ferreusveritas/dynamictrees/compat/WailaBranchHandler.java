@@ -10,7 +10,10 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
-import mcp.mobius.waila.api.*;
+import mcp.mobius.waila.api.IComponentProvider;
+import mcp.mobius.waila.api.IDataAccessor;
+import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.RenderableTextComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -47,7 +50,7 @@ public class WailaBranchHandler implements IComponentProvider {
 		Species species = Species.NULL_SPECIES;
 
 		//Attempt to get species from server via NBT data
-		if(nbtData.contains("species")) {
+		if (nbtData.contains("species")) {
 			species = TreeRegistry.findSpecies(new ResourceLocation(nbtData.getString("species")));
 		}
 

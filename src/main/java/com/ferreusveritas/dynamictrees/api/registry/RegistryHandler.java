@@ -29,9 +29,9 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     public static final Registry<RegistryHandler> REGISTRY = new Registry<>(RegistryHandler.class, new RegistryHandler("null"), true);
 
     /**
-     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering,
-     * and subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant
-     * mod constructor!
+     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating,
+     * registering, and subscribing it to the {@code mod event bus}. This should be {@code only}
+     * be called from the relevant mod constructor!
      *
      * @param modId The {@code mod ID} to setup for.
      */

@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages {@link JoCode} objects, reading from tree packs. Can be used to call random JoCodes during worldgen.
@@ -170,6 +171,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     }
 
     @Override
-    public void load(IResourceManager resourceManager) { }
+    public CompletableFuture<Void> load(IResourceManager resourceManager) {
+        return CompletableFuture.runAsync(() -> {});
+    }
 
 }

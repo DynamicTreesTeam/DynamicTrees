@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.Util;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -22,13 +23,16 @@ public abstract class ReloadListener<T> {
     }
 
     /**
-     * Loads the relevant data from the resource manager given. This should only be called on initial
-     * game load, allowing apply to handle registering to Forge registries.
+     * Loads the relevant data from the resource manager given. This should only be
+     * called on initial game load, allowing apply to handle registering to Forge
+     * registries.
      *
      * @param resourceManager The {@link IResourceManager} object.
+     * @return The {@link CompletableFuture<Void>} that loads the relevant data.
      */
-    public void load (final IResourceManager resourceManager) {
-        this.apply(this.prepare(resourceManager), resourceManager, true);
+    public CompletableFuture<Void> load (final IResourceManager resourceManager) {
+        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.getServerExecutor())
+                .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, true));
     }
 
     /**
@@ -40,7 +44,7 @@ public abstract class ReloadListener<T> {
     public CompletableFuture<Void> reload (final IFutureReloadListener.IStage stage, final IResourceManager resourceManager, final Executor backgroundExecutor, final Executor gameExecutor) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), backgroundExecutor)
                 .thenCompose(stage::markCompleteAwaitingOthers)
-                .thenAcceptAsync((preparedObject) -> this.apply(preparedObject, resourceManager, false), gameExecutor);
+                .thenAcceptAsync(preparedObject -> this.apply(preparedObject, resourceManager, false), gameExecutor);
     }
 
     /**
