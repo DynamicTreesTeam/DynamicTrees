@@ -32,6 +32,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.Event;
@@ -160,6 +162,9 @@ public final class JsonObjectGetters {
     public static IJsonObjectGetter<Block> BLOCK;
     public static IJsonObjectGetter<Item> ITEM;
     public static IJsonObjectGetter<Biome> BIOME;
+
+    public static final IJsonObjectGetter<AxisAlignedBB> AXIS_ALIGNED_BB = register(AxisAlignedBB.class, new AxisAlignedBBGetter());
+    public static final IJsonObjectGetter<VoxelShape> VOXEL_SHAPE = register(VoxelShape.class, new VoxelShapeGetter());
 
     public static final IJsonObjectGetter<CellKit> CELL_KIT = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY));
     public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY));

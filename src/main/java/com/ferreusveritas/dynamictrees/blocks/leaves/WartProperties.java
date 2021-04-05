@@ -17,7 +17,6 @@ public class WartProperties extends SolidLeavesProperties {
 
     public WartProperties(final ResourceLocation registryName) {
         super(registryName);
-        this.requiresShears = false;
     }
 
     @Override

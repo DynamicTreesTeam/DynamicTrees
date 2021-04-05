@@ -17,7 +17,9 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,6 +78,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
                 })
                 .register("seed", Seed.class, Species::setSeed)
+                .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
+                .register("sapling_sound", SoundType.class, Species::setSaplingSound)
+                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
                 .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
                 .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))

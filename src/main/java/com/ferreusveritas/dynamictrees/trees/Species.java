@@ -63,12 +63,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockDisplayReader;
@@ -241,7 +239,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		return this.setDefaultGrowingParameters();
+		return this.setDefaultGrowingParameters().setSaplingShape(DEFAULT_SAPLING_SHAPE).setSaplingSound(SoundType.GRASS);
 	}
 
 	/**
@@ -787,9 +785,24 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == world.getBlockState(pos.below()).getBlock());
 	}
 
-	//Returns whether the sapling should be able to grow without player intervention
+	private boolean canSaplingGrowNaturally = true;
+
+	public Species setCanSaplingGrowNaturally(boolean canSaplingGrowNaturally) {
+		this.canSaplingGrowNaturally = canSaplingGrowNaturally;
+		return this;
+	}
+
+	/**
+	 * Determines whether or not the {@link #saplingBlock} should be able to grow
+	 * without player intervention (bone-mealing).
+	 *
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} of the {@link DynamicSaplingBlock}.
+	 * @return {@code true} if the sapling can and should grow naturally;
+	 * 	       {@code false} otherwise.
+	 */
 	public boolean canSaplingGrowNaturally(World world, BlockPos pos) {
-		return canSaplingGrow(world, pos);
+		return this.canSaplingGrowNaturally && this.canSaplingGrow(world, pos);
 	}
 
 	//Returns if sapling should consume bonemeal when used on it.
@@ -827,10 +840,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return false;
 	}
 
+	private static final VoxelShape DEFAULT_SAPLING_SHAPE = DTRegistries.SAPLING;
+	private VoxelShape saplingShape = DEFAULT_SAPLING_SHAPE;
+
 	public VoxelShape getSaplingShape() {
-		return VoxelShapes.create(new AxisAlignedBB(0.25f, 0.0f, 0.25f, 0.75f, 0.75f, 0.75f));
+		return this.saplingShape;
 	}
-	
+
+	public Species setSaplingShape(VoxelShape saplingShape) {
+		this.saplingShape = saplingShape;
+		return this;
+	}
+
 	//This is used to load the sapling model
 	public ResourceLocation getSaplingRegName() {
 		return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
@@ -839,12 +860,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {
 		return getLeavesProperties().foliageColorMultiplier(state, access, pos);
 	}
+
+	private SoundType saplingSound;
 	
 	public SoundType getSaplingSound() {
-		return SoundType.GRASS;
+		return this.saplingSound;
 	}
-	
-	
+
+	public Species setSaplingSound(SoundType saplingSound) {
+		this.saplingSound = saplingSound;
+		return this;
+	}
+
 	///////////////////////////////////////////
 	//DIRT
 	///////////////////////////////////////////

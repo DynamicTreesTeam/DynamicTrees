@@ -47,6 +47,8 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -56,7 +58,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -245,6 +249,31 @@ public class DTRegistries {
 		public final BlockState PODZOL = Blocks.PODZOL.defaultBlockState();
 		public final BlockState RED_MUSHROOM = Blocks.RED_MUSHROOM.defaultBlockState();
 		public final BlockState BROWN_MUSHROOM = Blocks.BROWN_MUSHROOM.defaultBlockState();
+	}
+
+	/** Holds common {@link VoxelShape}s keyed by a string, allowing easy access via Json elements. */
+	public static final Map<String, VoxelShape> COMMON_VOXEL_SHAPES = new HashMap<>();
+
+	public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
+	public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
+	public static final VoxelShape MUSHROOM_STEM = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
+	public static final VoxelShape MUSHROOM_CAP_FLAT = Block.box(4D, 5D, 4D, 12D, 8D, 12D);
+	public static final VoxelShape MUSHROOM_CAP_ROUND = Block.box(5D, 3D, 5D, 11D, 8D, 11D);
+	public static final VoxelShape MUSHROOM_BRIM_E = Block.box(11D, 3D, 5D, 12D, 5D, 11D);
+	public static final VoxelShape MUSHROOM_BRIM_W = Block.box(4D, 3D, 5D, 5D, 5D, 11D);
+	public static final VoxelShape MUSHROOM_BRIM_S = Block.box(4D, 3D, 11D, 12D, 5D, 12D);
+	public static final VoxelShape MUSHROOM_BRIM_N = Block.box(4D, 3D, 4D, 12D, 5D, 5D);
+
+	public static final VoxelShape SAPLING = VoxelShapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
+	public static final VoxelShape FLAT_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
+	public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
+
+	static {
+		COMMON_VOXEL_SHAPES.put("empty", VoxelShapes.empty());
+		COMMON_VOXEL_SHAPES.put("block", VoxelShapes.block());
+		COMMON_VOXEL_SHAPES.put("sapling", SAPLING);
+		COMMON_VOXEL_SHAPES.put("flat_mushroom", FLAT_MUSHROOM);
+		COMMON_VOXEL_SHAPES.put("round_mushroom", ROUND_MUSHROOM);
 	}
 
 	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();

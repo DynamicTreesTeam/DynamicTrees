@@ -33,6 +33,7 @@ import java.util.Random;
 
 import net.minecraft.block.AbstractBlock.Properties;
 
+@SuppressWarnings("deprecation")
 public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable {
 	
 	protected Species species;
@@ -77,7 +78,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (getSpecies().canSaplingGrowNaturally(worldIn, pos))
+		if (this.getSpecies().canSaplingGrowNaturally(worldIn, pos))
 			this.performBonemeal(worldIn, rand, pos, state);
 	}
 
@@ -112,7 +113,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-		return getSpecies().getSaplingSound();
+		return this.getSpecies().getSaplingSound();
 	}
 	
 	///////////////////////////////////////////
