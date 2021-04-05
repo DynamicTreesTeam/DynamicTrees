@@ -49,10 +49,11 @@ import java.util.stream.Collectors;
 @SuppressWarnings("deprecation")
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
-	public static final int RADMAX_NORMAL = 8;
-	public static DynamicTrees.EnumDestroyMode destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
-	
-	private Family tree = Family.NULL_FAMILY; // The tree this branch type creates
+	public static final int MAX_RADIUS = 8;
+	public static DynamicTrees.DESTROY_MODE destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
+
+	/** The {@link Family} for this {@link BranchBlock}. */
+	private Family family = Family.NULL_FAMILY;
 	private ItemStack[] primitiveLogDrops = new ItemStack[]{};
 	private boolean canBeStripped;
 
@@ -74,11 +75,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	
 	public void setFamily(Family tree) {
-		this.tree = tree;
+		this.family = tree;
 	}
 	
 	public Family getFamily() {
-		return tree;
+		return family;
 	}
 	
 	@Override
@@ -211,7 +212,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public abstract BlockState getStateForRadius(int radius);
 	
 	public int getMaxRadius() {
-		return RADMAX_NORMAL;
+		return MAX_RADIUS;
 	}
 	
 	///////////////////////////////////////////
@@ -260,9 +261,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
 		NetVolumeNode volumeSum = new NetVolumeNode();
 		DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity ? (PlayerEntity) entity : null);
-		destroyMode = DynamicTrees.EnumDestroyMode.HARVEST;
+		destroyMode = DynamicTrees.DESTROY_MODE.HARVEST;
 		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
-		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
+		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
 		
 		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
 		List<BlockPos> endPoints = destroyer.getEnds();
@@ -292,7 +293,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param pos
 	 */
 	public void rot(IWorld world, BlockPos pos) {
-		breakDeliberate(world, pos, DynamicTrees.EnumDestroyMode.ROT);
+		breakDeliberate(world, pos, DynamicTrees.DESTROY_MODE.ROT);
 	}
 	
 	/**
@@ -421,15 +422,25 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		//Damage the axe by a prescribed amount
 		damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
 	}
-	
-	// We override the standard behavior because we need to preserve the tree network structure to calculate
-	// the wood volume for drops.  The standard removedByPlayer() call will set this block to air before we get
-	// a chance to make a summation.  Because we have done this we must re-implement the entire drop logic flow.
-	
-	
+
+	/**
+	 * We override the standard behavior because we need to preserve the tree network structure to calculate
+	 * the wood volume for drops. {@link super#removedByPlayer(BlockState, World, BlockPos, PlayerEntity, boolean, FluidState)}
+	 * will set this block to air before we get a chance to make a summation. Because we have done this we must
+	 * re-implement the entire drop logic flow.
+	 *
+	 * @param state The {@link BlockState} removed.
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} of the {@link Block} removed.
+	 * @param player The {@link PlayerEntity} damaging the {@link Block}, or {@code null}.
+	 * @param willHarvest {@code true} if {@link #playerDestroy(World, PlayerEntity, BlockPos, BlockState, TileEntity, ItemStack)}
+	 *                                will be called after this, if the return is {@code true}.
+	 * @param fluid The current {@link FluidState} for the position in the {@link World}.
+	 * @return {@code true} if {@link #destroy(IWorld, BlockPos, BlockState)} should be called; {@code false} otherwise.
+	 */
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
-		return removedByEntity(state, world, pos, player);
+		return this.removedByEntity(state, world, pos, player);
 	}
 	
 	public boolean removedByEntity(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
@@ -505,31 +516,51 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	@Override
 	public void playerDestroy(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-		if(!world.isClientSide && destroyMode == DynamicTrees.EnumDestroyMode.SLOPPY) {
-			//System.out.println("Sloppy break detected at: " + pos);
-			BlockState toBlockState = world.getBlockState(pos);
-			Block toBlock = toBlockState.getBlock();
-			if(toBlock == Blocks.AIR) {
-				world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
-				sloppyBreak(world, pos, DestroyType.VOID);
-			} else
-				if(toBlock == Blocks.FIRE) { //Block has burned
-					world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
-					sloppyBreak(world, pos, DestroyType.FIRE);
-					//world.setBlockState(pos, Blocks.FIRE.getDefaultState());  <-- FIXME: Causes overflow
-				} else
-					if(toBlock == Blocks.STONE) { //Likely destroyed by the Pyroclasm mod's volcanic lava
-						world.setBlock(pos, state, 0);//Set the block back and attempt a proper breaking
-						sloppyBreak(world, pos, DestroyType.VOID);
-						world.setBlockAndUpdate(pos, toBlockState);//Set back to stone
-					} else {
-						if(DTConfigs.WORLD_GEN_DEBUG.get()) {
-							System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
-						}
-					}
+		if (!world.isClientSide && destroyMode == DynamicTrees.DESTROY_MODE.SLOPPY) {
+//			LogManager.getLogger().debug("Sloppy break detected at: " + pos);
+			final BlockState toBlockState = world.getBlockState(pos);
+			final Block toBlock = toBlockState.getBlock();
+
+			if (toBlock == Blocks.AIR) { // Block was set to air improperly.
+				world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
+				this.sloppyBreak(world, pos, DestroyType.VOID);
+				this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+				return;
+			}
+			if (toBlock == Blocks.FIRE) { // Block has burned.
+				world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
+				this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
+				//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
+				this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air instead.
+				return;
+			}
+			if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.
+				world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
+				this.sloppyBreak(world, pos, DestroyType.VOID);
+				this.setBlockStateIgnored(world, pos, toBlockState, 2); // Set back to whatever block caused this problem.
+				return;
+			}
+
+			// There's a tile entity block that snuck in.  Don't touch it!
+			for (final Direction dir : Direction.values()) { // Let's just play it safe and destroy all surrounding branch block networks.
+				final BlockPos offPos = pos.relative(dir);
+				final BlockState offState = world.getBlockState(offPos);
+
+				if (offState.getBlock() instanceof BranchBlock)
+					this.sloppyBreak(world, offPos, DestroyType.VOID);
+			}
 		}
 	}
-	
+
+	/**
+	 * Provides a means to set a blockState over a branch block without triggering sloppy breaking.
+	 */
+	public void setBlockStateIgnored(World world, BlockPos pos, BlockState state, int flags) {
+		destroyMode = DynamicTrees.DESTROY_MODE.IGNORE; // Set the state machine to ignore so we don't accidentally recurse with breakBlock.
+		world.setBlock(pos, state, flags);
+		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY; // Ready the state machine for sloppy breaking again.
+	}
+
 	// Super member also does nothing
 	@Override
 	public void playerWillDestroy(World world, BlockPos pos, BlockState state, PlayerEntity player) {
@@ -541,10 +572,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param world
 	 * @param pos
 	 */
-	public void breakDeliberate(IWorld world, BlockPos pos, DynamicTrees.EnumDestroyMode mode) {
+	public void breakDeliberate(IWorld world, BlockPos pos, DynamicTrees.DESTROY_MODE mode) {
 		destroyMode = mode;
 		world.removeBlock(pos, false);
-		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
+		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
 	}
 	
 	// We do not allow the tree branches to be pushed by a piston for reasons that should be obvious if you

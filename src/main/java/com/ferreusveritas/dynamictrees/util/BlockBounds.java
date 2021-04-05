@@ -109,16 +109,20 @@ public class BlockBounds implements Iterable<BlockPos> {
 		return new BlockPos(this.maxX, this.maxY, this.maxZ);
 	}
 
-	public BlockBounds shrink(Direction dir, int amount) {
+	public BlockBounds expand(Direction dir, int amount) {
 		switch(dir) {
-			case DOWN: this.minY += amount; break;
-			case UP: this.maxY -= amount; break;
-			case NORTH: this.minZ += amount; break;
-			case SOUTH: this.maxZ -= amount; break;
-			case WEST: this.minX += amount; break;
-			case EAST: this.maxX -= amount; break;
+			case DOWN: this.minY -= amount; break;
+			case UP: this.maxY += amount; break;
+			case NORTH: this.minZ -= amount; break;
+			case SOUTH: this.maxZ += amount; break;
+			case WEST: this.minX -= amount; break;
+			case EAST: this.maxX += amount; break;
 		}
 		return this;
+	}
+
+	public BlockBounds shrink(Direction dir, int amount) {
+		return this.expand(dir, -amount);
 	}
 	
 	public BlockBounds move(int x, int y, int z) {

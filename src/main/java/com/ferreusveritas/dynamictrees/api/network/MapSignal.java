@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.network;
 
+import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +15,10 @@ public class MapSignal {
 
 	public BlockPos root;
 	public int depth;
+
+	public boolean multiroot = false;
+	public boolean destroyLoopedNodes = true;
+	public boolean trackVisited = false;
 
 	public Direction localRootDir;
 
@@ -49,6 +54,16 @@ public class MapSignal {
 
 	public ArrayList<INodeInspector> getInspectors() {
 		return nodeInspectors;
+	}
+
+	public boolean doTrackingVisited(BlockPos pos) {
+		if (nodeInspectors.size() > 0) {
+			final INodeInspector inspector = nodeInspectors.get(0);
+
+			if (inspector instanceof CollectorNode)
+				return ((CollectorNode) inspector).contains(pos);
+		}
+		return false;
 	}
 	
 }

@@ -94,7 +94,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	private final List<BranchBlock> validBranches = new LinkedList<>();
 
 	/** The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#maxBranchRadius} will be clamped to this value. */
-	private int maxBranchRadius = BranchBlock.RADMAX_NORMAL;
+	private int maxBranchRadius = BranchBlock.MAX_RADIUS;
 
 	//Leaves
 	/** Used to modify the getRadiusForCellKit call to create a special case */
@@ -354,7 +354,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	}
 
 	public boolean isThick() {
-		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
+		return this.maxBranchRadius > BranchBlock.MAX_RADIUS;
 	}
 
 	public int getMaxBranchRadius() {

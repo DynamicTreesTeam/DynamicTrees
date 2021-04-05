@@ -60,8 +60,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 			}
 		//}
 		
-		for (int i = 0; i < ThickBranchBlock.RADMAX_THICK-ThickBranchBlock.RADMAX_NORMAL; i++) {
-			int radius = i + ThickBranchBlock.RADMAX_NORMAL + 1;
+		for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_TICK -ThickBranchBlock.MAX_RADIUS; i++) {
+			int radius = i + ThickBranchBlock.MAX_RADIUS + 1;
 			trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);
 			trunksTopBark[i] = bakeTrunkBark(radius, this.barkTexture, false);
 			trunksTopRings[i] = bakeTrunkRings(radius,  thickRingsTexture, Direction.UP);
@@ -158,7 +158,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
 		int coreRadius = this.getRadius(state);
 
-		if (coreRadius <= BranchBlock.RADMAX_NORMAL)
+		if (coreRadius <= BranchBlock.MAX_RADIUS)
 			return super.getQuads(state, null, rand, extraData);
 
 		coreRadius = MathHelper.clamp(coreRadius, 9, 24);

@@ -18,6 +18,8 @@ public final class CommandConstants {
     public static final String SET_COORD_XOR = "setcoordxor";
     public static final String CREATE_TRANSFORM_POTION = "createtransformpotion";
     public static final String TRANSFORM = "transform";
+    public static final String CLEAR_ORPHANED = "clearorphaned";
+    public static final String PURGE_TREES = "purgetrees";
 
     // Extra arguments.
     public static final String LOCATION_ARGUMENT = "location";
@@ -30,5 +32,6 @@ public final class CommandConstants {
     public static final String READ_ONLY_ARGUMENT = "readOnly";
     public static final String MAX_USES_ARGUMENT = "maxUses";
     public static final String XOR_ARGUMENT = "xor";
+    public static final String RADIUS_ARGUMENT = "radius";
 
 }

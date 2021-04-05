@@ -36,7 +36,8 @@ public class DynamicTrees {
 		VOLUME
 	}
 
-	public enum EnumDestroyMode {
+	public enum DESTROY_MODE {
+		IGNORE,
 		SLOPPY,
 		SET_RADIUS,
 		HARVEST,

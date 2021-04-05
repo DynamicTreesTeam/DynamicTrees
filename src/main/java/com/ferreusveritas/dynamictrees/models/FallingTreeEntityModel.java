@@ -98,7 +98,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 				boolean bottomRingsAdded = false;
 				if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0){
 					BlockPos offsetPos = BlockPos.ZERO.relative(cutDir);
-					float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.RADMAX_NORMAL) ) / 16f;
+					float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS) ) / 16f;
 					treeQuads.addAll(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)));
 					bottomRingsAdded = true;
 				}

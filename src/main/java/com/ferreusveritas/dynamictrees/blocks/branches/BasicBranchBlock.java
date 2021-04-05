@@ -12,8 +12,8 @@ import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -42,22 +42,47 @@ import java.util.Random;
 @SuppressWarnings("deprecation")
 public class BasicBranchBlock extends BranchBlock {
 	
-	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
-	
-	protected BlockState[] branchStates;
+	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
+
+	/** Stores a cache of the {@link BlockState}s for rapid lookup. Created by {@link #createBranchStates(IntegerProperty, int)}. */
+	protected final BlockState[] branchStates;
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
 	public BasicBranchBlock(Material material) {
-		this(AbstractBlock.Properties.of(material));
+		this(AbstractBlock.Properties.of(material), RADIUS, MAX_RADIUS);
 	}
 	
 	// Useful for more unique subclasses
-	public BasicBranchBlock(AbstractBlock.Properties properties) {
+	public BasicBranchBlock(AbstractBlock.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
 		super(properties.harvestLevel(0));
 
-		cacheBranchStates();
+		// Create branch state cache.
+		this.branchStates = this.createBranchStates(radiusProperty, maxRadius);
+	}
+
+	/**
+	 * Creates a cache of {@link BlockState}s for the given {@link IntegerProperty} up
+	 * to the given {@code maxRadius}.
+	 *
+	 * @param radiusProperty The {@link IntegerProperty} for the radius.
+	 * @param maxRadius The maximum radius (must be the same as max for {@link IntegerProperty}.
+	 * @return The {@code array} cache of {@link BlockState}s.
+	 */
+	public BlockState[] createBranchStates(final IntegerProperty radiusProperty, final int maxRadius) {
+		this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1));
+
+		final BlockState[] branchStates = new BlockState[maxRadius + 1];
+
+		// Cache the branch blocks states for rapid lookup.
+		branchStates[0] = Blocks.AIR.defaultBlockState();
+
+		for (int radius = 1; radius <= maxRadius; radius++) {
+			branchStates[radius] = defaultBlockState().setValue(radiusProperty, radius);
+		}
+
+		return branchStates;
 	}
 
 	@Override
@@ -76,18 +101,6 @@ public class BasicBranchBlock extends BranchBlock {
 		return getFamily().getBranchHarvestLevel(state);
 	}
 
-	public void cacheBranchStates() {
-		this.registerDefaultState(stateDefinition.any().setValue(RADIUS, 1));
-		
-		branchStates = new BlockState[RADMAX_NORMAL + 1];
-		
-		//Cache the branch blocks states for rapid lookup
-		branchStates[0] = Blocks.AIR.defaultBlockState();
-		for(int radius = 1; radius <= RADMAX_NORMAL; radius++) {
-			branchStates[radius] = defaultBlockState().setValue(BasicBranchBlock.RADIUS, radius);
-		}
-	}
-	
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
@@ -208,9 +221,9 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
-		destroyMode = DynamicTrees.EnumDestroyMode.SET_RADIUS;
+		destroyMode = DynamicTrees.DESTROY_MODE.SET_RADIUS;
 		world.setBlock(pos, getStateForRadius(radius), flags);
-		destroyMode = DynamicTrees.EnumDestroyMode.SLOPPY;
+		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
 		return radius;
 	}
 	
@@ -288,7 +301,7 @@ public class BasicBranchBlock extends BranchBlock {
 			//Only continue to set radii if the tree growth isn't choked out
 			if(!signal.choked) {
 				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), RADMAX_NORMAL);
+				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), MAX_RADIUS);
 				
 				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
 				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
@@ -379,6 +392,11 @@ public class BasicBranchBlock extends BranchBlock {
 	@Override
 	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
+
+		if (signal.overflow || (signal.trackVisited && signal.doTrackingVisited(pos))) {
+			return signal;
+		}
+
 		if (signal.depth++ < getMaxSignalDepth()) {// Prevents going too deep into large networks, or worse, being caught in a network loop
 			signal.run(blockState, world, pos, fromDir);// Run the inspectors of choice
 			for (Direction dir : Direction.values()) {// Spread signal in various directions
@@ -388,7 +406,7 @@ public class BasicBranchBlock extends BranchBlock {
 					BlockState deltaState = world.getBlockState(deltaPos);
 					ITreePart treePart = TreeHelper.getTreePart(deltaState);
 					
-					if(treePart.shouldAnalyse(deltaState, world, deltaPos)) {
+					if (treePart.shouldAnalyse(deltaState, world, deltaPos)) {
 						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 						
 						// This should only be true for the originating block when the root node is found
@@ -401,9 +419,9 @@ public class BasicBranchBlock extends BranchBlock {
 			signal.returnRun(blockState, world, pos, fromDir);
 		} else {
 			BlockState state = world.getBlockState(pos);
-			if(state.getBlock() instanceof BranchBlock) {
+			if (signal.destroyLoopedNodes && state.getBlock() instanceof BranchBlock) {
 				BranchBlock branch = (BranchBlock) state.getBlock();
-				branch.breakDeliberate(world, pos, DynamicTrees.EnumDestroyMode.OVERFLOW);// Destroy one of the offending nodes
+				branch.breakDeliberate(world, pos, DynamicTrees.DESTROY_MODE.OVERFLOW);// Destroy one of the offending nodes
 			}
 			signal.overflow = true;
 		}

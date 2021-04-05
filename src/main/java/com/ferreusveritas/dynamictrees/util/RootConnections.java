@@ -52,11 +52,12 @@ public class RootConnections extends Connections {
 
     /**
      * This holds the type of connection a surface root has with the block in the given {@link Direction} as described by its index (see
-     * {@link RootConnections}.connectionLevels). <br><br>
-     * A <tt>MID</tt> connection level is a normal connection with another root at the same y-level in the given {@link Direction},
-     * a <tt>LOW</tt> connection level describes one where there is a surface root down one block in the y-direction and offset by one block in
-     * the given {@link Direction}, and a <tt>HIGH</tt> connection describes one where there is a surface root up one block in the y-direction
-     * and offset by one block in the given {@link Direction}.
+     * {@link RootConnections#connectionLevels}).
+     * <ul>
+     *     <li>A <tt>MID</tt> connection level is a normal connection with another root at the same y-level in the given {@link Direction}.</li>
+     *     <li>A <tt>LOW</tt> connection level describes one where there is a surface root down one block in the y-direction and offset by one block in the given {@link Direction}.</li>
+     *     <li>A <tt>HIGH</tt> connection describes one where there is a surface root up one block in the y-direction and offset by one block in the given {@link Direction}.</li>
+     * </ul>
      */
     public enum ConnectionLevel implements IStringSerializable {
         MID(0),

@@ -1,14 +1,21 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -22,11 +29,10 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * So named because the base64 codes it generates almost always start with "JO"
@@ -36,6 +42,11 @@ import java.util.Optional;
  * @author ferreusveritas
  */
 public class JoCode {
+
+	private static final Logger LOGGER = LogManager.getLogger();
+
+	/** Ensures second chance regen doesn't recurse too far. */
+	public static boolean secondChanceRegen = false;
 	
 	private static final String BASE_64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	protected static final byte FORK_CODE = 6;
@@ -137,89 +148,178 @@ public class JoCode {
 	}
 	
 	/**
-	 * Generate a tree from a JoCode instruction list.
+	 * Generate a tree from this {@link JoCode} instruction list.
 	 *
-	 * @param world The world
-	 * @param rootPos The position of what will become the rootydirt block
-	 * @param biome The biome of the coordinates.
-	 * @param facing Direction of tree
-	 * @param radius Constraint radius
+	 * @param world The {@link World} instance.
+	 * @param rootPosIn The position of what will become the {@link com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock}.
+	 * @param biome The {@link Biome} at {@code rootPosIn}.
+	 * @param facing The {@link Direction} of the tree.
+	 * @param radius The radius constraint.
 	 */
-	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPos, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
-		
-		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
-		//A Tree generation boundary radius is at least 2 and at most 8
+		// A Tree generation boundary radius is at least 2 and at most 8
 		radius = MathHelper.clamp(radius, 2, 8);
 		
-		setFacing(facing);
-		rootPos = species.preGeneration(world, rootPos, radius, facing, safeBounds, this);
+		this.setFacing(facing);
+		final BlockPos rootPos = species.preGeneration(world, rootPosIn, radius, facing, safeBounds, this);
+
+		if (rootPos == BlockPos.ZERO)
+			return;
 		
-		
-		if(rootPos != BlockPos.ZERO) {
-			BlockState initialDirtState = world.getBlockState(rootPos);//Save the initial state of the dirt in case this fails
-			species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
-			
-			//Make the tree branch structure
-			generateFork(world, species, 0, rootPos, false);
-			
-			//Establish a position for the bottom block of the trunk
-			BlockPos treePos = rootPos.above();
-			
-			//Fix branch thicknesses and map out leaf locations
-			BlockState treeState = world.getBlockState(treePos);
-			BranchBlock branch = TreeHelper.getBranch(treeState);
-			if(branch != null) {//If a branch exists then the growth was successful
-				LeavesProperties leavesProperties = species.getLeavesProperties();
-				SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
-				INodeInspector inflator = species.getNodeInflator(leafMap);//This is responsible for thickening the branches
-				FindEndsNode endFinder = new FindEndsNode();//This is responsible for gathering a list of branch end points
-				MapSignal signal = new MapSignal(inflator, endFinder);//The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
-				branch.analyse(treeState, world, treePos, Direction.DOWN, signal);
-				List<BlockPos> endPoints = endFinder.getEnds();
-				
-				smother(leafMap, leavesProperties);//Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
-				
-				//Place Growing Leaves Blocks from voxmap
-				for(Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) {//Iterate through all of the cells that are leaves(not air or branches)
-					BlockPos.Mutable cellPos = cell.getPos();
-					if(safeBounds.inBounds(cellPos, false)) {
-						BlockState testBlockState = world.getBlockState(cellPos);
-						if(testBlockState.canBeReplacedByLeaves(world, cellPos)) {
-							world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2);//Flag 16 to prevent observers from causing cascading lag
-						}
-					} else {
-						leafMap.setVoxel(cellPos, (byte) 0);
-					}
+		final BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails.
+		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
+
+		//Make the tree branch structure
+		generateFork(world, species, 0, rootPos, false);
+
+		//Establish a position for the bottom block of the trunk
+		BlockPos treePos = rootPos.above();
+
+		//Fix branch thicknesses and map out leaf locations
+		BlockState treeState = world.getBlockState(treePos);
+		BranchBlock branch = TreeHelper.getBranch(treeState);
+
+		// If a branch exists then the growth was successful.
+		if (branch == null) {
+			// If a branch doesn't exist the growth failed.. turn the soil back to what it was.
+			world.setBlock(rootPos, initialDirtState, this.careful ? 3 : 2);
+			return;
+		}
+
+		final LeavesProperties leavesProperties = species.getLeavesProperties();
+		final SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
+		final INodeInspector inflator = species.getNodeInflator(leafMap); // This is responsible for thickening the branches.
+		final FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points.
+		final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
+		signal.destroyLoopedNodes = this.careful;
+
+		branch.analyse(treeState, world, treePos, Direction.DOWN, signal);
+
+		if (signal.found || signal.overflow) { // Something went terribly wrong.
+			LOGGER.debug("Non-viable branch network detected during world generation @ {}", treePos);
+			LOGGER.debug("Species: {}", species);
+			LOGGER.debug("Radius: {}", radius);
+			LOGGER.debug("JoCode: {}", this);
+
+			// Completely blow away any improperly defined network nodes.
+			this.cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
+
+			// Now that everything is clear we may as well regenerate the tree that screwed everything up.
+			if (!secondChanceRegen) {
+				secondChanceRegen = true;
+				this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds);
+			}
+			secondChanceRegen = false;
+			return;
+		}
+
+		final List<BlockPos> endPoints = endFinder.getEnds();
+
+		this.smother(leafMap, leavesProperties); // Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
+
+		// Place Growing Leaves Blocks from voxmap.
+		for (final Cell cell: leafMap.getAllNonZeroCells((byte) 0x0F)) { // Iterate through all of the cells that are leaves (not air or branches).
+			final BlockPos.Mutable cellPos = cell.getPos();
+
+			if (safeBounds.inBounds(cellPos, false)) {
+				final BlockState testBlockState = world.getBlockState(cellPos);
+				if (testBlockState.canBeReplacedByLeaves(world, cellPos)) {
+					world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
 				}
-				
-				//Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
-				for(Cell cell: leafMap.getAllNonZeroCells()) {
-					BlockPos.Mutable cellPos = cell.getPos();
-					if(!safeBounds.inBounds(cellPos, true)) {
-						leafMap.setVoxel(cellPos, (byte) 0);
-					}
-				}
-				
-				//Age volume for 3 cycles using a leafmap
-				TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
-				
-				//Rot the unsupported branches
-				if(species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
-					return;//The entire tree rotted away before it had a chance
-				}
-				
-				// Allow for special decorations by the tree itself
-				species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
-				MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
-				
-				//Add snow to parts of the tree in chunks where snow was already placed
-				addSnow(leafMap, world, rootPos, biome);
-				
-			} else { //The growth failed.. turn the soil back to what it was
-				world.setBlock(rootPos, initialDirtState, careful ? 3 : 2);
+			} else {
+				leafMap.setVoxel(cellPos, (byte) 0);
 			}
 		}
+
+		// Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
+		for (final Cell cell: leafMap.getAllNonZeroCells()) {
+			final BlockPos.Mutable cellPos = cell.getPos();
+			if (!safeBounds.inBounds(cellPos, true)) {
+				leafMap.setVoxel(cellPos, (byte) 0);
+			}
+		}
+
+		// Age volume for 3 cycles using a leafmap.
+		TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
+
+		// Rot the unsupported branches.
+		if (species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
+			return; // The entire tree rotted away before it had a chance.
+		}
+
+		// Allow for special decorations by the tree itself.
+		species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+		MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
+
+		// Add snow to parts of the tree in chunks where snow was already placed.
+		this.addSnow(leafMap, world, rootPos, biome);
+	}
+
+	/** Attempt to clean up fused trees that have multiple root blocks by simply destroying them both messily */
+	protected void cleanupFrankentree(IWorld world, BlockPos treePos, BlockState treeState, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+		final Set<BlockPos> blocksToDestroy = new HashSet<>();
+		final BranchBlock branch = TreeHelper.getBranch(treeState);
+		final MapSignal signal = new MapSignal(new CollectorNode(blocksToDestroy));
+
+		signal.destroyLoopedNodes = false;
+		signal.trackVisited = true;
+
+		assert branch != null;
+
+		branch.analyse(treeState, world, treePos, null, signal);
+		BranchBlock.destroyMode = DynamicTrees.DESTROY_MODE.IGNORE;
+
+		for (BlockPos pos : blocksToDestroy) {
+			if (safeBounds.inBounds(pos, false)) {
+				final BlockState branchState = world.getBlockState(pos);
+				final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
+
+				if (!branchBlock.isPresent())
+					continue;
+
+				int radius = branchBlock.get().getRadius(branchState);
+				final Family family = branchBlock.get().getFamily();
+				final Species species = family.getCommonSpecies();
+
+				if (family.getPrimaryThickness() == radius) {
+					species.getLeavesProperties().ifValid(leavesProperties -> {
+						final SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
+
+						if (leafCluster != LeafClusters.NULL_MAP) {
+							for (Cell cell : leafCluster.getAllNonZeroCells()) {
+								final BlockPos delPos = pos.offset(cell.getPos());
+								if (safeBounds.inBounds(delPos, false)) {
+									final BlockState leavesState = world.getBlockState(delPos);
+									if (TreeHelper.isLeaves(leavesState)) {
+										final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
+										if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
+											world.setBlock(delPos, DTRegistries.BLOCK_STATES.AIR, 2);
+										}
+									}
+								}
+							}
+						}
+					});
+				}
+
+				world.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
+			}
+		}
+
+		BranchBlock.destroyMode = DynamicTrees.DESTROY_MODE.HARVEST;
+
+		// Now wreck out all surrounding leaves. Let them grow back naturally.
+ 		/*if (!endPoints.isEmpty()) {
+ 			final BlockBounds bounds = new BlockBounds(endPoints).expand(3);
+
+ 			for (BlockPos pos : bounds) {
+ 				if (safeBounds.inBounds(pos, false) && TreeHelper.isLeaves(world.getBlockState(pos))) {
+					world.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
+				}
+ 			}
+ 		}*/
 	}
 	
 	/**

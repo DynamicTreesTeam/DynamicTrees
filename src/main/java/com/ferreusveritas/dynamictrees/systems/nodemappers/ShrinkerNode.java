@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 public class ShrinkerNode implements INodeInspector {
 	
@@ -26,8 +25,8 @@ public class ShrinkerNode implements INodeInspector {
 		
 		if(branch != null) {
 			radius = branch.getRadius(blockState);
-			if(radius > BranchBlock.RADMAX_NORMAL) {
-				branch.setRadius(world, pos, BranchBlock.RADMAX_NORMAL, fromDir);
+			if(radius > BranchBlock.MAX_RADIUS) {
+				branch.setRadius(world, pos, BranchBlock.MAX_RADIUS, fromDir);
 			}
 		}
 		

@@ -1,4 +1,6 @@
-@ParametersAreNonnullByDefault
+@ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
 package com.ferreusveritas.dynamictrees.blocks.branches;
+
+import mcp.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

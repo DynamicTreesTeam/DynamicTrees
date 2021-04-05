@@ -51,11 +51,11 @@ public class TreeHelper {
 	
 	/**
 	 * Pulses an entire leafMap volume of blocks each with an age signal.
-	 * Warning: CPU intensive and should be used sparingly
+	 * Warning: CPU intensive and should be used sparingly.
 	 *
-	 * @param world The world
-	 * @param leafMap The voxel map of hydrovalues to use as a iterator
-	 * @param iterations The number of times to age the map
+	 * @param world The {@link IWorld} instance.
+	 * @param leafMap The voxel map of hydro values to use as an iterator.
+	 * @param iterations The number of times to age the volume.
 	 */
 	public static void ageVolume(IWorld world, SimpleVoxmap leafMap, int iterations, SafeChunkBounds safeBounds){
 		
@@ -163,37 +163,21 @@ public class TreeHelper {
 		
 		return Species.NULL_SPECIES;
 	}
-	
+
 	/**
 	 * This is resource intensive.  Use only for interaction code.
 	 * Only the root node can determine the exact species and it has
 	 * to be found by mapping the branch network.
 	 *
-	 * This function is deprecated and will be removed in the future.
-	 * Use getExactSpecies(World, BlockPos)
-	 *
-	 * @param world
-	 * @param pos
-	 * @return
-	 */
-	@Deprecated
-	public static Species getExactSpecies(BlockState unused, World world, BlockPos pos) {
-		return getExactSpecies(world, pos);
-	}
-	
-	/**
-	 * This is resource intensive.  Use only for interaction code.
-	 * Only the root node can determine the exact species and it has
-	 * to be found by mapping the branch network.
-	 *
-	 * @param world
-	 * @param pos
-	 * @return
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} to find the {@link Species} at.
+	 * @return The {@link Species}, or {@link Species#NULL_SPECIES} if one
+	 *         couldn't be found.
 	 */
 	public static Species getExactSpecies(World world, BlockPos pos) {
 		BlockPos rootPos = findRootNode(world, pos);
 		
-		if(rootPos != BlockPos.ZERO) {
+		if (rootPos != BlockPos.ZERO) {
 			BlockState rootyState = world.getBlockState(rootPos);
 			return TreeHelper.getRooty(rootyState).getSpecies(rootyState, world, rootPos);
 		}
@@ -242,6 +226,25 @@ public class TreeHelper {
 		}
 		
 		return BlockPos.ZERO;
+	}
+
+	/**
+	 * Sets a custom rooty block decay (what dirt it becomes when the tree is gone)
+	 * algorithm for mods that have special requirements.
+	 *
+	 * @param decay The {@link ICustomRootDecay} implementation.
+	 */
+	public static void setCustomRootBlockDecay(ICustomRootDecay decay) {
+		RootyBlock.customRootDecay = decay;
+	}
+
+	/**
+	 * Provided as a means for an implementation to chain the handlers.
+	 *
+	 * @return The currently defined {@link ICustomRootDecay} handler.
+	 */
+	public static ICustomRootDecay getCustomRootBlockDecay() {
+		return RootyBlock.customRootDecay;
 	}
 	
 	/**
@@ -334,13 +337,18 @@ public class TreeHelper {
 	}
 	
 	public static Optional<BranchBlock> getBranchOpt(BlockState state) {
-		return isBranch(state.getBlock()) ? Optional.of((BranchBlock)state.getBlock()) : Optional.empty();
+		final Block block = state.getBlock();
+		return isBranch(block) ? Optional.of((BranchBlock) block) : Optional.empty();
 	}
 	
 	public static Optional<BranchBlock> getBranchOpt(ITreePart treepart) {
-		return treepart instanceof BranchBlock ? Optional.of((BranchBlock)treepart) : Optional.empty();
+		return treepart instanceof BranchBlock ? Optional.of((BranchBlock) treepart) : Optional.empty();
 	}
-	
+
+	public static Optional<RootyBlock> getRootyOpt(BlockState blockState) {
+		Block block = blockState.getBlock();
+		return isRooty(block) ? Optional.of((RootyBlock) block) : Optional.empty();
+	}
 	
 	//Leaves
 	

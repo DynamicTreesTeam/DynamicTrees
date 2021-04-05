@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Contains utility classes for operations relating to {@code null}.
@@ -32,12 +33,27 @@ public final class Null {
      * @return {@code true} if the given {@link Object} is {@code null};
      *         {@code false} otherwise.
      */
-    public static <T> boolean ifNonnull(@Nullable final T obj, final Consumer<T> nonnullConsumer) {
-        if (isNull(obj)) {
+    public static <T> boolean consumerIfNonnull(@Nullable final T obj, final Consumer<T> nonnullConsumer) {
+        if (!isNull(obj)) {
             nonnullConsumer.accept(obj);
             return true;
         }
         return false;
+    }
+
+    @Nullable
+    public static <T, R> R applyIfNonnull(@Nullable T obj, final Function<T, R> function) {
+        if (!isNull(obj)) {
+            return function.apply(obj);
+        }
+        return null;
+    }
+
+    public static <T, R> R applyIfNonnull(@Nullable T obj, final Function<T, R> function, final R defaultReturn) {
+        if (!isNull(obj)) {
+            return function.apply(obj);
+        }
+        return defaultReturn;
     }
 
 }

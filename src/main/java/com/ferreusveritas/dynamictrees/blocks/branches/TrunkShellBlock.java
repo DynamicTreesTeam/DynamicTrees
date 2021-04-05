@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.util.Null;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
@@ -13,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.EnumProperty;
@@ -35,10 +35,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
@@ -60,8 +57,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		}
 		
 		public int getRadius() {
-			Block block = state.getBlock();
-			return block instanceof BranchBlock ? ((BranchBlock)block).getRadius(state) : 0;
+			final Block block = this.state.getBlock();
+			return block instanceof BranchBlock ? ((BranchBlock) block).getRadius(state) : 0;
 		}
 	}
 
@@ -79,7 +76,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-		if(getMuseUnchecked(worldIn, state, pos) == null) {
+		if (this.getMuseUnchecked(worldIn, state, pos) == null) {
 			worldIn.removeBlock(pos, false);
 		}
 	}
@@ -88,147 +85,128 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	// INTERACTION
 	///////////////////////////////////////////
 
-
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
-		ShellMuse muse = getMuse(world, state, pos);
-		if(muse != null) {
-			return muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest, world.getFluidState(pos));
-		}
-
-		return false;
+		return Null.applyIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().removedByPlayer(muse.state, world, muse.pos, player, willHarvest, world.getFluidState(pos)), false);
 	}
 
 	@Override
 	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		ShellMuse muse = getMuse(worldIn, state, pos);
-		return muse != null ? muse.state.getBlock().getDestroyProgress(muse.state, player, worldIn, muse.pos) : 0.0f;
+		return Null.applyIfNonnull(this.getMuse(worldIn, state, pos), muse -> muse.state.getBlock().getDestroyProgress(muse.state, player, worldIn, muse.pos), 0f);
 	}
 
 	@Override
 	public float getHardness(IBlockReader world, BlockPos pos) {
-		ShellMuse muse = this.getMuse(world, world.getBlockState(pos), pos);
-		return muse != null ? ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(world, pos) : super.getHardness(world, pos);
+		return Null.applyIfNonnull(this.getMuse(world, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(world, pos), super.getHardness(world, pos));
 	}
 
 	@Override
 	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-		ShellMuse muse = getMuse(world, state, pos);
-		return muse != null ? muse.state.getBlock().getSoundType(muse.state, world, muse.pos, entity) : SoundType.WOOD;
+		return Null.applyIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().getSoundType(muse.state, world, muse.pos, entity), SoundType.WOOD);
 	}
 
 	@Override
 	public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
-		ShellMuse muse = getMuse(world, pos);
-		return muse != null ? muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, explosion) : 0.0f;
+		return Null.applyIfNonnull(this.getMuse(world, pos), muse -> muse.state.getBlock().getExplosionResistance(world.getBlockState(pos), world, muse.pos, explosion), 0f);
 	}
 
 	@Override
 	public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
-		return getMuse(useContext.getLevel(), useContext.getClickedPos()) == null;
+		return this.getMuse(useContext.getLevel(), useContext.getClickedPos()) == null;
 	}
 
-	public Surround getMuseDir(@Nonnull BlockState state, @Nonnull BlockPos pos) {
+	public Surround getMuseDir(BlockState state, BlockPos pos) {
 		return state.getValue(CORE_DIR);
 	}
 
 	@Nullable
-	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
-		return getMuseUnchecked(access, access.getBlockState(pos), pos);
+	public ShellMuse getMuseUnchecked(IBlockReader access, BlockPos pos) {
+		return this.getMuseUnchecked(access, access.getBlockState(pos), pos);
 	}
+
 	@Nullable
-	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
-		return getMuseUnchecked(access, state, pos, pos);
+	public ShellMuse getMuseUnchecked(IBlockReader access, BlockState state, BlockPos pos) {
+		return this.getMuseUnchecked(access, state, pos, pos);
 	}
+
 	@Nullable
-	public ShellMuse getMuseUnchecked(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos, @Nonnull BlockPos originalPos) {
-		Surround museDir = getMuseDir(state, pos);
-		BlockPos musePos = pos.offset(museDir.getOffset());
-		BlockState museState = CoordUtils.getStateSafe(access, musePos);
+	public ShellMuse getMuseUnchecked(IBlockReader access, BlockState state, BlockPos pos, BlockPos originalPos) {
+		final Surround museDir = getMuseDir(state, pos);
+		final BlockPos musePos = pos.offset(museDir.getOffset());
+		final BlockState museState = CoordUtils.getStateSafe(access, musePos);
 
 		if (museState == null)
 			return null;
 
-		Block block = museState.getBlock();
-		if(block instanceof IMusable && ((IMusable)block).isMusable()) {
+		final Block block = museState.getBlock();
+		if (block instanceof IMusable && ((IMusable) block).isMusable()) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
-		} else if (block instanceof TrunkShellBlock){ //If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse
-			final Vector3i offset = ((TrunkShellBlock)block).getMuseDir(museState, musePos).getOffset();
+		} else if (block instanceof TrunkShellBlock) { // If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse.
+			final Vector3i offset = ((TrunkShellBlock) block).getMuseDir(museState, musePos).getOffset();
 			if (new Vector3d(offset.getX(), offset.getY(), offset.getZ()).add(new Vector3d(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSqr() > 2.25){
-				return (((TrunkShellBlock)block).getMuseUnchecked(access, museState, musePos, originalPos));
+				return (((TrunkShellBlock) block).getMuseUnchecked(access, museState, musePos, originalPos));
 			}
 		}
 		return null;
 	}
 
 	@Nullable
-	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockPos pos) {
-		return getMuse(access, access.getBlockState(pos), pos);
+	public ShellMuse getMuse(IBlockReader access, BlockPos pos) {
+		return this.getMuse(access, access.getBlockState(pos), pos);
 	}
 
 	@Nullable
-	public ShellMuse getMuse(@Nonnull IBlockReader access, @Nonnull BlockState state, @Nonnull BlockPos pos) {
-		ShellMuse muse = getMuseUnchecked(access, state, pos);
+	public ShellMuse getMuse(IBlockReader access, BlockState state, BlockPos pos) {
+		final ShellMuse muse = this.getMuseUnchecked(access, state, pos);
 
-		//Check the muse for validity
-		if(muse == null || muse.getRadius() <= 8) {
-			scheduleForClearing(access, pos);
+		// Check the muse for validity.
+		if (muse == null || muse.getRadius() <= 8) {
+			this.scheduleForClearing(access, pos);
 		}
 
 		return muse;
 	}
 
 	public void scheduleForClearing(IBlockReader access, BlockPos pos) {
-		if(access instanceof World) {
-			World world = (World) access;
-			if(!world.isClientSide) {
-				world.getBlockTicks().scheduleTick(pos.immutable(), this, 0, TickPriority.HIGH);
-			}
-		}
+		if (!(access instanceof World) || !((World) access).isClientSide())
+			return;
+
+		((World) access).getBlockTicks().scheduleTick(pos.immutable(), this, 0, TickPriority.HIGH);
 	}
 
 	@Override
 	public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-		getMuse(world, pos);
+		this.getMuse(world, pos);
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
-		ShellMuse muse = getMuse(reader, state, pos);
-		if (muse != null){
-			VoxelShape shape = muse.state.getShape(reader, muse.pos);
-			return VoxelShapes.create(shape.bounds().move(muse.museOffset));
-		} else {
-			return VoxelShapes.empty();//NULL_AABB;
-		}
+		return Null.applyIfNonnull(this.getMuse(reader, state, pos), muse -> VoxelShapes.create(muse.state.getShape(reader, muse.pos).bounds().move(muse.museOffset)), VoxelShapes.empty());
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		ShellMuse muse = getMuse(world, state, pos);
-		return muse != null ? muse.state.getBlock().getPickBlock(muse.state, target, world, muse.pos, player) : ItemStack.EMPTY;
+		return Null.applyIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().getPickBlock(muse.state, target, world, muse.pos, player), ItemStack.EMPTY);
 	}
 
 	@Override
 	public boolean isAir(BlockState state, IBlockReader access, BlockPos pos) {
-		return getMuse(access, state, pos) == null;
+		return this.getMuse(access, state, pos) == null;
 	}
 
 	@Override
 	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
-		ShellMuse muse = getMuse(world, pos);
-		if(muse != null) {
-			muse.state.getBlock().onBlockExploded(muse.state, world, muse.pos, explosion);
-		}
+		Null.consumerIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, world, muse.pos, explosion));
 	}
 
 	//TODO: This may not even be necessary
+	@Nullable
 	protected Surround findDetachedMuse(World world, BlockPos pos) {
-		for(Surround s: Surround.values()) {
-			BlockState state = world.getBlockState(pos.offset(s.getOffset()));
-			if(state.getBlock() instanceof IMusable) {
+		for (Surround s : Surround.values()) {
+			final BlockState state = world.getBlockState(pos.offset(s.getOffset()));
+
+			if (state.getBlock() instanceof IMusable)
 				return s;
-			}
 		}
 		return null;
 	}
@@ -236,33 +214,28 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	//TODO: This may not even be necessary
 	@Override
 	public void destroy(IWorld world, BlockPos pos, BlockState state) {
-		BlockState newState = world.getBlockState(pos);
-		if(newState.getBlock() == Blocks.AIR) {
-			Surround surr = findDetachedMuse((World) world, pos);
-			if(surr != null) {
-				world.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surr), 1);
-			}
-		}
+		final BlockState newState = world.getBlockState(pos);
+
+		if (newState.getBlock() != Blocks.AIR)
+			return;
+
+		Null.consumerIfNonnull(this.findDetachedMuse((World) world, pos),
+				surround -> world.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surround), 1));
 	}
 
 	@Override
 	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		ShellMuse muse = getMuse(world, pos);
-		if(muse != null) {
-			return muse.state.getBlock().use(muse.state, world, muse.pos, playerIn, hand, hit);
-		}
-
-		return ActionResultType.FAIL;
+		return Null.applyIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().use(muse.state, world, muse.pos, playerIn, hand, hit), ActionResultType.FAIL);
 	}
 
 	@Override
 	public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return false;
+		return false; // This is the simple solution to the problem.  Maybe I'll work it out later.
 	}
 
 	@Override
 	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return 0;
+		return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
 	}
 
 	@Override
@@ -280,21 +253,17 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		return false;
 	}
 
-//	@Override
-//	public boolean addRunningEffects(BlockState state, World world, BlockPos pos, Entity entity) {
-//		return false;
-//	}
-
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager) {
-		//BlockState state = world.getBlockState(pos);
 		if (state.getBlock() == this) {
-			ShellMuse muse = this.getMuseUnchecked(world, state, pos);
-			if (muse == null) return true;
+			final ShellMuse muse = this.getMuseUnchecked(world, state, pos);
 
-			BlockState museState = muse.state;
-			BlockPos musePos = muse.pos;
+			if (muse == null)
+				return true;
+
+			final BlockState museState = muse.state;
+			final BlockPos musePos = muse.pos;
 
 			manager.destroy(musePos, museState);
 		}
@@ -305,19 +274,21 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	@OnlyIn(Dist.CLIENT)
 	public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
 		BlockPos shellPos;
-		if (target instanceof BlockRayTraceResult){
-			shellPos = ((BlockRayTraceResult)target).getBlockPos();
+		if (target instanceof BlockRayTraceResult) {
+			shellPos = ((BlockRayTraceResult) target).getBlockPos();
 		} else {
 			return false;
 		}
 
 		if (state.getBlock() == this) {
-			ShellMuse muse = this.getMuseUnchecked(world, state, shellPos);
-			if (muse == null) return true;
+			final ShellMuse muse = this.getMuseUnchecked(world, state, shellPos);
 
-			BlockState museState = muse.state;
-			BlockPos musePos = muse.pos;
-			Random rand = world.random;
+			if (muse == null)
+				return true;
+
+			final BlockState museState = muse.state;
+			final BlockPos musePos = muse.pos;
+			final Random rand = world.random;
 
 			int x = musePos.getX();
 			int y = musePos.getY();
@@ -336,7 +307,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 				case EAST:  d0 = x + axisalignedbb.maxX + 0.1D; break;
 			}
 
-			// Safe to spawn particles here since this is a client side only member function
+			// Safe to spawn particles here since this is a client side only member function.
 			world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, museState), d0, d1, d2, 0, 0, 0);
 		}
 

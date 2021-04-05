@@ -15,6 +15,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public abstract class SubCommand {
 
     /**

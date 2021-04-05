@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.ICustomRootDecay;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
@@ -39,9 +40,11 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.ModLoadingContext;
 
 import javax.annotation.Nonnull;
@@ -64,6 +67,8 @@ import java.util.Random;
  */
 @SuppressWarnings("deprecation")
 public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
+
+	public static ICustomRootDecay customRootDecay = null;
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
 	public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
@@ -83,7 +88,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	// BLOCKSTATES
 	///////////////////////////////////////////
 	
-	public Block getPrimitiveDirt (){
+	public Block getPrimitiveDirt () {
 		return primitiveDirt;
 	}
 	
@@ -162,38 +167,42 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @return
 	 */
 	public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-		return primitiveDirt.defaultBlockState();
+		return this.primitiveDirt.defaultBlockState();
 	}
-	
-	//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+
+	/**
+	 * Forces the {@link RootyBlock} to decay if it's there, turning it back to
+	 * its {@link #primitiveDirt}. Custom decay logic is also supported, see
+	 * {@link ICustomRootDecay} for details.
+	 *
+	 * @param world The {@link World} instance.
+	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock}.
+	 * @param rootyState The {@link BlockState} of the {@link RootyBlock}.
+	 * @param species The {@link Species} of the tree that was removed.
+	 */
 	public void doDecay(World world, BlockPos rootPos, BlockState rootyState, Species species) {
-		if(!world.isClientSide) {
-			if(TreeHelper.isRooty(rootyState)) {
-				updateTree(rootyState, world, rootPos, world.random, true);//This will turn the rooty dirt back to it's default soil block. Usually dirt or sand
-				BlockState newState = world.getBlockState(rootPos);
-				
-				if(!TreeHelper.isRooty(newState)) { //Make sure we're not still a rooty block
-					world.setBlockAndUpdate(rootPos, getDecayBlockState(rootyState, world, rootPos));
-//					if(customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)) {
-//						return;
-//					}
-//					Biome biome = world.getBiome(rootPos);
-//
-//					BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();
-//					BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnder();
+		if (world.isClientSide || !TreeHelper.isRooty(rootyState))
+			return;
 
+		this.updateTree(rootyState, world, rootPos, world.random, true); // This will turn the rooty dirt back to it's default soil block.
+		final BlockState newState = world.getBlockState(rootPos);
 
-//					if(mimic == topBlock || mimic == fillerBlock) {
-//						world.setBlockState(rootPos, mimic);
-//					}
-//					else if(topBlock.getMaterial() == newState.getMaterial()) {
-//						world.setBlockState(rootPos, topBlock);
-//					}
-//					else if(fillerBlock.getMaterial() == newState.getMaterial()) {
-//						world.setBlockState(rootPos, fillerBlock);
-//					}
-				}
-			}
+		// Make sure we're not still a rooty block and return if custom decay returns true.
+		if (TreeHelper.isRooty(newState) || (customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)))
+			return;
+
+		final Biome biome = world.getBiome(rootPos);
+		final BlockState primitiveDirt = this.getPrimitiveDirt().defaultBlockState();
+
+		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
+
+		if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
+			world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+		} else if (topBlock.getMaterial() == newState.getMaterial()) {
+			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
+		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
+			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
 		}
 	}
 
@@ -326,7 +335,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		
-		signal.root = pos;
+		if (signal.root == null) {
+			signal.root = pos;
+		} else {
+			signal.multiroot = true;
+		}
+
 		signal.found = true;
 		
 		return signal;

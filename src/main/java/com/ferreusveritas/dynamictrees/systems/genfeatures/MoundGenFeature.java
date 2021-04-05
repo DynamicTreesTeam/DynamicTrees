@@ -88,7 +88,7 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 			
 			//Place dirt blocks around rooty dirt block if tree has a > 8 radius
 			BlockState branchState = world.getBlockState(treePos);
-			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.RADMAX_NORMAL) {
+			if(TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.MAX_RADIUS) {
 				for(Surround dir: Surround.values()) {
 					BlockPos dPos = rootPos.offset(dir.getOffset());
 					world.setBlock(dPos, initialDirtState, 3);

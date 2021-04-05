@@ -18,7 +18,7 @@ public final class DTCommand {
         // Registers sub-commands.
         Collections.addAll(this.subCommands, new GetTreeCommand(), new GrowPulseCommand(), new KillTreeCommand(), new SpeciesListCommand(),
                 new SoilLifeCommand(), new SetTreeCommand(), new RotateJoCodeCommand(), new CreateStaffCommand(), new SetCoordXorCommand(),
-                new CreateTransformPotionCommand(), new TransformCommand());
+                new CreateTransformPotionCommand(), new TransformCommand(), new ClearOrphanedCommand(), new PurgeTreesCommand());
     }
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {

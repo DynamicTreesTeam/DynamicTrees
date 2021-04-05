@@ -414,14 +414,14 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	}
 	
 	public void cleanupRootyDirt() {
-		//Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-		if(!level.isClientSide) {
-			BlockPos rootPos = getDestroyData().cutPos.below();
-			BlockState belowState = level.getBlockState(rootPos);
+		// Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
+		if (!this.level.isClientSide) {
+			final BlockPos rootPos = getDestroyData().cutPos.below();
+			final BlockState belowState = this.level.getBlockState(rootPos);
 			
-			if(TreeHelper.isRooty(belowState)) {
-				RootyBlock rootyBlock = (RootyBlock) belowState.getBlock();
-				rootyBlock.doDecay(level, rootPos, belowState, getDestroyData().species);
+			if (TreeHelper.isRooty(belowState)) {
+				final RootyBlock rootyBlock = (RootyBlock) belowState.getBlock();
+				rootyBlock.doDecay(this.level, rootPos, belowState, getDestroyData().species);
 			}
 		}
 	}

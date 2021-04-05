@@ -239,7 +239,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		return this.setDefaultGrowingParameters().setSaplingShape(DEFAULT_SAPLING_SHAPE).setSaplingSound(SoundType.GRASS);
+		return this.setDefaultGrowingParameters().setSaplingShape(DTRegistries.SAPLING).setSaplingSound(SoundType.GRASS);
 	}
 
 	/**
@@ -840,8 +840,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return false;
 	}
 
-	private static final VoxelShape DEFAULT_SAPLING_SHAPE = DTRegistries.SAPLING;
-	private VoxelShape saplingShape = DEFAULT_SAPLING_SHAPE;
+	private VoxelShape saplingShape = DTRegistries.SAPLING;
 
 	public VoxelShape getSaplingShape() {
 		return this.saplingShape;
@@ -918,7 +917,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 	
 	public boolean isThick() {
-		return this.maxBranchRadius > BranchBlock.RADMAX_NORMAL;
+		return this.maxBranchRadius > BranchBlock.MAX_RADIUS;
 	}
 
 	public int getMaxBranchRadius() {

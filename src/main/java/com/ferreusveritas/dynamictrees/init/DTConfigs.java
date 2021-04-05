@@ -36,7 +36,6 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.DoubleValue DISEASE_CHANCE;
 	public static final ForgeConfigSpec.IntValue MAX_BRANCH_ROT_RADIUS;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_APPLE_TREES;
-	public static final ForgeConfigSpec.BooleanValue ENABLE_THICK_TREES;
 	public static final ForgeConfigSpec.DoubleValue ROOTY_BLOCK_HARDNESS_MULTIPLIER;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_SWAMP_OAKS_IN_WATER;
 	
@@ -107,8 +106,6 @@ public class DTConfigs {
 				defineInRange("maxBranchRotRadius", 8, 0, 24);
 		ENABLE_APPLE_TREES = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
 				define("enableAppleTrees", true);
-		ENABLE_THICK_TREES = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
-				define("enableThickTrees", true);
 		ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		ENABLE_SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("If enabled swamp oak trees will be able to generate on shallow water with mangrove-like roots").

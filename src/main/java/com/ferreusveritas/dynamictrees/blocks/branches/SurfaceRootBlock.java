@@ -32,13 +32,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @SuppressWarnings("deprecation")
 public class SurfaceRootBlock extends Block {
 	
-	public static final int RADMAX_NORMAL = 8;
+	public static final int MAX_RADIUS = 8;
 	
-	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, RADMAX_NORMAL);
+	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
 
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
 
@@ -75,11 +76,11 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(family.getDynamicBranchItem());
+		return new ItemStack(this.family.getDynamicBranchItem());
 	}
 
 	///////////////////////////////////////////
-	// BLOCKSTATES
+	// BLOCK STATES
 	///////////////////////////////////////////
 
 	@Override
@@ -92,16 +93,16 @@ public class SurfaceRootBlock extends Block {
 	}
 
 	public int setRadius(IWorld world, BlockPos pos, int radius, int flags) {
-		world.setBlock(pos, getStateForRadius(radius), flags);
+		world.setBlock(pos, this.getStateForRadius(radius), flags);
 		return radius;
 	}
 
 	public BlockState getStateForRadius(int radius) {
-		return defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
+		return this.defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
 	}
 
 	public int getMaxRadius() {
-		return RADMAX_NORMAL;
+		return MAX_RADIUS;
 	}
 
 	public int getRadialHeight(int radius) {
@@ -138,25 +139,28 @@ public class SurfaceRootBlock extends Block {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
 		boolean connectionMade = false;
-		int thisRadius = getRadius(state);
+		final int thisRadius = getRadius(state);
 
 		VoxelShape shape = VoxelShapes.empty();
 
 		for (Direction dir : CoordUtils.HORIZONTALS) {
-			RootConnection conn = getSideConnectionRadius(world, pos, dir);
-			if (conn != null) {
-				connectionMade = true;
-				int r = MathHelper.clamp(conn.radius, 1, thisRadius);
-				double radius = r / 16.0;
-				double radialHeight = getRadialHeight(r) / 16.0;
-				double gap = 0.5 - radius;
-				AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight, radius);
-				aabb = aabb.expandTowards(dir.getStepX() * gap, 0, dir.getStepZ() * gap).move(0.5, 0.0, 0.5);
-				shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
-			}
+			final RootConnection conn = this.getSideConnectionRadius(world, pos, dir);
+
+			if (conn == null)
+				continue;
+
+			connectionMade = true;
+			final int r = MathHelper.clamp(conn.radius, 1, thisRadius);
+			final double radius = r / 16.0;
+			final double radialHeight = getRadialHeight(r) / 16.0;
+			final double gap = 0.5 - radius;
+
+			AxisAlignedBB aabb = new AxisAlignedBB(-radius, 0, -radius, radius, radialHeight, radius);
+			aabb = aabb.expandTowards(dir.getStepX() * gap, 0, dir.getStepZ() * gap).move(0.5, 0.0, 0.5);
+			shape = VoxelShapes.joinUnoptimized(shape, VoxelShapes.create(aabb), IBooleanFunction.OR);
 		}
 
-		if(!connectionMade) {
+		if (!connectionMade) {
 			double radius = thisRadius / 16.0;
 			double radialHeight = getRadialHeight(thisRadius) / 16.0;
 			AxisAlignedBB aabb = new AxisAlignedBB(0.5 - radius, 0, 0.5 - radius, 0.5 + radius, radialHeight, 0.5 + radius);
@@ -166,6 +170,7 @@ public class SurfaceRootBlock extends Block {
 		return shape;
 	}
 
+	@Nullable
 	protected RootConnection getSideConnectionRadius(IBlockReader blockReader, BlockPos pos, Direction side) {
 		if (!side.getAxis().isHorizontal())
 			return null;
@@ -193,14 +198,14 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
-		BlockState upstate = world.getBlockState(pos.above());
+		final BlockState upstate = world.getBlockState(pos.above());
 
 		if (upstate.getBlock() == DTRegistries.TRUNK_SHELL) {
 			world.setBlockAndUpdate(pos, upstate);
 		}
 
-		for(Direction dir : CoordUtils.HORIZONTALS) {
-			BlockPos dPos = pos.relative(dir).below();
+		for (Direction dir : CoordUtils.HORIZONTALS) {
+			final BlockPos dPos = pos.relative(dir).below();
 			world.getBlockState(dPos).neighborChanged(world, dPos, this, pos, false);
 		}
 
@@ -209,38 +214,40 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		if(!canBlockStay(world, pos, state)) {
+		if (!canBlockStay(world, pos, state)) {
 			world.removeBlock(pos, false);
 		}
 	}
 
 	protected boolean canBlockStay(World world, BlockPos pos, BlockState state) {
+		final BlockPos below = pos.below();
+		final BlockState belowState = world.getBlockState(below);
 
-		BlockPos below = pos.below();
-		BlockState belowState = world.getBlockState(below);
+		final int radius = getRadius(state);
 
-		int thisRadius = getRadius(state);
+		if (belowState.isRedstoneConductor(world, below)) { // If a root is sitting on a solid block.
+			for (Direction dir : CoordUtils.HORIZONTALS) {
+				final RootConnection conn = this.getSideConnectionRadius(world, pos, dir);
 
-		if(belowState.isRedstoneConductor(world,below)) { // If a branch is sitting on a solid block
-			for(Direction dir : CoordUtils.HORIZONTALS) {
-				RootConnection conn = getSideConnectionRadius(world, pos, dir);
-				if(conn != null && conn.radius > thisRadius) {
+				if (conn != null && conn.radius > radius)
 					return true;
-				}
 			}
-		} else { // If the branch has no solid block under it
+		} else { // If the root has no solid block under it.
 			boolean connections = false;
-			for(Direction dir : CoordUtils.HORIZONTALS) {
-				RootConnection conn = getSideConnectionRadius(world, pos, dir);
-				if(conn != null) {
-					if(conn.level == RootConnections.ConnectionLevel.MID) {
-						return false;
-					}
-					if(conn.radius > thisRadius) {
-						connections = true;
-					}
-				}
+
+			for (Direction dir : CoordUtils.HORIZONTALS) {
+				final RootConnection conn = this.getSideConnectionRadius(world, pos, dir);
+
+				if (conn == null)
+					continue;
+
+				if (conn.level == RootConnections.ConnectionLevel.MID)
+					return false;
+
+				if (conn.radius > radius)
+					connections = true;
 			}
+
 			return connections;
 		}
 
