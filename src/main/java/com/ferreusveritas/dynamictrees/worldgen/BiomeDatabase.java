@@ -263,7 +263,7 @@ public class BiomeDatabase {
 	}
 	
 	public BiomeDatabase setForestness(Biome biome, float forestness) {
-		getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.seedMinForestness.get()));
+		getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.SEED_MIN_FORESTNESS.get()));
 		return this;
 	}
 	

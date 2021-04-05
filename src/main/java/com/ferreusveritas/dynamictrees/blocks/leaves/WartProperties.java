@@ -11,22 +11,18 @@ import net.minecraft.util.ResourceLocation;
 /**
  * @author Harley O'Connor
  */
-public final class WartProperties extends LeavesProperties {
+public class WartProperties extends SolidLeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(WartProperties::new);
 
     public WartProperties(final ResourceLocation registryName) {
         super(registryName);
+        this.requiresShears = false;
     }
 
     @Override
     protected ResourceLocation getDynamicLeavesRegName() {
         return ResourceLocationUtils.suffix(this.getRegistryName(), "_wart");
-    }
-
-    @Override
-    protected DynamicLeavesBlock createDynamicLeaves(AbstractBlock.Properties properties) {
-        return new DynamicWartBlock(this, properties);
     }
 
     @Override

@@ -51,9 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
-import net.minecraft.block.AbstractBlock.Properties;
-
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
  *
@@ -115,7 +112,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
 	@Override
 	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-		if(random.nextInt(DTConfigs.treeGrowthFolding.get()) == 0) {
+		if(random.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) == 0) {
 			updateTree(state, worldIn, pos, random, true);
 		}
 	}
@@ -213,7 +210,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
 	@Override
 	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		return (float) (primitiveDirt.defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.rootyBlockHardnessMultiplier.get());
+		return (float) (primitiveDirt.defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
 	}
 
 	@Override

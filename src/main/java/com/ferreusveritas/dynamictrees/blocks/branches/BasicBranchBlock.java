@@ -159,7 +159,7 @@ public class BasicBranchBlock extends BranchBlock {
 	public float getHardness (IBlockReader worldIn, BlockPos pos) {
 		final int radius = this.getRadius(worldIn.getBlockState(pos));
 		final float hardness = this.getFamily().getPrimitiveLog().defaultBlockState().getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
-		return (float) Math.min(hardness, DTConfigs.maxTreeHardness.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+		return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
 	}
 
 	@Override
@@ -314,7 +314,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.enableBranchClimbing.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
+		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
 	}
 	
 	@Nonnull

@@ -35,7 +35,7 @@ public class DirtBucket extends Item {
 			}
 		}
 
-		if (DTConfigs.dirtBucketPlacesDirt.get()) {
+		if (DTConfigs.DIRT_BUCKET_PLACES_DIRT.get()) {
 			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
 				return new ActionResult<>(ActionResultType.PASS, itemStack);
 			} else {

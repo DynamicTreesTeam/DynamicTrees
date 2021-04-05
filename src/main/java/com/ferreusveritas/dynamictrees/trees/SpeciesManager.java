@@ -22,6 +22,8 @@ import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.Consumer;
+
 /**
  * @author Harley O'Connor
  */
@@ -52,8 +54,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
             return ObjectFetchResult.success((world, pos) -> biomePredicateFetchResult.getValue().test(world.getBiome(pos)));
         });
 
-        this.loadAppliers.registerIfTrueApplier("generate_seed", Species::generateSeed)
-                .registerIfTrueApplier("generate_sapling", Species::generateSapling);
+        this.loadAppliers.register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
+                .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling);
 
         this.reloadAppliers.register("tapering", Float.class, Species::setTapering)
                 .register("up_probability", Integer.class, Species::setUpProbability)
@@ -88,6 +90,12 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 });
 
         super.registerAppliers(applierListIdentifier);
+    }
+
+    @Override
+    protected void postLoad(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        // Generates seeds and saplings if should.
+        species.generateSeed().generateSapling();
     }
 
 }

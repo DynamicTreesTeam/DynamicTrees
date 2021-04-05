@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
@@ -41,6 +42,7 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
+		event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
 		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
 	}
 

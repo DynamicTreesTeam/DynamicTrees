@@ -150,11 +150,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	}
 
 	public void setupCommonSpecies(final Species species) {
-		this.commonSpecies = species;
-
-		// Auto generate seeds and saplings for common species.
-		species.generateSeed();
-		species.generateSapling();
+		// Set the common species and auto-generate seeds and saplings unless opted out.
+		this.commonSpecies = species.setShouldGenerateSeedIfNull(true).setShouldGenerateSaplingIfNull(true)
+				.generateSeed().generateSapling();
 	}
 
 	public Species getCommonSpecies() {

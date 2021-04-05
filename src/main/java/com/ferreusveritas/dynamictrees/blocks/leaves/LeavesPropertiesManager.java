@@ -47,7 +47,8 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
                 .registerIfTrueApplier("air", AbstractBlock.Properties::air)
                 .registerIfTrueApplier("requires_tool", AbstractBlock.Properties::requiresCorrectToolForDrops);
 
-        this.reloadAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
+        this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
+                .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
                 .register("light_requirement", Integer.class, LeavesProperties::setLightRequirement)

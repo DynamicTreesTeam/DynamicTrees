@@ -28,7 +28,6 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
@@ -46,9 +45,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
-import net.minecraft.block.AbstractBlock.Properties;
 
 @SuppressWarnings("deprecation")
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
@@ -150,14 +146,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 
 	public boolean canBeStripped(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-		int stripRadius = DTConfigs.minRadiusForStrip.get();
+		int stripRadius = DTConfigs.MIN_RADIUS_FOR_STRIP.get();
 		return stripRadius != 0 && stripRadius <= getRadius(state) && canBeStripped && isAxe(heldItem);
 	}
 
 	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
 		int radius = this.getRadius(state);
 		this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
-		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.enableStripRadiusReduction.get()?1:0)), null);
+		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get()?1:0)), null);
 	}
 
 	@Override
@@ -374,7 +370,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
-		volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());// For cheaters.. you know who you are.
+		volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get());// For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, new ArrayList<>(), volume, handStack);
 	}
 
@@ -448,7 +444,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		//Get all of the wood drops
 		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
 		
-		if(!DTConfigs.sloppyBreakDrops.get()) {
+		if(!DTConfigs.SLOPPY_BREAK_DROPS.get()) {
 			destroyData.leavesDrops.clear();
 			woodDropList.clear();
 		}
@@ -482,7 +478,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 		int damage;
 
-		switch(DTConfigs.axeDamageMode.get()) {
+		switch(DTConfigs.AXE_DAMAGE_MODE.get()) {
 			default:
 			case VANILLA:
 				damage = 1;
@@ -527,7 +523,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 						sloppyBreak(world, pos, DestroyType.VOID);
 						world.setBlockAndUpdate(pos, toBlockState);//Set back to stone
 					} else {
-						if(DTConfigs.worldGenDebug.get()) {
+						if(DTConfigs.WORLD_GEN_DEBUG.get()) {
 							System.err.println("Warning: Sloppy break with unusual block: " + toBlockState);
 						}
 					}

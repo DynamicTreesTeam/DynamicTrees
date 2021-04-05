@@ -13,10 +13,15 @@ import net.minecraft.world.server.ServerWorld;
 
 import net.minecraft.block.AbstractBlock.Properties;
 
+/**
+ * An extension of {@link DynamicLeavesBlock} which makes the block solid. This means
+ * that it can be landed on like normal and gives fall damage, is a full cube, and isn't
+ * passable (even if the config option is enabled).
+ */
 @SuppressWarnings("deprecation")
-public class DynamicWartBlock extends DynamicLeavesBlock {
+public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
 
-    public DynamicWartBlock (final LeavesProperties leavesProperties, final Properties properties) {
+    public SolidDynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
         super(leavesProperties, properties);
     }
 
@@ -37,10 +42,5 @@ public class DynamicWartBlock extends DynamicLeavesBlock {
 
     @Override
     public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) { }
-
-    @Override
-    protected boolean shouldDropForPlayer(PlayerEntity player) {
-        return true;
-    }
 
 }

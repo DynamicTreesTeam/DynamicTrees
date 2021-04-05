@@ -95,7 +95,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
-		@Override public Species setSeed(Seed newSeed) { return this; }
+		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
@@ -476,22 +476,55 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public Optional<Seed> getSeed() {
 		return !this.hasSeed() ? !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
 	}
-	
+
 	/**
-	 * Generate a seed. Developer is still required to register the item
-	 * in the appropriate registries.
+	 * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive}
+	 * so its default value is {@code null}.
+	 */
+	private Boolean shouldGenerateSeed;
+
+	public boolean shouldGenerateSeed() {
+		return this.shouldGenerateSeed != null && this.shouldGenerateSeed;
+	}
+
+	public void setShouldGenerateSeed(boolean shouldGenerateSeed) {
+		this.shouldGenerateSeed = shouldGenerateSeed;
+	}
+
+	/**
+	 * Sets {@link #shouldGenerateSeed} to the given boolean, only if it's currently
+	 * {@code null}. This allows for setting a default which can then be overridden by
+	 * Json.
+	 *
+	 * @param shouldGenerateSeed {@code true} if a seed should be generated;
+	 *                           {@code false} otherwise.
+	 * @return This {@link Species} object for chaining.
+	 */
+	public Species setShouldGenerateSeedIfNull(boolean shouldGenerateSeed) {
+		if (this.shouldGenerateSeed == null)
+			this.shouldGenerateSeed = shouldGenerateSeed;
+		return this;
+	}
+
+	/**
+	 * Generates and registers a {@link Seed} item for this species. Note that
+	 * it will only be generated if {@link #shouldGenerateSeed} is {@code true}.
+	 *
+	 * @return This {@link Species} object for chaining.
 	 */
 	public Species generateSeed() {
-		return this.setSeed(RegistryHandler.addItem(ResourceLocationUtils.suffix(this.getRegistryName(), "_seed"), new Seed(this)));
+		return !this.shouldGenerateSeed() || this.seed != null ? this :
+				this.setSeed(RegistryHandler.addItem(ResourceLocationUtils.suffix(this.getRegistryName(), "_seed"), new Seed(this)));
 	}
-	
+
 	/**
-	 * 
-	 * @param newSeed
-	 * @return this for chaining
+	 * Sets the {@link Seed} object for this {@link Species}.
+	 *
+	 * @param seed The {@link Seed} to set.
+	 * @return This {@link Species} object for chaining.
 	 */
-	public Species setSeed(Seed newSeed) {
-		seed = newSeed;
+	public Species setSeed(final Seed seed) {
+		this.seed = seed;
 		return this;
 	}
 	
@@ -612,7 +645,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		public List<ItemStack> logs;
 		public final int sticks;
 		public LogsAndSticks(List<ItemStack> logs, int sticks) {
-			this.logs = logs; this.sticks = DTConfigs.dropSticks.get() ? sticks : 0;
+			this.logs = logs; this.sticks = DTConfigs.DROP_STICKS.get() ? sticks : 0;
 		}
 	}
 	
@@ -677,13 +710,45 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		saplingBlock = sapling;
 		return this;
 	}
-	
+
 	/**
-	 * Generate a sapling. Developer is still required to register the block
-	 * in the appropriate registries.
+	 * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive}
+	 * so its default value is {@code null}.
+	 */
+	private Boolean shouldGenerateSapling;
+
+	public boolean shouldGenerateSapling() {
+		return this.shouldGenerateSapling != null && this.shouldGenerateSapling;
+	}
+
+	public void setShouldGenerateSapling(boolean shouldGenerateSapling) {
+		this.shouldGenerateSapling = shouldGenerateSapling;
+	}
+
+	/**
+	 * Sets {@link #shouldGenerateSapling} to the given boolean, only if it's currently
+	 * {@code null}. This allows for setting a default which can then be overridden by
+	 * Json.
+	 *
+	 * @param shouldGenerateSapling {@code true} if a sapling should be generated;
+	 *                                          {@code false} otherwise.
+	 * @return This {@link Species} object for chaining.
+	 */
+	public Species setShouldGenerateSaplingIfNull(boolean shouldGenerateSapling) {
+		if (this.shouldGenerateSapling == null)
+			this.shouldGenerateSapling = shouldGenerateSapling;
+		return this;
+	}
+
+	/**
+	 * Generates and registers a {@link DynamicLeavesBlock} for this species. Note that
+	 * it will only be generated if {@link #shouldGenerateSapling} is {@code true}.
+	 *
+	 * @return This {@link Species} object for chaining.
 	 */
 	public Species generateSapling() {
-		return this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
+		return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
+				this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
 	}
 	
 	public Optional<DynamicSaplingBlock> getSapling() {
@@ -1030,7 +1095,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			}
 		}
 		
-		if (rapid || (DTConfigs.maxBranchRotRadius.get() != 0 && radius <= DTConfigs.maxBranchRotRadius.get())) {
+		if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
 			if (branch != null) {
 				branch.rot(world, pos);
@@ -1076,7 +1141,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
-		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.treeGrowthMultiplier.get() * DTConfigs.treeGrowthFolding.get());
+		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
 		do {
 			if (soilLife > 0) {
 				if (growthRate > random.nextFloat()) {
@@ -1212,7 +1277,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return true if the tree became diseased
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
-		if (soilLife == 0 && DTConfigs.diseaseChance.get() > random.nextFloat() ) {
+		if (soilLife == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat() ) {
 			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
 			return true;
 		}
@@ -1247,7 +1312,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			return suitabilityEvent.getSuitability();
 		}
 		
-		float ugs = (float)(double) DTConfigs.scaleBiomeGrowthRate.get();//universal growth scalar
+		float ugs = (float)(double) DTConfigs.SCALE_BIOME_GROWTH_RATE.get();//universal growth scalar
 		
 		if (ugs == 1.0f || this.isBiomePerfect(biome)) {
 			return 1.0f;
@@ -1340,15 +1405,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return Factor from 0.0 (no growth) to 1.0 (full growth).
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-		return DTConfigs.enableSeasonalGrowthFactor.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
 	}
 
 	public float seasonalSeedDropFactor(World world, BlockPos pos) {
-		return DTConfigs.enableSeasonalSeedDropFactor.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos) : 1.0f;
 	}
 
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-		return DTConfigs.enableSeasonalFruitProductionFactor.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, false) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, false) : 1.0f;
 	}
 
 	/**

@@ -19,16 +19,9 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.AbstractBlock.Properties;
 
 public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
@@ -60,7 +53,7 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
     @Override
     public float getHardness(IBlockReader worldIn, BlockPos pos) {
-        return (float) (0.5 * DTConfigs.rootyBlockHardnessMultiplier.get());
+        return (float) (0.5 * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
     }
 
     @Override

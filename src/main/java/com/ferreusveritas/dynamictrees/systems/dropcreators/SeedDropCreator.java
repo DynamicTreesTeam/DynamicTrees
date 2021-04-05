@@ -73,7 +73,7 @@ public class SeedDropCreator extends DropCreator {
 	
 	@Override
 	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		if(getVoluntaryRarity() * DTConfigs.seedDropRate.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
+		if(getVoluntaryRarity() * DTConfigs.SEED_DROP_RATE.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
 			dropList.add(getSeedStack(species));
 			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);

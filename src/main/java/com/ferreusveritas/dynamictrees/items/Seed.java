@@ -101,9 +101,9 @@ public class Seed extends Item implements IPlantable {
 			return false;
 		}
 		
-		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.seedPlantRate.get());
+		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.SEED_PLANT_RATE.get());
 		
-		if(DTConfigs.seedOnlyForest.get()) {
+		if(DTConfigs.SEED_ONLY_FOREST.get()) {
 			plantChance *= DTResourceRegistries.getBiomeDatabaseManager().getDimensionDatabase(world.dimension().location())
 					.getForestness(world.getBiome(pos));
 		}
@@ -128,7 +128,7 @@ public class Seed extends Item implements IPlantable {
 	}
 	
 	public int getTimeToLive(ItemStack seedStack) {
-		int lifespan = DTConfigs.seedTimeToLive.get();//1 minute by default(helps with lag)
+		int lifespan = DTConfigs.SEED_TIME_TO_LIVE.get();//1 minute by default(helps with lag)
 		if(seedStack.hasTag()) {
 			CompoundNBT nbtData = seedStack.getTag();
 			assert nbtData != null;

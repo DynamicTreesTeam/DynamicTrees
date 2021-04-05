@@ -97,6 +97,13 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	protected int lightRequirement = 13;
 	protected boolean connectAnyRadius = false;
 
+	/**
+	 * Since shears are not a {@link net.minecraftforge.common.ToolType} (at the moment),
+	 * we'll use this for an optional override of the {@link Block.Properties}
+	 * {@link net.minecraftforge.common.ToolType}.
+	 */
+	protected boolean requiresShears = true;
+
 	private LeavesProperties() { }
 
 	public LeavesProperties(final ResourceLocation registryName) {
@@ -273,7 +280,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F)
+		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).requiresCorrectToolForDrops()
 				.randomTicks().sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
 				.isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
 	}
@@ -291,6 +298,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		return (fromRadius == 1 || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+	}
+
+	public boolean doRequireShears() {
+		return requiresShears;
+	}
+
+	public void setRequiresShears(boolean requiresShears) {
+		this.requiresShears = requiresShears;
 	}
 
 	///////////////////////////////////////////

@@ -144,7 +144,7 @@ public class TreeGenerator {
 		}
 
 		// Display concrete circles for testing the circle growing algorithm.
-		if (DTConfigs.worldGenDebug.get()) {
+		if (DTConfigs.WORLD_GEN_DEBUG.get()) {
 			makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
 		}
 

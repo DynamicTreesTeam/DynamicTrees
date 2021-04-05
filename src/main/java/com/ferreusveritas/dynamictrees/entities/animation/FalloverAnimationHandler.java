@@ -101,7 +101,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 
 		//Crush living things with clumsy dead trees
 		World world = entity.level;
-		if(DTConfigs.enableFallingTreeDamage.get() && !world.isClientSide) {
+		if(DTConfigs.ENABLE_FALLING_TREE_DAMAGE.get() && !world.isClientSide) {
 			List<LivingEntity> elist = testEntityCollision(entity);
 			for(LivingEntity living: elist) {
 				if(!getData(entity).entitiesHit.contains(living)) {
@@ -114,7 +114,7 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 								living.getDeltaMovement().y + (world.random.nextFloat() * fallSpeed * 0.25f),
 								living.getDeltaMovement().z + (world.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepZ() * damage * 0.2f));
 						living.setDeltaMovement(living.getDeltaMovement().x + (world.random.nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (world.random.nextFloat() - 0.5));
-						damage *= DTConfigs.fallingTreeDamageMultiplier.get();
+						damage *= DTConfigs.FALLING_TREE_DAMAGE_MULTIPLIER.get();
 						//System.out.println("Tree Falling Damage: " + damage + "/" + living.getHealth());
 						living.hurt(AnimationConstants.TREE_DAMAGE, damage);
 					}

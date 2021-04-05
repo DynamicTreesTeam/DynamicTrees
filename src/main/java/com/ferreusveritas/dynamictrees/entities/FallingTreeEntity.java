@@ -315,7 +315,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	}
 	
 	protected IAnimationHandler selectAnimationHandler() {
-		return DTConfigs.enableFallingTrees.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
+		return DTConfigs.ENABLE_FALLING_TREES.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
 	}
 	
 	public IAnimationHandler defaultAnimationHandler() {

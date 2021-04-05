@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.worldgen.WorldGenEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * Holds and manages event handlers.
@@ -40,9 +39,9 @@ public final class EventHandlers {
      * Called when the config is loaded or reloaded in {@link DTConfigs}.
      */
     public static void configReload() {
-        registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.replaceVanillaSapling.get());
-        registerOrUnregister(WORLD_GEN_EVENT_HANDLER, DTConfigs.worldGen.get());
-        registerOrUnregister(POISSON_DISC_EVENT_HANDLER, DTConfigs.worldGen.get());
+        registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.REPLACE_VANILLA_SAPLING.get());
+        registerOrUnregister(WORLD_GEN_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
+        registerOrUnregister(POISSON_DISC_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
     }
 
     /**

@@ -134,7 +134,7 @@ public class WailaBranchHandler implements IComponentProvider {
 			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
 
 			NetVolumeNode.Volume volume = volumeSum.getVolume();
-			volume.multiplyVolume(DTConfigs.treeHarvestMultiplier.get());
+			volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get());
 
 			return volume;
 		}

@@ -29,7 +29,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 
 	@Override
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-		if(DTConfigs.podzolGen.get()) {
+		if(DTConfigs.PODZOL_GEN.get()) {
 			FindEndsNode endFinder = new FindEndsNode();
 			TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 			List<BlockPos> endPoints = endFinder.getEnds();

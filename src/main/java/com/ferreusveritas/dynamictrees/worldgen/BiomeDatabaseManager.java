@@ -166,7 +166,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.blacklistedDimensions.clear();
 
         // If world gen is disabled don't waste processing power reading these.
-        if (!DTConfigs.worldGen.get())
+        if (!DTConfigs.WORLD_GEN.get())
             return;
 
         final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
@@ -203,7 +203,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         });
 
         // Blacklist certain dimensions according to the config.
-        DTConfigs.dimensionBlacklist.get().forEach(resourceLocationString -> {
+        DTConfigs.DIMENSION_BLACKLIST.get().forEach(resourceLocationString -> {
             try {
                 this.blacklistedDimensions.add(new ResourceLocation(resourceLocationString));
             } catch (ResourceLocationException e) {
@@ -219,7 +219,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.defaultDatabase = new BiomeDatabase();
 
         // If world gen is disabled don't waste processing power reading these.
-        if (!DTConfigs.worldGen.get())
+        if (!DTConfigs.WORLD_GEN.get())
             return;
 
         final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
