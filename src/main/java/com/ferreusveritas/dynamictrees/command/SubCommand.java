@@ -3,43 +3,47 @@ package com.ferreusveritas.dynamictrees.command;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommandHelper;
+import com.ferreusveritas.dynamictrees.util.ThrowableRunnable;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.command.arguments.BlockPosArgument;
+import net.minecraft.command.arguments.ILocationArgument;
 import net.minecraft.command.arguments.ResourceLocationArgument;
-import net.minecraft.command.arguments.Vec3Argument;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
-import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+/**
+ * @author Harley O'Connor
+ */
 public abstract class SubCommand {
 
-    /**
-     * takesCoordinates - Set this to true in constructor in order to add location arguments to the command.
-     * Handle the execution with coordinates by overriding executeWithCoords() method.
-     */
-    protected boolean takesCoordinates = false;
+    protected static final DynamicCommandExceptionType NO_TREE_FOUND = new DynamicCommandExceptionType(pos -> new TranslationTextComponent("commands.dynamictrees.error.get_tree", new TranslationTextComponent("chat.coordinates", getVector3i(pos).getX(), getVector3i(pos).getY(), getVector3i(pos).getZ()).withStyle(style -> style.withColor(TextFormatting.DARK_RED))));
+    protected static final DynamicCommandExceptionType SPECIES_UNKNOWN = new DynamicCommandExceptionType(resLocStr -> new TranslationTextComponent("commands.dynamictrees.error.unknown_species", darkRed(resLocStr)));
+    protected static final DynamicCommandExceptionType SPECIES_NOT_TRANSFORMABLE = new DynamicCommandExceptionType(nonTransformableSpecies -> new TranslationTextComponent("commands.dynamictrees.error.not_transformable", darkRed(nonTransformableSpecies)));
 
-    /**
-     * executesWithCoordinates - Set this to false to disable calling execute when coordinate argument is given only.
-     */
-    protected boolean executesWithCoordinates = true;
-
-    /**
-     * defaultToExecute - Set this to false to disable calling execute() when no arguments are given.
-     */
-    protected boolean defaultToExecute = true;
-
-    /**
-     * extraArguments - Append any extra arguments you wish to add onto the command in the constructor.
-     * These will be registered automatically.
-     */
-    protected RequiredArgumentBuilder<CommandSource, ?> extraArguments = null;
+    private static Vector3i getVector3i(final Object vecObj) {
+        if (vecObj instanceof Vector3i)  {
+            return ((Vector3i) vecObj);
+        }
+        return Vector3i.ZERO;
+    }
 
     /**
      * Returns the name of the command.
@@ -55,72 +59,90 @@ public abstract class SubCommand {
      */
     protected abstract int getPermissionLevel ();
 
-    /**
-     * Call this method on valid command execution (when all arguments are given).
-     * Implement it to include command logic.
-     *
-     * @param context Context of the command.
-     * @return Integer value which is returned to ArgumentBuilder.executes.
-     */
-    protected abstract int execute (CommandContext<CommandSource> context);
-
     public ArgumentBuilder<CommandSource, ?> register() {
-        LiteralArgumentBuilder<CommandSource> subCommandBuilder = Commands.literal(this.getName());
-
-        subCommandBuilder.requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()));
-
-        if (this.defaultToExecute)
-            subCommandBuilder.executes(this::execute);
-
-        ArgumentBuilder<CommandSource, ?> subSubCommandBuilder = null;
-
-        if (this.takesCoordinates) {
-            subSubCommandBuilder = Commands.argument(CommandConstants.LOCATION_ARGUMENT, Vec3Argument.vec3());
-
-            if (this.executesWithCoordinates)
-                subSubCommandBuilder.executes(this::execute);
-        }
-
-        if (this.extraArguments != null) {
-            if (subSubCommandBuilder == null)
-                subSubCommandBuilder = this.extraArguments;
-            else subSubCommandBuilder.then(this.extraArguments);
-        }
-
-        if (subSubCommandBuilder == null)
-            return subCommandBuilder;
-
-        return subCommandBuilder.then(subSubCommandBuilder);
+        return Commands.literal(this.getName()).requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()))
+                .then(this.registerArguments());
     }
 
-    /**
-     * Sends a message to the command sender.
-     *
-     * @param context The command context.
-     * @param message The message to send.
-     */
-    protected void sendMessage (CommandContext<CommandSource> context, ITextComponent message) {
-        context.getSource().sendSuccess(message, true);
+    public abstract ArgumentBuilder<CommandSource, ?> registerArguments();
+
+    protected static int executesSuccess(final ThrowableRunnable<CommandSyntaxException> executeRunnable) throws CommandSyntaxException {
+        executeRunnable.run();
+        return 1;
     }
 
-    protected BlockPos getPositionArg (CommandContext<CommandSource> context) {
-        return Vec3Argument.getCoordinates(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
+    protected static int executesSuccess(final CommandContext<CommandSource> context, final Consumer<CommandContext<CommandSource>> executeConsumer) {
+        executeConsumer.accept(context);
+        return 1;
     }
 
-    protected Species getSpeciesArg (CommandContext<CommandSource> context) {
-        return TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT));
+    protected static RequiredArgumentBuilder<CommandSource, Integer> intArgument(final String name) {
+        return Commands.argument(name, IntegerArgumentType.integer());
     }
 
-    protected BlockPos getRootPos (CommandContext<CommandSource> context) {
-        return this.getRootPos(context, context.getSource().getLevel());
+    protected static int intArgument(final CommandContext<CommandSource> context, final String name) {
+        return IntegerArgumentType.getInteger(context, name);
     }
 
-    protected BlockPos getRootPos (CommandContext<CommandSource> context, World world) {
-        return this.getRootPos(context, world, this.getPositionArg(context));
+    protected static RequiredArgumentBuilder<CommandSource, String> stringArgument(final String name) {
+        return Commands.argument(name, StringArgumentType.string());
     }
 
-    protected BlockPos getRootPos (CommandContext<CommandSource> context, World world, BlockPos pos) {
-        return TreeHelper.findRootNode(world, pos);
+    protected static RequiredArgumentBuilder<CommandSource, String> stringArgument(final String name, final Collection<String> suggestions) {
+        return Commands.argument(name, StringArgumentType.string()).suggests(((context, builder) -> ISuggestionProvider.suggest(suggestions, builder)));
+    }
+
+    protected static String stringArgument(final CommandContext<CommandSource> context, final String name) {
+        return StringArgumentType.getString(context, name);
+    }
+
+    protected static RequiredArgumentBuilder<CommandSource, ILocationArgument> blockPosArgument() {
+        return Commands.argument(CommandConstants.LOCATION, BlockPosArgument.blockPos());
+    }
+
+    protected static BlockPos blockPosArgument(final CommandContext<CommandSource> context) throws CommandSyntaxException {
+        return BlockPosArgument.getLoadedBlockPos(context, CommandConstants.LOCATION);
+    }
+
+    protected static BlockPos rootPosArgument (final CommandContext<CommandSource> context) throws CommandSyntaxException {
+        final BlockPos pos = blockPosArgument(context);
+        final BlockPos rootPos = TreeHelper.findRootNode(context.getSource().getLevel(), pos);
+
+        if (rootPos == BlockPos.ZERO)
+            throw NO_TREE_FOUND.create(pos);
+
+        return rootPos;
+    }
+
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> speciesArgument () {
+        return resourceLocationArgument(CommandConstants.SPECIES, Species.REGISTRY::getRegistryNames);
+    }
+
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> transformableSpeciesArgument () {
+        return resourceLocationArgument(CommandConstants.SPECIES, TreeRegistry::getTransformableSpeciesLocations);
+    }
+
+    protected static Species speciesArgument(final CommandContext<CommandSource> context) throws CommandSyntaxException {
+        final ResourceLocation registryName = ResourceLocationArgument.getId(context, CommandConstants.SPECIES);
+        final Species species = TreeRegistry.findSpecies(registryName);
+
+        if (!species.isValid())
+            throw SPECIES_UNKNOWN.create(registryName.toString());
+
+        return species;
+    }
+
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> resourceLocationArgument (final String name, final Supplier<Collection<ResourceLocation>> suggestionsSupplier) {
+        return Commands.argument(name, ResourceLocationArgument.id())
+                .suggests((context, builder) -> ISuggestionProvider.suggestResource(suggestionsSupplier.get(), builder));
+    }
+
+    protected static ITextComponent aqua(final Object object) {
+        return CommandHelper.colour(object, TextFormatting.AQUA);
+    }
+
+    protected static ITextComponent darkRed(final Object object) {
+        return CommandHelper.colour(object, TextFormatting.DARK_RED);
     }
 
 }

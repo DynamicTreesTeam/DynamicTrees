@@ -1,17 +1,16 @@
 package com.ferreusveritas.dynamictrees.command;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.ResourceLocationArgument;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
 /**
@@ -19,30 +18,25 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public final class CreateTransformPotionCommand extends SubCommand {
 
-    public CreateTransformPotionCommand() {
-        this.takesCoordinates = true;
-        this.executesWithCoordinates = false;
-        this.defaultToExecute = false;
-
-        this.extraArguments = Commands.argument(CommandConstants.TREE_FAMILY_ARGUMENT, ResourceLocationArgument.id())
-                .suggests((context, builder) -> ISuggestionProvider.suggestResource(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
-    }
-
     @Override
     protected String getName() {
         return CommandConstants.CREATE_TRANSFORM_POTION;
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> context) {
-        final BlockPos pos = this.getPositionArg(context);
-        final Species species = TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.TREE_FAMILY_ARGUMENT));
+    protected int getPermissionLevel() {
+        return 2;
+    }
 
-        // Ensure species given exists.
-        if (!species.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.TREE_FAMILY_ARGUMENT)));
-            return 0;
-        }
+    @Override
+    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+        return blockPosArgument().then(transformableSpeciesArgument().executes(context -> this.spawnTransformPotion(context.getSource(),
+                blockPosArgument(context), speciesArgument(context))));
+    }
+
+    private int spawnTransformPotion(final CommandSource source, final BlockPos pos, final Species species) throws CommandSyntaxException {
+        if (!species.isTransformable())
+            throw SPECIES_NOT_TRANSFORMABLE.create(species.getTextComponent());
 
         final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION;
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);
@@ -50,14 +44,11 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
-        ItemUtils.spawnItemStack(context.getSource().getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
+        ItemUtils.spawnItemStack(source.getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
+        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.create_transform_potion",
+                species.getTextComponent(), CommandHelper.posComponent(pos, TextFormatting.AQUA)), true);
 
         return 1;
-    }
-
-    @Override
-    protected int getPermissionLevel() {
-        return 2;
     }
 
 }

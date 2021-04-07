@@ -137,8 +137,8 @@
     "apply": {
       "species" : {
         "random" : {
-          "oak" : 24,
-          "apple" : 1
+          "oak": 24,
+          "apple_oak": 1
         }
       },
       "density": [ 0.05 ],

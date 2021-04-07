@@ -22,12 +22,13 @@ import java.util.Optional;
  */
 public class ChunkTreeHelper {
 
-    public static void removeOrphanedBranchNodes(World world, @Nullable ChunkPos chunkPos, int radius) {
+    public static int removeOrphanedBranchNodes(World world, @Nullable ChunkPos chunkPos, int radius) {
         if (chunkPos == null)
-            return;
+            return 0;
 
         final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
+        int orphansCleared = 0;
 
         for (BlockPos pos: bounds) {
             final BlockState state = world.getBlockState(pos);
@@ -38,8 +39,9 @@ public class ChunkTreeHelper {
 
                 if (rootPos == BlockPos.ZERO) { // If the root position is the ORIGIN object it means that no root block was found.
                     // If the root node isn't found then all nodes are orphan.  Destroy the entire network.
-                    BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
+                    final BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
                     FallingTreeEntity.dropTree(world, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+                    orphansCleared++;
                 } else {
                     // There is at least one root block in the network.
                     final BlockState rootyState = world.getBlockState(rootPos);
@@ -57,8 +59,9 @@ public class ChunkTreeHelper {
                             trunk.get().analyse(trunkState, world, trunkPos, null, signal);
 
                             if (signal.multiroot || signal.overflow) { // We found multiple root nodes.  This can't be resolved. Destroy the entire network.
-                                BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
+                                final BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
                                 FallingTreeEntity.dropTree(world, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT); // Destroy the tree client side without fancy effects.
+                                orphansCleared++;
                             }
                         }
                     }
@@ -66,24 +69,29 @@ public class ChunkTreeHelper {
             }
         }
 
+        return orphansCleared;
     }
 
-    public static void removeAllBranchesFromChunk(World world, @Nullable ChunkPos chunkPos, int radius) {
+    public static int removeAllBranchesFromChunk(World world, @Nullable ChunkPos chunkPos, int radius) {
         if (chunkPos == null)
-            return;
+            return 0;
 
         final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
+
+        int treesCleared = 0;
 
         for (BlockPos pos: bounds) {
             BlockState state = world.getBlockState(pos);
             Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(state);
             if (branchBlock.isPresent()) {
-                BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
+                final BranchDestructionData destroyData = branchBlock.get().destroyBranchFromNode(world, pos, Direction.DOWN, true, null);
                 FallingTreeEntity.dropTree(world, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);// Destroy the tree client side without fancy effects
+                treesCleared++;
             }
         }
 
+        return treesCleared;
     }
 
     private static BlockBounds getBounds(final World world, final Chunk chunk, int radius) {

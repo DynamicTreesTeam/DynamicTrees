@@ -20,15 +20,14 @@ import java.util.function.Consumer;
  */
 public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListener<LeavesProperties> {
 
-    private JsonPropertyApplierList<AbstractBlock.Properties> blockPropertyAppliers;
+    private final JsonPropertyApplierList<AbstractBlock.Properties> blockPropertyAppliers = new JsonPropertyApplierList<>(AbstractBlock.Properties.class);
 
     public LeavesPropertiesManager() {
         super(LeavesProperties.REGISTRY, JsonApplierRegistryEvent.LEAVES_PROPERTIES);
     }
 
     @Override
-    public void registerAppliers(final String applierListIdentifier) {
-        this.blockPropertyAppliers = new JsonPropertyApplierList<>(AbstractBlock.Properties.class);
+    public void registerAppliers() {
         this.blockPropertyAppliers.registerIfTrueApplier("does_not_block_movement", AbstractBlock.Properties::noCollission)
                 .registerIfTrueApplier("not_solid", AbstractBlock.Properties::noOcclusion)
                 .register("harvest_level", Integer.class, AbstractBlock.Properties::harvestLevel)
@@ -47,6 +46,8 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
                 .registerIfTrueApplier("air", AbstractBlock.Properties::air)
                 .registerIfTrueApplier("requires_tool", AbstractBlock.Properties::requiresCorrectToolForDrops);
 
+        this.postApplierEvent(this.blockPropertyAppliers, "leaves_block_property");
+
         this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
                 .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
@@ -56,8 +57,7 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius);
 
-        this.postApplierEvent(this.blockPropertyAppliers, "leaves_block_property");
-        super.registerAppliers(applierListIdentifier);
+        super.registerAppliers();
     }
 
     @Override

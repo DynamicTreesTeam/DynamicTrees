@@ -43,7 +43,7 @@ public class TreeHelper {
 	public static void growPulse(World world, BlockPos rootPos) {
 		BlockState rootyState = world.getBlockState(rootPos);
 		RootyBlock dirt = TreeHelper.getRooty(rootyState);
-		if(dirt != null) {
+		if (dirt != null) {
 			dirt.updateTree(rootyState, world, rootPos, world.random, false);
 			ageVolume(world, rootPos, 8, 32, 1, SafeChunkBounds.ANY);//blindly age a cuboid volume
 		}

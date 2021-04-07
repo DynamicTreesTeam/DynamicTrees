@@ -50,8 +50,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     private BiomeDatabase defaultDatabase = new BiomeDatabase();
     private final Map<ResourceLocation, BiomeDatabase> dimensionDatabases = Maps.newHashMap();
 
-    private JsonPropertyApplierList<BiomeDatabase.Entry> biomeDatabaseAppliers;
-    private JsonPropertyApplierList<BiomePropertySelectors.FeatureCancellations> featureCancellationAppliers;
+    private final JsonPropertyApplierList<BiomeDatabase.Entry> biomeDatabaseAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class);
+    private final JsonPropertyApplierList<BiomePropertySelectors.FeatureCancellations> featureCancellationAppliers = new JsonPropertyApplierList<>(BiomePropertySelectors.FeatureCancellations.class);
 
     private final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
 
@@ -67,8 +67,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     @Override
-    public void registerAppliers(final String applierListIdentifier) {
-        this.biomeDatabaseAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class)
+    public void registerAppliers() {
+        this.biomeDatabaseAppliers
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
                     final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR.get(jsonElement);
 
@@ -133,8 +133,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     database.setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
                 });
 
-        this.featureCancellationAppliers = new JsonPropertyApplierList<>(BiomePropertySelectors.FeatureCancellations.class)
-                .register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
+        this.featureCancellationAppliers.register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .registerArrayApplier("namespaces", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
                 .registerArrayApplier("types", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller);

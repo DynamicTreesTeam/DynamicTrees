@@ -15,7 +15,6 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -25,6 +24,12 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -159,7 +164,11 @@ public class JoCode {
 	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
-		// A Tree generation boundary radius is at least 2 and at most 8
+		// If the family doesn't have a branch then don't attempt growth.
+		if (species.getFamily().getDynamicBranch() == null)
+			return;
+
+		// A Tree generation boundary radius is at least 2 and at most 8.
 		radius = MathHelper.clamp(radius, 2, 8);
 		
 		this.setFacing(facing);
@@ -169,24 +178,25 @@ public class JoCode {
 			return;
 		
 		final BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails.
-		species.placeRootyDirtBlock(world, rootPos, 0);//Set to unfertilized rooty dirt
+		species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt.
 
-		//Make the tree branch structure
-		generateFork(world, species, 0, rootPos, false);
+		// Make the tree branch structure.
+		this.generateFork(world, species, 0, rootPos, false);
 
-		//Establish a position for the bottom block of the trunk
-		BlockPos treePos = rootPos.above();
+		// Establish a position for the bottom block of the trunk.
+		final BlockPos treePos = rootPos.above();
 
-		//Fix branch thicknesses and map out leaf locations
-		BlockState treeState = world.getBlockState(treePos);
-		BranchBlock branch = TreeHelper.getBranch(treeState);
+		// Fix branch thicknesses and map out leaf locations.
+		final BlockState treeState = world.getBlockState(treePos);
+		final BranchBlock firstBranch = TreeHelper.getBranch(treeState);
 
-		// If a branch exists then the growth was successful.
-		if (branch == null) {
-			// If a branch doesn't exist the growth failed.. turn the soil back to what it was.
+		// If a branch doesn't exist the growth failed.. turn the soil back to what it was.
+		if (firstBranch == null) {
 			world.setBlock(rootPos, initialDirtState, this.careful ? 3 : 2);
 			return;
 		}
+
+		// If a branch exists then the growth was successful.
 
 		final LeavesProperties leavesProperties = species.getLeavesProperties();
 		final SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
@@ -195,23 +205,10 @@ public class JoCode {
 		final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
 		signal.destroyLoopedNodes = this.careful;
 
-		branch.analyse(treeState, world, treePos, Direction.DOWN, signal);
+		firstBranch.analyse(treeState, world, treePos, Direction.DOWN, signal);
 
 		if (signal.found || signal.overflow) { // Something went terribly wrong.
-			LOGGER.debug("Non-viable branch network detected during world generation @ {}", treePos);
-			LOGGER.debug("Species: {}", species);
-			LOGGER.debug("Radius: {}", radius);
-			LOGGER.debug("JoCode: {}", this);
-
-			// Completely blow away any improperly defined network nodes.
-			this.cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
-
-			// Now that everything is clear we may as well regenerate the tree that screwed everything up.
-			if (!secondChanceRegen) {
-				secondChanceRegen = true;
-				this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds);
-			}
-			secondChanceRegen = false;
+			this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder);
 			return;
 		}
 
@@ -255,6 +252,26 @@ public class JoCode {
 
 		// Add snow to parts of the tree in chunks where snow was already placed.
 		this.addSnow(leafMap, world, rootPos, biome);
+	}
+
+	private void tryGenerateAgain(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder) {
+		// Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
+		if (worldGen) {
+			LOGGER.debug("Non-viable branch network detected during world generation @ {}", treePos);
+			LOGGER.debug("Species: {}", species);
+			LOGGER.debug("Radius: {}", radius);
+			LOGGER.debug("JoCode: {}", this);
+		}
+
+		// Completely blow away any improperly defined network nodes.
+		this.cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
+
+		// Now that everything is clear we may as well regenerate the tree that screwed everything up.
+		if (!secondChanceRegen) {
+			secondChanceRegen = true;
+			this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds);
+		}
+		secondChanceRegen = false;
 	}
 
 	/** Attempt to clean up fused trees that have multiple root blocks by simply destroying them both messily */
@@ -354,8 +371,9 @@ public class JoCode {
 	}
 	
 	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
-		if(world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-			species.getFamily().getDynamicBranch().setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
+		if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+			Objects.requireNonNull(species.getFamily().getDynamicBranch())
+					.setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
 		}
 		return true;
@@ -476,6 +494,13 @@ public class JoCode {
 	@Override
 	public String toString() {
 		return encode(instructions);
+	}
+
+	public ITextComponent getTextComponent() {
+		return new StringTextComponent(this.toString()).withStyle(style ->
+				style.withColor(TextFormatting.AQUA).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, this.toString()))
+						.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.copy.click")))
+		);
 	}
 	
 	/**

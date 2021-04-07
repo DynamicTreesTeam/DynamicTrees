@@ -27,7 +27,7 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
     }
 
     @Override
-    public void registerAppliers(final String applierListIdentifier) {
+    public void registerAppliers() {
         this.appliers.register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
 
@@ -46,7 +46,7 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
                 .register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa);
 
-        super.registerAppliers(applierListIdentifier);
+        super.registerAppliers();
     }
 
     /**

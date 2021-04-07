@@ -1,25 +1,23 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.Vec3Argument;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class SoilLifeCommand extends SubCommand {
-
-    public SoilLifeCommand() {
-        this.takesCoordinates = true;
-        this.defaultToExecute = false;
-
-        // Register setting soil life as an extra argument.
-        this.extraArguments = Commands.argument(CommandConstants.SOIL_LIFE_ARGUMENT, IntegerArgumentType.integer(0, 15)).executes(this::execute);
-    }
 
     @Override
     protected String getName() {
@@ -27,31 +25,37 @@ public final class SoilLifeCommand extends SubCommand {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getLevel();
-        final BlockPos rootPos = this.getRootPos(context, world);;
-
-        if (rootPos == BlockPos.ZERO) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
-            return 0;
-        }
-
-        BlockState state = world.getBlockState(rootPos);
-
-        try {
-            final int soilLife = IntegerArgumentType.getInteger(context, CommandConstants.SOIL_LIFE_ARGUMENT);
-            TreeHelper.getRooty(state).setSoilLife(world, rootPos, soilLife);
-        } catch (IllegalArgumentException e) {
-            final int soilLife = TreeHelper.getRooty(state).getSoilLife(state, world, rootPos);
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.soillife.get", soilLife));
-        }
-
-        return 1;
-    }
-
-    @Override
     protected int getPermissionLevel() {
         return 0;
+    }
+
+    private static final String SOIL_LIFE = "soil_life";
+
+    @Override
+    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+        return blockPosArgument().executes(context -> executesSuccess(() -> this.getSoilLife(context.getSource(), rootPosArgument(context))))
+                .then(Commands.argument(SOIL_LIFE, IntegerArgumentType.integer(0, 15)).suggests(((context, builder) -> ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder)))
+                        .requires(commandSource -> commandSource.hasPermission(2)) // Setting soil life requires higher permission level.
+                        .executes(context -> executesSuccess(() -> this.setSoilLife(context.getSource(), rootPosArgument(context),
+                                intArgument(context, SOIL_LIFE)))));
+    }
+
+    private void getSoilLife(final CommandSource source, final BlockPos rootPos) {
+        final BlockState state = source.getLevel().getBlockState(rootPos);
+        final int soilLife = Objects.requireNonNull(TreeHelper.getRooty(state)).getSoilLife(state, source.getLevel(), rootPos);
+
+        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_soil_life",
+                CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
+                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)), false);
+    }
+
+    private void setSoilLife(final CommandSource source, final BlockPos rootPos, final int soilLife) {
+        final BlockState state = source.getLevel().getBlockState(rootPos);
+        Objects.requireNonNull(TreeHelper.getRooty(state)).setSoilLife(source.getLevel(), rootPos, soilLife);
+
+        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_soil_life",
+                CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
+                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)), true);
     }
 
 }

@@ -33,17 +33,18 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on biome type). */
-    private JsonPropertyApplierList<Species> environmentFactorAppliers;
+    /**
+     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects.
+     * (based on {@link net.minecraftforge.common.BiomeManager.BiomeType}).
+     */
+    private final JsonPropertyApplierList<Species> environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
 
     public SpeciesManager() {
         super(Species.REGISTRY, JsonApplierRegistryEvent.SPECIES);
     }
 
     @Override
-    public void registerAppliers(final String applierListIdentifier) {
-        this.environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
-
+    public void registerAppliers() {
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
@@ -94,7 +95,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     return PropertyApplierResult.success();
                 });
 
-        super.registerAppliers(applierListIdentifier);
+        super.registerAppliers();
     }
 
     @Override

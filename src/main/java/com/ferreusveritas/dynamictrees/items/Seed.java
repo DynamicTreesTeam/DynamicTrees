@@ -104,7 +104,7 @@ public class Seed extends Item implements IPlantable {
 		float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.SEED_PLANT_RATE.get());
 		
 		if(DTConfigs.SEED_ONLY_FOREST.get()) {
-			plantChance *= DTResourceRegistries.getBiomeDatabaseManager().getDimensionDatabase(world.dimension().location())
+			plantChance *= DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.dimension().location())
 					.getForestness(world.getBiome(pos));
 		}
 		

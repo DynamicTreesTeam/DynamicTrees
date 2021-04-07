@@ -7,14 +7,15 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.TransformNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.mojang.brigadier.context.CommandContext;
+import com.ferreusveritas.dynamictrees.util.CommandHelper;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.ResourceLocationArgument;
-import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -23,14 +24,7 @@ import net.minecraft.world.World;
  */
 public final class TransformCommand extends SubCommand {
 
-    public TransformCommand() {
-        this.takesCoordinates = true;
-        this.executesWithCoordinates = false;
-        this.defaultToExecute = false;
-
-        this.extraArguments = Commands.argument(CommandConstants.SPECIES_ARGUMENT, ResourceLocationArgument.id())
-                .suggests((context, builder) -> ISuggestionProvider.suggestResource(TreeRegistry.getTransformableSpeciesLocations(), builder)).executes(this::execute);
-    }
+    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> new TranslationTextComponent("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
 
     @Override
     protected String getName() {
@@ -43,34 +37,21 @@ public final class TransformCommand extends SubCommand {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getLevel();
-        final BlockPos pos = Vec3Argument.getCoordinates(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource());
-        final Species toSpecies = TreeRegistry.findSpecies(ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT));
+    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+        return blockPosArgument().then(transformableSpeciesArgument().executes(context -> executesSuccess(() ->
+                this.transformSpecies(context.getSource(), rootPosArgument(context), speciesArgument(context)))));
+    }
 
-        if (!toSpecies.isValid()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.error.unknownspecies", ResourceLocationArgument.getId(context, CommandConstants.SPECIES_ARGUMENT)));
-            return 0;
-        }
-
-        final BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-
-        if (rootPos.equals(BlockPos.ZERO)) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
-            return 0;
-        }
+    private void transformSpecies(final CommandSource source, final BlockPos rootPos, final Species toSpecies) throws CommandSyntaxException {
+        final World world = source.getLevel();
 
         final Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
 
-        if (toSpecies == fromSpecies) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.speciesequal"));
-            return 0;
-        }
+        if (toSpecies == fromSpecies)
+            throw SPECIES_EQUAL.create(toSpecies.getTextComponent(), fromSpecies.getTextComponent());
 
-        if (!toSpecies.isTransformable() || !fromSpecies.isTransformable()) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.nottransformableerror", !toSpecies.isTransformable() ? toSpecies.getRegistryName() : fromSpecies.getRegistryName()));
-            return 0;
-        }
+        if (!toSpecies.isTransformable() || !fromSpecies.isTransformable())
+            throw SPECIES_NOT_TRANSFORMABLE.create(!toSpecies.isTransformable() ? toSpecies.getTextComponent() : fromSpecies.getTextComponent());
 
         final BlockState rootyState = world.getBlockState(rootPos);
         final RootyBlock rootyBlock = ((RootyBlock) rootyState.getBlock());
@@ -83,11 +64,10 @@ public final class TransformCommand extends SubCommand {
             toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
         }
 
-        this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.transform.success",
-                fromSpecies.getLocalizedName(), toSpecies.getLocalizedName()));
+        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.transform",
+                fromSpecies.getTextComponent(), CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
+                toSpecies.getTextComponent()), true);
+
         WailaOther.invalidateWailaPosition();
-
-        return 1;
     }
-
 }

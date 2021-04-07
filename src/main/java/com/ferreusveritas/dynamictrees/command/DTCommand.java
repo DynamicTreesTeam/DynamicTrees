@@ -23,7 +23,7 @@ public final class DTCommand {
 
     public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
         // Create DT command builder.
-        LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.<CommandSource>literal(CommandConstants.COMMAND);
+        LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.literal(CommandConstants.COMMAND);
 
         // Add sub-commands.
         for (SubCommand subCommand : this.subCommands) dtCommandBuilder = dtCommandBuilder.then(subCommand.register());

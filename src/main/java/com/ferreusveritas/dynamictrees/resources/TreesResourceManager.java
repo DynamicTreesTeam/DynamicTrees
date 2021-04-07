@@ -45,6 +45,13 @@ public final class TreesResourceManager implements IResourceManager {
         this.reloadListeners.add(position, reloadListener);
     }
 
+    public void registerJsonAppliers() {
+        this.reloadListeners.stream()
+                .filter(JsonApplierReloadListener.class::isInstance)
+                .map(JsonApplierReloadListener.class::cast)
+                .forEach(JsonApplierReloadListener::registerAppliers);
+    }
+
     public void load () {
         this.reloadListeners.forEach(reloadListener -> reloadListener.load(this).join());
     }

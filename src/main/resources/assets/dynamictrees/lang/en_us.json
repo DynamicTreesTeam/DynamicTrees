@@ -24,6 +24,8 @@
   "species.dynamictrees.mega_crimson": "Mega Crimson",
   "species.dynamictrees.warped": "Warped",
   "species.dynamictrees.mega_warped": "Mega Warped",
+  "species.dynamictrees.brown_mushroom": "Brown Mushroom",
+  "species.dynamictrees.red_mushroom": "Red Mushroom",
 
   "item.dynamictrees.oak_seed":"Oak Acorn",
   "item.dynamictrees.spruce_seed":"Spruce Cone",
@@ -47,15 +49,25 @@
   "item.dynamictrees.staff":"Woodland Staff",
   "block.dynamictrees.bonsai_pot":"Bonsai Pot",
 
-  "commands.dynamictrees.repop.run": "§aRepopulating worldgen database.",
-  "commands.dynamictrees.gettree.success": "§aSpecies: §b%s §aJoCode: §b%s",
-  "commands.dynamictrees.gettree.failure": "§cCould not find tree species at this position.",
-  "commands.dynamictrees.error.unknownspecies": "§cUnknown species '§4%s§c'.",
-  "commands.dynamictrees.soillife.get": "§aSoil Life: §b%s",
-  "commands.dynamictrees.xor.set": "§aSet Coordinate Xor: §b%s",
-  "commands.dynamictrees.transform.speciesequal": "§cTargeted species is the same as given species.",
-  "commands.dynamictrees.transform.success": "§aSuccessfully transformed species §b%s §ato species §b%s§a.",
-  "commands.dynamictrees.transform.nottransformableerror": "§cSpecies §4%s §cis not transformable.",
+  "chat.species.tooltip": "Registry Name: %s",
+
+  "commands.dynamictrees.success.get_tree": "§aSpecies: %s §aJoCode: %s",
+  "commands.dynamictrees.error.get_tree": "§cCould not find tree species at position %s.",
+  "commands.dynamictrees.success.set_tree": "§aSuccessfully set tree at position %s §ato species %s §awith JoCode %s§a.",
+  "commands.dynamictrees.success.kill_tree": "§aSuccessfully killed tree at position %s.",
+  "commands.dynamictrees.error.unknown_species": "§cUnknown species %s§c.",
+  "commands.dynamictrees.success.get_soil_life": "§aSoil life of tree at position %s §ais %s§a.",
+  "commands.dynamictrees.success.set_soil_life": "§aSuccessfully set soil life of tree at position %s §ato %s§a.",
+  "commands.dynamictrees.success.grow_pulse": "§aSuccessfully sent %s§a growth pulses to tree at position %s§a.",
+  "commands.dynamictrees.success.set_xor": "§aSuccessfully set coordinate Xor to %s§a.",
+  "commands.dynamictrees.success.rotate_jo_code": "§aRotated JoCode: %s",
+  "commands.dynamictrees.error.species_equal": "§cTargeted species is the same as given species.",
+  "commands.dynamictrees.success.transform": "§aSuccessfully transformed species %s §aat position %s §ato species %s§a.",
+  "commands.dynamictrees.error.not_transformable": "§cSpecies %s §cis not transformable.",
+  "commands.dynamictrees.success.create_staff": "§aSuccessfully created staff with species %s§a, code %s§a, color %s§a, read only %s§a, and max uses %s§a at position %s§a.",
+  "commands.dynamictrees.success.create_transform_potion": "§aSuccessfully created transform potion for species %s§a at position %s§a.",
+  "commands.dynamictrees.success.clear_orphaned": "§aSuccessfully cleared %s§a orphaned branch networks.",
+  "commands.dynamictrees.success.purge_trees": "§aSuccessfully purged %s§a trees.",
 
   "potion.biochar.description": "§7Base tree potion for brewing",
   "potion.depletion.description": "§7Destroys tree soil fertility",
@@ -68,5 +80,5 @@
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
 
-  "block.dynamictrees.rooty_water":"Water Roots"
+  "block.dynamictrees.rooty_water": "Water Roots"
 }

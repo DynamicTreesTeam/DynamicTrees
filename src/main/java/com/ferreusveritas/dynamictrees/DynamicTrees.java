@@ -78,7 +78,7 @@ public class DynamicTrees {
 
 		DTRegistries.DENDRO_POTION.registerRecipes();
 
-		DTResourceRegistries.getBiomeDatabaseManager().onCommonSetup();
+		DTResourceRegistries.BIOME_DATABASE_MANAGER.onCommonSetup();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

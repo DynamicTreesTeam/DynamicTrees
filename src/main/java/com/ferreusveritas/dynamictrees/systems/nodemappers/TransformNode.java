@@ -48,13 +48,15 @@ public class TransformNode implements INodeInspector {
 	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 		return false;
 	}
+
+	private static final int TEST_LEAVES_RADIUS = 3;
 	
 	public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
 		if (!world.isClientSide()) {
-			BlockPos.betweenClosedStream(twigPos.offset(-3, -3, -3), twigPos.offset(3, 3, 3)).forEach(leavesPos -> {
-				if(fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
+			BlockPos.betweenClosedStream(twigPos.offset(-TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS), twigPos.offset(TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS)).forEach(leavesPos -> {
+				if (fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
 					BlockState state = world.getBlockState(leavesPos);
-					if(fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
+					if (fromSpecies.getFamily().isCompatibleGenericLeaves(state, world, leavesPos)) {
 						int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
 						world.setBlock(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
 					}

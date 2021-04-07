@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.Gson;
@@ -39,26 +38,26 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     /** Holds appliers that should only be applied when reloading. */
     protected final JsonPropertyApplierList<V> reloadAppliers;
 
+    protected final String applierListIdentifier;
+
     public JsonApplierReloadListener(final String folderName, final Class<V> objectType, final String applierListIdentifier) {
         super(folderName);
 
         this.appliers = new JsonPropertyApplierList<>(objectType);
         this.loadAppliers = new JsonPropertyApplierList<>(objectType);
         this.reloadAppliers = new JsonPropertyApplierList<>(objectType);
-
-        this.registerAppliers(applierListIdentifier);
+        this.applierListIdentifier = applierListIdentifier;
     }
 
     /**
-     * Called from {@link JsonReloadListener#JsonReloadListener(String, Class, String)}. Sub-classes should
-     * can override to register their Json appliers.
-     *
-     * @param applierListIdentifier The identifier for the applier lists.
+     * Called from {@link DTResourceRegistries#setupTreesResourceManager()}. Sub-classes should
+     * can override to register their Json appliers, and should call super so their events are
+     * posted properly.
      */
-    public void registerAppliers(final String applierListIdentifier) {
-        this.postApplierEvent(this.appliers, applierListIdentifier);
-        this.postApplierEvent(this.loadAppliers, applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
-        this.postApplierEvent(this.reloadAppliers, applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
+    public void registerAppliers() {
+        this.postApplierEvent(this.appliers, this.applierListIdentifier);
+        this.postApplierEvent(this.loadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
+        this.postApplierEvent(this.reloadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
     }
 
     /**

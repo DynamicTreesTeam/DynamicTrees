@@ -340,6 +340,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return this;
 	}
 
+	@Nullable
 	public BranchBlock getDynamicBranch() {
 		return dynamicBranch;
 	}

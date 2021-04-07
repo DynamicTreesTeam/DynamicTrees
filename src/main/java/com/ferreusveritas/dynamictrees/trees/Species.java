@@ -68,6 +68,11 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IWorld;
@@ -82,6 +87,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
@@ -293,6 +299,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public String getUnlocalizedName() {
 		return this.unlocalizedName;
+	}
+
+	public ITextComponent getTextComponent() {
+		return new TranslationTextComponent(this.unlocalizedName).withStyle(style -> style.withColor(TextFormatting.AQUA)
+				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+						new TranslationTextComponent("chat.species.tooltip", this.getRegistryName())))
+				.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
+						this.getRegistryName().toString())));
 	}
 	
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -1663,10 +1677,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			}
 		}
 
-		final JoCodeManager joCodeManager = DTResourceRegistries.getJoCodeManager();
 		Direction facing = CoordUtils.getRandomDir(random);
-		if(!joCodeManager.getCodes(this).isEmpty()) {
-			JoCode code = joCodeManager.getRandomCode(this, radius, random);
+		if(!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
+			JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
 			if(code != null) {
 				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;
@@ -1678,6 +1691,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public JoCode getJoCode(String joCodeString) {
 		return new JoCode(joCodeString);
+	}
+
+	public Collection<JoCode> getJoCodes() {
+		return DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).values().stream().flatMap(Collection::stream)
+				.collect(Collectors.toList());
 	}
 
 	/**

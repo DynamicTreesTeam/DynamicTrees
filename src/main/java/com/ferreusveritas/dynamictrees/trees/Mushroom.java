@@ -14,6 +14,7 @@ public class Mushroom extends Species {
 		this.redcap = redcap;
 
 		this.setRegistryName(DynamicTrees.resLoc((redcap ? "red" : "brown") + "_mushroom"));
+		this.setUnlocalizedName(this.getRegistryName().toString());
 		this.setStandardSoils();
 
 		this.addGenFeature(GenFeatures.HUGE_MUSHROOM.with(HugeMushroomGenFeature.MUSHROOM_BLOCK,

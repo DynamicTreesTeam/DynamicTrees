@@ -1,20 +1,17 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-
-import com.mojang.brigadier.context.CommandContext;
+import com.ferreusveritas.dynamictrees.util.CommandHelper;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public final class KillTreeCommand extends SubCommand {
+import java.util.Objects;
 
-    public KillTreeCommand() {
-        this.takesCoordinates = true;
-        this.defaultToExecute = false;
-    }
+public final class KillTreeCommand extends SubCommand {
 
     @Override
     protected String getName() {
@@ -22,23 +19,21 @@ public final class KillTreeCommand extends SubCommand {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> context) {
-        final World world = context.getSource().getLevel();
-        final BlockPos rootPos = this.getRootPos(context, world);
-
-        if (rootPos == BlockPos.ZERO) {
-            this.sendMessage(context, new TranslationTextComponent("commands.dynamictrees.gettree.failure"));
-            return 0;
-        }
-
-        TreeHelper.getRooty(world.getBlockState(rootPos)).destroyTree(world, rootPos);
-
-        return 0;
+    protected int getPermissionLevel() {
+        return 2;
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+        return blockPosArgument().executes(context -> executesSuccess(() -> this.killTree(context.getSource(), rootPosArgument(context))));
+    }
+
+    private void killTree(final CommandSource source, final BlockPos rootPos) {
+        final World world = source.getLevel();
+
+        Objects.requireNonNull(TreeHelper.getRooty(world.getBlockState(rootPos))).destroyTree(world, rootPos);
+        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.kill_tree",
+                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)), true);
     }
 
 }

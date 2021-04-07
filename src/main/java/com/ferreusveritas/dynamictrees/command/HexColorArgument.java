@@ -28,7 +28,7 @@ public final class HexColorArgument implements ArgumentType<String> {
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {
-        String in = reader.readString();
+        final String in = reader.readString();
 
         try { Color.decode((in.startsWith("#") ? "" : "#") + in).getRGB(); } catch (NumberFormatException e) {
             throw COLOR_INVALID.create(in);

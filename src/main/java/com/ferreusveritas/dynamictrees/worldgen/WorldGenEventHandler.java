@@ -43,7 +43,7 @@ public final class WorldGenEventHandler {
 
         // Loop through all vegetal features and remove if found to contain trees.
         event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
-            final BiomePropertySelectors.FeatureCancellations featureCancellations = DTResourceRegistries.getBiomeDatabaseManager().getDefaultDatabase().getEntry(biomeResLoc).getFeatureCancellations();
+            final BiomePropertySelectors.FeatureCancellations featureCancellations = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDefaultDatabase().getEntry(biomeResLoc).getFeatureCancellations();
 
             for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
                 if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations))

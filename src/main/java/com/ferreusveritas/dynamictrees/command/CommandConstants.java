@@ -1,12 +1,22 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public final class CommandConstants {
 
-    // Base command.
+    //////////////////////////////
+    // Base Command
+    //////////////////////////////
+
     public static final String COMMAND = "dt";
     public static final String COMMAND_ALIAS = "dynamictrees";
 
-    // Sub-commands.
+    //////////////////////////////
+    // Sub-Commands
+    //////////////////////////////
+
     public static final String GET_TREE = "gettree";
     public static final String GROW_PULSE = "growpulse";
     public static final String KILL_TREE = "killtree";
@@ -21,17 +31,26 @@ public final class CommandConstants {
     public static final String CLEAR_ORPHANED = "clearorphaned";
     public static final String PURGE_TREES = "purgetrees";
 
-    // Extra arguments.
-    public static final String LOCATION_ARGUMENT = "location";
-    public static final String JO_CODE_ARGUMENT = "joCode";
-    public static final String TURNS_ARGUMENT = "turns";
-    public static final String SPECIES_ARGUMENT = "species";
-    public static final String TREE_FAMILY_ARGUMENT = "treeFamily";
-    public static final String SOIL_LIFE_ARGUMENT = "soilLife";
-    public static final String COLOR_ARGUMENT = "color";
-    public static final String READ_ONLY_ARGUMENT = "readOnly";
-    public static final String MAX_USES_ARGUMENT = "maxUses";
-    public static final String XOR_ARGUMENT = "xor";
-    public static final String RADIUS_ARGUMENT = "radius";
+    //////////////////////////////
+    // Argument Identifiers
+    //////////////////////////////
+
+    public static final String LOCATION = "location";
+    public static final String JO_CODE = "jo_code";
+    public static final String TURNS = "turns";
+    public static final String SPECIES = "species";
+
+    //////////////////////////////
+    // Argument Defaults
+    //////////////////////////////
+
+    public static final String DEFAULT_JO_CODE = "JP";
+    public static final int DEFAULT_TURNS = 0;
+
+    //////////////////////////////
+    // Suggestions
+    //////////////////////////////
+
+    public static final Collection<String> TURNS_SUGGESTIONS = Stream.of(0, 1, 2).map(String::valueOf).collect(Collectors.toList());
 
 }

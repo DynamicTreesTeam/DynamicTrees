@@ -41,15 +41,52 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
     /**
      * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T},
-     * only if this {@link RegistryEntry} is valid.
+     * only if this {@link RegistryEntry} is {@code valid}.
      *
      * @param consumer The {@link Consumer} of type {@link T}.
-     * @return True if this {@link RegistryEntry} is valid.
+     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false}
+     *         otherwise.
      */
     @SuppressWarnings("unchecked")
     public final boolean ifValid(final Consumer<T> consumer) {
         if (this.isValid()) {
             consumer.accept((T) this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T},
+     * only if this {@link RegistryEntry} is {@code valid}. Otherwise calls
+     * {@link Runnable#run()} on the given {@link Runnable}.
+     *
+     * @param consumer The {@link Consumer} of type {@link T} to consume if {@code valid}.
+     * @param runnable The {@link Runnable} to run if {@code invalid}.
+     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false}
+     *         otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    public final boolean ifValidElse(final Consumer<T> consumer, final Runnable runnable) {
+        if (this.isValid()) {
+            consumer.accept((T) this);
+            return true;
+        }
+        runnable.run();
+        return false;
+    }
+
+    /**
+     * Calls {@link Runnable#run()} on the given {@link Runnable} if this {@link RegistryEntry}
+     * is {@code invalid}.
+     *
+     * @param runnable The {@link Runnable} to run if {@code invalid}.
+     * @return {@code true} if this {@link RegistryEntry} is {@code invalid}; {@code false}
+     *         otherwise.
+     */
+    public final boolean ifInvalid(final Runnable runnable) {
+        if (!this.isValid()) {
+            runnable.run();
             return true;
         }
         return false;

@@ -64,7 +64,18 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
-	
+
+	/**
+	 * This is the creative tab that holds all DT items. Must be instantiated here
+	 * so that it's not {@code null} when we create blocks and items.
+	 */
+	public static final ItemGroup ITEM_GROUP = new ItemGroup(DynamicTrees.MOD_ID) {
+		@Override
+		public ItemStack makeIcon() {
+			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
+		}
+	};
+
 	///////////////////////////////////////////
 	// BLOCKS
 	///////////////////////////////////////////
@@ -232,14 +243,6 @@ public class DTRegistries {
 	// MISC
 	///////////////////////////////////////////
 
-	/** This is the creative tab that holds all DT items */
-	public static final ItemGroup ITEM_GROUP = new ItemGroup(DynamicTrees.MOD_ID) {
-		@Override
-		public ItemStack makeIcon() {
-			return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
-		}
-	};
-	
 	public static final class CommonBlockStates {
 		public final BlockState AIR = Blocks.AIR.defaultBlockState();
 		public final BlockState DIRT = Blocks.DIRT.defaultBlockState();

@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.Vec3Argument;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
@@ -13,23 +13,29 @@ import net.minecraft.world.World;
  */
 public abstract class ChunkBasedCommand extends SubCommand {
 
-    public ChunkBasedCommand() {
-        this.takesCoordinates = true;
-        this.executesWithCoordinates = false;
-        this.defaultToExecute = false;
-        this.extraArguments = Commands.argument(CommandConstants.RADIUS_ARGUMENT, IntegerArgumentType.integer(0))
-                .executes(this::execute);
+    private static final String RADIUS = "radius";
+
+    private static final int DEFAULT_RADIUS = 1;
+
+    @Override
+    public ArgumentBuilder<CommandSource, ?> register() {
+        return super.register().executes(context -> executesSuccess(() -> this.processChunk(context.getSource(),
+                context.getSource().getLevel(), this.getChunkPos(context.getSource()), DEFAULT_RADIUS)));
+    }
+
+    private ChunkPos getChunkPos(final CommandSource source) {
+        return new ChunkPos(new BlockPos(source.getPosition().x, source.getPosition().y, source.getPosition().z));
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> context) {
-        final ChunkPos chunkPos = new ChunkPos(Vec3Argument.getCoordinates(context, CommandConstants.LOCATION_ARGUMENT).getBlockPos(context.getSource()));
-        final int radius = IntegerArgumentType.getInteger(context, CommandConstants.RADIUS_ARGUMENT);
-
-        this.processChunk(context.getSource().getLevel(), chunkPos, radius);
-        return 1;
+    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+        return blockPosArgument().executes(context -> executesSuccess(() -> this.processChunk(context.getSource(),
+                context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), DEFAULT_RADIUS)))
+                .then(Commands.argument(RADIUS, IntegerArgumentType.integer(1))
+                        .executes(context -> executesSuccess(() -> this.processChunk(context.getSource(),
+                                context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), intArgument(context, RADIUS)))));
     }
 
-    protected abstract void processChunk(World world, ChunkPos chunkPos, int radius);
+    protected abstract void processChunk(CommandSource source, World world, ChunkPos chunkPos, int radius);
 
 }

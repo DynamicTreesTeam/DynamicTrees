@@ -6,11 +6,11 @@ import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
+import com.google.common.collect.Lists;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,10 +23,11 @@ import org.apache.logging.log4j.LogManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-
-import net.minecraft.resources.IFutureReloadListener.IStage;
+import java.util.stream.Stream;
 
 /**
  * Holds and registers data pack entries ({@link IFutureReloadListener} objects).
@@ -42,24 +43,20 @@ public final class DTResourceRegistries {
 
     public static final TreesResourceManager TREES_RESOURCE_MANAGER = new TreesResourceManager();
 
-    private static FamilyManager familyManager;
-    private static LeavesPropertiesManager leavesPropertiesManager;
-    private static SpeciesManager speciesManager;
-    private static JoCodeManager joCodeManager;
-    private static BiomeDatabaseManager biomeDatabaseManager;
+    public static final LeavesPropertiesManager LEAVES_PROPERTIES_MANAGER = new LeavesPropertiesManager();
+    public static final FamilyManager FAMILY_MANAGER = new FamilyManager();
+    public static final SpeciesManager SPECIES_MANAGER = new SpeciesManager();
+    public static final JoCodeManager JO_CODE_MANAGER = new JoCodeManager();
+    public static final BiomeDatabaseManager BIOME_DATABASE_MANAGER = new BiomeDatabaseManager();
 
     public static void setupTreesResourceManager () {
-        leavesPropertiesManager = new LeavesPropertiesManager();
-        familyManager = new FamilyManager();
-        speciesManager = new SpeciesManager();
-        joCodeManager = new JoCodeManager();
-        biomeDatabaseManager = new BiomeDatabaseManager();
-
-        TREES_RESOURCE_MANAGER.addReloadListeners(leavesPropertiesManager, familyManager, speciesManager, joCodeManager, biomeDatabaseManager);
+        TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);
         ModLoader.get().postEvent(addLoadListenerEvent);
+
+        TREES_RESOURCE_MANAGER.registerJsonAppliers(); // Register any Json appliers reload listeners.
 
         ModList.get().getMods().forEach(modInfo -> {
             final String modId = modInfo.getModId();
@@ -83,26 +80,6 @@ public final class DTResourceRegistries {
         // Only add resource pack if the trees file exists in the mod file.
         if (Files.exists(treesPath))
             TREES_RESOURCE_MANAGER.addResourcePack(new ModTreeResourcePack(treesPath, modFile));
-    }
-
-    public static FamilyManager getTreeFamilyManager() {
-        return familyManager;
-    }
-
-    public static LeavesPropertiesManager getLeavesPropertiesManager() {
-        return leavesPropertiesManager;
-    }
-
-    public static SpeciesManager getSpeciesManager() {
-        return speciesManager;
-    }
-
-    public static JoCodeManager getJoCodeManager() {
-        return joCodeManager;
-    }
-
-    public static BiomeDatabaseManager getBiomeDatabaseManager() {
-        return biomeDatabaseManager;
     }
 
     public static final class AddTreesLoadListenerEvent extends Event implements IModBusEvent {

@@ -88,7 +88,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	
 	@Override
 	public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> items) {
-		if (!this.allowdedIn(group)) {
+		if (this.allowdedIn(group)) {
 			for (final DendroPotionType potion : DendroPotionType.values()) {
 				if (potion.getActive()) {
 					items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
