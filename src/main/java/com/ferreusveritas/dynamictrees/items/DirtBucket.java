@@ -23,6 +23,16 @@ public class DirtBucket extends Item {
 	}
 
 	@Override
+	public boolean hasContainerItem(ItemStack stack) {
+		return true;
+	}
+
+	@Override
+	public ItemStack getContainerItem(ItemStack itemStack) {
+		return itemStack.copy();
+	}
+
+	@Override
 	public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		
 		final ItemStack itemStack = player.getItemInHand(hand);

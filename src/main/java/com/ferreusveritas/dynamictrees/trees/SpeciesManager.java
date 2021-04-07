@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraftforge.common.BiomeDictionary;
@@ -82,7 +83,10 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("sapling_sound", SoundType.class, Species::setSaplingSound)
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
+                .register("primitive_sapling_item", Item.class, Species::addPrimitiveSaplingItem)
+                .registerArrayApplier("primitive_sapling_items", Item.class, Species::addPrimitiveSaplingItem)
                 .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
+                .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
                 .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)

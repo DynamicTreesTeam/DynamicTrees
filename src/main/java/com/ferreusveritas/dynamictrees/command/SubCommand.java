@@ -64,6 +64,11 @@ public abstract class SubCommand {
                 .then(this.registerArguments());
     }
 
+    /**
+     * Registers the arguments for this implementation of {@link SubCommand}.
+     *
+     * @return The {@link ArgumentBuilder} created.
+     */
     public abstract ArgumentBuilder<CommandSource, ?> registerArguments();
 
     protected static int executesSuccess(final ThrowableRunnable<CommandSyntaxException> executeRunnable) throws CommandSyntaxException {

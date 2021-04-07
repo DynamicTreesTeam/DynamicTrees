@@ -15,6 +15,7 @@
     },
     "seed_drop_rarity": 1.0,
     "stick_drop_rarity": 1.0,
+    "primitive_sapling_item": "apple",
     "perfect_biomes": { "name": "minecraft:plains" },
     "features" : [
         {

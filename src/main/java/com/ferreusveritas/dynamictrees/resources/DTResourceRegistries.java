@@ -4,13 +4,18 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
+import com.ferreusveritas.dynamictrees.util.RecipeRegistryEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.profiler.IProfiler;
+import net.minecraft.resources.DataPackRegistries;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,11 +28,10 @@ import org.apache.logging.log4j.LogManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.stream.Stream;
 
 /**
  * Holds and registers data pack entries ({@link IFutureReloadListener} objects).
@@ -96,14 +100,38 @@ public final class DTResourceRegistries {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new ReloadTreesResources());
+        event.addListener(new ReloadTreesResources(event.getDataPackRegistries()));
     }
 
     public static final class ReloadTreesResources implements IFutureReloadListener {
+        private final DataPackRegistries dataPackRegistries;
+
+        public ReloadTreesResources(DataPackRegistries dataPackRegistries) {
+            this.dataPackRegistries = dataPackRegistries;
+        }
+
         @Override
         public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager, IProfiler preparationsProfiler, IProfiler reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
             // Reload all reload listeners in the trees resource manager.
-            return CompletableFuture.runAsync(() -> TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor));
+            return CompletableFuture.runAsync(() -> TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor))
+                    .thenRunAsync(this::sendRecipeRegistryEvent);
+        }
+
+        private void sendRecipeRegistryEvent() {
+            final Map<IRecipeType<?>, Map<ResourceLocation, IRecipe<?>>> recipes = new HashMap<>();
+
+            // Put the recipes into the new map and make each type's recipes mutable.
+            this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
+                    recipes.put(recipeType, new HashMap<>(currentRecipes))));
+
+            // Post an event for each type.
+            recipes.forEach((recipeType, currentRecipes) -> MinecraftForge.EVENT_BUS.post(new RecipeRegistryEvent(recipeType, currentRecipes)));
+
+            // Revert each type's recipes back to immutable.
+            recipes.forEach(((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
+
+            // Set the new recipes.
+            dataPackRegistries.getRecipeManager().recipes = ImmutableMap.copyOf(recipes);
         }
     }
 

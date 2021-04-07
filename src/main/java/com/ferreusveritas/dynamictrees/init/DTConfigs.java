@@ -56,6 +56,9 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
 	
 	public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
+
+	public static final ForgeConfigSpec.BooleanValue GENERATE_DIRT_BUCKET_RECIPES;
+
 	public static final ForgeConfigSpec.BooleanValue WORLD_GEN;
 	public static final ForgeConfigSpec.ConfigValue<List<String>> DIMENSION_BLACKLIST;
 	
@@ -74,7 +77,7 @@ public class DTConfigs {
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 		
-		SERVER_BUILDER.comment("Seed settings").push("seeds");
+		SERVER_BUILDER.comment("Seed Settings").push("seeds");
 		SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
 				defineInRange("dropRate", 0.01, 0.0, 1.0);
 		SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
@@ -87,7 +90,7 @@ public class DTConfigs {
 				defineInRange("dropRate", 0.0, 0.0, 1.0);
 		SERVER_BUILDER.pop();
 		
-		SERVER_BUILDER.comment("Tree settings").push("trees");
+		SERVER_BUILDER.comment("Tree Settings").push("trees");
 		TREE_GROWTH_MULTIPLIER = SERVER_BUILDER.comment("Factor that multiplies the rate at which trees grow. Use at own risk").
 				defineInRange("growthMultiplier", 0.5f, 0, 16f);
 		TREE_HARVEST_MULTIPLIER = SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
@@ -112,7 +115,7 @@ public class DTConfigs {
 				define("enableSwampOaksInWater", true);
 		SERVER_BUILDER.pop();
 		
-		SERVER_BUILDER.comment("Interaction between player and Dynamic Trees content").push("interaction");
+		SERVER_BUILDER.comment("Interaction Settings").push("interaction");
 		IS_LEAVES_PASSABLE = SERVER_BUILDER.comment("If enabled all leaves will be passable").
 				define("isLeavesPassable", false);
 		VANILLA_LEAVES_COLLISION = SERVER_BUILDER.comment("If enabled player movement on leaves will not be enhanced").
@@ -139,25 +142,28 @@ public class DTConfigs {
 				define("enableStripRadiusReduction", true);
 		SERVER_BUILDER.pop();
 		
-		COMMON_BUILDER.comment("Settings regarding vanilla trees").push("vanilla");
+		COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
 		REPLACE_VANILLA_SAPLING = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
 		REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
 				define("replaceNyliumFungi", false);
 		COMMON_BUILDER.pop();
 		
-		SERVER_BUILDER.comment("World settings").push("world");
+		SERVER_BUILDER.comment("World Generation Settings").push("world");
 		PODZOL_GEN = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
 				define("podzolGen", true);
+		SERVER_BUILDER.pop();
 
+		SERVER_BUILDER.comment("Miscellaneous Settings").push("misc");
+		GENERATE_DIRT_BUCKET_RECIPES = SERVER_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
+				.define("generateDirtBucketRecipes", true);
 		SERVER_BUILDER.pop();
 		
-		COMMON_BUILDER.comment("World settings").push("world");
+		COMMON_BUILDER.comment("World Generation Settings").push("world");
 		WORLD_GEN = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
 				define("worldGen", true);
 		DIMENSION_BLACKLIST = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen (tree cancellers need to be configured individually for biomes in dynamictrees/tree_canceller.json)").
 				define("dimensionsBlacklist", new ArrayList<>());
-		
 		COMMON_BUILDER.pop();
 
 		COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
@@ -170,12 +176,12 @@ public class DTConfigs {
 
 		COMMON_BUILDER.pop();
 
-//		CLIENT_BUILDER.comment("Visual clientside settings").push("client");
+//		CLIENT_BUILDER.comment("Visual Settings").push("visuals");
 //		fancyThickRings = CLIENT_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
 //				define("fancyThickRings", true);
 //		CLIENT_BUILDER.pop();
 		
-		SERVER_BUILDER.comment("Debug settings for development").push("debug");
+		SERVER_BUILDER.comment("Debug Settings").push("debug");
 		WORLD_GEN_DEBUG = SERVER_BUILDER.comment("Enable to mark tree spawn locations with wool circles.").
 				define("debug", false);
 		SERVER_BUILDER.pop();

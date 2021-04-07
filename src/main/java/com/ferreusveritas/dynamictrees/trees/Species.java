@@ -44,7 +44,6 @@ import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -56,6 +55,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
@@ -150,8 +150,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	// TODO: Make sure this is implemented properly.
 	protected int maxBranchRadius = 8;
 
-	/** Stores whether or not this species can be transformed to another, if true and this species has it's own seed a
-	 * transformation potion will also be automatically created. */
+	/** Stores whether or not this species can be transformed to another, if {@code true} and
+	 *  this species has it's own seed a transformation potion will also be automatically created. */
 	private boolean transformable = true;
 
 	/** If this is not empty, saplings will only grow when planted on these blocks. */
@@ -165,9 +165,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	
 	//Seeds
 	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
-	protected Seed seed = null;
+	protected Seed seed;
+	/** Valid primitive sapling {@link Item}s. Used for dirt bucket recipes. */
+	protected final Set<Item> primitiveSaplingItems = new HashSet<>();
 	/** A blockState that will turn itself into this tree */
-	protected DynamicSaplingBlock saplingBlock = null;
+	protected DynamicSaplingBlock saplingBlock;
 	/** A place to store what drops from the species. Similar to a loot table */
 	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
 	
@@ -231,6 +233,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.envFactors.clear();
 		this.genFeatures.clear();
 		this.acceptableBlocksForGrowth.clear();
+		this.primitiveSaplingItems.clear();
 
 		this.clearAcceptableSoils();
 
@@ -715,9 +718,21 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	
 	
 	///////////////////////////////////////////
-	//SAPLING
+	// SAPLING
 	///////////////////////////////////////////
-	
+
+	public Set<Item> getPrimitiveSaplingItems() {
+		final Set<Item> saplingItems = new HashSet<>(this.primitiveSaplingItems);
+		saplingItems.addAll(TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey)
+				.map(BlockState::getBlock).map(Block::asItem).filter(item -> item != Items.AIR).collect(Collectors.toSet()));
+		return saplingItems;
+	}
+
+	public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {
+		this.primitiveSaplingItems.add(primitiveSaplingItem);
+		return this;
+	}
+
 	public Species setSapling(DynamicSaplingBlock sapling) {
 		saplingBlock = sapling;
 		return this;
