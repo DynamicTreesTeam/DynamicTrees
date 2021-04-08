@@ -1389,6 +1389,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public JoCode getJoCode(String joCodeString) {
 		return new JoCode(joCodeString);
 	}
+	public JoCode getJoCode(World world, BlockPos rootPos, EnumFacing facing) { return new JoCode(world, rootPos, facing); }
 	
 	/**
 	 * A {@link JoCode} defines the block model of the {@link TreeFamily}

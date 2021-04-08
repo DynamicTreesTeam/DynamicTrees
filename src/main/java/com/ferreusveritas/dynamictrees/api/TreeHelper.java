@@ -51,7 +51,7 @@ public class TreeHelper {
 	 * Warning: CPU intensive and should be used sparingly
 	 * 
 	 * @param world The world
-	 * @param iterMap The voxel map of hydrovalues to use as a iterator
+	 * @param leafMap The voxel map of hydrovalues to use as a iterator
 	 * @param iterations The number of times to age the map
 	 */
 	public static void ageVolume(World world, SimpleVoxmap leafMap, int iterations, SafeChunkBounds safeBounds){
@@ -126,13 +126,18 @@ public class TreeHelper {
 	public static Optional<JoCode> getJoCode(World world, BlockPos pos) {
 		return getJoCode(world, pos, EnumFacing.SOUTH);
 	}
-	
-	public static Optional<JoCode> getJoCode(World world, BlockPos pos, EnumFacing facing) {
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos, Species species) {
+		return getJoCode(world, pos, EnumFacing.SOUTH, species);
+	}
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos, EnumFacing facing){
+		return getJoCode(world, pos, facing, Species.NULLSPECIES);
+	}
+	public static Optional<JoCode> getJoCode(World world, BlockPos pos, EnumFacing facing, Species species) {
 		if(pos == null) {
 			return Optional.empty();
 		}
 		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-		return rootPos != BlockPos.ORIGIN ? Optional.of(new JoCode(world, rootPos, facing)) : Optional.empty();
+		return rootPos != BlockPos.ORIGIN ?  Optional.of((species.isValid() ? species.getJoCode(world, rootPos, facing) : new JoCode(world, rootPos, facing))) : Optional.empty();
 	}
 	
 	public static BlockPos dereferenceTrunkShell(World world, BlockPos pos) {

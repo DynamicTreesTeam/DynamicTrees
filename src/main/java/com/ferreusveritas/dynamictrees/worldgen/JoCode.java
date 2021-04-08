@@ -97,7 +97,7 @@ public class JoCode {
 	/**
 	 * A facing matrix for mapping instructions to different rotations
 	 */
-	private byte dirmap[][] = {
+	private byte[][] dirmap = {
 			//  {D, U, N, S, W, E, F, R}
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING DOWN:	 Same as NORTH
 			{0, 1, 2, 3, 4, 5, 6, 7},//FACING UP:	 Same as NORTH
@@ -108,8 +108,8 @@ public class JoCode {
 	};
 	
 	//"Pointers" to the current rotation direction.
-	private byte facingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
-	private byte unfacingMap[] = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] facingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
+	private byte[] unfacingMap = dirmap[2];//Default to NORTH(Effectively an identity matrix)
 	
 	/**
 	 * Get the instruction at a locus.  

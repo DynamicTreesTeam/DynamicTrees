@@ -55,7 +55,7 @@ public class TreeCactus extends TreeFamily {
 				public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, float volume) {
 					int numLogs = (int) (volume / 2);
 					while(numLogs > 0) {
-						dropList.add(species.getSeedStack(numLogs >= 64 ? 64 : numLogs));
+						dropList.add(species.getSeedStack(Math.min(numLogs, 64)));
 						numLogs -= 64;
 					}
 					return dropList;
