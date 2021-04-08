@@ -100,7 +100,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 						}
 					}
 				}
-				return b -> biomeHasTypes(b, typesWhiteList) && (typesBlackList.size() == 0 || !biomeHasTypes(b, typesBlackList));
+				return b -> biomeHasTypes(b, typesWhiteList) && (typesBlackList.size() == 0 || !biomeHasAnyType(b, typesBlackList));
 			}
 
 			return b -> false;
@@ -199,6 +199,10 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 				}
 			}
 		}
+	}
+
+	public static boolean biomeHasAnyType(Biome biome, List<BiomeDictionary.Type> types) {
+		return types.stream().anyMatch(t -> BiomeDictionary.hasType(biome, t));
 	}
 	
 	public static boolean biomeHasTypes(Biome biome, List<BiomeDictionary.Type> types) {
