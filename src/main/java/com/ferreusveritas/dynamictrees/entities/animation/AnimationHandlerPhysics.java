@@ -82,6 +82,8 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 		entity.rotationYaw = MathHelper.wrapDegrees(entity.rotationYaw + getData(entity).rotYaw);
 		
 		int radius = 8;
+		if (entity.getDestroyData().getNumBranches() <= 0)
+			return;
 		IBlockState state = entity.getDestroyData().getBranchBlockState(0);
 		if(TreeHelper.isBranch(state)) {
 			radius = ((BlockBranch)state.getBlock()).getRadius(state);
